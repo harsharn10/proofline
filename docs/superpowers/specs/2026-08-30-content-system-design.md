@@ -214,7 +214,8 @@ Stub-depth research files contain the same 11 headings; sections without researc
 - `deployment.chain`: robinhood-chain · arbitrum-one · ethereum · base · solana · hyperliquid · other
 - `deployment.role`: token · factory · router · vault · proxy · implementation · admin · multisig · timelock · other
 - `feed.kind`: company · ct · onchain · risk
-- `accounts.tier`: top · watch
+- `accounts.tier`: top · watch · downweight · skip (skip = posts not ingested as evidence; extended in Task 5)
+- `accounts.role`: project · alpha · kol · data · infra · media (Task 5)
 - `changelog.type`: score · risk · stage · finding · correction · coverage
 - `changelog.severity`: Info · Review · Material · Risk
 
@@ -251,16 +252,20 @@ same cross-check a project file gets. A slug with no feed file is fine; the feed
 ```yaml
 - handle: "@ponsdotfamily"
   name: Pons                       # optional
-  tier: watch                      # top | watch
+  tier: watch                      # top | watch | downweight | skip
+  role: project                    # optional: project | alpha | kol | data | infra | media
+  slug: pons                       # optional: census slug for an official account
+  followers: 6800                  # optional integer snapshot
   note: "..."                      # optional
 ```
 
 New accounts start at `tier: watch`; the maintainer promotes one to `top` once its calls have proven worth
-following. Only `tier: top` accounts count toward the trending signal.
+following. Only `tier: top` accounts whose `role` is absent or `alpha` / `kol` count toward the trending signal;
+`downweight` and `skip` rows never do. Notes describe observable behaviour only (no conduct words; `validate` lints them).
 
 `site.yaml` gains `trending: { min_accounts: 3, window_days: 7 }`. `scripts/lib/trending.mjs` exports
 `computeTrending(feedBySlug, accounts, { minAccounts, windowDays, today }) → Map<slug, { trending, accounts, latest }>`:
-a slug is trending when at least `min_accounts` distinct `tier: top` account handles have each posted a `kind: ct`
+a slug is trending when at least `min_accounts` distinct counting account handles (`tier: top`, role absent or alpha/kol) have each posted a `kind: ct`
 item about it dated within `[today − windowDays, today]` (the same handle posting more than once still counts
 once). `scripts/score.mjs` computes this (`derive()` itself stays pure and knows nothing about feed/accounts) and
 merges `trending: boolean` into every project's derived object, plus a top-level `trending: [slug, ...]` list in

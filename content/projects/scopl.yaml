@@ -2,7 +2,7 @@ slug: scopl
 name: SCOPL
 symbol: SCOPL
 category: Aggregator
-lifecycle: mainnet
+lifecycle: announced
 coverage: stub
 summary: Non-custodial one-tick limit orders on Uniswap V3 and V4 (the position NFT stays in the user's wallet) with fee revenue split to referrals, buybacks and operations; V2 audited by SpyWolf per the project.
 official_links:
@@ -63,7 +63,14 @@ findings:
       class: claim
       sources:
         - S6
+    - text: The token address above was flagged as suspect in one desk round (round 10) and the flag withdrawn in later rounds (12 and 16, on the account bio and a SpyWolf audit); not reproduced on Blockscout in this review.
+      class: claim
+      sources:
+        - S6
+        - S4
+        - S5
   missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from the bio not reproduced on Blockscout
     - text: Nine V2 contract addresses not published
     - text: Buyback vault and fee router control

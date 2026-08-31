@@ -19,6 +19,17 @@ const PRINT_NEAR_TRIGGER_RE = /\bprints?\b(?:\s+\S+){0,3}\s+(?:mcap|market\s+cap
 const wordRe = (word) => new RegExp(`\\b${word}\\b`, "i");
 const phraseRe = (phrase) => new RegExp(`\\b${phrase.replace(/\s+/g, "\\s+")}\\b`, "i");
 
+// Conduct verdicts about people or accounts. Only applied to `accounts[].note` (a "yield farm" in project
+// prose is fine; "farm" about an account is an accusation). A note describes observable behaviour —
+// "handle collides with the official @X; posts not used as evidence" — never conduct.
+const CONDUCT_WORDS = ["drainer", "drainers", "impersonator", "impersonators", "impersonation", "farm", "farms", "farmed", "scammer", "scammers", "scam", "scams", "insider", "insiders", "fraud", "fraudulent", "malicious", "phishing", "shady", "sketchy"];
+
+/** Whole-word, case-insensitive scan for conduct words; use on account notes only. */
+export function conductWarnings(text, where) {
+  if (!text) return [];
+  return CONDUCT_WORDS.filter((w) => wordRe(w).test(text)).map((w) => `${where}: conduct word "${w}"`);
+}
+
 /**
  * Case-insensitive, whole-word scan of `text` for the banned-phrase list.
  * Returns human-readable warning strings prefixed with `where`; empty text yields no warnings.

@@ -1,8 +1,9 @@
 # CT accounts for the trending signal — built by scripts/build-accounts.mjs from research/inbox/account-desk.yaml
 # (wins) + research/inbox/2026-08-31-accounts.yaml + census/feed handles, per the Task 5 addendum mapping.
-# tier: top | watch | downweight | blacklist — only top + role alpha/kol counts toward trending (scripts/lib/trending.mjs);
-# blacklist rows are kept so impersonations and collisions are not lost. role: project | alpha | kol | data | infra | media.
-# Counts: watch 110, downweight 31, top 4, blacklist 11 (total 156). Hand edits welcome; rerun the script only to rebuild from the desk.
+# tier: top | watch | downweight | skip — only top + role alpha/kol counts toward trending (scripts/lib/trending.mjs);
+# skip = posts not ingested as evidence (handle collisions, unconfirmed official accounts, third-party links); the row
+# is kept so the collision is not lost. Notes describe observable behaviour only. role: project | alpha | kol | data | infra | media.
+# Counts: watch 110, downweight 31, top 4, skip 11 (total 156). Hand edits welcome; rerun the script only to rebuild from the desk.
 - handle: "@_safehood"
   tier: watch
   role: project
@@ -11,7 +12,7 @@
 - handle: "@0xCB27"
   tier: downweight
   role: kol
-  note: Recurring RWA holdings list on X; treat as claims.
+  note: Posts a recurring list of RWA-token holdings; treated as claims.
 - handle: "@0xkekov"
   tier: watch
   role: kol
@@ -31,7 +32,7 @@
 - handle: "@AdamEShelton"
   tier: downweight
   role: kol
-  note: High reach, memecoin contract posts; heat only, never trending.
+  note: High-reach account that posts memecoin contract addresses; not counted toward trending.
 - handle: "@agendotspace"
   tier: watch
   role: project
@@ -43,24 +44,24 @@
 - handle: "@alphai_onchain"
   tier: downweight
   role: data
-  note: Flagged Delta late. Promo tone.
+  note: Posted about Delta after the official posts; promotional register; not counted toward trending.
 - handle: "@andrewtalksdefi"
   tier: top
   role: alpha
   note: Named Delta/Wire/Hedge/Website/Mesh.
 - handle: "@annisapt_"
-  tier: blacklist
+  tier: skip
   role: kol
-  note: Posted a SCOPL 'holder portal' at cryptolot.lol on 30 Aug; the desk flagged it as not official and a phishing risk.
+  note: Posted a link to a third-party 'holder portal' domain (cryptolot.lol) alongside the SCOPL token address on 30 Aug; the domain is not the project's; posts not used as evidence.
 - handle: "@arcus_xyz"
   tier: watch
   role: infra
   note: Day-one partner (dYdX team).
 - handle: "@ArrowFinanceHQ"
-  tier: blacklist
+  tier: skip
   role: project
   followers: 555
-  note: 555 followers, CDP copy.
+  note: Second account using the Arrow Finance name (555 followers at snapshot); not treated as official until the team confirms; posts not used as evidence.
 - handle: "@ArrowFinanceio"
   tier: watch
   role: project
@@ -68,9 +69,9 @@
   followers: 8500
   note: Official CDP. 09:30 ET params are citable.
 - handle: "@arrowfinances"
-  tier: blacklist
+  tier: skip
   role: project
-  note: Same collision class.
+  note: Third account using the Arrow Finance name; not treated as official; posts not used as evidence.
 - handle: "@arrowsonhood"
   tier: watch
   role: project
@@ -106,9 +107,9 @@
   tier: downweight
   role: kol
 - handle: "@Canopy_Finance"
-  tier: blacklist
+  tier: skip
   role: project
-  note: HoodInsider typo. Official is @canopyfinance.
+  note: Handle appeared as a typo in a HoodInsider recap; the project's account is @canopyfinance; posts not used as evidence.
 - handle: "@canopyfinance"
   tier: watch
   role: project
@@ -133,7 +134,7 @@
 - handle: "@DaoKingdom"
   tier: downweight
   role: kol
-  note: Quoted MaxFi promo. Typical paid-adjacent CT.
+  note: Quoted a MaxFi promotional video; the desk mutes it for trending.
 - handle: "@DeGenWealth2"
   tier: downweight
   role: kol
@@ -179,12 +180,14 @@
   role: project
   note: Stock-token pairs on RH.
 - handle: "@fomokidpump_gew"
-  tier: blacklist
+  tier: skip
   role: kol
-  note: Same cryptolot.lol SCOPL portal copy as other flagged accounts.
+  note: Posted a link to a third-party 'holder portal' domain (cryptolot.lol) alongside the SCOPL token address on 30 Aug; the domain is not the project's; posts not used as evidence.
 - handle: "@fox_onrh"
   tier: watch
   role: project
+  slug: foxpad
+  note: Account of the FOX culture token; the FoxPad launchpad's own handle is unconfirmed.
 - handle: "@FundedProtocol"
   tier: watch
   role: project
@@ -248,7 +251,7 @@
 - handle: "@hookosfun"
   tier: watch
   role: project
-  note: Multi-chain hook pad. Llama 0 RH vol.
+  note: Multi-chain hook launchpad ($HOOK); zero Robinhood Chain volume on DefiLlama; kept on file so it is not merged with Hookr.
 - handle: "@Hookrfun"
   tier: watch
   role: project
@@ -280,7 +283,7 @@
 - handle: "@layerggofficial"
   tier: watch
   role: data
-  note: ATH recaps with CAs. Mixed BSC/RH ($CETS).
+  note: Posts all-time-high recaps with contract addresses across chains, including BSC tickers next to Robinhood Chain ones; use its addresses, not its tickers.
 - handle: "@lemondotfun"
   tier: watch
   role: project
@@ -328,7 +331,7 @@
 - handle: "@MetalHead_rh"
   tier: downweight
   role: kol
-  note: May overlap a token. Not official.
+  note: Handle shares the METALHEAD token's name; not confirmed as the project's account.
 - handle: "@MidasRWA"
   tier: watch
   role: infra
@@ -356,9 +359,9 @@
   role: project
   note: Onchain ETF baskets on RH.
 - handle: "@My_Stomachfat"
-  tier: blacklist
+  tier: skip
   role: kol
-  note: Same cryptolot.lol SCOPL portal copy as other flagged accounts.
+  note: Posted a link to a third-party 'holder portal' domain (cryptolot.lol) alongside the SCOPL token address on 30 Aug; the domain is not the project's; posts not used as evidence.
 - handle: "@NetNetCap"
   tier: watch
   role: project
@@ -383,7 +386,7 @@
   tier: watch
   role: project
   slug: noxa
-  note: Pad. Llama fees exist.
+  note: Official NOXA Fun account; DefiLlama lists the pad's fees.
 - handle: "@ObscuraCEX"
   tier: watch
   role: project
@@ -416,9 +419,9 @@
   role: project
   note: $PONGO Pons graduation with a dog-meme narrative; no mechanism.
 - handle: "@Ponsbotfamily"
-  tier: blacklist
+  tier: skip
   role: project
-  note: Homonym. Official is @ponsdotfamily.
+  note: Handle resembles the official @ponsdotfamily; not treated as official; posts not used as evidence.
 - handle: "@PonscadeRH"
   tier: downweight
   role: project
@@ -445,9 +448,9 @@
   role: infra
   note: PENGU ticker trading on RH.
 - handle: "@QUOTRONGenesis"
-  tier: blacklist
+  tier: skip
   role: kol
-  note: Typo-filled mint account.
+  note: Mint account not treated as official by the desk; the project's account is @Quotrons404; posts not used as evidence.
 - handle: "@Quotrons404"
   tier: watch
   role: project
@@ -472,9 +475,9 @@
   slug: agent-name-service
   note: .agent namespace. Claimed 0.002 ETH/year names on RH.
 - handle: "@RHDaily_"
-  tier: blacklist
+  tier: skip
   role: media
-  note: Seeded typo. Live RH news is @RHDaily__.
+  note: Seeded as a typo of @RHDaily__; the handle resolves to an unrelated account; posts not used as evidence.
 - handle: "@RHDaily__"
   tier: watch
   role: media
@@ -501,18 +504,18 @@
   role: infra
   note: Issuer. Chain stats are claims to reproduce.
 - handle: "@RobinPAD_MEME"
-  tier: blacklist
+  tier: skip
   role: project
   followers: 8000
-  note: Same display name, different pad.
+  note: Display name collides with @Robin_Pad (a different launchpad); posts not used as evidence for either.
 - handle: "@RVHProtocol"
   tier: watch
   role: project
-  note: Ravenhood DAO treasury.
+  note: Ravenhood DAO treasury account; posts about farming on UPDex and SwapHood; observe.
 - handle: "@SafehoodCTO_"
   tier: downweight
   role: project
-  note: CTO of the token, not the protocol.
+  note: Community-takeover account for the $SAFEHOOD token, not the Safehood protocol.
 - handle: "@safehoodonrh"
   tier: downweight
   role: project
@@ -540,7 +543,7 @@
 - handle: "@sleuth_ai"
   tier: watch
   role: project
-  note: AI sleuth on Base/RH/Sol.
+  note: AI tool account active on Base, Robinhood Chain and Solana; its community token address is on Base; not the StonkBrokers Sleuth TGE.
 - handle: "@SnuggleFi"
   tier: watch
   role: project
@@ -577,7 +580,7 @@
 - handle: "@theunipcs"
   tier: downweight
   role: kol
-  note: '"szn" reach. No mechanism.'
+  note: High-reach posts about the chain that name no mechanism or contract; not counted toward trending.
 - handle: "@thinkingcatRH"
   tier: downweight
   role: project
@@ -634,9 +637,9 @@
   slug: virtuals
   note: Agent layer. Individual agents are graduations.
 - handle: "@VoidlexETH_ias"
-  tier: blacklist
+  tier: skip
   role: kol
-  note: Same cryptolot.lol SCOPL portal copy as other flagged accounts.
+  note: Posted a link to a third-party 'holder portal' domain (cryptolot.lol) alongside the SCOPL token address on 30 Aug; the domain is not the project's; posts not used as evidence.
 - handle: "@whalewatchRH"
   tier: watch
   role: data
@@ -658,7 +661,7 @@
 - handle: "@yousef_sol"
   tier: downweight
   role: kol
-  note: Delta skeptic (weeks old vs Meteora).
+  note: Posted one comparison of Delta's age and fee take against Meteora; not a recurring source.
 - handle: "@YowlonHood"
   tier: watch
   role: project
@@ -666,4 +669,4 @@
 - handle: "@zackfromsubway"
   tier: downweight
   role: kol
-  note: Seeded trench.
+  note: Seeded from the Chain File dossiers; no mechanism call recorded.

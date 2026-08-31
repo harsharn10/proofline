@@ -3,7 +3,7 @@ import { validateAgainst } from "./schemas.mjs";
 import { crossCheck, releaseCheck, referencedSourceIds } from "./checks.mjs";
 import { checkResearch, tagIds } from "./research-md.mjs";
 import { derive } from "./score.mjs";
-import { voiceWarnings } from "./voice.mjs";
+import { voiceWarnings, conductWarnings } from "./voice.mjs";
 
 /**
  * Runs every check in spec §7 over a content tree.
@@ -49,12 +49,13 @@ export async function validateContent(root = "content", { release = false } = {}
     for (const id of ledgerIds) if (!referenced.has(id)) warnings.push(`sources/${slug}: ${id} is never cited by projects/${slug}.yaml, research/${slug}.md or feed/${slug}.yaml`);
   }
 
-  // Trending hygiene (Task 5 addendum ruling 4): a feed item attributed to a blacklisted account is a
-  // warning — the item stays (it is a dated record of what was said) but it can never count.
-  const blacklisted = new Set((content.accounts ?? []).filter((a) => a.tier === "blacklist").map((a) => a.handle));
+  // Trending hygiene (Task 5 addendum ruling 4): a feed item attributed to a `skip` account (posts not
+  // ingested as evidence) is a warning — the item stays as a dated record of what was said, but it can
+  // never count and should not be leaned on.
+  const skipped = new Set((content.accounts ?? []).filter((a) => a.tier === "skip").map((a) => a.handle));
   for (const [slug, f] of content.feed ?? new Map())
     for (const item of f.items ?? [])
-      if (item.account && blacklisted.has(item.account)) warnings.push(`feed/${slug}.yaml: ${item.id} cites blacklisted account ${item.account}`);
+      if (item.account && skipped.has(item.account)) warnings.push(`feed/${slug}.yaml: ${item.id} cites skip-tier account ${item.account}`);
 
   // Voice lint: banned-phrase warnings over summary, findings text, feed bodies/titles and research
   // markdown. --release turns them into errors.
@@ -70,6 +71,11 @@ export async function validateContent(root = "content", { release = false } = {}
       voice(item.body, `feed/${slug}.yaml: ${item.id} body`);
     }
   for (const [slug, text] of content.research) voice(text, `research/${slug}.md`);
+  // Account notes: hype words and conduct verdicts about named accounts are both out (fix round 1 ruling E).
+  for (const a of content.accounts ?? []) {
+    voice(a.note, `accounts.yaml: ${a.handle} note`);
+    conductWarnings(a.note, `accounts.yaml: ${a.handle} note`).forEach((w) => (release ? errors : warnings).push(w));
+  }
 
   if (release) {
     const derivedBySlug = new Map([...content.projects].map(([slug, p]) => [slug, derive(p)]));

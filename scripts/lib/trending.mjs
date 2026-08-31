@@ -4,7 +4,7 @@
  *
  * An account counts only when `tier === "top"` AND its `role` is absent or one of `alpha` / `kol`
  * (Task 5 addendum ruling 4): official project accounts, data feeds, infra and media never vote on
- * trending even when they sit at `top`, and `blacklist` rows are never counted at all.
+ * trending even when they sit at `top`. `watch`, `downweight` and `skip` rows never count.
  *
  * @param {Map<string, Array>} feedBySlug - slug -> feed items array
  * @param {Array<{handle: string, tier: string, role?: string}>} accounts
@@ -16,7 +16,6 @@ export const TRENDING_ROLES = new Set(["alpha", "kol"]);
 /** True when this account row is allowed to count toward the trending signal. */
 export function countsForTrending(account) {
   if (!account || account.tier !== "top") return false;
-  if (account.tier === "blacklist") return false;
   return account.role === undefined || account.role === null || TRENDING_ROLES.has(account.role);
 }
 

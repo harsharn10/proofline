@@ -10,6 +10,10 @@ export const LINK_KIND_TO_SOURCE_KIND = { site: "official-site", app: "official-
 
 const AUDIT = "An independent audit was not found in this review";
 const LIFECYCLE_UNKNOWN = "Lifecycle not verified — no deployment evidence reviewed";
+const MAINNET_CLAIM = "Mainnet status rests on the project's own posts; not independently verified";
+// Fix round 1 ruling C: `mainnet` needs evidence beyond the project's own posts (explorer, DefiLlama chain-slice row,
+// docs that publish addresses). These rows are `announced` in the census until that evidence is reviewed.
+const MAINNET_ON_OWN_POSTS = new Set(["artificial-inu", "longshot", "long", "bankr", "denar", "longbow", "netnet", "tickeryard", "earn-protocol", "hookr", "quotrons", "pools-trade", "wire", "maxfi", "mesh", "foxpad", "scopl", "website", "lemon", "robindex", "vynex", "sinjoh", "hoodlock", "arrows", "stonks-fun"]);
 
 const FACTS = {
   // ---------------------------------------------------------------- PRD seed set
@@ -167,5 +171,6 @@ const FACTS = {
 /** SEED[slug] = { symbol, dependencies, summary, deployments, missing } — deployments derived from HARVEST. */
 export const SEED = Object.fromEntries(Object.entries(FACTS).map(([slug, f]) => [slug, {
   ...f,
+  missing: MAINNET_ON_OWN_POSTS.has(slug) ? [MAINNET_CLAIM, ...f.missing] : f.missing,
   deployments: (HARVEST[slug]?.deployments ?? []).map(({ label, address, role, chain }) => ({ label, chain: chain ?? "robinhood-chain", address, role })),
 }]));

@@ -2,7 +2,7 @@ slug: long
 name: LONG
 symbol: null
 category: Launchpad
-lifecycle: mainnet
+lifecycle: announced
 coverage: stub
 summary: Stock-paired launchpad (Factory + Airlock) that made stock-paired tokens possible on Robinhood Chain; $AI launched here.
 official_links:
@@ -19,13 +19,15 @@ deployments:
     address: not-verified
     role: factory
     verified: false
-    sources: []
+    sources:
+      - S6
   - label: Factory (PRD lists 0x22e9…eeED, truncated)
     chain: robinhood-chain
     address: not-verified
     role: factory
     verified: false
-    sources: []
+    sources:
+      - S6
   - label: TickerAirlockFactory (named on Dune per the workbook)
     chain: robinhood-chain
     address: not-verified
@@ -60,6 +62,7 @@ findings:
         - S3
   risk: []
   missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Full factory addresses (PRD Appendix A is truncated; the workbook points at a Dune dashboard)
     - text: Airlock controls and who can release
     - text: Launch fee flows

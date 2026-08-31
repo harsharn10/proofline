@@ -34,7 +34,7 @@ Slug and name decisions:
 
 | Map | Census | Why |
 |---|---|---|
-| `fox` "FOX" | `foxpad` "FoxPad" | The map's own note says "split before filing"; the brief lists FoxPad as in and FOX-the-mascot as out (PRD §2.2 pure culture meme). The row is the pad; the FOX token address is recorded as the asset the pad's fee split buys. |
+| `fox` "FOX" | `foxpad` "FoxPad" | The map's own note says "split before filing"; the brief lists FoxPad as in and FOX-the-mascot as out (PRD §2.2 pure culture meme). The row is the pad; the FOX token address is recorded as the asset the pad's fee split buys. Fix round 1: the FOX board-placement feed item was dropped (it was about the token) and the row's T2/T4 are `value: false` (ruling D). |
 | `index` "The Index" | `index` "The Index" | Brief: keep slug, rename. |
 | `stonkbroker` "StonkBrokers" | name → "StonkBrokers" | The project's own name (workbook, X). Slug kept. |
 | `website` "notawebsite" | kept as-is | Map fidelity; `/n/website` is odd but harmless. |
@@ -63,6 +63,24 @@ Lifecycle changes (each has a `type: stage` changelog entry dated 2026-08-31):
 
 Ruling 2 (`unknown` → `announced` + "Lifecycle not verified — no deployment evidence reviewed"): safehood, l4va,
 agent-name-service.
+
+**Fix round 1, ruling C — lifecycle follows evidence.** `mainnet` requires evidence beyond the project's own posts
+(explorer / Blockscout, a DefiLlama chain-slice row, or docs that publish addresses). Every subject the EVAL
+(`research/inbox/EVAL-research-branch-2026-08-31.md` §5) marks ◐ or ✗ on test 1 and that stood at `mainnet` moved to
+`announced`, with the `findings.missing` line "Mainnet status rests on the project's own posts; not independently
+verified" and a `type: stage` changelog entry — **25 slugs**: artificial-inu, longshot, long, bankr, denar, longbow,
+netnet, tickeryard, earn-protocol, hookr, quotrons, pools-trade, wire, maxfi, mesh, foxpad, scopl, website, lemon,
+robindex, vynex, sinjoh, hoodlock, arrows, stonks-fun. Kept `mainnet` on independent evidence (test 1 ✓): pons,
+stonkbroker, index, meridian, vimen, up, fables, noxa, virtuals, delta, snuggle, sherwood, what-the-hook, swaphood
+(14). mancer and statics-protocol stay `beta` (the map says beta). Census lifecycle after the round: mainnet 14 ·
+beta 2 · announced 32 · testnet-only 1. Four of the changed rows are PRD seed names (artificial-inu, longshot, long,
+bankr) whose seed-table `mainnet` rested on PRD Appendix A addresses that have not been reproduced on the explorer.
+
+**Fix round 1, ruling D — honest qualifying flags.** Seven rows keep their census row but carry `value: false` on the
+test(s) the EVAL fails outright, with the eval's reason in `note` (visible `validate` warning; `validate:release`
+error — intended): robinhood-index-vaults (T1), virtuals (T2), l4va (T1, T4), squeeze (T1, T4), agent-name-service
+(T1), foxpad (T2, T4 — the pad's only evidence is one dossier line naming foxpad.app; no handle or address was found,
+so the judge call went the eval's way), robindex (T4). Ten qualifying warnings in total.
 
 ## 3. Excluded dossiers (22 of 42) and the rule
 
@@ -236,25 +254,29 @@ Addresses kept **out of `deployments`** (in `findings.risk` or the text only):
 - 0x76af8d3B… — third-party LOCK address, truncated in the intake → hoodlock risk
 - Every observe / graduation address (Ponscade, Canopy, Mosaic, YOWL, PONGO, TAYSOM, SBC, CQ, FOMO, OddyseyAI, Odyssey/NOXA, InstantRobinFactory) stays in this file's lists
 
-**SCOPL token 0xaA40e79E987517f7462bF79315B8A118799B04E3 — filed as a deployment.** The addendum names SCOPL as a
-desk-flagged address (ops.md §1 "treated SCOPL CAs as real once"). Desk rounds 12 and 16 then reversed that: the
-address sits in the official account's bio and in a SpyWolf audit for chain 4663 ("Correction: that CA is official …
-Stop calling the CA fake"). The desk's final position governs, so the token is a `verified: false` deployment
-and the cryptolot.lol "holder portal" posts are a `findings.risk` line and a `kind: risk` feed item. Flagged for the
-owner in the report; trivial to move to risk-only if the ruling is meant literally.
+**SCOPL token 0xaA40e79E987517f7462bF79315B8A118799B04E3 — filed as a deployment (ruling F, fix round 1).** The
+addendum names SCOPL as a desk-flagged address (ops.md §1 "treated SCOPL CAs as real once"). Desk rounds 12 and 16
+then reversed that: the address sits in the official account's bio and in a SpyWolf audit for chain 4663. The
+reviewer confirmed the withdrawal; the token stays a `verified: false` deployment with a `findings.risk` line stating
+that the address was flagged as suspect in one desk round and the flag withdrawn in later rounds, not reproduced on
+Blockscout in this review. The cryptolot.lol "holder portal" posts remain a separate risk line and a `kind: risk`
+feed item.
 
 ArrowPad factory 0x1Badc838… is a deployment on `arrow` labelled as the launchpad, not the CDP (map `pad_not_cdp`).
 Vynex's token address is a deployment labelled as a third-party citation (the project never posted it).
 
 ## 7. Feed
 
-46 feed files, 106 items (19 `ct`). Every item is dated, attributed (`account` = the handle) and cites the ledger entry
-for the fill / dossier it came from; `sourceUrl` is the account's X profile (no status ids in the intake) or the
-artifact URL. DefiLlama figures became one `onchain` item per subject dated 2026-08-31 with
-`sourceUrl: https://defillama.com/protocol/pons` for Pons (the only protocol page the map names) and the chain page
-for the rest — protocol slugs were not guessed. Where a fill gave no post date, the item is dated to the fill round
-and the body says the desk captured it that day (arrows, netnet, tickeryard, website, sinjoh). Undated / unattributed
-dossier items were dropped (Longbow "first CEX access", long.xyz "AI/NVDA defines the meta").
+45 feed files, 105 items (18 `ct`) after fix round 1 (the FOX board-placement item on `foxpad` was dropped). Every
+item is dated, attributed (`account` = the handle) and cites the ledger entry for the fill / dossier it came from;
+`sourceUrl` is the account's X profile (no status ids in the intake) or the artifact URL. DefiLlama figures became one
+`onchain` item per subject dated 2026-08-31 with `sourceUrl: https://defillama.com/protocol/pons` for Pons (the only
+protocol page the map names) and the chain page for the rest — protocol slugs were not guessed. Five items come from
+posts the desk captured without their date (arrows-1, netnet-3, tickeryard-1, website-2, sinjoh-2): they are dated
+2026-08-31 and each body ends "(captured by the desk on 2026-08-31; original post date not recorded)" — the convention
+is now in README's feed section. `pools-trade-2` (Project VEX on pools.trade) is dated 2026-08-30 with the RH Daily
+thread it came from. `hoodlock-1` keeps 2026-08-29: fill 6 dates the Mintera 25% post to 29 Aug. Undated /
+unattributed dossier items were dropped (Longbow "first CEX access", long.xyz "AI/NVDA defines the meta").
 
 Trending after this pass: **0** — the four counting accounts (`top` + `alpha`) have no `kind: ct` items in the window.
 `@andrewtalksdefi`'s 24 Aug utility list gives delta / wire / mesh / website one `ct` item each.
@@ -266,14 +288,21 @@ Trending after this pass: **0** — the four counting accounts (`top` + `alpha`)
 | top | 4 | desk `listen: high` and role alpha/kol — @0xSammy, @Adam_Tehc, @ahboyash, @andrewtalksdefi |
 | watch | 110 | every other `follow: true` row, plus census handles and feed handles the desk had not scored |
 | downweight | 31 | `listen: mute-trend`; `follow: false` + `listen: low`; engagement farm/bot; engagement mixed with trust ≤ 1 |
-| blacklist | 11 | `listen: skip-ingest` or flags impersonator / drainer — @RHDaily_, @ArrowFinanceHQ, @arrowfinances, @Ponsbotfamily, @QUOTRONGenesis, @Canopy_Finance, @RobinPAD_MEME, @annisapt_, @My_Stomachfat, @fomokidpump_gew, @VoidlexETH_ias |
+| skip | 11 | `listen: skip-ingest` or the desk's conduct flags (read here as handle-collision / third-party-link) — @RHDaily_, @ArrowFinanceHQ, @arrowfinances, @Ponsbotfamily, @QUOTRONGenesis, @Canopy_Finance, @RobinPAD_MEME, @annisapt_, @My_Stomachfat, @fomokidpump_gew, @VoidlexETH_ias |
+
+Fix round 1, ruling E: the tier is `skip` ("posts not ingested as evidence"), not `blacklist`, everywhere — schema,
+trending, validate, tests, README, spec. Every `skip` / `downweight` note describes observable behaviour (what the
+account posts, whether it is treated as official, whether a handle collides) and never conduct; `build-accounts.mjs`
+fails on hype or conduct words and `validate` now lints `accounts[].note` the same way. 33 notes are rewritten in
+`OVERRIDES` (up from 12), including the four the review named (@DaoKingdom, @ArrowFinanceHQ, @alphai_onchain,
+@QUOTRONGenesis).
 
 Roles: project 99, kol 23, infra 17, alpha 7, data 5, media 5. The desk's `builder` maps to `project` (team accounts;
-cannot trend under the new rule either way) and `farm` to `kol` (all four are blacklisted) — the schema enum is the
-addendum's six values. `slug` is set for 47 rows (census handles). `followers` for the 10 handles the snapshot notes
-quote. `note` = the desk's `why`, first sentence, with 12 lines rewritten for voice (bag/verdict wording).
-Where the desk and the earlier accounts intake disagree the desk wins (e.g. the trench KOLs went watch → downweight;
-`@RHDaily_` went watch → blacklist as the typo of `@RHDaily__`).
+cannot trend under the new rule either way) and `farm` to `kol` (all four are skip-tier) — the schema enum is the
+addendum's six values. `slug` is set for 48 rows (census handles; `@fox_onrh` → `foxpad` after the census lookup was
+made to win over the intake's stale `fox`). `followers` for the 10 handles the snapshot notes quote. Where the desk
+and the earlier accounts intake disagree the desk wins (e.g. the trench KOLs went watch → downweight; `@RHDaily_` went
+watch → skip as the typo of `@RHDaily__`).
 
 ## 9. Dependency cards
 
@@ -298,6 +327,11 @@ kinds; the new cards render with an empty kind label until that map gains the se
   opened" changelog entries are dated 2026-08-31.
 - `validate` now counts feed `sources` as citations for the never-cited warning (a feed item was already required to
   cite an existing id; it just did not count as use).
+- Fix round 1: three analyst inferences that had been filed as `claim` are now `class: inference` (wire router-approval
+  patch, The Index's volume-dependent payouts) or trimmed to the attributed fact (l4va press release); Blockscout's
+  contract-source flag is written out as "contract source code verified on Blockscout (per the desk)" so it cannot be
+  read as Proofline verification; the three PRD Appendix A addresses ($AI, Longshot token, LONG factories) cite a PRD
+  ledger entry.
 - The desk's map lists What The Hook both as a subject and under observe.native_amms (with the Llama TVL); the subject
   row uses the figure.
 - Fables: the workbook (30 Aug) said not launched with a PROLOGUE TGE on 5 Oct; the desk map and DefiLlama (31 Aug)
@@ -307,8 +341,11 @@ kinds; the new cards render with an empty kind label until that map gains the se
 
 ## 11. Open questions for the owner
 
-1. SCOPL token address as a deployment (§6) — keep, or move to risk-only per the addendum's literal wording?
-2. Meridian lifecycle from a DefiLlama listing alone — acceptable, or hold at announced until an official post is read?
-3. The seven new `dependency.kind` values need a one-line label addition in `site/src/data/types.ts`.
-4. `website` as a slug (map fidelity) vs `notawebsite`.
-5. Feed items dated to the fill round when the post date was not captured (five subjects) — acceptable convention?
+Settled in fix round 1: SCOPL stays a deployment with a risk line (ruling F); Meridian stays `mainnet` on the DefiLlama
+row (EVAL test 1 ✓); the capture-date convention is documented (ruling A); `blacklist` → `skip` (ruling E).
+
+1. The seven new `dependency.kind` values need a one-line label addition in `site/src/data/types.ts`; the site's
+   `AccountTier` type (`"top" | "watch"`) also predates `downweight` / `skip` (it only filters for `top`, so no crash).
+2. `website` as a slug (map fidelity) vs `notawebsite`.
+3. Four PRD seed names (artificial-inu, longshot, long, bankr) are now `announced` under ruling C; the PRD seed table
+   says `mainnet` — reproduce the Appendix A addresses on Blockscout to restore it.

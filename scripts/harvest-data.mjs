@@ -18,6 +18,7 @@ export const ARTIFACTS = {
   desk: { url: `${GH}/research/inbox/account-desk.yaml`, publisher: "Grok research desk — account ledger (intake, 2026-08-31)", kind: "third-party-data" },
   dossier: { url: `${GH}/research/inbox/grok-2026-08-30/chain-file.json`, publisher: "Grok Chain File dossiers (intake, 2026-08-30)", kind: "third-party-data" },
   workbook: { url: `${GH}/research/inbox/grok-2026-08-30/build_rh_tokens.py`, publisher: "Grok workbook sheet 02–06 (intake, 2026-08-30)", kind: "third-party-data" },
+  prd: { url: `${GH}/PRD.md`, publisher: "Proofline PRD v1 — Appendix A official starting links (2026-08-30)", kind: "docs" },
   llama: { url: "https://defillama.com/chain/robinhood-chain", publisher: "DefiLlama", kind: "third-party-data" },
   llamaPons: { url: "https://defillama.com/protocol/pons", publisher: "DefiLlama", kind: "third-party-data" },
   fill1: fill(1, "2026-08-31-x-fill.md"), fill2: fill(2, "2026-08-31-x-fill-2.md"), fill3: fill(3, "2026-08-31-x-fill-3.md"),
@@ -53,7 +54,7 @@ export const HARVEST = {
       { label: "V2 curve / graduation router", address: "not-verified", role: "router", sources: [] },
     ],
     positive: [
-      { text: "The desk's auditor reported the PONS token contract present on Blockscout 4663 with 56,062 holders and a source-verified contract.", sources: ["fill17"] },
+      { text: "The desk's auditor reported the PONS token contract present on Blockscout 4663 with 56,062 holders and its contract source code verified on Blockscout (the explorer's flag, per the desk — not Proofline verification).", sources: ["fill17"] },
       { text: "The official account posted $4B in lifetime volume (31 Aug), $20.93M paid to token creators in 47 days (30 Aug) and 29% of PONS supply burned (29 Aug).", sources: ["fill7"] },
       { text: "DefiLlama listed Pons V2 with roughly $86.5M 24h volume and $4.7M 24h fees on 2026-08-31.", sources: ["llamaPons", "map"] },
     ],
@@ -108,13 +109,14 @@ export const HARVEST = {
 
   "artificial-inu": {
     sources: {
+      prd: "PRD Appendix A: official site and the $AI contract address; pair vs NVDA on Uniswap",
       map: "Desk handle for Artificial Inu and its vault-plus-pool NVDA claim (about $1.7M, roughly 20% of tokenized NVDA on the chain)",
       fill4: "Official 30–31 Aug posts: pool and community vault NVDA holdings, snapshot figures, $3M of AI burned or locked, AI-pair lock/burn mechanism",
       workbook: "Sheet 05 row: AI/NVDA pair on long.xyz launched 14 Jul 2026; roughly $86M RWA-side volume in the Dune table",
       dossier: "Chain File dossier: 25 Aug RH Daily board mention",
     },
     deployments: [
-      { label: "$AI token (PRD Appendix A)", address: "0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18", role: "token", sources: [] },
+      { label: "$AI token (PRD Appendix A)", address: "0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18", role: "token", sources: ["prd"] },
       { label: "Community vault", address: "not-verified", role: "vault", sources: [] },
     ],
     positive: [
@@ -136,10 +138,11 @@ export const HARVEST = {
 
   longshot: {
     sources: {
+      prd: "PRD Appendix A: official site, X account and the Robinhood Chain token address for Longshot",
       map: "Desk handle and tree placement for Longshot (stock-paired factory with an imported perps leg)",
       workbook: "Sheet 02 row for LONGSHOT: multi-chain launch protocol (RH, Base, Solana, BNB, HyperEVM); fees fund a fixed Hyperliquid perp, holder rewards and the protocol; creator picks underlying, direction and leverage at launch",
     },
-    deployments: [{ label: "RH Chain token (PRD Appendix A)", address: "0x8701E2C87ade58325601f4F9bf37ADF46Cb75745", role: "token", sources: ["workbook"] }],
+    deployments: [{ label: "RH Chain token (PRD Appendix A)", address: "0x8701E2C87ade58325601f4F9bf37ADF46Cb75745", role: "token", sources: ["prd", "workbook"] }],
     positive: [
       { text: "The workbook describes a launch where the creator fixes the Hyperliquid underlying, direction and leverage at launch, with those parameters immutable afterward; the desk places it as a stock-paired factory with an imported perps leg.", sources: ["workbook", "map"] },
     ],
@@ -152,13 +155,14 @@ export const HARVEST = {
 
   long: {
     sources: {
+      prd: "PRD Appendix A: app URL, X account and two truncated factory addresses (0x9c88…0845, 0x22e9…eeED) for LONG",
       map: "Desk handle and placement for LONG (stock-paired factory)",
       workbook: "Sheet 02 and sheet 04 rows for LONG / long.xyz: Dune figures (about 10.6k launched, 5.6k traded, 4,061 RWA-paired, about 70% RWA-pair volume share), TickerAirlockFactory named on Dune, live since 14 Jul 2026",
       fill1: "Desk's machine card: LONG is a stock-paired factory, not a curve pad and not a hook marketplace",
     },
     deployments: [
-      { label: "Factory (PRD lists 0x9c88…0845, truncated)", address: "not-verified", role: "factory", sources: [] },
-      { label: "Factory (PRD lists 0x22e9…eeED, truncated)", address: "not-verified", role: "factory", sources: [] },
+      { label: "Factory (PRD lists 0x9c88…0845, truncated)", address: "not-verified", role: "factory", sources: ["prd"] },
+      { label: "Factory (PRD lists 0x22e9…eeED, truncated)", address: "not-verified", role: "factory", sources: ["prd"] },
       { label: "TickerAirlockFactory (named on Dune per the workbook)", address: "not-verified", role: "factory", sources: ["workbook"] },
     ],
     positive: [
@@ -226,7 +230,7 @@ export const HARVEST = {
       { text: "DefiLlama listed The Index with $24,321 24h and $151,043 7d revenue on 2026-08-31 per the desk map.", sources: ["map"] },
     ],
     risk: [
-      { text: "Distribution size is volume-reflexive by design; the dossier flags that the hook whitelist and fee routing need a contract read.", sources: ["dossier"] },
+      { text: "A distribution funded by a trade tax scales with trading volume, so payouts shrink when volume does; the dossier flags that the hook whitelist and fee routing need a contract read.", class: "inference", sources: ["dossier"] },
     ],
     unresolved: ["The project's claim of about $1M in Stock Tokens distributed (workbook: over $1M) has not been reproduced on chain."],
     feed: [
@@ -248,7 +252,7 @@ export const HARVEST = {
       workbook: "Sheet 02 row for $ARROW / Arrow Finance: CDP minting aUSD against Stock Tokens, ETFs, WETH and USDG; token and aUSD addresses; name collisions with a Solana-origin launcher and the $ARROWS options protocol",
       fill6: "Official pre-open parameters: 16 collateral markets, 75–90% initial max LTV, about $1.6M aggregate aUSD cap, equity collateral only during US cash hours, aUSD LP moved to an up v3 pool",
       fill13: "29 Aug post: stability pool rewritten into risk-tiered pools after the Sherlock review; 'everything is deployed', caps raised after the green light",
-      fill17: "Desk auditor's Blockscout 4663 check: ARROW / ArrowToken 6,886 holders (source verified) and aUSD / Arrow USD 21 holders (source unverified), same creator",
+      fill17: "Desk auditor's Blockscout 4663 check: ARROW / ArrowToken 6,886 holders (contract source code verified on the explorer) and aUSD / Arrow USD 21 holders (source code not verified on the explorer), same creator",
       desk: "Desk account ledger: @ArrowFinanceHQ and @arrowfinances flagged as unconfirmed accounts; only @ArrowFinanceio treated as official",
     },
     deployments: [
@@ -261,10 +265,10 @@ export const HARVEST = {
     positive: [
       { text: "The official account posted pre-open parameters: 16 collateral markets (stables, WETH, tokenized equities and indices), 75–90% initial maximum LTV, about $1.6M aggregate aUSD borrow cap, and equity or index collateral usable only during US cash hours (09:30–16:00 ET) with WETH and stables 24/7.", sources: ["fill6"] },
       { text: "The official account posted on 2026-08-29 that the stability pool had been rewritten into risk-tiered pools so an equity shortfall cannot reach stablecoin or wstETH providers, following a Sherlock review.", sources: ["fill13"] },
-      { text: "The desk's auditor reported both the ARROW token (source verified, 6,886 holders) and aUSD (source unverified, 21 holders) present on Blockscout 4663 with the same creator.", sources: ["fill17"] },
+      { text: "The desk's auditor reported both the ARROW token (6,886 holders, contract source code verified on Blockscout) and aUSD (21 holders, source code not verified on Blockscout) present on chain 4663 with the same creator — the explorer's source-code flag, per the desk, not Proofline verification.", sources: ["fill17"] },
     ],
     risk: [
-      { text: "The aUSD contract was reported on Blockscout without verified source; the CDP's own contracts were not located in this review.", sources: ["fill17"] },
+      { text: "The aUSD contract was reported on Blockscout without its source code verified on the explorer; the CDP's own contracts were not located in this review.", sources: ["fill17"] },
       { text: "Two further X accounts using the Arrow name (@ArrowFinanceHQ, @arrowfinances) were flagged by the research desk as unconfirmed; only @ArrowFinanceio is treated as the project's account in this file.", sources: ["desk"] },
       { text: "The workbook records unrelated products using the Arrow name on this chain: a Solana-origin token launcher (launcharrow.xyz) and the separate Arrows options protocol.", sources: ["workbook"] },
     ],
@@ -275,7 +279,7 @@ export const HARVEST = {
       { date: "2026-08-30", kind: "company", title: "Mainnet dated for 31 Aug 09:30 ET", account: "@ArrowFinanceio", sourceUrl: X("@ArrowFinanceio"), sources: ["fill6"],
         body: "The account posted that mainnet would open on Monday 2026-08-31 at 09:30 ET with 16 collateral markets, an aggregate aUSD cap of about $1.6M, equity collateral usable in US cash hours only, and the aUSD LP moved to an up v3 pool." },
       { date: "2026-08-31", kind: "onchain", title: "Token contracts on Blockscout", sourceUrl: "https://robinhoodchain.blockscout.com", sources: ["fill17"],
-        body: "The desk's auditor reported ARROW (6,886 holders, source verified) and aUSD (21 holders, source unverified) present on Blockscout 4663 with the same creator; a token existing is not evidence the CDP is open." },
+        body: "The desk's auditor reported ARROW (6,886 holders, contract source code verified on Blockscout) and aUSD (21 holders, source code not verified on the explorer) present on chain 4663 with the same creator; a token existing is not evidence the CDP is open." },
       { date: "2026-08-30", kind: "risk", title: "Name collisions", sourceUrl: ARTIFACTS.workbook.url, sources: ["workbook", "desk"],
         body: "The workbook and the desk list unrelated products and accounts using the Arrow name: Arrows (options), ArrowPad (launchpad), a Solana-origin launcher, and two unconfirmed X accounts." },
     ],
@@ -537,7 +541,7 @@ export const HARVEST = {
       { text: "The workbook's Dune extract records about 60k tokens launched and 59k traded on Noxa, none paired to a Stock Token in that snapshot.", sources: ["workbook"] },
     ],
     risk: [
-      { text: "The dossier and workbook name clone pads and copy URLs using the Noxa name; only noxa.fun is treated as the project site here.", sources: ["dossier"] },
+      { text: "The dossier and workbook name other sites using the Noxa name; only noxa.fun is treated as the project site here.", sources: ["dossier"] },
     ],
     unresolved: [],
     feed: [llamaItem("NOXA Fun", "about $5.43M TVL and $123,438 24h fees")],
@@ -560,7 +564,7 @@ export const HARVEST = {
     ],
     unresolved: ["No Robinhood Chain contract address for the agent launch layer was found in either intake."],
     feed: [
-      { date: "2026-07-19", kind: "company", title: "FalconX primer figures", sourceUrl: "https://virtuals.io", sources: ["dossier"],
+      { date: "2026-07-19", kind: "company", title: "FalconX primer figures", sourceUrl: ARTIFACTS.dossier.url, sources: ["dossier"],
         body: "A FalconX primer cited 4,500+ agents launched, $150M+ agent volume and $2.3M+ raised by builders on Robinhood Chain, with tokenized tax liens among live agent products." },
       { date: "2026-08-30", kind: "ct", title: "HoodInsider recap figure", account: "@HoodInsider_", sourceUrl: X("@HoodInsider_"), sources: ["fill13"],
         body: "A HoodInsider weekly recap cited over $270M of Robinhood Chain volume from Virtuals agents; the desk treats the recap as a media claim." },
@@ -592,7 +596,7 @@ export const HARVEST = {
       { date: "2026-08-31", kind: "ct", title: "Among the most-discussed tokens on Jumper", account: "@jumperapp", sourceUrl: X("@jumperapp"), sources: ["fill1"],
         body: "Jumper's seven-day X lane on 2026-08-31 listed $NET with PONS, CASHCAT, AI and DELTA as the five most-discussed tokens." },
       { date: "2026-08-31", kind: "company", title: "Treasury holdings claim", account: "@NetNetCap", sourceUrl: X("@NetNetCap"), sources: ["map"],
-        body: "The account posted that the treasury held about $7.5M and the largest AAPL, NVDA and SPCX Stock Token holdings on the chain." },
+        body: "The account posted that the treasury held about $7.5M and the largest AAPL, NVDA and SPCX Stock Token holdings on the chain (captured by the desk on 2026-08-31; original post date not recorded)." },
       llamaItem("NetNet", "a Reserve Currency row at zero TVL"),
     ],
   },
@@ -614,7 +618,7 @@ export const HARVEST = {
     unresolved: ["The bridge and custody path for the BTC backing yBTC has not been described in either intake."],
     feed: [
       { date: "2026-08-31", kind: "company", title: "yBTC on Robinhood Chain", account: "@TickerYardHQ", sourceUrl: X("@TickerYardHQ"), sources: ["map"],
-        body: "The account posted yBTC shipping on Robinhood Chain, routed from WBTC on Arbitrum." },
+        body: "The account posted yBTC shipping on Robinhood Chain, routed from WBTC on Arbitrum (captured by the desk on 2026-08-31; original post date not recorded)." },
     ],
   },
 
@@ -655,11 +659,11 @@ export const HARVEST = {
       { text: "A GlobeNewswire release dated 2026-08-18, as carried by the dossier, announced the L4VA TGE natively on Robinhood Chain with terms stated as a $0.003 price, 1B maximum supply, a 20% team allocation and a non-upgradeable ERC-20; the desk recorded lifecycle as unknown.", sources: ["dossier", "map"] },
     ],
     risk: [
-      { text: "The dossier records no vault holding a Stock Token as of 30 Aug; the product is a press-release stage narrative until such a transaction exists.", sources: ["dossier"] },
+      { text: "The dossier records no vault holding a Stock Token as of 30 Aug; the only public record of the product is the TGE press release.", sources: ["dossier"] },
     ],
     unresolved: [],
     feed: [
-      { date: "2026-08-18", kind: "company", title: "TGE announced", sourceUrl: "https://l4va.org", sources: ["dossier"],
+      { date: "2026-08-18", kind: "company", title: "TGE announced", sourceUrl: ARTIFACTS.dossier.url, sources: ["dossier"],
         body: "A GlobeNewswire release announced the L4VA Technologies TGE for $L4VA natively on Robinhood Chain, with terms at l4va.org/tge." },
       { date: "2026-08-30", kind: "company", title: "TGE marketing continues", account: "@L4VAprotocol", sourceUrl: X("@L4VAprotocol"), sources: ["dossier"],
         body: "The account posted that Robinhood Chain is built better, continuing TGE marketing." },
@@ -858,7 +862,7 @@ export const HARVEST = {
     feed: [
       { date: "2026-08-05", kind: "company", title: "Hello world pools.trade", account: "@TradePools", sourceUrl: X("@TradePools"), sources: ["fill4"],
         body: "A launch post for the Uniswap Labs pad, cited by the desk with 563k views." },
-      { date: "2026-08-31", kind: "company", title: "Agentic launches via Project VEX", account: "@ProjectVEXai", sourceUrl: X("@ProjectVEXai"), sources: ["fill10"],
+      { date: "2026-08-30", kind: "company", title: "Agentic launches via Project VEX", account: "@ProjectVEXai", sourceUrl: X("@ProjectVEXai"), sources: ["fill10"],
         body: "Project VEX posted that its agentic token launches run through pools.trade." },
     ],
   },
@@ -875,7 +879,7 @@ export const HARVEST = {
       { text: "The desk observed production replies from the account launching tokens on Pons from X, with fees posted as about 0.0005 ETH to Pons plus $3 to the protocol plus gas, and an optional pairing with GME, USDG, NVDA or SPY.", sources: ["fill9", "map"] },
     ],
     risk: [
-      { text: "The account posted on 2026-08-30 that it had patched a missing router approval on post-graduation buys; the fix suggests buys through the command layer failed for some period.", sources: ["fill9"] },
+      { text: "The account posted on 2026-08-30 that it had patched a missing router approval on post-graduation buys; a fix of that kind implies buys through the command layer failed for some period.", class: "inference", sources: ["fill9"] },
     ],
     unresolved: ["How user keys are custodied when commands arrive from X or Telegram is not described in the intake."],
     feed: [
@@ -967,10 +971,7 @@ export const HARVEST = {
       { text: "The FOX site states the token is not the official Robinhood mascot and is not endorsed by Robinhood; the FOX token itself is a culture token and is not profiled here (PRD §2.2).", sources: ["dossier"] },
     ],
     unresolved: ["The pad's own X handle is unconfirmed; the linked account belongs to the FOX token."],
-    feed: [
-      { date: "2026-08-25", kind: "ct", title: "FOX on the daily board", account: "@RHDaily__", sourceUrl: X("@RHDaily__"), sources: ["dossier"],
-        body: "RH Daily's trending list placed FOX with CASHCAT, PONS, PEPE and JUGGERNAUT; the dossier notes the site disclaims any Robinhood affiliation." },
-    ],
+    feed: [],
   },
 
   scopl: {
@@ -991,6 +992,7 @@ export const HARVEST = {
     risk: [
       { text: "Several accounts posted a 'holder portal' link at a third-party domain (cryptolot.lol) alongside the token address on 2026-08-30; the research desk flagged those posts as not from the project and treated the domain as a phishing risk.", sources: ["fill10", "fill12"] },
       { text: "An Ethereum address (0x07f5b682…) circulated as SCOPL's contract is not a contract on chain 4663 per the desk.", sources: ["fill10"] },
+      { text: "The token address above was flagged as suspect in one desk round (round 10) and the flag withdrawn in later rounds (12 and 16, on the account bio and a SpyWolf audit); not reproduced on Blockscout in this review.", sources: ["fill10", "fill12", "fill16"] },
     ],
     unresolved: ["The audit text describes the protocol as already live while the official account still described V2 as around the corner; no deployed addresses for the nine V2 contracts were published."],
     feed: [
@@ -1019,7 +1021,7 @@ export const HARVEST = {
       { date: "2026-08-24", kind: "ct", title: "Named in a utility list", account: "@andrewtalksdefi", sourceUrl: X("@andrewtalksdefi"), sources: ["fill16"],
         body: "An alpha account listed Website among Robinhood Chain utility names, naming the ad-slot mechanism." },
       { date: "2026-08-31", kind: "company", title: "Volume and payouts since v2", account: "@notawebsite_rh", sourceUrl: X("@notawebsite_rh"), sources: ["fill2"],
-        body: "The account posted 8.178 ETH of volume since v2 on 2026-08-11 and 6.08 ETH paid to slot owners." },
+        body: "The account posted 8.178 ETH of volume since v2 on 2026-08-11 and 6.08 ETH paid to slot owners (captured by the desk on 2026-08-31; original post date not recorded)." },
     ],
   },
 
@@ -1107,7 +1109,7 @@ export const HARVEST = {
       { date: "2026-08-25", kind: "company", title: "Buybacks and airdrops on a customer token", account: "@SinjohDeFi", sourceUrl: X("@SinjohDeFi"), sources: ["fill6"],
         body: "The account posted that over half of the $SAFEHOOD token's supply had been bought back and airdropped through Sinjoh in under a week." },
       { date: "2026-08-31", kind: "company", title: "Airdrop, burn and volume figures", account: "@SinjohDeFi", sourceUrl: X("@SinjohDeFi"), sources: ["fill6"],
-        body: "The account posted over $42k of PONS and NVDA airdropped, 42M INJOH burned and over $11M volume in under a month, and announced Yield Banks." },
+        body: "The account posted over $42k of PONS and NVDA airdropped, 42M INJOH burned and over $11M volume in under a month, and announced Yield Banks (captured by the desk on 2026-08-31; original post date not recorded)." },
     ],
   },
 
@@ -1156,7 +1158,7 @@ export const HARVEST = {
     unresolved: [],
     feed: [
       { date: "2026-08-31", kind: "company", title: "Week-one figures; ETH options", account: "@arrowsonhood", sourceUrl: X("@arrowsonhood"), sources: ["fill6"],
-        body: "In posts captured by the desk on 2026-08-31 the account cited week-one figures of $1,234 volume, 227 trades, 220 contracts, $12,134 vault LP and $205 premiums, and claimed ETH options and settlement from 31 Aug." },
+        body: "The account cited week-one figures of $1,234 volume, 227 trades, 220 contracts, $12,134 vault LP and $205 premiums, and claimed ETH options and settlement from 31 Aug (captured by the desk on 2026-08-31; original post date not recorded)." },
     ],
   },
 
@@ -1207,7 +1209,7 @@ export const HARVEST = {
       map: "Desk handle, HOOD / V3 factory / h33 / V2 factory addresses and note for SwapHood: HOOD explorer-verified with 395 holders; V3 factory on the explorer named PancakeV3Factory with the same deployer; flywheel HOOD → fees → buyback → h33",
       fill13: "Official flywheel posts: HOOD emissions about 2,375/day (max 5M) to LPs, fees to HOOD buybacks (28 Aug: 633.93 HOOD for 0.012 ETH), buybacks raise h33 backing; team claims it owns no HOOD and no LP",
       fill15: "Official 12 Jul HOOD token post with address and pair; gitbook addresses for h33 and the V2/V3 factories kept as candidates; DefiLlama SwapHood V3 volume about $126–130k",
-      fill17: "Desk auditor's Blockscout 4663 check: HOOD / SwapHood Token present, 395 holders, source verified; the V3 factory is a PancakeV3Factory contract with the same deployer",
+      fill17: "Desk auditor's Blockscout 4663 check: HOOD / SwapHood Token present, 395 holders, contract source code verified on the explorer; the V3 factory is a PancakeV3Factory contract with the same deployer",
     },
     deployments: [
       { label: "HOOD token (SwapHood Token — not the Robinhood HOOD Stock Token)", address: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c", role: "token", sources: ["fill15", "fill17", "map"] },
@@ -1218,7 +1220,7 @@ export const HARVEST = {
     ],
     positive: [
       { text: "The official account describes a flywheel of HOOD emissions (about 2,375 per day, 5M maximum) to LPs, protocol fees used for HOOD buybacks (633.93 HOOD for 0.012 ETH on 2026-08-28) and buybacks raising the backing of h33; the team states it holds no HOOD and no LP.", sources: ["fill13"] },
-      { text: "The desk's auditor reported the HOOD token present on Blockscout 4663 with 395 holders and verified source, and DefiLlama lists SwapHood V3 with about $126–130k 24h volume.", sources: ["fill17", "fill15"] },
+      { text: "The desk's auditor reported the HOOD token present on Blockscout 4663 with 395 holders and its contract source code verified on the explorer (per the desk, not Proofline verification), and DefiLlama lists SwapHood V3 with about $126–130k 24h volume.", sources: ["fill17", "fill15"] },
     ],
     risk: [
       { text: "The token's HOOD ticker is also the ticker of the Robinhood-issued HOOD Stock Token at a different address; the two are unrelated.", sources: ["fill17"] },
@@ -1231,7 +1233,7 @@ export const HARVEST = {
       { date: "2026-08-28", kind: "company", title: "Buyback", account: "@SwapHoodFi", sourceUrl: X("@SwapHoodFi"), sources: ["fill13"],
         body: "The account posted a buyback of 633.93 HOOD for 0.012 ETH as part of a flywheel of emissions, fees, buybacks and h33 backing, and stated the team holds no HOOD and no LP." },
       { date: "2026-08-31", kind: "onchain", title: "Explorer check by the desk", sourceUrl: "https://robinhoodchain.blockscout.com", sources: ["fill17"],
-        body: "The desk's auditor reported the HOOD token on Blockscout 4663 (395 holders, source verified) and the V3 factory as a PancakeV3Factory contract with the same deployer." },
+        body: "The desk's auditor reported the HOOD token on Blockscout 4663 (395 holders, contract source code verified on the explorer) and the V3 factory as a PancakeV3Factory contract with the same deployer." },
     ],
   },
 };

@@ -2,7 +2,7 @@ slug: longshot
 name: Longshot
 symbol: null
 category: Fee-routing protocol
-lifecycle: mainnet
+lifecycle: announced
 coverage: stub
 summary: Launch and fee-routing protocol on Robinhood Chain; fees split into a fixed Hyperliquid perp position, holder rewards and the protocol.
 official_links:
@@ -19,6 +19,7 @@ deployments:
     role: token
     verified: false
     sources:
+      - S5
       - S4
 review:
   researcher: harsharn10
@@ -47,6 +48,7 @@ findings:
       sources:
         - S4
   missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from PRD Appendix A not yet reproduced on Blockscout
     - text: Who controls the Hyperliquid position and how funds cross venues
     - text: Fee-split contract and admin powers unknown

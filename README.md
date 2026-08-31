@@ -88,19 +88,27 @@ example).
 `content/feed/<slug>.yaml` is an optional per-project activity feed: `{ slug, items: [{ id, date, kind, title, body,
 account?, sourceUrl?, sources? }] }`. `kind` is `company | ct | onchain | risk`; `account` is a CT handle matching
 `^@[A-Za-z0-9_]{1,15}$`. A feed file's `slug` must be a census slug, and any `sources` ids it cites must exist in that
-slug's ledger — same rule as a project file.
+slug's ledger — same rule as a project file. `date` is the post date; when an intake recorded a post without its date,
+the item is dated to the capture date and the body says so ("captured by the desk on 2026-08-31; original post date not
+recorded").
 
 `content/accounts.yaml` is the list of CT accounts worth tracking: `[{ handle, name?, tier, role?, slug?, followers?,
-note? }]`. `tier` is `top | watch | downweight | blacklist` (blacklist = impersonators, wrong-chain homonyms, drainer
-copypasta — the row stays so the collision is not lost); `role` is `project | alpha | kol | data | infra | media` and
-says how to read the account; `slug` ties an official account to its census row. New accounts start at `tier: watch`;
-the maintainer promotes one to `top` once its calls have proven worth following.
+note? }]`. `tier` is `top | watch | downweight | skip`: `downweight` = scrape, never count toward trending; `skip` =
+posts not ingested as evidence (handle collisions, unconfirmed official accounts, third-party links) — the row stays so
+the collision is not lost. `role` is `project | alpha | kol | data | infra | media` and says how to read the account;
+`slug` ties an official account to its census row. New accounts start at `tier: watch`; the maintainer promotes one to
+`top` once its calls have proven worth following. Notes describe observable behaviour only — what the account posts,
+how often, whether a disclosed relationship exists — never conduct; `validate` lints notes for hype words and conduct
+words (drainer, impersonator, farm, scammer, insider, …). When the ledger is rebuilt from the research desk
+(`scripts/build-accounts.mjs`), the desk's `builder` role maps to `project` (team accounts never trend), `farm` to
+`kol`, and `follow: false` + `listen: low` rows to `downweight`.
 
 `site.yaml`'s `trending: { min_accounts, window_days }` (3 accounts / 7 days by default) drives `computeTrending()`
 (`scripts/lib/trending.mjs`): a project is trending when at least `min_accounts` distinct counting accounts have each
 posted a `kind: ct` item about it within the last `window_days` days. An account counts only when `tier: top` **and**
 its `role` is absent or `alpha` / `kol` — official project accounts, data feeds and media never vote on trending, and
-`blacklist` rows are never counted; `validate` warns when a feed item is attributed to a blacklisted handle. `npm run score` merges the result into
+`watch`, `downweight` and `skip` rows are never counted; `validate` warns when a feed item is attributed to a `skip`
+handle. `npm run score` merges the result into
 `build/derived.json` — `trending: boolean` on every project, plus a top-level `trending: [slug, ...]` list. Pass
 `--today YYYY-MM-DD` to pin "today" for a reproducible run; it defaults to the real date.
 

@@ -45,7 +45,7 @@
 - slug: artificial-inu
   name: Artificial Inu
   category: Stock-paired token
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://artificialinu.com }
@@ -62,7 +62,7 @@
 - slug: longshot
   name: Longshot
   category: Fee-routing protocol
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://www.uselongshot.xyz }
@@ -79,7 +79,7 @@
 - slug: long
   name: LONG
   category: Launchpad
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: app, url: https://app.long.xyz }
@@ -147,7 +147,7 @@
 - slug: bankr
   name: Bankr
   category: Agent / execution
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/bankrbot }
@@ -224,7 +224,7 @@
   discovery_source: Prototype seed profile 2026-08-30; restored by product owner; Grok desk map 2026-08-31
   tree: { primary: rwa-products/index-vault }
   qualifying:
-    deployed_on_chain: { value: true, note: "Testnet deployment only; qualifies under 'officially launching' pending mainnet", verified: false }
+    deployed_on_chain: { value: false, note: "No mainnet deployment — testnet only (EVAL 2026-08-31 §5, T1); kept as a row so the universe is visible", verified: false }
     native_play:       { value: true, note: "ERC-4626 index vault for Stock Token baskets", verified: false }
     citable:           { value: true, note: "Source repository", verified: false }
     research_story:    { value: true, note: "Mock swap router; audit and mainnet are roadmap items", verified: false }
@@ -285,7 +285,7 @@
 - slug: denar
   name: Denar
   category: Lending
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/DenarMarkets }
@@ -301,7 +301,7 @@
 - slug: longbow
   name: Longbow
   category: Lending
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://longbow.cash }
@@ -345,14 +345,14 @@
   tree: { primary: agents/agent-launch-layer }
   qualifying:
     deployed_on_chain: { value: true, note: "DefiLlama lists Virtuals revenue on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
-    native_play:       { value: true, note: "Multi-chain agent launch layer with a Robinhood Chain instance; filed as the layer, not its individual agents", verified: false }
+    native_play:       { value: false, note: "Imported multi-chain agent launch layer; by the desk's own native rule and PRD §2.2 this is a dependency/observe (EVAL 2026-08-31 §5, T2); its Robinhood Chain revenue does not make it native", verified: false }
     citable:           { value: true, note: "Site and X account", verified: false }
     research_story:    { value: true, note: "Agent launch and fee mechanics on this chain; bridged versus native token instance", verified: false }
 
 - slug: netnet
   name: NetNet Capital
   category: RWA baskets
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/NetNetCap }
@@ -368,7 +368,7 @@
 - slug: tickeryard
   name: TickerYard
   category: Oracle / infra
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://tickeryard.com }
@@ -385,7 +385,7 @@
 - slug: earn-protocol
   name: EARN
   category: Yield
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://earnonhood.com }
@@ -411,10 +411,10 @@
   handle: "@L4VAprotocol"
   tree: { primary: rwa-products/stock-paired-token }
   qualifying:
-    deployed_on_chain: { value: true, note: "Press release dated the TGE 2026-08-18 on Robinhood Chain; no contract or vault reviewed — lifecycle recorded as announced", verified: false }
+    deployed_on_chain: { value: false, note: "Lifecycle unknown; no contract, vault or deployment evidence reviewed — press release only (EVAL 2026-08-31 §5, T1)", verified: false }
     native_play:       { value: true, note: "Vault factory issuing tokens backed by locked RWAs, stocks, NFTs or memes per the project", verified: false }
     citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Vault custody of the backing assets; 20% team allocation; governance and buyback claims", verified: false }
+    research_story:    { value: false, note: "No mechanism recorded anywhere beyond the press release (EVAL 2026-08-31 §5, T4)", verified: false }
 
 - slug: delta
   name: Delta
@@ -475,10 +475,10 @@
   handle: "@UseSqueeze_RH"
   tree: { primary: tooling/scanner }
   qualifying:
-    deployed_on_chain: { value: true, note: "Project states its Tape (TWAP reader) is live and the Desk has no contracts deployed; qualifies under 'officially launching'", verified: false }
+    deployed_on_chain: { value: false, note: "Nothing deployed: the project states the Desk has no contracts and the Tape is off-chain (EVAL 2026-08-31 §5, T1)", verified: false }
     native_play:       { value: true, note: "Short-interest tape and a planned short desk for Robinhood Chain pools", verified: false }
     citable:           { value: true, note: "X account", verified: false }
-    research_story:    { value: true, note: "If the Desk ships: lender custody, liquidation on thin books, oracle rules", verified: false }
+    research_story:    { value: false, note: "A tape/scanner has no user-fund, routing, launch or control-plane story until the Desk exists (EVAL 2026-08-31 §5, T4)", verified: false }
 
 - slug: agent-name-service
   name: Agent Name Service
@@ -491,7 +491,7 @@
   handle: "@RHAgentNS"
   tree: { primary: agents/agent-identity, secondary: [tooling/names] }
   qualifying:
-    deployed_on_chain: { value: true, note: "Project posts a .agent namespace on Robinhood Chain; no registrar contract reviewed — lifecycle recorded as announced", verified: false }
+    deployed_on_chain: { value: false, note: "No deployment evidence for the registrar — lifecycle unknown (EVAL 2026-08-31 §5, T1)", verified: false }
     native_play:       { value: true, note: "Name registry for agents with a claimed yearly fee", verified: false }
     citable:           { value: true, note: "X account; no site located", verified: false }
     research_story:    { value: true, note: "Registrar ownership, fee custody and name revocation powers", verified: false }
@@ -499,7 +499,7 @@
 - slug: hookr
   name: Hookr
   category: Launchpad
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://hookr.fun }
@@ -532,7 +532,7 @@
 - slug: quotrons
   name: Quotrons
   category: NFT / treasury
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://quotrons.cash }
@@ -549,7 +549,7 @@
 - slug: pools-trade
   name: pools.trade
   category: Launchpad
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/pools_dot_fun }
@@ -565,7 +565,7 @@
 - slug: wire
   name: Wire
   category: Agent / execution
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/wirebotRH }
@@ -581,7 +581,7 @@
 - slug: maxfi
   name: MaxFi
   category: Yield
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://maxfi.tech }
@@ -614,7 +614,7 @@
 - slug: mesh
   name: Mesh
   category: Scanner / tooling
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/MeshGateway }
@@ -630,7 +630,7 @@
 - slug: foxpad
   name: FoxPad
   category: Launchpad
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://foxpad.app }
@@ -640,14 +640,14 @@
   tree: { primary: launch/other-pad }
   qualifying:
     deployed_on_chain: { value: true, note: "FOX token address given by the dossier and the map; the pad's own contracts not located", verified: false }
-    native_play:       { value: true, note: "Launchpad whose fee split buys the FOX token; graduated tokens auto-burn token-side Uniswap fees per the project", verified: false }
+    native_play:       { value: false, note: "The only evidence that FoxPad exists as a product distinct from the FOX culture token is one dossier line naming foxpad.app; no handle, no address (EVAL 2026-08-31 §5, T2 — the eval places the pad in observe)", verified: false }
     citable:           { value: true, note: "Pad site from the dossier; X account is the FOX token's account (the pad's own handle is unconfirmed)", verified: false }
-    research_story:    { value: true, note: "Pad fee custody and the 50/50 ops vs FOX vault split", verified: false }
+    research_story:    { value: false, note: "The 50/50 fee split and auto-burn are a single dossier claim; no contract or official post describes the pad's mechanism (EVAL 2026-08-31 §5, T4)", verified: false }
 
 - slug: scopl
   name: SCOPL
   category: Aggregator
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://scopl.live }
@@ -664,7 +664,7 @@
 - slug: website
   name: notawebsite
   category: NFT / treasury
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/notawebsite_rh }
@@ -680,7 +680,7 @@
 - slug: lemon
   name: Lemon
   category: Launchpad
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/lemondotfun }
@@ -696,7 +696,7 @@
 - slug: robindex
   name: Robindex
   category: Scanner / tooling
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://robindex.pro/about }
@@ -708,12 +708,12 @@
     deployed_on_chain: { value: true, note: "Token address on the project's About page and X bio per the dossier", verified: false }
     native_play:       { value: true, note: "Token scanner and Telegram bot for Robinhood Chain with a project token; not the ERC-4626 Robinhood Index Vaults", verified: false }
     citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Token utility and treasury; four products share the Robindex name", verified: false }
+    research_story:    { value: false, note: "A scanner plus Telegram bot: no user-fund, routing, launch or control-plane story (EVAL 2026-08-31 §5, T4)", verified: false }
 
 - slug: vynex
   name: Vynex
   category: Yield
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/UseVynex }
@@ -729,7 +729,7 @@
 - slug: sinjoh
   name: Sinjoh
   category: Fee-routing protocol
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/SinjohDeFi }
@@ -745,7 +745,7 @@
 - slug: hoodlock
   name: HoodLock
   category: Scanner / tooling
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://hoodlock.tech }
@@ -762,7 +762,7 @@
 - slug: arrows
   name: Arrows
   category: Options
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://arrows.finance }
@@ -795,7 +795,7 @@
 - slug: stonks-fun
   name: Stonks.fun
   category: Launchpad
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: x, url: https://x.com/stonksdotfun }

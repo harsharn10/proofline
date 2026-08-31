@@ -2,7 +2,7 @@ slug: wire
 name: Wire
 symbol: WIRE
 category: Agent / execution
-lifecycle: mainnet
+lifecycle: announced
 coverage: stub
 summary: Command layer that launches tokens on Pons and executes trades from X, Telegram or web, with a $WIRE token.
 official_links:
@@ -36,11 +36,12 @@ findings:
         - S4
         - S2
   risk:
-    - text: The account posted on 2026-08-30 that it had patched a missing router approval on post-graduation buys; the fix suggests buys through the command layer failed for some period.
-      class: claim
+    - text: The account posted on 2026-08-30 that it had patched a missing router approval on post-graduation buys; a fix of that kind implies buys through the command layer failed for some period.
+      class: inference
       sources:
         - S4
   missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from the bio not reproduced on Blockscout
     - text: Key custody for user commands
     - text: Protocol fee custody

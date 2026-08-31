@@ -12,7 +12,7 @@ import { loadContent } from "./lib/load.mjs";
 import { selectUnsent, buildDigest, chunkMessage, readDotEnv } from "./lib/telegram.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
-import { voiceWarnings } from "./lib/voice.mjs";
+import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
@@ -279,8 +279,8 @@ async function makeContent(mutate = () => {}) {
   const research = await readFile(researchPath, "utf8");
   await writeFile(researchPath, research.replace("## Identity\n\n_Research pending._", "## Identity\n\nPons is a launchpad. [claim S98]"));
   const cited = await validateContent(tmp);
-  // A feed item citing S3 counts as a citation; a feed item attributed to a blacklisted account warns.
-  await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: blacklist\n  role: kol\n");
+  // A feed item citing S99 counts as a citation; a feed item attributed to a skip-tier account warns; a conduct word in an account note warns.
+  await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n  note: Known drainer.\n");
   await writeFile(join(tmp, "feed", "pons.yaml"), "slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ct\n    title: T\n    body: B\n    account: \"@spam\"\n    sources: [S99]\n");
   const feedCited = await validateContent(tmp);
   await writeFile(join(tmp, "projects", "arrow.yaml"), "slug: [\n");
@@ -292,7 +292,8 @@ async function makeContent(mutate = () => {}) {
     assert.ok(releaseRun.errors.some((e) => e.includes("fails qualifying test citable")), "qualifying value false is a release error");
     assert.deepEqual(feedCited.errors, [], "feed citation of an existing ledger id is not an error");
     assert.ok(!feedCited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited only from a feed item is not 'never cited'");
-    assert.ok(feedCited.warnings.some((w) => w.includes("blacklisted account @spam")), "feed item attributed to a blacklisted account warns");
+    assert.ok(feedCited.warnings.some((w) => w.includes("skip-tier account @spam")), "feed item attributed to a skip-tier account warns");
+    assert.ok(feedCited.warnings.some((w) => w.includes("@spam note: conduct word \"drainer\"")), "conduct word in an account note warns");
     assert.deepEqual(cited.errors, [], "prose citation validates");
     assert.ok(!cited.warnings.some((w) => w.includes("S98 is never cited")), "an id cited only in research prose is not 'never cited'");
     assert.ok(cited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited nowhere still warns");
@@ -426,7 +427,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 
 // Task 2 / Task 5 — computeTrending: distinct counting accounts with `kind: ct` items dated inside the window.
 // Task 5 addendum ruling 4: an account counts only when tier == top AND (role absent OR role ∈ {alpha, kol});
-// blacklist rows never count.
+// watch / downweight / skip rows never count.
 {
   const accounts = [
     { handle: "@a", tier: "top" },                      // no role → counts (legacy shape)
@@ -435,7 +436,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     { handle: "@d", tier: "watch", role: "alpha" },
     { handle: "@p", tier: "top", role: "project" },     // official account at top: must NOT count
     { handle: "@m", tier: "top", role: "media" },
-    { handle: "@x", tier: "blacklist", role: "kol" },
+    { handle: "@x", tier: "skip", role: "kol" },
     { handle: "@w", tier: "downweight", role: "kol" },
   ];
   const opts = { minAccounts: 3, windowDays: 7, today: "2026-08-30" };
@@ -446,7 +447,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   const oneWatch = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@d")]);
   const topProject = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@p")]);
   const topMedia = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@m")]);
-  const blacklisted = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@x")]);
+  const skipped = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@x")]);
   const downweighted = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@w")]);
   const outsideWindow = run([item("1", "2026-08-20", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@c")]);
   const sameAccountThrice = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@a"), item("3", "2026-08-27", "@a")]);
@@ -457,13 +458,14 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.equal(oneWatch.trending, false, "one of three is watch tier → not trending");
     assert.equal(topProject.trending, false, "top + role: project must not count");
     assert.equal(topMedia.trending, false, "top + role: media must not count");
-    assert.equal(blacklisted.trending, false, "blacklist never counts");
+    assert.equal(skipped.trending, false, "skip never counts");
     assert.equal(downweighted.trending, false, "downweight never counts");
     assert.equal(outsideWindow.trending, false, "one dated outside window → not trending");
     assert.equal(sameAccountThrice.trending, false, "same account thrice counts once → not trending");
     assert.equal(countsForTrending({ handle: "@z", tier: "top", role: "alpha" }), true);
     assert.equal(countsForTrending({ handle: "@z", tier: "top", role: "data" }), false);
-    assert.equal(countsForTrending({ handle: "@z", tier: "blacklist" }), false);
+    assert.equal(countsForTrending({ handle: "@z", tier: "skip" }), false);
+    assert.equal(countsForTrending({ handle: "@z", tier: "downweight", role: "alpha" }), false);
     console.log("ok   computeTrending");
   } catch (err) { failures++; console.error(`FAIL computeTrending: ${err.message}`); }
 }
@@ -473,7 +475,8 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   const row = (extra) => [{ handle: "@a", tier: "watch", ...extra }];
   const cases = [
     [row({ tier: "downweight" }), 0, "downweight tier"],
-    [row({ tier: "blacklist" }), 0, "blacklist tier"],
+    [row({ tier: "skip" }), 0, "skip tier"],
+    [row({ tier: "blacklist" }), 1, "blacklist is no longer a tier"],
     [row({ tier: "muted" }), 1, "unknown tier rejected"],
     [row({ role: "alpha" }), 0, "role alpha"],
     [row({ role: "builder" }), 1, "role outside the enum rejected"],
@@ -534,6 +537,18 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.ok(feedDangling.errors.some((e) => e.includes("S9")), "feed item cites a source id absent from the ledger");
     console.log("ok   crossCheck feed");
   } catch (err) { failures++; console.error(`FAIL crossCheck feed: ${err.message}`); }
+}
+
+// Fix round 1 — conductWarnings: conduct verdicts in account notes; whole-word so "yield farming" prose elsewhere is untouched.
+{
+  try {
+    assert.equal(conductWarnings("Known drainer wrapping the official CA.", "x").length, 1, "drainer");
+    assert.equal(conductWarnings("Likely impersonator of Arrow.", "x").length, 1, "impersonator");
+    assert.equal(conductWarnings("Handle collides with the official @ArrowFinanceio; posts not used as evidence.", "x").length, 0, "behaviour-only note passes");
+    assert.equal(conductWarnings("Runs farms on UPDex.", "x").length, 1, "farm/farms about an account");
+    assert.equal(conductWarnings("Farmhouse Finance", "x").length, 0, "whole-word only");
+    console.log("ok   conductWarnings");
+  } catch (err) { failures++; console.error(`FAIL conductWarnings: ${err.message}`); }
 }
 
 // Task 2 — voiceWarnings: whole-word, case-insensitive matches only.
