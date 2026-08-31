@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "feed",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slug","items"],
+  "$defs": {
+    "sourceId": { "type": "string", "pattern": "^S[1-9][0-9]*$" },
+    "item": { "type": "object", "additionalProperties": false, "required": ["id","date","kind","title","body"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "date": { "type": "string", "format": "date" },
+        "kind": { "enum": ["company","ct","onchain","risk"] },
+        "title": { "type": "string", "minLength": 1 },
+        "body": { "type": "string", "minLength": 1 },
+        "account": { "type": "string", "pattern": "^@[A-Za-z0-9_]{1,15}$" },
+        "sourceUrl": { "type": "string", "format": "uri" },
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/sourceId" }, "uniqueItems": true }
+      } }
+  },
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "items": { "type": "array", "items": { "$ref": "#/$defs/item" } }
+  }
+}

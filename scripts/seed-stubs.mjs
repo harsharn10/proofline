@@ -35,7 +35,7 @@ for (const c of census) {
     slug: c.slug, name: c.name, symbol: seed.symbol, category: c.category, lifecycle: c.lifecycle,
     coverage: "stub", summary: seed.summary, official_links: c.official_links,
     dependencies: seed.dependencies,
-    addresses: seed.addresses.map((a) => ({ ...a, verified: false, sources: [] })),
+    deployments: seed.deployments.map((a) => ({ ...a, verified: false, sources: [] })),
     review: { researcher: RESEARCHER, approver: "pending", methodology_version: "proofline-v1.0", reviewed_at: DATE, published_at: null },
     findings: {
       positive: sources.map((s) => ({ text: `${c.name} publishes an official ${s.kind === "official-site" ? "site" : s.kind} at ${s.url}.`, class: "claim", sources: [s.id] })),

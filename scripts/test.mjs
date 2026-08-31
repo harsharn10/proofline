@@ -11,6 +11,8 @@ import { checkResearch, tagIds, REQUIRED_HEADINGS } from "./lib/research-md.mjs"
 import { loadContent } from "./lib/load.mjs";
 import { selectUnsent, buildDigest, chunkMessage, readDotEnv } from "./lib/telegram.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
+import { computeTrending } from "./lib/trending.mjs";
+import { voiceWarnings } from "./lib/voice.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
@@ -103,9 +105,9 @@ for (const name of Object.keys(expected)) {
   const approverCaps = await errsWith((p) => { p.review.approver = "Pending"; });
   const approverSpace = await errsWith((p) => { p.review.approver = "pending "; });
   const researcherCaps = await errsWith((p) => { p.review.researcher = "Fixture"; });
-  const verifiedSentinel = await errsWith((p) => { p.addresses[0] = { label: "Router", address: "not-verified", role: "router", verified: true, sources: [] }; });
-  const verifiedNoSource = await errsWith((p) => { p.addresses[0].sources = []; });
-  const unverifiedSentinel = await errsWith((p) => { p.addresses[0] = { label: "Router", address: "not-verified", role: "router", verified: false, sources: [] }; });
+  const verifiedSentinel = await errsWith((p) => { p.deployments[0] = { label: "Router", chain: "robinhood-chain", address: "not-verified", role: "router", verified: true, sources: [] }; });
+  const verifiedNoSource = await errsWith((p) => { p.deployments[0].sources = []; });
+  const unverifiedSentinel = await errsWith((p) => { p.deployments[0] = { label: "Router", chain: "robinhood-chain", address: "not-verified", role: "router", verified: false, sources: [] }; });
   const unknownWithSources = await errsWith((p) => { p.findings.positive[0] = { text: "Unclear.", class: "unknown", sources: ["S1"] }; });
   const unknownNoSources = await errsWith((p) => { p.findings.positive[0] = { text: "Unclear.", class: "unknown" }; });
   const typo = await errsWith((p) => { p.scoring.overide = { level: "High", reason: "x", evidence: ["S1"] }; });
@@ -205,6 +207,7 @@ async function makeContent(mutate = () => {}) {
     census: [{ slug: "clean", name: p.name, category: p.category, lifecycle: p.lifecycle, coverage: p.coverage }],
     projects: new Map([["clean", p]]), sources: new Map([["clean", s]]), research: new Map([["clean", "stub"]]),
     dependencies: new Map(), changelog: [{ slug: "clean" }],
+    feed: new Map(), accounts: [],
   };
   mutate(content, p);
   return content;
@@ -241,7 +244,7 @@ async function makeContent(mutate = () => {}) {
   const run = async (mutate) => { const c = await makeContent(mutate); return releaseCheck(c, derived(c)); };
   const clean = await run();
   const todo = await run((c) => { c.site.corrections.destination = "TODO"; });
-  const unverified = await run((c, p) => { p.addresses[0] = { label: "Router", address: "not-verified", role: "router", verified: false, sources: [] }; });
+  const unverified = await run((c, p) => { p.deployments[0] = { label: "Router", chain: "robinhood-chain", address: "not-verified", role: "router", verified: false, sources: [] }; });
   const pendingHigh = await run((c, p) => { p.review.approver = "pending"; });
   const pendingLow = await run((c, p) => { p.review.approver = "pending"; p.scoring.confidence = { primary_source_coverage: 60, onchain_verification: 60, independent_corroboration: 60, freshness: 60, review_completeness: 60 }; });
   const checkedNull = await run((c) => { c.site.chain.checked = null; });
@@ -405,6 +408,96 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.deepEqual(readDotEnv("A=1\n# c\nB=\"two words\"\n"), { A: "1", B: "two words" });
     console.log("ok   telegram digest");
   } catch (err) { failures++; console.error(`FAIL telegram digest: `); }
+}
+
+// Task 2 — computeTrending: distinct top-tier accounts with `kind: ct` items dated inside the window.
+{
+  const accounts = [
+    { handle: "@a", tier: "top" },
+    { handle: "@b", tier: "top" },
+    { handle: "@c", tier: "top" },
+    { handle: "@d", tier: "watch" },
+  ];
+  const opts = { minAccounts: 3, windowDays: 7, today: "2026-08-30" };
+  const item = (id, date, account) => ({ id, date, kind: "ct", title: "t", body: "b", account });
+  const run = (items) => computeTrending(new Map([["x", items]]), accounts, opts).get("x");
+  const threeTop = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@c")]);
+  const twoTop = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b")]);
+  const oneWatch = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@d")]);
+  const outsideWindow = run([item("1", "2026-08-20", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@c")]);
+  const sameAccountThrice = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@a"), item("3", "2026-08-27", "@a")]);
+  try {
+    assert.equal(threeTop.trending, true, "3 top accounts in window → trending");
+    assert.equal(twoTop.trending, false, "2 accounts → not trending");
+    assert.equal(oneWatch.trending, false, "one of three is watch tier → not trending");
+    assert.equal(outsideWindow.trending, false, "one dated outside window → not trending");
+    assert.equal(sameAccountThrice.trending, false, "same account thrice counts once → not trending");
+    console.log("ok   computeTrending");
+  } catch (err) { failures++; console.error(`FAIL computeTrending: ${err.message}`); }
+}
+
+// Task 2 — feed schema: kind enum and account handle pattern.
+{
+  const feedBase = () => ({ slug: "pons", items: [{ id: "f1", date: "2026-08-20", kind: "company", title: "T", body: "B" }] });
+  const newsKind = validateAgainst("feed", { slug: "pons", items: [{ ...feedBase().items[0], kind: "news" }] });
+  const badAccount = validateAgainst("feed", { slug: "pons", items: [{ ...feedBase().items[0], account: "longbow" }] });
+  const ok = validateAgainst("feed", feedBase());
+  try {
+    assert.ok(newsKind.length > 0, "kind: news is rejected");
+    assert.ok(badAccount.length > 0, "account without a leading @ is rejected");
+    assert.deepEqual(ok, [], "a well-formed feed file passes");
+    console.log("ok   feed schema");
+  } catch (err) { failures++; console.error(`FAIL feed schema: ${err.message}`); }
+}
+
+// Task 2 — crossCheck: feed for a slug not in census, and a feed item citing a source id absent from the ledger.
+{
+  const feedGhost = crossCheck(await makeContent((c) => { c.feed = new Map([["ghost", { slug: "ghost", items: [] }]]); }));
+  const feedDangling = crossCheck(await makeContent((c) => {
+    c.feed = new Map([["clean", { slug: "clean", items: [{ id: "i1", date: "2026-08-20", kind: "ct", title: "t", body: "b", sources: ["S9"] }] }]]);
+  }));
+  try {
+    assert.ok(feedGhost.errors.some((e) => e.includes("ghost") && e.includes("census")), "feed slug not in census.yaml");
+    assert.ok(feedDangling.errors.some((e) => e.includes("S9")), "feed item cites a source id absent from the ledger");
+    console.log("ok   crossCheck feed");
+  } catch (err) { failures++; console.error(`FAIL crossCheck feed: ${err.message}`); }
+}
+
+// Task 2 — voiceWarnings: whole-word, case-insensitive matches only.
+{
+  const ape = voiceWarnings("Do not ape this", "x");
+  const grape = voiceWarnings("Grape harvest", "x");
+  try {
+    assert.equal(ape.length, 1, "banned word ape matches once");
+    assert.equal(grape.length, 0, "whole-word match does not fire inside grape");
+    console.log("ok   voiceWarnings");
+  } catch (err) { failures++; console.error(`FAIL voiceWarnings: ${err.message}`); }
+}
+
+// Task 2 — project schema: `addresses` is gone, `deployments[]` takes over with a chain enum.
+{
+  const fresh = async () => parse(await readFile(new URL("../fixtures/clean/project.yaml", import.meta.url), "utf8"));
+  const p1 = await fresh();
+  p1.deployments = [{ label: "Router", chain: "robinhood-chain", address: "0x0000000000000000000000000000000000000001", role: "router", verified: true, sources: ["S1"] }];
+  delete p1.addresses;
+  const deploymentsOk = validateAgainst("project", p1);
+
+  const p2 = await fresh(); // simulate the pre-migration shape: old `addresses` key, no `deployments` — must now fail
+  p2.addresses = [{ label: "Router", address: "0x0000000000000000000000000000000000000001", role: "router", verified: true, sources: ["S1"] }];
+  delete p2.deployments;
+  const oldAddressesRejected = validateAgainst("project", p2);
+
+  const p3 = await fresh();
+  p3.deployments = [{ label: "Router", chain: "bsc", address: "0x0000000000000000000000000000000000000001", role: "router", verified: true, sources: ["S1"] }];
+  delete p3.addresses;
+  const badChainRejected = validateAgainst("project", p3);
+
+  try {
+    assert.deepEqual(deploymentsOk, [], "deployments with chain: robinhood-chain passes");
+    assert.ok(oldAddressesRejected.length > 0, "old addresses key without deployments now fails");
+    assert.ok(badChainRejected.length > 0, "chain: bsc is rejected");
+    console.log("ok   project schema deployments");
+  } catch (err) { failures++; console.error(`FAIL project schema deployments: ${err.message}`); }
 }
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }

@@ -3,6 +3,7 @@ import { validateAgainst } from "./schemas.mjs";
 import { crossCheck, releaseCheck, referencedSourceIds } from "./checks.mjs";
 import { checkResearch, tagIds } from "./research-md.mjs";
 import { derive } from "./score.mjs";
+import { voiceWarnings } from "./voice.mjs";
 
 /**
  * Runs every check in spec §7 over a content tree.
@@ -22,6 +23,8 @@ export async function validateContent(root = "content", { release = false } = {}
   for (const [slug, p] of content.projects) fail(`projects/${slug}.yaml`, validateAgainst("project", p));
   for (const [slug, s] of content.sources) fail(`sources/${slug}.yaml`, validateAgainst("sources", s));
   for (const [id, d] of content.dependencies) fail(`dependencies/${id}.yaml`, validateAgainst("dependency", d));
+  for (const [slug, f] of content.feed) fail(`feed/${slug}.yaml`, validateAgainst("feed", f));
+  fail("accounts.yaml", validateAgainst("accounts", content.accounts));
 
   const x = crossCheck(content);
   errors.push(...x.errors); warnings.push(...x.warnings);
@@ -43,6 +46,21 @@ export async function validateContent(root = "content", { release = false } = {}
     }
     for (const id of ledgerIds) if (!referenced.has(id)) warnings.push(`sources/${slug}: ${id} is never cited by projects/${slug}.yaml or research/${slug}.md`);
   }
+
+  // Voice lint: banned-phrase warnings over summary, findings text, feed bodies/titles and research
+  // markdown. --release turns them into errors.
+  const voice = (text, where) => voiceWarnings(text, where).forEach((w) => (release ? errors : warnings).push(w));
+  for (const [slug, project] of content.projects) {
+    voice(project.summary, `projects/${slug}.yaml: summary`);
+    for (const kind of ["positive", "risk", "missing", "unresolved"])
+      (project.findings?.[kind] ?? []).forEach((f, i) => voice(f.text, `projects/${slug}.yaml: findings.${kind}[${i}]`));
+  }
+  for (const [slug, f] of content.feed)
+    for (const item of f.items ?? []) {
+      voice(item.title, `feed/${slug}.yaml: ${item.id} title`);
+      voice(item.body, `feed/${slug}.yaml: ${item.id} body`);
+    }
+  for (const [slug, text] of content.research) voice(text, `research/${slug}.md`);
 
   if (release) {
     const derivedBySlug = new Map([...content.projects].map(([slug, p]) => [slug, derive(p)]));

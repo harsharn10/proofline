@@ -127,10 +127,13 @@ coverage: stub                     # full | stub — Pons flips to full when its
 summary: one sentence
 official_links: [...]
 dependencies: [uniswap, usdg, stock-tokens]        # ids in content/dependencies/
-addresses:
-  - { label: "V2 curve factory", address: "0x...", role: factory, verified: false, sources: [S1] }
-  # address is a 0x… hex address or the sentinel not-verified (known to exist, not yet located).
-  # verified: true requires a 0x… address and at least one source.
+deployments:
+  - { label: "V2 curve factory", chain: robinhood-chain, address: "0x...", role: factory, verified: false, sources: [S1] }
+  # chain: robinhood-chain | arbitrum-one | ethereum | base | solana | hyperliquid | other — the same
+  # ticker can have more than one on-chain deployment (e.g. a Stock Token's Robinhood Chain address vs.
+  # its Arbitrum One "Classic EU" address); each gets its own entry. issuer is optional.
+  # address is a 0x… hex address, a base58 Solana address, or the sentinel not-verified (known to exist,
+  # not yet located). verified: true requires a real address (not the sentinel) and at least one source.
 review:
   researcher: <id>                 # ^[a-z0-9-]+$
   approver: pending                # a different person's id (^[a-z0-9-]+$), or the literal string pending
@@ -205,20 +208,70 @@ Stub-depth research files contain the same 11 headings; sections without researc
 
 ### 5.6 Enumerations
 
-- `category`: Launchpad · Aggregator · Stock-paired token · Fee-routing protocol · NFT / treasury · RWA distributor · RWA baskets · CDP · Agent / execution · Prediction market · Index vault
+- `category`: Launchpad · Aggregator · Stock-paired token · Fee-routing protocol · NFT / treasury · RWA distributor · RWA baskets · CDP · Agent / execution · Prediction market · Index vault · Lending · Options · Yield · Perpetuals · Oracle / infra · Stablecoin · Scanner / tooling
 - `lifecycle`: mainnet · beta · announced · inactive · testnet-only
 - `source.kind`: official-site · docs · whitepaper · social · explorer · repository · audit · announcement · third-party-data · news · other
-- `address.role`: token · factory · router · vault · proxy · implementation · admin · multisig · timelock · other
+- `deployment.chain`: robinhood-chain · arbitrum-one · ethereum · base · solana · hyperliquid · other
+- `deployment.role`: token · factory · router · vault · proxy · implementation · admin · multisig · timelock · other
+- `feed.kind`: company · ct · onchain · risk
+- `accounts.tier`: top · watch
 - `changelog.type`: score · risk · stage · finding · correction · coverage
 - `changelog.severity`: Info · Review · Material · Risk
 
 ### 5.7 `content/dependencies/<id>.yaml`
 
-Ids: `stock-tokens`, `usdg`, `uniswap` (one card for the chain's v2/v3/v4 deployment), `hyperliquid`, `chainlink`. Fields: `id`, `name`, `kind` (issuer-asset | dex | perp-venue | oracle | stablecoin), `summary`, `controls` (list of `{ power, holder, note, class, sources }`), `failure_modes` (list of `{ text, class, sources }`), `sources` (same entry shape as §5.4, shared via `schema/source-entry.schema.json`). A control or failure mode with `class ≠ unknown` needs ≥ 1 source, and every id it cites must exist in the card's own `sources`. Skeleton only in this step.
+Ids: `stock-tokens`, `usdg`, `uniswap` (one card for the chain's v2/v3/v4 deployment), `hyperliquid`, `chainlink`. Fields: `id`, `name`, `kind` (issuer-asset | dex | perp-venue | oracle | stablecoin), `summary`, `controls` (list of `{ power, holder, note, class, sources }`), `failure_modes` (list of `{ text, class, sources }`), an optional `deployments[]` (same shape as a project's, §5.3, plus an optional `ticker` — for cards that cover more than one on-chain asset, e.g. `stock-tokens`), `sources` (same entry shape as §5.4, shared via `schema/source-entry.schema.json`). A control or failure mode with `class ≠ unknown` needs ≥ 1 source, and every id it cites must exist in the card's own `sources`. Skeleton only in this step.
 
 ### 5.8 `content/changelog.yaml`
 
 List of `{ date, slug, type, severity, title, detail, prior, new, reviewer, methodology_version }`. `prior`/`new` are free-form objects (e.g. `{ score: 64, risk: Elevated }`). Seeded with one `coverage` entry per slug dated 2026-08-30, "Initial stub opened".
+
+### 5.9 Feed, accounts, trending and voice lint
+
+`content/feed/<slug>.yaml` — optional per slug:
+
+```yaml
+slug: pons
+items:
+  - id: pons-1
+    date: 2026-08-20
+    kind: company                  # company | ct | onchain | risk
+    title: Pair with any supported RWA
+    body: "..."
+    account: "@ponsdotfamily"      # optional; ^@[A-Za-z0-9_]{1,15}$
+    sourceUrl: https://x.com/ponsdotfamily   # optional
+    sources: [S1]                  # optional; must exist in sources/<slug>.yaml
+```
+
+A feed file's `slug` must be a census slug, and any `sources` id it cites must exist in that slug's own ledger — the
+same cross-check a project file gets. A slug with no feed file is fine; the feed is a bonus signal, not a requirement.
+
+`content/accounts.yaml` — a flat list of CT accounts worth tracking:
+
+```yaml
+- handle: "@ponsdotfamily"
+  name: Pons                       # optional
+  tier: watch                      # top | watch
+  note: "..."                      # optional
+```
+
+New accounts start at `tier: watch`; the maintainer promotes one to `top` once its calls have proven worth
+following. Only `tier: top` accounts count toward the trending signal.
+
+`site.yaml` gains `trending: { min_accounts: 3, window_days: 7 }`. `scripts/lib/trending.mjs` exports
+`computeTrending(feedBySlug, accounts, { minAccounts, windowDays, today }) → Map<slug, { trending, accounts, latest }>`:
+a slug is trending when at least `min_accounts` distinct `tier: top` account handles have each posted a `kind: ct`
+item about it dated within `[today − windowDays, today]` (the same handle posting more than once still counts
+once). `scripts/score.mjs` computes this (`derive()` itself stays pure and knows nothing about feed/accounts) and
+merges `trending: boolean` into every project's derived object, plus a top-level `trending: [slug, ...]` list in
+`build/derived.json`. `--today YYYY-MM-DD` pins "today" for a reproducible run; it defaults to the real date.
+
+**Voice lint.** `scripts/lib/voice.mjs` exports `voiceWarnings(text, where) → string[]`: a case-insensitive,
+whole-word scan for a banned-phrase list (ape/aped/aping, casino, rug/rugged/rugs, moon/mooning,
+shill/shilled/shilling, bag/bags, degen/degens, giga, vapor, "send it"; plus "print"/"prints" only when it reads as
+market-cap-speak — within three words of "mcap", "market cap" or "FDV"). `validateContent` runs it over a project's
+`summary`, every `findings.*[].text`, every feed item's `title`/`body`, and each `research/<slug>.md` in full,
+folding hits into `warnings` normally and into `errors` under `--release`.
 
 ## 6. Scoring and display algorithm (`scripts/lib/score.mjs`)
 
@@ -248,10 +301,11 @@ Rounding: percentages and scores to the nearest integer at the end, never mid-co
 ## 7. Validation (`scripts/validate.mjs`)
 
 1. Every YAML file parses and passes its JSON Schema.
-2. Cross-references: census slugs ⇔ project files ⇔ sources files ⇔ research files (exact 1:1:1:1); every census slug has a `changelog.yaml` entry; census `name`, `category`, `lifecycle`, `coverage` equal the project file's; `dependencies[]` ids exist; every `sources: [S..]` reference in a project file exists in that project's ledger; every id a dependency card's controls/failure modes cite exists in that card's own `sources`; changelog slugs exist; `approver ≠ researcher`. A ledger id cited neither in the project file nor in a research tag is a warning.
+2. Cross-references: census slugs ⇔ project files ⇔ sources files ⇔ research files (exact 1:1:1:1); every census slug has a `changelog.yaml` entry; census `name`, `category`, `lifecycle`, `coverage` equal the project file's; `dependencies[]` ids exist; every `sources: [S..]` reference in a project file exists in that project's ledger; every id a dependency card's controls/failure modes cite exists in that card's own `sources`; changelog slugs exist; `approver ≠ researcher`. A ledger id cited neither in the project file nor in a research tag is a warning. A `content/feed/<slug>.yaml` slug must be a census slug, and any `sources` id a feed item cites must exist in that slug's ledger (§5.9).
 3. Research markdown: front matter present and agreeing with the project (`slug`, `coverage`); the 11 headings present in order. Every tag, in every section, must satisfy the grammar (§5.5) and cite ids that exist in the ledger — anything bracket-shaped that names a class but breaks the grammar is a `malformed tag` error with a line number. Material sections 2–9 additionally may not contain an untagged non-empty paragraph (a paragraph is material unless it is the literal `_Research pending._`), and a `coverage: full` profile may not contain `_Research pending._` in those sections at all. HTML comments are stripped before these checks.
 4. Full profiles: `scoring` present and complete; stubs: `scoring` absent, `findings.missing` non-empty.
-5. `--release` flag additionally fails on `corrections.destination: TODO`, `chain.checked: null`, any census qualifying test with `value: false`, any `addresses[]` entry still `verified: false` on a `full` profile, and any full profile with `review.approver: pending` whose derived confidence would be ≥ `FULL_WEIGHT_CONFIDENCE` without the cap (reviewer needs to know the cap is doing work).
+5. Voice lint (§5.9): `voiceWarnings()` over `summary`, findings text, feed `title`/`body`, and research Markdown — warnings normally, errors under `--release`.
+6. `--release` flag additionally fails on `corrections.destination: TODO`, `chain.checked: null`, any census qualifying test with `value: false`, any `deployments[]` entry still `verified: false` on a `full` profile, and any full profile with `review.approver: pending` whose derived confidence would be ≥ `FULL_WEIGHT_CONFIDENCE` without the cap (reviewer needs to know the cap is doing work).
 
 Exit code 1 on any error; warnings print but pass. `scripts/score.mjs` runs the same checks first and refuses to write `build/derived.json` while there is any error (`--force` overrides, for local experiments only).
 

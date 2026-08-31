@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "site",
   "type": "object", "additionalProperties": false,
-  "required": ["name","tagline","methodology_version","maintainer","corrections","telegram","chain","disclaimer"],
+  "required": ["name","tagline","methodology_version","maintainer","corrections","telegram","chain","trending","disclaimer"],
   "properties": {
     "name": { "type": "string" }, "tagline": { "type": "string" },
     "methodology_version": { "const": "proofline-v1.0" },
@@ -13,6 +13,8 @@
     "chain": { "type": "object", "additionalProperties": false, "required": ["name","id","stack","gas","mainnet_date","explorer","docs","checked"],
       "properties": { "name": { "type": "string" }, "id": { "type": "integer" }, "stack": { "type": "string" }, "gas": { "type": "string" },
         "mainnet_date": { "type": "string", "format": "date" }, "explorer": { "type": "string", "format": "uri" }, "docs": { "type": "string", "format": "uri" }, "checked": { "type": ["string","null"], "format": "date" } } },
+    "trending": { "type": "object", "additionalProperties": false, "required": ["min_accounts","window_days"],
+      "properties": { "min_accounts": { "type": "integer", "minimum": 1 }, "window_days": { "type": "integer", "minimum": 1 } } },
     "disclaimer": { "type": "string", "minLength": 20 }
   }
 }
