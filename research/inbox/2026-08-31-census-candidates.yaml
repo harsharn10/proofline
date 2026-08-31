@@ -1,0 +1,257 @@
+# Census proposals only — not a write to content/census.yaml.
+# Shape: docs/integrations/grok-bot.md §2.5 (schema/census.schema.json). Human reviews before filing.
+# Round 22 coverage seed, 2026-08-31. Addresses are records; exists_on_4663 stays null (Blockscout 4663 403 this round).
+
+candidates:
+  - slug: hedge
+    name: Hedgehogs
+    category: "NFT / treasury"
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: site, url: "https://hedgehogs.tech" }
+      - { kind: x, url: "https://x.com/HedgeOnHood" }
+    discovery_source: "Grok field desk round 22 seed audit + fill-20/21 map subject, x-fill-22.md"
+    handle: "@HedgeOnHood"
+    tree: { primary: nft-treasury/token-bound-nft }
+    token:
+      value: "0x8226DDA5F73619DEdC671e09Be738fA308da1944"
+      chain: robinhood-chain
+      source: docs
+      seen: 2026-08-31
+      exists_on_4663: null
+      explorer_source_verified: null
+    qualifying:
+      deployed_on_chain: { value: true, note: "Site and fill-20/map record token 0x8226DDA5F73619DEdC671e09Be738fA308da1944; Blockscout 4663 not reproduced this round", verified: false }
+      native_play: { value: true, note: "Token-bound fund seats on Robinhood Chain; not a Stock Token or day-one infra", verified: false }
+      citable: { value: true, note: "Official site hedgehogs.tech and X @HedgeOnHood", verified: false }
+      research_story: { value: true, note: "ERC-721 manager seat x ERC-6551 account x ERC-4626 vault; distinct from StonkBrokers, Quotrons, and HOODIES", verified: false }
+
+  - slug: arc
+    name: Arc
+    category: Lending
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: site, url: "https://arcliquidity.capital" }
+      - { kind: x, url: "https://x.com/ArcLiquidity" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@ArcLiquidity"
+    qualifying:
+      deployed_on_chain: { value: false, note: "No contract address in bio as of 2026-08-31 scout; site copy is not explorer evidence", verified: false }
+      native_play: { value: true, note: "USDG borrow against LP on Robinhood Chain; not a Stock Token or day-one infra", verified: false }
+      citable: { value: true, note: "Official site arcliquidity.capital and X @ArcLiquidity", verified: false }
+      research_story: { value: true, note: "Scout 2026-08-31: USDG borrow against LP, 6 markets, site line Arc Liquidity on Robinhood; distinct from Arrow CDP", verified: false }
+
+  - slug: scalar
+    name: Scalar
+    category: Yield
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: site, url: "https://scalarliquidity.com" }
+      - { kind: x, url: "https://x.com/scalarliquidity" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@scalarliquidity"
+    token:
+      value: "0xBe92b334E045Bbfd292a28e54f8C75aF2FC07bBE"
+      chain: robinhood-chain
+      source: third-party
+      seen: 2026-08-31
+      exists_on_4663: null
+      explorer_source_verified: null
+    qualifying:
+      deployed_on_chain: { value: true, note: "Token record 0xBe92b334E045Bbfd292a28e54f8C75aF2FC07bBE; exists_on_4663 null until Blockscout", verified: false }
+      native_play: { value: true, note: "Yield layer on Robinhood Chain; builds on @v4dotfun", verified: false }
+      citable: { value: true, note: "Official site scalarliquidity.com and X @scalarliquidity", verified: false }
+      research_story: { value: true, note: "Yield product that builds on @v4dotfun; not Hookr, not what-the-hook, not Canopy", verified: false }
+
+  - slug: bricks
+    name: bricks
+    category: Yield
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: site, url: "https://brickswall.tech" }
+      - { kind: x, url: "https://x.com/brickswalltech" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@brickswalltech"
+    token:
+      value: "0x7b7faa885c237faba733e7006e80149ba9224643"
+      chain: robinhood-chain
+      source: third-party
+      seen: 2026-08-31
+      exists_on_4663: null
+      explorer_source_verified: null
+    qualifying:
+      deployed_on_chain: { value: true, note: "Token record 0x7b7faa885c237faba733e7006e80149ba9224643; location stated as Robinhood Chain; exists_on_4663 null", verified: false }
+      native_play: { value: true, note: "Yield product stating Robinhood Chain location; not a Stock Token or day-one infra", verified: false }
+      citable: { value: true, note: "Official site brickswall.tech and X @brickswalltech", verified: false }
+      research_story: { value: true, note: "Yield category this round; a human may later recategorize as Fee-routing protocol", verified: false }
+
+  - slug: floor
+    name: Floor
+    category: "RWA distributor"
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: site, url: "https://floorfi.app" }
+      - { kind: x, url: "https://x.com/Floor_fi" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@Floor_fi"
+    qualifying:
+      deployed_on_chain: { value: false, note: "No contract address recorded this round; site and X only", verified: false }
+      native_play: { value: true, note: "Stock-backed floor for Robinhood L2 tokens; not a Stock Token issuer", verified: false }
+      citable: { value: true, note: "Official site floorfi.app and X @Floor_fi", verified: false }
+      research_story: { value: true, note: "Stock-backed floor for Robinhood L2 tokens; ticker FLR not FLOOR", verified: false }
+
+  - slug: sluice
+    name: Sluice
+    category: Yield
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: site, url: "https://sluice.live" }
+      - { kind: x, url: "https://x.com/sluice_rh" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@sluice_rh"
+    token:
+      value: "0xb48d34dd8b53324cb8525461c8e548522db885ec"
+      chain: robinhood-chain
+      source: third-party
+      seen: 2026-08-31
+      exists_on_4663: null
+      explorer_source_verified: null
+    qualifying:
+      deployed_on_chain: { value: true, note: "Token record 0xb48d34dd8b53324cb8525461c8e548522db885ec; exists_on_4663 null until Blockscout", verified: false }
+      native_play: { value: true, note: "Yield product on Robinhood Chain; not RamsesX", verified: false }
+      citable: { value: true, note: "Official site sluice.live and X @sluice_rh", verified: false }
+      research_story: { value: true, note: "Yield venue; keep distinct from RamsesX", verified: false }
+
+  - slug: twofold
+    name: TwoFold
+    category: Yield
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: site, url: "https://twofold.fi" }
+      - { kind: x, url: "https://x.com/twofoldfi" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@twofoldfi"
+    token:
+      value: "0x2A4a33A2163D005d8E7f1D9aC08d14c98db288d5"
+      chain: robinhood-chain
+      source: third-party
+      seen: 2026-08-31
+      exists_on_4663: null
+      explorer_source_verified: null
+    qualifying:
+      deployed_on_chain: { value: true, note: "Token record 0x2A4a33A2163D005d8E7f1D9aC08d14c98db288d5; exists_on_4663 null until Blockscout", verified: false }
+      native_play: { value: true, note: "Uniswap v4 hook yield product on Robinhood Chain", verified: false }
+      citable: { value: true, note: "Official site twofold.fi and X @twofoldfi", verified: false }
+      research_story: { value: true, note: "Uni v4 hook; distinct from Hookr, what-the-hook, and v4.fun", verified: false }
+
+  - slug: v4fun
+    name: v4.fun
+    category: Launchpad
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: site, url: "https://v4.fun" }
+      - { kind: x, url: "https://x.com/v4dotfun" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@v4dotfun"
+    qualifying:
+      deployed_on_chain: { value: false, note: "No contract address recorded this round; site and X only", verified: false }
+      native_play: { value: true, note: "Launchpad on Robinhood Chain powered by @canopyfinance", verified: false }
+      citable: { value: true, note: "Official site v4.fun and X @v4dotfun", verified: false }
+      research_story: { value: true, note: "Launchpad powered by @canopyfinance; distinct from Hookr, what-the-hook, Hooded.Meme, and Canopy", verified: false }
+
+  - slug: hooded-meme
+    name: Hooded.Meme
+    category: Launchpad
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: x, url: "https://x.com/HoodedDotMeme" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@HoodedDotMeme"
+    qualifying:
+      deployed_on_chain: { value: false, note: "No contract address recorded this round; X only", verified: false }
+      native_play: { value: true, note: "Launchpad named beside SwapHood; not the SwapHood DEX", verified: false }
+      citable: { value: true, note: "Official X @HoodedDotMeme", verified: false }
+      research_story: { value: true, note: "Launchpad made by @SwapHoodFi; distinct from swaphood, hoodfun, and stonks-fun", verified: false }
+
+  - slug: canopy
+    name: Canopy
+    category: Launchpad
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: x, url: "https://x.com/canopyfinance" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@canopyfinance"
+    token:
+      value: "0x532c5583671870723ceef573600208af49c87c54"
+      chain: robinhood-chain
+      source: third-party
+      seen: 2026-08-31
+      exists_on_4663: null
+      explorer_source_verified: null
+    qualifying:
+      deployed_on_chain: { value: true, note: "Map observe CA copied as record 0x532c5583671870723ceef573600208af49c87c54; exists_on_4663 null", verified: false }
+      native_play: { value: true, note: "NL to Uniswap v4 launcher on Robinhood Chain; not Hookr", verified: false }
+      citable: { value: true, note: "Official X @canopyfinance; not @Canopy_Finance", verified: false }
+      research_story: { value: true, note: "agen.space NL to v4 plus CNPY stock ratchet per fill-14/map; distinct from Hookr", verified: false }
+
+  - slug: mosaicetf
+    name: MosaicETF
+    category: "RWA baskets"
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: x, url: "https://x.com/MosaicETF" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@MosaicETF"
+    token:
+      value: "0x776650808dda2ae08653dc70cdac45a9ce39e025"
+      chain: robinhood-chain
+      source: third-party
+      seen: 2026-08-31
+      exists_on_4663: null
+      explorer_source_verified: null
+    qualifying:
+      deployed_on_chain: { value: true, note: "Map observe CA copied as record 0x776650808dda2ae08653dc70cdac45a9ce39e025; exists_on_4663 null", verified: false }
+      native_play: { value: true, note: "Onchain ETF baskets on Robinhood Chain; not Index and not Statics", verified: false }
+      citable: { value: true, note: "Official X @MosaicETF", verified: false }
+      research_story: { value: true, note: "Wallet-mirror baskets per fill-13/map; distinct from Index and Statics", verified: false }
+
+  - slug: rallypad
+    name: Rallypad
+    category: Launchpad
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: x, url: "https://x.com/rallypadfun" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@rallypadfun"
+    qualifying:
+      deployed_on_chain: { value: false, note: "No contract address recorded this round; X only", verified: false }
+      native_play: { value: true, note: "Programmable launchpad on Robinhood Chain; not Pons and not Hookr", verified: false }
+      citable: { value: true, note: "Official X @rallypadfun", verified: false }
+      research_story: { value: true, note: "Livestream and fee-routing pad per desk/map; distinct from Pons and Hookr", verified: false }
+
+  - slug: robinpad
+    name: RobinPad
+    category: Launchpad
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: x, url: "https://x.com/Robin_Pad" }
+    discovery_source: "Grok field desk round 22 seed audit, x-fill-22.md"
+    handle: "@Robin_Pad"
+    qualifying:
+      deployed_on_chain: { value: false, note: "Fill-15 docs factories remain unlabeled pending Blockscout 4663; a tweet is not mainnet", verified: false }
+      native_play: { value: true, note: "Odyssey pad on Robinhood Chain; not Meridian", verified: false }
+      citable: { value: true, note: "Official X @Robin_Pad; not @RobinPAD_MEME and not @OddyseyAI", verified: false }
+      research_story: { value: true, note: "Instant plus curve pad plus Hyperliquid-wrapped RobinPerps per fill-15; lifecycle remains announced", verified: false }
