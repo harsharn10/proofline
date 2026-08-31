@@ -384,6 +384,16 @@ subjects:
     handle: "@notawebsite_rh"
     note: Tokenized ad slots. Claims ETH volume/payouts since 11 Aug v2.
 
+  - slug: hedge
+    name: Hedgehogs
+    tree_primary: nft-treasury/token-bound-nft
+    tree_secondary: [yield/savings-vault]
+    lifecycle: mainnet
+    live_evidence: [official-post, docs]
+    handle: "@HedgeOnHood"
+    cas: { token: "0x8226DDA5F73619DEdC671e09Be738fA308da1944" }
+    note: TBF = ERC-721 manager × ERC-6551 account × ERC-4626 vault. 3,333 seats sold out. Site hedgehogs.tech. Burn $HEDGE to level NFT; 0.5% upgrade emissions to wallet not vault. Distinct from StonkBrokers (6551 stock seats), Quotrons (ERC-404 hardwire), HOODIES (100×6551 airdrop, different CA).
+
   - slug: lemon
     name: Lemon
     tree_primary: launch/other-pad
@@ -477,7 +487,7 @@ dependencies:
   - { name: Arcus, tree_primary: trading/perps-imported, tree_secondary: [trading/prop-amm], handle: "@arcus_xyz", llama_tvl_rh: 19978227 }
   - { name: Spark Savings, tree_primary: chain-infra/stablecoin, handle: "@sparkfinance", llama_tvl_rh: 28726816 }
   - { name: Chainlink, tree_primary: chain-infra/oracle, handle: "@chainlink" }
-  - { name: USDG / Paxos, tree_primary: chain-infra/stablecoin, handle: null }
+  - { name: USDG / Paxos, tree_primary: chain-infra/stablecoin, handle: null, cas: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168", note: "Official docs.robinhood.com/chain/contracts." }
   - { name: LayerZero V2, tree_primary: chain-infra/bridge, handle: "@LayerZero_Core", llama_tvl_rh: 1437917 }
   - { name: Symbiosis, tree_primary: chain-infra/bridge, handle: "@symbiosis_fi", llama_tvl_rh: 265998 }
   - { name: Alchemy, tree_primary: chain-infra/rpc-aa, handle: null }
@@ -584,6 +594,7 @@ observe:
     - { name: Vantis, handle: "@vantis_ai", note: "x402 facilitator on USDG rails. Observe." }
     - { name: Moby, handle: "@mobyagent", note: "KOL tracking / trigger buys. Exec. Observe." }
     - { name: Hood Insider, handle: "@HoodInsider_", note: "Weekly recap media. Numbers are claims. Distinct from @RHDaily__." }
+    - { name: HOODIES, handle: null, cas: "0x8F468471ee1b11a0C060bd76A8e7300d4bc91360", note: "100× ERC-6551 vault NFTs. Token 0x971c43907c9f5ccf52Dc8a560d7240E27153fdEf. Not Hedgehogs." }
     - { name: Hoodit, note: "Llama DEX dust." }
     - { name: HoodFrens, note: "Llama SoFi row." }
     - { name: YOWL, handle: "@YowlonHood", ca: "0x062939bB32EaBD47A522FE48872F41E04017a095", note: "yowl.trade Morpho. Related to stonks.fun. Graduation/app until mechanism is independent." }
