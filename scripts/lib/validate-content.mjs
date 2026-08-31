@@ -44,8 +44,17 @@ export async function validateContent(root = "content", { release = false } = {}
       fail(`research/${slug}.md`, checkResearch(text, { slug, coverage: project.coverage, ledgerIds }));
       for (const id of tagIds(text)) referenced.add(id);
     }
-    for (const id of ledgerIds) if (!referenced.has(id)) warnings.push(`sources/${slug}: ${id} is never cited by projects/${slug}.yaml or research/${slug}.md`);
+    // Feed items cite ledger ids too (crossCheck already requires them to exist); count them as citations.
+    for (const item of content.feed?.get(slug)?.items ?? []) for (const id of item.sources ?? []) referenced.add(id);
+    for (const id of ledgerIds) if (!referenced.has(id)) warnings.push(`sources/${slug}: ${id} is never cited by projects/${slug}.yaml, research/${slug}.md or feed/${slug}.yaml`);
   }
+
+  // Trending hygiene (Task 5 addendum ruling 4): a feed item attributed to a blacklisted account is a
+  // warning — the item stays (it is a dated record of what was said) but it can never count.
+  const blacklisted = new Set((content.accounts ?? []).filter((a) => a.tier === "blacklist").map((a) => a.handle));
+  for (const [slug, f] of content.feed ?? new Map())
+    for (const item of f.items ?? [])
+      if (item.account && blacklisted.has(item.account)) warnings.push(`feed/${slug}.yaml: ${item.id} cites blacklisted account ${item.account}`);
 
   // Voice lint: banned-phrase warnings over summary, findings text, feed bodies/titles and research
   // markdown. --release turns them into errors.

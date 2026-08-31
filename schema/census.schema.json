@@ -13,6 +13,9 @@
       "official_links": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["kind","url"],
         "properties": { "kind": { "enum": ["site","app","docs","whitepaper","x","github","telegram","discord","other"] }, "url": { "type": "string", "format": "uri" } } } },
       "discovery_source": { "type": "string", "minLength": 1 },
+      "handle": { "type": "string", "pattern": "^@[A-Za-z0-9_]{1,15}$" },
+      "tree": { "type": "object", "additionalProperties": false, "required": ["primary"],
+        "properties": { "primary": { "type": "string", "minLength": 1 }, "secondary": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true } } },
       "qualifying": { "type": "object", "additionalProperties": false, "required": ["deployed_on_chain","native_play","citable","research_story"],
         "properties": {
           "deployed_on_chain": { "$ref": "#/$defs/test" }, "native_play": { "$ref": "#/$defs/test" }, "citable": { "$ref": "#/$defs/test" }, "research_story": { "$ref": "#/$defs/test" } } }

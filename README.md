@@ -21,13 +21,13 @@ If a number on the site is wrong, the fix is in an input or in `score.mjs`, neve
 ## Layout
 
     content/site.yaml               name, maintainer, corrections contact, chain facts, trending config, disclaimer
-    content/census.yaml             the coverage universe; one entry per play with the four qualifying tests
+    content/census.yaml             the coverage universe; one entry per play with the four qualifying tests, optional handle + tree placement
     content/projects/<slug>.yaml    structured record: identity, deployments, dependencies, scoring inputs, findings
     content/sources/<slug>.yaml     source ledger — every S-id cited anywhere for that slug lives here
     content/research/<slug>.md      narrative record, 11 fixed sections, every material sentence tagged
     content/dependencies/<id>.yaml  shared cards: stock-tokens, usdg, uniswap, hyperliquid, chainlink
     content/feed/<slug>.yaml        optional per-project activity feed (company/ct/onchain/risk items)
-    content/accounts.yaml           CT accounts tracked for the trending signal (handle, tier: top|watch)
+    content/accounts.yaml           CT accounts tracked for the trending signal (handle, tier, role, slug, followers)
     content/changelog.yaml          dated record of every published change
     content/methodology.md          generated from PRD §6–7 (see Task 5 in the plan for the extraction command)
     schema/                         JSON Schema for each file type
@@ -90,12 +90,17 @@ account?, sourceUrl?, sources? }] }`. `kind` is `company | ct | onchain | risk`;
 `^@[A-Za-z0-9_]{1,15}$`. A feed file's `slug` must be a census slug, and any `sources` ids it cites must exist in that
 slug's ledger — same rule as a project file.
 
-`content/accounts.yaml` is the list of CT accounts worth tracking: `[{ handle, name?, tier: top|watch, note? }]`. New
-accounts start at `tier: watch`; the maintainer promotes one to `top` once its calls have proven worth following.
+`content/accounts.yaml` is the list of CT accounts worth tracking: `[{ handle, name?, tier, role?, slug?, followers?,
+note? }]`. `tier` is `top | watch | downweight | blacklist` (blacklist = impersonators, wrong-chain homonyms, drainer
+copypasta — the row stays so the collision is not lost); `role` is `project | alpha | kol | data | infra | media` and
+says how to read the account; `slug` ties an official account to its census row. New accounts start at `tier: watch`;
+the maintainer promotes one to `top` once its calls have proven worth following.
 
 `site.yaml`'s `trending: { min_accounts, window_days }` (3 accounts / 7 days by default) drives `computeTrending()`
-(`scripts/lib/trending.mjs`): a project is trending when at least `min_accounts` distinct `tier: top` accounts have
-each posted a `kind: ct` item about it within the last `window_days` days. `npm run score` merges the result into
+(`scripts/lib/trending.mjs`): a project is trending when at least `min_accounts` distinct counting accounts have each
+posted a `kind: ct` item about it within the last `window_days` days. An account counts only when `tier: top` **and**
+its `role` is absent or `alpha` / `kol` — official project accounts, data feeds and media never vote on trending, and
+`blacklist` rows are never counted; `validate` warns when a feed item is attributed to a blacklisted handle. `npm run score` merges the result into
 `build/derived.json` — `trending: boolean` on every project, plus a top-level `trending: [slug, ...]` list. Pass
 `--today YYYY-MM-DD` to pin "today" for a reproducible run; it defaults to the real date.
 

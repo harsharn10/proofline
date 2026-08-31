@@ -11,7 +11,7 @@
   "properties": {
     "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
     "name": { "type": "string", "minLength": 1 },
-    "kind": { "enum": ["issuer-asset","dex","perp-venue","oracle","stablecoin"] },
+    "kind": { "enum": ["issuer-asset","dex","perp-venue","oracle","stablecoin","lending","yield","bridge","infra","nft-marketplace","locker","aggregator"] },
     "summary": { "type": "string", "minLength": 1 },
     "controls": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["power","holder","note","class","sources"],
       "properties": { "power": { "type": "string" }, "holder": { "type": "string" }, "note": { "type": "string" }, "class": { "$ref": "#/$defs/evidenceClass" }, "sources": { "$ref": "#/$defs/sourceRefs" } },

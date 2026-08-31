@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { parse } from "yaml";
 import assert from "node:assert/strict";
-import { mkdtemp, cp, rm, writeFile, appendFile } from "node:fs/promises";
+import { mkdtemp, mkdir, cp, rm, writeFile, appendFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { derive, SECURITY_MAX, PROVISIONAL_CONFIDENCE, FULL_WEIGHT_CONFIDENCE } from "./lib/score.mjs";
@@ -11,7 +11,7 @@ import { checkResearch, tagIds, REQUIRED_HEADINGS } from "./lib/research-md.mjs"
 import { loadContent } from "./lib/load.mjs";
 import { selectUnsent, buildDigest, chunkMessage, readDotEnv } from "./lib/telegram.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
-import { computeTrending } from "./lib/trending.mjs";
+import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings } from "./lib/voice.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
@@ -264,21 +264,35 @@ async function makeContent(mutate = () => {}) {
 {
   const tmp = await mkdtemp(join(tmpdir(), "proofline-"));
   await cp("content", tmp, { recursive: true });
+  await mkdir(join(tmp, "feed"), { recursive: true });
   const baseline = await validateContent(tmp);
+  // Flip one qualifying test to false on the scratch copy: it must warn normally and error under --release.
+  const censusPath = join(tmp, "census.yaml");
+  const censusText = await readFile(censusPath, "utf8");
+  await writeFile(censusPath, censusText.replace(/citable:\s*\{ value: true,/, "citable:           { value: false,"));
+  const qualifyingFalse = await validateContent(tmp);
   const releaseRun = await validateContent(tmp, { release: true });
+  await writeFile(censusPath, censusText);
   const ledgerPath = join(tmp, "sources", "pons.yaml"), researchPath = join(tmp, "research", "pons.md");
   const entry = (id) => `  - id: ${id}\n    url: https://example.com/${id}\n    publisher: Example\n    kind: docs\n    accessed_at: 2026-08-30T00:00:00Z\n    claim: Fixture\n    excerpt: n/a\n    hash: null\n    archive_url: null\n    researcher: harsharn10\n    available: true\n`;
   await appendFile(ledgerPath, entry("S2") + entry("S3"));
   const research = await readFile(researchPath, "utf8");
   await writeFile(researchPath, research.replace("## Identity\n\n_Research pending._", "## Identity\n\nPons is a launchpad. [claim S2]"));
   const cited = await validateContent(tmp);
+  // A feed item citing S3 counts as a citation; a feed item attributed to a blacklisted account warns.
+  await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: blacklist\n  role: kol\n");
+  await writeFile(join(tmp, "feed", "pons.yaml"), "slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ct\n    title: T\n    body: B\n    account: \"@spam\"\n    sources: [S3]\n");
+  const feedCited = await validateContent(tmp);
   await writeFile(join(tmp, "projects", "arrow.yaml"), "slug: [\n");
   const broken = await validateContent(tmp);
   await rm(tmp, { recursive: true, force: true });
   try {
     assert.deepEqual(baseline.errors, [], "scratch copy validates");
-    assert.ok(baseline.warnings.some((w) => w.includes("stonkbroker fails qualifying test citable")), "qualifying value false warns");
-    assert.ok(releaseRun.errors.some((e) => e.includes("stonkbroker fails qualifying test citable")), "qualifying value false is a release error");
+    assert.ok(qualifyingFalse.warnings.some((w) => w.includes("fails qualifying test citable")), "qualifying value false warns");
+    assert.ok(releaseRun.errors.some((e) => e.includes("fails qualifying test citable")), "qualifying value false is a release error");
+    assert.deepEqual(feedCited.errors, [], "feed citation of an existing ledger id is not an error");
+    assert.ok(!feedCited.warnings.some((w) => w.includes("S3 is never cited")), "an id cited only from a feed item is not 'never cited'");
+    assert.ok(feedCited.warnings.some((w) => w.includes("blacklisted account @spam")), "feed item attributed to a blacklisted account warns");
     assert.deepEqual(cited.errors, [], "prose citation validates");
     assert.ok(!cited.warnings.some((w) => w.includes("S2 is never cited")), "an id cited only in research prose is not 'never cited'");
     assert.ok(cited.warnings.some((w) => w.includes("S3 is never cited")), "an id cited nowhere still warns");
@@ -410,13 +424,19 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   } catch (err) { failures++; console.error(`FAIL telegram digest: `); }
 }
 
-// Task 2 — computeTrending: distinct top-tier accounts with `kind: ct` items dated inside the window.
+// Task 2 / Task 5 — computeTrending: distinct counting accounts with `kind: ct` items dated inside the window.
+// Task 5 addendum ruling 4: an account counts only when tier == top AND (role absent OR role ∈ {alpha, kol});
+// blacklist rows never count.
 {
   const accounts = [
-    { handle: "@a", tier: "top" },
-    { handle: "@b", tier: "top" },
-    { handle: "@c", tier: "top" },
-    { handle: "@d", tier: "watch" },
+    { handle: "@a", tier: "top" },                      // no role → counts (legacy shape)
+    { handle: "@b", tier: "top", role: "alpha" },
+    { handle: "@c", tier: "top", role: "kol" },
+    { handle: "@d", tier: "watch", role: "alpha" },
+    { handle: "@p", tier: "top", role: "project" },     // official account at top: must NOT count
+    { handle: "@m", tier: "top", role: "media" },
+    { handle: "@x", tier: "blacklist", role: "kol" },
+    { handle: "@w", tier: "downweight", role: "kol" },
   ];
   const opts = { minAccounts: 3, windowDays: 7, today: "2026-08-30" };
   const item = (id, date, account) => ({ id, date, kind: "ct", title: "t", body: "b", account });
@@ -424,16 +444,69 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   const threeTop = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@c")]);
   const twoTop = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b")]);
   const oneWatch = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@d")]);
+  const topProject = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@p")]);
+  const topMedia = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@m")]);
+  const blacklisted = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@x")]);
+  const downweighted = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@w")]);
   const outsideWindow = run([item("1", "2026-08-20", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@c")]);
   const sameAccountThrice = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@a"), item("3", "2026-08-27", "@a")]);
   try {
-    assert.equal(threeTop.trending, true, "3 top accounts in window → trending");
+    assert.equal(threeTop.trending, true, "3 counting accounts in window → trending");
+    assert.deepEqual(threeTop.accounts, ["@a", "@b", "@c"]);
     assert.equal(twoTop.trending, false, "2 accounts → not trending");
     assert.equal(oneWatch.trending, false, "one of three is watch tier → not trending");
+    assert.equal(topProject.trending, false, "top + role: project must not count");
+    assert.equal(topMedia.trending, false, "top + role: media must not count");
+    assert.equal(blacklisted.trending, false, "blacklist never counts");
+    assert.equal(downweighted.trending, false, "downweight never counts");
     assert.equal(outsideWindow.trending, false, "one dated outside window → not trending");
     assert.equal(sameAccountThrice.trending, false, "same account thrice counts once → not trending");
+    assert.equal(countsForTrending({ handle: "@z", tier: "top", role: "alpha" }), true);
+    assert.equal(countsForTrending({ handle: "@z", tier: "top", role: "data" }), false);
+    assert.equal(countsForTrending({ handle: "@z", tier: "blacklist" }), false);
     console.log("ok   computeTrending");
   } catch (err) { failures++; console.error(`FAIL computeTrending: ${err.message}`); }
+}
+
+// Task 5 — accounts schema: tier superset, role enum, slug pattern, integer followers.
+{
+  const row = (extra) => [{ handle: "@a", tier: "watch", ...extra }];
+  const cases = [
+    [row({ tier: "downweight" }), 0, "downweight tier"],
+    [row({ tier: "blacklist" }), 0, "blacklist tier"],
+    [row({ tier: "muted" }), 1, "unknown tier rejected"],
+    [row({ role: "alpha" }), 0, "role alpha"],
+    [row({ role: "builder" }), 1, "role outside the enum rejected"],
+    [row({ slug: "denar" }), 0, "slug"],
+    [row({ slug: "Denar Markets" }), 1, "slug must match ^[a-z0-9-]+$"],
+    [row({ followers: 6800 }), 0, "integer followers"],
+    [row({ followers: "6.8k" }), 1, "followers must be an integer"],
+    [row({ weight: "top" }), 1, "desk field weight is not carried over"],
+  ];
+  try {
+    for (const [data, want, why] of cases) assert.equal(validateAgainst("accounts", data).length > 0 ? 1 : 0, want, why);
+    console.log("ok   accounts schema");
+  } catch (err) { failures++; console.error(`FAIL accounts schema: ${err.message}`); }
+}
+
+// Task 5 — census schema: optional handle (X pattern) and tree { primary, secondary[] }.
+{
+  const base = () => ({
+    slug: "denar", name: "Denar", category: "Lending", lifecycle: "mainnet", coverage: "stub", official_links: [],
+    discovery_source: "desk", qualifying: Object.fromEntries(["deployed_on_chain", "native_play", "citable", "research_story"].map((k) => [k, { value: true, note: "n", verified: false }])),
+  });
+  const cases = [
+    [{ ...base(), handle: "@DenarMarkets" }, 0, "handle"],
+    [{ ...base(), handle: "DenarMarkets" }, 1, "handle needs @"],
+    [{ ...base(), tree: { primary: "credit/isolated-money-market" } }, 0, "tree primary only"],
+    [{ ...base(), tree: { primary: "credit/isolated-money-market", secondary: ["yield/savings-vault"] } }, 0, "tree with secondary"],
+    [{ ...base(), tree: { secondary: ["x"] } }, 1, "tree needs primary"],
+    [{ ...base(), tree: { primary: "x", tertiary: [] } }, 1, "tree rejects unknown keys"],
+  ];
+  try {
+    for (const [data, want, why] of cases) assert.equal(validateAgainst("census", [data]).length > 0 ? 1 : 0, want, why);
+    console.log("ok   census schema handle/tree");
+  } catch (err) { failures++; console.error(`FAIL census schema handle/tree: ${err.message}`); }
 }
 
 // Task 2 — feed schema: kind enum and account handle pattern.
