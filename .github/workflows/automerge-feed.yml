@@ -1,13 +1,16 @@
 name: Automerge feed PRs
 
 # Grok Bot contract (docs/integrations/grok-bot.md): a PR from a grok/<date> branch whose changed
-# files are entirely within the allowed intake/feed paths gets approved and queued for auto-merge —
-# GitHub's native auto-merge then waits for the Validate workflow's required check to pass before it
-# actually merges. Anything else gets a comment asking for human review and the job exits 0.
+# files are entirely within the allowed intake/feed paths gets squash-merged, but only after this
+# workflow itself watches the PR's checks to completion and confirms they passed — it does not rely
+# on GitHub's native "auto-merge" feature or on branch protection being configured, so it works even
+# on a repo where nobody has flipped "Allow auto-merge" on. (Branch protection with validate.yml's
+# `test` job as a required check is still worth adding as a second line of defense, but this workflow
+# doesn't need it to behave correctly.) Anything else gets a comment asking for human review and the
+# job exits 0 without merging.
 #
-# Requires "Allow auto-merge" enabled in the repo's General settings, and Validate's `test` job set
-# as a required status check in branch protection for main — otherwise `gh pr merge --auto` merges
-# without waiting on it.
+# No approval step: merging with GITHUB_TOKEN doesn't require one unless branch protection demands
+# reviews, and an approval step here would just file a duplicate approval on every re-run.
 on:
   pull_request:
     branches: [main]
@@ -49,8 +52,13 @@ jobs:
         if: steps.paths.outputs.out_of_scope == 'true'
         run: gh pr comment "$PR_NUMBER" --body "needs human review (touches scoring/risk/census)"
 
-      - name: Approve and queue auto-merge
+      # Blocks until every check on the PR resolves; exits non-zero the moment one fails (validate.yml
+      # runs on this same pull_request event, so its check is normally already registered or about to
+      # be by the time this polls). A non-zero exit here fails this job and the merge step never runs.
+      - name: Wait for checks to pass
         if: steps.paths.outputs.out_of_scope == 'false'
-        run: |
-          gh pr review "$PR_NUMBER" --approve
-          gh pr merge "$PR_NUMBER" --squash --auto
+        run: gh pr checks "$PR_NUMBER" --watch --fail-fast
+
+      - name: Squash-merge
+        if: steps.paths.outputs.out_of_scope == 'false'
+        run: gh pr merge "$PR_NUMBER" --squash --delete-branch

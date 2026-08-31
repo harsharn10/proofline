@@ -247,10 +247,12 @@ daily cadence that always opens a PR, even an empty one, defeats the purpose of 
    site's `typecheck` + `build`. This is what actually catches a malformed feed item or source entry —
    even though §2 asks the desk to only write when "the shape validates," CI is the real backstop.
 2. **`automerge-feed.yml`** runs in parallel. If every changed file is under `content/feed/**`,
-   `content/sources/**`, `content/accounts.yaml`, or `research/inbox/**`, it approves the PR and calls
-   `gh pr merge --squash --auto` — which queues the merge to happen automatically once `validate.yml`'s
-   check passes, not immediately. If anything else changed, it comments "needs human review (touches
-   scoring/risk/census)" and stops; a human merges it manually after reviewing.
+   `content/sources/**`, `content/accounts.yaml`, or `research/inbox/**`, it watches the PR's checks to
+   completion itself (`gh pr checks --watch --fail-fast`) and, only once they pass, squash-merges it
+   (`gh pr merge --squash --delete-branch`) — it does not rely on GitHub's native auto-merge feature or
+   on any branch-protection setting, and it never files an approval. If anything else changed, it
+   comments "needs human review (touches scoring/risk/census)" and stops; a human merges it manually
+   after reviewing.
 3. **On merge to `main`**, `publish.yml` runs `npm run score` (recomputing derived scores, including
    `trending`) and sends the Telegram digest for anything new — silently skipped if the Telegram
    secrets aren't configured.

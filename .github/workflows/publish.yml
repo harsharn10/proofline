@@ -13,6 +13,13 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # The `secrets` context is NOT available in step- or job-level `if:` — only in `env:` and step
+    # inputs. Hoisting the three secrets to job-level env lets every step's `if:` read them back out
+    # as `env.*`, which IS available in `if:`.
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      SITE_URL: ${{ secrets.SITE_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -26,22 +33,22 @@ jobs:
       - name: Derive scores
         run: npm run score
 
-      # Skipped (not failed) when the repo secrets aren't set, so forks and secret-less CI runs
-      # stay green. secrets.* is safe to read directly in an `if:` — GitHub Actions evaluates it
-      # itself before the shell ever sees it, and forked-PR runs simply see empty secrets.
+      # Skipped (not failed) when the repo secrets aren't set, so forks and secret-less CI runs stay
+      # green.
       - name: Telegram digest
-        if: ${{ secrets.TELEGRAM_BOT_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != '' }}
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          SITE_URL: ${{ secrets.SITE_URL }}
+        id: digest
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
         run: npm run telegram
 
+      # Only runs when the digest step above actually ran (outcome == success — 'skipped' when the
+      # secrets were absent short-circuits this too), and only commits if that run actually changed
+      # the state file (a re-run with nothing new to send leaves it byte-identical).
       - name: Commit updated telegram state
+        if: ${{ steps.digest.outcome == 'success' }}
         run: |
           git config user.name "proofline-bot"
           git config user.email "proofline-bot@users.noreply.github.com"
-          if [ -n "$(git status --porcelain ops/telegram-state.json)" ]; then
+          if ! git diff --quiet -- ops/telegram-state.json; then
             git add ops/telegram-state.json
             git commit -m "chore: update telegram state [skip ci]"
             git push

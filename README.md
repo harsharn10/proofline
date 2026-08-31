@@ -142,16 +142,18 @@ Three workflows under `.github/workflows/`:
   secrets; commits `ops/telegram-state.json` back with `[skip ci]` if it changed.
 - **`automerge-feed.yml`** — on a pull request from a `grok/**` branch (see "Grok Bot" below). If
   every changed file is under `content/feed/**`, `content/sources/**`, `content/accounts.yaml`, or
-  `research/inbox/**`, it approves the PR and queues `gh pr merge --squash --auto`, which merges once
-  `validate.yml` passes. Anything else gets a "needs human review" comment and waits.
+  `research/inbox/**`, it watches the PR's checks to completion (`gh pr checks --watch --fail-fast`)
+  and, only once they pass, squash-merges it (`gh pr merge --squash --delete-branch`) — no approval
+  step, no dependency on GitHub's native auto-merge. Anything else gets a "needs human review" comment
+  and the job exits 0 without merging.
 
 Required repo secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `SITE_URL` (all optional — absent
 means the digest step is skipped, not failed). `GITHUB_TOKEN` is automatic.
 
-Required repo setting: **Allow auto-merge** (Settings → General → Pull Requests) must be on for
-`automerge-feed.yml`'s `gh pr merge --auto` to work at all; add `validate.yml`'s `test` job as a
-required status check in branch protection on `main` so auto-merge actually waits for it instead of
-merging immediately.
+`automerge-feed.yml` doesn't need "Allow auto-merge" or any branch-protection setting to work — it
+polls and merges itself. Adding `validate.yml`'s `test` job as a required status check in branch
+protection on `main` is still worth doing as a second line of defense (it stops anyone, human or bot,
+from merging past a red check some other way), just not required for this workflow specifically.
 
 ## Grok Bot
 
