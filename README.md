@@ -162,10 +162,8 @@ Credentials (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, optional `SITE_URL`, `PRO
 `.env.local` (gitignored) locally, or from repo secrets in CI. Sent-state lives in
 `ops/telegram-state.json` — tracked in git (moved out of `build/`, which is gitignored and
 regenerated, precisely so the digest remembers what it already sent across CI runs). `publish.yml` runs
-the digest and commits the updated state back on every push to `main` — which includes a human clicking
-"Merge" in the GitHub UI, but not a squash-merge done by `automerge-feed.yml` with its own token (GitHub
-never fires push-triggered workflows from `GITHUB_TOKEN`'s own commits); that path dispatches
-`publish.yml` explicitly right after merging instead (see "CI" below).
+the digest and commits the updated state back on every push to `main` — a human clicking "Merge" in the
+GitHub UI. `automerge-feed.yml` does not merge and does not dispatch `publish.yml`.
 
 ## CI
 
@@ -178,31 +176,28 @@ Three workflows under `.github/workflows/`:
   --release` step with `continue-on-error: true` so release blockers (corrections contact, verified
   deployments, approvals) show up in the log without failing the check, then the site's `npm ci && npm
   run typecheck && npm run build && npm run smoke` (the smoke test boots the build and asserts every
-  route is 200 with no `uncapped` leakage — see "Site contract" above). This job's pass/fail is the only
-  gate `automerge-feed.yml` trusts.
+  route is 200 with no `uncapped` leakage — see "Site contract" above). `automerge-feed.yml` reads this
+  job's conclusion only to decide whether to comment; a green Validate never merges.
 - **`automerge-feed.yml`** — triggers on `validate.yml`'s own completion (`workflow_run`, so it always
   runs the copy of this file committed to `main`, never a PR's copy) for a `grok/**` head branch that
   Validate just passed. It finds the PR, asks the GitHub API for its exact file list (not `git diff`,
-  which can hide a rename), and requires every file to be an addition or in-place edit under
-  `content/feed/**`, `content/sources/**` (additions-only — any removed line rejects it) or
-  `research/inbox/**` — `content/accounts.yaml` is deliberately **not** on this list, a tier or note
-  change there always needs a human. If everything clears, it squash-merges
-  (`gh pr merge --squash --delete-branch`) and then runs `gh workflow run publish.yml --ref main`
-  explicitly (see "Telegram digest" above for why) — no approval step, no dependency on GitHub's native
-  auto-merge or on branch protection. Otherwise it leaves one de-duplicated "needs human review" comment
-  and exits 0 without merging.
-- **`publish.yml`** — on push to `main`, and on the explicit dispatch above. `npm run score`, then the
-  Telegram digest, skipped rather than failed when `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` aren't set
-  as repo secrets; commits `ops/telegram-state.json` back with `[skip ci]` if it changed.
+  which can hide a rename), and classifies against the intake allowlist: every file must be an addition
+  or in-place edit under `content/feed/**`, `content/sources/**` (additions-only — any removed line
+  rejects it) or `research/inbox/**` — `content/accounts.yaml` is deliberately **not** on this list, a
+  tier or note change there always needs extra eyes. **It never merges** — no `gh pr merge`, no GitHub
+  auto-merge, no `publish.yml` dispatch. Allowlisted PRs get one "waiting for human merge" comment;
+  anything else gets one "needs human review" comment. A human must approve and merge in the GitHub UI
+  before anything lands on `main`.
+- **`publish.yml`** — on push to `main` (a human merge) and on explicit dispatch. `npm run score`, then
+  the Telegram digest, skipped rather than failed when `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` aren't
+  set as repo secrets; commits `ops/telegram-state.json` back with `[skip ci]` if it changed.
 
 Required repo secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `SITE_URL` (all optional — absent
-means the digest step is skipped, not failed). `GITHUB_TOKEN` is automatic; `automerge-feed.yml` needs
-`contents: write`, `pull-requests: write` and `actions: write` (the last one to dispatch `publish.yml`).
+means the digest step is skipped, not failed). `GITHUB_TOKEN` is automatic; `automerge-feed.yml` only
+needs `pull-requests: write` (comments). It has no `contents: write` and no `actions: write`.
 
-`automerge-feed.yml` doesn't need "Allow auto-merge" or any branch-protection setting to work — it
-merges itself via the API. Adding `validate.yml`'s job as a required status check in branch protection
-on `main` is still worth doing as a second line of defense (it stops anyone, human or bot, from merging
-past a red check some other way), just not required for this workflow specifically.
+Leave repo "Allow auto-merge" off. Adding `validate.yml`'s job as a required status check in branch
+protection on `main` is still worth doing (it stops anyone from merging past a red check).
 
 ## Grok Bot
 
@@ -221,8 +216,8 @@ over a project's `summary`, its findings text, feed `title`/`body`, research Mar
   vapor, "send it", plus "print"/"prints" only when it reads as market-cap-speak (close to "mcap",
   "market cap" or "FDV"). A hit in a project's `summary`, findings or research Markdown is a warning
   that `npm run validate:release` turns into an error; a hit in a feed `title`/`body` or an account
-  `note` is an error unconditionally, because those files sit on the `automerge-feed.yml` auto-merge
-  path and CI is the only backstop there (final review C3).
+  `note` is an error unconditionally, because those files sit on the intake path and CI is the only
+  automated gate before a human merges (final review C3).
 - **Conduct** (`conductWarnings`) flags verdicts about a named person, team or account — drainer,
   scammer, scam, impersonator, fraud, fraudster, insider, honeypot, ponzi, "same person as" (plus,
   in an account note only, impersonation, farm/farmed, scams, insiders, fraudulent, malicious,

@@ -1,10 +1,9 @@
 name: Publish
 
-# Runs on every push to main — and on explicit dispatch: automerge-feed.yml calls
-# `gh workflow run publish.yml --ref main` after squash-merging a grok/ PR, because merges made with
-# GITHUB_TOKEN never fire push-triggered workflows. Recomputes derived scores and, when there is
-# something new, sends the Telegram digest. GitHub's own [skip ci] convention (used by the "Commit
-# telegram state" step below) keeps the push trigger from re-firing on the state commit.
+# Runs on every push to main (a human merge in the GitHub UI) and on explicit dispatch. Recomputes
+# derived scores and, when there is something new, sends the Telegram digest. GitHub's own [skip ci]
+# convention (used by the "Commit telegram state" step below) keeps the push trigger from re-firing
+# on the state commit. automerge-feed.yml no longer merges or dispatches this workflow.
 on:
   push:
     branches: [main]

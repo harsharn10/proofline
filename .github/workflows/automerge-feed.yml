@@ -1,8 +1,8 @@
-name: Automerge feed PRs
+name: Feed PR gate
 
-# Grok Bot contract (docs/integrations/grok-bot.md §9): a PR from a grok/<date> branch whose changed
-# files are all additions or in-place modifications under the intake allowlist is squash-merged once
-# the Validate workflow has passed on its head commit, and publish.yml is then dispatched explicitly.
+# Grok Bot contract (docs/integrations/grok-bot.md §9): after Validate succeeds on a grok/<date>
+# branch, this workflow classifies the PR and comments. It NEVER merges. A human must approve and
+# merge in the GitHub UI before anything lands on main.
 #
 # Trigger is `workflow_run` on Validate's completion, NOT `pull_request` (final review C1):
 #   - this file is read from `main`, so a PR cannot alter the gate it is judged by;
@@ -14,24 +14,22 @@ name: Automerge feed PRs
 # --name-only` collapses a rename to its destination (final review C2). Every file must be `added` or
 # `modified`, carry no `previous_filename`, and sit under the allowlist; a modified source ledger must
 # be additions-only. `content/accounts.yaml` is deliberately NOT on the allowlist: tier and note
-# changes need a human. Anything else gets exactly one "needs human review" comment (de-duplicated by
-# a marker) and the job exits 0 without merging.
+# changes need extra eyes. Anything off the allowlist gets exactly one "needs human review" comment
+# (de-duplicated by a marker). Allowlisted PRs get a "waiting for human merge" comment instead.
 #
-# Merges made with GITHUB_TOKEN never fire push-triggered workflows, so publish.yml is dispatched
-# explicitly after the merge (final review I2). No approval step, no `--auto`, no dependency on
-# branch protection or GitHub's native auto-merge.
+# This workflow must never: call `gh pr merge`, enable GitHub auto-merge
+# (`enablePullRequestAutoMerge` / `--auto`), or dispatch publish.yml. publish.yml runs on a human
+# merge's push to main. Permissions are comment-only so a reintroduced merge step would fail.
 on:
   workflow_run:
     workflows: ["Validate"]
     types: [completed]
 
 permissions:
-  contents: write
   pull-requests: write
-  actions: write
 
 jobs:
-  automerge:
+  classify:
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
       startsWith(github.event.workflow_run.head_branch, 'grok/')
@@ -84,7 +82,7 @@ jobs:
             esac
           done <<< "$FILES"
           # 2. A modified source ledger may only add lines: any removed line (other than a `---` header)
-          #    in the API's patch, any deletion count, or a missing patch (diff too large) → human.
+          #    in the API's patch, any deletion count, or a missing patch (diff too large) → extra-eyes.
           SOURCES="$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[] | select(.status == "modified" and (.filename | startswith("content/sources/"))) | [.filename, (.deletions | tostring), (.patch // "" | @base64)] | @tsv')"
           while IFS=$'\t' read -r FILENAME DELETIONS PATCH_B64; do
             [ -z "$FILENAME" ] && continue
@@ -94,16 +92,16 @@ jobs:
             if [ -n "$REMOVED" ]; then BAD="$BAD removed-lines:$FILENAME"; fi
           done <<< "$SOURCES"
           if [ -n "$BAD" ]; then
-            echo "Needs human review:$BAD"
-            echo "mergeable=false" >> "$GITHUB_OUTPUT"
+            echo "Needs extra-eyes review:$BAD"
+            echo "allowlisted=false" >> "$GITHUB_OUTPUT"
             echo "reasons=$BAD" >> "$GITHUB_OUTPUT"
           else
-            echo "Every file is an addition or in-place modification under the allowlist."
-            echo "mergeable=true" >> "$GITHUB_OUTPUT"
+            echo "Every file is an addition or in-place modification under the allowlist — still waits for a human."
+            echo "allowlisted=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Comment — needs human review (once per PR)
-        if: steps.pr.outputs.number != '' && steps.paths.outputs.mergeable == 'false'
+        if: steps.pr.outputs.number != '' && steps.paths.outputs.allowlisted == 'false'
         env:
           PR: ${{ steps.pr.outputs.number }}
           REASONS: ${{ steps.paths.outputs.reasons }}
@@ -114,17 +112,25 @@ jobs:
             echo "Already commented (comment id(s): $EXISTING) — not repeating."
             exit 0
           fi
-          BODY="needs human review — not auto-merged. Auto-merge covers additions and in-place edits under content/feed/, content/sources/ (additions only) and research/inbox/; this PR renames, deletes or rewrites something, or touches a path outside that set (content/accounts.yaml, projects, census, scoring, workflows all need a human).
+          BODY="needs human review. This workflow never merges. A human must approve before anything lands on main. Extra eyes because this PR renames, deletes or rewrites something, or touches a path outside content/feed/, content/sources/ (additions only) and research/inbox/ (content/accounts.yaml, projects, census, scoring, workflows).
 
           Reasons:$REASONS
 
           <!-- $MARKER -->"
           gh pr comment "$PR" --repo "$REPO" --body "$BODY"
 
-      - name: Squash-merge and dispatch publish
-        if: steps.pr.outputs.number != '' && steps.paths.outputs.mergeable == 'true'
+      - name: Comment — Validate passed, waiting for human merge
+        if: steps.pr.outputs.number != '' && steps.paths.outputs.allowlisted == 'true'
         env:
           PR: ${{ steps.pr.outputs.number }}
         run: |
-          gh pr merge "$PR" --repo "$REPO" --squash --delete-branch --match-head-commit "$HEAD_SHA"
-          gh workflow run publish.yml --repo "$REPO" --ref main
+          MARKER="automerge-feed: waiting-for-human-merge"
+          EXISTING="$(gh api "repos/$REPO/issues/$PR/comments" --paginate --jq ".[] | select(.body | contains(\"$MARKER\")) | .id")"
+          if [ -n "$EXISTING" ]; then
+            echo "Already commented (comment id(s): $EXISTING) — not repeating."
+            exit 0
+          fi
+          BODY="Validate passed and every file is an addition or in-place edit under the intake allowlist (content/feed/, content/sources/ additions-only, research/inbox/). This workflow does not merge. A human must approve and merge.
+
+          <!-- $MARKER -->"
+          gh pr comment "$PR" --repo "$REPO" --body "$BODY"

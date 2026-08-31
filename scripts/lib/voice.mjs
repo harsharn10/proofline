@@ -21,7 +21,7 @@ const phraseRe = (phrase) => new RegExp(`\\b${phrase.replace(/\s+/g, "\\s+")}\\b
 
 // Conduct verdicts about people, teams or accounts — the verdict nouns. Applied everywhere the site renders
 // prose about named parties: account notes, feed titles/bodies, findings text and summaries (final review
-// C3: these files sit on the auto-merge path, so a hit is an error, never a warning). Whole-word and
+// C3: these files sit on the intake path, so a hit is an error, never a warning). Whole-word and
 // deliberately short so ordinary protocol prose ("yield farm", "phishing-resistant") never trips it.
 // Prose describes observable behaviour — "an address with the same ticker at a different address",
 // "the account posted a link to a domain that is not the project's" — never intent or identity.

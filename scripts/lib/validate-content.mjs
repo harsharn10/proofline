@@ -59,7 +59,7 @@ export async function validateContent(root = "content", { release = false } = {}
 
   // Voice lint (banned hype phrases). Hits in a project's summary, findings and research record are warnings
   // that --release turns into errors; hits in feed titles/bodies and account notes are errors always — those
-  // files sit on the auto-merge path and `npm test` is the only gate there (final review C3).
+  // files sit on the intake path and `npm test` is the only automated gate before a human merges (final review C3).
   const voice = (text, where, { hard = false } = {}) => voiceWarnings(text, where).forEach((w) => (hard || release ? errors : warnings).push(w));
   // Conduct lint (verdicts about named parties): errors always, wherever the site renders the text.
   const conduct = (text, where, opts) => conductWarnings(text, where, opts).forEach((w) => errors.push(w));

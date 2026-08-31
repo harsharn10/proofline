@@ -31,9 +31,10 @@ number itself against a primary source and can cite that reproduction.
 
 Two tiers: raw intake, which always goes to `research/inbox/**`, and content-system files, which the
 desk may write directly **only when the shape validates**. Of those, `content/feed/**`,
-`content/sources/**` (additions/edits only) and `research/inbox/**` are covered by the
-`automerge-feed.yml` workflow (§8) and merge on their own once CI passes; `content/accounts.yaml` (§2.4)
-is a direct write too, but always waits for a human to merge — see §2.4.
+`content/sources/**` (additions/edits only) and `research/inbox/**` are classified by the
+`automerge-feed.yml` workflow (§9) after Validate passes; **none of them merge on their own**. A human
+must approve every PR before it lands on `main`. `content/accounts.yaml` (§2.4) is a direct write too,
+and is off the allowlist so it always gets the extra-eyes comment — see §2.4.
 
 ### 2.1 Raw intake — `research/inbox/**` (always allowed)
 
@@ -117,10 +118,11 @@ Only additive, low-risk changes: a new row (always `tier: watch` — the desk ne
 only the maintainer promotes), or a `note`/`slug` correction on an existing row. Notes describe
 observable behavior only, never conduct — `npm run validate` lints for hype and conduct words
 (`drainer`, `impersonator`, `farm`, `scammer`, `insider`, …) and fails the check unconditionally on a
-hit, not just under `--release`. Unlike §2.2/§2.3, a PR that touches only this file still does not
-auto-merge: `content/accounts.yaml` is deliberately off the `automerge-feed.yml` allowlist (a tier or
-note change about a named account always gets a human's eyes before it ships) — CI passing just means
-it's ready for that human to merge.
+hit, not just under `--release`. Unlike §2.2/§2.3, a PR that touches this file is off the `automerge-feed.yml` allowlist
+(`content/accounts.yaml` is deliberately excluded — a tier or note change about a named account
+always gets a human's eyes before it ships). Every intake PR already waits for a human to merge after
+Validate; this file additionally gets the "needs human review" comment even when the rest of the
+shape is clean.
 
 ### 2.5 Census candidates — proposal only, not a direct write
 
@@ -174,8 +176,8 @@ hand (PRD §2.1: "Add names only when they meet the four tests").
 - `content/changelog.yaml` — changelog entries are written when a reviewed change publishes, not by
   intake.
 - Anything outside `research/inbox/**`, `content/feed/**`, `content/sources/**`, and
-  `content/accounts.yaml`. `automerge-feed.yml` enforces this mechanically (§8); a PR that touches
-  anything else gets a "needs human review" comment and waits.
+  `content/accounts.yaml`. `automerge-feed.yml` still classifies paths mechanically (§9); a PR that
+  touches anything else gets a "needs human review" comment. Every PR waits for a human to merge.
 
 ## 5. Process rules
 
@@ -231,6 +233,10 @@ to the API directly rather than using `git`. All calls are to `https://api.githu
    If a PR already exists for the day's branch, `PUT` more files onto it instead of opening a second
    PR — commits after the first push update it automatically.
 
+   Do **not** enable GitHub auto-merge on the PR (`auto_merge` / `enablePullRequestAutoMerge` /
+   `gh pr merge --auto`). Do not call the pulls merge API. The desk opens the PR and stops. A human
+   merges after reviewing.
+
 ## 7. Token scope
 
 A fine-grained personal access token, scoped to **this repository only** (`harsharn10/proofline`),
@@ -246,7 +252,7 @@ API from outside).
 ## 8. Cadence
 
 Every 6 hours. Skip the PR entirely when a round finds nothing that changes a file (§5). A weekly or
-daily cadence that always opens a PR, even an empty one, defeats the purpose of the auto-merge path in
+daily cadence that always opens a PR, even an empty one, defeats the purpose of the intake PR path in
 §9 below — reviewers should only ever see a PR when there's something in it.
 
 ## 9. What happens after the PR opens
@@ -259,23 +265,21 @@ daily cadence that always opens a PR, even an empty one, defeats the purpose of 
 2. **`automerge-feed.yml`** does not run on the PR itself — it triggers on `validate.yml`'s own
    *completion* (`workflow_run`, so it always runs the version of this workflow committed to `main`, not
    whatever the PR's branch contains) and only for a `grok/**` branch. If Validate did not succeed,
-   nothing else happens: no comment, no merge attempt. If it succeeded, the job asks GitHub's API for the
-   exact list of changed files (not `git diff`, which can hide a rename): every file must be an addition
-   or an in-place edit under `content/feed/**`, `content/sources/**`, or `research/inbox/**` —
-   **`content/accounts.yaml` is not on this list**, a tier or note change there always needs a human — and
-   a modified file under `content/sources/**` may only add lines, never remove or rewrite one. If every
-   file clears that bar, the job squash-merges the PR (`gh pr merge --squash --delete-branch`) and then
-   explicitly triggers `publish.yml` (see 3 below) — it never relies on GitHub's native auto-merge feature,
-   any branch-protection setting, or an approval step. If anything fails the check, it leaves one
-   "needs human review" comment on the PR (not one per push) naming what tripped it, and stops; a human
-   merges it manually after reviewing.
+   nothing else happens: no comment. If it succeeded, the job asks GitHub's API for the exact list of
+   changed files (not `git diff`, which can hide a rename): every file must be an addition or an
+   in-place edit under `content/feed/**`, `content/sources/**`, or `research/inbox/**` —
+   **`content/accounts.yaml` is not on this list**, a tier or note change there always needs extra
+   eyes — and a modified file under `content/sources/**` may only add lines, never remove or rewrite
+   one. **The job never merges.** It never calls `gh pr merge`, never enables GitHub auto-merge, and
+   never dispatches `publish.yml`. If every file clears the allowlist, it leaves one "waiting for
+   human merge" comment (not one per push). If anything fails the check, it leaves one "needs human
+   review" comment naming what tripped it. In both cases a human must approve and merge in the GitHub
+   UI before anything lands on `main`.
 3. **`publish.yml`** runs `npm run score` (recomputing derived scores, including `trending`) and sends the
    Telegram digest for anything new, silently skipped if the Telegram secrets aren't configured. It fires
-   on every push to `main` — which covers a human clicking "Merge" in the GitHub UI — but a squash-merge
-   made by `automerge-feed.yml` uses the workflow's own token, and GitHub never fires push-triggered
-   workflows from that token's commits. That's why step 2 above dispatches `publish.yml` explicitly
-   (`gh workflow run publish.yml --ref main`) right after merging a grok PR — without it, an auto-merged
-   round would sit on `main` unscored and undigested until something else happened to push.
+   on every push to `main` — which is how a human clicking "Merge" in the GitHub UI scores and digests
+   the round. There is no bot squash-merge path, so there is no explicit `gh workflow run publish.yml`
+   dispatch after intake.
 
 See the root [`README.md`](../../README.md) "CI" section for the workflow files themselves and the
 required repo settings.
@@ -296,9 +300,10 @@ required repo settings.
 6. `lifecycle: mainnet` requires evidence beyond the project's own post — a tweet makes it `announced`,
    not `mainnet`.
 7. You may now write directly to `content/feed/**` and `content/sources/**` (additions/edits only, never
-   a deletion or a removed line) plus `research/inbox/**` when the shape validates — those auto-merge
-   after CI passes. `content/accounts.yaml` is a PR like any other write but always waits for a human to
-   merge it, even an additive `tier: watch` row; anything outside this set waits for a human too.
+   a deletion or a removed line) plus `research/inbox/**` when the shape validates — those wait for a
+   human to merge after Validate passes; they do not auto-merge. `content/accounts.yaml` is a PR like
+   any other write and also waits for a human, even an additive `tier: watch` row; anything outside
+   this set waits for a human too.
 8. New census names go into a `research/inbox/<date>-census-candidates.yaml` proposal (§2.5), never
    straight into `content/census.yaml`.
 9. `content/projects/**`, `scoring`, `review.approver`, and `content/changelog.yaml` stay off-limits —
@@ -345,7 +350,8 @@ This round:
    - Write each changed file with PUT /repos/harsharn10/proofline/contents/<path> on that branch
      (GET first if the file already exists, to get its blob sha).
    - Open the PR: POST /repos/harsharn10/proofline/pulls, title "feed: <YYYY-MM-DD>", head
-     "grok/<YYYY-MM-DD>", base "main".
+     "grok/<YYYY-MM-DD>", base "main". Do not enable auto-merge (no auto_merge,
+     enablePullRequestAutoMerge, or gh pr merge).
    - If nothing changed this round, skip the branch and the PR — do not open an empty PR.
 9. Run again in 6 hours.
 

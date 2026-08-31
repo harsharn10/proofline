@@ -284,7 +284,7 @@ async function makeContent(mutate = () => {}) {
   await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n  note: Handle collides with the official account; posts not used as evidence.\n");
   await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("B"));
   const feedCited = await validateContent(tmp);
-  // Hard content gate (final review C3): feed files and account notes are on the auto-merge path, so a hype word
+  // Hard content gate (final review C3): feed files and account notes sit on the intake path, so a hype word
   // in a feed body and a conduct verdict in an account note are errors without --release. Findings text too.
   await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n  note: Known drainer.\n");
   const conductNote = await validateContent(tmp);
