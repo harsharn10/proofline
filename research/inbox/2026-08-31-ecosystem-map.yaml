@@ -93,7 +93,7 @@ subjects:
     lifecycle: announced   # claimed mainnet 2026-08-31 09:30 ET; confirm after open
     live_evidence: [official-post]
     handle: "@ArrowFinanceio"
-    note: Official 2026-08-31 09:30 ET mainnet. 16 markets, ~$1.6M aUSD cap, equity collat 9:30-16:00 ET only. aUSD LP on UP 0x29e3f3d9891cacf213361bcbcb7728970d53baa8. Confirm after open. Not @arrowsonhood options. Not ArrowPad.
+    note: Official 2026-08-31 09:30 ET mainnet. Still announced as of 00:11 CDT 31 Aug — no "we're live" post. Sherlock pass rewrote stability into **risk-tiered pools** (equities vs stables/wstETH), not a unified SP. 16 markets, ~$1.6M aUSD cap, equity collat 9:30-16:00 ET only. aUSD LP on UP 0x29e3f3d9891cacf213361bcbcb7728970d53baa8. Not @arrowsonhood. Not ArrowPad.
 
   - slug: bankr
     name: Bankr
@@ -448,6 +448,14 @@ subjects:
     handle: "@stonksdotfun"
     note: DN-404 + Doppler pad. Fees burn $STONKS. Builder @nikshepsvn. $REDACTED ZEC-pair launched here. Rebrand to RWA baskets announced. Not StonkBrokers.
 
+  - slug: swaphood
+    name: SwapHood
+    tree_primary: trading/amm-native
+    lifecycle: mainnet
+    live_evidence: [llama-volume, official-post]
+    handle: "@SwapHoodFi"
+    note: HOOD-aligned meta DEX. Llama V2/V3 rows. Flywheel official 11-28 Aug — HOOD emissions (~2375/day, max 5M) incentivize LP; fees buy back HOOD; buybacks back $h33. Team claims they own no HOOD/LP. Not Uni, not up, not Fables. Trench "h33 vs ve33."
+
 # --- DEPENDENCIES (cite, no profile) ---
 dependencies:
   - { name: Uniswap, tree_primary: trading/amm-imported, handle: "@Uniswap", llama_tvl_rh: 133000000, note: "V2+V3+V4. ~80% of spot volume." }
@@ -540,21 +548,29 @@ observe:
     - { name: Openpump, handle: "@openpumpio", note: "MCP trading infra + pad inventory source. Not a subject." }
     - { name: FOMO venue, note: "fomo.family trading frontend. Distinct from $FOMO token and from clan.tech." }
     - { name: Orderly, handle: "@OrderlyNetwork", note: "No-code perp DEX builder 130+ markets. Imported." }
-    - { name: Rallypad, handle: "@rallypadfun", note: "Livestream launches. RH Daily 30 Aug — main product claimed live on RH." }
+    - { name: Rallypad, handle: "@rallypadfun", note: "Programmable market layer (humans+agents). Bonding curve, livestream trade, 40% swap fees to attention/buybacks. Distinct from Hookr (hook compose) and Pons." }
     - { name: ObsidianSwap, handle: "@ObsidianSwap", note: "Cross-chain to/from RH." }
     - { name: Project VEX, handle: "@ProjectVEXai", note: "Agentic launches through pools.trade. Distinct from Wire (Pons) and Bankr." }
     - { name: Hood City, handle: "@hoodcityonhood", note: "Landmark product. Machine unclear." }
     - { name: Banana Gun, handle: "@bananagun", note: "Stonklauncher pre-bond + 30% cashback. Exec bot." }
     - { name: Dolores, handle: "@DoloresResearch", note: "Virtuals agent. Graduation until own venue." }
     - { name: Good Coin, handle: "@GoodCoinRH", note: "Graduation. Gate Alpha + Tangem." }
-    - { name: Ctrl Fi, handle: "@JoinCtrlFi", note: "Ctrl Ranks on RH." }
+    - { name: Ctrl Fi, handle: "@JoinCtrlFi", note: "Creator pad — keep 80%, locked LP, instant Uni V4, audited. Distinct from Pons/Hookr/pools.trade." }
     - { name: Obscura, handle: "@ObscuraCEX", note: "AI trade-builder UI." }
     - { name: WISE Token, handle: "@WISE_Token", note: "USDG telecom nodes claimed 22% APY. Observe." }
     - { name: Ponscade, handle: "@PonscadeRH", ca: "0x7086a13aa868b2bf8ed98a86ce1daac62eb6a856", note: "Arcade game, not a protocol." }
     - { name: STORMM, note: "StonkBrokers product. Official @ClutchMarkets 29 Aug. Not a separate slug. Not Sleuth." }
     - { name: Sleuth TGE, note: "aixbt only 27 Aug. Confirm @ClutchMarkets. Do not merge with @sleuth_ai (Base) or with STORMM." }
     - { name: HookOS, handle: "@hookosfun", ca: "0x85d4e6F147BFb5729378E451F32cf5287dE75f97", note: "Multi-chain hook launchpad + app store. $HOOK. Uniswap v4 incubation (Atrium). Llama 0 vol. NOT Hookr (@Hookrfun). Candidate if RH volume appears." }
-    - { name: SwapHood, handle: "@SwapHoodFi", note: "Official. HOOD-aligned meta DEX. Llama metrics live 25 Jul. h33 vs ve33 claim. Candidate native AMM." }
+    - { name: MosaicETF, handle: "@MosaicETF", ca: "0x776650808dda2ae08653dc70cdac45a9ce39e025", note: "Wallet-mirror baskets: paste address, freeze holdings, 0.30% creator fee, redeemable to real tokens, no admin key. RH live; Base/BNB next. Not Index, not Statics." }
+    - { name: Flap, handle: "@flapdotsh", note: "Stock-token pair support on RH. Programmable dividends/buybacks/burns. Llama launchpad already." }
+    - { name: Prism Assets, handle: "@prismassets", note: "99 new tokenized assets claimed (diamonds, platinum). Observe." }
+    - { name: Funded Protocol, handle: "@FundedProtocol", note: "Onchain prop-firm claim. Observe." }
+    - { name: Canopy, handle: "@Canopy_Finance", note: "Programmable Uni v4 markets. Observe — do not merge with Hookr." }
+    - { name: Liquidium, handle: "@LiquidiumWTF", note: "Announced RH expansion. Observe." }
+    - { name: Vantis, handle: "@vantis_ai", note: "x402 facilitator on USDG rails. Observe." }
+    - { name: Moby, handle: "@mobyagent", note: "KOL tracking / trigger buys. Exec. Observe." }
+    - { name: Hood Insider, handle: "@HoodInsider_", note: "Weekly recap media. Numbers are claims. Distinct from @RHDaily__." }
     - { name: Hoodit, note: "Llama DEX dust." }
     - { name: HoodFrens, note: "Llama SoFi row." }
     - { name: YOWL, handle: "@YowlonHood", ca: "0x062939bB32EaBD47A522FE48872F41E04017a095", note: "yowl.trade Morpho. Related to stonks.fun. Graduation/app until mechanism is independent." }

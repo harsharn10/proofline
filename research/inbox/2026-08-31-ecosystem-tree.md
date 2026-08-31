@@ -46,7 +46,7 @@ ecosystem
 │
 ├── trading
 │   ├── amm-imported             Uniswap V2/V3/V4, Sushi, Pancake, Curve
-│   ├── amm-native               up, Fables, GIGA, Ramses, Alandale, Orvex, Ekubo/STONX
+│   ├── amm-native               up, Fables, GIGA, Ramses, Alandale, Orvex, Ekubo/STONX, SwapHood (h33 flywheel)
 │   ├── aggregator               Mancer (router, beta), SCOPL (limit-order-as-CL), Kyber, 1inch
 │   ├── hook-mev                 What The Hook (MEV redistribution inside a v4 hook — not Hookr)
 │   ├── perps-imported           Lighter, Arcus perps
