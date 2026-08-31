@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { validateContent } from "./lib/validate-content.mjs";
-import { derive } from "./lib/score.mjs";
+import { derive, computeRanks } from "./lib/score.mjs";
 import { computeTrending } from "./lib/trending.mjs";
 
 const args = process.argv.slice(2);
@@ -26,6 +26,9 @@ const trendingBySlug = computeTrending(feedItemsBySlug, content.accounts, {
   today,
 });
 
+// Task A — category ranks: one basis per census category, computed over every project's own `metrics[]`.
+const ranksBySlug = computeRanks([...content.projects.values()].map((p) => ({ slug: p.slug, category: p.category, metrics: p.metrics ?? [] })));
+
 const projects = {};
 const rows = [];
 for (const [slug, p] of [...content.projects].sort(([a], [b]) => a.localeCompare(b))) {
@@ -35,11 +38,17 @@ for (const [slug, p] of [...content.projects].sort(([a], [b]) => a.localeCompare
   // The counting accounts behind the flag (tier top, role alpha/kol, ct item inside the window) — the site
   // renders this list instead of recomputing it with its own rule (final review I4).
   d.trendingAccounts = t?.trending ? t.accounts : [];
+  // metrics are content claims (class: claim, ledger-cited) — passthrough is allowed in the site contract
+  // (see README "Site contract"); rank is derived from them, never typed into a file.
+  d.metrics = p.metrics ?? [];
+  d.rank = ranksBySlug.get(slug) ?? null;
   projects[slug] = d;
   rows.push([slug.padEnd(24), p.coverage.padEnd(5), String(d.score ?? "—").padStart(3), d.provisional ? "*" : " ",
     String(d.confidence ?? "—").padStart(3) + "%", (d.risk ?? "—").padEnd(9), d.override ? `override ${d.override.level}` : "", d.trending ? "trending" : "", d.label ?? ""].join("  "));
 }
 const trending = Object.keys(projects).filter((slug) => projects[slug].trending).sort();
+const withMetrics = Object.keys(projects).filter((slug) => projects[slug].metrics.length > 0).length;
+const ranked = Object.keys(projects).filter((slug) => projects[slug].rank !== null).length;
 
 console.log(["slug".padEnd(24), "cov  ", "scr", " ", "conf", "risk     ", "", "", ""].join("  "));
 for (const r of rows) console.log(r);
@@ -48,4 +57,4 @@ console.log("\n* = provisional (confidence 50–69)");
 await mkdir("build", { recursive: true });
 const out = { generated_at: new Date().toISOString(), methodology_version: content.site.methodology_version, projects, trending };
 await writeFile("build/derived.json", JSON.stringify(out, null, 2) + "\n");
-console.log(`wrote build/derived.json (${Object.keys(projects).length} projects, ${trending.length} trending)`);
+console.log(`wrote build/derived.json (${Object.keys(projects).length} projects, ${trending.length} trending, ${withMetrics} with metrics, ${ranked} ranked)`);
