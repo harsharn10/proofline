@@ -269,7 +269,9 @@ Vynex's token address is a deployment labelled as a third-party citation (the pr
 
 45 feed files, 105 items (18 `ct`) after fix round 1 (the FOX board-placement item on `foxpad` was dropped). Every
 item is dated, attributed (`account` = the handle) and cites the ledger entry for the fill / dossier it came from;
-`sourceUrl` is the account's X profile (no status ids in the intake) or the artifact URL. DefiLlama figures became one
+`sourceUrl` is the account's X profile (no status ids in the intake) or the artifact URL — an intake limitation, not
+a shape the contract endorses: `docs/integrations/grok-bot.md` §2.2 requires a post URL (a status link) going
+forward, and these 105 items predate that requirement. DefiLlama figures became one
 `onchain` item per subject dated 2026-08-31 with `sourceUrl: https://defillama.com/protocol/pons` for Pons (the only
 protocol page the map names) and the chain page for the rest — protocol slugs were not guessed. Five items come from
 posts the desk captured without their date (arrows-1, netnet-3, tickeryard-1, website-2, sinjoh-2): they are dated
