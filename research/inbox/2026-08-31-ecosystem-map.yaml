@@ -91,7 +91,7 @@ subjects:
     name: Arrow Finance
     tree_primary: credit/cdp
     tree_secondary: []
-    lifecycle: announced   # official app loaded 2026-08-31; token CAs exist on 4663; CDP machine contracts unlabeled; no Llama CDP row
+    lifecycle: announced   # official app loaded 2026-08-31; token/pair/lp CAs exist on 4663; analytics proxies unlabeled; no Llama CDP row
     live_evidence: [official-post, explorer]
     handle: "@ArrowFinanceio"
     cas:
@@ -121,16 +121,44 @@ subjects:
         chain: "robinhood-chain"
         source: "docs"
         seen: "2026-08-31"
-        exists_on_4663: null
-        explorer_source_verified: null
+        exists_on_4663: true
+        explorer_source_verified: true
       lp:
         value: "0x5bb059c1ca8ffc0A97cD09ce93D0fddfb4230224"
         chain: "robinhood-chain"
         source: "third-party"
         seen: "2026-08-31"
-        exists_on_4663: null
-        explorer_source_verified: null
-    note: "Official staking app loaded 2026-08-31 20:00 UTC at staking.arrowfinance.io (read-only TVL $58,865.23). Token CAs exist on 4663: aUSD/Arrow USD 23 holders, explorer source not verified; ARROW/ArrowToken 7140 holders, explorer source verified. CDP machine contracts unlabeled. No Llama CDP protocol row. Token existing is not CDP-live. Pad factory is ArrowPad Launchpad, not the CDP. Not Arrows 0xD71b7b4e. Not ArrowPad @Arrowpadfun. Not @ArrowFinanceHQ / @arrowfinances."
+        exists_on_4663: true
+        explorer_source_verified: true
+      analytics_1:
+        value: "0xce016353fa93E5c3CD2d04328df38aDDF1a5425E"
+        chain: "robinhood-chain"
+        source: "docs"
+        seen: "2026-08-31"
+        exists_on_4663: true
+        explorer_source_verified: true
+      analytics_2:
+        value: "0xF87F813e77326E821b95Be3866136B688A95BdE9"
+        chain: "robinhood-chain"
+        source: "docs"
+        seen: "2026-08-31"
+        exists_on_4663: true
+        explorer_source_verified: true
+      analytics_3:
+        value: "0x196348c1c3D709aEA52F9481fE8093aaB07041bA"
+        chain: "robinhood-chain"
+        source: "docs"
+        seen: "2026-08-31"
+        exists_on_4663: true
+        explorer_source_verified: true
+      analytics_4:
+        value: "0x1049CD33e7CFA096d8FB7aA69efc988D6CA5cd74"
+        chain: "robinhood-chain"
+        source: "docs"
+        seen: "2026-08-31"
+        exists_on_4663: true
+        explorer_source_verified: true
+    note: "Official staking app loaded 2026-08-31 20:00 UTC at staking.arrowfinance.io (read-only TVL $58,865.23). Blockscout 4663 2026-08-31T20:06:57Z via robinhoodchain.blockscout.com (explorer.robinhood.com TLS handshake failure): ARROW/ArrowToken 7140 holders source verified; aUSD/Arrow USD 23 holders source not verified; pair UniswapV2Pair UNI-V2 13 holders source verified; lp AlgebraPool source verified (not an ERC-20 token page; not the CDP). analytics_1..4 exist as TransparentUpgradeableProxy, function unlabeled. Llama chain-slice 2026-08-31T20:03:00Z TVL $724,600,133.83; no Arrow Finance CDP protocol row. Token/pair/lp existing is not CDP-live. Pad factory is ArrowPad Launchpad, not the CDP. Not Arrows 0xD71b7b4e. Not ArrowPad @Arrowpadfun. Not @ArrowFinanceHQ / @arrowfinances."
 
   - slug: bankr
     name: Bankr
