@@ -57,24 +57,34 @@ export async function validateContent(root = "content", { release = false } = {}
     for (const item of f.items ?? [])
       if (item.account && skipped.has(item.account)) warnings.push(`feed/${slug}.yaml: ${item.id} cites skip-tier account ${item.account}`);
 
-  // Voice lint: banned-phrase warnings over summary, findings text, feed bodies/titles and research
-  // markdown. --release turns them into errors.
-  const voice = (text, where) => voiceWarnings(text, where).forEach((w) => (release ? errors : warnings).push(w));
+  // Voice lint (banned hype phrases). Hits in a project's summary, findings and research record are warnings
+  // that --release turns into errors; hits in feed titles/bodies and account notes are errors always — those
+  // files sit on the auto-merge path and `npm test` is the only gate there (final review C3).
+  const voice = (text, where, { hard = false } = {}) => voiceWarnings(text, where).forEach((w) => (hard || release ? errors : warnings).push(w));
+  // Conduct lint (verdicts about named parties): errors always, wherever the site renders the text.
+  const conduct = (text, where, opts) => conductWarnings(text, where, opts).forEach((w) => errors.push(w));
   for (const [slug, project] of content.projects) {
     voice(project.summary, `projects/${slug}.yaml: summary`);
+    conduct(project.summary, `projects/${slug}.yaml: summary`);
     for (const kind of ["positive", "risk", "missing", "unresolved"])
-      (project.findings?.[kind] ?? []).forEach((f, i) => voice(f.text, `projects/${slug}.yaml: findings.${kind}[${i}]`));
+      (project.findings?.[kind] ?? []).forEach((f, i) => {
+        voice(f.text, `projects/${slug}.yaml: findings.${kind}[${i}]`);
+        conduct(f.text, `projects/${slug}.yaml: findings.${kind}[${i}]`);
+      });
   }
   for (const [slug, f] of content.feed)
     for (const item of f.items ?? []) {
-      voice(item.title, `feed/${slug}.yaml: ${item.id} title`);
-      voice(item.body, `feed/${slug}.yaml: ${item.id} body`);
+      voice(item.title, `feed/${slug}.yaml: ${item.id} title`, { hard: true });
+      voice(item.body, `feed/${slug}.yaml: ${item.id} body`, { hard: true });
+      conduct(item.title, `feed/${slug}.yaml: ${item.id} title`);
+      conduct(item.body, `feed/${slug}.yaml: ${item.id} body`);
     }
   for (const [slug, text] of content.research) voice(text, `research/${slug}.md`);
-  // Account notes: hype words and conduct verdicts about named accounts are both out (fix round 1 ruling E).
+  // Account notes: hype words and conduct verdicts about named accounts are both out (fix round 1 ruling E);
+  // the note scope adds the words that are accusations about an account but ordinary in protocol prose.
   for (const a of content.accounts ?? []) {
-    voice(a.note, `accounts.yaml: ${a.handle} note`);
-    conductWarnings(a.note, `accounts.yaml: ${a.handle} note`).forEach((w) => (release ? errors : warnings).push(w));
+    voice(a.note, `accounts.yaml: ${a.handle} note`, { hard: true });
+    conduct(a.note, `accounts.yaml: ${a.handle} note`, { note: true });
   }
 
   if (release) {

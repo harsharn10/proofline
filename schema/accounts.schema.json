@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "accounts",
   "type": "array",
+  "uniqueItems": true,
   "items": { "type": "object", "additionalProperties": false, "required": ["handle","tier"],
     "properties": {
       "handle": { "type": "string", "pattern": "^@[A-Za-z0-9_]{1,15}$" },

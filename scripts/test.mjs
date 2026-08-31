@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { parse } from "yaml";
+import { parse, stringify } from "yaml";
 import assert from "node:assert/strict";
 import { mkdtemp, mkdir, cp, rm, writeFile, appendFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -279,10 +279,24 @@ async function makeContent(mutate = () => {}) {
   const research = await readFile(researchPath, "utf8");
   await writeFile(researchPath, research.replace("## Identity\n\n_Research pending._", "## Identity\n\nPons is a launchpad. [claim S98]"));
   const cited = await validateContent(tmp);
-  // A feed item citing S99 counts as a citation; a feed item attributed to a skip-tier account warns; a conduct word in an account note warns.
-  await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n  note: Known drainer.\n");
-  await writeFile(join(tmp, "feed", "pons.yaml"), "slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ct\n    title: T\n    body: B\n    account: \"@spam\"\n    sources: [S99]\n");
+  // A feed item citing S99 counts as a citation; a feed item attributed to a skip-tier account warns.
+  const feedItem = (body) => `slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ct\n    title: T\n    body: ${JSON.stringify(body)}\n    account: "@spam"\n    sources: [S99]\n`;
+  await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n  note: Handle collides with the official account; posts not used as evidence.\n");
+  await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("B"));
   const feedCited = await validateContent(tmp);
+  // Hard content gate (final review C3): feed files and account notes are on the auto-merge path, so a hype word
+  // in a feed body and a conduct verdict in an account note are errors without --release. Findings text too.
+  await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n  note: Known drainer.\n");
+  const conductNote = await validateContent(tmp);
+  await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n");
+  await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("Ape in, this will moon."));
+  const hypeFeed = await validateContent(tmp);
+  await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("B"));
+  const ponsPath = join(tmp, "projects", "pons.yaml");
+  const pons = parse(await readFile(ponsPath, "utf8"));
+  pons.findings.risk.push({ text: "The deployer is a known scammer.", class: "claim" });
+  await writeFile(ponsPath, stringify(pons));
+  const conductFinding = await validateContent(tmp);
   await writeFile(join(tmp, "projects", "arrow.yaml"), "slug: [\n");
   const broken = await validateContent(tmp);
   await rm(tmp, { recursive: true, force: true });
@@ -293,7 +307,9 @@ async function makeContent(mutate = () => {}) {
     assert.deepEqual(feedCited.errors, [], "feed citation of an existing ledger id is not an error");
     assert.ok(!feedCited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited only from a feed item is not 'never cited'");
     assert.ok(feedCited.warnings.some((w) => w.includes("skip-tier account @spam")), "feed item attributed to a skip-tier account warns");
-    assert.ok(feedCited.warnings.some((w) => w.includes("@spam note: conduct word \"drainer\"")), "conduct word in an account note warns");
+    assert.ok(conductNote.errors.some((e) => e.includes("@spam note: conduct word \"drainer\"")), "conduct word in an account note is an error without --release");
+    assert.ok(hypeFeed.errors.some((e) => e.includes("feed/pons.yaml: t1 body: banned word \"moon\"")), "hype word in a feed body is an error without --release");
+    assert.ok(conductFinding.errors.some((e) => e.includes("projects/pons.yaml: findings.risk") && e.includes("conduct word \"scammer\"")), "conduct word in findings text is an error without --release");
     assert.deepEqual(cited.errors, [], "prose citation validates");
     assert.ok(!cited.warnings.some((w) => w.includes("S98 is never cited")), "an id cited only in research prose is not 'never cited'");
     assert.ok(cited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited nowhere still warns");
@@ -539,16 +555,37 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   } catch (err) { failures++; console.error(`FAIL crossCheck feed: ${err.message}`); }
 }
 
-// Fix round 1 — conductWarnings: conduct verdicts in account notes; whole-word so "yield farming" prose elsewhere is untouched.
+// Fix round 1 + final review C3 — conductWarnings: the verdict-noun list applies everywhere (notes, feed, findings);
+// `{ note: true }` adds the words that are accusations about an account but ordinary in protocol prose ("farm").
 {
   try {
     assert.equal(conductWarnings("Known drainer wrapping the official CA.", "x").length, 1, "drainer");
     assert.equal(conductWarnings("Likely impersonator of Arrow.", "x").length, 1, "impersonator");
     assert.equal(conductWarnings("Handle collides with the official @ArrowFinanceio; posts not used as evidence.", "x").length, 0, "behaviour-only note passes");
-    assert.equal(conductWarnings("Runs farms on UPDex.", "x").length, 1, "farm/farms about an account");
-    assert.equal(conductWarnings("Farmhouse Finance", "x").length, 0, "whole-word only");
+    assert.equal(conductWarnings("Runs farms on UPDex.", "x", { note: true }).length, 1, "farm/farms about an account (note scope)");
+    assert.equal(conductWarnings("Farmhouse Finance", "x", { note: true }).length, 0, "whole-word only");
+    assert.equal(conductWarnings("Deposits go to a yield farm on UPDex.", "x").length, 0, "farm in finding/feed prose is not a verdict");
+    assert.equal(conductWarnings("Dakota/Sinjoh alt. Same person as @DSB_117.", "x").length, 1, "identity assertion phrase");
+    assert.equal(conductWarnings("The contract is a honeypot.", "x").length, 1, "honeypot");
+    assert.equal(conductWarnings("A ponzi with extra steps.", "x").length, 1, "ponzi");
+    assert.equal(conductWarnings("Reads like a fraudster's pitch.", "x").length, 1, "fraudster (possessive still whole-word)");
+    assert.equal(conductWarnings("Inside the vault, the router forwards fees.", "x").length, 0, "insider does not fire inside 'Inside'");
     console.log("ok   conductWarnings");
   } catch (err) { failures++; console.error(`FAIL conductWarnings: ${err.message}`); }
+}
+
+// Final review minor — account handles are unique (case-insensitive): crossCheck errors on a duplicate, and the
+// schema rejects a byte-identical duplicate row.
+{
+  const dupRows = crossCheck(await makeContent((c) => { c.accounts = [{ handle: "@Alpha", tier: "watch" }, { handle: "@alpha", tier: "top", role: "kol" }]; }));
+  const distinct = crossCheck(await makeContent((c) => { c.accounts = [{ handle: "@alpha", tier: "watch" }, { handle: "@beta", tier: "top", role: "kol" }]; }));
+  const identical = validateAgainst("accounts", [{ handle: "@alpha", tier: "watch" }, { handle: "@alpha", tier: "watch" }]);
+  try {
+    assert.ok(dupRows.errors.some((e) => e.includes("duplicate handle @alpha")), "duplicate handle (case-insensitive) is an error");
+    assert.ok(!distinct.errors.some((e) => e.includes("duplicate handle")), "distinct handles pass");
+    assert.ok(identical.length > 0, "schema rejects an identical duplicate row");
+    console.log("ok   accounts unique handles");
+  } catch (err) { failures++; console.error(`FAIL accounts unique handles: ${err.message}`); }
 }
 
 // Task 2 — voiceWarnings: whole-word, case-insensitive matches only.

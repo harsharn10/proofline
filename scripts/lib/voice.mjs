@@ -19,15 +19,28 @@ const PRINT_NEAR_TRIGGER_RE = /\bprints?\b(?:\s+\S+){0,3}\s+(?:mcap|market\s+cap
 const wordRe = (word) => new RegExp(`\\b${word}\\b`, "i");
 const phraseRe = (phrase) => new RegExp(`\\b${phrase.replace(/\s+/g, "\\s+")}\\b`, "i");
 
-// Conduct verdicts about people or accounts. Only applied to `accounts[].note` (a "yield farm" in project
-// prose is fine; "farm" about an account is an accusation). A note describes observable behaviour —
-// "handle collides with the official @X; posts not used as evidence" — never conduct.
-const CONDUCT_WORDS = ["drainer", "drainers", "impersonator", "impersonators", "impersonation", "farm", "farms", "farmed", "scammer", "scammers", "scam", "scams", "insider", "insiders", "fraud", "fraudulent", "malicious", "phishing", "shady", "sketchy"];
+// Conduct verdicts about people, teams or accounts — the verdict nouns. Applied everywhere the site renders
+// prose about named parties: account notes, feed titles/bodies, findings text and summaries (final review
+// C3: these files sit on the auto-merge path, so a hit is an error, never a warning). Whole-word and
+// deliberately short so ordinary protocol prose ("yield farm", "phishing-resistant") never trips it.
+// Prose describes observable behaviour — "an address with the same ticker at a different address",
+// "the account posted a link to a domain that is not the project's" — never intent or identity.
+const CONDUCT_WORDS = ["drainer", "drainers", "scammer", "scammers", "scam", "impersonator", "impersonators", "fraud", "fraudster", "insider", "honeypot", "ponzi"];
+const CONDUCT_PHRASES = ["same person as"];
+// Words that are an accusation when written about an account but ordinary in protocol prose ("runs farms"
+// vs "a yield farm"); applied to `accounts[].note` only, on top of the list above (fix round 1 ruling E).
+const NOTE_CONDUCT_WORDS = ["impersonation", "farm", "farms", "farmed", "scams", "insiders", "fraudulent", "malicious", "phishing", "shady", "sketchy"];
 
-/** Whole-word, case-insensitive scan for conduct words; use on account notes only. */
-export function conductWarnings(text, where) {
+/**
+ * Whole-word, case-insensitive scan for conduct verdicts. Pass `{ note: true }` for an account note to
+ * add the note-only words.
+ */
+export function conductWarnings(text, where, { note = false } = {}) {
   if (!text) return [];
-  return CONDUCT_WORDS.filter((w) => wordRe(w).test(text)).map((w) => `${where}: conduct word "${w}"`);
+  const words = note ? [...CONDUCT_WORDS, ...NOTE_CONDUCT_WORDS] : CONDUCT_WORDS;
+  const out = words.filter((w) => wordRe(w).test(text)).map((w) => `${where}: conduct word "${w}"`);
+  for (const phrase of CONDUCT_PHRASES) if (phraseRe(phrase).test(text)) out.push(`${where}: conduct phrase "${phrase}"`);
+  return out;
 }
 
 /**
