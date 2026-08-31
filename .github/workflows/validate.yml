@@ -1,12 +1,17 @@
 name: Validate
 
-# Every PR and every push to any branch: prove the content system and the site still build.
-# The release-blockers job is informational only (continue-on-error) so it never fails a PR — it
-# just makes launch blockers (corrections contact, verified deployments, approvals) visible early.
+# Every PR, and every push to main: prove the content system and the site still build. Pushes to other
+# branches are covered by their PR run — a `push: ["**"]` trigger ran everything twice per PR commit.
+#
+# automerge-feed.yml keys off this workflow's conclusion, so the only things allowed to fail the job
+# are the real gates: root `npm test`, site typecheck, site build. Release blockers (corrections
+# contact, verified deployments, approvals) run as a step with continue-on-error so they show up in
+# the log without failing the check — a separate job with continue-on-error still reports a failed
+# check run on the PR, which is what broke the old auto-merge design.
 on:
   pull_request:
   push:
-    branches: ["**"]
+    branches: [main]
 
 jobs:
   test:
@@ -25,6 +30,10 @@ jobs:
       - name: Root test (validate content/ + scoring fixtures + rule tests)
         run: npm test
 
+      - name: Release blockers (informational — never fails this job)
+        continue-on-error: true
+        run: node scripts/validate.mjs --release
+
       - name: Site install
         working-directory: site
         run: npm ci
@@ -36,18 +45,3 @@ jobs:
       - name: Site build
         working-directory: site
         run: npm run build
-
-  release-blockers:
-    name: Release blockers (non-blocking)
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - run: npm ci
-
-      - run: node scripts/validate.mjs --release

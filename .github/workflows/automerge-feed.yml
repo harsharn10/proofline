@@ -1,66 +1,130 @@
 name: Automerge feed PRs
 
-# Grok Bot contract (docs/integrations/grok-bot.md): a PR from a grok/<date> branch whose changed
-# files are entirely within the allowed intake/feed paths gets squash-merged, but only after this
-# workflow itself watches the PR's checks to completion and confirms they passed — it does not rely
-# on GitHub's native "auto-merge" feature or on branch protection being configured, so it works even
-# on a repo where nobody has flipped "Allow auto-merge" on. (Branch protection with validate.yml's
-# `test` job as a required check is still worth adding as a second line of defense, but this workflow
-# doesn't need it to behave correctly.) Anything else gets a comment asking for human review and the
-# job exits 0 without merging.
+# Grok Bot contract (docs/integrations/grok-bot.md §9): a PR from a grok/<date> branch whose changed
+# files are all additions or in-place modifications under the intake allowlist is squash-merged once
+# the Validate workflow has passed on its head commit, and publish.yml is then dispatched explicitly.
 #
-# No approval step: merging with GITHUB_TOKEN doesn't require one unless branch protection demands
-# reviews, and an approval step here would just file a duplicate approval on every re-run.
+# Trigger is `workflow_run` on Validate's completion, NOT `pull_request` (final review C1):
+#   - this file is read from `main`, so a PR cannot alter the gate it is judged by;
+#   - there is nothing to wait for — Validate has already concluded by the time this runs. (The old
+#     `gh pr checks --watch` design waited on its own in-progress check run and on the informational
+#     release-blockers job, which fails by design before launch.)
+#
+# The file list comes from the pulls API, which reports renames and deletions explicitly — `git diff
+# --name-only` collapses a rename to its destination (final review C2). Every file must be `added` or
+# `modified`, carry no `previous_filename`, and sit under the allowlist; a modified source ledger must
+# be additions-only. `content/accounts.yaml` is deliberately NOT on the allowlist: tier and note
+# changes need a human. Anything else gets exactly one "needs human review" comment (de-duplicated by
+# a marker) and the job exits 0 without merging.
+#
+# Merges made with GITHUB_TOKEN never fire push-triggered workflows, so publish.yml is dispatched
+# explicitly after the merge (final review I2). No approval step, no `--auto`, no dependency on
+# branch protection or GitHub's native auto-merge.
 on:
-  pull_request:
-    branches: [main]
+  workflow_run:
+    workflows: ["Validate"]
+    types: [completed]
 
 permissions:
   contents: write
   pull-requests: write
-  checks: read
-  actions: read
+  actions: write
 
 jobs:
   automerge:
-    if: startsWith(github.head_ref, 'grok/')
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'grok/')
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PR_NUMBER: ${{ github.event.pull_request.number }}
-      BASE_REF: ${{ github.event.pull_request.base.ref }}
+      REPO: ${{ github.repository }}
+      BRANCH: ${{ github.event.workflow_run.head_branch }}
+      HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check changed paths are within the allowed set
-        id: paths
+      # No checkout: every step talks to the API with --repo. Nothing from the PR is executed here.
+      - name: Find the open PR for the validated branch
+        id: pr
         run: |
-          git fetch origin "$BASE_REF" --depth=1
-          CHANGED=$(git diff --name-only "origin/$BASE_REF"...HEAD)
-          echo "Changed files in this PR:"
-          echo "$CHANGED"
-          BAD=$(echo "$CHANGED" | grep -vE '^(content/feed/|content/sources/|content/accounts\.yaml$|research/inbox/)' || true)
+          PR_JSON="$(gh pr list --repo "$REPO" --head "$BRANCH" --base main --state open --json number,headRefOid --jq '.[0]')"
+          if [ -z "$PR_JSON" ] || [ "$PR_JSON" = "null" ]; then
+            echo "No open PR from $BRANCH into main — nothing to do."
+            exit 0
+          fi
+          NUMBER="$(printf '%s' "$PR_JSON" | jq -r '.number')"
+          HEAD="$(printf '%s' "$PR_JSON" | jq -r '.headRefOid')"
+          if [ "$HEAD" != "$HEAD_SHA" ]; then
+            echo "PR #$NUMBER head is $HEAD but Validate passed on $HEAD_SHA — the newer push gets its own run."
+            exit 0
+          fi
+          echo "PR #$NUMBER at $HEAD"
+          echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Check the PR's file list against the allowlist
+        if: steps.pr.outputs.number != ''
+        id: paths
+        env:
+          PR: ${{ steps.pr.outputs.number }}
+        run: |
+          BAD=""
+          # 1. Every file: status added|modified, no previous_filename, path under the allowlist.
+          FILES="$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[] | [.status, .filename, (.previous_filename // "")] | @tsv')"
+          echo "Files in PR #$PR (status, path, previous path):"
+          echo "$FILES"
+          while IFS=$'\t' read -r STATUS FILENAME PREVIOUS; do
+            [ -z "$FILENAME" ] && continue
+            case "$STATUS" in
+              added|modified) ;;
+              *) BAD="$BAD $STATUS:$FILENAME"; continue ;;
+            esac
+            if [ -n "$PREVIOUS" ]; then BAD="$BAD renamed-from:$PREVIOUS"; continue; fi
+            case "$FILENAME" in
+              content/feed/*|content/sources/*|research/inbox/*) ;;
+              *) BAD="$BAD outside-allowlist:$FILENAME" ;;
+            esac
+          done <<< "$FILES"
+          # 2. A modified source ledger may only add lines: any removed line (other than a `---` header)
+          #    in the API's patch, any deletion count, or a missing patch (diff too large) → human.
+          SOURCES="$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[] | select(.status == "modified" and (.filename | startswith("content/sources/"))) | [.filename, (.deletions | tostring), (.patch // "" | @base64)] | @tsv')"
+          while IFS=$'\t' read -r FILENAME DELETIONS PATCH_B64; do
+            [ -z "$FILENAME" ] && continue
+            if [ -z "$PATCH_B64" ]; then BAD="$BAD no-patch:$FILENAME"; continue; fi
+            if [ "$DELETIONS" != "0" ]; then BAD="$BAD deletions:$FILENAME"; continue; fi
+            REMOVED="$(printf '%s' "$PATCH_B64" | base64 -d | grep -E '^-' | grep -vE '^---' || true)"
+            if [ -n "$REMOVED" ]; then BAD="$BAD removed-lines:$FILENAME"; fi
+          done <<< "$SOURCES"
           if [ -n "$BAD" ]; then
-            echo "Outside the allowed paths:"
-            echo "$BAD"
-            echo "out_of_scope=true" >> "$GITHUB_OUTPUT"
+            echo "Needs human review:$BAD"
+            echo "mergeable=false" >> "$GITHUB_OUTPUT"
+            echo "reasons=$BAD" >> "$GITHUB_OUTPUT"
           else
-            echo "out_of_scope=false" >> "$GITHUB_OUTPUT"
+            echo "Every file is an addition or in-place modification under the allowlist."
+            echo "mergeable=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Comment — needs human review
-        if: steps.paths.outputs.out_of_scope == 'true'
-        run: gh pr comment "$PR_NUMBER" --body "needs human review (touches scoring/risk/census)"
+      - name: Comment — needs human review (once per PR)
+        if: steps.pr.outputs.number != '' && steps.paths.outputs.mergeable == 'false'
+        env:
+          PR: ${{ steps.pr.outputs.number }}
+          REASONS: ${{ steps.paths.outputs.reasons }}
+        run: |
+          MARKER="automerge-feed: needs-human-review"
+          EXISTING="$(gh api "repos/$REPO/issues/$PR/comments" --paginate --jq ".[] | select(.body | contains(\"$MARKER\")) | .id")"
+          if [ -n "$EXISTING" ]; then
+            echo "Already commented (comment id(s): $EXISTING) — not repeating."
+            exit 0
+          fi
+          BODY="needs human review — not auto-merged. Auto-merge covers additions and in-place edits under content/feed/, content/sources/ (additions only) and research/inbox/; this PR renames, deletes or rewrites something, or touches a path outside that set (content/accounts.yaml, projects, census, scoring, workflows all need a human).
 
-      # Blocks until every check on the PR resolves; exits non-zero the moment one fails (validate.yml
-      # runs on this same pull_request event, so its check is normally already registered or about to
-      # be by the time this polls). A non-zero exit here fails this job and the merge step never runs.
-      - name: Wait for checks to pass
-        if: steps.paths.outputs.out_of_scope == 'false'
-        run: gh pr checks "$PR_NUMBER" --watch --fail-fast
+          Reasons:$REASONS
 
-      - name: Squash-merge
-        if: steps.paths.outputs.out_of_scope == 'false'
-        run: gh pr merge "$PR_NUMBER" --squash --delete-branch
+          <!-- $MARKER -->"
+          gh pr comment "$PR" --repo "$REPO" --body "$BODY"
+
+      - name: Squash-merge and dispatch publish
+        if: steps.pr.outputs.number != '' && steps.paths.outputs.mergeable == 'true'
+        env:
+          PR: ${{ steps.pr.outputs.number }}
+        run: |
+          gh pr merge "$PR" --repo "$REPO" --squash --delete-branch --match-head-commit "$HEAD_SHA"
+          gh workflow run publish.yml --repo "$REPO" --ref main
