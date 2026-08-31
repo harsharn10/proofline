@@ -744,12 +744,34 @@ accounts:
     signal: 3
     why: Stock-token pair support.
 
+  - handle: "@canopyfinance"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    conflict: team
+    why: Official. agen.space NL→v4 + CNPY stock ratchet. Not Hookr.
+
   - handle: "@Canopy_Finance"
+    role: project
+    follow: false
+    listen: skip-ingest
+    flags: [impersonator]
+    why: HoodInsider typo. Official is @canopyfinance.
+
+  - handle: "@agendotspace"
+    role: project
+    follow: true
+    listen: medium
+    conflict: team
+    why: Canopy NL launcher.
+
+  - handle: "@flapdotsh"
     role: project
     follow: true
     listen: medium
     signal: 3
-    why: Programmable Uni v4. Do not merge with Hookr.
+    why: Stock-token pairs on RH. yzilabs. Imported pad.
 
   - handle: "@rallypadfun"
     role: project
