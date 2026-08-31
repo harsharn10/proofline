@@ -1,5 +1,16 @@
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import type { Tone } from "@/data/types";
+
+// Eregion-grammar badge: tiny bordered mono, lowercase. Tones map to the semantic
+// colors — live=green (mainnet/official), warn=amber (claimed/reported/trending),
+// risk=red, muted=faint.
+const TONE_CLASS: Record<Tone, string> = {
+  default: "badge",
+  live: "badge badge-live",
+  warn: "badge badge-warn",
+  risk: "badge badge-risk",
+  muted: "badge badge-na",
+};
 
 export function Badge({
   className,
@@ -7,22 +18,8 @@ export function Badge({
   children,
 }: {
   className?: string;
-  tone?: "default" | "live" | "warn" | "risk" | "muted";
+  tone?: Tone;
   children: ReactNode;
 }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex h-6 items-center rounded-xs px-2 font-mono text-[10px] font-medium uppercase tracking-[0.12em]",
-        tone === "default" && "bg-raised text-accent",
-        tone === "live" && "bg-raised text-live",
-        tone === "warn" && "bg-raised text-warn",
-        tone === "risk" && "bg-raised text-risk",
-        tone === "muted" && "bg-raised text-muted",
-        className,
-      )}
-    >
-      {children}
-    </span>
-  );
+  return <span className={className ? `${TONE_CLASS[tone]} ${className}` : TONE_CLASS[tone]}>{children}</span>;
 }

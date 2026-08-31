@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Check, Copy } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { shortAddress } from "@/lib/dejargon";
 
-export function CopyAddress({ address, label, href }: { address: string; label?: string; href?: string }) {
+// Middle-truncated mono address with a tiny mono copy button — inline, no card.
+export function CopyAddress({ address, href }: { address: string; href?: string }) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -15,28 +15,20 @@ export function CopyAddress({ address, label, href }: { address: string; label?:
     }
   }
 
-  const short = `${address.slice(0, 6)}…${address.slice(-4)}`;
+  const short = shortAddress(address);
 
   return (
-    <div className="flex min-w-0 items-center gap-2 rounded-sm border border-border bg-surface px-3 py-2">
-      <div className="min-w-0 flex-1">
-        {label ? <p className="text-[11px] text-muted">{label}</p> : null}
-        {href ? (
-          <a
-            href={href}
-            target="_blank"
-            rel="noreferrer"
-            className="block truncate font-mono text-xs text-accent hover:underline"
-          >
-            {short}
-          </a>
-        ) : (
-          <span className="block truncate font-mono text-xs text-fg">{short}</span>
-        )}
-      </div>
-      <Button variant="ghost" size="icon" className="size-9 shrink-0" onClick={copy} aria-label="Copy address">
-        {copied ? <Check className="size-4 text-live" /> : <Copy className="size-4 text-muted" />}
-      </Button>
-    </div>
+    <>
+      {href ? (
+        <a href={href} target="_blank" rel="noreferrer" className="addr">
+          {short}
+        </a>
+      ) : (
+        <span className="addr">{short}</span>
+      )}
+      <button type="button" className="copybtn" onClick={copy} aria-label={`Copy address ${address}`}>
+        {copied ? "copied" : "copy"}
+      </button>
+    </>
   );
 }
