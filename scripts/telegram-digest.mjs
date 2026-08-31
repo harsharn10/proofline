@@ -19,7 +19,7 @@ try { env = { ...readDotEnv(await readFile(".env.local", "utf8")), ...env }; } c
 const token = env.TELEGRAM_BOT_TOKEN, chatId = env.TELEGRAM_CHAT_ID;
 const siteUrl = env.SITE_URL ?? "", profilePath = env.PROFILE_PATH ?? "/n/";
 
-const STATE = "build/telegram-state.json";
+const STATE = "ops/telegram-state.json";
 let state = { sent_keys: [] };
 try { state = JSON.parse(await readFile(STATE, "utf8")); } catch { /* first run */ }
 
@@ -45,7 +45,7 @@ if (limit > 0) entries = entries.slice(0, limit);
 if (!entries.length) { console.log("No material research changes since the last digest — nothing sent."); process.exit(0); }
 if (markSent) {
   state.sent_keys = [...new Set([...(state.sent_keys ?? []), ...entries.map(entryKey)])];
-  await mkdir("build", { recursive: true });
+  await mkdir("ops", { recursive: true });
   await writeFile(STATE, JSON.stringify(state, null, 2) + "\n");
   console.log(`Marked ${entries.length} change(s) as sent without posting. Future digests start after this point.`);
   process.exit(0);
@@ -70,6 +70,6 @@ if (!token || !chatId) {
 for (const chunk of chunks) await send(chunk);
 state.sent_keys = [...new Set([...(state.sent_keys ?? []), ...entries.map(entryKey)])];
 state.last_sent_at = new Date().toISOString();
-await mkdir("build", { recursive: true });
+await mkdir("ops", { recursive: true });
 await writeFile(STATE, JSON.stringify(state, null, 2) + "\n");
 console.log(`Sent ${chunks.length} message(s) covering ${entries.length} change(s). State recorded in ${STATE}.`);
