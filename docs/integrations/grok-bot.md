@@ -252,7 +252,9 @@ daily cadence that always opens a PR, even an empty one, defeats the purpose of 
    (`gh pr merge --squash --delete-branch`) — it does not rely on GitHub's native auto-merge feature or
    on any branch-protection setting, and it never files an approval. If anything else changed, it
    comments "needs human review (touches scoring/risk/census)" and stops; a human merges it manually
-   after reviewing.
+   after reviewing. The first real `grok/…` PR doubles as the end-to-end test of this path — if that
+   job fails with a permissions error rather than a checks-related one, the fix is in
+   `automerge-feed.yml`'s `permissions:` block, not in the PR.
 3. **On merge to `main`**, `publish.yml` runs `npm run score` (recomputing derived scores, including
    `trending`) and sends the Telegram digest for anything new — silently skipped if the Telegram
    secrets aren't configured.
