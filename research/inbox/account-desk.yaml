@@ -1,0 +1,683 @@
+# Source-quality desk — not content/, not a protocol score, not a skip-list.
+# Schema: research/inbox/2026-08-31-ops.md §4
+# as_of: 2026-08-31  first seed from fills 1–11. Human can override any row.
+
+meta:
+  as_of: 2026-08-31
+  trending_rule: "role in [alpha, kol] AND listen == high"
+  note: skip-ingest keeps the row. Do not drop collisions.
+
+# --- follow: true, listen high ---
+accounts:
+  - handle: "@ponsdotfamily"
+    role: project
+    follow: true
+    listen: high
+    signal: 5
+    reach: 5
+    trust: 4
+    engagement: organic
+    conflict: team
+    why: Official pad. Lifetime volume and creator-payout posts later matched Llama Pons V2.
+
+  - handle: "@ClutchMarkets"
+    role: project
+    follow: true
+    listen: high
+    signal: 5
+    reach: 4
+    trust: 3
+    engagement: organic
+    conflict: team
+    why: STORMM / Leverage Machine article is a real machine spec. StonkBrokers control plane.
+
+  - handle: "@OxSimpleFarmer"
+    role: builder
+    follow: true
+    listen: high
+    signal: 5
+    reach: 4
+    trust: 3
+    engagement: organic
+    conflict: team
+    why: Founder. Mechanism posts (Uni v4 LP + options). Do not take TVL from him as verified.
+
+  - handle: "@ArrowFinanceio"
+    role: project
+    follow: true
+    listen: high
+    signal: 5
+    reach: 4
+    trust: 4
+    engagement: organic
+    conflict: team
+    why: Official CDP. 09:30 ET params are citable. NOT @arrowsonhood.
+
+  - handle: "@arrowsonhood"
+    role: project
+    follow: true
+    listen: high
+    signal: 5
+    reach: 2
+    trust: 3
+    engagement: organic
+    conflict: team
+    why: Live options, week-1 numbers. Collision with Arrow CDP is the point of following both.
+
+  - handle: "@iam0x00"
+    role: builder
+    follow: true
+    listen: medium
+    signal: 4
+    reach: 1
+    trust: 2
+    conflict: team
+    why: Arrows founder.
+
+  - handle: "@deltaliquidity"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    reach: 3
+    trust: 2
+    engagement: organic
+    conflict: team
+    why: Official LP layer CA. $1m TVL claim unverified vs Llama $16k.
+
+  - handle: "@MAXFILABS"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    reach: 2
+    trust: 2
+    conflict: team
+    why: Stock-LP specialist. $128k/day payout is a claim. Distinct from Delta.
+
+  - handle: "@Hookrfun"
+    role: project
+    follow: true
+    listen: high
+    signal: 5
+    reach: 3
+    trust: 3
+    conflict: team
+    why: Compose v4 hooks. 2.5M burn claim. Not HookOS, not WTH.
+
+  - handle: "@NodarJ"
+    role: builder
+    follow: true
+    listen: high
+    signal: 5
+    reach: 3
+    trust: 3
+    conflict: team
+    why: Hookr / Zaps. Hook Tokens spec is mechanism, not CT.
+
+  - handle: "@0xzaps"
+    role: project
+    follow: true
+    listen: medium
+    signal: 4
+    conflict: team
+    why: Fee split into HOOKR blocks.
+
+  - handle: "@whatthehookv4"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    conflict: team
+    why: MEV-in-hook. Easy to merge with Hookr — keep follow so we don't.
+
+  - handle: "@hookosfun"
+    role: project
+    follow: true
+    listen: medium
+    signal: 3
+    trust: 2
+    flags: [self-trend]
+    why: Multi-chain hook pad. Llama 0 RH vol. Follow to keep it off Hookr's row.
+
+  - handle: "@MancerXYZ"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    reach: 3
+    trust: 3
+    conflict: team
+    why: Aggregator. Still audit/beta as of 25 Aug.
+
+  - handle: "@TheIndexFi"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    trust: 3
+    conflict: team
+    why: Dividend layer. Distinct from Quotrons / $AI vault.
+
+  - handle: "@SinjohDeFi"
+    role: project
+    follow: true
+    listen: high
+    signal: 5
+    reach: 2
+    trust: 3
+    conflict: team
+    why: Fee router. $INJOH numbers are official claims.
+
+  - handle: "@DSB_117"
+    role: builder
+    follow: true
+    listen: medium
+    signal: 4
+    conflict: team
+    why: Sinjoh founder.
+
+  - handle: "@HoodLockRH"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    trust: 2
+    conflict: team
+    why: Native locker. 3M TVL-locked is a claim. Bio CA is the one to use.
+
+  - handle: "@fablesfi"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    trust: 3
+    conflict: team
+    why: Native v4 ve(3,3). Llama volume is real-enough to follow.
+
+  - handle: "@lemondotfun"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    conflict: team
+    why: Pad + agentic X accounts + HL terminal claims.
+
+  - handle: "@wirebotRH"
+    role: project
+    follow: true
+    listen: high
+    signal: 5
+    trust: 4
+    conflict: team
+    why: Live command layer. Replies show Pons fee path. Not Bankr.
+
+  - handle: "@bankrbot"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    conflict: team
+    why: Own factory. Graduations stay graduation.
+
+  - handle: "@StaticsProtocol"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    conflict: team
+    why: Official. DEX not live.
+
+  - handle: "@Quotrons404"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    trust: 3
+    conflict: team
+    why: ERC-404 hardwire. Reward posts are claims marked off Blockscout.
+
+  - handle: "@cruelhandeth"
+    role: builder
+    follow: true
+    listen: medium
+    conflict: team
+    why: Named Quotrons dev.
+
+  - handle: "@longbowlend"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    trust: 2
+    conflict: team
+    why: Morpho overlay. TVL still tiny vs Morpho.
+
+  - handle: "@DenarMarkets"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    trust: 2
+    conflict: team
+    why: Isolated MM. CA still unverified on Blockscout this desk.
+
+  - handle: "@UseVynex"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    trust: 2
+    conflict: team
+    why: Vault + Morpho NVDA. Distinct from Denar/Longbow/Arrow.
+
+  - handle: "@uponrh"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    trust: 4
+    conflict: team
+    why: Native AMM. Llama up v3 volume.
+
+  - handle: "@stonksdotfun"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    conflict: team
+    why: DN-404 Doppler pad. Not StonkBrokers.
+
+  - handle: "@nikshepsvn"
+    role: builder
+    follow: true
+    listen: medium
+    conflict: team
+    why: Stonks.fun builder.
+
+  - handle: "@sight_hood"
+    role: project
+    follow: true
+    listen: high
+    signal: 5
+    trust: 4
+    conflict: team
+    why: Official "we do not have a token." Genesis 2 Sep. Any $SIGHT ticker is fake.
+
+  - handle: "@ArtificiallyInu"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    conflict: team
+    why: $AI / NVDA vault. Stronger stock-hold model than CETS-style memes.
+
+  - handle: "@pools_dot_fun"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    conflict: team
+    why: Uniswap Labs pad. VEX agentic launches sit on it.
+
+  - handle: "@TradePools"
+    role: project
+    follow: true
+    listen: medium
+    conflict: team
+    why: Same pad, different handle. Collision with @pools_dot_fun — keep both.
+
+  - handle: "@meridiandotxyz"
+    role: project
+    follow: true
+    listen: high
+    signal: 3
+    trust: 4
+    conflict: team
+    why: Llama perps + predict TVL. Follow for product posts.
+
+  - handle: "@longdotxyz"
+    role: project
+    follow: true
+    listen: medium
+    conflict: team
+    why: Stock-paired factory. $AI figures are claims.
+
+  # scouts / data / media
+  - handle: "@RHDaily__"
+    role: media
+    follow: true
+    listen: high
+    signal: 4
+    reach: 4
+    trust: 3
+    engagement: mixed
+    conflict: none
+    why: Best weekly inventory. Numbers still claims. Two underscores.
+
+  - handle: "@0xSammy"
+    role: alpha
+    follow: true
+    listen: high
+    signal: 5
+    reach: 3
+    trust: 3
+    engagement: organic
+    conflict: unknown
+    why: Native-play list with infra excluded. Trending-eligible.
+
+  - handle: "@Adam_Tehc"
+    role: alpha
+    follow: true
+    listen: high
+    signal: 4
+    reach: 2
+    trust: 3
+    conflict: none
+    why: Dune trenches. Dashboards are pointers.
+
+  - handle: "@openpumpio"
+    role: infra
+    follow: true
+    listen: high
+    signal: 5
+    reach: 1
+    trust: 4
+    conflict: team
+    why: Pad census on 4663 (PONS, poolstrade, odyssey, hoodfun). Rare primary.
+
+  - handle: "@layerggofficial"
+    role: data
+    follow: true
+    listen: high
+    signal: 4
+    reach: 3
+    trust: 2
+    flags: [wrong-chain]
+    why: ATH recaps with CAs. Mixed BSC/RH in the same post ($CETS). Use CAs, not tickers.
+
+  - handle: "@whalewatchRH"
+    role: data
+    follow: true
+    listen: medium
+    signal: 3
+    reach: 2
+    trust: 2
+    why: Flow alerts. Tickers not mechanisms.
+
+  - handle: "@GeckoTerminal"
+    role: data
+    follow: true
+    listen: medium
+    signal: 3
+    trust: 3
+    why: Pointers only. Reproduce.
+
+  - handle: "@RobinhoodCrypto"
+    role: infra
+    follow: true
+    listen: high
+    signal: 3
+    trust: 3
+    why: Issuer. Chain stats are claims to reproduce.
+
+  - handle: "@ahboyash"
+    role: alpha
+    follow: true
+    listen: high
+    signal: 4
+    trust: 2
+    why: Named primitives (UP, Fables, NetNet, Clutch, Delta, LONG, Arrow). Trending-eligible.
+
+  - handle: "@0xkekov"
+    role: kol
+    follow: true
+    listen: medium
+    signal: 3
+    reach: 4
+    trust: 1
+    why: One useful ecosystem dump. Not a daily source. Not trending-eligible yet.
+
+  - handle: "@gornx0x"
+    role: builder
+    follow: true
+    listen: medium
+    conflict: team
+    why: Named Wire builder.
+
+  - handle: "@hooftly"
+    role: builder
+    follow: true
+    listen: medium
+    conflict: team
+    why: Statics builder.
+
+  - handle: "@booj1e"
+    role: builder
+    follow: true
+    listen: medium
+    conflict: team
+    why: Sight builder.
+
+# --- scrape, mute-trend (reach without machine) ---
+  - handle: "@AdamEShelton"
+    role: kol
+    follow: false
+    listen: mute-trend
+    signal: 1
+    reach: 5
+    trust: 0
+    engagement: mixed
+    conflict: bag
+    why: High reach, memecoin CAs. Heat only. Never trending.
+
+  - handle: "@theunipcs"
+    role: kol
+    follow: false
+    listen: mute-trend
+    signal: 1
+    reach: 4
+    trust: 0
+    why: "szn" reach. No mechanism.
+
+  - handle: "@DaoKingdom"
+    role: kol
+    follow: false
+    listen: mute-trend
+    signal: 1
+    reach: 3
+    trust: 0
+    engagement: farm
+    why: Quoted MaxFi promo. Typical paid-adjacent CT.
+
+  - handle: "@hoodmemecoins"
+    role: kol
+    follow: false
+    listen: low
+    signal: 1
+    why: Ticker lists.
+
+  - handle: "@GG1nvestments"
+    role: kol
+    follow: false
+    listen: low
+    signal: 1
+    why: Seeded. No mechanism call this pass.
+
+  - handle: "@zackfromsubway"
+    role: kol
+    follow: false
+    listen: low
+    signal: 1
+    why: Seeded trench.
+
+  - handle: "@notEezzy"
+    role: kol
+    follow: false
+    listen: low
+  - handle: "@DeGenWealth2"
+    role: kol
+    follow: false
+    listen: low
+  - handle: "@Cuba19_"
+    role: kol
+    follow: false
+    listen: low
+  - handle: "@ibweb3eth"
+    role: kol
+    follow: false
+    listen: low
+  - handle: "@monchhh0"
+    role: kol
+    follow: false
+    listen: low
+  - handle: "@Odinekachukwu1"
+    role: kol
+    follow: false
+    listen: low
+  - handle: "@MetalHead_rh"
+    role: kol
+    follow: false
+    listen: low
+    flags: [ca-collision]
+    why: May overlap a token. Not official.
+
+  - handle: "@BrodieHasFun"
+    role: kol
+    follow: false
+    listen: low
+
+  - handle: "@alphai_onchain"
+    role: data
+    follow: false
+    listen: low
+    signal: 2
+    why: Flagged Delta late. Promo tone.
+
+# --- skip-ingest (keep the row) ---
+  - handle: "@RHDaily_"
+    role: media
+    follow: false
+    listen: skip-ingest
+    flags: [ca-collision]
+    why: Seeded typo. Live RH news is @RHDaily__. Other lookup is Rainbow High.
+
+  - handle: "@ArrowFinanceHQ"
+    role: project
+    follow: false
+    listen: skip-ingest
+    flags: [impersonator]
+    why: 555 followers, CDP copy. Evidence only from @ArrowFinanceio until the team says otherwise.
+
+  - handle: "@arrowfinances"
+    role: project
+    follow: false
+    listen: skip-ingest
+    flags: [impersonator]
+    why: Same collision class.
+
+  - handle: "@Ponsbotfamily"
+    role: project
+    follow: false
+    listen: skip-ingest
+    flags: [impersonator]
+    why: Homonym. Official is @ponsdotfamily.
+
+  - handle: "@QUOTRONGenesis"
+    role: farm
+    follow: false
+    listen: skip-ingest
+    flags: [farm]
+    why: Typo-filled mint account. Not @Quotrons404.
+
+  - handle: "@safehoodonrh"
+    role: project
+    follow: false
+    listen: low
+    conflict: bag
+    why: $SAFEHOOD token (Pons+Sinjoh). Graduation. Not census Safehood protocol.
+
+  - handle: "@SafehoodCTO_"
+    role: project
+    follow: false
+    listen: low
+    why: CTO of the token, not the protocol.
+
+# --- observe / medium ---
+  - handle: "@rallypadfun"
+    role: project
+    follow: true
+    listen: medium
+    signal: 3
+    why: Livestream pad claimed live.
+
+  - handle: "@ProjectVEXai"
+    role: project
+    follow: true
+    listen: medium
+    signal: 3
+    why: Agentic launches on pools.trade. Distinct from Wire/Bankr.
+
+  - handle: "@hoodfunfamily"
+    role: project
+    follow: true
+    listen: medium
+    signal: 3
+    why: Pad announced Jul, last official coming-soon. openpump still lists it.
+
+  - handle: "@OrderlyNetwork"
+    role: infra
+    follow: true
+    listen: medium
+    why: Imported perp builder.
+
+  - handle: "@ObsidianSwap"
+    role: infra
+    follow: true
+    listen: low
+    why: Bridge. Dependency.
+
+  - handle: "@bananagun"
+    role: infra
+    follow: false
+    listen: low
+    why: Exec bot. Not a native play.
+
+  - handle: "@Noxa_Fi"
+    role: project
+    follow: true
+    listen: medium
+    why: Pad. Llama fees exist. Early Noxa dark-site history — trust 2.
+
+  - handle: "@virtuals_io"
+    role: infra
+    follow: true
+    listen: medium
+    why: Agent layer. Individual agents are graduations.
+
+  - handle: "@fiatphobia"
+    role: alpha
+    follow: true
+    listen: medium
+    signal: 3
+    why: clan.tech posts. Not FOMO venue.
+
+  - handle: "@clantechapp"
+    role: project
+    follow: true
+    listen: medium
+    why: SocialFi on RH. Observe.
+
+  - handle: "@MCGlive"
+    role: media
+    follow: true
+    listen: medium
+    signal: 3
+    why: Interview show (Pons, Fables, EARN). Pointer.
+
+  - handle: "@0xCB27"
+    role: kol
+    follow: false
+    listen: low
+    signal: 2
+    why: Recurring RWA bag list. Claims.
