@@ -3,7 +3,7 @@ name: Pons
 symbol: PONS
 category: Launchpad
 lifecycle: mainnet
-coverage: stub
+coverage: full
 summary: "Native launchpad on Robinhood Chain with two documented generations: v1 launches fixed-supply tokens straight into locked Uniswap V3 WETH pools; v2 sells from a bonding curve that graduates into a permanently locked Uniswap v4 pool and can pair against approved assets such as tokenised stocks. Per its docs v2 is deployed, creator-allowlisted and still under audit."
 official_links:
   - kind: site
@@ -172,6 +172,102 @@ review:
   methodology_version: proofline-v1.0
   reviewed_at: 2026-08-31
   published_at: null
+scoring:
+  security:
+    deployment_verifiability:
+      level: partial
+      evidence: [S17, S18, S19, S22, S23, S24, S25, S26, S27, S28, S29, S30, S20, S21, S33]
+      note: "Thirteen of the fifteen documented contracts were opened on Blockscout with verified source and no proxy, and their names match the docs' labels; the v1 legacy factory and locker are unverified and per-launch curves, tokens and pools are not enumerated. Full needs those two contracts verified (or retired from scope) and a mapped sample of per-launch contracts."
+    privileged_power:
+      level: zero
+      evidence: [S22, S23, S19, S33]
+      note: "A 2-of-3 Safe holds owner() directly and the verified ABIs let it change protocol and creator fee recipients and shares, the hook fee, pairing-asset approvals and economics, launch configs, the graduation executor and launch deployer, and call rescue functions; neither locker has an unlock path. No credit until a source read shows those setters are bounded and cannot reach a live curve's reserves or a graduation in flight — that would justify partial."
+    authorization_topology:
+      level: partial
+      evidence: [S31, S33]
+      note: "The owner is a Safe (SafeL2 1.4.1) with a threshold of 2 across three EOA signers on every owned contract; signer identities and independence are unknown, one signer has never transacted, and the Safe's scope covers every privileged function. Full needs identified independent signers or a documented signer policy."
+    timelock_exit_window:
+      level: zero
+      evidence: [S33, S16, S22]
+      note: "No timelock sits between the Safe and the contracts; owner setters execute immediately. The only documented delay is the three-day window on a Pons-proposed creator-fee-recipient takeover (docs, not read from source). Partial needs an enforced delay on owner actions, or a source read showing no owner action can change fund logic for existing launches."
+    audit_deployment_match:
+      level: zero
+      evidence: [S16, S13]
+      note: "The v2 docs name three reviews in progress and say no audit has closed; the v1 docs do not mention an audit; no report was found in this review. Partial needs a published report; full needs its scope to cover the deployed commit with material findings resolved."
+    continuous_safeguards:
+      level: zero
+      evidence: [S16, S13]
+      note: "A security contact address is published; no bug bounty, monitoring, pause/response design or incident process was found. The v2 graduation guard and seven-day stall return are protocol mechanics, not operational safeguards. Partial needs a bounty or a published response process."
+    incident_handling:
+      level: full
+      evidence: [S5, S6, S8, S32]
+      note: "No incident affecting Pons contracts was found across the desk's X monitoring rounds, DefiLlama history or the explorer; the two address confusions on X are communications issues, not contract incidents. Drops on any disclosed incident without a postmortem."
+  factors:
+    engineering:
+      level: mixed
+      positive:
+        - "Explorer-verified source for thirteen contracts (Solidity 0.8.30 for v1, 0.8.35 for v2), with names matching the docs' labels"
+        - "Detailed integration docs for both generations: events, reads, CREATE2 launch addresses, quote maths, Uniswap v4 pool reconstruction"
+      negative:
+        - "No public repository, test suite, CI or release history linked from the site or docs"
+        - "The v1 legacy factory and locker have unverified source"
+      missing:
+        - "Repository and tests"
+        - "Source read of the owner-gated functions"
+        - "Copied-code comparison against known launchpad codebases"
+      evidence: [S18, S19, S22, S23, S24, S25, S26, S27, S28, S29, S30, S13, S16]
+    transparency:
+      level: mixed
+      positive:
+        - "Operating entity named (Pons Labs, LLC) with a published contact address"
+        - "Fee splits, revenue policy (including that the 80% buyback allocation is not immutable yet) and audit status disclosed"
+        - "Risk disclosures on both docs pages"
+      negative:
+        - "The docs do not name the owner Safe or its signers"
+        - "No audit report published"
+        - "No named contributors"
+      missing:
+        - "Signer identities and signer policy"
+        - "Audit reports"
+        - "Incident process"
+      evidence: [S1, S13, S16, S33]
+    maturity:
+      level: mixed
+      positive:
+        - "v1 live since block 8600612 with a second generation shipped and legacy pools still trading"
+        - "Material third-party activity: about $86M 24h and $295M 30d volume on 2026-08-31 per DefiLlama"
+        - "No known incident"
+      negative:
+        - "The chain itself is two months old; v2 is weeks old, creator-allowlisted and unaudited"
+      missing:
+        - "Operational history beyond August 2026"
+        - "Monitoring and response evidence"
+        - "Adapter-to-generation mapping for the activity figures"
+      evidence: [S13, S16, S14, S15, S7, S18, S22]
+    economic:
+      level: mixed
+      positive:
+        - "Liquidity locked by design on both generations, with no unlock path in either locker's ABI"
+        - "Fee split fixed per launch at creation; v2 creator tax capped and fixed"
+        - "No oracle dependency: curve and AMM pricing"
+      negative:
+        - "The v1 revenue policy (80% buyback TWAP) is mutable by the protocol"
+        - "v2 custom pairs import the pairing asset's issuer, transfer and price risk (tokenised stocks, USDG)"
+        - "Hook-level fee parameters are owner-mutable"
+      missing:
+        - "Concentration of launched tokens and holders"
+        - "Identity of the v1 fee recipient and buyback wallet"
+        - "Per-launch fee-policy reads"
+      evidence: [S13, S16, S19, S26, S23]
+  confidence:
+    primary_source_coverage: 70
+    onchain_verification: 60
+    independent_corroboration: 45
+    freshness: 95
+    review_completeness: 50
+  risk:
+    assessed: Elevated
+    reason: "PRD §6.4 Elevated applies: v2 is a new production system with meaningful fund exposure that its own docs call unaudited, no audit was found for v1, and the owner Safe's undelayed setters over fee routing and graduation components are not yet bounded by a source read. Not High: every material contract is identifiable and verifiable, the lockers expose no liquidity exit, and no unilateral drain, mint or freeze path is evidenced. The assessed level already meets the §6.4 floor, so no numeric override is recorded."
 findings:
   positive:
     - text: Pons publishes an official site at https://ponsfamily.com, docs for both protocol generations at https://docs.ponsfamily.com and an X account at https://x.com/ponsdotfamily.

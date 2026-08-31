@@ -1,6 +1,6 @@
 ---
 slug: pons
-coverage: stub
+coverage: full
 methodology_version: proofline-v1.0
 ---
 

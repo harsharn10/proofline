@@ -1034,3 +1034,32 @@
     research_sections_filled: 9
   reviewer: harsharn10
   methodology_version: proofline-v1.0
+- date: 2026-08-31
+  slug: pons
+  type: coverage
+  severity: Review
+  title: Coverage stub → full
+  detail: "Research record complete across all eleven sections (identity, deployment, control, security, engineering, team, product and economics, communications, findings, sources, review metadata) after the desk's 2026-08-31 pass, the v2 docs read, a Blockscout reproduction of every documented address and RPC reads of the owner Safe. First full record on the site. Approver pending: confidence is capped at 69 and the number shows as provisional until a second reviewer approves."
+  prior:
+    coverage: stub
+  new:
+    coverage: full
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+- date: 2026-08-31
+  slug: pons
+  type: score
+  severity: Review
+  title: First evidence score — 41 provisional, 64% confidence, Elevated risk
+  detail: "Security 8/35 (deployment verifiability partial; authorization topology partial — 2-of-3 Safe; incident handling full; privileged power, timelock, audit match and safeguards zero — no timelock, no closed audit, owner setters not yet bounded by a source read). Engineering, transparency, maturity and economic each mixed (50). Confidence 64 (primary sources 70, onchain 60, corroboration 45, freshness 95, review completeness 50); single researcher, approver pending. Risk Elevated per PRD §6.4 (new production system its docs call unaudited, undelayed owner powers); no numeric override. What raises it: a source read bounding the owner setters, a published audit matching the deployed commit, a timelock or documented signer policy, a bounty or incident process."
+  prior:
+    score: null
+    confidence: null
+    risk: null
+  new:
+    score: 41
+    provisional: true
+    confidence: 64
+    risk: Elevated
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
