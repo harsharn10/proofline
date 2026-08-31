@@ -11,7 +11,7 @@ export default defineConfig(({ command, isPreview }) => ({
   plugins: [
     tailwindcss(),
     tanstackStart(),
-    ...(command === "build" || isPreview ? [nitro({ preset: "vercel" })] : []),
+    ...(command === "build" || isPreview ? [nitro({ preset: process.env.NITRO_PRESET ?? "vercel" })] : []),
     viteReact(),
   ],
 }));
