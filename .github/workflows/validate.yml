@@ -1,0 +1,53 @@
+name: Validate
+
+# Every PR and every push to any branch: prove the content system and the site still build.
+# The release-blockers job is informational only (continue-on-error) so it never fails a PR — it
+# just makes launch blockers (corrections contact, verified deployments, approvals) visible early.
+on:
+  pull_request:
+  push:
+    branches: ["**"]
+
+jobs:
+  test:
+    name: Root + site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Root install
+        run: npm ci
+
+      - name: Root test (validate content/ + scoring fixtures + rule tests)
+        run: npm test
+
+      - name: Site install
+        working-directory: site
+        run: npm ci
+
+      - name: Site typecheck
+        working-directory: site
+        run: npm run typecheck
+
+      - name: Site build
+        working-directory: site
+        run: npm run build
+
+  release-blockers:
+    name: Release blockers (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - run: node scripts/validate.mjs --release

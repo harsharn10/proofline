@@ -1,0 +1,56 @@
+name: Automerge feed PRs
+
+# Grok Bot contract (docs/integrations/grok-bot.md): a PR from a grok/<date> branch whose changed
+# files are entirely within the allowed intake/feed paths gets approved and queued for auto-merge —
+# GitHub's native auto-merge then waits for the Validate workflow's required check to pass before it
+# actually merges. Anything else gets a comment asking for human review and the job exits 0.
+#
+# Requires "Allow auto-merge" enabled in the repo's General settings, and Validate's `test` job set
+# as a required status check in branch protection for main — otherwise `gh pr merge --auto` merges
+# without waiting on it.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    if: startsWith(github.head_ref, 'grok/')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      BASE_REF: ${{ github.event.pull_request.base.ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check changed paths are within the allowed set
+        id: paths
+        run: |
+          git fetch origin "$BASE_REF" --depth=1
+          CHANGED=$(git diff --name-only "origin/$BASE_REF"...HEAD)
+          echo "Changed files in this PR:"
+          echo "$CHANGED"
+          BAD=$(echo "$CHANGED" | grep -vE '^(content/feed/|content/sources/|content/accounts\.yaml$|research/inbox/)' || true)
+          if [ -n "$BAD" ]; then
+            echo "Outside the allowed paths:"
+            echo "$BAD"
+            echo "out_of_scope=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "out_of_scope=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment — needs human review
+        if: steps.paths.outputs.out_of_scope == 'true'
+        run: gh pr comment "$PR_NUMBER" --body "needs human review (touches scoring/risk/census)"
+
+      - name: Approve and queue auto-merge
+        if: steps.paths.outputs.out_of_scope == 'false'
+        run: |
+          gh pr review "$PR_NUMBER" --approve
+          gh pr merge "$PR_NUMBER" --squash --auto

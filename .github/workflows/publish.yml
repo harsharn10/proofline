@@ -1,0 +1,50 @@
+name: Publish
+
+# Runs on every push to main: recompute derived scores and, when there is something new, send the
+# Telegram digest. GitHub's own [skip ci] convention (used by the "Commit telegram state" step below)
+# keeps this workflow from re-triggering itself in a loop — no extra guard needed here.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        run: npm ci
+
+      - name: Derive scores
+        run: npm run score
+
+      # Skipped (not failed) when the repo secrets aren't set, so forks and secret-less CI runs
+      # stay green. secrets.* is safe to read directly in an `if:` — GitHub Actions evaluates it
+      # itself before the shell ever sees it, and forked-PR runs simply see empty secrets.
+      - name: Telegram digest
+        if: ${{ secrets.TELEGRAM_BOT_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != '' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: npm run telegram
+
+      - name: Commit updated telegram state
+        run: |
+          git config user.name "proofline-bot"
+          git config user.email "proofline-bot@users.noreply.github.com"
+          if [ -n "$(git status --porcelain ops/telegram-state.json)" ]; then
+            git add ops/telegram-state.json
+            git commit -m "chore: update telegram state [skip ci]"
+            git push
+          else
+            echo "No telegram state changes to commit."
+          fi
