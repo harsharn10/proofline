@@ -31,8 +31,9 @@ subjects:
     lifecycle: mainnet
     live_evidence: [llama-fees, llama-volume, official-post, docs]
     handle: "@ponsdotfamily"
+    cas: { token: "0x39dbed3a2bd333467115de45665cc57f813c4571" }
     llama: { fees_24h: 4700000, revenue_24h: 868850, vol_24h: 86499622 }
-    note: Llama DEX now lists Pons V2 $86.5m 24h (3rd on chain after Uni V4/V3). Official 31 Aug $4B lifetime volume, $20.93M creator payouts in 47d, 29% $PONS burned. Busiest native fee machine.
+    note: Token CA explorer-verified PONS / PonsLauncherToken, 56k holders. 0x07f5b682 is NOT a contract on 4663 (twitter cashtag noise). Llama Pons V2 $86.5m 24h. Official $4B lifetime vol, $20.93M creator payouts, 29% burned.
 
   - slug: mancer
     name: Mancer
@@ -94,10 +95,10 @@ subjects:
     live_evidence: [official-post]
     handle: "@ArrowFinanceio"
     cas:
-      ausd_candidate: "0x4f11d7603D1B0D0f021Db552D8A6d88d7fa38ecf"
-      token_candidate: "0xf2915d1e3C1B0c769d0c756Ec43F1c1f6c99cD03"
+      ausd: "0x4f11d7603D1B0D0f021Db552D8A6d88d7fa38ecf"
+      token: "0xf2915d1e3C1B0c769d0c756Ec43F1c1f6c99cD03"
       pad_not_cdp: "0x1Badc838AAe6ac41829180744ea2e1C89b452aAe"
-    note: Official 2026-08-31 09:30 ET mainnet. Still announced as of 00:15 CDT 31 Aug. Sherlock risk-tiered stability pools. aUSD/ARROW CAs from linktr — candidate until Blockscout 4663. Pad factory is ArrowPad, not CDP. Not @arrowsonhood 0xD71b7b4e.
+    note: CDP still announced (open 09:30 ET). Explorer 4663 — aUSD/Arrow USD 21 holders source-unverified; ARROW/ArrowToken 6886 holders source-verified; same creator. Token existing ≠ CDP live. Pad factory is ArrowPad. Not Arrows 0xD71b7b4e.
 
   - slug: bankr
     name: Bankr
@@ -457,14 +458,14 @@ subjects:
     name: SwapHood
     tree_primary: trading/amm-native
     lifecycle: mainnet
-    live_evidence: [llama-volume, official-post]
+    live_evidence: [llama-volume, official-post, explorer]
     handle: "@SwapHoodFi"
     cas:
       token: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
+      v3_factory: "0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7"
       h33_docs: "0xA7036C8C28F96e8cE242d0Af45d1B395B69DAF38"
       v2_factory_docs: "0xE7206Ecac3A51afe7e6179182ad4130A26068dD1"
-      v3_factory_docs: "0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7"
-    note: Native AMM fork (own V2/V3 factories, not canonical Uni). $HOOD CA official 12 Jul X. Other CAs gitbook until Blockscout. Flywheel HOOD→fees→buyback→h33. Team claims no HOOD/LP. Not up, not Fables.
+    note: $HOOD explorer-verified SwapHood Token, 395 holders, source verified. V3 factory on explorer as PancakeV3Factory, same deployer as HOOD — pancake fork, not canonical Uni. Flywheel HOOD→fees→buyback→h33. Not up, not Fables.
 
 # --- DEPENDENCIES (cite, no profile) ---
 dependencies:
