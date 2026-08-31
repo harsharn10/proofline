@@ -92,7 +92,7 @@ subjects:
     lifecycle: announced   # claimed mainnet 2026-08-31 09:30 ET; confirm after open
     live_evidence: [official-post]
     handle: "@ArrowFinanceio"
-    note: Sherlock review claimed complete. Separate Llama rows ArrowPad.fun / ArrowPad are pads, not the CDP.
+    note: Official 2026-08-31 09:30 ET mainnet. 16 markets, ~$1.6M aUSD cap, equity collat 9:30-16:00 ET only. aUSD LP on UP 0x29e3f3d9891cacf213361bcbcb7728970d53baa8. Confirm after open. Not @arrowsonhood options. Not ArrowPad.
 
   - slug: bankr
     name: Bankr
@@ -129,6 +129,7 @@ subjects:
     lifecycle: mainnet
     live_evidence: [docs]
     handle: null
+    note: Census protocol from docs. NOT the Pons token $SAFEHOOD (@safehoodonrh CA 0x663492eab45ed21d6bdd7836efdc1a9cd51ae199) which is a Sinjoh-powered graduation.
 
   - slug: robinhood-index-vaults
     name: Robinhood Index Vaults
@@ -303,7 +304,7 @@ subjects:
       token: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
       router: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
       hook: "0x62E200Cc8e4D95cf622f40Dd70f407C883EcB0cc"
-    note: ERC-404 4444 terminals. Burn liquid token to hardwire NFT; rewards in 10 stock tokens via one QUOTRON/WETH pool. V1 exploit, V2 new collection. Missed in first map. Not StonkBrokers.
+    note: ERC-404 4444 terminals. Burn liquid token to hardwire NFT; rewards in 10 stock tokens via one QUOTRON/WETH pool. V1 exploit, V2 new collection. OpenSea V2 sales in ETH 29-31 Aug; claim posts of stock-token rewards. Desktop mint 1 Sep @QuotronsDesktop — confirm same control plane. Not StonkBrokers.
 
   - slug: pools-trade
     name: pools.trade
@@ -363,7 +364,7 @@ subjects:
     lifecycle: unknown
     live_evidence: [unverified-claim]
     handle: null
-    note: Trench "Jupiter of RH" — yield-bearing limit orders. Official handle unconfirmed. Peer of Mancer if real.
+    note: Trench "Jupiter of RH" vs Delta=Meteora — yield-bearing limit orders, 0 fee/slippage claimed. Handle still null. Ethereum CA 0x07f5b682 pasted on X is also $JIMOTHY — treat as wrong. Peer of Mancer if real.
 
   - slug: website
     name: notawebsite
@@ -398,6 +399,43 @@ subjects:
     handle: "@UseVynex"
     cas: { token: "0x8cf33e3026604bd85677e7bc6e04d256571b6653" }
     note: Liquid vault ERC-20 + Morpho NVDA/USDG borrow 38.5% LTV, 30m TWAP oracle they built. Unaudited per one X claim. Not Denar.
+
+  - slug: sinjoh
+    name: Sinjoh
+    tree_primary: yield/fee-router
+    tree_secondary: [launch/other-pad]
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@SinjohDeFi"
+    cas: { token: "0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D" }
+    note: Programmable capital layer. $INJOH routes launch/creator fees into PONS+NVDA airdrops + burns. Safehood token is a customer. Founder @DSB_117. Yield Banks announced. Not a locker (that's HoodLock). Not a pad (that's Pons).
+
+  - slug: hoodlock
+    name: HoodLock
+    tree_primary: tooling/locker
+    tree_secondary: [launch/other-pad]
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@HoodLockRH"
+    cas: { token: "0xd5BF43f29BF7Aa5bb42Ae9e217b84B86EB7a4B94" }
+    note: Native locker (not UNCX). Claimed 3M+ TVL locked. Mintera.art 25% revenue buyback $LOCK. Launchpad with one-click fee split announced 31 Aug. Ignore third-party CA 0x76af8d3B.
+
+  - slug: arrows
+    name: Arrows
+    tree_primary: markets/options
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@arrowsonhood"
+    cas: { token: "0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e" }
+    note: Fully collateralized options on tokenized stocks. Founder @iam0x00. Week-1 challenge $1.2k vol / $12k vault LP. ETH options claimed from 31 Aug. NOT Arrow Finance CDP. NOT ArrowPad.
+
+  - slug: hoodfun
+    name: hood.fun
+    tree_primary: launch/bonding-curve
+    lifecycle: announced
+    live_evidence: [official-post]
+    handle: "@hoodfunfamily"
+    note: Fair-launch bonding curve → locked Uni v3. Last official "coming soon" 31 Jul. openpump lists it as a 4663 pad on 29 Aug. Not $HFUN Pons token. Not fefe-hood.fun.
 
 # --- DEPENDENCIES (cite, no profile) ---
 dependencies:
@@ -485,6 +523,16 @@ observe:
     - { name: pools.fun, handle: "@pools_dot_fun" }
     - { name: FoxPad, handle: null, note: "Launchpad vs FOX mascot — keep as observe until handle confirmed." }
     - { name: MaxFi, Quotrons, Atlas, Robindex, RSTOCKS, Oakmont, HOOD10, RoodFi }
+    - { name: the odyssey, note: "openpump pad list 29 Aug — instant+curve. Handle unknown. Do not merge with @OddyseyAI agent fleet." }
+    - { name: StonksFun, note: "Pad that launched $REDACTED ZEC pair. Handle unconfirmed." }
+    - { name: clan.tech, handle: "@clantechapp", note: "SocialFi groups / friendtech-on-RH. LBank listing claimed. Not FOMO venue." }
+    - { name: Openpump, handle: "@openpumpio", note: "MCP trading infra + pad inventory source. Not a subject." }
+    - { name: FOMO venue, note: "fomo.family trading frontend. Distinct from $FOMO token and from clan.tech." }
+    - { name: Orderly, handle: "@OrderlyNetwork", note: "No-code perp DEX builder 130+ markets. Imported." }
+    - { name: Rallypad, handle: "@rallypadfun", note: "Livestream launches." }
+    - { name: ObsidianSwap, handle: "@ObsidianSwap", note: "Cross-chain to/from RH." }
+    - { name: Ponscade, handle: "@PonscadeRH", ca: "0x7086a13aa868b2bf8ed98a86ce1daac62eb6a856", note: "Arcade game, not a protocol." }
+    - { name: STORMM / Sleuth TGE, note: "aixbt 27 Aug — StonkBrokers on-chain options infra + Sleuth TGE. Confirm @ClutchMarkets. Do not merge with @sleuth_ai (Base tool)." }
 
 # --- GRADUATION (do not auto-file) ---
 graduation:
@@ -495,3 +543,10 @@ graduation:
     - { name: CQ, pad: bankr, pair: QQQ, ca: "0xFE995FAAE56956aD78833bf8cc26fa014E4D5BA3" }
     - { name: PIGGY, pad: pons, note: "@ponspiggybank full-reserve claim — still a pad output until mechanism is documented independently." }
     - { name: Harmonic Agents token, pad: pons, note: "Agent that claims Pons collector fees. Could graduate to agents/agent-product if control plane is real." }
+    - { name: SAFEHOOD, pad: pons, ca: "0x663492eab45ed21d6bdd7836efdc1a9cd51ae199", handle: "@safehoodonrh", note: "Sinjoh tek buyback+4x airdrop. Not census Safehood protocol." }
+    - { name: PONGO, pad: pons, ca: "0xedAee44320107CAa714BaAEc486261A87F27022d", handle: "@Pongorh", note: "Dog-meme narrative. ATH ~$5.5m. Bag until own machine." }
+    - { name: HOOD10, note: "CASHCAT whale buy ~$4.6m MC. Graduation." }
+    - { name: CETS, note: "Winner-list meme ~$23-33m. Stock-payout claim unverified. No official handle this round." }
+    - { name: HFUN, pad: pons, ca: "0x01224f6012e02ba6d4602613c638c5b1d428b609", note: "Not the hood.fun pad." }
+    - { name: FOMO token, ca: "0xecda99a916f0b3863840884047339ddbe4dffb9d", note: "Not FOMO the trading venue (fomo.family) and not clan.tech." }
+    - { name: REDACTED, pad: stonksfun, note: "ZEC-pair meme on StonksFun. Pad handle unconfirmed." }

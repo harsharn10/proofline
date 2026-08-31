@@ -73,7 +73,7 @@ ecosystem
 │   └── reserve-currency         NetNet ($NET)
 │
 ├── launch
-│   ├── bonding-curve            Pons V1/V2
+│   ├── bonding-curve            Pons V1/V2, hood.fun (announced)
 │   ├── hook-programmable        Hookr (compose v4 hook blocks; not Pons)
 │   ├── stock-paired-factory     LONG, Bankr (stock-paired deploys)
 │   ├── uni-pool-launch          Safehood, pools.trade
@@ -94,19 +94,20 @@ ecosystem
 │
 ├── markets
 │   ├── prediction               Meridian Predict, Hoodbets, wambo
-│   └── options                  (Arrow options claim; harvest “Arrows”)
+│   └── options                  Arrows (@arrowsonhood) — not Arrow CDP
 │
 ├── yield
 │   ├── savings-vault            Spark, Saffron, TownSquare
 │   ├── lp-manager               Snuggle, Delta, EZManager, What The Hook
 │   ├── allocator                T3tris, D2, Krystal
+│   ├── fee-router               Sinjoh (creator/launch fees → buyback/airdrop/burn)
 │   └── gamified-mining          SLVR, StockRip, Orchard, LUNA, MinePea
 │
 ├── privacy
 │   └── private-transfer         Sherwood, Privacy Cash
 │
 └── tooling
-    ├── locker                   UNCX
+    ├── locker                   UNCX (imported), HoodLock (native)
     ├── scanner                  Squeeze (short-interest tape)
     └── names                    Agent Name Service (also under agents)
 ```
