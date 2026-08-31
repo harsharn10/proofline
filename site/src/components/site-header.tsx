@@ -15,7 +15,9 @@ export function SiteHeader() {
     <header className="border-b border-border bg-bg">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <Link to="/" className="group min-w-0">
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted">Robinhood Chain</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted">
+            Robinhood Chain {meta.chainId}
+          </p>
           <h1 className="mt-1 font-sans text-lg font-semibold tracking-tight text-fg group-hover:text-accent">
             {meta.name}
           </h1>

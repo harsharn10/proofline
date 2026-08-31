@@ -266,5 +266,6 @@ export const getSiteMeta = createServerFn({ method: "GET" }).handler(async () =>
     namesOnFile: content.dossiers.length,
     trendingCount: content.dossiers.filter((d) => d.derived.trending).length,
     corrections: content.site.corrections,
+    chainId: content.site.chain.id,
   };
 });
