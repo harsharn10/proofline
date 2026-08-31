@@ -1,0 +1,44 @@
+slug: snuggle
+name: Snuggle
+symbol: null
+category: Yield
+lifecycle: mainnet
+coverage: stub
+summary: Liquidity position manager on Robinhood Chain listed by DefiLlama with TVL and daily revenue; quiet on X during the desk's pass.
+official_links:
+  - kind: x
+    url: https://x.com/SnuggleFi
+dependencies:
+  - uniswap
+deployments:
+  - label: Position manager contracts
+    chain: robinhood-chain
+    address: not-verified
+    role: vault
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Snuggle publishes an official X account at https://x.com/SnuggleFi.
+      class: claim
+      sources:
+        - S1
+    - text: DefiLlama listed Snuggle as a liquidity manager with about $3.08M TVL and $14,749 24h revenue on 2026-08-31 per the desk map; the desk found the account quiet on X during its pass.
+      class: claim
+      sources:
+        - S3
+        - S4
+  risk: []
+  missing:
+    - text: Contract addresses not located
+    - text: Rebalance and withdrawal powers
+    - text: An independent audit was not found in this review
+    - text: Official site not located
+  unresolved:
+    - text: The desk found no recent posts from the account; product details beyond the DefiLlama category are unknown.

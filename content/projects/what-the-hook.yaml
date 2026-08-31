@@ -1,0 +1,51 @@
+slug: what-the-hook
+name: What The Hook
+symbol: WTH
+category: Fee-routing protocol
+lifecycle: mainnet
+coverage: stub
+summary: MEV redistribution inside a Uniswap v4 hook that pays traders and LPs, with a WTH token.
+official_links:
+  - kind: x
+    url: https://x.com/whatthehookv4
+dependencies:
+  - uniswap
+deployments:
+  - label: WTH token
+    chain: robinhood-chain
+    address: not-verified
+    role: token
+    verified: false
+    sources: []
+  - label: MEV hook
+    chain: robinhood-chain
+    address: not-verified
+    role: other
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: What The Hook publishes an official X account at https://x.com/whatthehookv4.
+      class: claim
+      sources:
+        - S1
+    - text: The desk records the product as an MEV bot that runs inside a Uniswap v4 hook and redistributes captured value to traders and LPs, with a DefiLlama TVL row of about $1.93M on 2026-08-31.
+      class: claim
+      sources:
+        - S3
+        - S4
+  risk: []
+  missing:
+    - text: Hook and token addresses not located
+    - text: Upgrade and redirect powers over the hook
+    - text: How MEV is captured and paid out
+    - text: An independent audit was not found in this review
+    - text: Official site not located
+  unresolved:
+    - text: No contract address for the hook or the WTH token was found in either intake.

@@ -1,0 +1,67 @@
+slug: arrows
+name: Arrows
+symbol: ARROWS
+category: Options
+lifecycle: announced
+coverage: stub
+summary: Fully collateralized options on tokenized stocks as transferable ERC-1155s with writer vaults earning premiums; live at small size since late August per the project.
+official_links:
+  - kind: site
+    url: https://arrows.finance
+  - kind: x
+    url: https://x.com/arrowsonhood
+dependencies:
+  - stock-tokens
+deployments:
+  - label: ARROWS token
+    chain: robinhood-chain
+    address: "0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e"
+    role: token
+    verified: false
+    sources:
+      - S3
+      - S4
+  - label: Option and writer-vault contracts
+    chain: robinhood-chain
+    address: not-verified
+    role: vault
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Arrows publishes an official site at https://arrows.finance.
+      class: claim
+      sources:
+        - S1
+    - text: Arrows publishes an official X account at https://x.com/arrowsonhood.
+      class: claim
+      sources:
+        - S2
+    - text: The official account posted week-one figures of $1,234 volume, 227 trades, 220 contracts, $12,134 of writer-vault LP and $205 of premiums, and claimed ETH options and settlement from 2026-08-31.
+      class: claim
+      sources:
+        - S5
+        - S4
+    - text: The workbook records options on TSLA, NVDA, AAPL and SPY Stock Tokens as transferable ERC-1155s with a fixed 1B token supply split 80% public liquidity, 12% treasury vest and 3% airdrop to Stock Token holders.
+      class: claim
+      sources:
+        - S3
+  risk:
+    - text: The name collides with Arrow Finance (CDP, @ArrowFinanceio) and ArrowPad (launchpad); the desk follows both Arrow accounts specifically to keep them apart.
+      class: claim
+      sources:
+        - S4
+        - S3
+  missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
+    - text: Token address from the workbook and desk not reproduced on Blockscout
+    - text: Option and writer-vault contracts not located
+    - text: Settlement and collateral controls
+    - text: An independent audit was not found in this review
+  unresolved: []

@@ -4,7 +4,8 @@ import { SEED, RESEARCHER, LINK_KIND_TO_SOURCE_KIND } from "./seed-data.mjs";
 import { REQUIRED_HEADINGS, PENDING_LINE } from "./lib/research-md.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 
-const AT = "2026-08-30T00:00:00Z", DATE = "2026-08-30";
+// Stub date: today unless SEED_DATE=YYYY-MM-DD is set (the first 14 stubs were seeded 2026-08-30).
+const DATE = process.env.SEED_DATE ?? new Date().toISOString().slice(0, 10), AT = `${DATE}T00:00:00Z`;
 const CHANGELOG = "content/changelog.yaml";
 const exists = (p) => access(p).then(() => true, () => false);
 const census = parse(await readFile("content/census.yaml", "utf8"));
@@ -35,7 +36,7 @@ for (const c of census) {
     slug: c.slug, name: c.name, symbol: seed.symbol, category: c.category, lifecycle: c.lifecycle,
     coverage: "stub", summary: seed.summary, official_links: c.official_links,
     dependencies: seed.dependencies,
-    addresses: seed.addresses.map((a) => ({ ...a, verified: false, sources: [] })),
+    deployments: seed.deployments.map((a) => ({ ...a, verified: false, sources: [] })),
     review: { researcher: RESEARCHER, approver: "pending", methodology_version: "proofline-v1.0", reviewed_at: DATE, published_at: null },
     findings: {
       positive: sources.map((s) => ({ text: `${c.name} publishes an official ${s.kind === "official-site" ? "site" : s.kind} at ${s.url}.`, class: "claim", sources: [s.id] })),

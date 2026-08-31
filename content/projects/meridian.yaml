@@ -2,24 +2,40 @@ slug: meridian
 name: Meridian
 symbol: null
 category: Prediction market
-lifecycle: announced
+lifecycle: mainnet
 coverage: stub
-summary: Native prediction-market launch partner on Robinhood Chain.
-official_links: []
+summary: Native perps and a prediction market under one handle; DefiLlama lists Meridian Perps and Meridian Predict TVL on Robinhood Chain.
+official_links:
+  - kind: x
+    url: https://x.com/meridiandotxyz
 dependencies: []
-addresses: []
+deployments: []
 review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
-  positive: []
+  positive:
+    - text: Meridian publishes an official X account at https://x.com/meridiandotxyz.
+      class: claim
+      sources:
+        - S1
+    - text: DefiLlama listed Meridian Perps with about $2.5M TVL and Meridian Predict with about $265k TVL on Robinhood Chain on 2026-08-31 per the desk map.
+      class: claim
+      sources:
+        - S3
+    - text: The workbook describes Meridian as RWA perps and prediction markets settling in USDe with no widely cited native token; the desk keeps it separate from Sight, a second prediction-market name with an NFT mint on 2026-09-02.
+      class: claim
+      sources:
+        - S4
+        - S5
   risk: []
   missing:
-    - text: Official site or account not yet located
-    - text: No deployment evidence reviewed — lifecycle recorded as announced
+    - text: Lifecycle set from the DefiLlama listing — no deployment or official post reviewed
+    - text: Official site not located
     - text: Resolution and oracle design
-    - text: Collateral custody
-  unresolved: []
+    - text: Collateral custody and settlement asset (the workbook says USDe)
+  unresolved:
+    - text: Lifecycle was moved from announced to mainnet on the DefiLlama listing alone; no official post or contract was reviewed. The workbook's USDe-settlement description is unverified.

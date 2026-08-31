@@ -1,0 +1,71 @@
+slug: denar
+name: Denar
+symbol: DENAR
+category: Lending
+lifecycle: announced
+coverage: stub
+summary: "Isolated money market for tokenized equities on Robinhood Chain, priced by Chainlink: lend USD or borrow against Stock Tokens; live since 2026-08-30 per the project."
+official_links:
+  - kind: x
+    url: https://x.com/DenarMarkets
+dependencies:
+  - chainlink
+  - stock-tokens
+  - usdg
+deployments:
+  - label: DENAR token (posted by the project 30 Aug)
+    chain: robinhood-chain
+    address: "0x3786728a2c49c4617bf4fe5bd82b90b6b0df5508"
+    role: token
+    verified: false
+    sources:
+      - S2
+      - S3
+      - S4
+  - label: Isolated market contracts
+    chain: robinhood-chain
+    address: not-verified
+    role: vault
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Denar publishes an official X account at https://x.com/DenarMarkets.
+      class: claim
+      sources:
+        - S1
+    - text: "The official account posted on 2026-08-30 that markets were live: lend USD or borrow against Stock Tokens in isolated markets priced by Chainlink, seeded with 10k USDG, with per-vault caps of $2,500 to be raised to $5,000 on a timelock."
+      class: claim
+      sources:
+        - S4
+        - S2
+    - text: The official account posted a points campaign (one dollar, one day, one point, for lending or borrowing) carrying priority access to a first dUSD minting window.
+      class: claim
+      sources:
+        - S2
+  risk:
+    - text: An independent audit was not found in this review; the dossier records the protocol as day-one with dUSD not yet live.
+      class: claim
+      sources:
+        - S2
+    - text: The token address comes from the project's own post and had not been reproduced on Blockscout by the desk.
+      class: claim
+      sources:
+        - S5
+        - S3
+  missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
+    - text: Token address from the project's post not reproduced on Blockscout
+    - text: Market contracts not located
+    - text: Who controls per-vault caps and the timelock
+    - text: An independent audit was not found in this review
+    - text: dUSD not live
+    - text: Site URL not in the intake
+  unresolved:
+    - text: Which contract holds lender deposits is unknown.

@@ -10,8 +10,9 @@ official_links:
     url: https://github.com/nsvoud-dev/robinhood-index-vaults
 dependencies:
   - stock-tokens
-addresses:
+deployments:
   - label: Vault (testnet)
+    chain: robinhood-chain
     address: not-verified
     role: vault
     verified: false
@@ -20,7 +21,7 @@ review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
@@ -28,6 +29,10 @@ findings:
       class: claim
       sources:
         - S1
+    - text: The desk map keeps Robinhood Index Vaults as testnet-only under rwa-products/index-vault with no official X handle found.
+      class: claim
+      sources:
+        - S2
   risk: []
   missing:
     - text: Testnet addresses

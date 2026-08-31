@@ -99,6 +99,7 @@ export function derive(project) {
     confidence: null, risk: null, override: null, securityRaw: null,
     factorPercents: { security: null, engineering: null, transparency: null, maturity: null, economic: null },
     uncappedConfidence: null,
+    trending: false, // derive() stays pure; scripts/score.mjs overwrites this from computeTrending()
   };
   if (project.coverage !== "full" || !project.scoring) return base;
 

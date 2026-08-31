@@ -1,0 +1,60 @@
+name: Publish
+
+# Runs on every push to main — and on explicit dispatch: automerge-feed.yml calls
+# `gh workflow run publish.yml --ref main` after squash-merging a grok/ PR, because merges made with
+# GITHUB_TOKEN never fire push-triggered workflows. Recomputes derived scores and, when there is
+# something new, sends the Telegram digest. GitHub's own [skip ci] convention (used by the "Commit
+# telegram state" step below) keeps the push trigger from re-firing on the state commit.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # The `secrets` context is NOT available in step- or job-level `if:` — only in `env:` and step
+    # inputs. Hoisting the three secrets to job-level env lets every step's `if:` read them back out
+    # as `env.*`, which IS available in `if:`.
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      SITE_URL: ${{ secrets.SITE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        run: npm ci
+
+      - name: Derive scores
+        run: npm run score
+
+      # Skipped (not failed) when the repo secrets aren't set, so forks and secret-less CI runs stay
+      # green.
+      - name: Telegram digest
+        id: digest
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
+        run: npm run telegram
+
+      # Only runs when the digest step above actually ran (outcome == success — 'skipped' when the
+      # secrets were absent short-circuits this too), and only commits if that run actually changed
+      # the state file (a re-run with nothing new to send leaves it byte-identical).
+      - name: Commit updated telegram state
+        if: ${{ steps.digest.outcome == 'success' }}
+        run: |
+          git config user.name "proofline-bot"
+          git config user.email "proofline-bot@users.noreply.github.com"
+          if ! git diff --quiet -- ops/telegram-state.json; then
+            git add ops/telegram-state.json
+            git commit -m "chore: update telegram state [skip ci]"
+            git push
+          else
+            echo "No telegram state changes to commit."
+          fi

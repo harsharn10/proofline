@@ -2,12 +2,13 @@ import { readFileSync } from "node:fs";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
-const NAMES = ["site", "census", "project", "sources", "dependency", "changelog"];
+const NAMES = ["site", "census", "project", "sources", "dependency", "changelog", "feed", "accounts"];
 const ajv = new Ajv({ allErrors: true, strict: true, strictTypes: false, strictTuples: false });
 addFormats(ajv);
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../../schema/${name}.schema.json`, import.meta.url), "utf8"));
 ajv.addSchema(load("source-entry")); // shared $ref target for sources.yaml and dependency ledgers; registered under its $id
+ajv.addSchema(load("shared")); // shared $ref target for category/chain/address/role/deployment; registered under its $id
 
 const validators = {};
 for (const name of NAMES) validators[name] = ajv.compile(load(name));

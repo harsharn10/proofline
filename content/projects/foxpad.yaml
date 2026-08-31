@@ -1,0 +1,63 @@
+slug: foxpad
+name: FoxPad
+symbol: null
+category: Launchpad
+lifecycle: announced
+coverage: stub
+summary: "Launchpad attached to the FOX mascot token: pad fees split 50/50 between operations and a FOX vault, and graduated tokens auto-burn token-side Uniswap fees, per the project."
+official_links:
+  - kind: site
+    url: https://foxpad.app
+  - kind: x
+    url: https://x.com/fox_onrh
+dependencies:
+  - uniswap
+deployments:
+  - label: FOX token (the mascot token the pad's fee split buys)
+    chain: robinhood-chain
+    address: "0x2103faA9D1762e27a716C61718b3aCf3Ec1F9bf1"
+    role: token
+    verified: false
+    sources:
+      - S3
+      - S4
+  - label: FoxPad launch factory
+    chain: robinhood-chain
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: FoxPad publishes an official site at https://foxpad.app.
+      class: claim
+      sources:
+        - S1
+    - text: FoxPad publishes an official X account at https://x.com/fox_onrh.
+      class: claim
+      sources:
+        - S2
+    - text: "The dossier records FoxPad as the launchpad attached to the FOX token: graduated tokens auto-burn token-side Uniswap fees and pad fees split 50/50 between operations and a FOX vault."
+      class: claim
+      sources:
+        - S3
+        - S5
+  risk:
+    - text: The FOX site states the token is not the official Robinhood mascot and is not endorsed by Robinhood; the FOX token itself is a culture token and is not profiled here (PRD §2.2).
+      class: claim
+      sources:
+        - S3
+  missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
+    - text: Pad contract addresses not located
+    - text: Fee custody and FOX vault control
+    - text: The pad's own X handle (the linked account is the FOX token's)
+    - text: An independent audit was not found in this review
+  unresolved:
+    - text: The pad's own X handle is unconfirmed; the linked account belongs to the FOX token.

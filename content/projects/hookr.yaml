@@ -1,0 +1,80 @@
+slug: hookr
+name: Hookr
+symbol: HOOKR
+category: Launchpad
+lifecycle: announced
+coverage: stub
+summary: "Uniswap v4 hook launchpad and hook marketplace: launch a token whose pool rules (anti-snipe, surge fee, auto-burn) are the product."
+official_links:
+  - kind: site
+    url: https://hookr.fun
+  - kind: x
+    url: https://x.com/Hookrfun
+dependencies:
+  - uniswap
+deployments:
+  - label: HOOKR token (hookr.fun + GitHub per the desk)
+    chain: robinhood-chain
+    address: "0x18E674231A58c239Dc7DaeDcffE15Ec3A24cff5c"
+    role: token
+    verified: false
+    sources:
+      - S3
+      - S4
+  - label: Hook launchpad
+    chain: robinhood-chain
+    address: "0xaAed6fab06D53311220F35421Dda5cc6D6e9d6C3"
+    role: factory
+    verified: false
+    sources:
+      - S3
+  - label: Hook contract
+    chain: robinhood-chain
+    address: "0xd0005624Da88a688BcaB3DBFB4d1Cb23d32Ca0CC"
+    role: other
+    verified: false
+    sources:
+      - S3
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Hookr publishes an official site at https://hookr.fun.
+      class: claim
+      sources:
+        - S1
+    - text: Hookr publishes an official X account at https://x.com/Hookrfun.
+      class: claim
+      sources:
+        - S2
+    - text: The official account posted on 2026-08-29 that it was closing in on 2.5M HOOKR burned; a builder posted on 2026-08-24 that Hook Tokens are issued only after a deployed hook crosses activity and volume thresholds.
+      class: claim
+      sources:
+        - S5
+    - text: The desk records the product as a Uniswap v4 hook launchpad and marketplace, with Gen 5 claimed live and a related OpenZaps product routing 50% of its fees into HOOKR.
+      class: claim
+      sources:
+        - S3
+        - S5
+  risk:
+    - text: Third-party posts in August said the project's X account had been compromised; the account posted on 2026-08-25 that it was back with 2FA secured. Posts from around that date should be read with that in mind.
+      class: claim
+      sources:
+        - S4
+    - text: HookOS (@hookosfun, token at 0x85d4e6F147BFb5729378E451F32cf5287dE75f97) is a separate multi-chain hook launchpad and not this project.
+      class: claim
+      sources:
+        - S6
+  missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
+    - text: Token, launchpad and hook addresses from the site and GitHub not reproduced on Blockscout
+    - text: Who can upgrade a deployed hook
+    - text: Fee split into Hook Blocks not verified against contracts
+    - text: An independent audit was not found in this review
+    - text: Hook Tokens not yet issued per the builder
+  unresolved:
+    - text: Hookr is not on the DefiLlama dump; addresses come from the project's site and GitHub per the desk and were not reproduced.

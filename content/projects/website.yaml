@@ -1,0 +1,43 @@
+slug: website
+name: notawebsite
+symbol: WEBSITE
+category: NFT / treasury
+lifecycle: announced
+coverage: stub
+summary: Tokenized ad slots on Robinhood Chain that pay ETH to slot owners; v2 live since 2026-08-11 per the project.
+official_links:
+  - kind: x
+    url: https://x.com/notawebsite_rh
+dependencies: []
+deployments:
+  - label: Slot contract / WEBSITE token
+    chain: robinhood-chain
+    address: not-verified
+    role: token
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: notawebsite publishes an official X account at https://x.com/notawebsite_rh.
+      class: claim
+      sources:
+        - S1
+    - text: The official account posted 8.178 ETH of volume since its v2 on 2026-08-11 and 6.08 ETH paid to slot owners.
+      class: claim
+      sources:
+        - S3
+        - S2
+  risk: []
+  missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
+    - text: Slot contract and token addresses not located
+    - text: Payout routing and who controls it
+    - text: Official site not located
+    - text: An independent audit was not found in this review
+  unresolved: []

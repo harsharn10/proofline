@@ -1,0 +1,758 @@
+# Proposed accounts ledger — 2026-08-31 intake
+# NOT content/accounts.yaml. Schema below is a proposal; current content schema
+# only allows {handle, name?, tier: top|watch, note?}.
+#
+# role:   project | alpha | kol | data | infra | media
+# weight: top | watch | downweight | blacklist
+#
+# Trending may only count (role in [alpha, kol] AND weight == top).
+# Project posts → kind: company. Blacklist → skip. Downweight → scrape, never trend.
+#
+# Followers are snapshots from X lookup 2026-08-30/31, not a quality score.
+# slug is a census slug if known, else a proposed candidate slug.
+
+# --- projects (official) ---
+- handle: "@ponsdotfamily"
+  role: project
+  weight: watch
+  slug: pons
+  note: Official Pons. Llama lists native launchpad fees/volume.
+
+- handle: "@MancerXYZ"
+  role: project
+  weight: watch
+  slug: mancer
+  note: Official. Bio says live on Robinhood. ~6.8k followers.
+
+- handle: "@longdotxyz"
+  role: project
+  weight: watch
+  slug: long
+  note: Official LONG. $AI burn/pairing figures are claims.
+
+- handle: "@uselongshot"
+  role: project
+  weight: watch
+  slug: longshot
+  note: Official. ~108 followers.
+
+- handle: "@ArrowFinanceio"
+  role: project
+  weight: watch
+  slug: arrow
+  note: Main Arrow CDP account (~8.5k). Official mainnet 2026-08-31 09:30 ET. NOT @arrowsonhood options.
+
+- handle: "@DenarMarkets"
+  role: project
+  weight: watch
+  slug: denar
+  note: Isolated MM. Official $DENAR 0x3786728a2c49c4617bf4fe5bd82b90b6b0df5508. Caps $2.5k→$5k timelock.
+
+- handle: "@longbowlend"
+  role: project
+  weight: watch
+  slug: longbow
+  note: Candidate. Credit layer; Morpho + Pons. TVL/volume claims unverified.
+
+- handle: "@TheIndexFi"
+  role: project
+  weight: watch
+  slug: index
+  note: Official for The Index (census slug index).
+
+- handle: "@L4VAprotocol"
+  role: project
+  weight: watch
+  slug: l4va
+  note: Candidate. RWA-backed launch product.
+
+- handle: "@EARNONHOOD"
+  role: project
+  weight: watch
+  slug: earn-protocol
+  note: Candidate. Bio CA 0xa3b6aee90017b72c0812dc1e013de70eb2917ba3 unverified.
+
+- handle: "@fablesfi"
+  role: project
+  weight: watch
+  slug: fables
+  note: Candidate. ve(3,3) Uniswap v4 hooks. Bio CA 0xb9972CA7188e511174947E3936a5315ac7073277 unverified.
+
+- handle: "@ClutchMarkets"
+  role: project
+  weight: watch
+  slug: stonkbroker
+  note: StonkBrokers / Clutch lab. ~25k followers. Related founder @OxSimpleFarmer.
+
+- handle: "@bankrbot"
+  role: project
+  weight: watch
+  slug: bankr
+  note: Agent execution surface. Official-looking; confirm.
+
+- handle: "@UseSqueeze_RH"
+  role: project
+  weight: watch
+  slug: squeeze
+  note: Reclassified from KOL. Bio is a short-interest product. ~4 followers, brand-new.
+
+# --- alpha ---
+- handle: "@0xSammy"
+  role: alpha
+  weight: watch
+  note: Best native-play list this pass (17 names, infra excluded). Stock-token wallet figure is a claim.
+
+- handle: "@ahboyash"
+  role: alpha
+  weight: watch
+  note: Named UP, Fables, NetNet, Clutch, Delta, LONG, Arrow as primitives.
+
+- handle: "@Adam_Tehc"
+  role: alpha
+  weight: watch
+  note: Dune robinhood trenches. Volume, bot share, launchpad mcap. Treat numbers as claims, dashboards as pointers.
+
+- handle: "@OxSimpleFarmer"
+  role: alpha
+  weight: watch
+  note: Founder @ClutchMarkets. Builder + scout. TickerYard $yBTC note.
+
+- handle: "@that1618guy"
+  role: alpha
+  weight: watch
+  note: Delphi / markets. RH eco mcap comments.
+
+# --- kol / trench ---
+- handle: "@RHDaily__"
+  role: kol
+  weight: watch
+  note: Correct RH news account (~7.6k). Replaces the seeded @RHDaily_ typo.
+
+- handle: "@GG1nvestments"
+  role: kol
+  weight: watch
+  note: Seeded. Keep until a mechanism call lands.
+
+- handle: "@AdamEShelton"
+  role: kol
+  weight: downweight
+  note: High reach, memecoin CA posts (WIFI). Heat only.
+
+- handle: "@zackfromsubway"
+  role: kol
+  weight: watch
+- handle: "@notEezzy"
+  role: kol
+  weight: watch
+- handle: "@DeGenWealth2"
+  role: kol
+  weight: watch
+- handle: "@Cuba19_"
+  role: kol
+  weight: watch
+- handle: "@ibweb3eth"
+  role: kol
+  weight: watch
+- handle: "@monchhh0"
+  role: kol
+  weight: watch
+- handle: "@DaoKingdom"
+  role: kol
+  weight: watch
+- handle: "@Odinekachukwu1"
+  role: kol
+  weight: watch
+- handle: "@MetalHead_rh"
+  role: kol
+  weight: watch
+  note: Seeded trench. May overlap the MetalHead project token — do not treat as official.
+
+- handle: "@theunipcs"
+  role: kol
+  weight: downweight
+  note: Reach ("Robinhood szn"), no mechanism.
+
+# --- data / infra ---
+- handle: "@GeckoTerminal"
+  role: data
+  weight: watch
+  note: Price/volume pointers only.
+
+- handle: "@RobinhoodCrypto"
+  role: infra
+  weight: watch
+  note: Issuer. Cum DEX / TVL tweets are claims to reproduce on Llama.
+
+- handle: "@RobinhoodApp"
+  role: infra
+  weight: watch
+
+- handle: "@virtuals_io"
+  role: infra
+  weight: watch
+  note: Agent layer. Individual Virtuals agents are not automatically census names.
+
+# --- handle collisions / dual accounts (human decides; do not skip) ---
+- handle: "@RHDaily_"
+  role: kol
+  weight: watch
+  note: Seeded handle. X lookup also finds @RHDaily__ (already listed above) as an RH-chain news account and a Rainbow High @rhdaily_. Collision — human picks the canonical. Do not drop.
+
+- handle: "@arrowfinances"
+  role: project
+  weight: watch
+  note: Second Arrow-named account. Could be alt or collision with @ArrowFinanceio. Keep.
+
+- handle: "@ArrowFinanceHQ"
+  role: project
+  weight: watch
+  note: 555 followers, CDP copy. Could be alt of @ArrowFinanceio. Keep both.
+
+- handle: "@Ponsbotfamily"
+  role: project
+  weight: watch
+  note: Homonym from chain-file scrape. Official-looking is @ponsdotfamily. Keep both until confirmed.
+
+- handle: "@BrodieHasFun"
+  role: kol
+  weight: watch
+  note: Culture-adjacent. Not a skip.
+
+# --- added this pass (official / builder) ---
+- handle: "@uponrh"
+  role: project
+  weight: watch
+  slug: up
+  note: Native (3,3) DEX. Llama up v2/v3. Site up33.xyz.
+
+- handle: "@deltaliquidity"
+  role: project
+  weight: watch
+  slug: delta
+  note: Official CA 0xe8ffd7e24187f72afb08d75b1bb13088a989a791. Claimed $1m TVL / $400k LP claimed 30 Aug. Not MaxFi/STORMM.
+
+- handle: "@NetNetCap"
+  role: project
+  weight: watch
+  slug: netnet
+  note: Reserve manager for $NET. Claims AAPL/NVDA/SPCX treasury. Llama category Reserve Currency, TVL ~0.
+
+- handle: "@TickerYardHQ"
+  role: project
+  weight: watch
+  slug: tickeryard
+  note: yBTC / WBTC route Arbitrum → RH. tickeryard.com.
+
+- handle: "@meridiandotxyz"
+  role: project
+  weight: watch
+  slug: meridian
+  note: Llama has Meridian Perps ($2.5m) and Meridian Predict ($0.27m). Census lifecycle 'announced' is stale if Llama TVL is real.
+
+- handle: "@Noxa_Fi"
+  role: project
+  weight: watch
+  slug: noxa
+  note: NOXA Fun launchpad. Llama TVL $5.4m, 24h fees $123k, revenue $0.
+
+- handle: "@arcus_xyz"
+  role: infra
+  weight: watch
+  note: Day-one partner (dYdX team). Dependency, not a native-play profile.
+
+- handle: "@RHAgentNS"
+  role: project
+  weight: watch
+  slug: agent-name-service
+  note: .agent namespace. Claimed 0.002 ETH/year names on RH.
+
+- handle: "@vimenprotocol"
+  role: project
+  weight: watch
+  slug: vimen
+  note: Llama Indexes, ~$9k TVL. Matches census.
+
+- handle: "@GwoodFinance"
+  role: project
+  weight: watch
+  slug: gwood
+  note: Named on MCG calendar this week. Self-custody neobank claim from prior list. Unverified.
+
+- handle: "@tradefortendies"
+  role: kol
+  weight: watch
+- handle: "@MCGlive"
+  role: kol
+  weight: watch
+  note: Interview show covering Pons, Fables, EARN, NetNet this week. Pointer, not a project.
+
+- handle: "@Hookrfun"
+  role: project
+  weight: watch
+  slug: hookr
+  note: Hook launchpad. Distinct from @whatthehookv4.
+
+- handle: "@NodarJ"
+  role: alpha
+  weight: watch
+  note: Builder of Hookr / DeFi Zaps. Prev Zapper.
+
+- handle: "@0xzaps"
+  role: project
+  weight: watch
+  note: OpenZaps. Fee split into HOOKR bond. Related to Hookr.
+
+- handle: "@whatthehookv4"
+  role: project
+  weight: watch
+  slug: what-the-hook
+  note: MEV-inside-hook. Not Hookr.
+
+- handle: "@Quotrons404"
+  role: project
+  weight: watch
+  slug: quotrons
+
+- handle: "@cruelhandeth"
+  role: alpha
+  weight: watch
+  note: Named as Quotrons developer on Dune.
+
+- handle: "@whalewatchRH"
+  role: data
+  weight: watch
+
+- handle: "@hoodmemecoins"
+  role: kol
+  weight: watch
+
+- handle: "@sight_hood"
+  role: project
+  weight: watch
+  note: Named on X as a prediction market. Distinct from Meridian Predict.
+
+- handle: "@jumperapp"
+  role: infra
+  weight: watch
+
+- handle: "@pools_dot_fun"
+  role: project
+  weight: watch
+  slug: pools-trade
+  note: Uniswap Labs pools.trade pad.
+
+- handle: "@0xCB27"
+  role: kol
+  weight: watch
+  note: Recurring RWA-play list on X (PONS/DELTA/STONKBROKER/INDEX/EARN/BOW). Treat as claim.
+
+- handle: "@wirebotRH"
+  role: project
+  weight: watch
+  slug: wire
+  note: Command layer. CA 0x8ECEA3d0E648DB646d824AA51EedeB16aC3d6878. Not Bankr.
+
+- handle: "@gornx0x"
+  role: alpha
+  weight: watch
+  note: Named as Wire builder.
+
+- handle: "@MAXFILABS"
+  role: project
+  weight: watch
+  slug: maxfi
+  note: Stock-LP manager. Distinct from Delta.
+
+- handle: "@booj1e"
+  role: alpha
+  weight: watch
+  note: Named as Sight builder.
+
+- handle: "@StaticsProtocol"
+  role: project
+  weight: watch
+  slug: statics-protocol
+  note: Official. CA 0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd. DEX not live; Genesis Epoch.
+
+- handle: "@hooftly"
+  role: alpha
+  weight: watch
+  note: Statics builder.
+
+- handle: "@MeshGateway"
+  role: project
+  weight: watch
+  slug: mesh
+  note: MPP gateway. CA 0x14641000a501bdc736116abf84e6fcea9b90a713.
+
+- handle: "@fox_onrh"
+  role: project
+  weight: watch
+  slug: fox
+
+- handle: "@notawebsite_rh"
+  role: project
+  weight: watch
+  slug: website
+
+- handle: "@HedgeOnHood"
+  role: project
+  weight: watch
+  slug: hedge
+
+- handle: "@andrewtalksdefi"
+  role: alpha
+  weight: watch
+  note: 24 Aug utility list (Delta, Wire, Hedge, Website, Mesh).
+
+- handle: "@lemondotfun"
+  role: project
+  weight: watch
+  slug: lemon
+  note: Launch/trade pad. Distinct from Pons/Hookr/LONG.
+
+- handle: "@rialto_xyz"
+  role: infra
+  weight: watch
+  note: Powers EARN omnipool zaps. Dependency.
+
+- handle: "@fox_onrh"
+  role: project
+  weight: watch
+  slug: fox
+  note: Already listed if present.
+
+- handle: "@ArtificiallyInu"
+  role: project
+  weight: watch
+  slug: artificial-inu
+  note: Official $AI / NVDA pair. Vault accumulates NVDA.
+
+- handle: "@robindexpro"
+  role: project
+  weight: watch
+  slug: robindex
+  note: Scanner/tracker. Not robinhood-index-vaults.
+
+- handle: "@Mike_Majestic"
+  role: alpha
+  weight: watch
+  note: Named Robindex dev.
+
+- handle: "@TradePools"
+  role: project
+  weight: watch
+  slug: pools-trade
+  note: Uniswap Labs pools.trade launch post. Collision with @pools_dot_fun.
+
+- handle: "@fefehood"
+  role: project
+  weight: watch
+  note: fefe-hood.fun community pad.
+
+- handle: "@lemondotfun"
+  role: project
+  weight: watch
+  slug: lemon
+- handle: "@UseVynex"
+  role: project
+  weight: watch
+  slug: vynex
+  note: Vault shares + Morpho NVDA borrow. Distinct from Denar/Longbow/Arrow.
+
+- handle: "@SinjohDeFi"
+  role: project
+  weight: watch
+  slug: sinjoh
+  note: Programmable capital / fee router. CA 0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D. $INJOH.
+
+- handle: "@DSB_117"
+  role: alpha
+  weight: watch
+  note: Sinjoh founder. Also @brainblast_ai.
+
+- handle: "@HoodLockRH"
+  role: project
+  weight: watch
+  slug: hoodlock
+  note: Native locker. $LOCK CA 0xd5BF43f29BF7Aa5bb42Ae9e217b84B86EB7a4B94.
+
+- handle: "@arrowsonhood"
+  role: project
+  weight: watch
+  slug: arrows
+  note: Options on tokenized stocks. CA 0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e. NOT @ArrowFinanceio.
+
+- handle: "@iam0x00"
+  role: alpha
+  weight: watch
+  note: Arrows founder.
+
+- handle: "@hoodfunfamily"
+  role: project
+  weight: watch
+  slug: hoodfun
+  note: Fair-launch pad announced. Not $HFUN token.
+
+- handle: "@_safehood"
+  role: project
+  weight: watch
+  slug: safehood
+  note: Official Uni-V3 pad. Quiet since 16 Jul. NOT @safehoodonrh.
+
+- handle: "@safehoodonrh"
+  role: project
+  weight: watch
+  note: $SAFEHOOD token (Pons+Sinjoh). Graduation. Not @_safehood protocol.
+
+- handle: "@SafehoodCTO_"
+  role: project
+  weight: watch
+  note: CTO page for $SAFEHOOD token.
+
+- handle: "@Pongorh"
+  role: project
+  weight: watch
+  note: $PONGO graduation. CA 0xedAee44320107CAa714BaAEc486261A87F27022d.
+
+- handle: "@openpumpio"
+  role: infra
+  weight: watch
+  note: MCP trading infra. Pad inventory source (PONS, poolstrade, odyssey, hoodfun).
+
+- handle: "@clantechapp"
+  role: project
+  weight: watch
+  note: clan.tech SocialFi. Distinct from FOMO venue.
+
+- handle: "@fiatphobia"
+  role: alpha
+  weight: watch
+  note: Posts clan.tech.
+
+- handle: "@PonscadeRH"
+  role: project
+  weight: watch
+  note: Arcade. CA 0x7086a13aa868b2bf8ed98a86ce1daac62eb6a856.
+
+- handle: "@OrderlyNetwork"
+  role: infra
+  weight: watch
+  note: No-code perp DEX builder. Imported.
+
+- handle: "@rallypadfun"
+  role: project
+  weight: watch
+  note: Livestream launches.
+
+- handle: "@ObsidianSwap"
+  role: infra
+  weight: watch
+  note: Cross-chain to/from RH.
+
+- handle: "@QuotronsDesktop"
+  role: project
+  weight: watch
+  note: Related Quotrons drop 1 Sep. Confirm same control plane as @Quotrons404.
+
+- handle: "@layerggofficial"
+  role: data
+  weight: watch
+  note: DEX ATH recaps including RH tickers.
+
+- handle: "@MinteraNFT"
+  role: project
+  weight: watch
+  note: NFT marketplace; fees buyback $LOCK.
+
+- handle: "@OxSimpleFarmer"
+  role: alpha
+  weight: watch
+  note: StonkBrokers / Clutch founder. STORMM + Leverage Machine.
+
+- handle: "@stonksdotfun"
+  role: project
+  weight: watch
+  slug: stonks-fun
+  note: DN-404 Doppler pad. Not StonkBrokers.
+
+- handle: "@nikshepsvn"
+  role: alpha
+  weight: watch
+  note: Stonks.fun builder.
+
+- handle: "@YowlonHood"
+  role: project
+  weight: watch
+  note: $YOWL CA 0x062939bB32EaBD47A522FE48872F41E04017a095. Related to stonks.fun.
+
+- handle: "@OddyseyAI"
+  role: project
+  weight: watch
+  note: Agent fleet CA 0xa2ceac1db81d7f0acc7eaa6018e6f9b4d33849cb. Not the Odyssey pad.
+
+- handle: "@hookosfun"
+  role: project
+  weight: watch
+  note: HookOS multi-chain hook pad. $HOOK 0x85d4e6F147BFb5729378E451F32cf5287dE75f97. NOT @Hookrfun.
+
+- handle: "@hookosbot"
+  role: project
+  weight: watch
+  note: HookOS deploy bot.
+
+- handle: "@RVHProtocol"
+  role: project
+  weight: watch
+  note: Ravenhood DAO. Farms on UPDex/SwapHood. Observe.
+
+- handle: "@0xkekov"
+  role: kol
+  weight: watch
+  note: 16 Aug RH ecosystem dump. Inventory source, not a project.
+
+- handle: "@alphai_onchain"
+  role: data
+  weight: watch
+  note: Flags RH liquidity names (Delta).
+
+- handle: "@ProjectVEXai"
+  role: project
+  weight: watch
+  note: Agentic launches on pools.trade. Not Wire, not Bankr.
+
+- handle: "@rallypadfun"
+  role: project
+  weight: watch
+  note: Livestream pad. Claimed live on RH.
+
+- handle: "@hoodcityonhood"
+  role: project
+  weight: watch
+  note: Landmark product.
+
+- handle: "@GoodCoinRH"
+  role: project
+  weight: watch
+  note: $GOOD graduation.
+
+- handle: "@bananagun"
+  role: infra
+  weight: watch
+  note: Exec bot. Stonklauncher pre-bond.
+
+- handle: "@DoloresResearch"
+  role: project
+  weight: watch
+  note: Virtuals agent.
+
+- handle: "@thinkingcatRH"
+  role: project
+  weight: watch
+  note: $HMM PFP. HMM is a bag.
+
+- handle: "@ObscuraCEX"
+  role: project
+  weight: watch
+
+- handle: "@JoinCtrlFi"
+  role: project
+  weight: watch
+
+- handle: "@WISE_Token"
+  role: project
+  weight: watch
+  note: USDG telecom nodes. Observe.
+
+- handle: "@Tangem"
+  role: infra
+  weight: watch
+  note: Hardware wallet native RH App 6.2.
+
+- handle: "@scopl_live"
+  role: project
+  weight: watch
+  slug: scopl
+  note: Official yield-bearing limit orders. CA 0xaA40e79E987517f7462bF79315B8A118799B04E3. Not Mancer, not Delta.
+
+- handle: "@Robin_Pad"
+  role: project
+  weight: watch
+  note: Odyssey pad renamed. robinpad.app. Instant+curve + RobinPerps (HL wrapper). Not @RobinPAD_MEME.
+
+- handle: "@RobinPAD_MEME"
+  role: project
+  weight: watch
+  note: Collision. Fairest/fastest meme pad. Not the Odyssey pad.
+
+- handle: "@HoodedDotMeme"
+  role: project
+  weight: watch
+  note: Named next to SwapHood as a launchpad. Observe.
+
+- handle: "@andrewtalksdefi"
+  role: alpha
+  weight: watch
+  note: Named Delta/Wire/Hedge/Website/Mesh.
+
+- handle: "@SwapHoodFi"
+  role: project
+  weight: watch
+  slug: swaphood
+  note: Official. HOOD/$h33 flywheel. Llama-listed.
+
+- handle: "@HoodInsider_"
+  role: media
+  weight: watch
+  note: Weekly recap. Numbers are claims. Distinct from @RHDaily__.
+
+- handle: "@MosaicETF"
+  role: project
+  weight: watch
+  note: Onchain ETF baskets.
+
+- handle: "@flapdotsh"
+  role: project
+  weight: watch
+  note: Stock-token pairs on RH.
+
+- handle: "@prismassets"
+  role: project
+  weight: watch
+
+- handle: "@canopyfinance"
+  role: project
+  weight: watch
+  note: Official. agen.space + $CNPY 0x532c5583671870723ceef573600208af49c87c54. Not Hookr. @Canopy_Finance is a wrong handle from HoodInsider.
+
+- handle: "@Canopy_Finance"
+  role: project
+  weight: watch
+  note: Collision / wrong handle. Official is @canopyfinance.
+
+- handle: "@agendotspace"
+  role: project
+  weight: watch
+  note: Canopy NL launcher.
+
+- handle: "@FundedProtocol"
+  role: project
+  weight: watch
+
+- handle: "@vantis_ai"
+  role: project
+  weight: watch
+
+- handle: "@mobyagent"
+  role: infra
+  weight: watch
+
+- handle: "@KarmaWallet_Eco"
+  role: media
+  weight: watch
+  note: Mis-tagged $JIMOTHY CA 0x07f5b682 as Pons. Downweight for CAs.
+
+- handle: "@rallypadfun"
+  role: project
+  weight: watch
+  note: Programmable pad + livestream. Distinct from Pons/Hookr.

@@ -1,5 +1,14 @@
 node_modules
+# build/derived.json and other generated output — never commit. Telegram digest state lives in
+# ops/telegram-state.json instead (tracked; see README "Telegram digest") precisely so it survives here.
 build
 .env
 .env.local
 .DS_Store
+
+# site (TanStack Start build outputs)
+site/.tanstack
+site/.vercel
+site/.output
+site/.nitro
+site/dist

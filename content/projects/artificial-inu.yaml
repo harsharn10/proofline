@@ -2,26 +2,36 @@ slug: artificial-inu
 name: Artificial Inu
 symbol: AI
 category: Stock-paired token
-lifecycle: mainnet
+lifecycle: announced
 coverage: stub
-summary: "Flagship LONG launch: $AI paired to tokenized NVDA on Uniswap, with a community vault."
+summary: "Flagship LONG launch: $AI paired to tokenized NVDA on Uniswap, with a community vault the project says accumulates NVDA from trading fees."
 official_links:
   - kind: site
     url: https://artificialinu.com
+  - kind: x
+    url: https://x.com/ArtificiallyInu
 dependencies:
   - stock-tokens
   - uniswap
-addresses:
-  - label: $AI token
+deployments:
+  - label: $AI token (PRD Appendix A)
+    chain: robinhood-chain
     address: "0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18"
     role: token
+    verified: false
+    sources:
+      - S7
+  - label: Community vault
+    chain: robinhood-chain
+    address: not-verified
+    role: vault
     verified: false
     sources: []
 review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
@@ -29,10 +39,29 @@ findings:
       class: claim
       sources:
         - S1
+    - text: Artificial Inu publishes an official X account at https://x.com/ArtificiallyInu.
+      class: claim
+      sources:
+        - S2
+    - text: The official account posted that the AI/NVDA pool and community vault held about $1.7M of NVDA (up $250k day over day on 29 Aug), 8,599 NVDA in total, and that this was 20.16% of all tokenized NVDA on Robinhood Chain.
+      class: claim
+      sources:
+        - S4
+        - S3
+    - text: The official account posted that $3M of $AI had been burned or locked since AI-pairs launched, and that every AI-paired token locks $AI in its pool and burns $AI per trade.
+      class: claim
+      sources:
+        - S4
+    - text: The workbook's Dune extract puts the AI/NVDA pair at roughly $86M of RWA-side volume since its 14 Jul launch on long.xyz.
+      class: claim
+      sources:
+        - S5
   risk: []
   missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from PRD Appendix A not yet reproduced on Blockscout
     - text: Community vault contract and its controller unknown
     - text: Fee routing and pair mechanics unverified
-    - text: NVDA Stock Token dependency card incomplete
-  unresolved: []
+    - text: Vault NVDA balance (about $1.7M per the project) not reproduced on chain
+  unresolved:
+    - text: Vault balances and burn totals are the project's own figures and have not been reproduced on chain.

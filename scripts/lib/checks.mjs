@@ -59,6 +59,26 @@ export function crossCheck(content) {
   }
   for (const [i, e] of content.changelog.entries()) if (!censusSlugs.has(e.slug)) errors.push(`changelog[${i}]: slug "${e.slug}" is not in census.yaml`);
 
+  // Account handles are unique, compared case-insensitively (X handles are). A duplicate row would otherwise
+  // resolve silently — last wins in build-accounts, first wins in countsForTrending.
+  const seenHandles = new Map();
+  for (const a of content.accounts ?? []) {
+    const key = String(a.handle ?? "").toLowerCase();
+    if (seenHandles.has(key)) errors.push(`accounts.yaml: duplicate handle ${a.handle} (also listed as ${seenHandles.get(key)}; handles are case-insensitive)`);
+    else seenHandles.set(key, a.handle);
+  }
+
+  // Feed files are optional per slug (§ Task 2): every slug that has one must be in the census, and every
+  // source id a feed item cites must exist in that slug's own ledger.
+  for (const [slug, feedFile] of content.feed ?? new Map()) {
+    if (!censusSlugs.has(slug)) errors.push(`feed/${slug} is not in census.yaml`);
+    if (feedFile.slug !== slug) errors.push(`feed/${slug}: slug field is "${feedFile.slug}"`);
+    const ledgerIds = new Set((content.sources.get(slug)?.sources ?? []).map((s) => s.id));
+    for (const item of feedFile.items ?? [])
+      for (const id of item.sources ?? [])
+        if (!ledgerIds.has(id)) errors.push(`feed/${slug}: item ${item.id} references ${id} which is not in sources/${slug}.yaml`);
+  }
+
   return { errors, warnings };
 }
 
@@ -70,7 +90,7 @@ export function releaseCheck(content, derivedBySlug) {
   if (content.site.chain?.checked == null) errors.push("site.yaml: chain.checked is null — set it to the date the chain facts were reproduced against docs.robinhood.com");
   for (const [slug, project] of content.projects) {
     if (project.coverage !== "full") continue;
-    for (const a of project.addresses ?? []) if (!a.verified) errors.push(`projects/${slug}: address "${a.label}" is not verified on a full profile`);
+    for (const a of project.deployments ?? []) if (!a.verified) errors.push(`projects/${slug}: deployment "${a.label}" is not verified on a full profile`);
     const d = derivedBySlug?.get(slug);
     if (project.review?.approver === "pending" && d && d.uncappedConfidence >= FULL_WEIGHT_CONFIDENCE)
       errors.push(`projects/${slug}: approver pending but uncapped confidence ${d.uncappedConfidence} ≥ ${FULL_WEIGHT_CONFIDENCE} — needs second-person approval`);

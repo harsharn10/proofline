@@ -1,11 +1,45 @@
+# USDG address appended by Task 5 from the workbook (verified: false).
 id: usdg
 name: USDG (Global Dollar)
 kind: stablecoin
 summary: Paxos-issued dollar stablecoin used as a quote asset and lending asset on Robinhood Chain.
 controls:
-  - { power: Mint / burn, holder: Paxos, note: Issuer-controlled, class: unknown, sources: [] }
-  - { power: Freeze / blacklist, holder: Paxos, note: Regulated-issuer freeze powers; confirm on the RH Chain deployment, class: unknown, sources: [] }
+  - power: Mint / burn
+    holder: Paxos
+    note: Issuer-controlled
+    class: unknown
+    sources: []
+  - power: Freeze / blacklist
+    holder: Paxos
+    note: Regulated-issuer freeze powers; confirm on the RH Chain deployment
+    class: unknown
+    sources: []
 failure_modes:
-  - { text: Address freeze traps quote-side liquidity in a launch curve or pool., class: unknown, sources: [] }
-  - { text: Bridge or canonical-deployment mismatch between chains., class: unknown, sources: [] }
-sources: []
+  - text: Address freeze traps quote-side liquidity in a launch curve or pool.
+    class: unknown
+    sources: []
+  - text: Bridge or canonical-deployment mismatch between chains.
+    class: unknown
+    sources: []
+sources:
+  - id: S1
+    url: https://github.com/harsharn10/proofline/blob/main/research/inbox/grok-2026-08-30/build_rh_tokens.py
+    publisher: Grok workbook sheet 01 / sheet 06 (intake, 2026-08-30)
+    kind: third-party-data
+    accessed_at: 2026-08-31T00:00:00Z
+    claim: USDG address given as a core asset on sheet 01 and as the largest stablecoin on the chain on sheet 06; founding GDN participants include Robinhood, Kraken and Paxos
+    excerpt: Workbook row; a claim of the workbook, not reproduced against the Paxos registry.
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+deployments:
+  - label: USDG (Global Dollar) — workbook sheet 01 core asset
+    ticker: USDG
+    chain: robinhood-chain
+    issuer: Paxos
+    address: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    role: token
+    verified: false
+    sources:
+      - S1

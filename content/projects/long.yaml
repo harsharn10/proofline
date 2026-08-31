@@ -2,7 +2,7 @@ slug: long
 name: LONG
 symbol: null
 category: Launchpad
-lifecycle: mainnet
+lifecycle: announced
 coverage: stub
 summary: Stock-paired launchpad (Factory + Airlock) that made stock-paired tokens possible on Robinhood Chain; $AI launched here.
 official_links:
@@ -12,37 +12,60 @@ official_links:
     url: https://x.com/longdotxyz
 dependencies:
   - stock-tokens
-addresses:
+  - uniswap
+deployments:
   - label: Factory (PRD lists 0x9c88…0845, truncated)
+    chain: robinhood-chain
     address: not-verified
     role: factory
     verified: false
-    sources: []
+    sources:
+      - S6
   - label: Factory (PRD lists 0x22e9…eeED, truncated)
+    chain: robinhood-chain
     address: not-verified
     role: factory
     verified: false
-    sources: []
+    sources:
+      - S6
+  - label: TickerAirlockFactory (named on Dune per the workbook)
+    chain: robinhood-chain
+    address: not-verified
+    role: factory
+    verified: false
+    sources:
+      - S4
 review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
-    - text: LONG publishes an official site at https://app.long.xyz.
+    - text: LONG publishes an official app at https://app.long.xyz.
       class: claim
       sources:
         - S1
-    - text: LONG publishes an official social at https://x.com/longdotxyz.
+    - text: LONG publishes an official X account at https://x.com/longdotxyz.
       class: claim
       sources:
         - S2
+    - text: The workbook's Dune extract records about 10.6k tokens launched and 5.6k traded on LONG, 4,061 of them paired to a Stock Token, with roughly 70% of the venue's volume on RWA pairs.
+      class: claim
+      sources:
+        - S4
+    - text: The desk's machine card places LONG as a stock-paired factory (a new token against NVDA or another Stock Token), not a bonding-curve pad and not a hook marketplace.
+      class: claim
+      sources:
+        - S5
+        - S3
   risk: []
   missing:
-    - text: Full factory addresses (PRD Appendix A is truncated)
+    - text: Mainnet status rests on the project's own posts; not independently verified
+    - text: Full factory addresses (PRD Appendix A is truncated; the workbook points at a Dune dashboard)
     - text: Airlock controls and who can release
     - text: Launch fee flows
-    - text: Audit status unknown
-  unresolved: []
+    - text: An independent audit was not found in this review
+  unresolved:
+    - text: Which factory is the factory of record for a given stock pair when both LONG and Bankr mint stock-paired tokens (desk gap).

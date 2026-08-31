@@ -2,16 +2,29 @@ slug: safehood
 name: Safehood
 symbol: null
 category: Launchpad
-lifecycle: mainnet
+lifecycle: announced
 coverage: stub
-summary: Robinhood Chain launchpad that creates Uniswap v3 pools and opens trading directly on mainnet.
+summary: Robinhood Chain launchpad that creates Uniswap v3 pools with no bonding curve; the official account has been quiet since 2026-07-16.
 official_links:
   - kind: github
     url: https://github.com/opengrid1/Launchpad
+  - kind: site
+    url: https://www.safehood.fun
+  - kind: x
+    url: https://x.com/_safehood
 dependencies:
   - uniswap
-addresses:
-  - label: Launchpad
+deployments:
+  - label: Safehood pad token (candidate — from the safehood.fun token page URL)
+    chain: robinhood-chain
+    address: "0x262b60af42c46bd09c00069cd0dcb2ae0093034b"
+    role: token
+    verified: false
+    sources:
+      - S5
+      - S4
+  - label: Launch factory (rebuilt 15 Jul per the project)
+    chain: robinhood-chain
     address: not-verified
     role: factory
     verified: false
@@ -20,7 +33,7 @@ review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
@@ -28,10 +41,33 @@ findings:
       class: claim
       sources:
         - S1
-  risk: []
+    - text: Safehood publishes an official site at https://www.safehood.fun.
+      class: claim
+      sources:
+        - S2
+    - text: Safehood publishes an official X account at https://x.com/_safehood.
+      class: claim
+      sources:
+        - S3
+    - text: The official account posted on 2026-07-15 that launches go to Uniswap V3 from block one with no bonding curve, are free apart from gas, and carry a 2% per-transaction and per-wallet cap until a $40k market cap that then clears itself on chain.
+      class: claim
+      sources:
+        - S5
+  risk:
+    - text: The official account posted the same day that the first factory had bugs and had been replaced by a new, ownerless-at-launch factory, with the fee split moving from 100% creator to 80% creator / 20% platform.
+      class: claim
+      sources:
+        - S5
+    - text: A token with the SAFEHOOD ticker at a different address (0x663492eab45ed21d6bdd7836efdc1a9cd51ae199, @safehoodonrh) is a Pons graduation using Sinjoh's fee router and is not this protocol.
+      class: claim
+      sources:
+        - S6
+        - S4
   missing:
+    - text: Lifecycle not verified — no deployment evidence reviewed
     - text: Mainnet addresses from the repository not yet reproduced on Blockscout
     - text: Single platform admin wallet claim — confirm scope of powers
-    - text: Independent audit evidence
-    - text: Whether the deployer retains token-level privileges
-  unresolved: []
+    - text: An independent audit was not found in this review
+    - text: Whether the factory rebuilt on 2026-07-15 is the one in the repository
+  unresolved:
+    - text: The official account's last posts are dated 2026-07-16; the desk recorded lifecycle as unknown and this file records announced pending deployment evidence.

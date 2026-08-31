@@ -1,0 +1,47 @@
+slug: mesh
+name: Mesh
+symbol: MESH
+category: Scanner / tooling
+lifecycle: announced
+coverage: stub
+summary: Machine-payments gateway (MPP) on Robinhood Chain with a MESH token; USDG fee epochs are paid to large holders and Pons is listed as a merchant.
+official_links:
+  - kind: x
+    url: https://x.com/MeshGateway
+dependencies:
+  - usdg
+deployments:
+  - label: MESH token
+    chain: robinhood-chain
+    address: "0x14641000a501bdc736116abf84e6fcea9b90a713"
+    role: token
+    verified: false
+    sources:
+      - S2
+      - S3
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Mesh publishes an official X account at https://x.com/MeshGateway.
+      class: claim
+      sources:
+        - S1
+    - text: The official account posted 4,273 paid calls and 209 USDG in under 48 hours, Pons listed as a merchant, and a 30 Aug epoch paying 68.49 USDG to 88 wallets holding at least 1M MESH.
+      class: claim
+      sources:
+        - S3
+        - S2
+  risk: []
+  missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
+    - text: Token and gateway addresses not reproduced on Blockscout
+    - text: Fee custody between epochs
+    - text: Who triggers and sizes epoch payouts
+    - text: Official site not located
+  unresolved:
+    - text: Where merchant fees are held between epochs and who triggers a payout is not described in the intake.

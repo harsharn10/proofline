@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
-import { parse } from "yaml";
+import { parse, stringify } from "yaml";
 import assert from "node:assert/strict";
-import { mkdtemp, cp, rm, writeFile, appendFile } from "node:fs/promises";
+import { mkdtemp, mkdir, cp, rm, writeFile, appendFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { derive, SECURITY_MAX, PROVISIONAL_CONFIDENCE, FULL_WEIGHT_CONFIDENCE } from "./lib/score.mjs";
@@ -9,7 +9,10 @@ import { validateAgainst } from "./lib/schemas.mjs";
 import { crossCheck, releaseCheck } from "./lib/checks.mjs";
 import { checkResearch, tagIds, REQUIRED_HEADINGS } from "./lib/research-md.mjs";
 import { loadContent } from "./lib/load.mjs";
+import { selectUnsent, buildDigest, chunkMessage, readDotEnv } from "./lib/telegram.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
+import { computeTrending, countsForTrending } from "./lib/trending.mjs";
+import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
@@ -102,9 +105,9 @@ for (const name of Object.keys(expected)) {
   const approverCaps = await errsWith((p) => { p.review.approver = "Pending"; });
   const approverSpace = await errsWith((p) => { p.review.approver = "pending "; });
   const researcherCaps = await errsWith((p) => { p.review.researcher = "Fixture"; });
-  const verifiedSentinel = await errsWith((p) => { p.addresses[0] = { label: "Router", address: "not-verified", role: "router", verified: true, sources: [] }; });
-  const verifiedNoSource = await errsWith((p) => { p.addresses[0].sources = []; });
-  const unverifiedSentinel = await errsWith((p) => { p.addresses[0] = { label: "Router", address: "not-verified", role: "router", verified: false, sources: [] }; });
+  const verifiedSentinel = await errsWith((p) => { p.deployments[0] = { label: "Router", chain: "robinhood-chain", address: "not-verified", role: "router", verified: true, sources: [] }; });
+  const verifiedNoSource = await errsWith((p) => { p.deployments[0].sources = []; });
+  const unverifiedSentinel = await errsWith((p) => { p.deployments[0] = { label: "Router", chain: "robinhood-chain", address: "not-verified", role: "router", verified: false, sources: [] }; });
   const unknownWithSources = await errsWith((p) => { p.findings.positive[0] = { text: "Unclear.", class: "unknown", sources: ["S1"] }; });
   const unknownNoSources = await errsWith((p) => { p.findings.positive[0] = { text: "Unclear.", class: "unknown" }; });
   const typo = await errsWith((p) => { p.scoring.overide = { level: "High", reason: "x", evidence: ["S1"] }; });
@@ -204,6 +207,7 @@ async function makeContent(mutate = () => {}) {
     census: [{ slug: "clean", name: p.name, category: p.category, lifecycle: p.lifecycle, coverage: p.coverage }],
     projects: new Map([["clean", p]]), sources: new Map([["clean", s]]), research: new Map([["clean", "stub"]]),
     dependencies: new Map(), changelog: [{ slug: "clean" }],
+    feed: new Map(), accounts: [],
   };
   mutate(content, p);
   return content;
@@ -240,7 +244,7 @@ async function makeContent(mutate = () => {}) {
   const run = async (mutate) => { const c = await makeContent(mutate); return releaseCheck(c, derived(c)); };
   const clean = await run();
   const todo = await run((c) => { c.site.corrections.destination = "TODO"; });
-  const unverified = await run((c, p) => { p.addresses[0] = { label: "Router", address: "not-verified", role: "router", verified: false, sources: [] }; });
+  const unverified = await run((c, p) => { p.deployments[0] = { label: "Router", chain: "robinhood-chain", address: "not-verified", role: "router", verified: false, sources: [] }; });
   const pendingHigh = await run((c, p) => { p.review.approver = "pending"; });
   const pendingLow = await run((c, p) => { p.review.approver = "pending"; p.scoring.confidence = { primary_source_coverage: 60, onchain_verification: 60, independent_corroboration: 60, freshness: 60, review_completeness: 60 }; });
   const checkedNull = await run((c) => { c.site.chain.checked = null; });
@@ -260,24 +264,55 @@ async function makeContent(mutate = () => {}) {
 {
   const tmp = await mkdtemp(join(tmpdir(), "proofline-"));
   await cp("content", tmp, { recursive: true });
+  await mkdir(join(tmp, "feed"), { recursive: true });
   const baseline = await validateContent(tmp);
+  // Flip one qualifying test to false on the scratch copy: it must warn normally and error under --release.
+  const censusPath = join(tmp, "census.yaml");
+  const censusText = await readFile(censusPath, "utf8");
+  await writeFile(censusPath, censusText.replace(/citable:\s*\{ value: true,/, "citable:           { value: false,"));
+  const qualifyingFalse = await validateContent(tmp);
   const releaseRun = await validateContent(tmp, { release: true });
+  await writeFile(censusPath, censusText);
   const ledgerPath = join(tmp, "sources", "pons.yaml"), researchPath = join(tmp, "research", "pons.md");
   const entry = (id) => `  - id: ${id}\n    url: https://example.com/${id}\n    publisher: Example\n    kind: docs\n    accessed_at: 2026-08-30T00:00:00Z\n    claim: Fixture\n    excerpt: n/a\n    hash: null\n    archive_url: null\n    researcher: harsharn10\n    available: true\n`;
-  await appendFile(ledgerPath, entry("S2") + entry("S3"));
+  await appendFile(ledgerPath, entry("S98") + entry("S99")); // ids no real ledger uses
   const research = await readFile(researchPath, "utf8");
-  await writeFile(researchPath, research.replace("## Identity\n\n_Research pending._", "## Identity\n\nPons is a launchpad. [claim S2]"));
+  await writeFile(researchPath, research.replace("## Identity\n\n_Research pending._", "## Identity\n\nPons is a launchpad. [claim S98]"));
   const cited = await validateContent(tmp);
+  // A feed item citing S99 counts as a citation; a feed item attributed to a skip-tier account warns.
+  const feedItem = (body) => `slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ct\n    title: T\n    body: ${JSON.stringify(body)}\n    account: "@spam"\n    sources: [S99]\n`;
+  await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n  note: Handle collides with the official account; posts not used as evidence.\n");
+  await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("B"));
+  const feedCited = await validateContent(tmp);
+  // Hard content gate (final review C3): feed files and account notes are on the auto-merge path, so a hype word
+  // in a feed body and a conduct verdict in an account note are errors without --release. Findings text too.
+  await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n  note: Known drainer.\n");
+  const conductNote = await validateContent(tmp);
+  await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n");
+  await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("Ape in, this will moon."));
+  const hypeFeed = await validateContent(tmp);
+  await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("B"));
+  const ponsPath = join(tmp, "projects", "pons.yaml");
+  const pons = parse(await readFile(ponsPath, "utf8"));
+  pons.findings.risk.push({ text: "The deployer is a known scammer.", class: "claim" });
+  await writeFile(ponsPath, stringify(pons));
+  const conductFinding = await validateContent(tmp);
   await writeFile(join(tmp, "projects", "arrow.yaml"), "slug: [\n");
   const broken = await validateContent(tmp);
   await rm(tmp, { recursive: true, force: true });
   try {
     assert.deepEqual(baseline.errors, [], "scratch copy validates");
-    assert.ok(baseline.warnings.some((w) => w.includes("stonkbroker fails qualifying test citable")), "qualifying value false warns");
-    assert.ok(releaseRun.errors.some((e) => e.includes("stonkbroker fails qualifying test citable")), "qualifying value false is a release error");
+    assert.ok(qualifyingFalse.warnings.some((w) => w.includes("fails qualifying test citable")), "qualifying value false warns");
+    assert.ok(releaseRun.errors.some((e) => e.includes("fails qualifying test citable")), "qualifying value false is a release error");
+    assert.deepEqual(feedCited.errors, [], "feed citation of an existing ledger id is not an error");
+    assert.ok(!feedCited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited only from a feed item is not 'never cited'");
+    assert.ok(feedCited.warnings.some((w) => w.includes("skip-tier account @spam")), "feed item attributed to a skip-tier account warns");
+    assert.ok(conductNote.errors.some((e) => e.includes("@spam note: conduct word \"drainer\"")), "conduct word in an account note is an error without --release");
+    assert.ok(hypeFeed.errors.some((e) => e.includes("feed/pons.yaml: t1 body: banned word \"moon\"")), "hype word in a feed body is an error without --release");
+    assert.ok(conductFinding.errors.some((e) => e.includes("projects/pons.yaml: findings.risk") && e.includes("conduct word \"scammer\"")), "conduct word in findings text is an error without --release");
     assert.deepEqual(cited.errors, [], "prose citation validates");
-    assert.ok(!cited.warnings.some((w) => w.includes("S2 is never cited")), "an id cited only in research prose is not 'never cited'");
-    assert.ok(cited.warnings.some((w) => w.includes("S3 is never cited")), "an id cited nowhere still warns");
+    assert.ok(!cited.warnings.some((w) => w.includes("S98 is never cited")), "an id cited only in research prose is not 'never cited'");
+    assert.ok(cited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited nowhere still warns");
     assert.equal(broken.content, null, "load failure returns no content");
     assert.equal(broken.errors.length, 1);
     assert.ok(broken.errors[0].includes("projects/arrow.yaml"), `YAML error names the file: ${broken.errors[0]}`);
@@ -381,6 +416,233 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     if (p.coverage === "full" && ((d.score === null) === (d.label === null))) { bad++; console.error(`  ${slug}: score/label inconsistent`); }
   }
   if (bad) { failures++; console.error("FAIL content derive"); } else console.log(`ok   content derive (${content.projects.size} projects)`);
+}
+
+// Telegram digest helpers: unsent selection, HTML escaping, numbers line, links, chunking, dotenv.
+{
+  const entries = [
+    { date: "2026-08-30", slug: "pons", type: "coverage", severity: "Info", title: "Initial stub opened", detail: "x" },
+    { date: "2026-08-31", slug: "pons", type: "score", severity: "Material", title: "Score published", detail: "<b>&" },
+  ];
+  const unsent = selectUnsent(entries, { sent_keys: ["2026-08-30|pons|coverage|Initial stub opened"] });
+  const projects = new Map([["pons", { name: "Pons" }]]);
+  const derived = new Map([["pons", { score: 64, provisional: true, risk: "Elevated", confidence: 57 }]]);
+  const text = buildDigest(unsent, { siteName: "Proofline", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
+  const chunks = chunkMessage("a".repeat(3000) + "\n\n" + "b".repeat(3000), 4096);
+  try {
+    assert.equal(unsent.length, 1);
+    assert.ok(text.includes("<b>Pons</b>"), "name bold");
+    assert.ok(text.includes("Score 64/100 (provisional) · Elevated risk · 57% confidence"), "numbers line");
+    assert.ok(text.includes("https://x.test/n/pons"), "profile link");
+    assert.ok(text.includes("&lt;b&gt;&amp;"), "html escaped");
+    assert.equal(chunks.length, 2, "chunked");
+    assert.deepEqual(readDotEnv("A=1\n# c\nB=\"two words\"\n"), { A: "1", B: "two words" });
+    console.log("ok   telegram digest");
+  } catch (err) { failures++; console.error(`FAIL telegram digest: `); }
+}
+
+// Task 2 / Task 5 — computeTrending: distinct counting accounts with `kind: ct` items dated inside the window.
+// Task 5 addendum ruling 4: an account counts only when tier == top AND (role absent OR role ∈ {alpha, kol});
+// watch / downweight / skip rows never count.
+{
+  const accounts = [
+    { handle: "@a", tier: "top" },                      // no role → counts (legacy shape)
+    { handle: "@b", tier: "top", role: "alpha" },
+    { handle: "@c", tier: "top", role: "kol" },
+    { handle: "@d", tier: "watch", role: "alpha" },
+    { handle: "@p", tier: "top", role: "project" },     // official account at top: must NOT count
+    { handle: "@m", tier: "top", role: "media" },
+    { handle: "@x", tier: "skip", role: "kol" },
+    { handle: "@w", tier: "downweight", role: "kol" },
+  ];
+  const opts = { minAccounts: 3, windowDays: 7, today: "2026-08-30" };
+  const item = (id, date, account) => ({ id, date, kind: "ct", title: "t", body: "b", account });
+  const run = (items) => computeTrending(new Map([["x", items]]), accounts, opts).get("x");
+  const threeTop = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@c")]);
+  const twoTop = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b")]);
+  const oneWatch = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@d")]);
+  const topProject = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@p")]);
+  const topMedia = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@m")]);
+  const skipped = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@x")]);
+  const downweighted = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@w")]);
+  const outsideWindow = run([item("1", "2026-08-20", "@a"), item("2", "2026-08-26", "@b"), item("3", "2026-08-27", "@c")]);
+  const sameAccountThrice = run([item("1", "2026-08-25", "@a"), item("2", "2026-08-26", "@a"), item("3", "2026-08-27", "@a")]);
+  try {
+    assert.equal(threeTop.trending, true, "3 counting accounts in window → trending");
+    assert.deepEqual(threeTop.accounts, ["@a", "@b", "@c"]);
+    assert.equal(twoTop.trending, false, "2 accounts → not trending");
+    assert.equal(oneWatch.trending, false, "one of three is watch tier → not trending");
+    assert.equal(topProject.trending, false, "top + role: project must not count");
+    assert.equal(topMedia.trending, false, "top + role: media must not count");
+    assert.equal(skipped.trending, false, "skip never counts");
+    assert.equal(downweighted.trending, false, "downweight never counts");
+    assert.equal(outsideWindow.trending, false, "one dated outside window → not trending");
+    assert.equal(sameAccountThrice.trending, false, "same account thrice counts once → not trending");
+    assert.equal(countsForTrending({ handle: "@z", tier: "top", role: "alpha" }), true);
+    assert.equal(countsForTrending({ handle: "@z", tier: "top", role: "data" }), false);
+    assert.equal(countsForTrending({ handle: "@z", tier: "skip" }), false);
+    assert.equal(countsForTrending({ handle: "@z", tier: "downweight", role: "alpha" }), false);
+    console.log("ok   computeTrending");
+  } catch (err) { failures++; console.error(`FAIL computeTrending: ${err.message}`); }
+}
+
+// Task 5 — accounts schema: tier superset, role enum, slug pattern, integer followers.
+{
+  const row = (extra) => [{ handle: "@a", tier: "watch", ...extra }];
+  const cases = [
+    [row({ tier: "downweight" }), 0, "downweight tier"],
+    [row({ tier: "skip" }), 0, "skip tier"],
+    [row({ tier: "blacklist" }), 1, "blacklist is no longer a tier"],
+    [row({ tier: "muted" }), 1, "unknown tier rejected"],
+    [row({ role: "alpha" }), 0, "role alpha"],
+    [row({ role: "builder" }), 1, "role outside the enum rejected"],
+    [row({ slug: "denar" }), 0, "slug"],
+    [row({ slug: "Denar Markets" }), 1, "slug must match ^[a-z0-9-]+$"],
+    [row({ followers: 6800 }), 0, "integer followers"],
+    [row({ followers: "6.8k" }), 1, "followers must be an integer"],
+    [row({ weight: "top" }), 1, "desk field weight is not carried over"],
+  ];
+  try {
+    for (const [data, want, why] of cases) assert.equal(validateAgainst("accounts", data).length > 0 ? 1 : 0, want, why);
+    console.log("ok   accounts schema");
+  } catch (err) { failures++; console.error(`FAIL accounts schema: ${err.message}`); }
+}
+
+// Task 5 — census schema: optional handle (X pattern) and tree { primary, secondary[] }.
+{
+  const base = () => ({
+    slug: "denar", name: "Denar", category: "Lending", lifecycle: "mainnet", coverage: "stub", official_links: [],
+    discovery_source: "desk", qualifying: Object.fromEntries(["deployed_on_chain", "native_play", "citable", "research_story"].map((k) => [k, { value: true, note: "n", verified: false }])),
+  });
+  const cases = [
+    [{ ...base(), handle: "@DenarMarkets" }, 0, "handle"],
+    [{ ...base(), handle: "DenarMarkets" }, 1, "handle needs @"],
+    [{ ...base(), tree: { primary: "credit/isolated-money-market" } }, 0, "tree primary only"],
+    [{ ...base(), tree: { primary: "credit/isolated-money-market", secondary: ["yield/savings-vault"] } }, 0, "tree with secondary"],
+    [{ ...base(), tree: { secondary: ["x"] } }, 1, "tree needs primary"],
+    [{ ...base(), tree: { primary: "x", tertiary: [] } }, 1, "tree rejects unknown keys"],
+  ];
+  try {
+    for (const [data, want, why] of cases) assert.equal(validateAgainst("census", [data]).length > 0 ? 1 : 0, want, why);
+    console.log("ok   census schema handle/tree");
+  } catch (err) { failures++; console.error(`FAIL census schema handle/tree: ${err.message}`); }
+}
+
+// Task 2 — feed schema: kind enum and account handle pattern.
+{
+  const feedBase = () => ({ slug: "pons", items: [{ id: "f1", date: "2026-08-20", kind: "company", title: "T", body: "B" }] });
+  const newsKind = validateAgainst("feed", { slug: "pons", items: [{ ...feedBase().items[0], kind: "news" }] });
+  const badAccount = validateAgainst("feed", { slug: "pons", items: [{ ...feedBase().items[0], account: "longbow" }] });
+  const ok = validateAgainst("feed", feedBase());
+  try {
+    assert.ok(newsKind.length > 0, "kind: news is rejected");
+    assert.ok(badAccount.length > 0, "account without a leading @ is rejected");
+    assert.deepEqual(ok, [], "a well-formed feed file passes");
+    console.log("ok   feed schema");
+  } catch (err) { failures++; console.error(`FAIL feed schema: ${err.message}`); }
+}
+
+// Task 2 — crossCheck: feed for a slug not in census, and a feed item citing a source id absent from the ledger.
+{
+  const feedGhost = crossCheck(await makeContent((c) => { c.feed = new Map([["ghost", { slug: "ghost", items: [] }]]); }));
+  const feedDangling = crossCheck(await makeContent((c) => {
+    c.feed = new Map([["clean", { slug: "clean", items: [{ id: "i1", date: "2026-08-20", kind: "ct", title: "t", body: "b", sources: ["S9"] }] }]]);
+  }));
+  try {
+    assert.ok(feedGhost.errors.some((e) => e.includes("ghost") && e.includes("census")), "feed slug not in census.yaml");
+    assert.ok(feedDangling.errors.some((e) => e.includes("S9")), "feed item cites a source id absent from the ledger");
+    console.log("ok   crossCheck feed");
+  } catch (err) { failures++; console.error(`FAIL crossCheck feed: ${err.message}`); }
+}
+
+// Fix round 1 + final review C3 — conductWarnings: the verdict-noun list applies everywhere (notes, feed, findings);
+// `{ note: true }` adds the words that are accusations about an account but ordinary in protocol prose ("farm").
+{
+  try {
+    assert.equal(conductWarnings("Known drainer wrapping the official CA.", "x").length, 1, "drainer");
+    assert.equal(conductWarnings("Likely impersonator of Arrow.", "x").length, 1, "impersonator");
+    assert.equal(conductWarnings("Handle collides with the official @ArrowFinanceio; posts not used as evidence.", "x").length, 0, "behaviour-only note passes");
+    assert.equal(conductWarnings("Runs farms on UPDex.", "x", { note: true }).length, 1, "farm/farms about an account (note scope)");
+    assert.equal(conductWarnings("Farmhouse Finance", "x", { note: true }).length, 0, "whole-word only");
+    assert.equal(conductWarnings("Deposits go to a yield farm on UPDex.", "x").length, 0, "farm in finding/feed prose is not a verdict");
+    assert.equal(conductWarnings("Dakota/Sinjoh alt. Same person as @DSB_117.", "x").length, 1, "identity assertion phrase");
+    assert.equal(conductWarnings("The contract is a honeypot.", "x").length, 1, "honeypot");
+    assert.equal(conductWarnings("A ponzi with extra steps.", "x").length, 1, "ponzi");
+    assert.equal(conductWarnings("Reads like a fraudster's pitch.", "x").length, 1, "fraudster (possessive still whole-word)");
+    assert.equal(conductWarnings("Inside the vault, the router forwards fees.", "x").length, 0, "insider does not fire inside 'Inside'");
+    console.log("ok   conductWarnings");
+  } catch (err) { failures++; console.error(`FAIL conductWarnings: ${err.message}`); }
+}
+
+// Final review minor — account handles are unique (case-insensitive): crossCheck errors on a duplicate, and the
+// schema rejects a byte-identical duplicate row.
+{
+  const dupRows = crossCheck(await makeContent((c) => { c.accounts = [{ handle: "@Alpha", tier: "watch" }, { handle: "@alpha", tier: "top", role: "kol" }]; }));
+  const distinct = crossCheck(await makeContent((c) => { c.accounts = [{ handle: "@alpha", tier: "watch" }, { handle: "@beta", tier: "top", role: "kol" }]; }));
+  const identical = validateAgainst("accounts", [{ handle: "@alpha", tier: "watch" }, { handle: "@alpha", tier: "watch" }]);
+  try {
+    assert.ok(dupRows.errors.some((e) => e.includes("duplicate handle @alpha")), "duplicate handle (case-insensitive) is an error");
+    assert.ok(!distinct.errors.some((e) => e.includes("duplicate handle")), "distinct handles pass");
+    assert.ok(identical.length > 0, "schema rejects an identical duplicate row");
+    console.log("ok   accounts unique handles");
+  } catch (err) { failures++; console.error(`FAIL accounts unique handles: ${err.message}`); }
+}
+
+// Task 2 — voiceWarnings: whole-word, case-insensitive matches only.
+{
+  const ape = voiceWarnings("Do not ape this", "x");
+  const grape = voiceWarnings("Grape harvest", "x");
+  try {
+    assert.equal(ape.length, 1, "banned word ape matches once");
+    assert.equal(grape.length, 0, "whole-word match does not fire inside grape");
+    console.log("ok   voiceWarnings");
+  } catch (err) { failures++; console.error(`FAIL voiceWarnings: ${err.message}`); }
+}
+
+// Task 2 fix round 2 — voiceWarnings: print/prints-near-mcap rule is exactly "print"/"prints" (whole word,
+// case-insensitive), then zero to three whitespace-separated words, then mcap | market cap | fdv
+// (case-insensitive). /\bprints?\b(?:\s+\S+){0,3}\s+(?:mcap|market\s+cap|fdv)\b/i
+{
+  const cases = [
+    ["prints mcap", 1, "zero gap"],
+    ["prints a $30M mcap", 1, "two words: a, $30M"],
+    ["prints a brand new FDV", 1, "three words: a, brand, new"],
+    ["prints a brand new high FDV", 0, "four words — over budget"],
+    ["printed a $30M mcap", 0, "printed is not print/prints"],
+    ["prints at a new all-time FDV", 0, "four words: at, a, new, all-time — over budget"],
+    ["a market cap of $30M", 0, "no print/prints trigger word"],
+    ["prints a new market cap", 1, "two-word target (market cap) within budget"],
+  ];
+  try {
+    for (const [text, want, why] of cases) assert.equal(voiceWarnings(text, "x").length, want, `${JSON.stringify(text)} (${why})`);
+    console.log("ok   voiceWarnings print-mcap window");
+  } catch (err) { failures++; console.error(`FAIL voiceWarnings print-mcap window: ${err.message}`); }
+}
+
+// Task 2 — project schema: `addresses` is gone, `deployments[]` takes over with a chain enum.
+{
+  const fresh = async () => parse(await readFile(new URL("../fixtures/clean/project.yaml", import.meta.url), "utf8"));
+  const p1 = await fresh();
+  p1.deployments = [{ label: "Router", chain: "robinhood-chain", address: "0x0000000000000000000000000000000000000001", role: "router", verified: true, sources: ["S1"] }];
+  delete p1.addresses;
+  const deploymentsOk = validateAgainst("project", p1);
+
+  const p2 = await fresh(); // simulate the pre-migration shape: old `addresses` key, no `deployments` — must now fail
+  p2.addresses = [{ label: "Router", address: "0x0000000000000000000000000000000000000001", role: "router", verified: true, sources: ["S1"] }];
+  delete p2.deployments;
+  const oldAddressesRejected = validateAgainst("project", p2);
+
+  const p3 = await fresh();
+  p3.deployments = [{ label: "Router", chain: "bsc", address: "0x0000000000000000000000000000000000000001", role: "router", verified: true, sources: ["S1"] }];
+  delete p3.addresses;
+  const badChainRejected = validateAgainst("project", p3);
+
+  try {
+    assert.deepEqual(deploymentsOk, [], "deployments with chain: robinhood-chain passes");
+    assert.ok(oldAddressesRejected.length > 0, "old addresses key without deployments now fails");
+    assert.ok(badChainRejected.length > 0, "chain: bsc is rejected");
+    console.log("ok   project schema deployments");
+  } catch (err) { failures++; console.error(`FAIL project schema deployments: ${err.message}`); }
 }
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }

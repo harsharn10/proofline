@@ -1,0 +1,51 @@
+slug: wire
+name: Wire
+symbol: WIRE
+category: Agent / execution
+lifecycle: announced
+coverage: stub
+summary: Command layer that launches tokens on Pons and executes trades from X, Telegram or web, with a $WIRE token.
+official_links:
+  - kind: x
+    url: https://x.com/wirebotRH
+dependencies: []
+deployments:
+  - label: WIRE token (account bio)
+    chain: robinhood-chain
+    address: "0x8ECEA3d0E648DB646d824AA51EedeB16aC3d6878"
+    role: token
+    verified: false
+    sources:
+      - S2
+      - S3
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Wire publishes an official X account at https://x.com/wirebotRH.
+      class: claim
+      sources:
+        - S1
+    - text: The desk observed production replies from the account launching tokens on Pons from X, with fees posted as about 0.0005 ETH to Pons plus $3 to the protocol plus gas, and an optional pairing with GME, USDG, NVDA or SPY.
+      class: claim
+      sources:
+        - S4
+        - S2
+  risk:
+    - text: The account posted on 2026-08-30 that it had patched a missing router approval on post-graduation buys; a fix of that kind implies buys through the command layer failed for some period.
+      class: inference
+      sources:
+        - S4
+  missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
+    - text: Token address from the bio not reproduced on Blockscout
+    - text: Key custody for user commands
+    - text: Protocol fee custody
+    - text: Details of the 2026-08-30 router-approval patch
+    - text: An independent audit was not found in this review
+  unresolved:
+    - text: How user keys are custodied when commands arrive from X or Telegram is not described in the intake.

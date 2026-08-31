@@ -1,0 +1,53 @@
+slug: robindex
+name: Robindex
+symbol: ROBINDEX
+category: Scanner / tooling
+lifecycle: announced
+coverage: stub
+summary: Token scanner and Telegram bot for Robinhood Chain (robindex.pro) with a $ROBINDEX token; not a stock index and not Robinhood Index Vaults.
+official_links:
+  - kind: site
+    url: https://robindex.pro/about
+  - kind: x
+    url: https://x.com/robindexpro
+dependencies: []
+deployments:
+  - label: ROBINDEX token (About page and X bio per the dossier)
+    chain: robinhood-chain
+    address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
+    role: token
+    verified: false
+    sources:
+      - S3
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Robindex publishes an official site at https://robindex.pro/about.
+      class: claim
+      sources:
+        - S1
+    - text: Robindex publishes an official X account at https://x.com/robindexpro.
+      class: claim
+      sources:
+        - S2
+    - text: The official account's 14 Aug post, per the desk, describes a token scanner for Robinhood Chain (paste an address for market data, holders and an AI read) and a Telegram bot for scans and alerts.
+      class: claim
+      sources:
+        - S5
+        - S4
+  risk:
+    - text: Four products share the Robindex name (robindex.pro scanner, robindex.money $RDEX, robindex.finance $RBD, robindex.online OTC); the project's own safety page calls out tokens using its ticker at other addresses.
+      class: claim
+      sources:
+        - S3
+  missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
+    - text: Token address from the About page not reproduced on Blockscout
+    - text: Token utility and treasury
+    - text: Three other products share the name
+  unresolved: []

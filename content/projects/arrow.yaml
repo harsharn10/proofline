@@ -1,21 +1,53 @@
 slug: arrow
 name: Arrow Finance
-symbol: null
+symbol: ARROW
 category: CDP
-lifecycle: mainnet
+lifecycle: announced
 coverage: stub
-summary: Native CDP and DeFi gateway on Robinhood Chain; launchpad live, CDP audit in flight per the seed table.
+summary: Native CDP minting aUSD against Stock Tokens, ETFs, WETH and USDG, dated by the project to open 2026-08-31 09:30 ET after a Sherlock review; an ArrowPad launchpad shares the brand.
 official_links:
   - kind: docs
     url: https://app.arrowfinance.io/docs
-dependencies: []
-addresses:
-  - label: Launchpad
-    address: not-verified
+  - kind: x
+    url: https://x.com/ArrowFinanceio
+dependencies:
+  - stock-tokens
+  - usdg
+deployments:
+  - label: ARROW token (ArrowToken)
+    chain: robinhood-chain
+    address: "0xf2915d1e3C1B0c769d0c756Ec43F1c1f6c99cD03"
+    role: token
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S7
+  - label: aUSD (Arrow USD)
+    chain: robinhood-chain
+    address: "0x4f11d7603D1B0D0f021Db552D8A6d88d7fa38ecf"
+    role: token
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S7
+  - label: ArrowPad launch factory (the launchpad, not the CDP)
+    chain: robinhood-chain
+    address: "0x1Badc838AAe6ac41829180744ea2e1C89b452aAe"
     role: factory
     verified: false
-    sources: []
+    sources:
+      - S3
+  - label: aUSD liquidity pool on up v3 (per the project's pre-open post)
+    chain: robinhood-chain
+    address: "0x29e3f3d9891cacf213361bcbcb7728970d53baa8"
+    role: other
+    verified: false
+    sources:
+      - S5
   - label: CDP core
+    chain: robinhood-chain
     address: not-verified
     role: vault
     verified: false
@@ -24,7 +56,7 @@ review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
@@ -32,10 +64,40 @@ findings:
       class: claim
       sources:
         - S1
-  risk: []
+    - text: Arrow Finance publishes an official X account at https://x.com/ArrowFinanceio.
+      class: claim
+      sources:
+        - S2
+    - text: "The official account posted pre-open parameters: 16 collateral markets (stables, WETH, tokenized equities and indices), 75–90% initial maximum LTV, about $1.6M aggregate aUSD borrow cap, and equity or index collateral usable only during US cash hours (09:30–16:00 ET) with WETH and stables 24/7."
+      class: claim
+      sources:
+        - S5
+    - text: The official account posted on 2026-08-29 that the stability pool had been rewritten into risk-tiered pools so an equity shortfall cannot reach stablecoin or wstETH providers, following a Sherlock review.
+      class: claim
+      sources:
+        - S6
+    - text: The desk's auditor reported both the ARROW token (6,886 holders, contract source code verified on Blockscout) and aUSD (21 holders, source code not verified on Blockscout) present on chain 4663 with the same creator — the explorer's source-code flag, per the desk, not Proofline verification.
+      class: claim
+      sources:
+        - S7
+  risk:
+    - text: The aUSD contract was reported on Blockscout without its source code verified on the explorer; the CDP's own contracts were not located in this review.
+      class: claim
+      sources:
+        - S7
+    - text: Two further X accounts using the Arrow name (@ArrowFinanceHQ, @arrowfinances) were flagged by the research desk as unconfirmed; only @ArrowFinanceio is treated as the project's account in this file.
+      class: claim
+      sources:
+        - S8
+    - text: "The workbook records unrelated products using the Arrow name on this chain: a Solana-origin token launcher (launcharrow.xyz) and the separate Arrows options protocol."
+      class: claim
+      sources:
+        - S4
   missing:
-    - text: Contract addresses not yet located
-    - text: CDP collateral types, oracle and liquidation path
-    - text: Audit report and covered commit
-    - text: Admin powers over the launchpad
-  unresolved: []
+    - text: Whether the CDP opened on 2026-08-31 — not confirmed in this review
+    - text: CDP core and stability-pool addresses not located
+    - text: Sherlock report and covered commit not reviewed
+    - text: Admin powers over caps, listings and the US-hours collateral switch
+    - text: ArrowPad factory controls
+  unresolved:
+    - text: "Whether the CDP opened at 09:30 ET on 2026-08-31: the desk's last check preceded the open and found no 'we're live' post. Lifecycle stays announced until an official post or on-chain activity is reviewed."

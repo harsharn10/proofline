@@ -1,6 +1,10 @@
-# Seed universe — PRD §2.1 (10) + product-owner restore of 4 native plays (2026-08-30).
-# Every `qualifying.*.verified: false` means the value is asserted by the PRD seed table and
-# has not been reproduced on Blockscout or the project's own contracts yet.
+# Coverage universe — PRD §2.1 seed set (14) + the Grok research desk's `subjects:` list (2026-08-31 ecosystem map).
+# Every `qualifying.*.verified: false` means the value is asserted by the seed table or the intake and has not
+# been reproduced on Blockscout or the project's own contracts yet. `handle` is the X account the desk treats as
+# official; `tree` is the desk's placement (category stays the PRD enum). Names the desk parked as `observe:` or
+# `graduation:` are not rows here — see research/inbox/grok-2026-08-30/HARVEST.md.
+
+# --- PRD seed set ---
 
 - slug: pons
   name: Pons
@@ -9,53 +13,63 @@
   coverage: stub          # flips to full when the research record lands (PRD §13, §14 step 4)
   official_links:
     - { kind: site, url: https://ponsfamily.com }
-  discovery_source: PRD seed table 2026-08-30; Messari profile pons-launchpad; Bitquery Pons API docs
+    - { kind: x, url: https://x.com/ponsdotfamily }
+  discovery_source: PRD seed table 2026-08-30; Messari profile pons-launchpad; Bitquery Pons API docs; Grok desk map 2026-08-31
+  handle: "@ponsdotfamily"
+  tree: { primary: launch/bonding-curve, secondary: [trading/amm-native] }
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: dominant native launchpad on Robinhood Chain", verified: false }
+    deployed_on_chain: { value: true, note: "PRD: dominant native launchpad; desk reports the PONS token contract on Blockscout 4663 and DefiLlama fee/volume rows", verified: false }
     native_play:       { value: true, note: "Launchpad with V2 curve graduating to Uniswap v4", verified: false }
-    citable:           { value: true, note: "Official site listed in PRD Appendix A", verified: false }
+    citable:           { value: true, note: "Official site listed in PRD Appendix A; X handle from the desk", verified: false }
     research_story:    { value: true, note: "User funds sit in the curve pre-graduation; quote assets ETH, USDG, Stock Tokens", verified: false }
 
 - slug: mancer
   name: Mancer
   category: Aggregator
-  lifecycle: mainnet
+  lifecycle: beta
   coverage: stub
   official_links:
     - { kind: site, url: https://mancer.xyz }
     - { kind: docs, url: https://mancer.xyz/docs }
     - { kind: whitepaper, url: https://mancer.xyz/whitepaper.pdf }
     - { kind: x, url: https://x.com/MancerXYZ }
-  discovery_source: PRD seed table 2026-08-30
+  discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31
+  handle: "@MancerXYZ"
+  tree: { primary: trading/aggregator, secondary: [nft-treasury/nft-fee-claim] }
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: native DEX aggregator with resting orders", verified: false }
+    deployed_on_chain: { value: true, note: "PRD: native DEX aggregator with resting orders; desk reads the 2026-08-14 post as a gated beta", verified: false }
     native_play:       { value: true, note: "Aggregator + order layer; Chain Mancers NFT + $MANCER; Shield announced", verified: false }
     citable:           { value: true, note: "Site, docs, whitepaper, X account", verified: false }
-    research_story:    { value: true, note: "Non-custodial order claims and NFT fee claim need verification", verified: false }
+    research_story:    { value: true, note: "Non-custodial order claims and NFT fee claim need verification; router audit in progress per the project", verified: false }
 
 - slug: artificial-inu
   name: Artificial Inu
   category: Stock-paired token
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://artificialinu.com }
-  discovery_source: PRD seed table 2026-08-30
+    - { kind: x, url: https://x.com/ArtificiallyInu }
+  discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31
+  handle: "@ArtificiallyInu"
+  tree: { primary: rwa-products/stock-paired-token }
   qualifying:
     deployed_on_chain: { value: true, note: "Token contract address given in PRD Appendix A", verified: false }
     native_play:       { value: true, note: "Flagship LONG launch; $AI paired to tokenized NVDA; community vault", verified: false }
-    citable:           { value: true, note: "Official site and contract address", verified: false }
+    citable:           { value: true, note: "Official site and contract address; X handle from the desk (fill round 4)", verified: false }
     research_story:    { value: true, note: "Vault, fee routing and pair design against a Stock Token", verified: false }
 
 - slug: longshot
   name: Longshot
   category: Fee-routing protocol
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: site, url: https://www.uselongshot.xyz }
     - { kind: x, url: https://x.com/uselongshot }
-  discovery_source: PRD seed table 2026-08-30
+  discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31
+  handle: "@uselongshot"
+  tree: { primary: launch/stock-paired-factory, secondary: [trading/perps-imported] }
   qualifying:
     deployed_on_chain: { value: true, note: "RH Chain token address given in PRD Appendix A", verified: false }
     native_play:       { value: true, note: "Launch / fee-routing protocol with a fixed Hyperliquid perp leg", verified: false }
@@ -65,113 +79,140 @@
 - slug: long
   name: LONG
   category: Launchpad
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   official_links:
     - { kind: app, url: https://app.long.xyz }
     - { kind: x, url: https://x.com/longdotxyz }
-  discovery_source: PRD seed table 2026-08-30
+  discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31
+  handle: "@longdotxyz"
+  tree: { primary: launch/stock-paired-factory }
   qualifying:
-    deployed_on_chain: { value: true, note: "Factory contracts referenced (truncated) in PRD Appendix A", verified: false }
+    deployed_on_chain: { value: true, note: "Factory contracts referenced (truncated) in PRD Appendix A; workbook cites a Dune dashboard of the factory", verified: false }
     native_play:       { value: true, note: "Stock-paired launchpad; Factory + Airlock; $AI launched here", verified: false }
     citable:           { value: true, note: "App and X account", verified: false }
     research_story:    { value: true, note: "Venue that made stock-paired tokens possible; launch mechanics and airlock controls", verified: false }
 
 - slug: stonkbroker
-  name: StonkBroker
+  name: StonkBrokers
   category: NFT / treasury
   lifecycle: mainnet
   coverage: stub
-  official_links: []
-  discovery_source: PRD seed table 2026-08-30
+  official_links:
+    - { kind: site, url: https://stonkbrokers.cash }
+    - { kind: x, url: https://x.com/ClutchMarkets }
+  discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31 (handle, Llama rows)
+  handle: "@ClutchMarkets"
+  tree: { primary: nft-treasury/token-bound-nft, secondary: [launch/nft-gated-launch, markets/options, yield/lp-manager] }
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: native ERC-6551 NFT on Robinhood Chain", verified: false }
-    native_play:       { value: true, note: "ERC-6551 NFT that can hold Stock Tokens", verified: false }
-    citable:           { value: false, note: "PRD lists no official link yet — locate before research", verified: false }
+    deployed_on_chain: { value: true, note: "PRD: native ERC-6551 NFT on Robinhood Chain; DefiLlama lists StonkBrokers TVL and fees", verified: false }
+    native_play:       { value: true, note: "ERC-6551 NFT that can hold Stock Tokens; STORMM options overlay and Leverage Machine announced", verified: false }
+    citable:           { value: true, note: "Site from the workbook and the Clutch Markets X account from the desk", verified: false }
     research_story:    { value: true, note: "Token-bound accounts holding Stock Tokens — custody and control questions", verified: false }
 
 - slug: index
-  name: Index
+  name: The Index
   category: RWA distributor
   lifecycle: mainnet
   coverage: stub
-  official_links: []
-  discovery_source: PRD seed table 2026-08-30
+  official_links:
+    - { kind: site, url: https://theindex.finance }
+    - { kind: x, url: https://x.com/TheIndexFi }
+  discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31 (handle, Llama revenue row)
+  handle: "@TheIndexFi"
+  tree: { primary: rwa-products/tax-distributor }
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: native RWA distributor", verified: false }
+    deployed_on_chain: { value: true, note: "PRD: native RWA distributor; token address given in the dossier and workbook; DefiLlama revenue row", verified: false }
     native_play:       { value: true, note: "Pool tax buys a basket of Stock Tokens for holders", verified: false }
-    citable:           { value: false, note: "PRD lists no official link yet — locate before research", verified: false }
+    citable:           { value: true, note: "Site from the workbook and X account from the desk", verified: false }
     research_story:    { value: true, note: "Tax-funded basket accumulation — who controls the basket and the tax", verified: false }
 
 - slug: arrow
   name: Arrow Finance
   category: CDP
-  lifecycle: mainnet
+  lifecycle: announced
   coverage: stub
   official_links:
     - { kind: docs, url: https://app.arrowfinance.io/docs }
-  discovery_source: PRD seed table 2026-08-30
+    - { kind: x, url: https://x.com/ArrowFinanceio }
+  discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31
+  handle: "@ArrowFinanceio"
+  tree: { primary: credit/cdp }
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: launchpad live; CDP audit in flight", verified: false }
-    native_play:       { value: true, note: "Native CDP / DeFi gateway plus launchpad", verified: false }
-    citable:           { value: true, note: "Docs site", verified: false }
+    deployed_on_chain: { value: true, note: "ARROW and aUSD token contracts reported on Blockscout 4663 (desk round 17); CDP open dated 2026-08-31 09:30 ET by the project, not confirmed in this review", verified: false }
+    native_play:       { value: true, note: "Native CDP / DeFi gateway plus launchpad (ArrowPad)", verified: false }
+    citable:           { value: true, note: "Docs site and X account", verified: false }
     research_story:    { value: true, note: "CDP collateral and liquidation path; launchpad controls; audit status", verified: false }
 
 - slug: bankr
   name: Bankr
   category: Agent / execution
-  lifecycle: mainnet
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
-  official_links: []
-  discovery_source: PRD seed table 2026-08-30
+  official_links:
+    - { kind: x, url: https://x.com/bankrbot }
+  discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31 (handle)
+  handle: "@bankrbot"
+  tree: { primary: agents/agent-execution, secondary: [launch/stock-paired-factory] }
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: agent trading surface expanded onto RH Chain", verified: false }
-    native_play:       { value: true, note: "Agent / execution surface", verified: false }
-    citable:           { value: false, note: "PRD lists no official link yet — locate before research", verified: false }
+    deployed_on_chain: { value: true, note: "PRD: agent trading surface expanded onto RH Chain; desk observed stock-paired deployments from the account on 2026-08-31", verified: false }
+    native_play:       { value: true, note: "Agent / execution surface with its own stock-paired factory", verified: false }
+    citable:           { value: true, note: "X account from the desk; no site located", verified: false }
     research_story:    { value: true, note: "Agent-driven execution: key custody, permissions, routing", verified: false }
 
 - slug: meridian
   name: Meridian
   category: Prediction market
-  lifecycle: announced
+  lifecycle: mainnet
   coverage: stub
-  official_links: []
-  discovery_source: PRD seed table 2026-08-30
+  official_links:
+    - { kind: x, url: https://x.com/meridiandotxyz }
+  discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31 (handle, Llama TVL rows)
+  handle: "@meridiandotxyz"
+  tree: { primary: trading/perps-native, secondary: [markets/prediction] }
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: native prediction-market launch partner — deployment not yet confirmed", verified: false }
-    native_play:       { value: true, note: "Prediction / RWA market", verified: false }
-    citable:           { value: false, note: "PRD lists no official link yet — locate before research", verified: false }
+    deployed_on_chain: { value: true, note: "DefiLlama lists Meridian Perps and Meridian Predict TVL on Robinhood Chain (desk snapshot 2026-08-31); no deployment or official post reviewed", verified: false }
+    native_play:       { value: true, note: "Prediction / RWA market plus native perps under one handle", verified: false }
+    citable:           { value: true, note: "X account from the desk; no site located", verified: false }
     research_story:    { value: true, note: "Resolution/oracle design and collateral custody", verified: false }
 
 - slug: statics-protocol
   name: Statics Protocol
   category: RWA baskets
-  lifecycle: mainnet
+  lifecycle: beta
   coverage: stub
   official_links:
+    - { kind: site, url: https://staticsprotocol.com }
     - { kind: docs, url: https://docs.staticsprotocol.com/docs/rollout/ }
     - { kind: docs, url: https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/ }
     - { kind: docs, url: https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/ }
-  discovery_source: Prototype seed profile 2026-08-30; restored by product owner
+    - { kind: x, url: https://x.com/StaticsProtocol }
+  discovery_source: Prototype seed profile 2026-08-30; restored by product owner; Grok desk map 2026-08-31
+  handle: "@StaticsProtocol"
+  tree: { primary: rwa-products/redeemable-basket, secondary: [trading/amm-native, chain-infra/stablecoin, credit/cdp] }
   qualifying:
-    deployed_on_chain: { value: true, note: "Docs report Genesis system live on Robinhood mainnet 2026-08-27", verified: false }
+    deployed_on_chain: { value: true, note: "Docs report Genesis system live on Robinhood mainnet 2026-08-27; the project's 30–31 Aug posts say the DEX is not live and credit is off", verified: false }
     native_play:       { value: true, note: "Redeemable multi-asset baskets, connected pools, self-backed credit", verified: false }
-    citable:           { value: true, note: "Rollout, governance and deployment docs", verified: false }
+    citable:           { value: true, note: "Rollout, governance and deployment docs; site and X account", verified: false }
     research_story:    { value: true, note: "Upgrade authority, seven-day timelock target, audit status", verified: false }
 
 - slug: safehood
   name: Safehood
   category: Launchpad
-  lifecycle: mainnet
+  lifecycle: announced
   coverage: stub
   official_links:
     - { kind: github, url: https://github.com/opengrid1/Launchpad }
-  discovery_source: Prototype seed profile 2026-08-30; restored by product owner
+    - { kind: site, url: https://www.safehood.fun }
+    - { kind: x, url: https://x.com/_safehood }
+  discovery_source: Prototype seed profile 2026-08-30; restored by product owner; Grok desk map 2026-08-31 (handle)
+  handle: "@_safehood"
+  tree: { primary: launch/uni-pool-launch }
   qualifying:
-    deployed_on_chain: { value: true, note: "Repository publishes mainnet contract addresses", verified: false }
+    deployed_on_chain: { value: true, note: "Repository publishes mainnet contract addresses; the desk found the official account quiet since 2026-07-16 and recorded lifecycle as unknown", verified: false }
     native_play:       { value: true, note: "Launchpad creating Uniswap v3 pools and opening trading on mainnet", verified: false }
-    citable:           { value: true, note: "Source repository", verified: false }
-    research_story:    { value: true, note: "Project states all protocol admin roles sit in one platform admin wallet", verified: false }
+    citable:           { value: true, note: "Source repository, site and X account", verified: false }
+    research_story:    { value: true, note: "Project states all protocol admin roles sit in one platform admin wallet; factory rebuilt the day it launched", verified: false }
 
 - slug: robinhood-index-vaults
   name: Robinhood Index Vaults
@@ -180,9 +221,10 @@
   coverage: stub
   official_links:
     - { kind: github, url: https://github.com/nsvoud-dev/robinhood-index-vaults }
-  discovery_source: Prototype seed profile 2026-08-30; restored by product owner
+  discovery_source: Prototype seed profile 2026-08-30; restored by product owner; Grok desk map 2026-08-31
+  tree: { primary: rwa-products/index-vault }
   qualifying:
-    deployed_on_chain: { value: true, note: "Testnet deployment only; qualifies under 'officially launching' pending mainnet", verified: false }
+    deployed_on_chain: { value: false, note: "No mainnet deployment — testnet only (EVAL 2026-08-31 §5, T1); kept as a row so the universe is visible", verified: false }
     native_play:       { value: true, note: "ERC-4626 index vault for Stock Token baskets", verified: false }
     citable:           { value: true, note: "Source repository", verified: false }
     research_story:    { value: true, note: "Mock swap router; audit and mainnet are roadmap items", verified: false }
@@ -194,9 +236,590 @@
   coverage: stub
   official_links:
     - { kind: github, url: https://github.com/vimenprotocol/vimen }
-  discovery_source: Prototype seed profile 2026-08-30; restored by product owner
+    - { kind: site, url: https://vimen.org }
+    - { kind: x, url: https://x.com/vimenprotocol }
+  discovery_source: Prototype seed profile 2026-08-30; restored by product owner; Grok desk map 2026-08-31 (handle, Llama TVL)
+  handle: "@vimenprotocol"
+  tree: { primary: rwa-products/redeemable-basket }
   qualifying:
-    deployed_on_chain: { value: true, note: "Prototype profile recorded early mainnet 2026-08-20", verified: false }
+    deployed_on_chain: { value: true, note: "Prototype profile recorded early mainnet 2026-08-20; DefiLlama lists a small TVL row", verified: false }
     native_play:       { value: true, note: "Immutable in-kind index baskets for Stock Tokens with deposit caps", verified: false }
-    citable:           { value: true, note: "Source repository", verified: false }
+    citable:           { value: true, note: "Source repository, site from the workbook, X account from the desk", verified: false }
     research_story:    { value: true, note: "Immutability / no-admin-key claims need bytecode reproduction", verified: false }
+
+# --- Grok desk subjects added 2026-08-31 ---
+
+- slug: up
+  name: up
+  category: Fee-routing protocol
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://up33.xyz }
+    - { kind: x, url: https://x.com/uponrh }
+  discovery_source: Grok desk map 2026-08-31 (trading/amm-native; Llama TVL, fees, volume)
+  handle: "@uponrh"
+  tree: { primary: trading/amm-native }
+  qualifying:
+    deployed_on_chain: { value: true, note: "DefiLlama lists up v2 and v3 TVL and volume on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
+    native_play:       { value: true, note: "Native AMM with a (3,3) emissions and buyback design; the desk calls it the largest native AMM by TVL after Uniswap", verified: false }
+    citable:           { value: true, note: "Site and X account from the desk", verified: false }
+    research_story:    { value: true, note: "Who controls emissions and the buyback path; whether the AMM is a fork and of what", verified: false }
+
+- slug: fables
+  name: Fables
+  category: Fee-routing protocol
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/fablesfi }
+  discovery_source: Grok desk map 2026-08-31 (trading/amm-native; Llama TVL and volume); workbook sheet 06
+  handle: "@fablesfi"
+  tree: { primary: trading/amm-native }
+  qualifying:
+    deployed_on_chain: { value: true, note: "DefiLlama lists Fables TVL and volume on Robinhood Chain (desk snapshot 2026-08-31); the workbook had it as upcoming — unresolved", verified: false }
+    native_play:       { value: true, note: "ve(3,3) DEX built on Uniswap v4 hooks for stock-token pairs; $PROLOGUE token", verified: false }
+    citable:           { value: true, note: "X account from the desk; no site URL located in the intake", verified: false }
+    research_story:    { value: true, note: "Hook logic, emissions control and the ve escrow are user-fund paths", verified: false }
+
+- slug: denar
+  name: Denar
+  category: Lending
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/DenarMarkets }
+  discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (credit/isolated-money-market)
+  handle: "@DenarMarkets"
+  tree: { primary: credit/isolated-money-market }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Project posted markets live and a contract address on 2026-08-30; address not reproduced on Blockscout in this review", verified: false }
+    native_play:       { value: true, note: "Isolated money market for tokenized equities, Chainlink priced", verified: false }
+    citable:           { value: true, note: "X account; the dossier says the address sits in the site footer but gives no site URL", verified: false }
+    research_story:    { value: true, note: "Day-one lending market: caps, timelock, oracle, who can list markets", verified: false }
+
+- slug: longbow
+  name: Longbow
+  category: Lending
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://longbow.cash }
+    - { kind: x, url: https://x.com/longbowlend }
+  discovery_source: Chain File dossier 2026-08-30; workbook sheet 02; Grok desk map 2026-08-31 (credit/credit-overlay)
+  handle: "@longbowlend"
+  tree: { primary: credit/credit-overlay }
+  qualifying:
+    deployed_on_chain: { value: true, note: "BOW token address given by the dossier and the workbook; the project posts live markets (GLD, RDDT, PONS)", verified: false }
+    native_play:       { value: true, note: "Credit overlay on Morpho Blue with Pons-token collateral and a protocol token", verified: false }
+    citable:           { value: true, note: "Site from the workbook and X account", verified: false }
+    research_story:    { value: true, note: "Isolated markets, oracle choice (Uniswap TWAP), fee split and who can list collateral", verified: false }
+
+- slug: noxa
+  name: NOXA Fun
+  category: Launchpad
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://noxa.fun }
+    - { kind: x, url: https://x.com/Noxa_Fi }
+  discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (launch/other-pad; Llama TVL and fees)
+  handle: "@Noxa_Fi"
+  tree: { primary: launch/other-pad }
+  qualifying:
+    deployed_on_chain: { value: true, note: "DefiLlama lists NOXA Fun TVL and fees on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
+    native_play:       { value: true, note: "Launchpad that launches straight into Uniswap v3 pools; origin pad of the chain's first-week memes", verified: false }
+    citable:           { value: true, note: "Site from the dossier and X account from the desk", verified: false }
+    research_story:    { value: true, note: "Launch fee flows and who controls the factory; clone sites use the name", verified: false }
+
+- slug: virtuals
+  name: Virtuals Protocol
+  category: Agent / execution
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://virtuals.io }
+    - { kind: x, url: https://x.com/virtuals_io }
+  discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (agents/agent-launch-layer; Llama revenue)
+  handle: "@virtuals_io"
+  tree: { primary: agents/agent-launch-layer }
+  qualifying:
+    deployed_on_chain: { value: true, note: "DefiLlama lists Virtuals revenue on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
+    native_play:       { value: false, note: "Imported multi-chain agent launch layer; by the desk's own native rule and PRD §2.2 this is a dependency/observe (EVAL 2026-08-31 §5, T2); its Robinhood Chain revenue does not make it native", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: true, note: "Agent launch and fee mechanics on this chain; bridged versus native token instance", verified: false }
+
+- slug: netnet
+  name: NetNet Capital
+  category: RWA baskets
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/NetNetCap }
+  discovery_source: Grok desk map 2026-08-31 (rwa-products/reserve-currency)
+  handle: "@NetNetCap"
+  tree: { primary: rwa-products/reserve-currency }
+  qualifying:
+    deployed_on_chain: { value: true, note: "DefiLlama has a Reserve Currency row at zero TVL; the project posts treasury holdings — no address reviewed", verified: false }
+    native_play:       { value: true, note: "Reserve token backed by a treasury the project says holds Stock Tokens (AAPL, NVDA, SPCX)", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Who holds the treasury, what backs $NET, and whether redemption exists", verified: false }
+
+- slug: tickeryard
+  name: TickerYard
+  category: Oracle / infra
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://tickeryard.com }
+    - { kind: x, url: https://x.com/TickerYardHQ }
+  discovery_source: Grok desk map 2026-08-31 (rwa-products/synthetic-asset); workbook sheet 02 ($YARD, StonkBrokers-incubated)
+  handle: "@TickerYardHQ"
+  tree: { primary: rwa-products/synthetic-asset }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Project posts yBTC shipping on Robinhood Chain; no address reviewed", verified: false }
+    native_play:       { value: true, note: "Synthetic asset product (yBTC from WBTC on Arbitrum) incubated in the StonkBrokers stack per the workbook", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: true, note: "Bridge and custody path for the BTC backing; mint and redeem controls", verified: false }
+
+- slug: earn-protocol
+  name: EARN
+  category: Yield
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://earnonhood.com }
+    - { kind: x, url: https://x.com/EARNONHOOD }
+  discovery_source: Workbook sheet 02; Grok desk map 2026-08-31 (yield/savings-vault)
+  handle: "@EARNONHOOD"
+  tree: { primary: yield/savings-vault }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token address in the account bio and workbook; omnipool zaps posted live 2026-08-30", verified: false }
+    native_play:       { value: true, note: "Uniswap v4 strategy vaults on stock-token pairs plus omnipools; protocol fee and buyback token", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: true, note: "Vault strategy control, fee take and Rialto routing; name collides with Robinhood Earn (Morpho)", verified: false }
+
+- slug: l4va
+  name: L4VA
+  category: Stock-paired token
+  lifecycle: announced
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://l4va.org }
+    - { kind: x, url: https://x.com/L4VAprotocol }
+  discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (lifecycle unknown)
+  handle: "@L4VAprotocol"
+  tree: { primary: rwa-products/stock-paired-token }
+  qualifying:
+    deployed_on_chain: { value: false, note: "Lifecycle unknown; no contract, vault or deployment evidence reviewed — press release only (EVAL 2026-08-31 §5, T1)", verified: false }
+    native_play:       { value: true, note: "Vault factory issuing tokens backed by locked RWAs, stocks, NFTs or memes per the project", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: false, note: "No mechanism recorded anywhere beyond the press release (EVAL 2026-08-31 §5, T4)", verified: false }
+
+- slug: delta
+  name: Delta
+  category: Yield
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/deltaliquidity }
+  discovery_source: Grok desk map 2026-08-31 (yield/lp-manager; Llama TVL)
+  handle: "@deltaliquidity"
+  tree: { primary: yield/lp-manager }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token address in the account bio; DefiLlama lists a small Delta TVL row", verified: false }
+    native_play:       { value: true, note: "LP manager / liquidity layer with its own token and LP reward claims", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Where LP deposits sit and who can move them; TVL claims disagree with DefiLlama", verified: false }
+
+- slug: snuggle
+  name: Snuggle
+  category: Yield
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/SnuggleFi }
+  discovery_source: Grok desk map 2026-08-31 (yield/lp-manager; Llama TVL and revenue)
+  handle: "@SnuggleFi"
+  tree: { primary: yield/lp-manager }
+  qualifying:
+    deployed_on_chain: { value: true, note: "DefiLlama lists Snuggle TVL and revenue on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
+    native_play:       { value: true, note: "Liquidity position manager listed by DefiLlama; the desk found it quiet on X", verified: false }
+    citable:           { value: true, note: "X account from the desk; no site located", verified: false }
+    research_story:    { value: true, note: "Position manager custody and who can rebalance", verified: false }
+
+- slug: sherwood
+  name: Sherwood
+  category: Scanner / tooling
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/sherw00d_cash }
+  discovery_source: Grok desk map 2026-08-31 (privacy/private-transfer; Llama TVL); workbook sheet 02 ($WOOD)
+  handle: "@sherw00d_cash"
+  tree: { primary: privacy/private-transfer }
+  qualifying:
+    deployed_on_chain: { value: true, note: "DefiLlama lists a Sherwood TVL row on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
+    native_play:       { value: true, note: "Private-transfer tooling per the desk; the workbook described an agent capital layer — unresolved", verified: false }
+    citable:           { value: true, note: "X account from the desk; no site located", verified: false }
+    research_story:    { value: true, note: "Custody inside the privacy pool and who can freeze or upgrade it", verified: false }
+
+- slug: squeeze
+  name: Squeeze
+  category: Scanner / tooling
+  lifecycle: announced
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/UseSqueeze_RH }
+  discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (tooling/scanner)
+  handle: "@UseSqueeze_RH"
+  tree: { primary: tooling/scanner }
+  qualifying:
+    deployed_on_chain: { value: false, note: "Nothing deployed: the project states the Desk has no contracts and the Tape is off-chain (EVAL 2026-08-31 §5, T1)", verified: false }
+    native_play:       { value: true, note: "Short-interest tape and a planned short desk for Robinhood Chain pools", verified: false }
+    citable:           { value: true, note: "X account", verified: false }
+    research_story:    { value: false, note: "A tape/scanner has no user-fund, routing, launch or control-plane story until the Desk exists (EVAL 2026-08-31 §5, T4)", verified: false }
+
+- slug: agent-name-service
+  name: Agent Name Service
+  category: Scanner / tooling
+  lifecycle: announced
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/RHAgentNS }
+  discovery_source: Grok desk map 2026-08-31 (agents/agent-identity; lifecycle unknown)
+  handle: "@RHAgentNS"
+  tree: { primary: agents/agent-identity, secondary: [tooling/names] }
+  qualifying:
+    deployed_on_chain: { value: false, note: "No deployment evidence for the registrar — lifecycle unknown (EVAL 2026-08-31 §5, T1)", verified: false }
+    native_play:       { value: true, note: "Name registry for agents with a claimed yearly fee", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Registrar ownership, fee custody and name revocation powers", verified: false }
+
+- slug: hookr
+  name: Hookr
+  category: Launchpad
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://hookr.fun }
+    - { kind: x, url: https://x.com/Hookrfun }
+  discovery_source: Grok desk map 2026-08-31 (launch/hook-programmable; fill rounds 1, 8, 9)
+  handle: "@Hookrfun"
+  tree: { primary: launch/hook-programmable }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token, launchpad and hook addresses given on the site and GitHub per the desk; not on the DefiLlama dump", verified: false }
+    native_play:       { value: true, note: "Uniswap v4 hook launchpad and hook marketplace; distinct from HookOS, What The Hook and Pons", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: true, note: "Hook code controls pool rules for every launched token; who can change a deployed hook", verified: false }
+
+- slug: what-the-hook
+  name: What The Hook
+  category: Fee-routing protocol
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/whatthehookv4 }
+  discovery_source: Grok desk map 2026-08-31 (trading/hook-mev; Llama TVL in the observe list)
+  handle: "@whatthehookv4"
+  tree: { primary: trading/hook-mev }
+  qualifying:
+    deployed_on_chain: { value: true, note: "WTH/WETH pair on DexScreener and a DefiLlama TVL row per the desk; no address reviewed", verified: false }
+    native_play:       { value: true, note: "MEV redistribution inside a Uniswap v4 hook that pays traders and LPs", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "The hook sits in the swap path of every pool using it; who can upgrade or redirect it", verified: false }
+
+- slug: quotrons
+  name: Quotrons
+  category: NFT / treasury
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://quotrons.cash }
+    - { kind: x, url: https://x.com/Quotrons404 }
+  discovery_source: Chain File dossier 2026-08-30; workbook sheets 02–03; Grok desk map 2026-08-31 (nft-treasury/token-bound-nft)
+  handle: "@Quotrons404"
+  tree: { primary: nft-treasury/token-bound-nft, secondary: [rwa-products/stock-paired-token] }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token, router and hook addresses given in project docs per the desk; V2 sales on OpenSea reported", verified: false }
+    native_play:       { value: true, note: "ERC-404 terminals that burn the liquid token and route pool fees into ten Stock Tokens", verified: false }
+    citable:           { value: true, note: "Site from the workbook and X account", verified: false }
+    research_story:    { value: true, note: "V1 retired after an exploit per the project; recovery Safe and blacklist guardian disclosed", verified: false }
+
+- slug: pools-trade
+  name: pools.trade
+  category: Launchpad
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/pools_dot_fun }
+  discovery_source: Grok desk map 2026-08-31 (launch/uni-pool-launch); workbook sheet 04
+  handle: "@pools_dot_fun"
+  tree: { primary: launch/uni-pool-launch }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Uniswap Labs pad per its 2026-08-05 blog post as cited by the desk; Dune launch counts in the workbook", verified: false }
+    native_play:       { value: true, note: "Launchpad minting straight into Uniswap pools; agentic launches (Project VEX) sit on it", verified: false }
+    citable:           { value: true, note: "X account (a second handle, @TradePools, is also in use per the desk)", verified: false }
+    research_story:    { value: true, note: "Launch fee flows and whether Uniswap Labs retains control of the factory", verified: false }
+
+- slug: wire
+  name: Wire
+  category: Agent / execution
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/wirebotRH }
+  discovery_source: Grok desk map 2026-08-31 (agents/agent-execution; fill rounds 2, 9)
+  handle: "@wirebotRH"
+  tree: { primary: agents/agent-execution, secondary: [launch/bonding-curve] }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token address in the account bio; live launch replies on Pons observed by the desk 2026-08-30/31", verified: false }
+    native_play:       { value: true, note: "Command layer executing launches and trades from X, Telegram or web against Pons and other venues", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Key custody for user commands; the protocol fee path; a router-approval patch on post-graduation buys", verified: false }
+
+- slug: maxfi
+  name: MaxFi
+  category: Yield
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://maxfi.tech }
+    - { kind: x, url: https://x.com/MAXFILABS }
+  discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (yield/lp-manager)
+  handle: "@MAXFILABS"
+  tree: { primary: yield/lp-manager }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Project posts LP payouts on Robinhood Chain; not on the DefiLlama dump; no address reviewed", verified: false }
+    native_play:       { value: true, note: "Managed LP positions on Stock Token / USDG pairs with no-swap rebalancing and a circuit breaker in progress", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: true, note: "Manager contract custody of LP positions; depeg handling; no token found", verified: false }
+
+- slug: sight
+  name: Sight
+  category: Prediction market
+  lifecycle: announced
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/sight_hood }
+  discovery_source: Grok desk map 2026-08-31 (markets/prediction; fill rounds 2, 11)
+  handle: "@sight_hood"
+  tree: { primary: markets/prediction }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Genesis NFT mint announced for 2026-09-02; the project states it has no token; no market contract reviewed", verified: false }
+    native_play:       { value: true, note: "Prediction market announced for Robinhood Chain, distinct from Meridian Predict", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Resolution design and collateral custody once a market ships", verified: false }
+
+- slug: mesh
+  name: Mesh
+  category: Scanner / tooling
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/MeshGateway }
+  discovery_source: Grok desk map 2026-08-31 (tooling/machine-payments; fill round 2)
+  handle: "@MeshGateway"
+  tree: { primary: tooling/machine-payments }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token address and paid-call figures posted by the project; no address reviewed", verified: false }
+    native_play:       { value: true, note: "Machine-payments gateway (MPP) with a token and USDG epochs paid to holders; Pons listed as a merchant", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Fee custody between merchants and holders; who sets epoch payouts", verified: false }
+
+- slug: foxpad
+  name: FoxPad
+  category: Launchpad
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://foxpad.app }
+    - { kind: x, url: https://x.com/fox_onrh }
+  discovery_source: Chain File dossier 2026-08-30 (fox); Grok desk map 2026-08-31 (launch/other-pad, filed as the pad — the FOX mascot token is excluded under PRD §2.2)
+  handle: "@fox_onrh"
+  tree: { primary: launch/other-pad }
+  qualifying:
+    deployed_on_chain: { value: true, note: "FOX token address given by the dossier and the map; the pad's own contracts not located", verified: false }
+    native_play:       { value: false, note: "The only evidence that FoxPad exists as a product distinct from the FOX culture token is one dossier line naming foxpad.app; no handle, no address (EVAL 2026-08-31 §5, T2 — the eval places the pad in observe)", verified: false }
+    citable:           { value: true, note: "Pad site from the dossier; X account is the FOX token's account (the pad's own handle is unconfirmed)", verified: false }
+    research_story:    { value: false, note: "The 50/50 fee split and auto-burn are a single dossier claim; no contract or official post describes the pad's mechanism (EVAL 2026-08-31 §5, T4)", verified: false }
+
+- slug: scopl
+  name: SCOPL
+  category: Aggregator
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://scopl.live }
+    - { kind: x, url: https://x.com/scopl_live }
+  discovery_source: Grok desk map 2026-08-31 (trading/aggregator; fill rounds 10, 12, 16)
+  handle: "@scopl_live"
+  tree: { primary: trading/aggregator }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token address in the account bio and in a SpyWolf audit for chain 4663; V2 contract addresses not published", verified: false }
+    native_play:       { value: true, note: "Non-custodial one-tick Uniswap V3/V4 limit orders with fee revenue split", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: true, note: "Order-position custody, revenue router and buyback vault; third-party 'holder portal' links flagged by the desk", verified: false }
+
+- slug: website
+  name: notawebsite
+  category: NFT / treasury
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/notawebsite_rh }
+  discovery_source: Grok desk map 2026-08-31 (rwa-products/ad-space; fill round 2)
+  handle: "@notawebsite_rh"
+  tree: { primary: rwa-products/ad-space }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Project posts ETH volume and slot payouts since its v2 on 2026-08-11; no address reviewed", verified: false }
+    native_play:       { value: true, note: "Tokenized ad slots that pay ETH to slot owners", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Slot contract ownership and payout routing", verified: false }
+
+- slug: lemon
+  name: Lemon
+  category: Launchpad
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/lemondotfun }
+  discovery_source: Grok desk map 2026-08-31 (launch/other-pad; fill rounds 3, 4, 6, 10)
+  handle: "@lemondotfun"
+  tree: { primary: launch/other-pad }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Project posts a launch/trade terminal built on Robinhood Chain; no address reviewed", verified: false }
+    native_play:       { value: true, note: "Launch and trading pad with agentic X accounts per coin and Hyperliquid tools claimed", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Launch custody and the Hyperliquid leg's key custody", verified: false }
+
+- slug: robindex
+  name: Robindex
+  category: Scanner / tooling
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://robindex.pro/about }
+    - { kind: x, url: https://x.com/robindexpro }
+  discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (tooling/scanner)
+  handle: "@robindexpro"
+  tree: { primary: tooling/scanner }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token address on the project's About page and X bio per the dossier", verified: false }
+    native_play:       { value: true, note: "Token scanner and Telegram bot for Robinhood Chain with a project token; not the ERC-4626 Robinhood Index Vaults", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: false, note: "A scanner plus Telegram bot: no user-fund, routing, launch or control-plane story (EVAL 2026-08-31 §5, T4)", verified: false }
+
+- slug: vynex
+  name: Vynex
+  category: Yield
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/UseVynex }
+  discovery_source: Grok desk map 2026-08-31 (yield/savings-vault; fill round 5)
+  handle: "@UseVynex"
+  tree: { primary: yield/savings-vault, secondary: [credit/isolated-money-market] }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Project posts an NVDA borrow market on Morpho Blue; token address cited by a third-party account only", verified: false }
+    native_play:       { value: true, note: "Liquid vault shares plus a Morpho NVDA/USDG market with a 30-minute TWAP oracle the project built", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Oracle control, vault custody and whether the Morpho position really sits under the user's address", verified: false }
+
+- slug: sinjoh
+  name: Sinjoh
+  category: Fee-routing protocol
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/SinjohDeFi }
+  discovery_source: Grok desk map 2026-08-31 (yield/fee-router; fill round 6)
+  handle: "@SinjohDeFi"
+  tree: { primary: yield/fee-router, secondary: [launch/other-pad] }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token address in the account bio; airdrop and burn figures posted by the project", verified: false }
+    native_play:       { value: true, note: "Fee router: launch and creator fees bought back into PONS and NVDA airdrops and burns", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Router custody of collected fees and who sets the split", verified: false }
+
+- slug: hoodlock
+  name: HoodLock
+  category: Scanner / tooling
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://hoodlock.tech }
+    - { kind: x, url: https://x.com/HoodLockRH }
+  discovery_source: Grok desk map 2026-08-31 (tooling/locker; fill round 6)
+  handle: "@HoodLockRH"
+  tree: { primary: tooling/locker, secondary: [launch/other-pad] }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token address in the account bio; locked-value figure posted by the project", verified: false }
+    native_play:       { value: true, note: "Native liquidity locker with a token and an announced fee-split launchpad", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: true, note: "Locker contract custody and unlock powers; lockers are a user-fund path by construction", verified: false }
+
+- slug: arrows
+  name: Arrows
+  category: Options
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://arrows.finance }
+    - { kind: x, url: https://x.com/arrowsonhood }
+  discovery_source: Workbook sheet 02 ($ARROWS); Grok desk map 2026-08-31 (markets/options; fill round 6)
+  handle: "@arrowsonhood"
+  tree: { primary: markets/options }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token address given by the workbook and the desk; week-one trading figures posted by the project", verified: false }
+    native_play:       { value: true, note: "Fully collateralized options on tokenized stocks with writer vaults; not Arrow Finance (CDP) and not ArrowPad", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: true, note: "Writer vault custody, settlement and collateral rules", verified: false }
+
+- slug: hoodfun
+  name: hood.fun
+  category: Launchpad
+  lifecycle: announced
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/hoodfunfamily }
+  discovery_source: Grok desk map 2026-08-31 (launch/bonding-curve; fill round 6)
+  handle: "@hoodfunfamily"
+  tree: { primary: launch/bonding-curve }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Announced fair-launch pad; last official 'coming soon' 2026-07-31; openpump listed it as a chain-4663 pad on 2026-08-29", verified: false }
+    native_play:       { value: true, note: "Bonding curve launching into locked Uniswap v3 with no presale or team allocation per the project", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Curve custody and graduation path if it launches", verified: false }
+
+- slug: stonks-fun
+  name: Stonks.fun
+  category: Launchpad
+  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/stonksdotfun }
+  discovery_source: Grok desk map 2026-08-31 (launch/other-pad; fill round 7)
+  handle: "@stonksdotfun"
+  tree: { primary: launch/other-pad }
+  qualifying:
+    deployed_on_chain: { value: true, note: "Pad posts launches (a ZEC-paired token) on Robinhood Chain; no address reviewed", verified: false }
+    native_play:       { value: true, note: "DN-404 launchpad on Doppler whose fees burn the platform token; rebrand toward RWA baskets announced", verified: false }
+    citable:           { value: true, note: "X account; no site located", verified: false }
+    research_story:    { value: true, note: "Fee burn path and factory control; not StonkBrokers", verified: false }
+
+- slug: swaphood
+  name: SwapHood
+  category: Fee-routing protocol
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: x, url: https://x.com/SwapHoodFi }
+  discovery_source: Grok desk map 2026-08-31 (trading/amm-native; fill rounds 12, 13, 15, 17)
+  handle: "@SwapHoodFi"
+  tree: { primary: trading/amm-native }
+  qualifying:
+    deployed_on_chain: { value: true, note: "HOOD token and V3 factory reported on Blockscout 4663 by the desk (round 17); DefiLlama lists SwapHood V3 volume", verified: false }
+    native_play:       { value: true, note: "Native AMM (a PancakeSwap V3 fork per the explorer contract name) with a HOOD emissions, fee and buyback flywheel into h33", verified: false }
+    citable:           { value: true, note: "X account; docs referenced as a gitbook without a URL in the intake", verified: false }
+    research_story:    { value: true, note: "Emissions and buyback control; team states it holds no HOOD or LP; ticker collides with the HOOD Stock Token", verified: false }

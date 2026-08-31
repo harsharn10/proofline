@@ -1,0 +1,45 @@
+slug: lemon
+name: Lemon
+symbol: null
+category: Launchpad
+lifecycle: announced
+coverage: stub
+summary: Launch and trading pad on Robinhood Chain whose coins get an X account posting on-chain facts; Hyperliquid tools claimed through a Lemon terminal.
+official_links:
+  - kind: x
+    url: https://x.com/lemondotfun
+dependencies:
+  - hyperliquid
+deployments:
+  - label: Launch / terminal contracts
+    chain: robinhood-chain
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Lemon publishes an official X account at https://x.com/lemondotfun.
+      class: claim
+      sources:
+        - S1
+    - text: The official account posted on 2026-08-22 that each coin gets its own X account posting from on-chain facts (market cap, volume, holder concentration, locked LP), that coins from other pads can be connected, and that Hyperliquid leverage is available through a Lemon terminal; the desk places it as a launch/trade pad distinct from Pons, Hookr, LONG and pools.trade.
+      class: claim
+      sources:
+        - S3
+        - S2
+  risk: []
+  missing:
+    - text: Mainnet status rests on the project's own posts; not independently verified
+    - text: Contract addresses not located
+    - text: Launch custody and fee flows
+    - text: Key custody for the Hyperliquid leg
+    - text: Official site not located
+    - text: An independent audit was not found in this review
+  unresolved: []

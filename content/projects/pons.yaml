@@ -1,6 +1,6 @@
 slug: pons
 name: Pons
-symbol: null
+symbol: PONS
 category: Launchpad
 lifecycle: mainnet
 coverage: stub
@@ -8,21 +8,40 @@ summary: "Native launchpad on Robinhood Chain: tokens launch on a V2 bonding cur
 official_links:
   - kind: site
     url: https://ponsfamily.com
+  - kind: x
+    url: https://x.com/ponsdotfamily
 dependencies:
   - uniswap
   - usdg
   - stock-tokens
-addresses:
-  - label: V2 curve / factory
-    address: not-verified
+deployments:
+  - label: PONS token (PonsLauncherToken)
+    chain: robinhood-chain
+    address: "0x39dBED3a2bd333467115dE45665cC57F813C4571"
+    role: token
+    verified: false
+    sources:
+      - S3
+      - S6
+      - S4
+  - label: Active launch factory (workbook sheet 02)
+    chain: robinhood-chain
+    address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
     role: factory
+    verified: false
+    sources:
+      - S4
+  - label: V2 curve / graduation router
+    chain: robinhood-chain
+    address: not-verified
+    role: router
     verified: false
     sources: []
 review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
@@ -30,43 +49,37 @@ findings:
       class: claim
       sources:
         - S1
-  risk: []
+    - text: Pons publishes an official X account at https://x.com/ponsdotfamily.
+      class: claim
+      sources:
+        - S2
+    - text: The desk's auditor reported the PONS token contract present on Blockscout 4663 with 56,062 holders and its contract source code verified on Blockscout (the explorer's flag, per the desk — not Proofline verification).
+      class: claim
+      sources:
+        - S6
+    - text: The official account posted $4B in lifetime volume (31 Aug), $20.93M paid to token creators in 47 days (30 Aug) and 29% of PONS supply burned (29 Aug).
+      class: claim
+      sources:
+        - S5
+    - text: DefiLlama listed Pons V2 with roughly $86.5M 24h volume and $4.7M 24h fees on 2026-08-31.
+      class: claim
+      sources:
+        - S7
+        - S3
+  risk:
+    - text: The workbook records a token with the PONS ticker at a different address (0xe306c19C72131B0a8f311648fa63FE8CeDf44571, 92 holders); only the address above is treated as the project token.
+      class: claim
+      sources:
+        - S4
+    - text: An Ethereum address circulating under the $PONS cashtag (0x07f5b682…) is not a contract on chain 4663 per the desk's explorer check; two accounts, including Longbow's official one, posted it as the Pons token.
+      class: claim
+      sources:
+        - S6
+        - S5
   missing:
-    - text: Deployment map (curve, factory, graduation router) not yet reproduced on Blockscout
+    - text: Curve, factory and graduation-router deployment map not yet reproduced on Blockscout (the workbook names one active factory; it says several versions exist)
     - text: Privileged roles over the curve and graduation path unknown
-    - text: Audit status unknown
+    - text: An independent audit was not found in this review
     - text: Team identity and repository not yet located
-  unresolved: []
-
-# ---------------------------------------------------------------------------
-# SCORING SKELETON — uncomment and fill when the research record is complete, then set coverage: full.
-# Levels: security tests full|partial|zero; factors strong|mixed|weak|insufficient; confidence inputs 0–100.
-# Every evidence: [] must list S-ids from sources/pons.yaml. Unknown = no credit; it lowers confidence, not the score.
-# ---------------------------------------------------------------------------
-# scoring:
-#   security:
-#     deployment_verifiability: { level: partial, evidence: [], note: "" }
-#     privileged_power:         { level: zero,    evidence: [], note: "" }
-#     authorization_topology:   { level: zero,    evidence: [], note: "" }
-#     timelock_exit_window:     { level: zero,    evidence: [], note: "" }
-#     audit_deployment_match:   { level: zero,    evidence: [], note: "" }
-#     continuous_safeguards:    { level: zero,    evidence: [], note: "" }
-#     incident_handling:        { level: full,    evidence: [], note: "" }
-#   factors:
-#     engineering:  { level: insufficient, positive: [], negative: [], missing: [], evidence: [] }
-#     transparency: { level: insufficient, positive: [], negative: [], missing: [], evidence: [] }
-#     maturity:     { level: insufficient, positive: [], negative: [], missing: [], evidence: [] }
-#     economic:     { level: insufficient, positive: [], negative: [], missing: [], evidence: [] }
-#   confidence:
-#     primary_source_coverage: 0
-#     onchain_verification: 0
-#     independent_corroboration: 0
-#     freshness: 0
-#     review_completeness: 0
-#   risk:
-#     assessed: Elevated
-#     reason: ""
-#   # override:            # only if PRD §6.4 applies
-#   #   level: High
-#   #   reason: ""
-#   #   evidence: []
+  unresolved:
+    - text: "Whether 0xA5aAb3F0… is the only active factory: the workbook says 'multiple factory versions' exist."
