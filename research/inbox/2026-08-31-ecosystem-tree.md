@@ -47,7 +47,7 @@ ecosystem
 ├── trading
 │   ├── amm-imported             Uniswap V2/V3/V4, Sushi, Pancake, Curve
 │   ├── amm-native               up, Fables, GIGA, Ramses, Alandale, Orvex, Ekubo/STONX
-│   ├── aggregator               Mancer, Kyber, 1inch, Definitive
+│   ├── aggregator               Mancer (router, beta), SCOPL (limit-order-as-CL), Kyber, 1inch
 │   ├── hook-mev                 What The Hook (MEV redistribution inside a v4 hook — not Hookr)
 │   ├── perps-imported           Lighter, Arcus perps
 │   ├── perps-native             Meridian Perps
@@ -74,7 +74,7 @@ ecosystem
 │
 ├── launch
 │   ├── bonding-curve            Pons V1/V2, hood.fun (announced)
-│   ├── hook-programmable        Hookr (compose v4 hook blocks; not Pons)
+│   ├── hook-programmable        Hookr (compose v4 hook blocks; not Pons). HookOS is a separate multi-chain pad (@hookosfun), not this leaf until RH volume.
 │   ├── stock-paired-factory     LONG, Bankr (stock-paired deploys)
 │   ├── uni-pool-launch          Safehood, pools.trade
 │   ├── nft-gated-launch         StonkBrokers / Clutch
@@ -98,7 +98,7 @@ ecosystem
 │
 ├── yield
 │   ├── savings-vault            Spark, Saffron, TownSquare
-│   ├── lp-manager               Snuggle, Delta, EZManager, What The Hook
+│   ├── lp-manager               Snuggle, Delta, MaxFi, EZManager
 │   ├── allocator                T3tris, D2, Krystal
 │   ├── fee-router               Sinjoh (creator/launch fees → buyback/airdrop/burn)
 │   └── gamified-mining          SLVR, StockRip, Orchard, LUNA, MinePea
