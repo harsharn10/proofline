@@ -1,0 +1,60 @@
+slug: l4va
+name: L4VA
+symbol: L4VA
+category: Stock-paired token
+lifecycle: announced
+coverage: stub
+summary: Vault factory that issues tokens backed by locked RWAs, stocks, NFTs or memes; TGE announced for 2026-08-18 on Robinhood Chain.
+official_links:
+  - kind: site
+    url: https://l4va.org
+  - kind: x
+    url: https://x.com/L4VAprotocol
+dependencies:
+  - stock-tokens
+deployments:
+  - label: L4VA token
+    chain: robinhood-chain
+    address: not-verified
+    role: token
+    verified: false
+    sources: []
+  - label: Vault factory
+    chain: robinhood-chain
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: L4VA publishes an official site at https://l4va.org.
+      class: claim
+      sources:
+        - S1
+    - text: L4VA publishes an official X account at https://x.com/L4VAprotocol.
+      class: claim
+      sources:
+        - S2
+    - text: A GlobeNewswire release dated 2026-08-18, as carried by the dossier, announced the L4VA TGE natively on Robinhood Chain with terms stated as a $0.003 price, 1B maximum supply, a 20% team allocation and a non-upgradeable ERC-20; the desk recorded lifecycle as unknown.
+      class: claim
+      sources:
+        - S3
+        - S4
+  risk:
+    - text: The dossier records no vault holding a Stock Token as of 30 Aug; the product is a press-release stage narrative until such a transaction exists.
+      class: claim
+      sources:
+        - S3
+  missing:
+    - text: Lifecycle not verified — no deployment evidence reviewed
+    - text: Token and vault factory addresses not located
+    - text: Whether any vault holds a Stock Token
+    - text: An independent audit was not found in this review
+    - text: Vesting for the 20% team allocation
+  unresolved: []

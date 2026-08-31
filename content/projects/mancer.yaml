@@ -2,9 +2,9 @@ slug: mancer
 name: Mancer
 symbol: MANCER
 category: Aggregator
-lifecycle: mainnet
+lifecycle: beta
 coverage: stub
-summary: Native DEX aggregator with resting orders; Chain Mancers NFT and $MANCER token; a Shield product is announced.
+summary: Native DEX aggregator with resting orders, in a gated beta for Chain Mancers and StonkBrokers holders; the project says its router and order contracts are under audit; a Shield product is announced.
 official_links:
   - kind: site
     url: https://mancer.xyz
@@ -17,23 +17,24 @@ official_links:
 dependencies:
   - uniswap
 deployments:
+  - label: $MANCER token (workbook sheet 02)
+    chain: robinhood-chain
+    address: "0xc72f232a6869e6cf34dc06129affd07f8a2a246a"
+    role: token
+    verified: false
+    sources:
+      - S6
   - label: Aggregator router
     chain: robinhood-chain
     address: not-verified
     role: router
     verified: false
     sources: []
-  - label: $MANCER token
-    chain: robinhood-chain
-    address: not-verified
-    role: token
-    verified: false
-    sources: []
 review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
@@ -49,14 +50,30 @@ findings:
       class: claim
       sources:
         - S3
-    - text: Mancer publishes an official social at https://x.com/MancerXYZ.
+    - text: Mancer publishes an official X account at https://x.com/MancerXYZ.
       class: claim
       sources:
         - S4
-  risk: []
+    - text: The project posted on 2026-08-14 that its aggregator and order layer was live in beta for Chain Mancers and StonkBrokers holders, and on 2026-08-25 that a formal audit of the router and order contracts was under way with public access to follow.
+      class: claim
+      sources:
+        - S7
+        - S5
+    - text: The workbook records each Chain Mancer NFT as backed by 500k MANCER, with 1,250 NFTs reserved to back an Anvil LP.
+      class: claim
+      sources:
+        - S6
+  risk:
+    - text: No public-open post was found through 2026-08-31; the census lifecycle was moved from mainnet to beta on the desk's reading of the project's own posts.
+      class: claim
+      sources:
+        - S8
+        - S5
   missing:
-    - text: Router and token addresses not yet located
+    - text: Router address not yet located; the $MANCER token address comes from the workbook and is not reproduced
     - text: Non-custodial order claim not verified against contracts
     - text: NFT fee-claim mechanics unverified
+    - text: Audit announced 2026-08-25 — no report found in this review
     - text: "Shield: announced only — no deployment evidence reviewed"
-  unresolved: []
+  unresolved:
+    - text: Whether the audit announced on 2026-08-25 has been published; no report was found in this review.

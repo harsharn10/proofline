@@ -1,0 +1,82 @@
+slug: longbow
+name: Longbow
+symbol: BOW
+category: Lending
+lifecycle: mainnet
+coverage: stub
+summary: "Credit overlay on Morpho Blue: isolated markets to borrow USDG against Stock Tokens, PONS and other collateral, with a $BOW token that shares protocol revenue per the project."
+official_links:
+  - kind: site
+    url: https://longbow.cash
+  - kind: x
+    url: https://x.com/longbowlend
+dependencies:
+  - morpho
+  - usdg
+  - stock-tokens
+  - chainlink
+  - uniswap
+deployments:
+  - label: BOW token
+    chain: robinhood-chain
+    address: "0x451b42A15100C340CA12F7c66DE06fac5EA2D751"
+    role: token
+    verified: false
+    sources:
+      - S3
+      - S4
+  - label: Morpho market contracts (GLD/USDG, RDDT/USDG, PONS/USDG)
+    chain: robinhood-chain
+    address: not-verified
+    role: vault
+    verified: false
+    sources:
+      - S6
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Longbow publishes an official site at https://longbow.cash.
+      class: claim
+      sources:
+        - S1
+    - text: Longbow publishes an official X account at https://x.com/longbowlend.
+      class: claim
+      sources:
+        - S2
+    - text: "The official account posted isolated markets on Morpho Blue: GLD/USDG on 2026-08-24 with a 62.5% maximum LTV and a Uniswap V3 TWAP oracle, RDDT/USDG on 2026-08-26 at 38.5% LTV, and PONS/USDG for borrowing USDG against PONS; the desk places the product as a Morpho + Pons credit overlay."
+      class: claim
+      sources:
+        - S6
+        - S5
+    - text: The workbook records a lending fee split of 35% treasury, 30% USDG vault, 25% buyback and burn, 10% stakers, and zero-fee flash loans.
+      class: claim
+      sources:
+        - S4
+    - text: The official account posted on 2026-08-30 that TVL had crossed $100,000.
+      class: claim
+      sources:
+        - S3
+        - S7
+  risk:
+    - text: The official account's 2026-08-30 post gave an Ethereum-cashtag address (0x07f5b682…) as the Pons token; the desk found that address is not a contract on chain 4663. Addresses in the project's posts should not be copied without a check.
+      class: claim
+      sources:
+        - S6
+    - text: The BOW ticker is also used by the bow.fun launchpad and by a Bankr-launched token at 0xf56D9aDAA11dc278638adcDCA8Cf697DDC008ba3; only the address above is treated as Longbow's token.
+      class: claim
+      sources:
+        - S4
+        - S3
+  missing:
+    - text: BOW address not reproduced on Blockscout
+    - text: Morpho market ids and oracle contracts unknown
+    - text: Fee-split enforcement not verified against contracts
+    - text: An independent audit was not found in this review
+    - text: TVL figures ($100k per the project on 2026-08-30; $58.6k per a third party on 2026-08-29) not reproduced
+  unresolved:
+    - text: "TVL: the project posted $100k on 30 Aug; a third-party post cited $58.6k on 29 Aug; DefiLlama had no usable row for the desk. None reproduced."

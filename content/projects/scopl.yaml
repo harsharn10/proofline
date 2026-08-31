@@ -1,0 +1,72 @@
+slug: scopl
+name: SCOPL
+symbol: SCOPL
+category: Aggregator
+lifecycle: mainnet
+coverage: stub
+summary: Non-custodial one-tick limit orders on Uniswap V3 and V4 (the position NFT stays in the user's wallet) with fee revenue split to referrals, buybacks and operations; V2 audited by SpyWolf per the project.
+official_links:
+  - kind: site
+    url: https://scopl.live
+  - kind: x
+    url: https://x.com/scopl_live
+dependencies:
+  - uniswap
+deployments:
+  - label: SCOPL token (account bio; SpyWolf audit for chain 4663)
+    chain: robinhood-chain
+    address: "0xaA40e79E987517f7462bF79315B8A118799B04E3"
+    role: token
+    verified: false
+    sources:
+      - S4
+      - S5
+      - S3
+  - label: V2 contracts (OrderPolicy, V3 and V4 managers, Referral, RevenueDistributor, FeeRouter, ZapRouter, BuybackVault, RouterSwapAdapter)
+    chain: robinhood-chain
+    address: not-verified
+    role: other
+    verified: false
+    sources:
+      - S5
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: SCOPL publishes an official site at https://scopl.live.
+      class: claim
+      sources:
+        - S1
+    - text: SCOPL publishes an official X account at https://x.com/scopl_live.
+      class: claim
+      sources:
+        - S2
+    - text: The official account posted on 2026-08-29 that every order is a concentrated-liquidity position whose fills pay real swap fees split between user and protocol, with no emissions; a competition cited about $500k volume, 1,000+ fills and 37 traders.
+      class: claim
+      sources:
+        - S4
+    - text: A SpyWolf audit dated 30 Aug, as read by the desk, names nine V2 contracts on chain 4663 with no major or critical findings and a revenue split of 30% referral, 50% buyback, 20% operations.
+      class: claim
+      sources:
+        - S5
+  risk:
+    - text: Several accounts posted a 'holder portal' link at a third-party domain (cryptolot.lol) alongside the token address on 2026-08-30; the research desk flagged those posts as not from the project and treated the domain as a phishing risk.
+      class: claim
+      sources:
+        - S6
+        - S4
+    - text: An Ethereum address (0x07f5b682…) circulated as SCOPL's contract is not a contract on chain 4663 per the desk.
+      class: claim
+      sources:
+        - S6
+  missing:
+    - text: Token address from the bio not reproduced on Blockscout
+    - text: Nine V2 contract addresses not published
+    - text: Buyback vault and fee router control
+    - text: "Whether V2 is live: the audit text and the official account disagree"
+  unresolved:
+    - text: The audit text describes the protocol as already live while the official account still described V2 as around the corner; no deployed addresses for the nine V2 contracts were published.

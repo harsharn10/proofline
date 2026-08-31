@@ -1,0 +1,69 @@
+slug: earn-protocol
+name: EARN
+symbol: EARN
+category: Yield
+lifecycle: mainnet
+coverage: stub
+summary: "Yield layer for tokenized stocks: Uniswap v4 strategy vaults on NVDA/USDG and GME/USDG, permissionless omnipools with zaps routed through Rialto, and a $EARN token that receives buybacks."
+official_links:
+  - kind: site
+    url: https://earnonhood.com
+  - kind: x
+    url: https://x.com/EARNONHOOD
+dependencies:
+  - uniswap
+  - rialto
+  - stock-tokens
+  - usdg
+deployments:
+  - label: EARN token (account bio; workbook sheet 02)
+    chain: robinhood-chain
+    address: "0xa3b6aee90017b72c0812dc1e013de70eb2917ba3"
+    role: token
+    verified: false
+    sources:
+      - S4
+      - S3
+  - label: Strategy vaults / omnipools
+    chain: robinhood-chain
+    address: not-verified
+    role: vault
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: EARN publishes an official site at https://earnonhood.com.
+      class: claim
+      sources:
+        - S1
+    - text: EARN publishes an official X account at https://x.com/EARNONHOOD.
+      class: claim
+      sources:
+        - S2
+    - text: "The official account posted on 2026-08-30 that zaps were live for its omnipools: deposit ETH or USDG and have it split across up to eight assets, routed through Rialto."
+      class: claim
+      sources:
+        - S5
+        - S4
+    - text: The workbook records Uniswap v4 strategy vaults on NVDA/USDG and GME/USDG and a protocol take of 10% of omnipool swap fees with 90% to LPs.
+      class: claim
+      sources:
+        - S3
+  risk:
+    - text: The name collides with Robinhood Earn, the Morpho-based USDG lending product inside the Robinhood app, which has no token; the two are unrelated per the workbook.
+      class: claim
+      sources:
+        - S3
+  missing:
+    - text: Token address from the bio and workbook not reproduced on Blockscout
+    - text: Vault and omnipool addresses unknown
+    - text: Strategy control and rebalancing powers
+    - text: Protocol fee take (10% of omnipool swap fees per the workbook) not verified against contracts
+    - text: An independent audit was not found in this review
+  unresolved: []

@@ -4,22 +4,50 @@ symbol: null
 category: Agent / execution
 lifecycle: mainnet
 coverage: stub
-summary: Agent trading surface expanded onto Robinhood Chain.
-official_links: []
-dependencies: []
-deployments: []
+summary: Agent execution surface on Robinhood Chain that launches tokens from X and runs its own stock-paired factory; the tokens it launches are graduations, not subjects.
+official_links:
+  - kind: x
+    url: https://x.com/bankrbot
+dependencies:
+  - stock-tokens
+deployments:
+  - label: Stock-paired launch factory
+    chain: robinhood-chain
+    address: not-verified
+    role: factory
+    verified: false
+    sources:
+      - S5
 review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
-  positive: []
-  risk: []
+  positive:
+    - text: Bankr publishes an official X account at https://x.com/bankrbot.
+      class: claim
+      sources:
+        - S1
+    - text: The workbook's Dune extract records about 85k tokens launched and 11k traded through Bankr, 2,244 paired to a Stock Token, with roughly 36% of its volume on RWA pairs.
+      class: claim
+      sources:
+        - S3
+    - text: The desk observed the account deploying stock-paired tokens (TSM, MSFT, QQQ pairs) on 2026-08-31; those tokens are pad outputs, not subjects.
+      class: claim
+      sources:
+        - S5
+        - S2
+  risk:
+    - text: The dossier notes the bot can launch tokens on user instruction and that a 30 Aug 'TEST' airdrop was a skill demo, not a distribution.
+      class: claim
+      sources:
+        - S4
   missing:
-    - text: Official site or account not yet located
-    - text: Whether any on-chain contracts are Bankr-specific or it routes through others
+    - text: Factory address not located in either intake
     - text: Key custody model for agent execution
-    - text: Lifecycle stage not independently verified
-  unresolved: []
+    - text: Launch fee flows (a 0.665% creator fee is cited by the dossier)
+    - text: Official site not located
+  unresolved:
+    - text: No Bankr-specific contract address was found in either intake; whether launches route through its own factory or others is unverified.

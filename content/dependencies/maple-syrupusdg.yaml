@@ -1,0 +1,41 @@
+# Skeleton dependency card (Task 5): cited on subject files, never profiled (PRD §2.2). Fill controls/failure modes with evidence before citing them as more than claims.
+id: maple-syrupusdg
+name: Maple syrupUSDG
+kind: yield
+summary: ERC-4626 receipt for USDG deposited into Maple's institutional lending, live on the chain from day one and approved as Earn collateral per the workbook.
+controls:
+  - power: Deposit / withdrawal gating
+    holder: Maple
+    note: Institutional lending pools have their own liquidity windows
+    class: unknown
+    sources: []
+  - power: Collateral approval in Earn markets
+    holder: Morpho curator (Steakhouse)
+    note: ""
+    class: unknown
+    sources: []
+failure_modes:
+  - text: A Maple pool default or withdrawal queue makes syrupUSDG illiquid while it sits as Morpho collateral.
+    class: claim
+    sources:
+      - S1
+deployments:
+  - label: syrupUSDG receipt token (workbook sheet 06, 'verify')
+    chain: robinhood-chain
+    address: "0x40858070814a57FdF33a613ae84fE0a8b4a874f7"
+    role: token
+    verified: false
+    sources:
+      - S1
+sources:
+  - id: S1
+    url: https://github.com/harsharn10/proofline/blob/site-integration/research/inbox/grok-2026-08-30/build_rh_tokens.py
+    publisher: Grok workbook sheet 06 (intake, 2026-08-30)
+    kind: third-party-data
+    accessed_at: 2026-08-31T00:00:00Z
+    claim: "Sheet 06: ERC-4626 receipt for USDG in Maple Syrup institutional lending; live on ETH and Robinhood Chain from day one; approved as Earn collateral; about $96M chain-slice market cap in one DefiLlama pull; address cited with 'verify'"
+    excerpt: Tokenless-infra row in the workbook script; a claim of the workbook.
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true

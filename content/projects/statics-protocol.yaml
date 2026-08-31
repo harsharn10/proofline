@@ -2,18 +2,31 @@ slug: statics-protocol
 name: Statics Protocol
 symbol: STATICS
 category: RWA baskets
-lifecycle: mainnet
+lifecycle: beta
 coverage: stub
-summary: Native protocol for redeemable multi-asset baskets, connected pools and self-backed credit; Genesis system reported live on Robinhood mainnet 2026-08-27.
+summary: Native protocol for redeemable multi-asset baskets, an Operator NFT reserve and self-backed credit; Genesis epoch live on mainnet per the project, with the hooks DEX and credit not yet enabled.
 official_links:
+  - kind: site
+    url: https://staticsprotocol.com
   - kind: docs
     url: https://docs.staticsprotocol.com/docs/rollout/
   - kind: docs
     url: https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/
   - kind: docs
     url: https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/
-dependencies: []
+  - kind: x
+    url: https://x.com/StaticsProtocol
+dependencies:
+  - uniswap
 deployments:
+  - label: STATICS token
+    chain: robinhood-chain
+    address: "0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd"
+    role: token
+    verified: false
+    sources:
+      - S6
+      - S7
   - label: Genesis system
     chain: robinhood-chain
     address: not-verified
@@ -24,10 +37,14 @@ review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
+    - text: Statics Protocol publishes an official site at https://staticsprotocol.com.
+      class: claim
+      sources:
+        - S4
     - text: Statics Protocol publishes an official docs at https://docs.staticsprotocol.com/docs/rollout/.
       class: claim
       sources:
@@ -40,10 +57,29 @@ findings:
       class: claim
       sources:
         - S3
-  risk: []
+    - text: Statics Protocol publishes an official X account at https://x.com/StaticsProtocol.
+      class: claim
+      sources:
+        - S5
+    - text: The workbook records a fixed 1B supply with 800M sold across six Doppler curves at launch and 5,555 Operator NFTs each backed by 180k STATICS plus a compounding ETH reserve.
+      class: claim
+      sources:
+        - S7
+    - text: The official account posted on 30–31 Aug a design where STATICS stakers pick any 12 assets and earn from every pool trading them, Operators can borrow up to 95% against their backing, and a USDstx options-based stable is planned.
+      class: claim
+      sources:
+        - S8
+  risk:
+    - text: Per the project's own posts the hooks DEX is not live, credit is not enabled and the Genesis epoch is in progress; the census lifecycle was moved from mainnet to beta on that reading.
+      class: claim
+      sources:
+        - S8
+        - S6
   missing:
-    - text: Mainnet addresses (docs reference a testnet deployment page)
+    - text: Mainnet addresses beyond the token (docs reference a testnet deployment page)
     - text: Deployed governance and timelock configuration vs the documented seven-day target
-    - text: Independent audit evidence
+    - text: An independent audit was not found in this review
     - text: Upgrade authority
-  unresolved: []
+    - text: USDstx is a design, not a deployment
+  unresolved:
+    - text: The workbook warns to separate Genesis mainnet addresses from leftover testnet (chain 46630) addresses in the docs.

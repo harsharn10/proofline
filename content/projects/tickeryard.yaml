@@ -1,0 +1,59 @@
+slug: tickeryard
+name: TickerYard
+symbol: null
+category: Oracle / infra
+lifecycle: mainnet
+coverage: stub
+summary: Synthetic-asset product shipping yBTC (WBTC routed from Arbitrum) on Robinhood Chain; incubated in the StonkBrokers stack with a $YARD token per the workbook.
+official_links:
+  - kind: site
+    url: https://tickeryard.com
+  - kind: x
+    url: https://x.com/TickerYardHQ
+dependencies: []
+deployments:
+  - label: yBTC
+    chain: robinhood-chain
+    address: not-verified
+    role: token
+    verified: false
+    sources: []
+  - label: YARD token (workbook)
+    chain: robinhood-chain
+    address: not-verified
+    role: token
+    verified: false
+    sources:
+      - S4
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: TickerYard publishes an official site at https://tickeryard.com.
+      class: claim
+      sources:
+        - S1
+    - text: TickerYard publishes an official X account at https://x.com/TickerYardHQ.
+      class: claim
+      sources:
+        - S2
+    - text: The official account posted yBTC shipping on Robinhood Chain, routed from WBTC on Arbitrum (desk map, 2026-08-31).
+      class: claim
+      sources:
+        - S3
+    - text: The workbook lists TickerYard ($YARD) as a StonkBrokers-incubated product.
+      class: claim
+      sources:
+        - S4
+  risk: []
+  missing:
+    - text: yBTC and YARD addresses not located
+    - text: Bridge and custody path for the BTC backing
+    - text: Mint and redeem controls
+    - text: An independent audit was not found in this review
+  unresolved:
+    - text: The bridge and custody path for the BTC backing yBTC has not been described in either intake.

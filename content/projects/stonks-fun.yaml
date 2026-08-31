@@ -1,0 +1,46 @@
+slug: stonks-fun
+name: Stonks.fun
+symbol: STONKS
+category: Launchpad
+lifecycle: mainnet
+coverage: stub
+summary: DN-404 launchpad on Doppler whose fees burn the $STONKS platform token; a rebrand toward RWA baskets is announced.
+official_links:
+  - kind: x
+    url: https://x.com/stonksdotfun
+dependencies: []
+deployments:
+  - label: STONKS token / factory
+    chain: robinhood-chain
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Stonks.fun publishes an official X account at https://x.com/stonksdotfun.
+      class: claim
+      sources:
+        - S1
+    - text: The official account's bio describes a DN-404 launchpad powered by Doppler whose fees burn $STONKS; a 22 Aug post announced a rebrand toward RWA baskets.
+      class: claim
+      sources:
+        - S3
+        - S2
+  risk:
+    - text: The name sits next to StonkBrokers (NFTs, Anvil, STORMM); they are separate projects and separate rows here.
+      class: claim
+      sources:
+        - S3
+  missing:
+    - text: Factory and token addresses not located
+    - text: Fee burn path not verified against contracts
+    - text: An independent audit was not found in this review
+    - text: Official site not located
+  unresolved: []

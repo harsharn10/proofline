@@ -1,0 +1,55 @@
+slug: noxa
+name: NOXA Fun
+symbol: null
+category: Launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Launchpad that launches tokens straight into Uniswap v3 pools; the venue behind the chain's first-week memes, listed on DefiLlama with TVL and fees.
+official_links:
+  - kind: site
+    url: https://noxa.fun
+  - kind: x
+    url: https://x.com/Noxa_Fi
+dependencies:
+  - uniswap
+deployments:
+  - label: Launch factory
+    chain: robinhood-chain
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: NOXA Fun publishes an official site at https://noxa.fun.
+      class: claim
+      sources:
+        - S1
+    - text: NOXA Fun publishes an official X account at https://x.com/Noxa_Fi.
+      class: claim
+      sources:
+        - S2
+    - text: DefiLlama listed NOXA Fun with about $5.43M TVL and $123,438 24h fees (revenue $0) on 2026-08-31 per the desk map.
+      class: claim
+      sources:
+        - S4
+    - text: The workbook's Dune extract records about 60k tokens launched and 59k traded on Noxa, none paired to a Stock Token in that snapshot.
+      class: claim
+      sources:
+        - S5
+  risk:
+    - text: The dossier and workbook name clone pads and copy URLs using the Noxa name; only noxa.fun is treated as the project site here.
+      class: claim
+      sources:
+        - S6
+  missing:
+    - text: Factory address not located
+    - text: Launch fee flows and who controls the factory
+    - text: An independent audit was not found in this review
+  unresolved: []

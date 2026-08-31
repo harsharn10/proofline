@@ -13,17 +13,18 @@ official_links:
 dependencies:
   - hyperliquid
 deployments:
-  - label: RH Chain token
+  - label: RH Chain token (PRD Appendix A)
     chain: robinhood-chain
     address: "0x8701E2C87ade58325601f4F9bf37ADF46Cb75745"
     role: token
     verified: false
-    sources: []
+    sources:
+      - S4
 review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
@@ -31,14 +32,24 @@ findings:
       class: claim
       sources:
         - S1
-    - text: Longshot publishes an official social at https://x.com/uselongshot.
+    - text: Longshot publishes an official X account at https://x.com/uselongshot.
       class: claim
       sources:
         - S2
-  risk: []
+    - text: The workbook describes a launch where the creator fixes the Hyperliquid underlying, direction and leverage at launch, with those parameters immutable afterward; the desk places it as a stock-paired factory with an imported perps leg.
+      class: claim
+      sources:
+        - S4
+        - S3
+  risk:
+    - text: The workbook notes the name sits next to long.xyz (LONG) and Longbow (BOW); the products differ and are separate rows here.
+      class: claim
+      sources:
+        - S4
   missing:
     - text: Token address from PRD Appendix A not yet reproduced on Blockscout
     - text: Who controls the Hyperliquid position and how funds cross venues
     - text: Fee-split contract and admin powers unknown
-    - text: Audit status unknown
+    - text: An independent audit was not found in this review
+    - text: Multi-chain footprint (Base, Solana, BNB, HyperEVM per the workbook) not reviewed
   unresolved: []

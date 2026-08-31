@@ -1,0 +1,46 @@
+slug: sinjoh
+name: Sinjoh
+symbol: INJOH
+category: Fee-routing protocol
+lifecycle: mainnet
+coverage: stub
+summary: "Fee router: launch and creator fees are bought back into PONS and NVDA airdrops and INJOH burns per the project; Yield Banks and raffle products are announced."
+official_links:
+  - kind: x
+    url: https://x.com/SinjohDeFi
+dependencies:
+  - stock-tokens
+deployments:
+  - label: INJOH token (account bio)
+    chain: robinhood-chain
+    address: "0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D"
+    role: token
+    verified: false
+    sources:
+      - S2
+      - S3
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Sinjoh publishes an official X account at https://x.com/SinjohDeFi.
+      class: claim
+      sources:
+        - S1
+    - text: The official account posted over $42k of PONS and NVDA airdropped, 42M INJOH (about 4.2%) burned and over $11M of volume in under a month, with launch and creator fees routed into buybacks, airdrops and burns.
+      class: claim
+      sources:
+        - S3
+        - S2
+  risk: []
+  missing:
+    - text: Token address from the bio not reproduced on Blockscout
+    - text: Router contract not located
+    - text: Who sets the fee split
+    - text: An independent audit was not found in this review
+  unresolved:
+    - text: The router contract that collects and splits fees was not located; airdrop and burn figures are the project's own.

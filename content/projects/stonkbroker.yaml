@@ -1,32 +1,80 @@
 slug: stonkbroker
-name: StonkBroker
-symbol: null
+name: StonkBrokers
+symbol: STONKBROKER
 category: NFT / treasury
 lifecycle: mainnet
 coverage: stub
-summary: ERC-6551 token-bound NFT on Robinhood Chain that can hold Stock Tokens; a native cultural and product layer.
-official_links: []
+summary: 4,444 ERC-6551 token-bound NFTs whose wallets hold Stock Tokens, with a $STONKBROKER activation token, an Anvil AMM and an announced STORMM options overlay on Uniswap v4.
+official_links:
+  - kind: site
+    url: https://stonkbrokers.cash
+  - kind: x
+    url: https://x.com/ClutchMarkets
 dependencies:
   - stock-tokens
+  - uniswap
 deployments:
-  - label: NFT collection
+  - label: $STONKBROKER token (CollectionToken, workbook sheet 02)
+    chain: robinhood-chain
+    address: "0xe934e36a439c94017b64a3fece66af12099abf50"
+    role: token
+    verified: false
+    sources:
+      - S5
+  - label: NFT collection (ERC-721 + ERC-6551)
     chain: robinhood-chain
     address: not-verified
     role: token
+    verified: false
+    sources: []
+  - label: Anvil AMM
+    chain: robinhood-chain
+    address: not-verified
+    role: other
     verified: false
     sources: []
 review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
-  positive: []
-  risk: []
+  positive:
+    - text: StonkBrokers publishes an official site at https://stonkbrokers.cash.
+      class: claim
+      sources:
+        - S1
+    - text: StonkBrokers publishes an official X account at https://x.com/ClutchMarkets.
+      class: claim
+      sources:
+        - S2
+    - text: The workbook records 4,444 ERC-6551 broker NFTs minted on 2026-07-17, each owning a token-bound wallet pre-seeded with Stock Tokens, with activation paid in $STONKBROKER (half burned).
+      class: claim
+      sources:
+        - S5
+    - text: DefiLlama listed StonkBrokers with about $25.6M parent TVL, $33,776 24h fees and $18,835 24h revenue on 2026-08-31 per the desk map.
+      class: claim
+      sources:
+        - S4
+    - text: The official account posted on 2026-08-29 a spec for STORMM, a Uniswap v4 hook overlay where LP positions also serve as options inventory, and announced a Leverage Machine of NFT-minted options (no liquidations) for September 2026.
+      class: claim
+      sources:
+        - S6
+  risk:
+    - text: The workbook states at least four other contracts share the StonkBroker name; only the token address above is treated as the project's.
+      class: claim
+      sources:
+        - S5
+    - text: The workbook notes activation resets on transfer, so a bought NFT does not carry the prior holder's reward weight.
+      class: claim
+      sources:
+        - S5
   missing:
-    - text: Official site or account not yet located
-    - text: Collection and registry addresses unknown
+    - text: Collection, registry and Anvil addresses not located; the token address comes from the workbook and is not reproduced
     - text: Who can move assets out of a token-bound account
-    - text: Lifecycle stage not independently verified
-  unresolved: []
+    - text: Activation and reward-weight mechanics unverified
+    - text: STORMM and the Leverage Machine are announced for September 2026 — no deployment evidence reviewed
+    - text: DefiLlama parent versus launchpad TVL split unexplained
+  unresolved:
+    - text: DefiLlama shows about $25.6M parent TVL against $1.05M on its launchpad page — a parent/child split the desk could not explain.

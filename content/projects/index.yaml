@@ -1,32 +1,68 @@
 slug: index
-name: Index
-symbol: null
+name: The Index
+symbol: INDEX
 category: RWA distributor
 lifecycle: mainnet
 coverage: stub
-summary: "RWA distributor: a pool tax buys a basket of Stock Tokens for holders."
-official_links: []
+summary: "RWA distributor: a 3% tax on $INDEX trades buys Stock Tokens and distributes them to holders on a short cadence, per the project."
+official_links:
+  - kind: site
+    url: https://theindex.finance
+  - kind: x
+    url: https://x.com/TheIndexFi
 dependencies:
   - stock-tokens
+  - uniswap
+  - rialto
 deployments:
-  - label: Token
+  - label: INDEX token
+    chain: robinhood-chain
+    address: "0x56910d4409f3a0c78c64dd8d0545ff0705389870"
+    role: token
+    verified: false
+    sources:
+      - S6
+      - S5
+  - label: Distributor / hook
     chain: robinhood-chain
     address: not-verified
-    role: token
+    role: other
     verified: false
     sources: []
 review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
-  positive: []
-  risk: []
+  positive:
+    - text: The Index publishes an official site at https://theindex.finance.
+      class: claim
+      sources:
+        - S1
+    - text: The Index publishes an official X account at https://x.com/TheIndexFi.
+      class: claim
+      sources:
+        - S2
+    - text: The project's 17 Jul writeup, as carried by the dossier, describes a 3% tax on trades funding Stock Token distributions every 15 minutes, with 75% of related fees buying tokenized stocks and 25% deepening liquidity.
+      class: claim
+      sources:
+        - S6
+        - S5
+    - text: DefiLlama listed The Index with $24,321 24h and $151,043 7d revenue on 2026-08-31 per the desk map.
+      class: claim
+      sources:
+        - S4
+  risk:
+    - text: Distribution size is volume-reflexive by design; the dossier flags that the hook whitelist and fee routing need a contract read.
+      class: claim
+      sources:
+        - S6
   missing:
-    - text: Official site or account not yet located
-    - text: Token and basket-holding contract addresses unknown
+    - text: Token address from the dossier and workbook not yet reproduced on Blockscout
+    - text: Distributor and hook contract addresses unknown
     - text: Who sets the tax and controls the basket
-    - text: Lifecycle stage not independently verified
-  unresolved: []
+    - text: Distribution totals (about $1M per the project) not reproduced on chain
+  unresolved:
+    - text: "The project's claim of about $1M in Stock Tokens distributed (workbook: over $1M) has not been reproduced on chain."

@@ -1,0 +1,53 @@
+slug: netnet
+name: NetNet Capital
+symbol: NET
+category: RWA baskets
+lifecycle: mainnet
+coverage: stub
+summary: Reserve token whose treasury the project says holds AAPL, NVDA and SPCX Stock Tokens; DefiLlama has it under Reserve Currency at zero TVL.
+official_links:
+  - kind: x
+    url: https://x.com/NetNetCap
+dependencies:
+  - stock-tokens
+deployments:
+  - label: NET token
+    chain: robinhood-chain
+    address: not-verified
+    role: token
+    verified: false
+    sources: []
+  - label: Treasury
+    chain: robinhood-chain
+    address: not-verified
+    role: vault
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: NetNet Capital publishes an official X account at https://x.com/NetNetCap.
+      class: claim
+      sources:
+        - S1
+    - text: The official account posted that its treasury held about $7.5M and the largest AAPL, NVDA and SPCX Stock Token positions on the chain (desk map, 2026-08-31).
+      class: claim
+      sources:
+        - S3
+  risk:
+    - text: DefiLlama's Reserve Currency row for NetNet showed zero TVL on 2026-08-31 while the project posted a $7.5M treasury; the treasury address was not located in this review.
+      class: claim
+      sources:
+        - S3
+  missing:
+    - text: NET token and treasury addresses not located
+    - text: Treasury holdings (about $7.5M per the project) not reproduced
+    - text: Redemption mechanism, if any
+    - text: Official site not located
+  unresolved:
+    - text: The HoodInsider recap's $677K 24h revenue figure is a media claim not reproduced.

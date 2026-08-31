@@ -113,5 +113,10 @@ research Markdown. `npm run validate` reports hits as warnings; `npm run validat
 
 ## Status
 
-Seeded 2026-08-30 with 14 stubs. No full profiles yet. `corrections.destination` in `site.yaml` is `TODO` and blocks
-`validate:release` on purpose.
+Seeded 2026-08-30 with 14 stubs; expanded 2026-08-31 to 49 stubs from the Grok research intake (see
+`research/inbox/grok-2026-08-30/HARVEST.md` — every address `verified: false`, every statement `class: claim`). No full
+profiles yet. `corrections.destination` in `site.yaml` is `TODO` and blocks `validate:release` on purpose.
+
+Intake tooling: `node scripts/import-chain-file.mjs` (intake → drafts, never content/), `node scripts/apply-harvest.mjs`
+(merges `scripts/harvest-data.mjs` into projects/sources/feed after `npm run seed`), `node scripts/build-accounts.mjs`
+(desk ledger → `accounts.yaml`), `node scripts/build-dependency-cards.mjs` (skeleton cards, never overwrites).

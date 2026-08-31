@@ -1,0 +1,62 @@
+slug: vynex
+name: Vynex
+symbol: VYNEX
+category: Yield
+lifecycle: mainnet
+coverage: stub
+summary: Liquid vault shares plus a Morpho Blue NVDA/USDG borrow market (38.5% LTV) using a 30-minute TWAP oracle the project built.
+official_links:
+  - kind: x
+    url: https://x.com/UseVynex
+dependencies:
+  - morpho
+  - stock-tokens
+  - usdg
+deployments:
+  - label: VYNEX token (cited by a third-party radar account, not the project)
+    chain: robinhood-chain
+    address: "0x8cf33e3026604bd85677e7bc6e04d256571b6653"
+    role: token
+    verified: false
+    sources:
+      - S3
+      - S2
+  - label: Vault / oracle contracts
+    chain: robinhood-chain
+    address: not-verified
+    role: vault
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: Vynex publishes an official X account at https://x.com/UseVynex.
+      class: claim
+      sources:
+        - S1
+    - text: The official account posted on 2026-08-30 an NVDA/USDG borrow market on Morpho Blue at 38.5% LTV where the position sits under the user's own address, priced by a 30-minute average oracle the project built from the NVDA pool rather than spot.
+      class: claim
+      sources:
+        - S3
+        - S2
+  risk:
+    - text: An independent audit was not found in this review; an X post on 2026-08-31 asserted that no audit had been done and that the stock vault had not yet produced income.
+      class: claim
+      sources:
+        - S3
+    - text: The token address comes from a third-party radar account, not from the project.
+      class: claim
+      sources:
+        - S3
+  missing:
+    - text: Token address comes from a third-party citation only
+    - text: Vault and oracle addresses not located
+    - text: Oracle control and Morpho market id
+    - text: An independent audit was not found in this review
+    - text: Official site not located
+  unresolved: []

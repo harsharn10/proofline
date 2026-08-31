@@ -8,6 +8,10 @@ summary: Immutable in-kind index baskets for Robinhood Stock Tokens with per-bas
 official_links:
   - kind: github
     url: https://github.com/vimenprotocol/vimen
+  - kind: site
+    url: https://vimen.org
+  - kind: x
+    url: https://x.com/vimenprotocol
 dependencies:
   - stock-tokens
 deployments:
@@ -21,7 +25,7 @@ review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
@@ -29,10 +33,31 @@ findings:
       class: claim
       sources:
         - S1
-  risk: []
+    - text: Vimen publishes an official site at https://vimen.org.
+      class: claim
+      sources:
+        - S2
+    - text: Vimen publishes an official X account at https://x.com/vimenprotocol.
+      class: claim
+      sources:
+        - S3
+    - text: The workbook lists MAG7 (AAPL/MSFT/GOOGL/AMZN/META/NVDA/TSLA) and AI6 (NVDA/AMD/MU/PLTR/GOOGL/SPCX) as fully backed baskets of Stock Tokens redeemable for the underlying.
+      class: claim
+      sources:
+        - S6
+    - text: DefiLlama listed Vimen under Indexes with about $9,208 TVL on 2026-08-31 per the desk map.
+      class: claim
+      sources:
+        - S5
+  risk:
+    - text: The workbook notes HOOD6 is a basket of chain-native tokens (CASHCAT, ARROW, HOODRAT, VIBECAT, VEX, VIRTUAL), not Stock Tokens.
+      class: claim
+      sources:
+        - S6
   missing:
     - text: Deployed addresses and bytecode vs repository
     - text: Immutability / no-admin-key claim not reproduced
     - text: Basket caps and redemption path
-    - text: Independent audit evidence
+    - text: An independent audit was not found in this review
+    - text: Basket composition (MAG7, AI6, HOOD6 per the workbook) not reproduced
   unresolved: []

@@ -4,7 +4,8 @@ import { SEED, RESEARCHER, LINK_KIND_TO_SOURCE_KIND } from "./seed-data.mjs";
 import { REQUIRED_HEADINGS, PENDING_LINE } from "./lib/research-md.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 
-const AT = "2026-08-30T00:00:00Z", DATE = "2026-08-30";
+// Stub date: today unless SEED_DATE=YYYY-MM-DD is set (the first 14 stubs were seeded 2026-08-30).
+const DATE = process.env.SEED_DATE ?? new Date().toISOString().slice(0, 10), AT = `${DATE}T00:00:00Z`;
 const CHANGELOG = "content/changelog.yaml";
 const exists = (p) => access(p).then(() => true, () => false);
 const census = parse(await readFile("content/census.yaml", "utf8"));

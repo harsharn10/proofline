@@ -1,0 +1,49 @@
+slug: pools-trade
+name: pools.trade
+symbol: null
+category: Launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Uniswap Labs launchpad minting tokens straight into Uniswap pools on Robinhood Chain.
+official_links:
+  - kind: x
+    url: https://x.com/pools_dot_fun
+dependencies:
+  - uniswap
+deployments:
+  - label: Launch factory
+    chain: robinhood-chain
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: pools.trade publishes an official X account at https://x.com/pools_dot_fun.
+      class: claim
+      sources:
+        - S1
+    - text: The desk records pools.trade as a Uniswap Labs launchpad announced on the Uniswap blog on 2026-08-05, with active mint links on X.
+      class: claim
+      sources:
+        - S2
+        - S4
+    - text: The workbook's Dune extract records about 71k tokens launched and 62k traded, 119 paired to a Stock Token.
+      class: claim
+      sources:
+        - S3
+  risk: []
+  missing:
+    - text: Factory address not located
+    - text: Launch fee flows
+    - text: Whether Uniswap Labs retains control of the factory
+    - text: Site URL not in the intake
+    - text: Relation to the 'Poolsfun' Sushi-V3 launches unresolved
+  unresolved:
+    - text: Two X handles (@pools_dot_fun and @TradePools) are in use; the desk kept both until the canonical one is confirmed. Whether the 'Poolsfun' Sushi-V3 launches noted by GeckoTerminal on 16 Aug are the same product is unresolved.

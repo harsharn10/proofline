@@ -1,0 +1,27 @@
+# Skeleton dependency card (Task 5): cited on subject files, never profiled (PRD §2.2). Fill controls/failure modes with evidence before citing them as more than claims.
+id: uncx
+name: UNCX (token locker)
+kind: locker
+summary: Imported liquidity locker with about $9.4M chain-slice TVL per the map; the native alternative is HoodLock (a census subject).
+controls:
+  - power: Lock and unlock
+    holder: Lock owner per lock; UNCX contracts
+    note: Lockers hold LP tokens on behalf of projects
+    class: unknown
+    sources: []
+failure_modes:
+  - text: A locker exploit or an owner-controlled early unlock releases liquidity a project advertised as locked.
+    class: unknown
+    sources: []
+sources:
+  - id: S1
+    url: https://github.com/harsharn10/proofline/blob/site-integration/research/inbox/2026-08-31-ecosystem-map.yaml
+    publisher: Grok research desk — ecosystem map (intake, 2026-08-31)
+    kind: third-party-data
+    accessed_at: 2026-08-31T00:00:00Z
+    claim: UNCX listed as a dependency (tooling/locker) with about $9.4M chain-slice TVL on 2026-08-31
+    excerpt: Dependency row in the desk's map; DefiLlama chain-slice TVL copied as listed on 2026-08-31, not reproduced.
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true

@@ -1,0 +1,66 @@
+slug: hoodlock
+name: HoodLock
+symbol: LOCK
+category: Scanner / tooling
+lifecycle: mainnet
+coverage: stub
+summary: Native liquidity locker with a $LOCK token; 25% of Mintera.art revenue buys LOCK per the project, and a fee-split launchpad is announced.
+official_links:
+  - kind: site
+    url: https://hoodlock.tech
+  - kind: x
+    url: https://x.com/HoodLockRH
+dependencies: []
+deployments:
+  - label: LOCK token (account bio)
+    chain: robinhood-chain
+    address: "0xd5BF43f29BF7Aa5bb42Ae9e217b84B86EB7a4B94"
+    role: token
+    verified: false
+    sources:
+      - S3
+      - S4
+  - label: Locker contract
+    chain: robinhood-chain
+    address: not-verified
+    role: other
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: HoodLock publishes an official site at https://hoodlock.tech.
+      class: claim
+      sources:
+        - S1
+    - text: HoodLock publishes an official X account at https://x.com/HoodLockRH.
+      class: claim
+      sources:
+        - S2
+    - text: The official account posted a native liquidity locker with instant on-chain lock proofs, over 3M in value locked, and on 2026-08-29 that 25% of Mintera.art revenue would buy LOCK for lockers.
+      class: claim
+      sources:
+        - S4
+        - S3
+    - text: The official account announced on 2026-08-31 a launchpad on hoodlock.tech with a one-click fee split (for example 50% burn / 30% 30-day lock / 20% team).
+      class: claim
+      sources:
+        - S4
+  risk:
+    - text: A third-party post circulated a different address (0x76af8d3B…, truncated in the intake) for LOCK; the desk treats the bio address as the token and the other as not the project's.
+      class: claim
+      sources:
+        - S3
+  missing:
+    - text: Token address from the bio not reproduced on Blockscout
+    - text: Locker contract not located
+    - text: Unlock and admin powers over locked positions
+    - text: Value locked (3M+ per the project) not reproduced
+    - text: An independent audit was not found in this review
+  unresolved:
+    - text: The locker contract itself was not located; unlock and admin powers over locked positions are unknown.

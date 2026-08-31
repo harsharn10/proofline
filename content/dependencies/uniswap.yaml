@@ -1,11 +1,23 @@
 id: uniswap
 name: Uniswap on Robinhood Chain (v2 / v3 / v4, UniswapX)
 kind: dex
-summary: Day-one public DEX on Robinhood Chain. Launchpads graduate into v3 or v4 pools; v4 hooks can add project-specific logic.
+summary: Day-one public DEX on Robinhood Chain and, per the desk's DefiLlama snapshot, about 80% of spot volume. Launchpads graduate into v3 or v4 pools; v4 hooks carry project-specific logic (Pons V2 fee hook, Hookr, Quotrons, STORMM, What The Hook, Fables).
 controls:
   - { power: Protocol fee switch, holder: Uniswap governance, note: Core contracts; low blast radius for LPs, class: unknown, sources: [] }
-  - { power: Hook logic (v4), holder: Per-pool hook deployer, note: A hook can restrict swaps or take fees — assess per project, class: unknown, sources: [] }
+  - { power: Hook logic (v4), holder: Per-pool hook deployer, note: "A hook can restrict swaps, take fees or redirect value — assess per project (several census subjects are hooks)", class: unknown, sources: [] }
 failure_modes:
-  - { text: "A malicious or buggy v4 hook affects only pools using it, not core Uniswap.", class: unknown, sources: [] }
-  - { text: Thin liquidity after graduation makes price discovery and exits unreliable., class: unknown, sources: [] }
-sources: []
+  - { text: "A buggy or privileged v4 hook affects only the pools using it, not core Uniswap.", class: unknown, sources: [] }
+  - { text: "Thin liquidity after graduation makes price discovery and exits unreliable.", class: unknown, sources: [] }
+  - { text: "Concentration: about 80% of the chain's spot volume runs through Uniswap deployments per the desk's DefiLlama snapshot, so native venues are priced off Uniswap pools.", class: claim, sources: [S1] }
+sources:
+  - id: S1
+    url: https://github.com/harsharn10/proofline/blob/site-integration/research/inbox/2026-08-31-ecosystem-map.yaml
+    publisher: Grok research desk — ecosystem map (intake, 2026-08-31)
+    kind: third-party-data
+    accessed_at: 2026-08-31T00:00:00Z
+    claim: "Uniswap listed as a dependency (trading/amm-imported) with about $133M chain-slice TVL and roughly 80% of spot volume on 2026-08-31"
+    excerpt: "Dependency row in the desk's map; DefiLlama chain-slice figures copied as listed, not reproduced."
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true

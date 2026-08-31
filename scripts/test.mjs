@@ -275,13 +275,13 @@ async function makeContent(mutate = () => {}) {
   await writeFile(censusPath, censusText);
   const ledgerPath = join(tmp, "sources", "pons.yaml"), researchPath = join(tmp, "research", "pons.md");
   const entry = (id) => `  - id: ${id}\n    url: https://example.com/${id}\n    publisher: Example\n    kind: docs\n    accessed_at: 2026-08-30T00:00:00Z\n    claim: Fixture\n    excerpt: n/a\n    hash: null\n    archive_url: null\n    researcher: harsharn10\n    available: true\n`;
-  await appendFile(ledgerPath, entry("S2") + entry("S3"));
+  await appendFile(ledgerPath, entry("S98") + entry("S99")); // ids no real ledger uses
   const research = await readFile(researchPath, "utf8");
-  await writeFile(researchPath, research.replace("## Identity\n\n_Research pending._", "## Identity\n\nPons is a launchpad. [claim S2]"));
+  await writeFile(researchPath, research.replace("## Identity\n\n_Research pending._", "## Identity\n\nPons is a launchpad. [claim S98]"));
   const cited = await validateContent(tmp);
   // A feed item citing S3 counts as a citation; a feed item attributed to a blacklisted account warns.
   await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: blacklist\n  role: kol\n");
-  await writeFile(join(tmp, "feed", "pons.yaml"), "slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ct\n    title: T\n    body: B\n    account: \"@spam\"\n    sources: [S3]\n");
+  await writeFile(join(tmp, "feed", "pons.yaml"), "slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ct\n    title: T\n    body: B\n    account: \"@spam\"\n    sources: [S99]\n");
   const feedCited = await validateContent(tmp);
   await writeFile(join(tmp, "projects", "arrow.yaml"), "slug: [\n");
   const broken = await validateContent(tmp);
@@ -291,11 +291,11 @@ async function makeContent(mutate = () => {}) {
     assert.ok(qualifyingFalse.warnings.some((w) => w.includes("fails qualifying test citable")), "qualifying value false warns");
     assert.ok(releaseRun.errors.some((e) => e.includes("fails qualifying test citable")), "qualifying value false is a release error");
     assert.deepEqual(feedCited.errors, [], "feed citation of an existing ledger id is not an error");
-    assert.ok(!feedCited.warnings.some((w) => w.includes("S3 is never cited")), "an id cited only from a feed item is not 'never cited'");
+    assert.ok(!feedCited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited only from a feed item is not 'never cited'");
     assert.ok(feedCited.warnings.some((w) => w.includes("blacklisted account @spam")), "feed item attributed to a blacklisted account warns");
     assert.deepEqual(cited.errors, [], "prose citation validates");
-    assert.ok(!cited.warnings.some((w) => w.includes("S2 is never cited")), "an id cited only in research prose is not 'never cited'");
-    assert.ok(cited.warnings.some((w) => w.includes("S3 is never cited")), "an id cited nowhere still warns");
+    assert.ok(!cited.warnings.some((w) => w.includes("S98 is never cited")), "an id cited only in research prose is not 'never cited'");
+    assert.ok(cited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited nowhere still warns");
     assert.equal(broken.content, null, "load failure returns no content");
     assert.equal(broken.errors.length, 1);
     assert.ok(broken.errors[0].includes("projects/arrow.yaml"), `YAML error names the file: ${broken.errors[0]}`);

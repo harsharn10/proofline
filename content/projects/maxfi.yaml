@@ -1,0 +1,60 @@
+slug: maxfi
+name: MaxFi
+symbol: null
+category: Yield
+lifecycle: mainnet
+coverage: stub
+summary: Managed LP positions on Stock Token / USDG pairs with no-swap rebalancing, time-delayed depeg protection and a circuit breaker in progress; no token found.
+official_links:
+  - kind: site
+    url: https://maxfi.tech
+  - kind: x
+    url: https://x.com/MAXFILABS
+dependencies:
+  - uniswap
+  - stock-tokens
+  - usdg
+deployments:
+  - label: LP manager contracts
+    chain: robinhood-chain
+    address: not-verified
+    role: vault
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-31
+  published_at: null
+findings:
+  positive:
+    - text: MaxFi publishes an official site at https://maxfi.tech.
+      class: claim
+      sources:
+        - S1
+    - text: MaxFi publishes an official X account at https://x.com/MAXFILABS.
+      class: claim
+      sources:
+        - S2
+    - text: The official account posted on 2026-08-30 that $128,324 had been paid to LP farmers in the previous 24 hours, and its bio claimed over $8M TVL.
+      class: claim
+      sources:
+        - S5
+        - S4
+    - text: The dossier and desk describe managed ranges on Stock Token / USDG pairs with no-swap rebalancing, time-delayed depeg protection and a circuit breaker in progress.
+      class: claim
+      sources:
+        - S3
+        - S4
+  risk:
+    - text: MaxFi is not on the DefiLlama dump; its TVL and payout figures are the project's own and were not reproduced.
+      class: claim
+      sources:
+        - S4
+  missing:
+    - text: Manager contract addresses not located
+    - text: Withdrawal and rebalance powers
+    - text: TVL ($8M per the bio) and payouts not reproduced
+    - text: An independent audit was not found in this review
+  unresolved: []

@@ -1,43 +1,669 @@
-# CT accounts worth tracking for the trending signal (spec: computeTrending counts kind: ct feed items
-# from tier: top accounts only). Seeded from research/inbox/grok-2026-08-30/chain-file.json 2026-08-30.
-# All start at tier: watch; the maintainer promotes an account to top once its calls have been worth following.
-- handle: "@RHDaily_"
+# CT accounts for the trending signal — built by scripts/build-accounts.mjs from research/inbox/account-desk.yaml
+# (wins) + research/inbox/2026-08-31-accounts.yaml + census/feed handles, per the Task 5 addendum mapping.
+# tier: top | watch | downweight | blacklist — only top + role alpha/kol counts toward trending (scripts/lib/trending.mjs);
+# blacklist rows are kept so impersonations and collisions are not lost. role: project | alpha | kol | data | infra | media.
+# Counts: watch 110, downweight 31, top 4, blacklist 11 (total 156). Hand edits welcome; rerun the script only to rebuild from the desk.
+- handle: "@_safehood"
   tier: watch
-- handle: "@UseSqueeze_RH"
+  role: project
+  slug: safehood
+  note: Official Uni-V3 pad. Quiet since 16 Jul.
+- handle: "@0xCB27"
+  tier: downweight
+  role: kol
+  note: Recurring RWA holdings list on X; treat as claims.
+- handle: "@0xkekov"
   tier: watch
-- handle: "@GG1nvestments"
+  role: kol
+  note: One useful ecosystem dump.
+- handle: "@0xSammy"
+  tier: top
+  role: alpha
+  note: Native-play list with infra excluded.
+- handle: "@0xzaps"
   tier: watch
-- handle: "@longbowlend"
+  role: project
+  note: Fee split into HOOKR blocks.
+- handle: "@Adam_Tehc"
+  tier: top
+  role: alpha
+  note: Dune trenches. Dashboards are pointers.
+- handle: "@AdamEShelton"
+  tier: downweight
+  role: kol
+  note: High reach, memecoin contract posts; heat only, never trending.
+- handle: "@agendotspace"
   tier: watch
-- handle: "@DenarMarkets"
+  role: project
+  note: Canopy NL launcher.
+- handle: "@ahboyash"
+  tier: top
+  role: alpha
+  note: Named primitives (UP, Fables, NetNet, Clutch, Delta, LONG, Arrow).
+- handle: "@alphai_onchain"
+  tier: downweight
+  role: data
+  note: Flagged Delta late. Promo tone.
+- handle: "@andrewtalksdefi"
+  tier: top
+  role: alpha
+  note: Named Delta/Wire/Hedge/Website/Mesh.
+- handle: "@annisapt_"
+  tier: blacklist
+  role: kol
+  note: Posted a SCOPL 'holder portal' at cryptolot.lol on 30 Aug; the desk flagged it as not official and a phishing risk.
+- handle: "@arcus_xyz"
   tier: watch
-- handle: "@ponsdotfamily"
+  role: infra
+  note: Day-one partner (dYdX team).
+- handle: "@ArrowFinanceHQ"
+  tier: blacklist
+  role: project
+  followers: 555
+  note: 555 followers, CDP copy.
+- handle: "@ArrowFinanceio"
   tier: watch
-- handle: "@TheIndexFi"
+  role: project
+  slug: arrow
+  followers: 8500
+  note: Official CDP. 09:30 ET params are citable.
+- handle: "@arrowfinances"
+  tier: blacklist
+  role: project
+  note: Same collision class.
+- handle: "@arrowsonhood"
   tier: watch
-- handle: "@MetalHead_rh"
+  role: project
+  slug: arrows
+  note: Live options, week-1 numbers.
+- handle: "@ArtificiallyInu"
   tier: watch
-- handle: "@L4VAprotocol"
-  tier: watch
+  role: project
+  slug: artificial-inu
+  note: $AI / NVDA vault. Stronger stock-hold model than CETS-style memes.
+- handle: "@bananagun"
+  tier: downweight
+  role: infra
+  note: Exec bot. Not a native play.
 - handle: "@bankrbot"
   tier: watch
-- handle: "@AdamEShelton"
+  role: project
+  slug: bankr
+  note: Own factory. Graduations stay graduation.
+- handle: "@BinanceWallet"
+  tier: downweight
+  role: infra
+  note: RH meme discovery card.
+- handle: "@booj1e"
   tier: watch
-- handle: "@notEezzy"
+  role: project
+  note: Sight builder.
+- handle: "@brainblast_ai"
   tier: watch
-- handle: "@DeGenWealth2"
+  role: project
+  note: Dakota/Sinjoh alt. Same person as @DSB_117.
+- handle: "@BrodieHasFun"
+  tier: downweight
+  role: kol
+- handle: "@Canopy_Finance"
+  tier: blacklist
+  role: project
+  note: HoodInsider typo. Official is @canopyfinance.
+- handle: "@canopyfinance"
   tier: watch
+  role: project
+  note: Official. agen.space NL→v4 + CNPY stock ratchet.
+- handle: "@clantechapp"
+  tier: watch
+  role: project
+  note: SocialFi on RH. Observe.
+- handle: "@ClutchMarkets"
+  tier: watch
+  role: project
+  slug: stonkbroker
+  followers: 25400
+  note: STORMM / Leverage Machine article is a real machine spec.
+- handle: "@cruelhandeth"
+  tier: watch
+  role: project
+  note: Named Quotrons dev.
 - handle: "@Cuba19_"
-  tier: watch
-- handle: "@ibweb3eth"
-  tier: watch
-- handle: "@monchhh0"
-  tier: watch
-- handle: "@zackfromsubway"
-  tier: watch
+  tier: downweight
+  role: kol
 - handle: "@DaoKingdom"
+  tier: downweight
+  role: kol
+  note: Quoted MaxFi promo. Typical paid-adjacent CT.
+- handle: "@DeGenWealth2"
+  tier: downweight
+  role: kol
+- handle: "@deltaliquidity"
   tier: watch
+  role: project
+  slug: delta
+  note: Official LP layer CA. $1m TVL claim unverified vs Llama $16k.
+- handle: "@DenarMarkets"
+  tier: watch
+  role: project
+  slug: denar
+  note: Isolated MM. CA still unverified on Blockscout this desk.
+- handle: "@DoloresResearch"
+  tier: downweight
+  role: project
+  note: $DOLORES Virtuals agent.
+- handle: "@DSB_117"
+  tier: watch
+  role: project
+  note: Sinjoh founder. Cannot trend.
+- handle: "@EARNONHOOD"
+  tier: watch
+  role: project
+  slug: earn-protocol
+  note: Candidate. Bio CA 0xa3b6aee90017b72c0812dc1e013de70eb2917ba3 unverified.
+- handle: "@fablesfi"
+  tier: watch
+  role: project
+  slug: fables
+  followers: 3000
+  note: Native v4 ve(3,3). Llama volume is real-enough to follow.
+- handle: "@fefehood"
+  tier: watch
+  role: project
+  note: fefe-hood.fun community pad.
+- handle: "@fiatphobia"
+  tier: watch
+  role: alpha
+  note: clan.tech posts. Not FOMO venue.
+- handle: "@flapdotsh"
+  tier: watch
+  role: project
+  note: Stock-token pairs on RH.
+- handle: "@fomokidpump_gew"
+  tier: blacklist
+  role: kol
+  note: Same cryptolot.lol SCOPL portal copy as other flagged accounts.
+- handle: "@fox_onrh"
+  tier: watch
+  role: project
+- handle: "@FundedProtocol"
+  tier: watch
+  role: project
 - handle: "@GeckoTerminal"
   tier: watch
-- handle: "@Odinekachukwu1"
+  role: data
+  note: Pointers only. Reproduce.
+- handle: "@GG1nvestments"
+  tier: downweight
+  role: kol
+  note: Seeded. No mechanism call this pass.
+- handle: "@GoodCoinRH"
+  tier: downweight
+  role: project
+  note: $GOOD graduation; Gate Alpha and Tangem listings.
+- handle: "@gornx0x"
   tier: watch
+  role: project
+  note: Named Wire builder.
+- handle: "@GwoodFinance"
+  tier: watch
+  role: project
+  note: Named on MCG calendar this week.
+- handle: "@HedgeOnHood"
+  tier: watch
+  role: project
+- handle: "@hoodcityonhood"
+  tier: watch
+  role: project
+  note: "Landmark: tokens/communities → onchain landmarks."
+- handle: "@HoodedDotMeme"
+  tier: watch
+  role: project
+  note: Named as launchpad beside SwapHood.
+- handle: "@hoodfunfamily"
+  tier: watch
+  role: project
+  slug: hoodfun
+  note: Pad announced Jul, last official coming-soon.
+- handle: "@HoodInsider_"
+  tier: watch
+  role: media
+  note: Weekly named-protocol recap.
+- handle: "@HoodLockRH"
+  tier: watch
+  role: project
+  slug: hoodlock
+  note: Native locker. 3M TVL-locked is a claim.
+- handle: "@hoodmemecoins"
+  tier: downweight
+  role: kol
+  note: Ticker lists.
+- handle: "@hooftly"
+  tier: watch
+  role: project
+  note: Statics builder.
+- handle: "@hookosbot"
+  tier: downweight
+  role: project
+  note: Fill 8 is the HookOS Telegram deploy bot, not an X evidence source.
+- handle: "@hookosfun"
+  tier: watch
+  role: project
+  note: Multi-chain hook pad. Llama 0 RH vol.
+- handle: "@Hookrfun"
+  tier: watch
+  role: project
+  slug: hookr
+  note: Compose v4 hooks. 2.5M burn claim.
+- handle: "@iam0x00"
+  tier: watch
+  role: project
+  note: Arrows founder. Cannot trend.
+- handle: "@ibweb3eth"
+  tier: downweight
+  role: kol
+- handle: "@JoinCtrlFi"
+  tier: watch
+  role: project
+  note: Ctrl Ranks across RH + TX.
+- handle: "@jumperapp"
+  tier: watch
+  role: infra
+- handle: "@KarmaWallet_Eco"
+  tier: downweight
+  role: media
+  note: Tagged an Ethereum address ($JIMOTHY) as the Pons token; do not use for contract addresses.
+- handle: "@L4VAprotocol"
+  tier: watch
+  role: project
+  slug: l4va
+  note: Candidate. RWA-backed launch product.
+- handle: "@layerggofficial"
+  tier: watch
+  role: data
+  note: ATH recaps with CAs. Mixed BSC/RH ($CETS).
+- handle: "@lemondotfun"
+  tier: watch
+  role: project
+  slug: lemon
+  note: Pad + agentic X accounts + HL terminal claims.
+- handle: "@Lighter_xyz"
+  tier: watch
+  role: infra
+  note: Imported perps. Llama RH TVL.
+- handle: "@longbowlend"
+  tier: watch
+  role: project
+  slug: longbow
+  note: Morpho overlay. TVL still tiny vs Morpho.
+- handle: "@longdotxyz"
+  tier: watch
+  role: project
+  slug: long
+  note: Stock-paired factory. $AI figures are claims.
+- handle: "@MancerXYZ"
+  tier: watch
+  role: project
+  slug: mancer
+  followers: 6800
+  note: Aggregator. Still audit/beta as of 25 Aug.
+- handle: "@MAXFILABS"
+  tier: watch
+  role: project
+  slug: maxfi
+  note: Stock-LP specialist. $128k/day payout is a claim.
+- handle: "@MCGlive"
+  tier: watch
+  role: media
+  note: Hosted SCOPL founder + WTH.
+- handle: "@meridiandotxyz"
+  tier: watch
+  role: project
+  slug: meridian
+  note: Llama perps + predict TVL.
+- handle: "@MeshGateway"
+  tier: watch
+  role: project
+  slug: mesh
+  note: MPP gateway. CA 0x14641000a501bdc736116abf84e6fcea9b90a713.
+- handle: "@MetalHead_rh"
+  tier: downweight
+  role: kol
+  note: May overlap a token. Not official.
+- handle: "@MidasRWA"
+  tier: watch
+  role: infra
+  note: mGLO into Steakhouse USDG vault.
+- handle: "@Mihawk_Research"
+  tier: downweight
+  role: data
+  note: Posted Longbow TVL $58.6k 29 Aug.
+- handle: "@Mike_Majestic"
+  tier: watch
+  role: alpha
+  note: Named Robindex dev.
+- handle: "@MinteraNFT"
+  tier: watch
+  role: project
+  note: mintera.art. Fees buyback $LOCK.
+- handle: "@mobyagent"
+  tier: watch
+  role: infra
+- handle: "@monchhh0"
+  tier: downweight
+  role: kol
+- handle: "@MosaicETF"
+  tier: watch
+  role: project
+  note: Onchain ETF baskets on RH.
+- handle: "@My_Stomachfat"
+  tier: blacklist
+  role: kol
+  note: Same cryptolot.lol SCOPL portal copy as other flagged accounts.
+- handle: "@NetNetCap"
+  tier: watch
+  role: project
+  slug: netnet
+  note: Reserve manager for $NET.
+- handle: "@nikshepsvn"
+  tier: watch
+  role: project
+  note: Stonks.fun builder.
+- handle: "@NodarJ"
+  tier: watch
+  role: project
+  note: Hookr / Zaps. Hook Tokens spec is mechanism, not CT.
+- handle: "@notawebsite_rh"
+  tier: watch
+  role: project
+  slug: website
+- handle: "@notEezzy"
+  tier: downweight
+  role: kol
+- handle: "@Noxa_Fi"
+  tier: watch
+  role: project
+  slug: noxa
+  note: Pad. Llama fees exist.
+- handle: "@ObscuraCEX"
+  tier: watch
+  role: project
+  note: AI trade-builder UI. Observe.
+- handle: "@ObsidianSwap"
+  tier: watch
+  role: infra
+  note: Bridge. Dependency.
+- handle: "@OddyseyAI"
+  tier: watch
+  role: project
+  note: Agent fleet. Not the Odyssey pad (openpump instant+curve).
+- handle: "@Odinekachukwu1"
+  tier: downweight
+  role: kol
+- handle: "@openpumpio"
+  tier: watch
+  role: infra
+  note: Pad census on 4663 (PONS, poolstrade, odyssey, hoodfun).
+- handle: "@OrderlyNetwork"
+  tier: watch
+  role: infra
+  note: Imported perp builder.
+- handle: "@OxSimpleFarmer"
+  tier: watch
+  role: project
+  note: Founder. Mechanism posts (Uni v4 LP + options).
+- handle: "@Pongorh"
+  tier: downweight
+  role: project
+  note: $PONGO Pons graduation with a dog-meme narrative; no mechanism.
+- handle: "@Ponsbotfamily"
+  tier: blacklist
+  role: project
+  note: Homonym. Official is @ponsdotfamily.
+- handle: "@PonscadeRH"
+  tier: downweight
+  role: project
+  note: Free arcade on RH. Game, not a protocol.
+- handle: "@ponsdotfamily"
+  tier: watch
+  role: project
+  slug: pons
+  note: Official pad. Lifetime volume and creator-payout posts later matched Llama Pons V2.
+- handle: "@pools_dot_fun"
+  tier: watch
+  role: project
+  slug: pools-trade
+  note: Uniswap Labs pad. VEX agentic launches sit on it.
+- handle: "@prismassets"
+  tier: watch
+  role: project
+- handle: "@ProjectVEXai"
+  tier: watch
+  role: project
+  note: Agentic launches on pools.trade.
+- handle: "@pudgypenguins"
+  tier: downweight
+  role: infra
+  note: PENGU ticker trading on RH.
+- handle: "@QUOTRONGenesis"
+  tier: blacklist
+  role: kol
+  note: Typo-filled mint account.
+- handle: "@Quotrons404"
+  tier: watch
+  role: project
+  slug: quotrons
+  followers: 5300
+  note: ERC-404 hardwire. Reward posts are claims marked off Blockscout.
+- handle: "@QuotronsDesktop"
+  tier: watch
+  role: project
+  note: Related drop 1 Sep 0.20 USD.
+- handle: "@rallypadfun"
+  tier: watch
+  role: project
+  note: Programmable pad + livestream + fee routing.
+- handle: "@RegardedRH"
+  tier: downweight
+  role: project
+  note: Token. Graduation.
+- handle: "@RHAgentNS"
+  tier: watch
+  role: project
+  slug: agent-name-service
+  note: .agent namespace. Claimed 0.002 ETH/year names on RH.
+- handle: "@RHDaily_"
+  tier: blacklist
+  role: media
+  note: Seeded typo. Live RH news is @RHDaily__.
+- handle: "@RHDaily__"
+  tier: watch
+  role: media
+  followers: 7600
+  note: Best weekly inventory.
+- handle: "@rialto_xyz"
+  tier: watch
+  role: infra
+  note: Powers EARN omnipool zaps.
+- handle: "@Robin_Pad"
+  tier: watch
+  role: project
+  note: Odyssey pad. Instant+curve + HL-wrapped RobinPerps.
+- handle: "@robindexpro"
+  tier: watch
+  role: project
+  slug: robindex
+  note: Scanner/tracker. Not robinhood-index-vaults.
+- handle: "@RobinhoodApp"
+  tier: watch
+  role: infra
+- handle: "@RobinhoodCrypto"
+  tier: watch
+  role: infra
+  note: Issuer. Chain stats are claims to reproduce.
+- handle: "@RobinPAD_MEME"
+  tier: blacklist
+  role: project
+  followers: 8000
+  note: Same display name, different pad.
+- handle: "@RVHProtocol"
+  tier: watch
+  role: project
+  note: Ravenhood DAO treasury.
+- handle: "@SafehoodCTO_"
+  tier: downweight
+  role: project
+  note: CTO of the token, not the protocol.
+- handle: "@safehoodonrh"
+  tier: downweight
+  role: project
+  note: $SAFEHOOD Pons and Sinjoh graduation token; not the @_safehood protocol.
+- handle: "@scopl_live"
+  tier: watch
+  role: project
+  slug: scopl
+  note: Official limit-order machine.
+- handle: "@sherw00d_cash"
+  tier: watch
+  role: project
+  slug: sherwood
+  note: Official account per the desk map; added so the census row has its handle on file.
+- handle: "@sight_hood"
+  tier: watch
+  role: project
+  slug: sight
+  note: Official account; states the project has no token and a Genesis mint on 2 Sep.
+- handle: "@SinjohDeFi"
+  tier: watch
+  role: project
+  slug: sinjoh
+  note: Fee router. $INJOH numbers are official claims.
+- handle: "@sleuth_ai"
+  tier: watch
+  role: project
+  note: AI sleuth on Base/RH/Sol.
+- handle: "@SnuggleFi"
+  tier: watch
+  role: project
+  slug: snuggle
+  note: Official account per the desk map; added so the census row has its handle on file.
+- handle: "@StaticsProtocol"
+  tier: watch
+  role: project
+  slug: statics-protocol
+  note: Official. DEX not live.
+- handle: "@stonksdotfun"
+  tier: watch
+  role: project
+  slug: stonks-fun
+  note: DN-404 Doppler pad. Not StonkBrokers.
+- handle: "@SwapHoodFi"
+  tier: watch
+  role: project
+  slug: swaphood
+  note: Official HOOD-aligned DEX.
+- handle: "@Tangem"
+  tier: watch
+  role: infra
+  note: Hardware wallet App 6.2 native RH.
+- handle: "@that1618guy"
+  tier: watch
+  role: alpha
+  note: Delphi / markets. RH eco mcap comments.
+- handle: "@TheIndexFi"
+  tier: watch
+  role: project
+  slug: index
+  note: Dividend layer. Distinct from Quotrons / $AI vault.
+- handle: "@theunipcs"
+  tier: downweight
+  role: kol
+  note: '"szn" reach. No mechanism.'
+- handle: "@thinkingcatRH"
+  tier: downweight
+  role: project
+  note: $HMM PFP generator; HMM is a Wire-adjacent culture token, not a mechanism.
+- handle: "@TickerYardHQ"
+  tier: watch
+  role: project
+  slug: tickeryard
+  note: yBTC / WBTC route Arbitrum → RH.
+- handle: "@tradefortendies"
+  tier: watch
+  role: kol
+- handle: "@TradePools"
+  tier: watch
+  role: project
+  note: Same pad, different handle.
+- handle: "@Treasure_DAO"
+  tier: watch
+  role: infra
+  note: NFT options, imported.
+- handle: "@uponrh"
+  tier: watch
+  role: project
+  slug: up
+  note: Native AMM. Llama up v3 volume.
+- handle: "@uselongshot"
+  tier: watch
+  role: project
+  slug: longshot
+  followers: 108
+  note: Official LONGSHOT. Tiny follow count.
+- handle: "@UseSqueeze_RH"
+  tier: watch
+  role: project
+  slug: squeeze
+  followers: 4
+  note: Reclassified from KOL.
+- handle: "@UseVynex"
+  tier: watch
+  role: project
+  slug: vynex
+  note: Vault + Morpho NVDA. Distinct from Denar/Longbow/Arrow.
+- handle: "@vantis_ai"
+  tier: watch
+  role: project
+- handle: "@vimenprotocol"
+  tier: watch
+  role: project
+  slug: vimen
+  note: Llama Indexes, ~$9k TVL.
+- handle: "@virtuals_io"
+  tier: watch
+  role: infra
+  slug: virtuals
+  note: Agent layer. Individual agents are graduations.
+- handle: "@VoidlexETH_ias"
+  tier: blacklist
+  role: kol
+  note: Same cryptolot.lol SCOPL portal copy as other flagged accounts.
+- handle: "@whalewatchRH"
+  tier: watch
+  role: data
+  note: Flow alerts. Tickers not mechanisms.
+- handle: "@whatthehookv4"
+  tier: watch
+  role: project
+  slug: what-the-hook
+  note: MEV-in-hook. Easy to merge with Hookr — keep follow so we don't.
+- handle: "@wirebotRH"
+  tier: watch
+  role: project
+  slug: wire
+  note: Live command layer. Replies show Pons fee path.
+- handle: "@WISE_Token"
+  tier: watch
+  role: project
+  note: USDG into Telecom Nodes, claimed 22% APY.
+- handle: "@yousef_sol"
+  tier: downweight
+  role: kol
+  note: Delta skeptic (weeks old vs Meteora).
+- handle: "@YowlonHood"
+  tier: watch
+  role: project
+  note: $YOWL yowl.trade Morpho borrow.
+- handle: "@zackfromsubway"
+  tier: downweight
+  role: kol
+  note: Seeded trench.
