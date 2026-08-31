@@ -5,7 +5,7 @@ services:
     name: proofline
     runtime: node
     plan: starter
-    buildCommand: npm ci && npm run score && cd site && npm ci && NITRO_PRESET=node-server npm run build
+    buildCommand: npm ci --include=dev && npm run score && cd site && npm ci --include=dev && NITRO_PRESET=node-server npm run build
     startCommand: node site/.output/server/index.mjs
     healthCheckPath: /
     envVars:
