@@ -13,6 +13,7 @@ import type {
   Findings,
   Derived,
   Link,
+  Research,
   Review,
   SiteConfig,
   SourceEntry,
@@ -32,6 +33,35 @@ function parseYamlFile<T>(filePath: string): T {
 
 function parseJsonFile<T>(filePath: string): T {
   return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
+}
+
+// loadContent() builds the whole bundle in one pass for both getContent() and
+// getDossier() — a missing or unparsable per-slug file must never throw, or one bad
+// slug takes down the directory and every dossier page. Missing → fallback silently
+// (feed files are legitimately optional). Present-but-unparsable → warn server-side
+// naming the file, then fall back the same as missing.
+function readYamlOrWarn<T>(filePath: string, slug: string, fallback: T): T {
+  if (!fs.existsSync(filePath)) return fallback;
+  try {
+    return parseYamlFile<T>(filePath);
+  } catch (err) {
+    console.warn(
+      `[content-server] ${slug}: failed to parse ${filePath} — ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return fallback;
+  }
+}
+
+function readResearchOrWarn(filePath: string, slug: string): Research {
+  if (!fs.existsSync(filePath)) return { sections: [] };
+  try {
+    return parseResearchMarkdown(fs.readFileSync(filePath, "utf8"));
+  } catch (err) {
+    console.warn(
+      `[content-server] ${slug}: failed to parse ${filePath} — ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return { sections: [] };
+  }
 }
 
 // --- project.yaml (the subset the site reads; see schema/project.schema.json) ----------
@@ -132,10 +162,13 @@ function loadContent(): ContentBundle {
   const dossiers: Dossier[] = projectFiles.map((file) => {
     const slug = file.replace(/\.yaml$/, "");
     const project = parseYamlFile<ProjectFile>(path.join(contentDir, "projects", file));
-    const sourcesFile = parseYamlFile<SourcesFile>(path.join(contentDir, "sources", `${slug}.yaml`));
-    const researchRaw = fs.readFileSync(path.join(contentDir, "research", `${slug}.md`), "utf8");
+    const sourcesFile = readYamlOrWarn<SourcesFile>(path.join(contentDir, "sources", `${slug}.yaml`), slug, {
+      slug,
+      sources: [],
+    });
+    const research = readResearchOrWarn(path.join(contentDir, "research", `${slug}.md`), slug);
     const feedPath = path.join(contentDir, "feed", `${slug}.yaml`);
-    const feedFile = fs.existsSync(feedPath) ? parseYamlFile<FeedFile>(feedPath) : null;
+    const feedFile = readYamlOrWarn<FeedFile | null>(feedPath, slug, null);
     const feed = feedFile ? [...feedFile.items].sort((a, b) => b.date.localeCompare(a.date)) : [];
     const changelog = changelogAll
       .filter((entry) => entry.slug === slug)
@@ -154,7 +187,7 @@ function loadContent(): ContentBundle {
       deployments: project.deployments,
       findings: project.findings,
       review: project.review,
-      research: parseResearchMarkdown(researchRaw),
+      research,
       feed,
       sources: sourcesFile.sources,
       changelog,

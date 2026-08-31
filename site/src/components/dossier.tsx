@@ -253,19 +253,25 @@ export function Dossier({
 
       <section className="pt-8">
         <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-subtle">Research record</h2>
-        <div className="mt-3 space-y-6">
-          {dossier.research.sections.map((s) => (
-            <div key={s.heading}>
-              <h3 className="text-sm font-medium text-fg">{s.heading}</h3>
-              {/* research.sections.html is produced by data/markdown.ts from research/<slug>.md —
-                  evidence tags are pre-rendered to .ev spans and HTML comments already stripped. */}
-              <div
-                className="research-body mt-2 text-sm leading-relaxed text-muted"
-                dangerouslySetInnerHTML={{ __html: s.html }}
-              />
-            </div>
-          ))}
-        </div>
+        {dossier.research.sections.length > 0 ? (
+          <div className="mt-3 space-y-6">
+            {dossier.research.sections.map((s) => (
+              <div key={s.heading}>
+                <h3 className="text-sm font-medium text-fg">{s.heading}</h3>
+                {/* research.sections.html is produced by data/markdown.ts from research/<slug>.md —
+                    evidence tags are pre-rendered to .ev spans and HTML comments already stripped. */}
+                <div
+                  className="research-body mt-2 text-sm leading-relaxed text-muted"
+                  dangerouslySetInnerHTML={{ __html: s.html }}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          // content-server.ts falls back to { sections: [] } when research/<slug>.md is
+          // missing or fails to parse, rather than throwing and taking down the page.
+          <p className="mt-3 text-sm text-muted">No research record yet.</p>
+        )}
       </section>
 
       <section className="pt-10">
