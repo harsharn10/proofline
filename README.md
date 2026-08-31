@@ -112,6 +112,54 @@ handle. `npm run score` merges the result into
 `build/derived.json` — `trending: boolean` on every project, plus a top-level `trending: [slug, ...]` list. Pass
 `--today YYYY-MM-DD` to pin "today" for a reproducible run; it defaults to the real date.
 
+## Telegram digest
+
+`node scripts/telegram-digest.mjs` (PRD §9.2) sends changelog entries not yet sent, batched into one
+message, and never sends when there's nothing new:
+
+    npm run telegram             # send
+    npm run telegram:dry         # preview only, sends nothing, state unchanged
+    npm run telegram:test        # send a one-off "bot connected" message
+    npm run telegram:mark-sent   # mark current entries sent without posting (e.g. after a manual send)
+    npm run telegram:chat-id     # look up your chat id
+
+Credentials (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, optional `SITE_URL`, `PROFILE_PATH`) come from
+`.env.local` (gitignored) locally, or from repo secrets in CI. Sent-state lives in
+`ops/telegram-state.json` — tracked in git (moved out of `build/`, which is gitignored and
+regenerated, precisely so the digest remembers what it already sent across CI runs). `publish.yml`
+runs the digest on every push to `main` and commits the updated state back.
+
+## CI
+
+Three workflows under `.github/workflows/`:
+
+- **`validate.yml`** — every PR and every push to any branch. Root `npm ci && npm test` (schema
+  validation + scoring/rule tests), then the site's `npm ci && npm run typecheck && npm run build`.
+  A second, non-blocking job runs `node scripts/validate.mjs --release` so release blockers
+  (corrections contact, verified deployments, approvals) show up on every PR without failing it.
+- **`publish.yml`** — on push to `main`. `npm run score`, then the Telegram digest (see above),
+  skipped rather than failed when `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` aren't set as repo
+  secrets; commits `ops/telegram-state.json` back with `[skip ci]` if it changed.
+- **`automerge-feed.yml`** — on a pull request from a `grok/**` branch (see "Grok Bot" below). If
+  every changed file is under `content/feed/**`, `content/sources/**`, `content/accounts.yaml`, or
+  `research/inbox/**`, it approves the PR and queues `gh pr merge --squash --auto`, which merges once
+  `validate.yml` passes. Anything else gets a "needs human review" comment and waits.
+
+Required repo secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `SITE_URL` (all optional — absent
+means the digest step is skipped, not failed). `GITHUB_TOKEN` is automatic.
+
+Required repo setting: **Allow auto-merge** (Settings → General → Pull Requests) must be on for
+`automerge-feed.yml`'s `gh pr merge --auto` to work at all; add `validate.yml`'s `test` job as a
+required status check in branch protection on `main` so auto-merge actually waits for it instead of
+merging immediately.
+
+## Grok Bot
+
+Automated research intake (X posts, on-chain events, official announcements) reaches this repo only
+as a pull request from a `grok/<YYYY-MM-DD>` branch, opened via the GitHub REST API. The full contract
+— what it may collect, where it may write, what it must never write, evidence rules, and the exact
+file shapes — is [`docs/integrations/grok-bot.md`](docs/integrations/grok-bot.md).
+
 ## Voice lint
 
 `scripts/lib/voice.mjs` flags hype language: case-insensitive, whole-word matches of a banned list (ape, casino, rug,
