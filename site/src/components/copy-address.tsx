@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { explorerTokenUrl } from "@/data/names";
 
-export function CopyAddress({ address, label }: { address: string; label?: string }) {
+export function CopyAddress({ address, label, href }: { address: string; label?: string; href?: string }) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -22,14 +21,18 @@ export function CopyAddress({ address, label }: { address: string; label?: strin
     <div className="flex min-w-0 items-center gap-2 rounded-sm border border-border bg-surface px-3 py-2">
       <div className="min-w-0 flex-1">
         {label ? <p className="text-[11px] text-muted">{label}</p> : null}
-        <a
-          href={explorerTokenUrl(address)}
-          target="_blank"
-          rel="noreferrer"
-          className="block truncate font-mono text-xs text-accent hover:underline"
-        >
-          {short}
-        </a>
+        {href ? (
+          <a
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            className="block truncate font-mono text-xs text-accent hover:underline"
+          >
+            {short}
+          </a>
+        ) : (
+          <span className="block truncate font-mono text-xs text-fg">{short}</span>
+        )}
       </div>
       <Button variant="ghost" size="icon" className="size-9 shrink-0" onClick={copy} aria-label="Copy address">
         {copied ? <Check className="size-4 text-live" /> : <Copy className="size-4 text-muted" />}

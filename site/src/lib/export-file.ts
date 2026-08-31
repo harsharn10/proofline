@@ -1,42 +1,57 @@
-import {
-  CATEGORY_LABEL,
-  FEED_LABEL,
-  STATUS_LABEL,
-  type NameRecord,
-} from "@/data/types";
+import { FEED_LABEL, LINK_KIND_LABEL, type Dossier, type Gap } from "@/data/types";
 
 function csvEscape(value: string): string {
   if (/[",\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
   return value;
 }
 
-export function namesToCsv(names: NameRecord[]): string {
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
+}
+
+function scoreLine(d: Dossier): string {
+  if (d.derived.label) return d.derived.label;
+  const parts = [`${d.derived.score}/100`];
+  if (d.derived.provisional) parts.push("provisional");
+  if (d.derived.confidence !== null) parts.push(`${d.derived.confidence}% confidence`);
+  if (d.derived.risk) parts.push(`${d.derived.risk} risk`);
+  return parts.join(" · ");
+}
+
+export function dossiersToCsv(dossiers: Dossier[]): string {
   const header = [
-    "ticker",
-    "project",
+    "symbol",
+    "name",
     "category",
-    "status",
-    "heat",
-    "one_liner",
-    "rwa_hook",
-    "contracts",
+    "lifecycle",
+    "coverage",
+    "score",
+    "risk",
+    "trending",
+    "summary",
     "links",
-    "x_query",
-    "updated",
+    "reviewed_at",
   ];
-  const rows = names.map((n) =>
+  const rows = dossiers.map((d) =>
     [
-      n.ticker,
-      n.project,
-      CATEGORY_LABEL[n.category],
-      STATUS_LABEL[n.status],
-      n.heat,
-      n.oneLiner,
-      n.rwaHook,
-      n.contracts.map((c) => `${c.label}:${c.address}`).join(" | "),
-      n.links.map((l) => `${l.label} ${l.href}`).join(" | "),
-      n.xQuery,
-      n.updated,
+      d.symbol ?? "",
+      d.name,
+      d.category,
+      d.lifecycle,
+      d.coverage,
+      d.derived.score !== null ? String(d.derived.score) : "",
+      d.derived.risk ?? "",
+      d.derived.trending ? "yes" : "no",
+      d.summary,
+      d.links.map((l) => `${l.kind}:${l.url}`).join(" | "),
+      d.review.reviewed_at,
     ]
       .map(csvEscape)
       .join(","),
@@ -44,74 +59,84 @@ export function namesToCsv(names: NameRecord[]): string {
   return [header.join(","), ...rows].join("\n");
 }
 
-export function nameToMarkdown(n: NameRecord): string {
-  const contracts = n.contracts.length
-    ? n.contracts.map((c) => `- ${c.label}: \`${c.address}\``).join("\n")
-    : "- none pinned";
-  const links = n.links.length
-    ? n.links.map((l) => `- [${l.label}](${l.href})`).join("\n")
+function findingsBlock(title: string, items: { text: string }[] | Gap[]): string {
+  const body = items.length > 0 ? items.map((i) => `- ${i.text}`).join("\n") : "_none recorded_";
+  return `### ${title}\n\n${body}`;
+}
+
+export function dossierToMarkdown(d: Dossier): string {
+  const links = d.links.length
+    ? d.links.map((l) => `- ${LINK_KIND_LABEL[l.kind]}: ${l.url}`).join("\n")
     : "- none";
-  const feed = n.feed.length
-    ? n.feed
-        .slice()
-        .sort((a, b) => b.date.localeCompare(a.date))
+  const deployments = d.deployments.length
+    ? d.deployments
+        .map(
+          (dep) =>
+            `- ${dep.label} (${dep.chain}): \`${dep.address}\`${dep.verified ? " — verified" : " — not verified"}`,
+        )
+        .join("\n")
+    : "- none recorded";
+  const research = d.research.sections
+    .map((s) => `### ${s.heading}\n\n${stripHtml(s.html)}`)
+    .join("\n\n");
+  const feed = d.feed.length
+    ? d.feed
         .map(
           (f) =>
-            `### ${f.date} · ${FEED_LABEL[f.kind]} · ${f.title}\n\n${f.body}${f.source ? `\n\n_${f.source}_` : ""}`,
+            `### ${f.date} · ${FEED_LABEL[f.kind]} · ${f.title}\n\n${f.body}${f.account ? `\n\n_${f.account}_` : ""}`,
         )
         .join("\n\n")
     : "_No feed items yet._";
+  const sources = d.sources.length
+    ? d.sources.map((s) => `- ${s.id}: ${s.claim} (${s.url}, accessed ${s.accessed_at.slice(0, 10)})`).join("\n")
+    : "_None recorded._";
 
   return [
-    `# ${n.ticker} — ${n.project}`,
+    `# ${d.symbol ?? d.name} — ${d.name}`,
     "",
-    `${CATEGORY_LABEL[n.category]} · ${STATUS_LABEL[n.status]} · updated ${n.updated}`,
+    `${d.category} · ${d.lifecycle} · ${d.coverage} · ${scoreLine(d)}`,
     "",
-    n.oneLiner,
-    "",
-    "## Overview",
-    "",
-    n.overview,
-    "",
-    "## RWA hook",
-    "",
-    n.rwaHook,
-    "",
-    "## Thesis",
-    "",
-    n.thesis,
-    "",
-    "## Mechanics",
-    "",
-    n.mechanics,
-    "",
-    "## Risks",
-    "",
-    n.risks,
-    n.collisions ? `\n## Name collisions\n\n${n.collisions}\n` : "",
-    "## Contracts",
-    "",
-    contracts,
+    d.summary,
     "",
     "## Links",
     "",
     links,
     "",
+    "## Deployments",
+    "",
+    deployments,
+    "",
+    "## Findings",
+    "",
+    findingsBlock("Positive", d.findings.positive),
+    "",
+    findingsBlock("Risk", d.findings.risk),
+    "",
+    findingsBlock("Missing evidence", d.findings.missing),
+    "",
+    findingsBlock("Unresolved", d.findings.unresolved),
+    "",
+    "## Research",
+    "",
+    research,
+    "",
     "## Feed",
     "",
     feed,
     "",
+    "## Sources",
+    "",
+    sources,
+    "",
   ].join("\n");
 }
 
-export function namesToMarkdown(names: NameRecord[]): string {
-  const index = names
-    .map((n) => `- ${n.ticker} — ${n.project} (${STATUS_LABEL[n.status]})`)
-    .join("\n");
+export function dossiersToMarkdown(dossiers: Dossier[]): string {
+  const index = dossiers.map((d) => `- ${d.symbol ?? d.name} — ${d.name} (${d.lifecycle})`).join("\n");
   return [
-    "# Chain File",
+    "# Proofline",
     "",
-    "Robinhood Chain names, researched. Not financial advice. Stock Tokens are not offered to US persons.",
+    "Robinhood Chain native plays, researched. Not financial advice.",
     "",
     "## Index",
     "",
@@ -119,7 +144,7 @@ export function namesToMarkdown(names: NameRecord[]): string {
     "",
     "---",
     "",
-    names.map(nameToMarkdown).join("\n---\n\n"),
+    dossiers.map(dossierToMarkdown).join("\n---\n\n"),
   ].join("\n");
 }
 

@@ -4,9 +4,23 @@ import { Badge } from "@/components/ui/badge";
 import { CopyAddress } from "@/components/copy-address";
 import { ExportMenu } from "@/components/export-menu";
 import { FeedList } from "@/components/feed-list";
-import { CATEGORY_LABEL, HEAT_LABEL, STATUS_LABEL, type NameRecord } from "@/data/types";
-import { dexUrl, xSearchUrl } from "@/data/names";
-import { statusTone } from "@/lib/status-tone";
+import {
+  CHAIN_LABEL,
+  LIFECYCLE_LABEL,
+  LINK_KIND_LABEL,
+  correctionsLink,
+  dexScreenerSearchUrl,
+  explorerTokenUrl,
+  lifecycleTone,
+  riskTone,
+  type AccountEntry,
+  type Dossier as DossierData,
+  type DependencyCard,
+  type EvidenceClass,
+  type Gap,
+  type Finding,
+  type SiteConfig,
+} from "@/data/types";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -17,109 +31,312 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-export function Dossier({ name }: { name: NameRecord }) {
-  const xUrl = xSearchUrl(name.xQuery);
-  const feedItems = name.feed
-    .slice()
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .map((item) => ({ name, item }));
+function EvidenceTag({ evidenceClass, sources }: { evidenceClass: EvidenceClass; sources?: string[] }) {
+  const ids = sources && sources.length > 0 ? sources.join(" ") : undefined;
+  return (
+    <span className={`ev ev-${evidenceClass}`} data-sources={ids}>
+      {ids ? `${evidenceClass} · ${ids}` : evidenceClass}
+    </span>
+  );
+}
+
+function FindingList({ items }: { items: Finding[] }) {
+  if (items.length === 0) return <p className="text-sm text-muted">None recorded.</p>;
+  return (
+    <ul className="space-y-2">
+      {items.map((f, i) => (
+        <li key={i} className="flex flex-wrap items-start gap-2">
+          <EvidenceTag evidenceClass={f.class} sources={f.sources} />
+          <span>{f.text}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function GapList({ items }: { items: Gap[] }) {
+  if (items.length === 0) return <p className="text-sm text-muted">None recorded.</p>;
+  return (
+    <ul className="list-disc space-y-1 pl-4 text-muted">
+      {items.map((g, i) => (
+        <li key={i}>{g.text}</li>
+      ))}
+    </ul>
+  );
+}
+
+function TrendingChip({ accounts }: { accounts: AccountEntry[] }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Badge tone="warn">Trending</Badge>
+      {accounts.length > 0 ? (
+        <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-subtle">
+          {accounts.map((a) => a.handle).join(" · ")}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+// Which tier:top accounts drove this dossier's trending signal, for display only — the
+// trending boolean itself always comes from derived.trending (build/derived.json).
+function trendingCtAccounts(dossier: DossierData, accounts: AccountEntry[]): AccountEntry[] {
+  const ctHandles = new Set(dossier.feed.filter((i) => i.kind === "ct" && i.account).map((i) => i.account));
+  return accounts.filter((a) => a.tier === "top" && ctHandles.has(a.handle));
+}
+
+export function Dossier({
+  dossier,
+  site,
+  dependencies,
+  accounts,
+}: {
+  dossier: DossierData;
+  site: SiteConfig;
+  dependencies: Record<string, DependencyCard>;
+  accounts: AccountEntry[];
+}) {
+  const { derived } = dossier;
+  const trendingAccounts = derived.trending ? trendingCtAccounts(dossier, accounts) : [];
+  const blockscoutDeployments = dossier.deployments.filter(
+    (d) => d.chain === "robinhood-chain" && d.address !== "not-verified",
+  );
+  const correction = correctionsLink(site.corrections.destination);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted">
-        {CATEGORY_LABEL[name.category]} · {HEAT_LABEL[name.heat]}
+        {dossier.category} · {LIFECYCLE_LABEL[dossier.lifecycle]}
       </p>
       <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-mono text-3xl font-medium tracking-tight text-fg">{name.ticker}</h1>
-          <p className="mt-1 text-base text-muted">{name.project}</p>
+          <h1 className="font-mono text-3xl font-medium tracking-tight text-fg">
+            {dossier.symbol ?? dossier.name}
+          </h1>
+          <p className="mt-1 text-base text-muted">{dossier.name}</p>
         </div>
-        <Badge tone={statusTone(name.status)}>{STATUS_LABEL[name.status]}</Badge>
+        <div className="flex items-center gap-2">
+          {derived.trending ? <TrendingChip accounts={trendingAccounts} /> : null}
+          <Badge tone={lifecycleTone(dossier.lifecycle)}>{LIFECYCLE_LABEL[dossier.lifecycle]}</Badge>
+        </div>
       </div>
-      <p className="mt-5 max-w-prose text-base leading-relaxed text-fg">{name.oneLiner}</p>
+
       <div className="mt-4">
-        <ExportMenu name={name} />
+        {derived.label ? (
+          <div className="inline-flex flex-wrap items-center gap-2 rounded-sm border border-dashed border-border px-3 py-2">
+            <Badge tone="muted">{dossier.coverage === "stub" ? "Stub" : "Provisional"}</Badge>
+            <p className="text-sm text-muted">{derived.label}</p>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-3 rounded-sm border border-border bg-surface px-3 py-2">
+            <p className="font-mono text-2xl tabular-nums text-fg">
+              {derived.score}
+              <span className="text-base text-subtle">/100</span>
+            </p>
+            {derived.provisional ? <Badge tone="warn">Provisional</Badge> : null}
+            {derived.confidence !== null ? (
+              <span className="font-mono text-xs text-muted">{derived.confidence}% confidence</span>
+            ) : null}
+            {derived.risk ? <Badge tone={riskTone(derived.risk)}>{derived.risk} risk</Badge> : null}
+            {derived.override ? (
+              <span className="font-mono text-[11px] text-subtle">
+                Capped by {derived.override.level} override
+              </span>
+            ) : null}
+          </div>
+        )}
+      </div>
+
+      <p className="mt-5 max-w-prose text-base leading-relaxed text-fg">{dossier.summary}</p>
+      <div className="mt-4">
+        <ExportMenu dossier={dossier} />
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2">
-        {name.links.map((link) => (
+        {dossier.links.map((link) => (
           <a
-            key={link.href + link.label}
-            href={link.href}
+            key={link.kind + link.url}
+            href={link.url}
             target="_blank"
             rel="noreferrer"
             className="inline-flex h-11 items-center gap-1.5 rounded-sm border border-border bg-surface px-3 text-sm text-fg hover:bg-raised"
           >
-            {link.label}
+            {LINK_KIND_LABEL[link.kind]}
             <ExternalLink className="size-3.5 text-subtle" />
           </a>
         ))}
         <a
-          href={xUrl}
+          href={dexScreenerSearchUrl(dossier.symbol ?? dossier.name)}
           target="_blank"
           rel="noreferrer"
           className="inline-flex h-11 items-center gap-1.5 rounded-sm border border-border bg-surface px-3 text-sm text-fg hover:bg-raised"
         >
-          Live X search
+          DexScreener
           <ArrowUpRight className="size-3.5 text-subtle" />
         </a>
-        {name.contracts[0]?.address ? (
+        {blockscoutDeployments.map((d) => (
           <a
-            href={dexUrl(name.contracts[0].address)}
+            key={d.label}
+            href={explorerTokenUrl(site.chain.explorer, d.address)}
             target="_blank"
             rel="noreferrer"
             className="inline-flex h-11 items-center gap-1.5 rounded-sm border border-border bg-surface px-3 text-sm text-fg hover:bg-raised"
           >
-            DexScreener
+            Blockscout: {d.label}
             <ExternalLink className="size-3.5 text-subtle" />
           </a>
-        ) : null}
+        ))}
       </div>
 
-      {name.contracts.length > 0 ? (
-        <div className="mt-6 grid gap-2 sm:grid-cols-2">
-          {name.contracts.map((c) => (
-            <CopyAddress key={c.address} address={c.address} label={c.label} />
-          ))}
-        </div>
-      ) : (
-        <p className="mt-6 border border-dashed border-border px-4 py-3 text-sm text-muted">
-          No pinned contract yet. Do not buy this ticker off a board until a CA is in the file.
-        </p>
-      )}
+      <Section title="Deployments">
+        {dossier.deployments.length > 0 ? (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {dossier.deployments.map((d, i) => (
+              <div key={i} className="rounded-sm border border-border bg-surface p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm text-fg">{d.label}</p>
+                  <Badge tone={d.verified ? "live" : "risk"}>{d.verified ? "Verified" : "Not verified"}</Badge>
+                </div>
+                <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.1em] text-subtle">
+                  {CHAIN_LABEL[d.chain]}
+                  {d.issuer ? ` · ${d.issuer}` : ""}
+                  {d.ticker ? ` · ${d.ticker}` : ""}
+                </p>
+                {d.address === "not-verified" ? (
+                  <p className="mt-2 text-xs text-muted">Address not yet located.</p>
+                ) : (
+                  <div className="mt-2">
+                    <CopyAddress
+                      address={d.address}
+                      href={d.chain === "robinhood-chain" ? explorerTokenUrl(site.chain.explorer, d.address) : undefined}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="border border-dashed border-border px-4 py-3 text-sm text-muted">
+            No deployments recorded yet.
+          </p>
+        )}
+      </Section>
 
-      <Section title="Overview">
-        <p className="text-muted">{name.overview}</p>
-      </Section>
-      <Section title="RWA hook">
-        <p className="text-muted">{name.rwaHook}</p>
-      </Section>
-      <Section title="Thesis">
-        <p className="text-muted">{name.thesis}</p>
-      </Section>
-      <Section title="Mechanics">
-        <p className="text-muted">{name.mechanics}</p>
-      </Section>
-      <Section title="Risks">
-        <p className="text-muted">{name.risks}</p>
-      </Section>
-      {name.collisions ? (
-        <Section title="Name collisions">
-          <p className="text-risk">{name.collisions}</p>
+      {dossier.dependencies.length > 0 ? (
+        <Section title="Dependencies">
+          <div className="flex flex-wrap gap-2">
+            {dossier.dependencies.map((id) => (
+              <span
+                key={id}
+                title={dependencies[id]?.summary}
+                className="inline-flex h-8 items-center rounded-sm border border-border bg-surface px-2.5 text-xs text-muted"
+              >
+                {dependencies[id]?.name ?? id}
+              </span>
+            ))}
+          </div>
         </Section>
       ) : null}
+
+      <Section title="Positive findings">
+        <FindingList items={dossier.findings.positive} />
+      </Section>
+      <Section title="Risk findings">
+        <FindingList items={dossier.findings.risk} />
+      </Section>
+      <Section title="Missing evidence">
+        <GapList items={dossier.findings.missing} />
+      </Section>
+      <Section title="Unresolved questions">
+        <GapList items={dossier.findings.unresolved} />
+      </Section>
+
+      <section className="pt-8">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-subtle">Research record</h2>
+        <div className="mt-3 space-y-6">
+          {dossier.research.sections.map((s) => (
+            <div key={s.heading}>
+              <h3 className="text-sm font-medium text-fg">{s.heading}</h3>
+              {/* research.sections.html is produced by data/markdown.ts from research/<slug>.md —
+                  evidence tags are pre-rendered to .ev spans and HTML comments already stripped. */}
+              <div
+                className="research-body mt-2 text-sm leading-relaxed text-muted"
+                dangerouslySetInnerHTML={{ __html: s.html }}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="pt-10">
         <div className="mb-3 flex items-baseline justify-between gap-3">
           <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-subtle">Feed</h2>
           <p className="font-mono text-[11px] tabular-nums text-subtle">
-            {name.feed.length} update{name.feed.length === 1 ? "" : "s"}
+            {dossier.feed.length} update{dossier.feed.length === 1 ? "" : "s"}
           </p>
         </div>
-        <FeedList items={feedItems} />
+        <FeedList items={dossier.feed.map((item) => ({ item }))} />
         <p className="mt-3 text-xs text-subtle">
           Company = project posts. What people are saying = CT. On-chain = prints. Risk = collisions and traps.
-          Last file pass {name.updated}.
+        </p>
+      </section>
+
+      <Section title="Sources">
+        {dossier.sources.length > 0 ? (
+          <ol className="space-y-3">
+            {dossier.sources.map((s) => (
+              <li key={s.id} className="rounded-sm border border-border bg-surface p-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-xs text-accent">{s.id}</span>
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="truncate text-sm text-fg hover:underline"
+                  >
+                    {s.publisher}
+                  </a>
+                  <span className="font-mono text-[10px] text-subtle">{s.accessed_at.slice(0, 10)}</span>
+                </div>
+                <p className="mt-1 text-sm text-muted">{s.claim}</p>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="text-sm text-muted">No sources recorded yet.</p>
+        )}
+      </Section>
+
+      <Section title="Changelog">
+        {dossier.changelog.length > 0 ? (
+          <ol className="divide-y divide-border border border-border bg-surface">
+            {dossier.changelog.map((c, i) => (
+              <li key={i} className="px-4 py-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <time className="font-mono text-[11px] text-subtle">{c.date}</time>
+                  <Badge tone="muted">{c.type}</Badge>
+                  <span className="font-mono text-[10px] uppercase text-subtle">{c.severity}</span>
+                </div>
+                <h3 className="mt-1 text-sm font-medium text-fg">{c.title}</h3>
+                <p className="mt-1 text-sm text-muted">{c.detail}</p>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="text-sm text-muted">No changelog entries yet.</p>
+        )}
+      </Section>
+
+      <section className="mt-10 border-t border-border pt-6">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-subtle">Corrections</h2>
+        <p className="mt-2 text-sm text-muted">
+          {correction.href ? (
+            <a href={correction.href} className="text-accent hover:underline">
+              {correction.label}
+            </a>
+          ) : (
+            correction.label
+          )}
         </p>
       </section>
     </article>

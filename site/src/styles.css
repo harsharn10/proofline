@@ -82,3 +82,77 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Evidence-class badges. Emitted verbatim by data/markdown.ts for research prose
+   (`<span class="ev ev-claim" data-sources="S1">claim · S1</span>`) and reused by the
+   EvidenceTag component in components/dossier.tsx for structured findings so both read
+   identically. */
+@layer components {
+  .ev {
+    display: inline-flex;
+    align-items: center;
+    height: 1.25rem;
+    padding: 0 0.375rem;
+    border-radius: var(--radius-xs);
+    background: var(--color-raised);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .ev-verified {
+    color: var(--color-live);
+  }
+
+  .ev-claim {
+    color: var(--color-muted);
+  }
+
+  .ev-inference {
+    color: var(--color-accent);
+  }
+
+  .ev-disputed {
+    color: var(--color-warn);
+  }
+
+  .ev-unknown {
+    color: var(--color-subtle);
+  }
+
+  /* Prose rendered from research/<slug>.md via marked (data/markdown.ts). */
+  .research-body :where(p) {
+    margin: 0 0 0.75em;
+  }
+
+  .research-body :where(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .research-body :where(a) {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .research-body :where(ul, ol) {
+    margin: 0 0 0.75em;
+    padding-left: 1.25em;
+  }
+
+  .research-body :where(strong) {
+    color: var(--color-fg);
+    font-weight: 600;
+  }
+
+  .research-body :where(code) {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--color-raised);
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius-xs);
+  }
+}

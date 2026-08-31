@@ -1,31 +1,37 @@
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { NAMES } from "@/data/names";
-import { namesToCsv, namesToMarkdown, nameToMarkdown, triggerDownload } from "@/lib/export-file";
-import type { NameRecord } from "@/data/types";
+import { getContent } from "@/data/content-server";
+import { dossierToMarkdown, dossiersToCsv, dossiersToMarkdown, triggerDownload } from "@/lib/export-file";
+import type { Dossier } from "@/data/types";
 
-export function ExportMenu({ name }: { name?: NameRecord }) {
-  function saveJson() {
-    const payload = name ?? NAMES;
+// With no `dossier`, the menu exports the whole file — it fetches the content bundle
+// lazily on click (this component renders in the sitewide header, outside any route
+// loader) rather than the site preloading all 14 dossiers up front.
+export function ExportMenu({ dossier }: { dossier?: Dossier }) {
+  async function allDossiers(): Promise<Dossier[]> {
+    const content = await getContent();
+    return content.dossiers;
+  }
+
+  async function saveJson() {
+    const payload = dossier ?? (await allDossiers());
     triggerDownload(
-      name ? `${name.slug}.json` : "chain-file.json",
+      dossier ? `${dossier.slug}.json` : "chain-file.json",
       JSON.stringify(payload, null, 2),
       "application/json",
     );
   }
 
-  function saveCsv() {
-    triggerDownload(
-      name ? `${name.slug}.csv` : "chain-file.csv",
-      namesToCsv(name ? [name] : NAMES),
-      "text/csv;charset=utf-8",
-    );
+  async function saveCsv() {
+    const list = dossier ? [dossier] : await allDossiers();
+    triggerDownload(dossier ? `${dossier.slug}.csv` : "chain-file.csv", dossiersToCsv(list), "text/csv;charset=utf-8");
   }
 
-  function saveMd() {
+  async function saveMd() {
+    const contents = dossier ? dossierToMarkdown(dossier) : dossiersToMarkdown(await allDossiers());
     triggerDownload(
-      name ? `${name.slug}.md` : "chain-file.md",
-      name ? nameToMarkdown(name) : namesToMarkdown(NAMES),
+      dossier ? `${dossier.slug}.md` : "chain-file.md",
+      contents,
       "text/markdown;charset=utf-8",
     );
   }
@@ -44,18 +50,6 @@ export function ExportMenu({ name }: { name?: NameRecord }) {
         <Download className="size-3.5" />
         JSON
       </Button>
-      {!name ? (
-        <>
-          <a
-            href="/exports/chain-file.xlsx"
-            download="chain-file.xlsx"
-            className="inline-flex h-9 items-center gap-2 rounded-xs border border-border bg-transparent px-3 text-xs font-medium text-fg hover:bg-raised"
-          >
-            <Download className="size-3.5" />
-            Excel
-          </a>
-        </>
-      ) : null}
     </div>
   );
 }

@@ -1,13 +1,14 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { Dossier } from "@/components/dossier";
-import { getName } from "@/data/names";
+import { getDossier } from "@/data/content-server";
 
 export const Route = createFileRoute("/n/$slug")({
-  loader: ({ params }) => {
-    const name = getName(params.slug);
-    if (!name) throw notFound();
-    return name;
+  loader: async ({ params }) => {
+    const result = await getDossier({ data: params.slug });
+    const { dossier, ...rest } = result;
+    if (!dossier) throw notFound();
+    return { dossier, ...rest };
   },
   component: NamePage,
   notFoundComponent: () => (
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/n/$slug")({
 });
 
 function NamePage() {
-  const name = Route.useLoaderData();
+  const { dossier, site, dependencies, accounts } = Route.useLoaderData();
   return (
     <div className="min-h-dvh bg-bg text-fg">
       <div className="mx-auto max-w-3xl px-4 pt-4 sm:px-6">
@@ -39,7 +40,7 @@ function NamePage() {
           All names
         </Link>
       </div>
-      <Dossier name={name} />
+      <Dossier dossier={dossier} site={site} dependencies={dependencies} accounts={accounts} />
     </div>
   );
 }

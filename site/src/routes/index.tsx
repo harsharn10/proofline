@@ -5,33 +5,46 @@ import { NameRow } from "@/components/name-row";
 import { FeedList } from "@/components/feed-list";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CHAIN } from "@/data/chain";
-import { NAMES, allFeed } from "@/data/names";
-import { CATEGORIES, CATEGORY_LABEL, type Category } from "@/data/types";
+import { getContent } from "@/data/content-server";
+import { formatDate } from "@/lib/utils";
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+  loader: () => getContent(),
+  component: Home,
+});
 
 function Home() {
+  const { site, dossiers } = Route.useLoaderData();
   const [q, setQ] = useState("");
-  const [cat, setCat] = useState<Category | "all">("all");
-  const feed = useMemo(() => allFeed().slice(0, 10), []);
+  const [cat, setCat] = useState<string>("all");
+
+  const categories = useMemo(() => Array.from(new Set(dossiers.map((d) => d.category))).sort(), [dossiers]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return NAMES.filter((n) => {
-      if (cat !== "all" && n.category !== cat) return false;
+    return dossiers.filter((d) => {
+      if (cat !== "all" && d.category !== cat) return false;
       if (!needle) return true;
       return (
-        n.ticker.toLowerCase().includes(needle) ||
-        n.project.toLowerCase().includes(needle) ||
-        n.oneLiner.toLowerCase().includes(needle) ||
-        n.slug.includes(needle)
+        (d.symbol ?? "").toLowerCase().includes(needle) ||
+        d.name.toLowerCase().includes(needle) ||
+        d.summary.toLowerCase().includes(needle) ||
+        d.slug.includes(needle)
       );
     });
-  }, [q, cat]);
+  }, [q, cat, dossiers]);
 
-  const live = NAMES.filter((n) => n.status === "live" || n.status === "official").length;
-  const launching = NAMES.filter((n) => n.status === "launching" || n.status === "upcoming").length;
+  const fullCount = dossiers.filter((d) => d.coverage === "full").length;
+  const trendingCount = dossiers.filter((d) => d.derived.trending).length;
+
+  const latestFeed = useMemo(
+    () =>
+      dossiers
+        .flatMap((d) => d.feed.map((item) => ({ dossier: d, item })))
+        .sort((a, b) => b.item.date.localeCompare(a.item.date))
+        .slice(0, 10),
+    [dossiers],
+  );
 
   return (
     <div className="min-h-dvh bg-bg text-fg">
@@ -40,33 +53,38 @@ function Home() {
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-subtle">The file</p>
             <h2 className="mt-2 max-w-xl text-2xl font-medium tracking-tight text-fg sm:text-3xl">
-              Every name on Robinhood Chain, researched. Feed more and they get a dossier.
+              {site.tagline}
             </h2>
             <div className="mt-5 max-w-prose space-y-3 text-sm leading-relaxed text-muted">
-              {CHAIN.brief.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
+              <p>
+                {site.name} tracks every native play on {site.chain.name} — deployments, control, security
+                posture, and what is still unverified.
+              </p>
+              <p>
+                {site.chain.stack}. Gas in {site.chain.gas}. Mainnet since {formatDate(site.chain.mainnet_date)}.
+              </p>
             </div>
           </div>
           <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-border bg-border">
-            <Stat label="Names on file" value={String(NAMES.length)} />
-            <Stat label="Official stock tokens" value={`${CHAIN.counts.officialStockTokens}+`} />
-            <Stat label="Live or official" value={String(live)} />
-            <Stat label="Launching / upcoming" value={String(launching)} />
-            <Stat label="Chain ID" value={String(CHAIN.chainId)} />
-            <Stat label="Mainnet" value="1 Jul 2026" />
+            <Stat label="Names on file" value={String(dossiers.length)} />
+            <Stat label="Full profiles" value={String(fullCount)} />
+            <Stat label="Trending now" value={String(trendingCount)} />
+            <Stat label="Chain ID" value={String(site.chain.id)} />
+            <Stat label="Mainnet" value={formatDate(site.chain.mainnet_date)} />
+            <Stat label="Facts checked" value={site.chain.checked ? formatDate(site.chain.checked) : "Unverified"} />
           </dl>
         </section>
 
         <section className="mt-10 grid gap-3 rounded-md border border-border bg-surface px-4 py-4 sm:grid-cols-3 sm:px-5">
+          <Note title="Explorer" body={site.chain.explorer} href={site.chain.explorer} />
+          <Note title="Docs" body={site.chain.docs} href={site.chain.docs} />
           <Note
-            title="No chain token"
-            body={CHAIN.nativeToken}
-          />
-          <Note title="Stock Tokens" body={CHAIN.stockTokens} />
-          <Note
-            title="Gas"
-            body={`${CHAIN.gas} on ${CHAIN.stack}. Registry at docs.robinhood.com/chain/contracts.`}
+            title="Chain facts"
+            body={
+              site.chain.checked
+                ? `Reproduced against docs.robinhood.com on ${formatDate(site.chain.checked)}.`
+                : "Not yet reproduced against docs.robinhood.com — treat as unverified."
+            }
           />
         </section>
 
@@ -75,7 +93,7 @@ function Home() {
             <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-subtle">Latest in the feed</h2>
             <p className="text-xs text-subtle">Company posts and CT, newest first</p>
           </div>
-          <FeedList items={feed} showName />
+          <FeedList items={latestFeed} />
         </section>
 
         <section className="mt-12">
@@ -100,9 +118,9 @@ function Home() {
             <FilterChip active={cat === "all"} onClick={() => setCat("all")}>
               All
             </FilterChip>
-            {CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <FilterChip key={c} active={cat === c} onClick={() => setCat(c)}>
-                {CATEGORY_LABEL[c]}
+                {c}
               </FilterChip>
             ))}
           </div>
@@ -117,7 +135,7 @@ function Home() {
             {filtered.length === 0 ? (
               <p className="px-4 py-10 text-sm text-muted">Nothing matches. Try another ticker or category.</p>
             ) : (
-              filtered.map((n) => <NameRow key={n.slug} name={n} />)
+              filtered.map((d) => <NameRow key={d.slug} dossier={d} />)
             )}
           </div>
         </section>
@@ -135,11 +153,17 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Note({ title, body }: { title: string; body: string }) {
+function Note({ title, body, href }: { title: string; body: string; href?: string }) {
   return (
     <div>
       <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-subtle">{title}</p>
-      <p className="mt-1 text-sm leading-relaxed text-muted">{body}</p>
+      {href ? (
+        <a href={href} target="_blank" rel="noreferrer" className="mt-1 block truncate text-sm text-accent hover:underline">
+          {body}
+        </a>
+      ) : (
+        <p className="mt-1 text-sm leading-relaxed text-muted">{body}</p>
+      )}
     </div>
   );
 }
