@@ -45,3 +45,7 @@ jobs:
       - name: Site build
         working-directory: site
         run: npm run build
+
+      - name: Site smoke test (boots the build, hits every loader route, checks for uncapped leakage)
+        working-directory: site
+        run: npm run smoke
