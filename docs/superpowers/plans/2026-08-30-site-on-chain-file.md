@@ -19,7 +19,7 @@ Date: 2026-08-30. Branch: `site`. Supersedes the "build the Next.js site from sc
 7. **Telegram** — `npm run telegram:dry` ✅ 2026-08-30; real send once `.env.local` has the bot token + chat id; GitHub Action on push to `main` later.
 8. **Deploy** — Vercel (preset already in `vite.config.ts`); `SITE_URL` in the digest env.
 
-## Open questions for the owner
-- Keep the CT "feed" as a first-class surface (it is the liveliest part of Chain File) or fold it into changelog + sources?
-- `heat` axis: drop, or keep as an explicit non-evidence "attention" signal?
-- Site URL / domain.
+## Decisions 2026-08-30 (owner)
+- **Feed is first-class.** Content gets `content/feed/<slug>.yaml` — items `{ id, date, kind: company|ct|onchain|risk, title, body, source, sourceUrl, account }` — rendered on the dossier and the home page like Chain File does today. Feed items are claims unless a source ledger entry backs them.
+- **No heat axis.** Replace with a computed **trending** signal: `content/accounts.yaml` lists tracked top accounts; a name is trending when ≥ N distinct tracked accounts have `ct` feed items on it within a window (defaults N=3, 7 days; both in `site.yaml`). Derived at build, never typed in.
+- Still open: site URL / domain.

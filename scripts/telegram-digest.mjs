@@ -12,6 +12,7 @@ const args = process.argv.slice(2);
 const flag = (n) => args.includes(n);
 const opt = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : null; };
 const dryRun = flag("--dry-run"), all = flag("--all"), since = opt("--since"), limit = Number(opt("--limit") ?? 0);
+const testOnly = flag("--test"), markSent = flag("--mark-sent");
 
 let env = { ...process.env };
 try { env = { ...readDotEnv(await readFile(".env.local", "utf8")), ...env }; } catch { /* no .env.local */ }
@@ -23,10 +24,32 @@ let state = { sent_keys: [] };
 try { state = JSON.parse(await readFile(STATE, "utf8")); } catch { /* first run */ }
 
 const content = await loadContent("content");
+
+async function send(text) {
+  if (!token || !chatId) { console.error("Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID — put them in .env.local."); process.exit(1); }
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML", disable_web_page_preview: true }),
+  });
+  if (!res.ok) { console.error(`Telegram rejected the message (${res.status}): ${(await res.text()).slice(0, 300)}`); process.exit(1); }
+}
+
+if (testOnly) {
+  await send(`<b>${content.site.name.toUpperCase()}</b> digest bot connected. Research updates will post here when something material is published.`);
+  console.log("Test message sent. No digest state changed.");
+  process.exit(0);
+}
 let entries = selectUnsent(content.changelog, state, { since, all })
   .sort((a, b) => a.date.localeCompare(b.date) || a.slug.localeCompare(b.slug));
 if (limit > 0) entries = entries.slice(0, limit);
 if (!entries.length) { console.log("No material research changes since the last digest — nothing sent."); process.exit(0); }
+if (markSent) {
+  state.sent_keys = [...new Set([...(state.sent_keys ?? []), ...entries.map(entryKey)])];
+  await mkdir("build", { recursive: true });
+  await writeFile(STATE, JSON.stringify(state, null, 2) + "\n");
+  console.log(`Marked ${entries.length} change(s) as sent without posting. Future digests start after this point.`);
+  process.exit(0);
+}
 
 const derivedBySlug = new Map([...content.projects].map(([slug, p]) => [slug, derive(p)]));
 const text = buildDigest(entries, {
@@ -44,13 +67,7 @@ if (!token || !chatId) {
   console.error("Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID — put them in .env.local. Use --dry-run to preview.");
   process.exit(1);
 }
-for (const chunk of chunks) {
-  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text: chunk, parse_mode: "HTML", disable_web_page_preview: true }),
-  });
-  if (!res.ok) { console.error(`Telegram rejected the digest (${res.status}): ${(await res.text()).slice(0, 300)}`); process.exit(1); }
-}
+for (const chunk of chunks) await send(chunk);
 state.sent_keys = [...new Set([...(state.sent_keys ?? []), ...entries.map(entryKey)])];
 state.last_sent_at = new Date().toISOString();
 await mkdir("build", { recursive: true });
