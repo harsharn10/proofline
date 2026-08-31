@@ -1,9 +1,9 @@
 # Source-quality desk — not content/, not a protocol score, not a skip-list.
 # Schema: research/inbox/2026-08-31-ops.md §4
-# as_of: 2026-08-31, fills 1-21. Human can override any row.
+# as_of: 2026-08-31, fills 1-22. Human can override any row.
 
 meta:
-  as_of: "2026-08-31, fills 1-21"
+  as_of: "2026-08-31, fills 1-22"
   trending_rule: "role in [alpha, kol] AND listen == high"
   note: "skip-ingest keeps the row. Do not drop collisions."
 
@@ -676,11 +676,12 @@ accounts:
 
 # --- observe / medium ---
   - handle: "@rallypadfun"
+    slug: rallypad
     role: project
     follow: true
     listen: medium
     signal: 3
-    why: Livestream pad claimed live.
+    why: "Livestream pad claimed live."
 
   - handle: "@ProjectVEXai"
     role: project
@@ -769,6 +770,7 @@ accounts:
     why: Official limit-order machine. Bio CA 0xaA40e79E is the token, not a drainer. cryptolot.lol wrapping that CA is still skip-ingest.
 
   - handle: "@Robin_Pad"
+    slug: robinpad
     role: project
     follow: true
     listen: high
@@ -784,6 +786,7 @@ accounts:
     why: Same display name, different pad. Do not ingest as Odyssey/Robin_Pad.
 
   - handle: "@HoodedDotMeme"
+    slug: hooded-meme
     role: project
     follow: true
     listen: medium
@@ -805,6 +808,7 @@ accounts:
     why: Named Delta/Wire/Hedge/Website/Mesh. Trending-eligible.
 
   - handle: "@HedgeOnHood"
+    slug: hedge
     role: project
     follow: true
     listen: high
@@ -851,6 +855,7 @@ accounts:
     why: Tagged ethereum 0x07f5b682 ($JIMOTHY) as the Pons token. Do not use for CAs.
 
   - handle: "@MosaicETF"
+    slug: mosaicetf
     role: project
     follow: true
     listen: medium
@@ -865,6 +870,7 @@ accounts:
     why: Stock-token pair support.
 
   - handle: "@canopyfinance"
+    slug: canopy
     role: project
     follow: true
     listen: high
@@ -894,12 +900,13 @@ accounts:
     why: Stock-token pairs on RH. yzilabs. Imported pad.
 
   - handle: "@rallypadfun"
+    slug: rallypad
     role: project
     follow: true
     listen: high
     signal: 4
     conflict: team
-    why: Programmable pad + livestream + fee routing. Distinct from Pons/Hookr.
+    why: "Programmable pad + livestream + fee routing. Distinct from Pons/Hookr."
 
 # --- fills 6-11 missing handles (desk 2026-08-31) ---
   - handle: "@brainblast_ai"
@@ -1155,3 +1162,68 @@ accounts:
     conflict: unknown
     flags: [drainer, copypasta]
     why: Same cryptolot.lol SCOPL portal copypasta.
+
+# --- fill 22 coverage seed (desk 2026-08-31) ---
+  - handle: "@ArcLiquidity"
+    slug: arc
+    role: project
+    follow: true
+    listen: medium
+    conflict: unknown
+    why: "USDG borrow against LP; site lists 6 markets. Official site arcliquidity.capital. No bio contract address as of 2026-08-31. Distinct from Arrow CDP."
+
+  - handle: "@scalarliquidity"
+    slug: scalar
+    role: project
+    follow: true
+    listen: medium
+    conflict: unknown
+    why: "Yield layer. Site scalarliquidity.com. Token record 0xBe92b334E045Bbfd292a28e54f8C75aF2FC07bBE. Builds on @v4dotfun."
+
+  - handle: "@brickswalltech"
+    slug: bricks
+    role: project
+    follow: true
+    listen: medium
+    conflict: unknown
+    why: "Yield product. Site brickswall.tech. Token record 0x7b7faa885c237faba733e7006e80149ba9224643. Location stated as Robinhood Chain."
+
+  - handle: "@Floor_fi"
+    slug: floor
+    role: project
+    follow: true
+    listen: medium
+    conflict: unknown
+    why: "Stock-backed floor for Robinhood L2 tokens. Site floorfi.app. Ticker FLR not FLOOR."
+
+  - handle: "@sluice_rh"
+    slug: sluice
+    role: project
+    follow: true
+    listen: medium
+    conflict: unknown
+    why: "Yield venue. Site sluice.live. Token record 0xb48d34dd8b53324cb8525461c8e548522db885ec. Distinct from RamsesX."
+
+  - handle: "@twofoldfi"
+    slug: twofold
+    role: project
+    follow: true
+    listen: medium
+    conflict: unknown
+    why: "Uni v4 hook yield. Site twofold.fi. Token record 0x2A4a33A2163D005d8E7f1D9aC08d14c98db288d5. Distinct from Hookr, what-the-hook, and v4.fun."
+
+  - handle: "@downto_finance"
+    role: project
+    follow: true
+    listen: low
+    conflict: unknown
+    why: "Observe until a Robinhood Chain contract address is recorded. Named in @graildoteth positions 2026-08-30 as $DTV. Not a census candidate this round."
+
+  - handle: "@v4dotfun"
+    slug: v4fun
+    role: project
+    follow: true
+    listen: medium
+    conflict: unknown
+    why: "Launchpad at v4.fun. Powered by @canopyfinance. Distinct from Hookr, what-the-hook, Hooded.Meme, and Canopy."
+
