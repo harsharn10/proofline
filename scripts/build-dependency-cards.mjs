@@ -7,7 +7,7 @@
 import { writeFile, access } from "node:fs/promises";
 import { stringify } from "yaml";
 import { validateAgainst } from "./lib/schemas.mjs";
-import { GH, ACCESSED } from "./harvest-data.mjs";
+import { GH, ACCESSED } from "./intake/2026-08-31/harvest-data.mjs";
 
 const RESEARCHER = "harsharn10";
 const exists = (p) => access(p).then(() => true, () => false);

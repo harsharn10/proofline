@@ -1,5 +1,5 @@
 // Task 5 harvest — everything the two research intakes said about each census subject, written to
-// PRD §7.3 and keyed to the artifact that said it. scripts/apply-harvest.mjs turns this into ledger
+// PRD §7.3 and keyed to the artifact that said it. scripts/intake/2026-08-31/apply-harvest.mjs turns this into ledger
 // entries (S-ids assigned per slug), `deployments[]`, `findings` and `content/feed/<slug>.yaml`.
 //
 // Rules applied throughout:
@@ -7,7 +7,7 @@
 //   - every address is `verified: false`; addresses the desk flagged as suspect live in `risk`, not `deployments`
 //   - social-post numbers are what an account posted, dated; never a bare fact
 //   - no verdicts, no "fake" as a bare label, "an independent audit was not found in this review"
-export const GH = "https://github.com/harsharn10/proofline/blob/site-integration";
+export const GH = "https://github.com/harsharn10/proofline/blob/main";
 export const ACCESSED = "2026-08-31T00:00:00Z";
 
 const fill = (n, file) => ({ url: `${GH}/research/inbox/${file}`, publisher: `Grok research desk — X-sourced fill round ${n} (2026-08-31)`, kind: "social" });

@@ -4,11 +4,13 @@ This is the contract for any Grok field desk contributing to Proofline: what to 
 allowed to write, what it must never write, how to open a PR for it, and what happens after.
 
 It replaces the current process — a 15-minute-loop-shaped, interactive session running
-`.grok/workflows/rh-field-round.rhai` with the `rh-field-ops` and `rh-account-desk` skills, all present
-under `research/inbox/../.grok/` on `research/ecosystem-baseline` — which commits directly to that
-branch and pushes it. Section 9 below lists exactly what changes. The reasoning behind every rule here
-comes from two documents produced evaluating that process against real intake data; read them for the
-full evidence, file:line by file:line:
+`.grok/workflows/rh-field-round.rhai` with the `rh-field-ops` and `rh-account-desk` skills, which live on
+`research/ecosystem-baseline:.grok/…` (that branch, not this one) — which commits directly to that branch
+and pushes it. **This contract supersedes those files' instructions to commit and push directly, and their
+"impersonator"/"drainer" conduct-flag vocabulary** (§4 below; item 4 of §10) — the desk should keep using
+its own copy of them for everything except those two things. Section 9 below lists exactly what changes. The reasoning
+behind every rule here comes from two documents produced evaluating that process against real intake
+data; read them for the full evidence, file:line by file:line:
 
 - [`research/inbox/EVAL-research-branch-2026-08-31.md`](../../research/inbox/EVAL-research-branch-2026-08-31.md) — the evaluation (§6.3 is the workflow-fix list this contract implements)
 - [`research/inbox/FEEDBACK-from-proofline-2026-08-31.md`](../../research/inbox/FEEDBACK-from-proofline-2026-08-31.md) — the short version sent back to the desk
@@ -28,8 +30,10 @@ number itself against a primary source and can cite that reproduction.
 ## 2. Where it writes
 
 Two tiers: raw intake, which always goes to `research/inbox/**`, and content-system files, which the
-desk may write directly **only when the shape validates** — the ones covered by the `automerge-feed.yml`
-workflow (§8).
+desk may write directly **only when the shape validates**. Of those, `content/feed/**`,
+`content/sources/**` (additions/edits only) and `research/inbox/**` are covered by the
+`automerge-feed.yml` workflow (§8) and merge on their own once CI passes; `content/accounts.yaml` (§2.4)
+is a direct write too, but always waits for a human to merge — see §2.4.
 
 ### 2.1 Raw intake — `research/inbox/**` (always allowed)
 
@@ -112,7 +116,11 @@ Use `researcher: grok-bot` (not a human name) so desk-sourced entries are identi
 Only additive, low-risk changes: a new row (always `tier: watch` — the desk never sets `tier: top`,
 only the maintainer promotes), or a `note`/`slug` correction on an existing row. Notes describe
 observable behavior only, never conduct — `npm run validate` lints for hype and conduct words
-(`drainer`, `impersonator`, `farm`, `scammer`, `insider`, …) and will fail the shape check on a hit.
+(`drainer`, `impersonator`, `farm`, `scammer`, `insider`, …) and fails the check unconditionally on a
+hit, not just under `--release`. Unlike §2.2/§2.3, a PR that touches only this file still does not
+auto-merge: `content/accounts.yaml` is deliberately off the `automerge-feed.yml` allowlist (a tier or
+note change about a named account always gets a human's eyes before it ships) — CI passing just means
+it's ready for that human to merge.
 
 ### 2.5 Census candidates — proposal only, not a direct write
 
@@ -243,21 +251,31 @@ daily cadence that always opens a PR, even an empty one, defeats the purpose of 
 
 ## 9. What happens after the PR opens
 
-1. **`validate.yml`** runs on the PR: root `npm test` (schema validation + scoring/rule tests) and the
-   site's `typecheck` + `build`. This is what actually catches a malformed feed item or source entry —
-   even though §2 asks the desk to only write when "the shape validates," CI is the real backstop.
-2. **`automerge-feed.yml`** runs in parallel. If every changed file is under `content/feed/**`,
-   `content/sources/**`, `content/accounts.yaml`, or `research/inbox/**`, it watches the PR's checks to
-   completion itself (`gh pr checks --watch --fail-fast`) and, only once they pass, squash-merges it
-   (`gh pr merge --squash --delete-branch`) — it does not rely on GitHub's native auto-merge feature or
-   on any branch-protection setting, and it never files an approval. If anything else changed, it
-   comments "needs human review (touches scoring/risk/census)" and stops; a human merges it manually
-   after reviewing. The first real `grok/…` PR doubles as the end-to-end test of this path — if that
-   job fails with a permissions error rather than a checks-related one, the fix is in
-   `automerge-feed.yml`'s `permissions:` block, not in the PR.
-3. **On merge to `main`**, `publish.yml` runs `npm run score` (recomputing derived scores, including
-   `trending`) and sends the Telegram digest for anything new — silently skipped if the Telegram
-   secrets aren't configured.
+1. **`validate.yml`** runs on the PR: root `npm test` (schema validation + scoring/rule tests, including
+   the voice/conduct lint — a hype word in a feed item or a conduct word in an account note fails this
+   job unconditionally, not just under `--release`), the site's `typecheck` + `build`, and a smoke test
+   against the built site. This is what actually catches a malformed feed item or source entry — even
+   though §2 asks the desk to only write when "the shape validates," CI is the real backstop.
+2. **`automerge-feed.yml`** does not run on the PR itself — it triggers on `validate.yml`'s own
+   *completion* (`workflow_run`, so it always runs the version of this workflow committed to `main`, not
+   whatever the PR's branch contains) and only for a `grok/**` branch. If Validate did not succeed,
+   nothing else happens: no comment, no merge attempt. If it succeeded, the job asks GitHub's API for the
+   exact list of changed files (not `git diff`, which can hide a rename): every file must be an addition
+   or an in-place edit under `content/feed/**`, `content/sources/**`, or `research/inbox/**` —
+   **`content/accounts.yaml` is not on this list**, a tier or note change there always needs a human — and
+   a modified file under `content/sources/**` may only add lines, never remove or rewrite one. If every
+   file clears that bar, the job squash-merges the PR (`gh pr merge --squash --delete-branch`) and then
+   explicitly triggers `publish.yml` (see 3 below) — it never relies on GitHub's native auto-merge feature,
+   any branch-protection setting, or an approval step. If anything fails the check, it leaves one
+   "needs human review" comment on the PR (not one per push) naming what tripped it, and stops; a human
+   merges it manually after reviewing.
+3. **`publish.yml`** runs `npm run score` (recomputing derived scores, including `trending`) and sends the
+   Telegram digest for anything new, silently skipped if the Telegram secrets aren't configured. It fires
+   on every push to `main` — which covers a human clicking "Merge" in the GitHub UI — but a squash-merge
+   made by `automerge-feed.yml` uses the workflow's own token, and GitHub never fires push-triggered
+   workflows from that token's commits. That's why step 2 above dispatches `publish.yml` explicitly
+   (`gh workflow run publish.yml --ref main`) right after merging a grok PR — without it, an auto-merged
+   round would sit on `main` unscored and undigested until something else happened to push.
 
 See the root [`README.md`](../../README.md) "CI" section for the workflow files themselves and the
 required repo settings.
@@ -277,9 +295,10 @@ required repo settings.
    `token_candidate`.
 6. `lifecycle: mainnet` requires evidence beyond the project's own post — a tweet makes it `announced`,
    not `mainnet`.
-7. You may now write directly to `content/feed/**`, `content/sources/**`, and `content/accounts.yaml`
-   when the shape validates — those, plus `research/inbox/**`, auto-merge after CI passes; anything
-   else waits for a human.
+7. You may now write directly to `content/feed/**` and `content/sources/**` (additions/edits only, never
+   a deletion or a removed line) plus `research/inbox/**` when the shape validates — those auto-merge
+   after CI passes. `content/accounts.yaml` is a PR like any other write but always waits for a human to
+   merge it, even an additive `tier: watch` row; anything outside this set waits for a human too.
 8. New census names go into a `research/inbox/<date>-census-candidates.yaml` proposal (§2.5), never
    straight into `content/census.yaml`.
 9. `content/projects/**`, `scoring`, `review.approver`, and `content/changelog.yaml` stay off-limits —
@@ -299,7 +318,8 @@ round, including the evidence rules (§3), the forbidden paths (§4), and the ex
 This round:
 
 1. Run your normal scout + specialist pass (X search, chain numbers, account desk, collision audit) as
-   .grok/workflows/rh-field-round.rhai and its skills (rh-field-ops, rh-account-desk) describe. Write
+   `research/ecosystem-baseline:.grok/workflows/rh-field-round.rhai` and its skills (rh-field-ops,
+   rh-account-desk) describe — except where this contract overrides them (§4, item 4 of §10). Write
    your working notes to research/inbox/<date>-x-fill-N.md and update research/inbox/account-desk.yaml
    — the one ledger. Do not also write 2026-08-31-accounts.yaml; it is retired.
 2. For every address you record, write the full record from grok-bot.md §2.1 — { value, chain, source,

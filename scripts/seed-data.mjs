@@ -1,9 +1,9 @@
 // Facts per slug that are not in census.yaml: symbol, one-sentence summary, dependency cards, and the
-// missing-evidence checklist (PRD §5.3). Known deployments come from scripts/harvest-data.mjs so the
+// missing-evidence checklist (PRD §5.3). Known deployments come from scripts/intake/2026-08-31/harvest-data.mjs so the
 // address list lives in one place; every one is verified:false until reproduced on Blockscout.
 // Voice: PRD §7.3 — no verdicts, "an independent audit was not found in this review", "the admin
 // address can …". Numbers from social posts are what an account posted, dated.
-import { HARVEST } from "./harvest-data.mjs";
+import { HARVEST } from "./intake/2026-08-31/harvest-data.mjs";
 
 export const RESEARCHER = "harsharn10";
 export const LINK_KIND_TO_SOURCE_KIND = { site: "official-site", app: "official-site", docs: "docs", whitepaper: "whitepaper", x: "social", github: "repository", telegram: "social", discord: "social", other: "other" };

@@ -1,6 +1,9 @@
 // Task 5 — build content/accounts.yaml from the Grok desk's account ledger (Task 5 addendum mapping).
+// ONE-SHOT for the 2026-08-30/31 intake (final review I9) — see README.md in this directory. Every run
+// REWRITES content/accounts.yaml wholesale from the desk files, discarding any hand edit (tier
+// promotion, note correction) made to it since the last run.
 //
-//   node scripts/build-accounts.mjs
+//   node scripts/intake/2026-08-31/build-accounts.mjs --overwrite
 //
 // Inputs (read-only): research/inbox/account-desk.yaml (wins), research/inbox/2026-08-31-accounts.yaml
 // (rows the desk does not have), content/census.yaml (handle → slug), content/feed/*.yaml (handles that
@@ -18,7 +21,17 @@
 //        fails on any hype word (voice.mjs) or conduct word (conductWarnings) in a note.
 import { readFile, writeFile, readdir } from "node:fs/promises";
 import { parse, stringify } from "yaml";
-import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
+import { voiceWarnings, conductWarnings } from "../../lib/voice.mjs";
+
+if (!process.argv.includes("--overwrite")) {
+  console.error(
+    "build-accounts: refuses to run without --overwrite.\n" +
+      "This is one-shot tooling for the 2026-08-30/31 Grok intake — it REWRITES content/accounts.yaml\n" +
+      "wholesale from research/inbox/account-desk.yaml, discarding any hand edit (a tier promotion, a\n" +
+      "note correction) made since the last run. Pass --overwrite to confirm.",
+  );
+  process.exit(1);
+}
 
 const readYaml = async (p) => parse(await readFile(p, "utf8"));
 /** The desk files are hand-written; quote `why:` / `note:` values a strict parser rejects (read-only inputs). */
@@ -127,7 +140,7 @@ for (const r of list) {
 if (hits) { console.error(`${hits} note(s) need a behaviour-only rewrite — add an OVERRIDES entry`); process.exit(1); }
 const counts = {};
 for (const r of list) counts[r.tier] = (counts[r.tier] ?? 0) + 1;
-const header = `# CT accounts for the trending signal — built by scripts/build-accounts.mjs from research/inbox/account-desk.yaml
+const header = `# CT accounts for the trending signal — built by scripts/intake/2026-08-31/build-accounts.mjs from research/inbox/account-desk.yaml
 # (wins) + research/inbox/2026-08-31-accounts.yaml + census/feed handles, per the Task 5 addendum mapping.
 # tier: top | watch | downweight | skip — only top + role alpha/kol counts toward trending (scripts/lib/trending.mjs);
 # skip = posts not ingested as evidence (handle collisions, unconfirmed official accounts, third-party links); the row
