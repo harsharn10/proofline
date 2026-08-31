@@ -474,26 +474,22 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   } catch (err) { failures++; console.error(`FAIL voiceWarnings: ${err.message}`); }
 }
 
-// Task 2 fix round 1 — voiceWarnings: print/prints-near-mcap window is exactly "at most 3 words before
-// the trigger" (the trigger's first word may land on the 1st, 2nd or 3rd token after print/prints; a
-// trigger only reachable at the 4th token or later must not match), and "bag" must not fire inside
-// "bagholder" (whole-word, same rule as "ape" inside "Grape").
+// Task 2 fix round 2 — voiceWarnings: print/prints-near-mcap rule is exactly "print"/"prints" (whole word,
+// case-insensitive), then zero to three whitespace-separated words, then mcap | market cap | fdv
+// (case-insensitive). /\bprints?\b(?:\s+\S+){0,3}\s+(?:mcap|market\s+cap|fdv)\b/i
 {
-  const printed = voiceWarnings("printed a $30M mcap", "x");          // not "print"/"prints" — never a trigger word
-  const prints2away = voiceWarnings("prints a $30M mcap", "x");        // "mcap" is 2 words after "prints" — within budget
-  const prints3away = voiceWarnings("prints at a new all-time FDV", "x");   // "FDV" is 4 words after "prints" — see note
-  const prints4away = voiceWarnings("prints at a new all time FDV", "x");   // "FDV" is 5 words after "prints" — over budget
-  const bagholder = voiceWarnings("Grapes and bagholder", "x");
+  const cases = [
+    ["prints mcap", 1, "zero gap"],
+    ["prints a $30M mcap", 1, "two words: a, $30M"],
+    ["prints a brand new FDV", 1, "three words: a, brand, new"],
+    ["prints a brand new high FDV", 0, "four words — over budget"],
+    ["printed a $30M mcap", 0, "printed is not print/prints"],
+    ["prints at a new all-time FDV", 0, "four words: at, a, new, all-time — over budget"],
+    ["a market cap of $30M", 0, "no print/prints trigger word"],
+    ["prints a new market cap", 1, "two-word target (market cap) within budget"],
+  ];
   try {
-    assert.equal(printed.length, 0, "printed (not print/prints) never triggers the mcap rule");
-    assert.equal(prints2away.length, 1, "trigger 2 words after print/prints is within the ≤3-word budget");
-    // NOTE for the reviewer: "prints at a new all-time FDV" — by whitespace tokenization "at", "a", "new",
-    // "all-time" are 4 distinct words between "prints" and "FDV" (all-time is one token; no whitespace inside
-    // it), so FDV sits 4 words away, past the ≤3-word budget — this asserts 0, not the 1 predicted in the
-    // finding. See "Fix round 1" in task-2-report.md for the full count and a request to confirm intent.
-    assert.equal(prints3away.length, 0, "trigger 4 words after print/prints (by whitespace count) is over budget — see note above");
-    assert.equal(prints4away.length, 0, "trigger 5 words after print/prints is over budget");
-    assert.equal(bagholder.length, 0, "whole-word match does not fire inside bagholder");
+    for (const [text, want, why] of cases) assert.equal(voiceWarnings(text, "x").length, want, `${JSON.stringify(text)} (${why})`);
     console.log("ok   voiceWarnings print-mcap window");
   } catch (err) { failures++; console.error(`FAIL voiceWarnings print-mcap window: ${err.message}`); }
 }
