@@ -4,8 +4,8 @@ export const RESEARCHER = "harsharn10";
 export const LINK_KIND_TO_SOURCE_KIND = { site: "official-site", app: "official-site", docs: "docs", whitepaper: "whitepaper", x: "social", github: "repository", telegram: "social", discord: "social", other: "other" };
 
 export const SEED = {
-  pons: { symbol: null, dependencies: ["uniswap", "usdg", "stock-tokens"],
-    summary: "Native launchpad on Robinhood Chain: tokens launch on a V2 bonding curve and graduate to Uniswap v4; quote assets include ETH, USDG and Stock Tokens.",
+  pons: { symbol: "PONS", dependencies: ["uniswap"],
+    summary: "Robinhood Chain launchpad whose current factory creates fixed-supply tokens directly in locked Uniswap V3 WETH pools; graduation is a liquidity threshold, not a migration.",
     addresses: [ { label: "V2 curve / factory", address: "not-verified", role: "factory" } ],
     missing: ["Deployment map (curve, factory, graduation router) not yet reproduced on Blockscout", "Privileged roles over the curve and graduation path unknown", "Audit status unknown", "Team identity and repository not yet located"] },
   mancer: { symbol: "MANCER", dependencies: ["uniswap"],

@@ -181,3 +181,15 @@
     lifecycle: mainnet
   reviewer: harsharn10
   methodology_version: proofline-v1.0
+- date: 2026-08-31
+  slug: pons
+  type: correction
+  severity: Material
+  title: Current launch mechanism corrected
+  detail: Replaced the seed's V2 bonding-curve and Uniswap v4 description with the current official deployment model; legacy Pons generations remain distinct.
+  prior:
+    mechanism: V2 bonding curve graduating to Uniswap v4 with multiple quote-asset classes
+  new:
+    mechanism: Fixed-supply token created directly in a locked Uniswap V3 WETH pool; graduation is a threshold without migration
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0

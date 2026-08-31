@@ -4,7 +4,7 @@ symbol: MANCER
 category: Aggregator
 lifecycle: mainnet
 coverage: stub
-summary: Native DEX aggregator with resting orders; Chain Mancers NFT and $MANCER token; a Shield product is announced.
+summary: Robinhood Chain DEX aggregator and non-custodial order layer offering swaps, signed limit and stop orders, OCO brackets and recurring execution.
 official_links:
   - kind: site
     url: https://mancer.xyz
@@ -43,6 +43,14 @@ findings:
       class: claim
       sources:
         - S2
+    - text: Mancer says swaps enforce a minimum output onchain and signed orders leave tokens in the user's wallet until execution.
+      class: claim
+      sources:
+        - S2
+    - text: Mancer documents offchain signed cancellation, onchain cancellation and allowance revocation as three order-exit paths.
+      class: claim
+      sources:
+        - S2
     - text: Mancer publishes an official whitepaper at https://mancer.xyz/whitepaper.pdf.
       class: claim
       sources:
@@ -51,10 +59,15 @@ findings:
       class: claim
       sources:
         - S4
-  risk: []
+  risk:
+    - text: The free cancellation path depends on Mancer's executor honoring a signed cancellation; users must cancel onchain or revoke allowance for a chain-enforced exit.
+      class: inference
+      sources:
+        - S2
   missing:
-    - text: Router and token addresses not yet located
-    - text: Non-custodial order claim not verified against contracts
-    - text: NFT fee-claim mechanics unverified
-    - text: "Shield: announced only — no deployment evidence reviewed"
+    - text: Router, settlement and token addresses not yet located
+    - text: Non-custodial and minimum-output claims not yet reproduced against deployed contracts
+    - text: Venue allowlist ownership and change controls not documented in the reviewed page
+    - text: Independent audit report and covered deployment not yet located
+    - text: Executor availability, key management and monitoring not independently verified
   unresolved: []

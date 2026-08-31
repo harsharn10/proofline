@@ -6,84 +6,67 @@ methodology_version: proofline-v1.0
 
 # Pons — research record
 
-<!-- HOW TO USE THIS FILE
-Every material sentence ends with an evidence tag: [verified S3] [claim S7] [inference S3 S4] [disputed S9] [unknown].
-Source ids come from content/sources/pons.yaml — add the source there first, then cite it here.
-Leave `_Research pending._` in any section you have not researched. Delete the prompts as you fill each section.
-When every section is filled and projects/pons.yaml has a complete scoring block, set coverage: full in
-this front matter, in projects/pons.yaml and in census.yaml, then run `npm run validate` and `npm run score`.
--->
-
 ## Identity
 
-_Research pending._
-
-<!-- Name, one-line description, category, chain (4663), lifecycle, official site/app/docs/X/GitHub.
-Confirm each link from two independent paths (PRD research checklist). -->
+Pons Labs, LLC operates a launch-and-trade interface for fixed-supply tokens on Robinhood Chain. The protocol's reference token is PONS at `0x39dbed3a2bd333467115de45665cc57f813c4571`. [claim S1 S2] [verified S3]
 
 ## Deployment
 
-_Research pending._
+The current docs publish active factory `0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB` and active locker `0x736D76699C26D0d966744cAe304C000d471f7F35`, alongside legacy factory and locker addresses. New versions are said to ship as new immutable factory and locker deployments. [claim S2]
 
-<!-- Every material contract: curve/bonding contract, factory, graduation router, fee collector, token templates.
-For each: address, deploy date, explorer link, source-verified?, proxy? implementation? Record in projects/pons.yaml addresses[]
-with verified:true only after you opened the Blockscout page. -->
+Current launches create a fixed one-billion-token supply and a locked Uniswap V3 WETH pool in one transaction. There is no bonding curve and no migration; trading continues in the original pool after the paired-WETH graduation threshold is reached. [claim S2]
+
+This differs materially from the prior seed description of a V2 curve graduating to Uniswap v4. DefiLlama still reports separate Pons V1 and V2 adapters, so version labels must accompany historical metrics and mechanics. [verified S3 S4] [inference S2 S3 S4]
 
 ## Control
 
-_Research pending._
+Pons says each token's creator/protocol fee split is snapshotted at launch and cannot change later. The active factory uses a 70/30 creator/protocol split, while legacy launches retain their original 90/10 split. [claim S2]
 
-<!-- Owner/admin/guardian roles on each contract. EOA, multisig (signers, threshold), timelock (delay, what it covers),
-emergency pause. What can a single actor do to funds sitting in the curve pre-graduation? This section feeds the
-seven security tests in projects/pons.yaml. -->
+Community takeovers are reviewed by the Pons team and may redirect a token's creator-fee payout wallet when the contracts permit it; the docs say this does not change the token, pool or locked liquidity. [claim S2]
+
+The active factory and locker ownership, privileged functions, signer topology and any delay around fee-recipient or factory changes were not independently reproduced in this pass. [unknown]
 
 ## Security
 
-_Research pending._
+The interface says it never holds user funds and that every launch and trade is submitted through the user's wallet. It also discloses smart-contract, wallet, RPC and indexer failure risks and warns that displayed values are estimates rather than execution guarantees. [claim S1 S2]
 
-<!-- Audits: auditor, report URL, commit hash, does it match deployed bytecode, unresolved findings. Bounty. Monitoring.
-Incident history on Robinhood Chain and any prior chains. -->
+The first two blocks apply launch restrictions: only the creator's initial buy may execute in the launch block, then per-wallet holding and buy caps apply for the remainder of the window. Selling and wallet transfers are not restricted. [claim S2]
+
+No independent audit, public bounty, deployed-bytecode match or incident-response record was located in the reviewed sources. [unknown]
 
 ## Engineering
 
-_Research pending._
+The docs provide factory events, pool `Swap` events, viem examples, read methods for token and factory state, a graduation-status call and fee-split reads. They direct indexers to factory and pool events as the authoritative source and warn that wide public-RPC log queries must be chunked. [claim S2]
 
-<!-- Repositories, contributors, commit cadence, releases, tests/CI, copied-code evidence (compare against known
-launchpad forks), reproducible deployment. -->
+No public source repository or reproducible build instructions were linked from the reviewed site. Published integration ABIs are useful but do not establish source-to-bytecode equivalence. [inference S2]
 
 ## Team
 
-_Research pending._
-
-<!-- Named or anonymous. What is independently verifiable. Prior projects. Conflicts (does the team hold launch
-allocations, fee recipients, admin keys?). -->
+The site identifies Pons Labs, LLC and publishes `contact@ponsfamily.com` for integration, support and partnership questions. Named technical contributors and governance signers were not established. [claim S1 S2]
 
 ## Product and economics
 
-_Research pending._
+Each current launch uses WETH as its sole quote asset, a 1% pool fee, a 0.0005 ETH launch fee and a default 4.2 ETH graduation threshold. Graduation is only a threshold indicator and does not guarantee quality, future liquidity or an exit. [claim S2]
 
-<!-- What is live today. User-fund path: deposit → curve → graduation → Uniswap v4 pool. Quote assets (ETH, USDG,
-Stock Tokens) and what each dependency card says. Fees, incentives, concentration of launched tokens. Volume/liquidity
-snapshots with as-of time (cited, not a terminal). -->
+Pons says 80% of protocol fees currently fund a manual TWAP that buys and burns PONS, with the remaining 20% funding infrastructure and team expansion. It explicitly says the 80% allocation is not immutable yet and is intended to become immutable and automated in a future release. [claim S2]
+
+At access time on 2026-08-31, DefiLlama reported about $85.9 million of 24-hour volume, $294.7 million over 30 days, $5.34 million of 24-hour fees and $26.5 million over 30 days. These are third-party adapter outputs and must remain timestamped. [verified S3 S4]
 
 ## Communications
 
-_Research pending._
-
-<!-- Material claims on site/X/docs. Discrepancies between claims and contracts. Deleted or changed claims with
-dated before/after evidence. -->
+The current documentation directly contradicts the older seed narrative: current launches are WETH-only Uniswap V3 pools with no curve or migration, not a V2 curve with USDG/stock-token quote assets graduating to v4. The project should be presented by deployment generation rather than as one timeless mechanism. [disputed S2] [inference S2 S3 S4]
 
 ## Findings
 
-_Research pending._
-
-<!-- Strongest evidence for. Strongest evidence against. Missing evidence. Unresolved questions.
-Mirror the structured lists in projects/pons.yaml findings{}. -->
+Pons has a detailed integration surface and material third-party activity measurements. The largest unresolved risks are privileged control over the active factory and locker, the mutable protocol-revenue policy, missing audit evidence and the absence of a linked public source repository. [inference S2 S3 S4]
 
 ## Sources
 
-See `content/sources/pons.yaml`. Every S-id cited above must exist there with accessed_at, claim and excerpt.
+- S1 — [Pons launchpad](https://ponsfamily.com), reviewed 2026-08-31. [claim S1]
+- S2 — [Pons documentation](https://docs.ponsfamily.com), reviewed 2026-08-31. [claim S2]
+- S3 — [DefiLlama Pons fees API](https://api.llama.fi/summary/fees/pons?dataType=dailyFees), accessed 2026-08-31. [verified S3]
+- S4 — [DefiLlama Pons volume API](https://api.llama.fi/summary/dexs/pons?dataType=dailyVolume), accessed 2026-08-31. [verified S4]
 
 ## Review metadata
 
-Researcher: harsharn10. Approver: pending. Methodology: proofline-v1.0. Reviewed: 2026-08-30. Published: not yet.
+Primary-source and activity-data pass by `harsharn10` on 2026-08-31. Approver pending; not published. Coverage remains a stub pending privileged-control, source-verification and audit evidence. [unknown]

@@ -4,7 +4,7 @@ symbol: STATICS
 category: RWA baskets
 lifecycle: mainnet
 coverage: stub
-summary: Native protocol for redeemable multi-asset baskets, connected pools and self-backed credit; Genesis system reported live on Robinhood mainnet 2026-08-27.
+summary: Statics reports its fixed-supply token and Genesis Operator system live on Robinhood mainnet; its basket, Dollar, lending and general-pool suite has a separate rollout.
 official_links:
   - kind: docs
     url: https://docs.staticsprotocol.com/docs/rollout/
@@ -12,6 +12,8 @@ official_links:
     url: https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/
   - kind: docs
     url: https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/
+  - kind: github
+    url: https://github.com/EqualFiLabs/statics
 dependencies: []
 addresses:
   - label: Genesis system
@@ -39,10 +41,31 @@ findings:
       class: claim
       sources:
         - S3
-  risk: []
+    - text: Statics says its Genesis token and 5,555-token Operator collection are live on Robinhood mainnet.
+      class: claim
+      sources:
+        - S1
+    - text: EqualFi Labs publishes the Statics contracts, tests, SDK and design documentation in a public repository.
+      class: verified
+      sources:
+        - S4
+  risk:
+    - text: The official security model says the broader multi-asset and Statics Dollar diamonds remain subject to independent review before production use.
+      class: claim
+      sources:
+        - S5
+    - text: Both diamonds remain upgradeable through a shared timelock until a future reviewed cut removes Diamond-cut authority.
+      class: claim
+      sources:
+        - S2
+        - S5
+    - text: Permissionless basket constituents can exhibit rebases, blocklists, arbitrary burns or hostile callbacks that the protocol does not make safe.
+      class: claim
+      sources:
+        - S5
   missing:
-    - text: Mainnet addresses (docs reference a testnet deployment page)
-    - text: Deployed governance and timelock configuration vs the documented seven-day target
-    - text: Independent audit evidence
-    - text: Upgrade authority
+    - text: Mainnet Genesis contract addresses in an official deployment manifest
+    - text: Deployed mainnet governance, signer threshold and timelock configuration versus the documented defaults
+    - text: Independent audit report, scope, covered commit and remediation status
+    - text: Onchain confirmation that the public repository matches the deployed Genesis contracts
   unresolved: []

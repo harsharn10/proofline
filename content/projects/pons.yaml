@@ -1,28 +1,41 @@
 slug: pons
 name: Pons
-symbol: null
+symbol: PONS
 category: Launchpad
 lifecycle: mainnet
 coverage: stub
-summary: "Native launchpad on Robinhood Chain: tokens launch on a V2 bonding curve and graduate to Uniswap v4; quote assets include ETH, USDG and Stock Tokens."
+summary: "Robinhood Chain launchpad whose current factory creates fixed-supply tokens directly in locked Uniswap V3 WETH pools; graduation is a liquidity threshold, not a migration."
 official_links:
   - kind: site
     url: https://ponsfamily.com
+  - kind: docs
+    url: https://docs.ponsfamily.com
 dependencies:
   - uniswap
-  - usdg
-  - stock-tokens
 addresses:
-  - label: V2 curve / factory
-    address: not-verified
+  - label: Active factory
+    address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
     role: factory
     verified: false
-    sources: []
+    sources:
+      - S2
+  - label: Active locker
+    address: "0x736D76699C26D0d966744cAe304C000d471f7F35"
+    role: other
+    verified: false
+    sources:
+      - S2
+  - label: PONS token
+    address: "0x39dbed3a2bd333467115de45665cc57f813c4571"
+    role: token
+    verified: false
+    sources:
+      - S3
 review:
   researcher: harsharn10
   approver: pending
   methodology_version: proofline-v1.0
-  reviewed_at: 2026-08-30
+  reviewed_at: 2026-08-31
   published_at: null
 findings:
   positive:
@@ -30,12 +43,37 @@ findings:
       class: claim
       sources:
         - S1
-  risk: []
+    - text: The current Pons factory creates fixed-supply tokens and locked Uniswap V3 WETH pools in one transaction, without a bonding curve or later migration.
+      class: claim
+      sources:
+        - S2
+    - text: Pons publishes the active factory and locker addresses plus event signatures and read examples for independent indexers.
+      class: claim
+      sources:
+        - S2
+    - text: DefiLlama reported approximately $85.9 million of 24-hour Pons volume and $5.34 million of 24-hour fees at the 2026-08-31 access time.
+      class: verified
+      sources:
+        - S3
+        - S4
+  risk:
+    - text: Pons says its current allocation of 80% of protocol fees to a manual TWAP buyback is not immutable yet.
+      class: claim
+      sources:
+        - S2
+    - text: Team-reviewed community takeovers may redirect a token's creator-fee payout wallet when the deployed contracts permit it.
+      class: claim
+      sources:
+        - S2
+    - text: Graduation only records that a WETH threshold was reached; it is not a quality, liquidity or exit guarantee.
+      class: claim
+      sources:
+        - S2
   missing:
-    - text: Deployment map (curve, factory, graduation router) not yet reproduced on Blockscout
-    - text: Privileged roles over the curve and graduation path unknown
-    - text: Audit status unknown
-    - text: Team identity and repository not yet located
+    - text: Active factory and locker ownership, privileged roles and fee-recipient controls not yet reproduced onchain
+    - text: Active deployment source verification and implementation map not yet captured from Blockscout
+    - text: Independent audit report, covered commit and incident-response process not yet located
+    - text: Public source repository and named technical contributors not yet located
   unresolved: []
 
 # ---------------------------------------------------------------------------

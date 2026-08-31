@@ -265,9 +265,10 @@ async function makeContent(mutate = () => {}) {
   const releaseRun = await validateContent(tmp, { release: true });
   const ledgerPath = join(tmp, "sources", "pons.yaml"), researchPath = join(tmp, "research", "pons.md");
   const entry = (id) => `  - id: ${id}\n    url: https://example.com/${id}\n    publisher: Example\n    kind: docs\n    accessed_at: 2026-08-30T00:00:00Z\n    claim: Fixture\n    excerpt: n/a\n    hash: null\n    archive_url: null\n    researcher: harsharn10\n    available: true\n`;
-  await appendFile(ledgerPath, entry("S2") + entry("S3"));
+  const fixtureCitedId = "S9001", fixtureUnusedId = "S9002";
+  await appendFile(ledgerPath, entry(fixtureCitedId) + entry(fixtureUnusedId));
   const research = await readFile(researchPath, "utf8");
-  await writeFile(researchPath, research.replace("## Identity\n\n_Research pending._", "## Identity\n\nPons is a launchpad. [claim S2]"));
+  await writeFile(researchPath, research.replace("## Identity\n\n", `## Identity\n\nFixture citation. [claim ${fixtureCitedId}]\n\n`));
   const cited = await validateContent(tmp);
   await writeFile(join(tmp, "projects", "arrow.yaml"), "slug: [\n");
   const broken = await validateContent(tmp);
@@ -277,8 +278,8 @@ async function makeContent(mutate = () => {}) {
     assert.ok(baseline.warnings.some((w) => w.includes("stonkbroker fails qualifying test citable")), "qualifying value false warns");
     assert.ok(releaseRun.errors.some((e) => e.includes("stonkbroker fails qualifying test citable")), "qualifying value false is a release error");
     assert.deepEqual(cited.errors, [], "prose citation validates");
-    assert.ok(!cited.warnings.some((w) => w.includes("S2 is never cited")), "an id cited only in research prose is not 'never cited'");
-    assert.ok(cited.warnings.some((w) => w.includes("S3 is never cited")), "an id cited nowhere still warns");
+    assert.ok(!cited.warnings.some((w) => w.includes(`${fixtureCitedId} is never cited`)), "an id cited only in research prose is not 'never cited'");
+    assert.ok(cited.warnings.some((w) => w.includes(`${fixtureUnusedId} is never cited`)), "an id cited nowhere still warns");
     assert.equal(broken.content, null, "load failure returns no content");
     assert.equal(broken.errors.length, 1);
     assert.ok(broken.errors[0].includes("projects/arrow.yaml"), `YAML error names the file: ${broken.errors[0]}`);

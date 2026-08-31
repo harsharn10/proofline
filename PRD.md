@@ -48,7 +48,7 @@ Seed set (V1 directory, not a promise of equal depth):
 
 | Slug | Name | Category | Why it is in |
 |---|---|---|---|
-| pons | Pons | Launchpad | Dominant native launchpad. V2 curve → Uniswap v4. Quote assets include ETH, USDG, and Stock Tokens. |
+| pons | Pons | Launchpad | Native launchpad. Current factory creates fixed-supply tokens directly in locked Uniswap V3 WETH pools; legacy deployment generations use different mechanics. |
 | mancer | Mancer | Aggregator / order layer | Native DEX aggregator + resting orders. Chain Mancers NFT + $MANCER. Shield announced. |
 | artificial-inu | Artificial Inu ($AI / NVDA) | Stock-paired project token | Flagship LONG launch. $AI paired to tokenized NVDA. Community vault. |
 | longshot | Longshot | Launch / fee-routing protocol | Native RH Chain deployment. Fees split into a fixed Hyperliquid perp, holder rewards, protocol. |
