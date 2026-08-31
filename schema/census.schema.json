@@ -7,7 +7,7 @@
     "properties": {
       "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
       "name": { "type": "string", "minLength": 1 },
-      "category": { "enum": ["Launchpad","Aggregator","Stock-paired token","Fee-routing protocol","NFT / treasury","RWA distributor","RWA baskets","CDP","Agent / execution","Prediction market","Index vault","Lending","Options","Yield","Perpetuals","Oracle / infra","Stablecoin","Scanner / tooling"] },
+      "category": { "$ref": "shared#/$defs/category" },
       "lifecycle": { "enum": ["mainnet","beta","announced","inactive","testnet-only"] },
       "coverage": { "enum": ["full","stub"] },
       "official_links": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["kind","url"],

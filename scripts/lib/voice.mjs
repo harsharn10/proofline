@@ -12,8 +12,9 @@ const BANNED_WORDS = [
   "vapor",
 ];
 const BANNED_PHRASES = ["send it"];
-// "print"/"prints" is only banned when it is being used as market-cap-speak — i.e. followed within
-// three words by "mcap", "market cap" or "FDV".
+// "print"/"prints" is only banned when it is being used as market-cap-speak — i.e. followed by at most
+// three words before "mcap", "market cap" or "FDV" (the trigger's first word may be the 1st, 2nd or 3rd
+// token after print/prints; a trigger only reachable at the 4th token or later does not count).
 const PRINT_TRIGGER_RE = /\b(mcap|market\s+cap|fdv)\b/i;
 
 const wordRe = (word) => new RegExp(`\\b${word}\\b`, "i");
@@ -33,7 +34,8 @@ export function voiceWarnings(text, where) {
   const tokens = text.split(/\s+/);
   tokens.forEach((tok, i) => {
     if (!/^prints?$/i.test(tok.replace(/[^\w]/g, ""))) return;
-    const next = tokens.slice(i + 1, i + 5).join(" "); // 3 words, +1 so a 2-word trigger starting on the 3rd still completes
+    // Exactly "at most three words before" the trigger: the next 3 tokens after print/prints, no more.
+    const next = tokens.slice(i + 1, i + 4).join(" ");
     if (PRINT_TRIGGER_RE.test(next)) out.push(`${where}: banned phrase "${tok} … mcap/market cap/FDV"`);
   });
 

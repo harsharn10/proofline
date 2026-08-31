@@ -8,6 +8,7 @@ addFormats(ajv);
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../../schema/${name}.schema.json`, import.meta.url), "utf8"));
 ajv.addSchema(load("source-entry")); // shared $ref target for sources.yaml and dependency ledgers; registered under its $id
+ajv.addSchema(load("shared")); // shared $ref target for category/chain/address/role/deployment; registered under its $id
 
 const validators = {};
 for (const name of NAMES) validators[name] = ajv.compile(load(name));
