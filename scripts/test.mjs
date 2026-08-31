@@ -9,6 +9,7 @@ import { validateAgainst } from "./lib/schemas.mjs";
 import { crossCheck, releaseCheck } from "./lib/checks.mjs";
 import { checkResearch, tagIds, REQUIRED_HEADINGS } from "./lib/research-md.mjs";
 import { loadContent } from "./lib/load.mjs";
+import { selectUnsent, buildDigest, chunkMessage, readDotEnv } from "./lib/telegram.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
@@ -381,6 +382,29 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     if (p.coverage === "full" && ((d.score === null) === (d.label === null))) { bad++; console.error(`  ${slug}: score/label inconsistent`); }
   }
   if (bad) { failures++; console.error("FAIL content derive"); } else console.log(`ok   content derive (${content.projects.size} projects)`);
+}
+
+// Telegram digest helpers: unsent selection, HTML escaping, numbers line, links, chunking, dotenv.
+{
+  const entries = [
+    { date: "2026-08-30", slug: "pons", type: "coverage", severity: "Info", title: "Initial stub opened", detail: "x" },
+    { date: "2026-08-31", slug: "pons", type: "score", severity: "Material", title: "Score published", detail: "<b>&" },
+  ];
+  const unsent = selectUnsent(entries, { sent_keys: ["2026-08-30|pons|coverage|Initial stub opened"] });
+  const projects = new Map([["pons", { name: "Pons" }]]);
+  const derived = new Map([["pons", { score: 64, provisional: true, risk: "Elevated", confidence: 57 }]]);
+  const text = buildDigest(unsent, { siteName: "Proofline", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
+  const chunks = chunkMessage("a".repeat(3000) + "\n\n" + "b".repeat(3000), 4096);
+  try {
+    assert.equal(unsent.length, 1);
+    assert.ok(text.includes("<b>Pons</b>"), "name bold");
+    assert.ok(text.includes("Score 64/100 (provisional) · Elevated risk · 57% confidence"), "numbers line");
+    assert.ok(text.includes("https://x.test/n/pons"), "profile link");
+    assert.ok(text.includes("&lt;b&gt;&amp;"), "html escaped");
+    assert.equal(chunks.length, 2, "chunked");
+    assert.deepEqual(readDotEnv("A=1\n# c\nB=\"two words\"\n"), { A: "1", B: "two words" });
+    console.log("ok   telegram digest");
+  } catch (err) { failures++; console.error(`FAIL telegram digest: `); }
 }
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }
