@@ -67,12 +67,12 @@ accounts:
   - handle: "@iam0x00"
     role: builder
     follow: true
-    listen: medium
+    listen: high
     signal: 4
     reach: 1
     trust: 2
     conflict: team
-    why: Arrows founder.
+    why: Arrows founder. Cannot trend.
 
   - handle: "@deltaliquidity"
     role: project
@@ -134,11 +134,11 @@ accounts:
   - handle: "@hookosfun"
     role: project
     follow: true
-    listen: medium
+    listen: low
     signal: 3
     trust: 2
     flags: [self-trend]
-    why: Multi-chain hook pad. Llama 0 RH vol. Follow to keep it off Hookr's row.
+    why: Multi-chain hook pad. Llama 0 RH vol. Follow so it stays off Hookr's row.
 
   - handle: "@MancerXYZ"
     role: project
@@ -172,10 +172,10 @@ accounts:
   - handle: "@DSB_117"
     role: builder
     follow: true
-    listen: medium
+    listen: high
     signal: 4
     conflict: team
-    why: Sinjoh founder.
+    why: Sinjoh founder. Cannot trend.
 
   - handle: "@HoodLockRH"
     role: project
@@ -389,12 +389,12 @@ accounts:
   - handle: "@layerggofficial"
     role: data
     follow: true
-    listen: high
+    listen: medium
     signal: 4
     reach: 3
     trust: 2
     flags: [wrong-chain]
-    why: ATH recaps with CAs. Mixed BSC/RH in the same post ($CETS). Use CAs, not tickers.
+    why: ATH recaps with CAs. Mixed BSC/RH ($CETS). Use CAs, never tickers. Cannot trend.
 
   - handle: "@whalewatchRH"
     role: data
@@ -692,6 +692,41 @@ accounts:
     engagement: organic
     conflict: team
     why: Official limit-order machine. Bio CA 0xaA40e79E is the token, not a drainer. cryptolot.lol wrapping that CA is still skip-ingest.
+
+  - handle: "@Robin_Pad"
+    role: project
+    follow: true
+    listen: high
+    signal: 4
+    conflict: team
+    why: Odyssey pad. Instant+curve + HL-wrapped RobinPerps. Not @RobinPAD_MEME, not OddyseyAI.
+
+  - handle: "@RobinPAD_MEME"
+    role: project
+    follow: false
+    listen: skip-ingest
+    flags: [ca-collision]
+    why: Same display name, different pad. Do not ingest as Odyssey/Robin_Pad.
+
+  - handle: "@HoodedDotMeme"
+    role: project
+    follow: true
+    listen: medium
+    why: Named as launchpad beside SwapHood.
+
+  - handle: "@uselongshot"
+    role: project
+    follow: true
+    listen: high
+    conflict: team
+    why: Official LONGSHOT. Tiny follow count.
+
+  - handle: "@andrewtalksdefi"
+    role: alpha
+    follow: true
+    listen: high
+    signal: 4
+    why: Named Delta/Wire/Hedge/Website/Mesh. Trending-eligible.
 
   - handle: "@SwapHoodFi"
     role: project

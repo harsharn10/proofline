@@ -93,7 +93,11 @@ subjects:
     lifecycle: announced   # claimed mainnet 2026-08-31 09:30 ET; confirm after open
     live_evidence: [official-post]
     handle: "@ArrowFinanceio"
-    note: Official 2026-08-31 09:30 ET mainnet. Still announced as of 00:11 CDT 31 Aug — no "we're live" post. Sherlock pass rewrote stability into **risk-tiered pools** (equities vs stables/wstETH), not a unified SP. 16 markets, ~$1.6M aUSD cap, equity collat 9:30-16:00 ET only. aUSD LP on UP 0x29e3f3d9891cacf213361bcbcb7728970d53baa8. Not @arrowsonhood. Not ArrowPad.
+    cas:
+      ausd_candidate: "0x4f11d7603D1B0D0f021Db552D8A6d88d7fa38ecf"
+      token_candidate: "0xf2915d1e3C1B0c769d0c756Ec43F1c1f6c99cD03"
+      pad_not_cdp: "0x1Badc838AAe6ac41829180744ea2e1C89b452aAe"
+    note: Official 2026-08-31 09:30 ET mainnet. Still announced as of 00:15 CDT 31 Aug. Sherlock risk-tiered stability pools. aUSD/ARROW CAs from linktr — candidate until Blockscout 4663. Pad factory is ArrowPad, not CDP. Not @arrowsonhood 0xD71b7b4e.
 
   - slug: bankr
     name: Bankr
@@ -454,7 +458,12 @@ subjects:
     lifecycle: mainnet
     live_evidence: [llama-volume, official-post]
     handle: "@SwapHoodFi"
-    note: HOOD-aligned meta DEX. Llama V2/V3 rows. Flywheel official 11-28 Aug — HOOD emissions (~2375/day, max 5M) incentivize LP; fees buy back HOOD; buybacks back $h33. Team claims they own no HOOD/LP. Not Uni, not up, not Fables. Trench "h33 vs ve33."
+    cas:
+      token: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
+      h33_docs: "0xA7036C8C28F96e8cE242d0Af45d1B395B69DAF38"
+      v2_factory_docs: "0xE7206Ecac3A51afe7e6179182ad4130A26068dD1"
+      v3_factory_docs: "0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7"
+    note: Native AMM fork (own V2/V3 factories, not canonical Uni). $HOOD CA official 12 Jul X. Other CAs gitbook until Blockscout. Flywheel HOOD→fees→buyback→h33. Team claims no HOOD/LP. Not up, not Fables.
 
 # --- DEPENDENCIES (cite, no profile) ---
 dependencies:
@@ -542,7 +551,8 @@ observe:
     - { name: pools.fun, handle: "@pools_dot_fun" }
     - { name: FoxPad, handle: null, note: "Launchpad vs FOX mascot — keep as observe until handle confirmed." }
     - { name: MaxFi, Quotrons, Atlas, Robindex, RSTOCKS, Oakmont, HOOD10, RoodFi }
-    - { name: the odyssey, note: "openpump pad list 29 Aug — instant+curve. Handle unknown. Do not merge with @OddyseyAI agent fleet." }
+    - { name: RobinPad / Odyssey, handle: "@Robin_Pad", note: "Was @Odysseydot_fun. openpump instant+curve. Pad + RobinPerps (Hyperliquid 150+ markets wrapper). Not Meridian. Docs factories are cas.candidate. Quiet since 19 Aug." }
+    - { name: RobinPAD_MEME, handle: "@RobinPAD_MEME", note: "Different account (fairest/fastest meme pad). Collision with @Robin_Pad. Do not merge." }
     - { name: StonksFun, handle: "@stonksdotfun", note: "DN-404 Doppler pad. $REDACTED ZEC pair. Also filed as candidate slug stonks-fun." }
     - { name: clan.tech, handle: "@clantechapp", note: "SocialFi groups / friendtech-on-RH. LBank listing claimed. Not FOMO venue." }
     - { name: Openpump, handle: "@openpumpio", note: "MCP trading infra + pad inventory source. Not a subject." }
