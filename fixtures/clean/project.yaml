@@ -1,0 +1,46 @@
+slug: clean
+name: Clean Fixture
+symbol: CLN
+category: Launchpad
+lifecycle: mainnet
+coverage: full
+summary: Fixture with every security test full and every factor strong.
+official_links:
+  - { kind: site, url: https://example.com }
+dependencies: []
+addresses:
+  - { label: Router, address: "0x0000000000000000000000000000000000000001", role: router, verified: true, sources: [S1] }
+review:
+  researcher: fixture
+  approver: fixture-approver
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-30
+  published_at: null
+scoring:
+  security:
+    deployment_verifiability: { level: full, evidence: [S1], note: all verified }
+    privileged_power:         { level: full, evidence: [S1], note: no unilateral power }
+    authorization_topology:   { level: full, evidence: [S1], note: 3-of-5 multisig }
+    timelock_exit_window:     { level: full, evidence: [S1], note: 7-day timelock }
+    audit_deployment_match:   { level: full, evidence: [S1], note: audit matches commit }
+    continuous_safeguards:    { level: full, evidence: [S1], note: bounty and monitoring }
+    incident_handling:        { level: full, evidence: [S1], note: no incidents }
+  factors:
+    engineering:  { level: strong, positive: [public repo], negative: [], missing: [], evidence: [S1] }
+    transparency: { level: strong, positive: [named team], negative: [], missing: [], evidence: [S1] }
+    maturity:     { level: strong, positive: [live 60 days], negative: [], missing: [], evidence: [S1] }
+    economic:     { level: strong, positive: [no oracle], negative: [], missing: [], evidence: [S1] }
+  confidence:
+    primary_source_coverage: 85
+    onchain_verification: 80
+    independent_corroboration: 75
+    freshness: 90
+    review_completeness: 80
+  risk:
+    assessed: Moderate
+    reason: Standard smart-contract exposure.
+findings:
+  positive: [ { text: Everything checks out., class: verified, sources: [S1] } ]
+  risk: []
+  missing: []
+  unresolved: []

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "changelog",
+  "type": "array",
+  "items": { "type": "object", "additionalProperties": false,
+    "required": ["date","slug","type","severity","title","detail","prior","new","reviewer","methodology_version"],
+    "properties": {
+      "date": { "type": "string", "format": "date" },
+      "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+      "type": { "enum": ["score","risk","stage","finding","correction","coverage"] },
+      "severity": { "enum": ["Info","Review","Material","Risk"] },
+      "title": { "type": "string", "minLength": 1 }, "detail": { "type": "string", "minLength": 1 },
+      "prior": { "type": ["object","null"] }, "new": { "type": ["object","null"] },
+      "reviewer": { "type": "string", "minLength": 1 },
+      "methodology_version": { "const": "proofline-v1.0" }
+    } }
+}

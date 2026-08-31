@@ -1,0 +1,37 @@
+slug: safehood
+name: Safehood
+symbol: null
+category: Launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Robinhood Chain launchpad that creates Uniswap v3 pools and opens trading directly on mainnet.
+official_links:
+  - kind: github
+    url: https://github.com/opengrid1/Launchpad
+dependencies:
+  - uniswap
+addresses:
+  - label: Launchpad
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-30
+  published_at: null
+findings:
+  positive:
+    - text: Safehood publishes an official repository at https://github.com/opengrid1/Launchpad.
+      class: claim
+      sources:
+        - S1
+  risk: []
+  missing:
+    - text: Mainnet addresses from the repository not yet reproduced on Blockscout
+    - text: Single platform admin wallet claim — confirm scope of powers
+    - text: Independent audit evidence
+    - text: Whether the deployer retains token-level privileges
+  unresolved: []

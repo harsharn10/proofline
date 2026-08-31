@@ -1,0 +1,37 @@
+slug: vimen
+name: Vimen
+symbol: null
+category: RWA baskets
+lifecycle: mainnet
+coverage: stub
+summary: Immutable in-kind index baskets for Robinhood Stock Tokens with per-basket deposit caps and no claimed admin keys over funds.
+official_links:
+  - kind: github
+    url: https://github.com/vimenprotocol/vimen
+dependencies:
+  - stock-tokens
+addresses:
+  - label: Basket custody
+    address: not-verified
+    role: vault
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-30
+  published_at: null
+findings:
+  positive:
+    - text: Vimen publishes an official repository at https://github.com/vimenprotocol/vimen.
+      class: claim
+      sources:
+        - S1
+  risk: []
+  missing:
+    - text: Deployed addresses and bytecode vs repository
+    - text: Immutability / no-admin-key claim not reproduced
+    - text: Basket caps and redemption path
+    - text: Independent audit evidence
+  unresolved: []

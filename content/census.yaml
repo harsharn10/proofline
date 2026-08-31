@@ -1,0 +1,202 @@
+# Seed universe — PRD §2.1 (10) + product-owner restore of 4 native plays (2026-08-30).
+# Every `qualifying.*.verified: false` means the value is asserted by the PRD seed table and
+# has not been reproduced on Blockscout or the project's own contracts yet.
+
+- slug: pons
+  name: Pons
+  category: Launchpad
+  lifecycle: mainnet
+  coverage: stub          # flips to full when the research record lands (PRD §13, §14 step 4)
+  official_links:
+    - { kind: site, url: https://ponsfamily.com }
+  discovery_source: PRD seed table 2026-08-30; Messari profile pons-launchpad; Bitquery Pons API docs
+  qualifying:
+    deployed_on_chain: { value: true, note: "PRD: dominant native launchpad on Robinhood Chain", verified: false }
+    native_play:       { value: true, note: "Launchpad with V2 curve graduating to Uniswap v4", verified: false }
+    citable:           { value: true, note: "Official site listed in PRD Appendix A", verified: false }
+    research_story:    { value: true, note: "User funds sit in the curve pre-graduation; quote assets ETH, USDG, Stock Tokens", verified: false }
+
+- slug: mancer
+  name: Mancer
+  category: Aggregator
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://mancer.xyz }
+    - { kind: docs, url: https://mancer.xyz/docs }
+    - { kind: whitepaper, url: https://mancer.xyz/whitepaper.pdf }
+    - { kind: x, url: https://x.com/MancerXYZ }
+  discovery_source: PRD seed table 2026-08-30
+  qualifying:
+    deployed_on_chain: { value: true, note: "PRD: native DEX aggregator with resting orders", verified: false }
+    native_play:       { value: true, note: "Aggregator + order layer; Chain Mancers NFT + $MANCER; Shield announced", verified: false }
+    citable:           { value: true, note: "Site, docs, whitepaper, X account", verified: false }
+    research_story:    { value: true, note: "Non-custodial order claims and NFT fee claim need verification", verified: false }
+
+- slug: artificial-inu
+  name: Artificial Inu
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://artificialinu.com }
+  discovery_source: PRD seed table 2026-08-30
+  qualifying:
+    deployed_on_chain: { value: true, note: "Token contract address given in PRD Appendix A", verified: false }
+    native_play:       { value: true, note: "Flagship LONG launch; $AI paired to tokenized NVDA; community vault", verified: false }
+    citable:           { value: true, note: "Official site and contract address", verified: false }
+    research_story:    { value: true, note: "Vault, fee routing and pair design against a Stock Token", verified: false }
+
+- slug: longshot
+  name: Longshot
+  category: Fee-routing protocol
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: site, url: https://www.uselongshot.xyz }
+    - { kind: x, url: https://x.com/uselongshot }
+  discovery_source: PRD seed table 2026-08-30
+  qualifying:
+    deployed_on_chain: { value: true, note: "RH Chain token address given in PRD Appendix A", verified: false }
+    native_play:       { value: true, note: "Launch / fee-routing protocol with a fixed Hyperliquid perp leg", verified: false }
+    citable:           { value: true, note: "Site and X account", verified: false }
+    research_story:    { value: true, note: "Fee split into a Hyperliquid perp, holder rewards and protocol — cross-venue custody path", verified: false }
+
+- slug: long
+  name: LONG
+  category: Launchpad
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: app, url: https://app.long.xyz }
+    - { kind: x, url: https://x.com/longdotxyz }
+  discovery_source: PRD seed table 2026-08-30
+  qualifying:
+    deployed_on_chain: { value: true, note: "Factory contracts referenced (truncated) in PRD Appendix A", verified: false }
+    native_play:       { value: true, note: "Stock-paired launchpad; Factory + Airlock; $AI launched here", verified: false }
+    citable:           { value: true, note: "App and X account", verified: false }
+    research_story:    { value: true, note: "Venue that made stock-paired tokens possible; launch mechanics and airlock controls", verified: false }
+
+- slug: stonkbroker
+  name: StonkBroker
+  category: NFT / treasury
+  lifecycle: mainnet
+  coverage: stub
+  official_links: []
+  discovery_source: PRD seed table 2026-08-30
+  qualifying:
+    deployed_on_chain: { value: true, note: "PRD: native ERC-6551 NFT on Robinhood Chain", verified: false }
+    native_play:       { value: true, note: "ERC-6551 NFT that can hold Stock Tokens", verified: false }
+    citable:           { value: false, note: "PRD lists no official link yet — locate before research", verified: false }
+    research_story:    { value: true, note: "Token-bound accounts holding Stock Tokens — custody and control questions", verified: false }
+
+- slug: index
+  name: Index
+  category: RWA distributor
+  lifecycle: mainnet
+  coverage: stub
+  official_links: []
+  discovery_source: PRD seed table 2026-08-30
+  qualifying:
+    deployed_on_chain: { value: true, note: "PRD: native RWA distributor", verified: false }
+    native_play:       { value: true, note: "Pool tax buys a basket of Stock Tokens for holders", verified: false }
+    citable:           { value: false, note: "PRD lists no official link yet — locate before research", verified: false }
+    research_story:    { value: true, note: "Tax-funded basket accumulation — who controls the basket and the tax", verified: false }
+
+- slug: arrow
+  name: Arrow Finance
+  category: CDP
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: docs, url: https://app.arrowfinance.io/docs }
+  discovery_source: PRD seed table 2026-08-30
+  qualifying:
+    deployed_on_chain: { value: true, note: "PRD: launchpad live; CDP audit in flight", verified: false }
+    native_play:       { value: true, note: "Native CDP / DeFi gateway plus launchpad", verified: false }
+    citable:           { value: true, note: "Docs site", verified: false }
+    research_story:    { value: true, note: "CDP collateral and liquidation path; launchpad controls; audit status", verified: false }
+
+- slug: bankr
+  name: Bankr
+  category: Agent / execution
+  lifecycle: mainnet
+  coverage: stub
+  official_links: []
+  discovery_source: PRD seed table 2026-08-30
+  qualifying:
+    deployed_on_chain: { value: true, note: "PRD: agent trading surface expanded onto RH Chain", verified: false }
+    native_play:       { value: true, note: "Agent / execution surface", verified: false }
+    citable:           { value: false, note: "PRD lists no official link yet — locate before research", verified: false }
+    research_story:    { value: true, note: "Agent-driven execution: key custody, permissions, routing", verified: false }
+
+- slug: meridian
+  name: Meridian
+  category: Prediction market
+  lifecycle: announced
+  coverage: stub
+  official_links: []
+  discovery_source: PRD seed table 2026-08-30
+  qualifying:
+    deployed_on_chain: { value: true, note: "PRD: native prediction-market launch partner — deployment not yet confirmed", verified: false }
+    native_play:       { value: true, note: "Prediction / RWA market", verified: false }
+    citable:           { value: false, note: "PRD lists no official link yet — locate before research", verified: false }
+    research_story:    { value: true, note: "Resolution/oracle design and collateral custody", verified: false }
+
+- slug: statics-protocol
+  name: Statics Protocol
+  category: RWA baskets
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: docs, url: https://docs.staticsprotocol.com/docs/rollout/ }
+    - { kind: docs, url: https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/ }
+    - { kind: docs, url: https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/ }
+  discovery_source: Prototype seed profile 2026-08-30; restored by product owner
+  qualifying:
+    deployed_on_chain: { value: true, note: "Docs report Genesis system live on Robinhood mainnet 2026-08-27", verified: false }
+    native_play:       { value: true, note: "Redeemable multi-asset baskets, connected pools, self-backed credit", verified: false }
+    citable:           { value: true, note: "Rollout, governance and deployment docs", verified: false }
+    research_story:    { value: true, note: "Upgrade authority, seven-day timelock target, audit status", verified: false }
+
+- slug: safehood
+  name: Safehood
+  category: Launchpad
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: github, url: https://github.com/opengrid1/Launchpad }
+  discovery_source: Prototype seed profile 2026-08-30; restored by product owner
+  qualifying:
+    deployed_on_chain: { value: true, note: "Repository publishes mainnet contract addresses", verified: false }
+    native_play:       { value: true, note: "Launchpad creating Uniswap v3 pools and opening trading on mainnet", verified: false }
+    citable:           { value: true, note: "Source repository", verified: false }
+    research_story:    { value: true, note: "Project states all protocol admin roles sit in one platform admin wallet", verified: false }
+
+- slug: robinhood-index-vaults
+  name: Robinhood Index Vaults
+  category: Index vault
+  lifecycle: testnet-only
+  coverage: stub
+  official_links:
+    - { kind: github, url: https://github.com/nsvoud-dev/robinhood-index-vaults }
+  discovery_source: Prototype seed profile 2026-08-30; restored by product owner
+  qualifying:
+    deployed_on_chain: { value: true, note: "Testnet deployment only; qualifies under 'officially launching' pending mainnet", verified: false }
+    native_play:       { value: true, note: "ERC-4626 index vault for Stock Token baskets", verified: false }
+    citable:           { value: true, note: "Source repository", verified: false }
+    research_story:    { value: true, note: "Mock swap router; audit and mainnet are roadmap items", verified: false }
+
+- slug: vimen
+  name: Vimen
+  category: RWA baskets
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - { kind: github, url: https://github.com/vimenprotocol/vimen }
+  discovery_source: Prototype seed profile 2026-08-30; restored by product owner
+  qualifying:
+    deployed_on_chain: { value: true, note: "Prototype profile recorded early mainnet 2026-08-20", verified: false }
+    native_play:       { value: true, note: "Immutable in-kind index baskets for Stock Tokens with deposit caps", verified: false }
+    citable:           { value: true, note: "Source repository", verified: false }
+    research_story:    { value: true, note: "Immutability / no-admin-key claims need bytecode reproduction", verified: false }

@@ -1,0 +1,48 @@
+slug: long
+name: LONG
+symbol: null
+category: Launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Stock-paired launchpad (Factory + Airlock) that made stock-paired tokens possible on Robinhood Chain; $AI launched here.
+official_links:
+  - kind: app
+    url: https://app.long.xyz
+  - kind: x
+    url: https://x.com/longdotxyz
+dependencies:
+  - stock-tokens
+addresses:
+  - label: Factory (PRD lists 0x9c88…0845, truncated)
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+  - label: Factory (PRD lists 0x22e9…eeED, truncated)
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-30
+  published_at: null
+findings:
+  positive:
+    - text: LONG publishes an official site at https://app.long.xyz.
+      class: claim
+      sources:
+        - S1
+    - text: LONG publishes an official social at https://x.com/longdotxyz.
+      class: claim
+      sources:
+        - S2
+  risk: []
+  missing:
+    - text: Full factory addresses (PRD Appendix A is truncated)
+    - text: Airlock controls and who can release
+    - text: Launch fee flows
+    - text: Audit status unknown
+  unresolved: []

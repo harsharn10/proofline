@@ -1,0 +1,37 @@
+slug: robinhood-index-vaults
+name: Robinhood Index Vaults
+symbol: rIDX
+category: Index vault
+lifecycle: testnet-only
+coverage: stub
+summary: Experimental ERC-4626 index vault for baskets of Robinhood Stock Tokens; testnet only, mock swap router.
+official_links:
+  - kind: github
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults
+dependencies:
+  - stock-tokens
+addresses:
+  - label: Vault (testnet)
+    address: not-verified
+    role: vault
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-30
+  published_at: null
+findings:
+  positive:
+    - text: Robinhood Index Vaults publishes an official repository at https://github.com/nsvoud-dev/robinhood-index-vaults.
+      class: claim
+      sources:
+        - S1
+  risk: []
+  missing:
+    - text: Testnet addresses
+    - text: Confirm no production deposit path exists
+    - text: Audit — roadmap item, none reviewed
+    - text: Mainnet plan and controls
+  unresolved: []

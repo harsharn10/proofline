@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "census",
+  "type": "array",
+  "items": { "type": "object", "additionalProperties": false,
+    "required": ["slug","name","category","lifecycle","coverage","official_links","discovery_source","qualifying"],
+    "properties": {
+      "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+      "name": { "type": "string", "minLength": 1 },
+      "category": { "enum": ["Launchpad","Aggregator","Stock-paired token","Fee-routing protocol","NFT / treasury","RWA distributor","RWA baskets","CDP","Agent / execution","Prediction market","Index vault"] },
+      "lifecycle": { "enum": ["mainnet","beta","announced","inactive","testnet-only"] },
+      "coverage": { "enum": ["full","stub"] },
+      "official_links": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["kind","url"],
+        "properties": { "kind": { "enum": ["site","app","docs","whitepaper","x","github","telegram","discord","other"] }, "url": { "type": "string", "format": "uri" } } } },
+      "discovery_source": { "type": "string", "minLength": 1 },
+      "qualifying": { "type": "object", "additionalProperties": false, "required": ["deployed_on_chain","native_play","citable","research_story"],
+        "properties": {
+          "deployed_on_chain": { "$ref": "#/$defs/test" }, "native_play": { "$ref": "#/$defs/test" }, "citable": { "$ref": "#/$defs/test" }, "research_story": { "$ref": "#/$defs/test" } } }
+    } },
+  "$defs": { "test": { "type": "object", "additionalProperties": false, "required": ["value","note","verified"],
+    "properties": { "value": { "type": "boolean" }, "note": { "type": "string", "minLength": 1 }, "verified": { "type": "boolean" } } } }
+}

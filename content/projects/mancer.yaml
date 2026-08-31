@@ -1,0 +1,60 @@
+slug: mancer
+name: Mancer
+symbol: MANCER
+category: Aggregator
+lifecycle: mainnet
+coverage: stub
+summary: Native DEX aggregator with resting orders; Chain Mancers NFT and $MANCER token; a Shield product is announced.
+official_links:
+  - kind: site
+    url: https://mancer.xyz
+  - kind: docs
+    url: https://mancer.xyz/docs
+  - kind: whitepaper
+    url: https://mancer.xyz/whitepaper.pdf
+  - kind: x
+    url: https://x.com/MancerXYZ
+dependencies:
+  - uniswap
+addresses:
+  - label: Aggregator router
+    address: not-verified
+    role: router
+    verified: false
+    sources: []
+  - label: $MANCER token
+    address: not-verified
+    role: token
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-30
+  published_at: null
+findings:
+  positive:
+    - text: Mancer publishes an official site at https://mancer.xyz.
+      class: claim
+      sources:
+        - S1
+    - text: Mancer publishes an official docs at https://mancer.xyz/docs.
+      class: claim
+      sources:
+        - S2
+    - text: Mancer publishes an official whitepaper at https://mancer.xyz/whitepaper.pdf.
+      class: claim
+      sources:
+        - S3
+    - text: Mancer publishes an official social at https://x.com/MancerXYZ.
+      class: claim
+      sources:
+        - S4
+  risk: []
+  missing:
+    - text: Router and token addresses not yet located
+    - text: Non-custodial order claim not verified against contracts
+    - text: NFT fee-claim mechanics unverified
+    - text: "Shield: announced only — no deployment evidence reviewed"
+  unresolved: []

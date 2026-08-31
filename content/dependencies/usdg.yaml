@@ -1,0 +1,11 @@
+id: usdg
+name: USDG (Global Dollar)
+kind: stablecoin
+summary: Paxos-issued dollar stablecoin used as a quote asset and lending asset on Robinhood Chain.
+controls:
+  - { power: Mint / burn, holder: Paxos, note: Issuer-controlled, class: unknown, sources: [] }
+  - { power: Freeze / blacklist, holder: Paxos, note: Regulated-issuer freeze powers; confirm on the RH Chain deployment, class: unknown, sources: [] }
+failure_modes:
+  - { text: Address freeze traps quote-side liquidity in a launch curve or pool., class: unknown, sources: [] }
+  - { text: Bridge or canonical-deployment mismatch between chains., class: unknown, sources: [] }
+sources: []

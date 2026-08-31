@@ -1,0 +1,11 @@
+id: uniswap
+name: Uniswap on Robinhood Chain (v2 / v3 / v4, UniswapX)
+kind: dex
+summary: Day-one public DEX on Robinhood Chain. Launchpads graduate into v3 or v4 pools; v4 hooks can add project-specific logic.
+controls:
+  - { power: Protocol fee switch, holder: Uniswap governance, note: Core contracts; low blast radius for LPs, class: unknown, sources: [] }
+  - { power: Hook logic (v4), holder: Per-pool hook deployer, note: A hook can restrict swaps or take fees — assess per project, class: unknown, sources: [] }
+failure_modes:
+  - { text: "A malicious or buggy v4 hook affects only pools using it, not core Uniswap.", class: unknown, sources: [] }
+  - { text: Thin liquidity after graduation makes price discovery and exits unreliable., class: unknown, sources: [] }
+sources: []

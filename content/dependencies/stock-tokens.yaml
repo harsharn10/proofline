@@ -1,0 +1,13 @@
+id: stock-tokens
+name: Robinhood Stock Tokens
+kind: issuer-asset
+summary: Robinhood-issued tokenized stocks on Robinhood Chain (NVDA, AAPL, SPY, …). Appear as pair legs, vault assets and basket constituents in native plays.
+controls:
+  - { power: Mint / burn, holder: Issuer (Robinhood), note: Issuer-controlled supply; confirm contract and role, class: unknown, sources: [] }
+  - { power: Freeze / transfer restriction, holder: Issuer, note: "Check for allowlist, pause or blacklist functions", class: unknown, sources: [] }
+  - { power: Redemption, holder: Issuer, note: Off-chain redemption path and eligibility, class: unknown, sources: [] }
+failure_modes:
+  - { text: "Issuer freeze or blacklist strands tokens held inside a vault, basket or pool.", class: unknown, sources: [] }
+  - { text: Off-hours pricing and oracle behaviour when the underlying market is closed., class: unknown, sources: [] }
+  - { text: Redemption suspension breaks in-kind basket exits., class: unknown, sources: [] }
+sources: []

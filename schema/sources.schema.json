@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sources",
+  "type": "object", "additionalProperties": false, "required": ["slug","sources"],
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "sources": { "type": "array", "items": { "$ref": "source-entry" } }
+  }
+}

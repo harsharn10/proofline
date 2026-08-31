@@ -1,0 +1,48 @@
+slug: statics-protocol
+name: Statics Protocol
+symbol: STATICS
+category: RWA baskets
+lifecycle: mainnet
+coverage: stub
+summary: Native protocol for redeemable multi-asset baskets, connected pools and self-backed credit; Genesis system reported live on Robinhood mainnet 2026-08-27.
+official_links:
+  - kind: docs
+    url: https://docs.staticsprotocol.com/docs/rollout/
+  - kind: docs
+    url: https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/
+  - kind: docs
+    url: https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/
+dependencies: []
+addresses:
+  - label: Genesis system
+    address: not-verified
+    role: other
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-30
+  published_at: null
+findings:
+  positive:
+    - text: Statics Protocol publishes an official docs at https://docs.staticsprotocol.com/docs/rollout/.
+      class: claim
+      sources:
+        - S1
+    - text: Statics Protocol publishes an official docs at https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/.
+      class: claim
+      sources:
+        - S2
+    - text: Statics Protocol publishes an official docs at https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/.
+      class: claim
+      sources:
+        - S3
+  risk: []
+  missing:
+    - text: Mainnet addresses (docs reference a testnet deployment page)
+    - text: Deployed governance and timelock configuration vs the documented seven-day target
+    - text: Independent audit evidence
+    - text: Upgrade authority
+  unresolved: []

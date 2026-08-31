@@ -1,0 +1,43 @@
+slug: longshot
+name: Longshot
+symbol: null
+category: Fee-routing protocol
+lifecycle: mainnet
+coverage: stub
+summary: Launch and fee-routing protocol on Robinhood Chain; fees split into a fixed Hyperliquid perp position, holder rewards and the protocol.
+official_links:
+  - kind: site
+    url: https://www.uselongshot.xyz
+  - kind: x
+    url: https://x.com/uselongshot
+dependencies:
+  - hyperliquid
+addresses:
+  - label: RH Chain token
+    address: "0x8701E2C87ade58325601f4F9bf37ADF46Cb75745"
+    role: token
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-30
+  published_at: null
+findings:
+  positive:
+    - text: Longshot publishes an official site at https://www.uselongshot.xyz.
+      class: claim
+      sources:
+        - S1
+    - text: Longshot publishes an official social at https://x.com/uselongshot.
+      class: claim
+      sources:
+        - S2
+  risk: []
+  missing:
+    - text: Token address from PRD Appendix A not yet reproduced on Blockscout
+    - text: Who controls the Hyperliquid position and how funds cross venues
+    - text: Fee-split contract and admin powers unknown
+    - text: Audit status unknown
+  unresolved: []

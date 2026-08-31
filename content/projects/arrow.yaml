@@ -1,0 +1,41 @@
+slug: arrow
+name: Arrow Finance
+symbol: null
+category: CDP
+lifecycle: mainnet
+coverage: stub
+summary: Native CDP and DeFi gateway on Robinhood Chain; launchpad live, CDP audit in flight per the seed table.
+official_links:
+  - kind: docs
+    url: https://app.arrowfinance.io/docs
+dependencies: []
+addresses:
+  - label: Launchpad
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+  - label: CDP core
+    address: not-verified
+    role: vault
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-30
+  published_at: null
+findings:
+  positive:
+    - text: Arrow Finance publishes an official docs at https://app.arrowfinance.io/docs.
+      class: claim
+      sources:
+        - S1
+  risk: []
+  missing:
+    - text: Contract addresses not yet located
+    - text: CDP collateral types, oracle and liquidation path
+    - text: Audit report and covered commit
+    - text: Admin powers over the launchpad
+  unresolved: []

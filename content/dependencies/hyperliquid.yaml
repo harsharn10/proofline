@@ -1,0 +1,11 @@
+id: hyperliquid
+name: Hyperliquid
+kind: perp-venue
+summary: External perpetuals venue. Longshot routes a fixed share of fees into a Hyperliquid perp position.
+controls:
+  - { power: Position control, holder: Whoever holds the Hyperliquid account keys, note: Custody sits off Robinhood Chain — identify the signer, class: unknown, sources: [] }
+  - { power: Bridge / transfer, holder: Protocol operator, note: How funds move between chains and who can redirect them, class: unknown, sources: [] }
+failure_modes:
+  - { text: Liquidation of the perp position erases the fee-funded leg., class: unknown, sources: [] }
+  - { text: Key compromise or operator discretion over the off-chain account., class: unknown, sources: [] }
+sources: []

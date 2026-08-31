@@ -1,0 +1,72 @@
+slug: pons
+name: Pons
+symbol: null
+category: Launchpad
+lifecycle: mainnet
+coverage: stub
+summary: "Native launchpad on Robinhood Chain: tokens launch on a V2 bonding curve and graduate to Uniswap v4; quote assets include ETH, USDG and Stock Tokens."
+official_links:
+  - kind: site
+    url: https://ponsfamily.com
+dependencies:
+  - uniswap
+  - usdg
+  - stock-tokens
+addresses:
+  - label: V2 curve / factory
+    address: not-verified
+    role: factory
+    verified: false
+    sources: []
+review:
+  researcher: harsharn10
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-08-30
+  published_at: null
+findings:
+  positive:
+    - text: Pons publishes an official site at https://ponsfamily.com.
+      class: claim
+      sources:
+        - S1
+  risk: []
+  missing:
+    - text: Deployment map (curve, factory, graduation router) not yet reproduced on Blockscout
+    - text: Privileged roles over the curve and graduation path unknown
+    - text: Audit status unknown
+    - text: Team identity and repository not yet located
+  unresolved: []
+
+# ---------------------------------------------------------------------------
+# SCORING SKELETON — uncomment and fill when the research record is complete, then set coverage: full.
+# Levels: security tests full|partial|zero; factors strong|mixed|weak|insufficient; confidence inputs 0–100.
+# Every evidence: [] must list S-ids from sources/pons.yaml. Unknown = no credit; it lowers confidence, not the score.
+# ---------------------------------------------------------------------------
+# scoring:
+#   security:
+#     deployment_verifiability: { level: partial, evidence: [], note: "" }
+#     privileged_power:         { level: zero,    evidence: [], note: "" }
+#     authorization_topology:   { level: zero,    evidence: [], note: "" }
+#     timelock_exit_window:     { level: zero,    evidence: [], note: "" }
+#     audit_deployment_match:   { level: zero,    evidence: [], note: "" }
+#     continuous_safeguards:    { level: zero,    evidence: [], note: "" }
+#     incident_handling:        { level: full,    evidence: [], note: "" }
+#   factors:
+#     engineering:  { level: insufficient, positive: [], negative: [], missing: [], evidence: [] }
+#     transparency: { level: insufficient, positive: [], negative: [], missing: [], evidence: [] }
+#     maturity:     { level: insufficient, positive: [], negative: [], missing: [], evidence: [] }
+#     economic:     { level: insufficient, positive: [], negative: [], missing: [], evidence: [] }
+#   confidence:
+#     primary_source_coverage: 0
+#     onchain_verification: 0
+#     independent_corroboration: 0
+#     freshness: 0
+#     review_completeness: 0
+#   risk:
+#     assessed: Elevated
+#     reason: ""
+#   # override:            # only if PRD §6.4 applies
+#   #   level: High
+#   #   reason: ""
+#   #   evidence: []

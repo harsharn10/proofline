@@ -1,0 +1,10 @@
+id: chainlink
+name: Chainlink
+kind: oracle
+summary: Day-one oracle infrastructure on Robinhood Chain; relevant to CDPs, prediction markets and any Stock Token pricing.
+controls:
+  - { power: Feed updates, holder: Chainlink node operators, note: Confirm which feeds exist on chain 4663 and their heartbeat, class: unknown, sources: [] }
+failure_modes:
+  - { text: Stale or missing feed for a Stock Token outside market hours., class: unknown, sources: [] }
+  - { text: A protocol using its own oracle instead of Chainlink inherits a different risk — record which it is., class: unknown, sources: [] }
+sources: []
