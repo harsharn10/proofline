@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
-import { parseResearchMarkdown } from "./markdown";
+import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
 import type {
   AccountEntry,
   ChangelogEntry,
@@ -201,6 +201,7 @@ function loadContent(): ContentBundle {
     dependencies,
     changelog: changelogAll,
     accounts,
+    generatedAt: derivedFile.generated_at,
   };
 }
 
@@ -229,3 +230,41 @@ export const getDossier = createServerFn({ method: "GET" })
       accounts: content.accounts,
     };
   });
+
+export const getDependency = createServerFn({ method: "GET" })
+  .validator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    const content = getCachedContent();
+    return {
+      dependency: content.dependencies[id] ?? null,
+      site: content.site,
+    };
+  });
+
+// content/methodology.md is a required top-level file (like site.yaml), so a missing or
+// unparsable file throws rather than falling back silently — unlike the per-slug files
+// readYamlOrWarn guards, which are legitimately optional.
+export const getMethodology = createServerFn({ method: "GET" }).handler(async () => {
+  const content = getCachedContent();
+  const root = repoRoot();
+  const raw = fs.readFileSync(path.join(root, "content", "methodology.md"), "utf8");
+  return {
+    html: renderWholeMarkdown(raw),
+    methodologyVersion: content.site.methodology_version,
+  };
+});
+
+// Small site-wide slice for the header, which renders outside any route's own loader
+// (mounted once in __root.tsx around every page). Backed by getCachedContent(), so this
+// costs no extra file I/O beyond the page's own loader call.
+export const getSiteMeta = createServerFn({ method: "GET" }).handler(async () => {
+  const content = getCachedContent();
+  return {
+    name: content.site.name,
+    tagline: content.site.tagline,
+    updated: content.generatedAt,
+    namesOnFile: content.dossiers.length,
+    trendingCount: content.dossiers.filter((d) => d.derived.trending).length,
+    corrections: content.site.corrections,
+  };
+});

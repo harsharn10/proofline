@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { NameRow } from "@/components/name-row";
 import { FeedList } from "@/components/feed-list";
@@ -35,7 +35,8 @@ function Home() {
   }, [q, cat, dossiers]);
 
   const fullCount = dossiers.filter((d) => d.coverage === "full").length;
-  const trendingCount = dossiers.filter((d) => d.derived.trending).length;
+  const trendingDossiers = dossiers.filter((d) => d.derived.trending);
+  const trendingCount = trendingDossiers.length;
 
   const latestFeed = useMemo(
     () =>
@@ -95,6 +96,25 @@ function Home() {
           </div>
           <FeedList items={latestFeed} />
         </section>
+
+        {trendingDossiers.length > 0 ? (
+          <section className="mt-12">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-subtle">Trending</h2>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {trendingDossiers.map((d) => (
+                <Link
+                  key={d.slug}
+                  to="/n/$slug"
+                  params={{ slug: d.slug }}
+                  className="inline-flex h-9 items-center gap-2 rounded-sm border border-border bg-surface px-3 text-sm text-fg hover:bg-raised"
+                >
+                  {d.symbol ?? d.name}
+                  <Badge tone="warn">Trending</Badge>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="mt-12">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

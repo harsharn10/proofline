@@ -228,6 +228,7 @@ export type ContentBundle = {
   dependencies: Record<string, DependencyCard>;
   changelog: ChangelogEntry[];
   accounts: AccountEntry[];
+  generatedAt: string; // build/derived.json generated_at — when scores were last computed
 };
 
 // --- Labels -----------------------------------------------------------------
@@ -248,6 +249,14 @@ export const CHAIN_LABEL: Record<Chain, string> = {
   solana: "Solana",
   hyperliquid: "Hyperliquid",
   other: "Other chain",
+};
+
+export const DEPENDENCY_KIND_LABEL: Record<DependencyCard["kind"], string> = {
+  "issuer-asset": "Issuer asset",
+  dex: "DEX",
+  "perp-venue": "Perp venue",
+  oracle: "Oracle",
+  stablecoin: "Stablecoin",
 };
 
 export const LINK_KIND_LABEL: Record<LinkKind, string> = {

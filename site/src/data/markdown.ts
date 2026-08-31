@@ -48,3 +48,12 @@ export function parseResearchMarkdown(raw: string): { sections: ResearchSection[
   });
   return { sections };
 }
+
+/**
+ * Render content/methodology.md (or any other whole-document markdown file) to HTML in
+ * one pass — unlike parseResearchMarkdown this does not split on `## ` headings, since the
+ * methodology page renders the full document top to bottom.
+ */
+export function renderWholeMarkdown(raw: string): string {
+  return marked.parse(stripHtmlComments(raw), { async: false }) as string;
+}

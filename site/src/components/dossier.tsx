@@ -1,11 +1,12 @@
-import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { CopyAddress } from "@/components/copy-address";
+import { DeploymentGrid } from "@/components/deployment-grid";
+import { EvidenceTag } from "@/components/evidence-tag";
 import { ExportMenu } from "@/components/export-menu";
 import { FeedList } from "@/components/feed-list";
+import { Section } from "@/components/section";
 import {
-  CHAIN_LABEL,
   LIFECYCLE_LABEL,
   LINK_KIND_LABEL,
   correctionsLink,
@@ -16,29 +17,10 @@ import {
   type AccountEntry,
   type Dossier as DossierData,
   type DependencyCard,
-  type EvidenceClass,
   type Gap,
   type Finding,
   type SiteConfig,
 } from "@/data/types";
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="pt-8">
-      <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-subtle">{title}</h2>
-      <div className="mt-3 text-sm leading-relaxed text-fg">{children}</div>
-    </section>
-  );
-}
-
-function EvidenceTag({ evidenceClass, sources }: { evidenceClass: EvidenceClass; sources?: string[] }) {
-  const ids = sources && sources.length > 0 ? sources.join(" ") : undefined;
-  return (
-    <span className={`ev ev-${evidenceClass}`} data-sources={ids}>
-      {ids ? `${evidenceClass} · ${ids}` : evidenceClass}
-    </span>
-  );
-}
 
 function FindingList({ items }: { items: Finding[] }) {
   if (items.length === 0) return <p className="text-sm text-muted">None recorded.</p>;
@@ -189,50 +171,22 @@ export function Dossier({
       </div>
 
       <Section title="Deployments">
-        {dossier.deployments.length > 0 ? (
-          <div className="grid gap-2 sm:grid-cols-2">
-            {dossier.deployments.map((d, i) => (
-              <div key={i} className="rounded-sm border border-border bg-surface p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm text-fg">{d.label}</p>
-                  <Badge tone={d.verified ? "live" : "risk"}>{d.verified ? "Verified" : "Not verified"}</Badge>
-                </div>
-                <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.1em] text-subtle">
-                  {CHAIN_LABEL[d.chain]}
-                  {d.issuer ? ` · ${d.issuer}` : ""}
-                  {d.ticker ? ` · ${d.ticker}` : ""}
-                </p>
-                {d.address === "not-verified" ? (
-                  <p className="mt-2 text-xs text-muted">Address not yet located.</p>
-                ) : (
-                  <div className="mt-2">
-                    <CopyAddress
-                      address={d.address}
-                      href={d.chain === "robinhood-chain" ? explorerTokenUrl(site.chain.explorer, d.address) : undefined}
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="border border-dashed border-border px-4 py-3 text-sm text-muted">
-            No deployments recorded yet.
-          </p>
-        )}
+        <DeploymentGrid deployments={dossier.deployments} explorerBase={site.chain.explorer} />
       </Section>
 
       {dossier.dependencies.length > 0 ? (
         <Section title="Dependencies">
           <div className="flex flex-wrap gap-2">
             {dossier.dependencies.map((id) => (
-              <span
+              <Link
                 key={id}
+                to="/d/$id"
+                params={{ id }}
                 title={dependencies[id]?.summary}
-                className="inline-flex h-8 items-center rounded-sm border border-border bg-surface px-2.5 text-xs text-muted"
+                className="inline-flex h-8 items-center rounded-sm border border-border bg-surface px-2.5 text-xs text-muted hover:bg-raised hover:text-fg"
               >
                 {dependencies[id]?.name ?? id}
-              </span>
+              </Link>
             ))}
           </div>
         </Section>

@@ -1,11 +1,16 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { getSiteMeta } from "@/data/content-server";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Proofline";
 
 export const Route = createRootRoute({
+  // Site-wide meta for the header (names on file, trending count, …) — loaded once here
+  // rather than SiteHeader fetching its own slice client-side, since it renders outside
+  // any route's own loader (mounted once in __root.tsx around every page).
+  loader: () => getSiteMeta(),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
