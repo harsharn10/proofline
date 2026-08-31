@@ -389,6 +389,16 @@ subjects:
     handle: "@robindexpro"
     note: CA scanner + TG bot. Not ERC-4626 Robinhood Index Vaults.
 
+  - slug: vynex
+    name: Vynex
+    tree_primary: yield/savings-vault
+    tree_secondary: [credit/isolated-money-market]
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@UseVynex"
+    cas: { token: "0x8cf33e3026604bd85677e7bc6e04d256571b6653" }
+    note: Liquid vault ERC-20 + Morpho NVDA/USDG borrow 38.5% LTV, 30m TWAP oracle they built. Unaudited per one X claim. Not Denar.
+
 # --- DEPENDENCIES (cite, no profile) ---
 dependencies:
   - { name: Uniswap, tree_primary: trading/amm-imported, handle: "@Uniswap", llama_tvl_rh: 133000000, note: "V2+V3+V4. ~80% of spot volume." }
