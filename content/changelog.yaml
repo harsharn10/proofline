@@ -996,3 +996,41 @@
     lifecycle: announced
   reviewer: harsharn10
   methodology_version: proofline-v1.0
+- date: 2026-08-31
+  slug: pons
+  type: finding
+  severity: Material
+  title: Two protocol generations documented; addresses reproduced on Blockscout
+  detail: "Research intake of the desk's 2026-08-31 pass plus the v2 docs the desk did not read: Pons v1 (fixed-supply token straight into a locked Uniswap V3 WETH pool) and v2 (bonding curve graduating into a permanently locked Uniswap v4 pool, pairable against approved assets, three audits in progress and none closed) both operate. All fifteen documented addresses are contracts on chain 4663, thirteen with verified source and no proxy; owner() on the factories, lockers, hook and buyback vault is a 2-of-3 Safe with no timelock. The seed summary described v2 only; the summary now names both generations."
+  prior:
+    summary: "Native launchpad on Robinhood Chain: tokens launch on a V2 bonding curve and graduate to Uniswap v4; quote assets include ETH, USDG and Stock Tokens."
+    deployments_verified: 0
+  new:
+    summary: "Two documented generations (v1 locked Uniswap V3 WETH pools; v2 bonding curve into a locked Uniswap v4 pool); v2 deployed, creator-allowlisted and under audit per its docs"
+    deployments_verified: 13
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+- date: 2026-08-31
+  slug: mancer
+  type: finding
+  severity: Info
+  title: Documentation pass recorded
+  detail: "Research intake of the desk's 2026-08-31 docs pass: non-custodial order design, onchain minimum-output claim, three cancellation paths, venue allowlist with undocumented controller, pair-dependent fee schedule. No addresses, audit report or team identity located; coverage stays stub."
+  prior:
+    research_sections_filled: 0
+  new:
+    research_sections_filled: 9
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+- date: 2026-08-31
+  slug: statics-protocol
+  type: finding
+  severity: Info
+  title: Primary-source pass recorded; public repository located
+  detail: "Research intake of the desk's 2026-08-31 pass: rollout page (Genesis live, basket/Dollar/lending suite on a separate rollout), timelock-and-roles page (shared seven-day timelock, multisig proposer, guardian), and the EqualFi Labs repository with its SECURITY.md (repository tests are not an external audit; diamonds upgradeable until a reviewed cut). Mainnet Genesis addresses and deployed governance not reproduced; coverage stays stub."
+  prior:
+    research_sections_filled: 0
+  new:
+    research_sections_filled: 9
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0

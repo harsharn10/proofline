@@ -4,9 +4,9 @@ sources:
     url: https://ponsfamily.com
     publisher: Pons
     kind: official-site
-    accessed_at: 2026-08-30T00:00:00Z
-    claim: Official site link for Pons
-    excerpt: Link recorded from the census; page not yet reviewed line by line.
+    accessed_at: 2026-08-31T19:52:55Z
+    claim: Pons Labs operates a Robinhood Chain interface for fixed-supply token launches and wallet-submitted trades.
+    excerpt: Launch and explore fixed-supply tokens on Robinhood Chain. Your wallet submits every transaction.
     hash: null
     archive_url: null
     researcher: harsharn10
@@ -128,6 +128,237 @@ sources:
     accessed_at: 2026-08-31T00:00:00Z
     claim: Chain-slice figures as listed by DefiLlama on 2026-08-31 (copied from the research intake; not reproduced)
     excerpt: Intake artifact committed to the research inbox; the linked file carries the desk's wording. Nothing in it is verified until reproduced on Blockscout or an official page.
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S13
+    url: https://docs.ponsfamily.com
+    publisher: Pons Labs, LLC
+    kind: docs
+    accessed_at: 2026-08-31T19:52:55Z
+    claim: Current launches use locked Uniswap V3 WETH pools with no curve or migration; the docs publish fees, revenue policy, contracts and integration methods.
+    excerpt: There is no bonding curve and no migration later.
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S14
+    url: https://api.llama.fi/summary/fees/pons?dataType=dailyFees
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-08-31T19:52:55Z
+    claim: DefiLlama identifies the PONS token address and reported Pons fees of $5,339,476 over 24 hours and $26,530,008 over 30 days.
+    excerpt: "total24h: 5339476; total30d: 26530008; address: robinhood:0x39dbed3a2bd333467115de45665cc57f813c4571"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S15
+    url: https://api.llama.fi/summary/dexs/pons?dataType=dailyVolume
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-08-31T19:52:55Z
+    claim: DefiLlama reported Pons volume of $85,868,837 over 24 hours and $294,684,257 over 30 days.
+    excerpt: "total24h: 85868837; total30d: 294684257; chain: Robinhood Chain"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S16
+    url: https://docs.ponsfamily.com/docs/v2
+    publisher: Pons Labs, LLC
+    kind: docs
+    accessed_at: 2026-08-31T22:45:00Z
+    claim: "Pons v2 docs: a launch sells from a bonding curve and graduates into a permanently locked Uniswap v4 pool; launches can pair against owner-approved assets such as tokenised stocks; the factory owner gates launch configs and pairing assets; Pons-proposed fee-recipient takeovers wait three days; nine deployed addresses on chain 4663; three security reviews in progress and none closed; public launches closed to non-allowlisted creators."
+    excerpt: "No audit has closed. Treat v2 as unaudited until the reports are published here. v2 is deployed and the addresses are listed under contracts. Public launches are closed, so only whitelisted addresses can create a token for now."
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S17
+    url: https://robinhoodchain.blockscout.com/address/0x39dBED3a2bd333467115dE45665cC57F813C4571
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: PONS at 0x39dB…4571 is a verified-source, non-proxy ERC-20 (PonsLauncherToken) on chain 4663, created by the v1 legacy factory 0x0c37…7a4, with 58,927 holders and a 1,000,000,000 total supply.
+    excerpt: "api/v2/addresses: is_contract true; is_verified true; name PonsLauncherToken; proxy_type null; creator_address_hash 0x0c37a24F5D23A486FA692d1500881d698B1F77a4; token.holders_count 58927; total_supply 1e27; api/v2/smart-contracts: compiler v0.8.30, verified_at 2026-07-13"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S18
+    url: https://robinhoodchain.blockscout.com/address/0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: "The v1 active factory 0xA5aA…1feB is a verified-source, non-proxy contract named PonsLaunchFactory; owner-callable writes in its ABI: addDexConfig, addLaunchConfig, updateLaunchConfig, setDexStatus, setLaunchEnabled, setLaunchFee, setWhitelistedLauncher, transferOwnership/acceptOwnership/renounceOwnership."
+    excerpt: "is_contract true; is_verified true; name PonsLaunchFactory; proxy_type null; creator 0xda4bCee76B29EFEc9697Fcf663601c2042043968; compiler v0.8.30; verified_at 2026-07-13; is_fully_verified true; license none"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S19
+    url: https://robinhoodchain.blockscout.com/address/0x736D76699C26D0d966744cAe304C000d471f7F35
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: "The v1 active locker 0x736D…7F35 is a verified-source, non-proxy contract named PonsLaunchLocker; its ABI has no unlock or withdraw function; writes: lockPosition, collectFees, setFeeCollector, setFeeRedirect, setProtocolFeeRecipient, setProtocolFeeShare, initialize, ownership transfer."
+    excerpt: "is_contract true; is_verified true; name PonsLaunchLocker; proxy_type null; creator 0xda4bCee76B29EFEc9697Fcf663601c2042043968; compiler v0.8.30; verified_at 2026-07-13; is_fully_verified true"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S20
+    url: https://robinhoodchain.blockscout.com/address/0x0c37a24F5D23A486FA692d1500881d698B1F77a4
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: The v1 legacy factory 0x0c37…7a4 is a contract on chain 4663 whose source is not verified on the explorer; it is the creator of the PONS token contract.
+    excerpt: "is_contract true; is_verified false; name null; proxy_type null; creator 0xda4bCee76B29EFEc9697Fcf663601c2042043968; creation tx 0xec8a7f6d…"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S21
+    url: https://robinhoodchain.blockscout.com/address/0x31ca5E101941A93A7DD6d0497928700625CF54B5
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: The v1 legacy locker 0x31ca…54B5 is a contract on chain 4663 whose source is not verified on the explorer.
+    excerpt: "is_contract true; is_verified false; name null; proxy_type null; creator 0xda4bCee76B29EFEc9697Fcf663601c2042043968; creation tx 0x6632319c…"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S22
+    url: https://robinhoodchain.blockscout.com/address/0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: "The v2 factory 0x7eD5…EC7e is a verified-source, non-proxy contract named PonsV2LaunchFactory; owner-callable writes in its ABI include addLaunchConfig, updateLaunchConfig, setLaunchEnabled, setLaunchFee, setWhitelistedLauncher, setPairTokenApproved, setPairTokenEconomics, setSnipeTaxSeconds, setSnipeTaxStartBps, setMaxCreatorTaxBps, setGraduationExecutor, setLaunchDeployer, setLaunchForwarder, setBuybackEnabled, setCreatorFeeRecipient, transferCreatorFeeRecipient, executeCreatorFeeRecipientChange, cancelCreatorFeeRecipientChange, rescueCurveFees, rescueSweptGraduation, forceSweptGraduation, plus launchToken, launchTokenFor, graduate, createGraduatedPool and ownership transfer."
+    excerpt: "is_contract true; is_verified true; name PonsV2LaunchFactory; proxy_type null; creator 0xFdDE5a1E3cDF791Da71E49F817D70C7ceD72CC36; creation tx 0x3817f297…; compiler v0.8.35; verified_at 2026-08-04; is_fully_verified true"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S23
+    url: https://robinhoodchain.blockscout.com/address/0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: "The v2 hook 0xE5e7…e044 is a verified-source, non-proxy contract named V2MemeHook; owner-callable writes in its ABI include setProtocolFeeRecipient, setProtocolFeeShareBps, setHookFeeBps, setCreatorFeeRecipient, setBuybackEnabled, setBuybackBurnBps, setBuybackVault, setFactory, setFeeSweepOperator, setMaxInternalPriceImpactBps, rescuePoolFees, sweepPoolFees, registerPool and ownership transfer, alongside the Uniswap v4 hook callbacks."
+    excerpt: "is_contract true; is_verified true; name V2MemeHook; proxy_type null; creator 0x4e59b44847b379578588920cA78FbF26c0B4956C (CREATE2 deployer); compiler v0.8.35; verified_at 2026-08-03"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S24
+    url: https://robinhoodchain.blockscout.com/address/0xd3AFEB2a57f70eF218Aa82451c51B2fb0416Ac9e
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: "The v2 fee escrow 0xd3AF…4c9e is a verified-source, non-proxy contract named V2FeeEscrow whose ABI exposes only claim, claimToken, credit and creditToken writes (no owner setters); it held about 723.6 ETH at access time."
+    excerpt: "is_contract true; is_verified true; name V2FeeEscrow; proxy_type null; creator 0xFdDE5a1E3cDF791Da71E49F817D70C7ceD72CC36; coin_balance 723629032176954734423 wei; compiler v0.8.35; verified_at 2026-08-03"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S25
+    url: https://robinhoodchain.blockscout.com/address/0x42df2a798f82289E177311362e8f5ccC45c1219c
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: "The v2 buyback vault 0x42df…219c is a verified-source, non-proxy contract named V2BuybackVault; ABI writes: lock, release, setFactory, an update function and ownership transfer."
+    excerpt: "is_contract true; is_verified true; name V2BuybackVault; proxy_type null; creator 0xFdDE5a1E3cDF791Da71E49F817D70C7ceD72CC36; compiler v0.8.35; verified_at 2026-08-03"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S26
+    url: https://robinhoodchain.blockscout.com/address/0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: "The v2 launch locker 0x2674…4952 is a verified-source, non-proxy contract named V2LaunchLocker whose ABI writes are lockPosition, lockTokenSupply, setFactory and ownership transfer — no unlock or withdraw function."
+    excerpt: "is_contract true; is_verified true; name V2LaunchLocker; proxy_type null; creator 0xFdDE5a1E3cDF791Da71E49F817D70C7ceD72CC36; compiler v0.8.35; verified_at 2026-08-03"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S27
+    url: https://robinhoodchain.blockscout.com/address/0xe33E9E479dF8802cb0866d5d05258bEc4cF62948
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: The v2 launch-and-buy router 0xe33E…2948 is a verified-source, non-proxy contract named PonsV2LaunchAndBuy.
+    excerpt: "is_contract true; is_verified true; name PonsV2LaunchAndBuy; proxy_type null; creator 0xFdDE5a1E3cDF791Da71E49F817D70C7ceD72CC36"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S28
+    url: https://robinhoodchain.blockscout.com/address/0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: The v2 launch deployer 0x3711…1A42 is a verified-source, non-proxy contract named PonsV2LaunchDeployer.
+    excerpt: "is_contract true; is_verified true; name PonsV2LaunchDeployer; proxy_type null; creator 0xFdDE5a1E3cDF791Da71E49F817D70C7ceD72CC36"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S29
+    url: https://robinhoodchain.blockscout.com/address/0xC7819B64A1dAECD7eC19856d026cb14EfBd89046
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: The v2 graduation executor 0xC781…9046 is a verified-source, non-proxy contract named V2GraduationExecutor.
+    excerpt: "is_contract true; is_verified true; name V2GraduationExecutor; proxy_type null; creator 0xFdDE5a1E3cDF791Da71E49F817D70C7ceD72CC36"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S30
+    url: https://robinhoodchain.blockscout.com/address/0xf5695117b99B6f6401e67d4195BD653628176C6C
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: The v2 graduation guard 0xf569…6C6C is a verified-source, non-proxy contract named PonsV2GraduationGuard, created by the v2 factory in the factory's own creation transaction.
+    excerpt: "is_contract true; is_verified true; name PonsV2GraduationGuard; proxy_type null; creator 0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e; creation tx 0x3817f297…"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S31
+    url: https://robinhoodchain.blockscout.com/address/0x263ed295dAFaE1d9AAdD6E56c4B6F9f38eE019Dd
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: 0x263e…19Dd, the owner returned by the Pons factories, lockers, hook and buyback vault, is a verified SafeProxy whose master copy is the canonical SafeL2 singleton 0x29fcB43b46531BcA003ddC8FCB67FFE91900C762.
+    excerpt: "is_contract true; is_verified true; name SafeProxy; proxy_type master_copy; implementations [{ address 0x29fcB43b46531BcA003ddC8FCB67FFE91900C762, name SafeL2 }]; creator 0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67; coin_balance about 174.9 ETH"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S32
+    url: https://robinhoodchain.blockscout.com/address/0xe306c19C72131B0a8f311648fa63FE8CeDf44571
+    publisher: Blockscout (Robinhood Chain explorer)
+    kind: explorer
+    accessed_at: 2026-08-31T23:10:00Z
+    claim: The second contract carrying the PONS ticker, 0xe306…4571, is a verified-source ERC-20 named MIMEToken (token name "Pons", symbol PONS) with 92 holders, created by 0xF193…7964 rather than by a Pons factory.
+    excerpt: "is_contract true; is_verified true; name MIMEToken; token.name Pons; token.symbol PONS; holders_count 92; creator 0xF193EDe778a92dc37CB450A1eF1565Ed1e8b7964"
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S33
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Robinhood Chain public RPC (chain id 4663), eth_call / eth_getStorageAt reads at block 51242016
+    kind: other
+    accessed_at: 2026-08-31T23:04:29Z
+    claim: "owner() on the v1 active and legacy factories and lockers, the v2 factory, hook, buyback vault, launch locker and launch-and-buy router returns 0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd; that address answers getThreshold() = 2, getOwners() = three externally owned accounts (0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e, 0x3825e7b3ff17637b08219e99d78b6c622b73f5b7, 0xfa31fe751c203a623b52fad26b4063abc2ffdf50 — code size 0, nonces 35 / 4 / 0) and VERSION() = 1.4.1; every listed Pons address has code, none has an EIP-1967 implementation or admin slot set, and paused() reverts on all of them."
+    excerpt: "eth_chainId 0x1237; eth_call owner() → 0x263ed295…19dd on 10 of 15 addresses (the token, fee escrow, launch deployer, graduation executor and guard revert); getThreshold() → 2; getOwners() → 3 addresses; VERSION() → 1.4.1; eth_getStorageAt EIP-1967 slots → 0 everywhere; latest block 51242265 at 2026-08-31T23:05:28Z"
     hash: null
     archive_url: null
     researcher: harsharn10
