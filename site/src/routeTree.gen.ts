@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChangelogRouteImport } from './routes/changelog'
+import { Route as FeedRouteImport } from './routes/feed'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as DIdRouteImport } from './routes/d.$id'
 import { Route as NSlugRouteImport } from './routes/n.$slug'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const ChangelogRoute = ChangelogRouteImport.update({
   id: '/changelog',
   path: '/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedRoute = FeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MethodologyRoute = MethodologyRouteImport.update({
@@ -44,6 +50,7 @@ const NSlugRoute = NSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
+  '/feed': typeof FeedRoute
   '/methodology': typeof MethodologyRoute
   '/d/$id': typeof DIdRoute
   '/n/$slug': typeof NSlugRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
+  '/feed': typeof FeedRoute
   '/methodology': typeof MethodologyRoute
   '/d/$id': typeof DIdRoute
   '/n/$slug': typeof NSlugRoute
@@ -59,21 +67,31 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
+  '/feed': typeof FeedRoute
   '/methodology': typeof MethodologyRoute
   '/d/$id': typeof DIdRoute
   '/n/$slug': typeof NSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/changelog' | '/methodology' | '/d/$id' | '/n/$slug'
+  fullPaths:
+    '/' | '/changelog' | '/feed' | '/methodology' | '/d/$id' | '/n/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/changelog' | '/methodology' | '/d/$id' | '/n/$slug'
-  id: '__root__' | '/' | '/changelog' | '/methodology' | '/d/$id' | '/n/$slug'
+  to: '/' | '/changelog' | '/feed' | '/methodology' | '/d/$id' | '/n/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/changelog'
+    | '/feed'
+    | '/methodology'
+    | '/d/$id'
+    | '/n/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChangelogRoute: typeof ChangelogRoute
+  FeedRoute: typeof FeedRoute
   MethodologyRoute: typeof MethodologyRoute
   DIdRoute: typeof DIdRoute
   NSlugRoute: typeof NSlugRoute
@@ -93,6 +111,13 @@ declare module '@tanstack/react-router' {
       path: '/changelog'
       fullPath: '/changelog'
       preLoaderRoute: typeof ChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/methodology': {
@@ -122,6 +147,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChangelogRoute: ChangelogRoute,
+  FeedRoute: FeedRoute,
   MethodologyRoute: MethodologyRoute,
   DIdRoute: DIdRoute,
   NSlugRoute: NSlugRoute,

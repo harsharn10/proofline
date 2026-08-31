@@ -1,10 +1,12 @@
 import { Link, useLoaderData } from "@tanstack/react-router";
 import { ExportMenu } from "@/components/export-menu";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { TopbarSearch } from "@/components/topbar-search";
 import { formatDate } from "@/lib/utils";
 
-// Sticky blurred topbar (Eregion top chrome): wide-tracked mono wordmark, crumb nav with
-// a green active underline, faint asof stamp, one export dropdown. Site-wide meta comes
-// from the root route's loader — see __root.tsx (`loader: () => getSiteMeta()`).
+// Sticky topbar (Eregion top chrome): wide-tracked mono wordmark, crumb nav with a green
+// active underline, the jump-to-name search, theme toggle, faint asof stamp, one export
+// dropdown. Site-wide meta comes from the root route's loader — see __root.tsx.
 export function SiteHeader() {
   const meta = useLoaderData({ from: "__root__" });
 
@@ -17,6 +19,9 @@ export function SiteHeader() {
         <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "on" }}>
           Coverage
         </Link>
+        <Link to="/feed" activeProps={{ className: "on" }}>
+          Feed
+        </Link>
         <Link to="/methodology" activeProps={{ className: "on" }}>
           Methodology
         </Link>
@@ -25,9 +30,11 @@ export function SiteHeader() {
         </Link>
       </nav>
       <div className="right">
+        <TopbarSearch names={meta.names} />
         <span className="asof">
           {meta.namesOnFile} names · upd {formatDate(meta.updated.slice(0, 10))}
         </span>
+        <ThemeToggle />
         <ExportMenu />
       </div>
     </header>

@@ -26,6 +26,14 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "stylesheet", href: appCss },
     ],
+    // Applies the saved theme before first paint (no flash of the wrong theme): reads
+    // localStorage in a try/catch — a private-mode failure falls through to dark default.
+    scripts: [
+      {
+        children:
+          'try{var t=localStorage.getItem("proofline.theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t)}}catch(e){}',
+      },
+    ],
   }),
   component: () => (
     <html lang="en" className="antialiased" suppressHydrationWarning>
