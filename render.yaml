@@ -1,0 +1,15 @@
+# Render Blueprint for the Proofline site (same pattern as DeathbyTax).
+# Connect in the Render dashboard: New + → Blueprint → select harsharn10/proofline → Apply.
+services:
+  - type: web
+    name: proofline
+    runtime: node
+    plan: starter
+    buildCommand: npm ci && npm run score && cd site && npm ci && NITRO_PRESET=node-server npm run build
+    startCommand: node site/.output/server/index.mjs
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
