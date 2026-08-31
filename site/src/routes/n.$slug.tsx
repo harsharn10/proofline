@@ -1,6 +1,5 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { Dossier } from "@/components/dossier";
 import { getName } from "@/data/names";
 
@@ -13,7 +12,6 @@ export const Route = createFileRoute("/n/$slug")({
   component: NamePage,
   notFoundComponent: () => (
     <div className="min-h-dvh bg-bg text-fg">
-      <SiteHeader />
       <div className="mx-auto max-w-3xl px-4 py-16">
         <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-subtle">Not on file</p>
         <h1 className="mt-2 text-2xl font-medium">That name is not in the file yet.</h1>
@@ -32,7 +30,6 @@ function NamePage() {
   const name = Route.useLoaderData();
   return (
     <div className="min-h-dvh bg-bg text-fg">
-      <SiteHeader />
       <div className="mx-auto max-w-3xl px-4 pt-4 sm:px-6">
         <Link
           to="/"

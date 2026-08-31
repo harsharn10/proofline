@@ -3,6 +3,12 @@ import { NAMES } from "@/data/names";
 import { CHAIN } from "@/data/chain";
 import { ExportMenu } from "@/components/export-menu";
 
+const NAV_LINKS = [
+  { to: "/", label: "Coverage" },
+  { to: "/methodology", label: "Methodology" },
+  { to: "/changelog", label: "Changelog" },
+] as const;
+
 export function SiteHeader() {
   return (
     <header className="border-b border-border bg-bg">
@@ -12,9 +18,20 @@ export function SiteHeader() {
             Robinhood Chain {CHAIN.chainId}
           </p>
           <h1 className="mt-1 font-sans text-lg font-semibold tracking-tight text-fg group-hover:text-accent">
-            Chain File
+            Proofline
           </h1>
         </Link>
+        <nav className="flex items-center gap-4">
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.to}
+              href={link.to}
+              className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted hover:text-fg"
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
         <div className="flex flex-wrap items-center gap-3">
           <div className="hidden sm:block text-right">
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-subtle">Names on file</p>

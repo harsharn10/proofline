@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { NameRow } from "@/components/name-row";
 import { FeedList } from "@/components/feed-list";
 import { Input } from "@/components/ui/input";
@@ -36,7 +35,6 @@ function Home() {
 
   return (
     <div className="min-h-dvh bg-bg text-fg">
-      <SiteHeader />
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
         <section className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
           <div>

@@ -1,9 +1,9 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
-import { AuthProvider } from "@/lib/auth/provider";
-import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "Chain File";
+const APP_NAME = "Proofline";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -14,7 +14,7 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#0b0c0e" },
       {
         name: "description",
-        content: "Running file on every name on Robinhood Chain. Overview, links, research, and a live feed of company and CT updates.",
+        content: "Evidence-backed research on native Robinhood Chain plays.",
       },
     ],
     links: [
@@ -26,8 +26,6 @@ export const Route = createRootRoute({
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap",
       },
-      { rel: "manifest", href: "/__grok/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
     ],
   }),
   component: () => (
@@ -36,10 +34,9 @@ export const Route = createRootRoute({
         <HeadContent />
       </head>
       <body>
-        <PreviewHostBridge />
-        <AuthProvider>
-          <Outlet />
-        </AuthProvider>
+        <SiteHeader />
+        <Outlet />
+        <SiteFooter />
         <Scripts />
       </body>
     </html>
