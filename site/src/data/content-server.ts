@@ -300,6 +300,12 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
     entries: content.dossiers.map((d) => toDirectoryEntry(d, content.handleBySlug)),
     latestFeed: latestFeed(content.dossiers),
     generatedAt: content.generatedAt,
+    counts: {
+      dependencyCards: Object.keys(content.dependencies).length,
+      sourcedClaims:
+        content.dossiers.reduce((n, d) => n + d.sources.length, 0) +
+        Object.values(content.dependencies).reduce((n, c) => n + c.sources.length, 0),
+    },
   };
 });
 

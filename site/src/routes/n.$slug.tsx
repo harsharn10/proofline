@@ -1,5 +1,4 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
 import { Dossier } from "@/components/dossier";
 import { getDossier } from "@/data/content-server";
 
@@ -12,18 +11,17 @@ export const Route = createFileRoute("/n/$slug")({
   },
   component: NamePage,
   notFoundComponent: () => (
-    <div className="min-h-dvh bg-bg text-fg">
-      <div className="mx-auto max-w-3xl px-4 py-16">
-        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-subtle">Not on file</p>
-        <h1 className="mt-2 text-2xl font-medium">That name is not in the file yet.</h1>
-        <p className="mt-3 max-w-prose text-sm text-muted">
-          Send the ticker and we will research it — overview, links, and a feed of company posts plus what people are saying.
-        </p>
-        <Link to="/" className="mt-6 inline-flex h-11 items-center text-sm text-accent hover:underline">
-          Back to the file
-        </Link>
-      </div>
-    </div>
+    <main className="wrap narrow pb-10">
+      <p className="eyebrow">Not on file</p>
+      <h1 className="text-2xl font-bold tracking-tight">That name is not in the file yet.</h1>
+      <p className="honest mt-3 max-w-prose">
+        Send the ticker and we will research it — overview, links, and a feed of project posts plus
+        commentary.
+      </p>
+      <Link to="/" className="backlink mt-6">
+        ← back to the file
+      </Link>
+    </main>
   ),
 });
 
@@ -32,17 +30,13 @@ function NamePage() {
   // note); the dossier reads its trending handles from derived.trendingAccounts and does not need it.
   const { dossier, site, dependencies } = Route.useLoaderData();
   return (
-    <div className="min-h-dvh bg-bg text-fg">
-      <div className="mx-auto max-w-3xl px-4 pt-4 sm:px-6">
-        <Link
-          to="/"
-          className="inline-flex h-11 items-center gap-2 text-sm text-muted hover:text-fg"
-        >
-          <ArrowLeft className="size-4" />
-          All names
+    <>
+      <div className="wrap narrow pt-3">
+        <Link to="/" className="backlink">
+          ← all names
         </Link>
       </div>
       <Dossier dossier={dossier} site={site} dependencies={dependencies} />
-    </div>
+    </>
   );
 }

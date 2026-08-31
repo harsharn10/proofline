@@ -289,6 +289,9 @@ export type DirectoryBundle = {
   entries: DirectoryEntry[];
   latestFeed: LatestFeedItem[];
   generatedAt: string; // build/derived.json generated_at — when scores were last computed
+  // Ledger totals for the home statrow (redesign rule 2: show what exists, no zeros) —
+  // counted server-side because the directory slice carries no source ledgers.
+  counts: { dependencyCards: number; sourcedClaims: number };
 };
 
 // What getDossier(slug) ships: the dossier, the cards it references, and the accounts its feed cites
@@ -348,8 +351,8 @@ export const LINK_KIND_LABEL: Record<LinkKind, string> = {
 };
 
 export const FEED_LABEL: Record<FeedKind, string> = {
-  company: "Company",
-  ct: "What people are saying",
+  company: "Project",
+  ct: "Commentary",
   onchain: "On-chain",
   risk: "Risk",
 };
