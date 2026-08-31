@@ -17,6 +17,7 @@ const BANNED_IN_DOSSIER = ["uncapped", "securityRaw"];
 function startPreview() {
   const child = spawn("npm", ["run", "preview", "--", "--port", String(PORT), "--strictPort"], {
     stdio: ["ignore", "pipe", "pipe"],
+    detached: true, // own process group, so we can kill vite (npm's grandchild) too
   });
   let output = "";
   child.stdout.on("data", (d) => (output += d));
@@ -66,7 +67,11 @@ async function main() {
     const output = getOutput().trim();
     if (output) console.error(output);
   } finally {
-    child.kill();
+    // Kill the whole process group: child.kill() would stop npm but orphan vite, whose open
+    // stdio pipe keeps a CI step alive indefinitely (the 2026-08-31 Validate hang).
+    try { process.kill(-child.pid, "SIGTERM"); } catch { child.kill("SIGTERM"); }
+    await new Promise((r) => setTimeout(r, 1500));
+    try { process.kill(-child.pid, "SIGKILL"); } catch { /* already gone */ }
   }
 
   if (failures.length > 0) {
