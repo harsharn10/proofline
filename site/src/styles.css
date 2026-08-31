@@ -297,10 +297,12 @@
 
   /* ── evidence badges (markdown.ts emits these verbatim) ─────────────── */
   .ev {
-    display: inline-flex; align-items: center; padding: 1px 6px;
+    display: inline-flex; flex-wrap: wrap; align-items: center; padding: 1px 6px;
     border-radius: 3px; border: 1px solid var(--line);
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em;
-    text-transform: lowercase; white-space: nowrap; color: var(--muted);
+    text-transform: lowercase; color: var(--muted);
+    /* a tag citing a dozen S-ids (first full record, Pons) must wrap inside the column at 390px */
+    max-width: 100%; white-space: normal; overflow-wrap: anywhere;
   }
   .ev-verified { color: var(--accent); border-color: rgba(0, 200, 5, 0.35); }
   .ev-claim { color: var(--muted); }
