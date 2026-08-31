@@ -190,7 +190,21 @@ export type DependencyFailureMode = { text: string; class: EvidenceClass; source
 export type DependencyCard = {
   id: string;
   name: string;
-  kind: "issuer-asset" | "dex" | "perp-venue" | "oracle" | "stablecoin";
+  // Mirrors schema/dependency.schema.json's `kind` enum exactly — DEPENDENCY_KIND_LABEL below is a
+  // Record over this union, so adding a kind to the schema without adding it here fails typecheck.
+  kind:
+    | "issuer-asset"
+    | "dex"
+    | "perp-venue"
+    | "oracle"
+    | "stablecoin"
+    | "lending"
+    | "yield"
+    | "bridge"
+    | "infra"
+    | "nft-marketplace"
+    | "locker"
+    | "aggregator";
   summary: string;
   controls: DependencyControl[];
   failure_modes: DependencyFailureMode[];
@@ -198,7 +212,11 @@ export type DependencyCard = {
   sources: SourceEntry[];
 };
 
-export type AccountTier = "top" | "watch";
+// Mirrors schema/accounts.schema.json's `tier` enum exactly. Only `top` (with role alpha/kol) counts
+// toward trending (scripts/lib/trending.mjs) and only `top` accounts render as trending sources
+// (components/dossier.tsx trendingCtAccounts) — `watch`, `downweight` and `skip` must never be treated
+// as sources by any code that adds a case here without also handling the other three.
+export type AccountTier = "top" | "watch" | "downweight" | "skip";
 export type AccountEntry = { handle: string; name?: string; tier: AccountTier; note?: string };
 
 export type SiteConfig = {
@@ -257,6 +275,13 @@ export const DEPENDENCY_KIND_LABEL: Record<DependencyCard["kind"], string> = {
   "perp-venue": "Perp venue",
   oracle: "Oracle",
   stablecoin: "Stablecoin",
+  lending: "Lending",
+  yield: "Yield",
+  bridge: "Bridge",
+  infra: "Infra",
+  "nft-marketplace": "NFT marketplace",
+  locker: "Locker",
+  aggregator: "Aggregator",
 };
 
 export const LINK_KIND_LABEL: Record<LinkKind, string> = {
