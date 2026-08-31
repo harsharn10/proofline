@@ -11,6 +11,7 @@ const REPLACEMENTS: Array<[RegExp, string]> = [
   [/[Tt]he desk map/g, "Proofline's chain map"],
   [/[Tt]he desk's/g, "Proofline's"],
   [/[Tt]he desk/g, "Proofline"],
+  [/[Dd]esk auditor/g, "Proofline auditor"],
   [/chain-slice/gi, "chain-level"],
   [/\bgraduations\b/g, "graduated launches"],
 ];

@@ -53,8 +53,13 @@ export function Dossier({
   );
   const correction = correctionsLink(site.corrections.destination);
   // Render only sections that hold actual research (brief rule 5) — data/markdown.ts
-  // renders an untouched section as a lone "Research pending." paragraph.
-  const researchSections = dossier.research.sections.filter((s) => !s.html.includes(">Research pending.<"));
+  // renders an untouched section as a lone "Research pending." paragraph. The template's
+  // boilerplate sections ("Sources" pointing at the repo file, "Review metadata") always
+  // carry text but are not research — the ledger below and the review record cover them.
+  const BOILERPLATE_HEADINGS = new Set(["Sources", "Review metadata"]);
+  const researchSections = dossier.research.sections.filter(
+    (s) => !s.html.includes(">Research pending.<") && !BOILERPLATE_HEADINGS.has(s.heading),
+  );
   const findingCount = findings.positive.length + findings.risk.length;
   const openItems = [...findings.missing, ...findings.unresolved];
 
