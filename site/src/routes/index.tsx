@@ -1,9 +1,8 @@
-import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { NameRow } from "@/components/name-row";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { FeedList } from "@/components/feed-list";
+import { HomeSection } from "@/components/home-section";
 import { getContent } from "@/data/content-server";
-import { type DirectoryEntry } from "@/data/types";
+import { SECTIONS, sectionForDomain, type DirectoryEntry } from "@/data/types";
 import { formatDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -11,49 +10,27 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+// The scene, by section (IA brief §Pages 1): masthead, statrow, the newest 5 feed items
+// (full firehose on /feed), then the nine visitor sections as ranked mini-tables. No
+// global flat list — the topbar search jumps straight to dossiers.
 function Home() {
-  // `entries` is the directory slice (no findings, research, sources or feeds) and `latestFeed`
-  // the 10 newest items across every name — both cut server-side in content-server.ts.
-  const { site, entries: dossiers, latestFeed, counts, generatedAt } = Route.useLoaderData();
-  const [q, setQ] = useState("");
-  const [cat, setCat] = useState<string>("all");
+  const { site, entries, latestFeed, counts, generatedAt } = Route.useLoaderData();
 
-  const categories = useMemo(() => Array.from(new Set(dossiers.map((d) => d.category))).sort(), [dossiers]);
+  const bySection = new Map<string, DirectoryEntry[]>();
+  for (const entry of entries) {
+    const section = sectionForDomain(entry.tree?.domain);
+    if (!section) continue;
+    const bucket = bySection.get(section.id);
+    if (bucket) bucket.push(entry);
+    else bySection.set(section.id, [entry]);
+  }
 
-  // Directory order (brief rule 4): names with feed activity first (busiest feeds on top),
-  // then the rest alphabetically. No score exists on a stub, so no score sort.
-  const sorted = useMemo(() => {
-    const quiet = (d: DirectoryEntry) => (d.feedCount > 0 || d.derived.trending ? 0 : 1);
-    return [...dossiers].sort((a, b) => {
-      if (quiet(a) !== quiet(b)) return quiet(a) - quiet(b);
-      if (quiet(a) === 0 && a.feedCount !== b.feedCount) return b.feedCount - a.feedCount;
-      return a.name.localeCompare(b.name);
-    });
-  }, [dossiers]);
-
-  const filtered = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    return sorted.filter((d) => {
-      if (cat !== "all" && d.category !== cat) return false;
-      if (!needle) return true;
-      return (
-        (d.symbol ?? "").toLowerCase().includes(needle) ||
-        d.name.toLowerCase().includes(needle) ||
-        d.summary.toLowerCase().includes(needle) ||
-        d.slug.includes(needle) ||
-        (d.handle ?? "").toLowerCase().includes(needle)
-      );
-    });
-  }, [q, cat, sorted]);
-
-  const liveFeedCount = dossiers.filter((d) => d.feedCount > 0).length;
+  const liveFeedCount = entries.filter((d) => d.feedCount > 0).length;
 
   return (
     <main className="wrap pb-4">
       <section className="hero">
-        <p className="eyebrow">
-          Robinhood Chain · {site.chain.id}
-        </p>
+        <p className="eyebrow">Robinhood Chain · {site.chain.id}</p>
         <h1>{site.tagline}</h1>
         <p className="desc">
           {site.name} tracks every native play on {site.chain.name} — deployments, control, security
@@ -62,10 +39,10 @@ function Home() {
         </p>
       </section>
 
-      {/* What exists, nothing else — no zero-stats above the fold (brief rule 2). */}
+      {/* What exists, nothing else — no zero-stats above the fold (redesign rule 2). */}
       <div className="statrow">
         <div className="s">
-          <b>{dossiers.length}</b>
+          <b>{entries.length}</b>
           <span>names on file</span>
         </div>
         <div className="s">
@@ -103,43 +80,16 @@ function Home() {
       <section>
         <div className="sechead">
           <h2 className="t">Latest</h2>
-          <span className="h">project posts &amp; commentary · newest first</span>
+          <Link to="/feed" className="h morelink">
+            full feed →
+          </Link>
         </div>
         <FeedList items={latestFeed} />
       </section>
 
-      <section>
-        <div className="sechead">
-          <h2 className="t">Names</h2>
-          <span className="h">
-            {filtered.length} of {dossiers.length} · open a name for links, findings, and its feed
-          </span>
-        </div>
-        <input
-          className="searchbox"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search ticker or project"
-          aria-label="Search names"
-        />
-        <div className="chips">
-          <button type="button" className={cat === "all" ? "on" : undefined} onClick={() => setCat("all")}>
-            All
-          </button>
-          {categories.map((c) => (
-            <button key={c} type="button" className={cat === c ? "on" : undefined} onClick={() => setCat(c)}>
-              {c}
-            </button>
-          ))}
-        </div>
-        <div className="mt-3">
-          {filtered.length === 0 ? (
-            <p className="honest mt-4">Nothing matches. Try another ticker or category.</p>
-          ) : (
-            filtered.map((d) => <NameRow key={d.slug} dossier={d} />)
-          )}
-        </div>
-      </section>
+      {SECTIONS.map((section) => (
+        <HomeSection key={section.id} section={section} entries={bySection.get(section.id) ?? []} />
+      ))}
     </main>
   );
 }

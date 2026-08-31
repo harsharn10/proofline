@@ -3,8 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { DeploymentGrid } from "@/components/deployment-grid";
 import { ExportMenu } from "@/components/export-menu";
 import { FeedList } from "@/components/feed-list";
+import { PeerCards } from "@/components/peer-cards";
 import { Section } from "@/components/section";
+import { SnapshotStrip } from "@/components/snapshot-strip";
 import { dejargon, hostLabel } from "@/lib/dejargon";
+import { formatDate } from "@/lib/utils";
 import {
   DEPENDENCY_KIND_LABEL,
   LIFECYCLE_LABEL,
@@ -13,14 +16,23 @@ import {
   correctionsLink,
   dexScreenerSearchUrl,
   explorerTokenUrl,
+  leafLabel,
   lifecycleTone,
   riskTone,
+  sectionForDomain,
   type Dossier as DossierData,
   type DependencyRef,
   type Finding,
   type Gap,
+  type PeerRef,
   type SiteConfig,
+  type TreeRef,
 } from "@/data/types";
+
+// URL-synced tabs (Eregion .tabs pattern): the id lives in ?tab=, overview is the clean
+// default URL. n.$slug.tsx validates the search param against this list.
+export const DOSSIER_TABS = ["overview", "evidence", "feed", "changelog"] as const;
+export type DossierTab = (typeof DOSSIER_TABS)[number];
 
 // One finding = one atom row: tiny kd label (evidence class + source ids), sentence below.
 // Risk findings carry a red `risk` prefix on the label instead of their own boxed section.
@@ -38,68 +50,44 @@ function FindingAtom({ finding, risk }: { finding: Finding; risk?: boolean }) {
   );
 }
 
-export function Dossier({
+function TabLink({ id, label, current }: { id: DossierTab; label: string; current: DossierTab }) {
+  return (
+    <Link
+      from="/n/$slug"
+      search={id === "overview" ? {} : { tab: id }}
+      resetScroll={false}
+      className={current === id ? "on" : undefined}
+      aria-current={current === id ? "page" : undefined}
+    >
+      {label}
+    </Link>
+  );
+}
+
+function OverviewTab({
   dossier,
   site,
   dependencies,
+  peers,
 }: {
   dossier: DossierData;
   site: SiteConfig;
   dependencies: Record<string, DependencyRef>;
+  peers: PeerRef[];
 }) {
-  const { derived, findings } = dossier;
+  const { findings } = dossier;
   const blockscoutDeployments = dossier.deployments.filter(
     (d) => d.chain === "robinhood-chain" && d.address !== NOT_VERIFIED,
   );
-  const correction = correctionsLink(site.corrections.destination);
-  // Render only sections that hold actual research (brief rule 5) — data/markdown.ts
-  // renders an untouched section as a lone "Research pending." paragraph. The template's
-  // boilerplate sections ("Sources" pointing at the repo file, "Review metadata") always
-  // carry text but are not research — the ledger below and the review record cover them.
-  const BOILERPLATE_HEADINGS = new Set(["Sources", "Review metadata"]);
-  const researchSections = dossier.research.sections.filter(
-    (s) => !s.html.includes(">Research pending.<") && !BOILERPLATE_HEADINGS.has(s.heading),
-  );
   const findingCount = findings.positive.length + findings.risk.length;
-  const openItems = [...findings.missing, ...findings.unresolved];
+  // Top 3, positives first; the risk flag survives so the atom keeps its red label.
+  const top = [
+    ...findings.positive.map((f) => ({ finding: f, risk: false })),
+    ...findings.risk.map((f) => ({ finding: f, risk: true })),
+  ].slice(0, 3);
 
   return (
-    <article className="wrap narrow pb-10">
-      <header className="masthead">
-        <div className="min-w-0">
-          <p className="eyebrow" style={{ margin: 0 }}>
-            {dossier.category}
-          </p>
-          <h1 className="mt-2">{dossier.symbol ?? dossier.name}</h1>
-          {dossier.symbol ? <p className="sub">{dossier.name}</p> : null}
-          <div className="mast-badges">
-            <Badge tone={lifecycleTone(dossier.lifecycle)}>{LIFECYCLE_LABEL[dossier.lifecycle]}</Badge>
-            {derived.trending ? <Badge tone="warn">trending</Badge> : null}
-            {derived.trending && derived.trendingAccounts.length > 0 ? (
-              <span className="asof">{derived.trendingAccounts.join(" · ")}</span>
-            ) : null}
-          </div>
-          {/* Site contract: `label` is the only display string and `provisional` the only
-              de-emphasis flag. The one "research pending" line for the whole dossier
-              (brief rule 1) lives here, in the score slot. */}
-          {derived.score === null ? (
-            <p className="scoreslot">no score yet · research pending</p>
-          ) : (
-            <div className="scorebig">
-              <span className="n">
-                {derived.score}
-                <span className="of">/100</span>
-              </span>
-              {derived.provisional ? <Badge tone="warn">provisional</Badge> : null}
-              {derived.confidence !== null ? <span className="conf">{derived.confidence}% confidence</span> : null}
-              {derived.risk ? <Badge tone={riskTone(derived.risk)}>{derived.risk} risk</Badge> : null}
-              {derived.override ? <span className="conf">capped by {derived.override.level} override</span> : null}
-            </div>
-          )}
-        </div>
-        <ExportMenu dossier={dossier} />
-      </header>
-
+    <div className="tabpanel">
       <p className="lead mt-5">{dejargon(dossier.summary)}</p>
 
       <div className="receiptrow mt-4">
@@ -129,12 +117,11 @@ export function Dossier({
         ))}
       </div>
 
-      <Section
-        title="Deployments"
-        hint={`${dossier.deployments.length} recorded`}
-      >
-        <DeploymentGrid deployments={dossier.deployments} explorerBase={site.chain.explorer} />
-      </Section>
+      {peers.length > 0 ? (
+        <Section title="Competes with" hint="same niche first, then same section">
+          <PeerCards peers={peers} />
+        </Section>
+      ) : null}
 
       {dossier.dependencies.length > 0 ? (
         <Section title="Depends on">
@@ -148,6 +135,59 @@ export function Dossier({
           </div>
         </Section>
       ) : null}
+
+      {top.length > 0 ? (
+        <Section
+          title="Findings"
+          hint={
+            findingCount > top.length ? (
+              <Link from="/n/$slug" search={{ tab: "evidence" }} resetScroll={false} className="morelink">
+                top {top.length} of {findingCount} — see Evidence →
+              </Link>
+            ) : undefined
+          }
+        >
+          <div className="atomlist">
+            {top.map((t, i) => (
+              <FindingAtom key={i} finding={t.finding} risk={t.risk} />
+            ))}
+          </div>
+        </Section>
+      ) : null}
+
+      {dossier.feed.length > 0 ? (
+        <Section
+          title="Latest"
+          hint={
+            <Link from="/n/$slug" search={{ tab: "feed" }} resetScroll={false} className="morelink">
+              see Feed tab →
+            </Link>
+          }
+        >
+          <FeedList items={dossier.feed.slice(0, 3).map((item) => ({ item }))} />
+        </Section>
+      ) : null}
+    </div>
+  );
+}
+
+function EvidenceTab({ dossier, site }: { dossier: DossierData; site: SiteConfig }) {
+  const { findings } = dossier;
+  const findingCount = findings.positive.length + findings.risk.length;
+  const openItems = [...findings.missing, ...findings.unresolved];
+  // Render only sections that hold actual research — data/markdown.ts renders an untouched
+  // section as a lone "Research pending." paragraph, and the template's boilerplate sections
+  // are covered by the ledger below and the Changelog tab's review record.
+  const BOILERPLATE_HEADINGS = new Set(["Sources", "Review metadata"]);
+  const researchSections = dossier.research.sections.filter(
+    (s) => !s.html.includes(">Research pending.<") && !BOILERPLATE_HEADINGS.has(s.heading),
+  );
+
+  return (
+    <div className="tabpanel">
+      <Section title="Deployments" hint={`${dossier.deployments.length} recorded`}>
+        <DeploymentGrid deployments={dossier.deployments} explorerBase={site.chain.explorer} />
+      </Section>
 
       <Section title="Findings" hint={findingCount > 0 ? `${findingCount} recorded` : undefined}>
         {findingCount > 0 ? (
@@ -174,26 +214,20 @@ export function Dossier({
         ) : null}
       </Section>
 
-      <Section title="Research record">
-        {researchSections.length > 0 ? (
+      {researchSections.length > 0 ? (
+        <Section title="Research record">
           <div className="mt-1 space-y-6">
             {researchSections.map((s) => (
               <div key={s.heading}>
                 <h3 className="text-sm font-semibold">{s.heading}</h3>
-                {/* research.sections.html is produced by data/markdown.ts from research/<slug>.md —
-                    evidence tags are pre-rendered to .ev spans and HTML comments already stripped. */}
+                {/* research.sections.html comes from data/markdown.ts — evidence tags are
+                    pre-rendered to .ev spans and HTML comments already stripped. */}
                 <div className="research-body mt-2 text-muted" dangerouslySetInnerHTML={{ __html: s.html }} />
               </div>
             ))}
           </div>
-        ) : (
-          <p className="honest">Full research record pending.</p>
-        )}
-      </Section>
-
-      <Section title="Feed" hint={`${dossier.feed.length} item${dossier.feed.length === 1 ? "" : "s"} · newest first`}>
-        <FeedList items={dossier.feed.map((item) => ({ item }))} />
-      </Section>
+        </Section>
+      ) : null}
 
       <Section title="Sources" hint={dossier.sources.length > 0 ? `${dossier.sources.length} in the ledger` : undefined}>
         {dossier.sources.length > 0 ? (
@@ -218,7 +252,24 @@ export function Dossier({
           <p className="honest">No sources recorded yet.</p>
         )}
       </Section>
+    </div>
+  );
+}
 
+function FeedTab({ dossier }: { dossier: DossierData }) {
+  return (
+    <div className="tabpanel">
+      <Section title="Feed" hint={`${dossier.feed.length} item${dossier.feed.length === 1 ? "" : "s"} · newest first`}>
+        <FeedList items={dossier.feed.map((item) => ({ item }))} />
+      </Section>
+    </div>
+  );
+}
+
+function ChangelogTab({ dossier }: { dossier: DossierData }) {
+  const review = dossier.review;
+  return (
+    <div className="tabpanel">
       <Section title="Changelog">
         {dossier.changelog.length > 0 ? (
           <ol className="m-0 list-none p-0">
@@ -238,6 +289,111 @@ export function Dossier({
           <p className="honest">No changelog entries yet.</p>
         )}
       </Section>
+
+      <Section title="Review record">
+        <div className="kvgrid">
+          <div className="s">
+            <div className="k">researched by</div>
+            <div className="v revv">{review.researcher}</div>
+          </div>
+          <div className="s">
+            <div className="k">approver</div>
+            <div className="v revv">{review.approver === "pending" ? "pending" : review.approver}</div>
+          </div>
+          <div className="s">
+            <div className="k">methodology</div>
+            <div className="v revv">{review.methodology_version}</div>
+          </div>
+          <div className="s">
+            <div className="k">last reviewed</div>
+            <div className="v revv">{formatDate(review.reviewed_at)}</div>
+          </div>
+          <div className="s">
+            <div className="k">published</div>
+            <div className="v revv">{review.published_at ? formatDate(review.published_at) : "not yet published"}</div>
+          </div>
+        </div>
+      </Section>
+    </div>
+  );
+}
+
+export function Dossier({
+  dossier,
+  site,
+  dependencies,
+  peers,
+  tree,
+  tab,
+}: {
+  dossier: DossierData;
+  site: SiteConfig;
+  dependencies: Record<string, DependencyRef>;
+  peers: PeerRef[];
+  tree: TreeRef | null;
+  tab: DossierTab;
+}) {
+  const { derived } = dossier;
+  const section = sectionForDomain(tree?.domain);
+  const correction = correctionsLink(site.corrections.destination);
+
+  return (
+    <article className="wrap narrow pb-10">
+      <header className="masthead">
+        <div className="min-w-0">
+          <p className="eyebrow mast-eyebrow">
+            {section ? (
+              <Link to="/" hash={section.id} className="seclink">
+                {section.label}
+              </Link>
+            ) : (
+              dossier.category
+            )}
+            {tree ? <span className="leafchip">{leafLabel(tree.leaf)}</span> : null}
+          </p>
+          <h1 className="mt-2">{dossier.symbol ?? dossier.name}</h1>
+          {dossier.symbol ? <p className="sub">{dossier.name}</p> : null}
+          <div className="mast-badges">
+            <Badge tone={lifecycleTone(dossier.lifecycle)}>{LIFECYCLE_LABEL[dossier.lifecycle]}</Badge>
+            {derived.trending ? <Badge tone="warn">trending</Badge> : null}
+            {derived.trending && derived.trendingAccounts.length > 0 ? (
+              <span className="asof">{derived.trendingAccounts.join(" · ")}</span>
+            ) : null}
+          </div>
+          {/* Site contract: `label` is the only display string and `provisional` the only
+              de-emphasis flag. The one "research pending" line for the whole dossier
+              lives here, in the score slot. */}
+          {derived.score === null ? (
+            <p className="scoreslot">no score yet · research pending</p>
+          ) : (
+            <div className="scorebig">
+              <span className="n">
+                {derived.score}
+                <span className="of">/100</span>
+              </span>
+              {derived.provisional ? <Badge tone="warn">provisional</Badge> : null}
+              {derived.confidence !== null ? <span className="conf">{derived.confidence}% confidence</span> : null}
+              {derived.risk ? <Badge tone={riskTone(derived.risk)}>{derived.risk} risk</Badge> : null}
+              {derived.override ? <span className="conf">capped by {derived.override.level} override</span> : null}
+            </div>
+          )}
+        </div>
+        <ExportMenu dossier={dossier} />
+      </header>
+
+      <SnapshotStrip metrics={derived.metrics} rank={derived.rank} category={dossier.category} sources={dossier.sources} />
+
+      <nav className="tabs" aria-label="Dossier sections">
+        <TabLink id="overview" label="Overview" current={tab} />
+        <TabLink id="evidence" label="Evidence" current={tab} />
+        <TabLink id="feed" label={dossier.feed.length > 0 ? `Feed · ${dossier.feed.length}` : "Feed"} current={tab} />
+        <TabLink id="changelog" label="Changelog" current={tab} />
+      </nav>
+
+      {tab === "overview" ? <OverviewTab dossier={dossier} site={site} dependencies={dependencies} peers={peers} /> : null}
+      {tab === "evidence" ? <EvidenceTab dossier={dossier} site={site} /> : null}
+      {tab === "feed" ? <FeedTab dossier={dossier} /> : null}
+      {tab === "changelog" ? <ChangelogTab dossier={dossier} /> : null}
 
       <p className="mt-10 border-t border-line pt-5 text-[12.5px] text-muted">
         Spotted an error?{" "}

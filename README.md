@@ -39,9 +39,13 @@ If a number on the site is wrong, the fix is in an input or in `score.mjs`, neve
 
 The site reads only `build/derived.json` (written by `npm run score`, which refuses to write when `content/` fails
 validation). Per project it may render `score`, `provisional`, `label`, `confidence`, `risk`, `override.level`,
-`factorPercents`, `trending` and `trendingAccounts`. `label` is the only display string and `provisional` the only
-de-emphasis flag; `trendingAccounts` is the counting-accounts list `computeTrending()` already produced — the site
-renders it as-is and never recomputes trending sources from account tiers with its own rule. It must never render
+`factorPercents`, `trending`, `trendingAccounts`, `metrics` and `rank`. `label` is the only display string and
+`provisional` the only de-emphasis flag; `trendingAccounts` is the counting-accounts list `computeTrending()` already
+produced — the site renders it as-is and never recomputes trending sources from account tiers with its own rule.
+`metrics` is a passthrough of the project file's own `metrics[]` (content claims — `class: claim`, ledger-cited,
+never `verified`); `rank` is `computeRanks()`'s output for the project's census category — `{ basis, position, of }`
+or `null` when the category has no ranked basis (see "Metrics and category ranks" below) — and the site must render
+it as-is rather than recomputing a basis or position from `metrics` with its own rule. It must never render
 `uncappedScore` or `uncappedConfidence` — those exist so reviewers can see when a cap is doing work. The loaders in
 `site/src/data/content-server.ts` also never ship an account's `note` to a page, and the directory route (`/`) ships
 a slim per-project slice, not the full research/sources/findings bundle — see that file's comments for the exact
@@ -121,6 +125,27 @@ its `role` is absent or `alpha` / `kol` — official project accounts, data feed
 handle. `npm run score` merges the result into
 `build/derived.json` — `trending: boolean` on every project, plus a top-level `trending: [slug, ...]` list. Pass
 `--today YYYY-MM-DD` to pin "today" for a reproducible run; it defaults to the real date.
+
+## Metrics and category ranks
+
+`content/projects/<slug>.yaml` may carry an optional `metrics: [{ kind, value, currency?, as_of, class, sources }]`.
+`kind` is `tvl | volume_24h | fees_24h | revenue_24h | market_cap | holders` (`schema/shared.schema.json`
+`metricKind`); `value` is a number ≥ 0; `currency` is the const `"USD"` and must be **absent** when `kind: holders`
+(a holder count has no currency), optional (defaults to USD) otherwise; `class` is always the const `"claim"` —
+a harvested metric is a number a third party published, never independently reproduced, so it can never be
+`verified`; `sources` is one or more ledger ids (`crossCheck` errors if any of them is missing from that slug's
+`sources/<slug>.yaml`, the same rule as everywhere else a project cites a source — no schema-level special case was
+needed, `referencedSourceIds()` already walks any array keyed `sources` generically).
+
+`scripts/lib/score.mjs`'s `computeRanks()` derives per-project category ranks from `metrics[]` — nothing is ever
+typed into a rank field by hand. Within each census `category`, it picks **one basis** for the whole category: the
+highest-priority kind, in the fixed order `tvl, volume_24h, fees_24h, revenue_24h` (`market_cap` and `holders` are
+never a ranking basis), that at least two projects in the category both carry a value for. A category where no kind
+clears that bar gets no ranks at all. Projects that have `metrics[]` but not a value for the category's basis kind
+are not ranked either. Ties use standard competition ranking — a tie shares the lower position and the next distinct
+value skips ahead by the tie size (`1, 1, 3`, never `1, 2`). `npm run score` merges the result into
+`build/derived.json`: every project gets `metrics: []` (a direct passthrough of the project file's own array) and
+`rank: { basis, position, of } | null` (`of` = how many projects in that category are ranked on that basis).
 
 ## Telegram digest
 

@@ -28,7 +28,18 @@
         "missing": { "type": "array", "items": { "type": "string" } }, "evidence": { "$ref": "#/$defs/sourceRefs" } },
       "if": { "properties": { "level": { "not": { "const": "insufficient" } } } },
       "then": { "properties": { "evidence": { "minItems": 1 } } } },
-    "pct": { "type": "integer", "minimum": 0, "maximum": 100 }
+    "pct": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "metric": { "type": "object", "additionalProperties": false, "required": ["kind","value","as_of","class","sources"],
+      "properties": {
+        "kind": { "$ref": "shared#/$defs/metricKind" },
+        "value": { "type": "number", "minimum": 0 },
+        "currency": { "const": "USD" },
+        "as_of": { "type": "string", "format": "date" },
+        "class": { "const": "claim" },
+        "sources": { "$ref": "#/$defs/sourceRefs", "minItems": 1 }
+      },
+      "if": { "properties": { "kind": { "const": "holders" } } },
+      "then": { "properties": { "currency": false } } }
   },
   "properties": {
     "slug": { "$ref": "#/$defs/slug" },
@@ -41,6 +52,7 @@
     "official_links": { "type": "array", "items": { "$ref": "#/$defs/link" } },
     "dependencies": { "type": "array", "items": { "$ref": "#/$defs/slug" }, "uniqueItems": true },
     "deployments": { "type": "array", "items": { "$ref": "shared#/$defs/deployment" } },
+    "metrics": { "type": "array", "items": { "$ref": "#/$defs/metric" } },
     "review": { "type": "object", "additionalProperties": false, "required": ["researcher","approver","methodology_version","reviewed_at","published_at"],
       "properties": { "researcher": { "type": "string", "pattern": "^[a-z0-9-]+$" }, "approver": { "type": "string", "pattern": "^[a-z0-9-]+$" },
         "methodology_version": { "const": "proofline-v1.0" }, "reviewed_at": { "type": "string", "format": "date" }, "published_at": { "type": ["string","null"], "format": "date" } } },

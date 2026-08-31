@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, cp, rm, writeFile, appendFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { derive, SECURITY_MAX, PROVISIONAL_CONFIDENCE, FULL_WEIGHT_CONFIDENCE } from "./lib/score.mjs";
+import { derive, SECURITY_MAX, PROVISIONAL_CONFIDENCE, FULL_WEIGHT_CONFIDENCE, computeRanks } from "./lib/score.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { crossCheck, releaseCheck } from "./lib/checks.mjs";
 import { checkResearch, tagIds, REQUIRED_HEADINGS } from "./lib/research-md.mjs";
@@ -643,6 +643,85 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.ok(badChainRejected.length > 0, "chain: bsc is rejected");
     console.log("ok   project schema deployments");
   } catch (err) { failures++; console.error(`FAIL project schema deployments: ${err.message}`); }
+}
+
+// Task A — project schema: metrics[] (schema/shared.schema.json metricKind + schema/project.schema.json metric).
+{
+  const fresh = async () => parse(await readFile(new URL("../fixtures/clean/project.yaml", import.meta.url), "utf8"));
+  const validTvl = await fresh(); validTvl.metrics = [{ kind: "tvl", value: 1000, currency: "USD", as_of: "2026-08-31", class: "claim", sources: ["S1"] }];
+  const validTvlErrs = validateAgainst("project", validTvl);
+  const emptySources = await fresh(); emptySources.metrics = [{ kind: "tvl", value: 1000, currency: "USD", as_of: "2026-08-31", class: "claim", sources: [] }];
+  const emptySourcesErrs = validateAgainst("project", emptySources);
+  const badKind = await fresh(); badKind.metrics = [{ kind: "mcap", value: 1000, currency: "USD", as_of: "2026-08-31", class: "claim", sources: ["S1"] }];
+  const badKindErrs = validateAgainst("project", badKind);
+  const holdersOk = await fresh(); holdersOk.metrics = [{ kind: "holders", value: 500, as_of: "2026-08-31", class: "claim", sources: ["S1"] }];
+  const holdersOkErrs = validateAgainst("project", holdersOk);
+  const holdersWithCurrency = await fresh(); holdersWithCurrency.metrics = [{ kind: "holders", value: 500, currency: "USD", as_of: "2026-08-31", class: "claim", sources: ["S1"] }];
+  const holdersWithCurrencyErrs = validateAgainst("project", holdersWithCurrency);
+  const negativeValue = await fresh(); negativeValue.metrics = [{ kind: "tvl", value: -5, currency: "USD", as_of: "2026-08-31", class: "claim", sources: ["S1"] }];
+  const negativeValueErrs = validateAgainst("project", negativeValue);
+  const wrongClass = await fresh(); wrongClass.metrics = [{ kind: "tvl", value: 5, currency: "USD", as_of: "2026-08-31", class: "verified", sources: ["S1"] }];
+  const wrongClassErrs = validateAgainst("project", wrongClass);
+  try {
+    assert.deepEqual(validTvlErrs, [], "valid tvl metric accepted");
+    assert.ok(emptySourcesErrs.length > 0, "metric with sources: [] rejected");
+    assert.ok(badKindErrs.length > 0, "kind mcap rejected");
+    assert.deepEqual(holdersOkErrs, [], "holders without currency accepted");
+    assert.ok(holdersWithCurrencyErrs.length > 0, "holders with a currency is rejected");
+    assert.ok(negativeValueErrs.length > 0, "negative value rejected");
+    assert.ok(wrongClassErrs.length > 0, "class other than claim rejected");
+    console.log("ok   project schema metrics");
+  } catch (err) { failures++; console.error(`FAIL project schema metrics: ${err.message}`); }
+}
+
+// Task A — crossCheck: a metrics[] entry citing a missing source id is an error. referencedSourceIds() already
+// walks any array keyed "sources" generically (checks.mjs:12), so metrics[].sources is covered without a
+// checks.mjs change — this test proves that holds for the new field too.
+{
+  const danglingMetric = crossCheck(await makeContent((c, p) => {
+    p.metrics = [{ kind: "tvl", value: 1000, currency: "USD", as_of: "2026-08-31", class: "claim", sources: ["S9"] }];
+  }));
+  try {
+    assert.ok(danglingMetric.errors.some((e) => e.includes("S9") && e.includes("projects/clean")), "metric citing a missing source id is an error");
+    console.log("ok   crossCheck metrics");
+  } catch (err) { failures++; console.error(`FAIL crossCheck metrics: ${err.message}`); }
+}
+
+// Task A — computeRanks: one basis per category (highest-priority kind ≥2 projects share), standard competition
+// ranking (ties share a position, the next distinct value skips: 1,1,3), categories with <2 ranked projects get none.
+{
+  const proj = (slug, category, metrics) => ({ slug, category, metrics });
+  const threeTvl = computeRanks([
+    proj("a", "Lending", [{ kind: "tvl", value: 300 }]),
+    proj("b", "Lending", [{ kind: "tvl", value: 200 }]),
+    proj("c", "Lending", [{ kind: "tvl", value: 100 }]),
+  ]);
+  const volumeShared = computeRanks([
+    proj("x", "Yield", [{ kind: "tvl", value: 50 }, { kind: "volume_24h", value: 10 }]), // tvl has only 1 holder in-category
+    proj("y", "Yield", [{ kind: "volume_24h", value: 20 }]),
+  ]);
+  const onlyOneMetricd = computeRanks([
+    proj("solo", "Options", [{ kind: "tvl", value: 5 }]),
+    proj("bare", "Options", []),
+  ]);
+  const tied = computeRanks([
+    proj("p", "Oracle / infra", [{ kind: "tvl", value: 100 }]),
+    proj("q", "Oracle / infra", [{ kind: "tvl", value: 100 }]),
+    proj("r", "Oracle / infra", [{ kind: "tvl", value: 50 }]),
+  ]);
+  try {
+    assert.deepEqual(threeTvl.get("a"), { basis: "tvl", position: 1, of: 3 }, "highest tvl → position 1 of 3");
+    assert.deepEqual(threeTvl.get("b"), { basis: "tvl", position: 2, of: 3 });
+    assert.deepEqual(threeTvl.get("c"), { basis: "tvl", position: 3, of: 3 });
+    assert.deepEqual(volumeShared.get("y"), { basis: "volume_24h", position: 1, of: 2 }, "tvl shared by only 1 project is skipped for volume_24h");
+    assert.deepEqual(volumeShared.get("x"), { basis: "volume_24h", position: 2, of: 2 });
+    assert.equal(onlyOneMetricd.has("solo"), false, "category with 1 metric'd project gets no ranks");
+    assert.equal(onlyOneMetricd.has("bare"), false);
+    assert.deepEqual(tied.get("p"), { basis: "tvl", position: 1, of: 3 }, "tie shares position 1");
+    assert.deepEqual(tied.get("q"), { basis: "tvl", position: 1, of: 3 }, "tie shares position 1");
+    assert.deepEqual(tied.get("r"), { basis: "tvl", position: 3, of: 3 }, "next distinct value skips to 3 (standard competition ranking)");
+    console.log("ok   computeRanks");
+  } catch (err) { failures++; console.error(`FAIL computeRanks: ${err.message}`); }
 }
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }

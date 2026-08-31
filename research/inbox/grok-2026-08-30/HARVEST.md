@@ -351,3 +351,62 @@ row (EVAL test 1 ✓); the capture-date convention is documented (ruling A); `bl
 2. `website` as a slug (map fidelity) vs `notawebsite`.
 3. Four PRD seed names (artificial-inu, longshot, long, bankr) are now `announced` under ruling C; the PRD seed table
    says `mainnet` — reproduce the Appendix A addresses on Blockscout to restore it.
+
+## 12. Metrics (2026-08-31 harvest, site-integration Task A)
+
+`scripts/intake/2026-08-31/harvest-metrics.mjs --overwrite` (one-shot; do not re-run — see that directory's
+README.md) turned the map's `subjects[].llama{}` blocks into `content/projects/<slug>.yaml` `metrics[]` and one new
+`content/sources/<slug>.yaml` ledger entry per harvested slug (`class: claim`, never `verified` — see README
+"Metrics and category ranks"). Of the map's 50 `subjects:` rows, **14** carry a literal `llama:` key; **12** of
+those yielded at least one metric this harvest maps understands (**21 metrics** total, one new ledger source each):
+
+| Slug | Metrics harvested |
+|---|---|
+| pons | fees_24h $4.7M, revenue_24h $868,850, volume_24h $86.5M |
+| stonkbroker | tvl $25,599,049, fees_24h $33,776, revenue_24h $18,835 |
+| index | revenue_24h $24,321 |
+| vimen | tvl $9,208 |
+| up | volume_24h $37.13M, revenue_24h $72,972 |
+| fables | tvl $2,244,192, volume_24h $11.88M |
+| noxa | tvl $5,425,289, fees_24h $123,438, revenue_24h $0 |
+| virtuals | revenue_24h $22,571 |
+| netnet | tvl $0 |
+| delta | tvl $16,201 |
+| snuggle | tvl $3,077,872, revenue_24h $14,749 |
+| sherwood | tvl $80,196 |
+
+The other 2 slugs with a `llama:` key produced nothing: `mancer` is `llama: null` (no data — its beta-gated router
+has no Llama row); `meridian`'s block (`perps_tvl`, `predict_tvl`) uses neither of the harvest's mapped keys (only
+literal `tvl`/`vol_24h`/`fees_24h`/`revenue_24h` map — the brief's rule, not a guess at Meridian's two products), so
+the whole subject was skipped rather than harvested under the wrong kind.
+
+Nonstandard keys skipped (recorded, never guessed at): `stonkbroker` — `anvil_vol_24h`, `pad_vol_24h` (its `llama:`
+line is also the file's one duplicate key — see §1 "Intake quirks"; the harvester takes the later of the two
+lines, which is the more complete one); `index` — `revenue_7d`; `meridian` — `perps_tvl`, `predict_tvl` (both);
+`up` — `tvl_v3`, `tvl_v2`; `virtuals` — `revenue_30d`. All 14 slugs with a `llama:` key already matched a
+`content/census.yaml` row (checked; none needed to be skipped as unmatched).
+
+Ledger URL: `pons` already carried a `defillama.com/protocol/pons` entry (S7, from the original Task 5 harvest) and
+the map's own `meta.sources` list names that same page — its new metrics entry (S9) reuses that URL. No other
+harvested slug's page is named anywhere in the map or its existing ledger, so all 11 cite
+`https://defillama.com/chain/robinhood-chain` (brief's default) instead.
+
+StonkBrokers: the map's note ("Llama parent TVL $26m vs launchpad-page $1.05m — child/parent split. Confirm.") is
+already recorded as a `risk`/`unresolved` pair from the original Task 5 harvest; per the brief this pass additionally
+appends a `findings.missing` line naming the same discrepancy with the exact number now harvested ($25,599,049) — a
+content reviewer may want to consolidate the three near-duplicate lines (`risk`, `unresolved`, `missing`) once a
+human resolves the split; this harvest does not merge across those buckets.
+
+**Category ranks** (`computeRanks()`, `scripts/lib/score.mjs`; see README "Metrics and category ranks"): of the 12
+harvested slugs, 8 land in a category with ≥2 metric'd peers sharing a basis kind and get a rank; 4 (stonkbroker,
+index, virtuals, sherwood) are the only metric'd project in their category and get `rank: null`.
+
+| Category | Basis | Ranked (position of `of`) |
+|---|---|---|
+| Launchpad | fees_24h | pons 1 of 2, noxa 2 of 2 |
+| Fee-routing protocol | volume_24h | up 1 of 2, fables 2 of 2 |
+| RWA baskets | tvl | vimen 1 of 2, netnet 2 of 2 |
+| Yield | tvl | snuggle 1 of 2, delta 2 of 2 |
+
+`npm run validate` after this harvest: still 49 projects, 0 errors, 11 warnings (unchanged). `npm run score`: 12
+projects with metrics, 8 ranked.

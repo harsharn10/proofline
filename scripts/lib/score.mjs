@@ -126,3 +126,48 @@ export function derive(project) {
   if (capped === null || confR === null || confR < PROVISIONAL_CONFIDENCE) return out; // label stays pending
   return { ...out, score: round(capped), provisional: confR < FULL_WEIGHT_CONFIDENCE, label: null };
 }
+
+// Task A — category ranks. Priority order for the one basis a category ranks on; market_cap and holders are
+// never eligible as a basis (display-only kinds for this task).
+export const RANK_PRIORITY = ["tvl", "volume_24h", "fees_24h", "revenue_24h"];
+
+/**
+ * Within each census category, ranks the projects that carry a `metrics[]` value for the category's basis
+ * kind — the highest-priority kind (RANK_PRIORITY order) that at least two projects in the category share.
+ * A category with no such kind gets no ranks at all. Standard competition ranking: a tie shares the lower
+ * position and the next distinct value skips ahead by the tie size (1,1,3 — never 1,2).
+ *
+ * @param {Array<{slug: string, category: string, metrics?: Array<{kind: string, value: number}>}>} projects
+ * @returns {Map<string, {basis: string, position: number, of: number}>} slug -> rank, only for ranked projects
+ */
+export function computeRanks(projects) {
+  const byCategory = new Map();
+  for (const p of projects) {
+    if (!p.metrics?.length) continue;
+    if (!byCategory.has(p.category)) byCategory.set(p.category, []);
+    byCategory.get(p.category).push(p);
+  }
+
+  const result = new Map();
+  for (const members of byCategory.values()) {
+    let basis = null;
+    for (const kind of RANK_PRIORITY) {
+      const count = members.filter((p) => p.metrics.some((m) => m.kind === kind)).length;
+      if (count >= 2) { basis = kind; break; }
+    }
+    if (!basis) continue;
+
+    const ranked = members
+      .map((p) => ({ slug: p.slug, value: p.metrics.find((m) => m.kind === basis)?.value }))
+      .filter((p) => p.value !== undefined)
+      .sort((a, b) => b.value - a.value || a.slug.localeCompare(b.slug));
+    const of = ranked.length;
+    let position = 0, prevValue = null;
+    ranked.forEach((p, i) => {
+      if (p.value !== prevValue) position = i + 1;
+      prevValue = p.value;
+      result.set(p.slug, { basis, position, of });
+    });
+  }
+  return result;
+}

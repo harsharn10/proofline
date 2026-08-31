@@ -1,8 +1,17 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
-import { Dossier } from "@/components/dossier";
+import { DOSSIER_TABS, Dossier, type DossierTab } from "@/components/dossier";
 import { getDossier } from "@/data/content-server";
 
 export const Route = createFileRoute("/n/$slug")({
+  // URL-synced tabs: /n/<slug>?tab=evidence. Overview is the clean default URL; anything
+  // unrecognized falls back to it. The default tab renders server-side like any other.
+  validateSearch: (search: Record<string, unknown>): { tab?: DossierTab } => {
+    const tab = search.tab;
+    if (typeof tab === "string" && tab !== "overview" && (DOSSIER_TABS as readonly string[]).includes(tab)) {
+      return { tab: tab as DossierTab };
+    }
+    return {};
+  },
   loader: async ({ params }) => {
     const result = await getDossier({ data: params.slug });
     const { dossier, ...rest } = result;
@@ -28,7 +37,8 @@ export const Route = createFileRoute("/n/$slug")({
 function NamePage() {
   // The loader also carries `accounts` (handle/tier/role for the handles this feed cites — never a
   // note); the dossier reads its trending handles from derived.trendingAccounts and does not need it.
-  const { dossier, site, dependencies } = Route.useLoaderData();
+  const { dossier, site, dependencies, peers, tree } = Route.useLoaderData();
+  const { tab } = Route.useSearch();
   return (
     <>
       <div className="wrap narrow pt-3">
@@ -36,7 +46,7 @@ function NamePage() {
           ← all names
         </Link>
       </div>
-      <Dossier dossier={dossier} site={site} dependencies={dependencies} />
+      <Dossier dossier={dossier} site={site} dependencies={dependencies} peers={peers} tree={tree} tab={tab ?? "overview"} />
     </>
   );
 }

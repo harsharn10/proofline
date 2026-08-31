@@ -139,6 +139,24 @@ export type ChangelogEntry = {
 export type RiskLevel = "Low" | "Moderate" | "Elevated" | "High" | "Critical";
 export type OverrideLevel = "Critical" | "High" | "Elevated";
 
+// --- Metrics & ranks (Task A: `metrics[]` on project files, `rank` in derived.json) ---
+
+export type MetricKind = "tvl" | "volume_24h" | "fees_24h" | "revenue_24h" | "market_cap" | "holders";
+
+// A reported figure from projects/<slug>.yaml `metrics[]` — always claim-class, always sourced.
+export type Metric = {
+  kind: MetricKind;
+  value: number;
+  currency?: "USD"; // absent for `holders`
+  as_of: string;
+  class: "claim";
+  sources: string[];
+};
+
+// Category rank from derived.json: position within the flat census category, computed on one
+// basis kind (scripts/lib/score.mjs computeRanks). Never renders without its basis in words.
+export type Rank = { basis: MetricKind; position: number; of: number };
+
 // Exactly the fields the site contract permits from build/derived.json. Never add
 // uncappedScore / uncappedConfidence / securityRaw here — see README "Site contract".
 export type Derived = {
@@ -161,7 +179,14 @@ export type Derived = {
   // The counting accounts behind `trending` (scripts/lib/trending.mjs), computed by `npm run score` —
   // the site renders this list and never recomputes it from tiers or feed dates.
   trendingAccounts: string[];
+  // Reported figures + category rank (Task A) — both in the site contract. Every metric renders
+  // with a `reported` chip and its as-of; a rank never renders without its basis spelled out.
+  metrics: Metric[];
+  rank: Rank | null;
 };
+
+// The desk's taxonomy placement from census.yaml `tree.primary` ("launch/bonding-curve").
+export type TreeRef = { domain: string; leaf: string };
 
 // What the directory (`/`) and the changelog need per name — no findings, research, sources or feed
 // bodies (final review I6: the full bundle was 561 KB at 49 names and grows with every record).
@@ -177,6 +202,9 @@ export type DirectoryEntry = {
   handle: string | null; // the project's official X handle from census.yaml, when it has one
   feedCount: number;
   reviewedAt: string; // review.reviewed_at — the stub sort key
+  // census tree.primary placement — the home page's section grouping (null when the census
+  // row carries no tree yet; such a name stays reachable via search and links).
+  tree: TreeRef | null;
 };
 
 // One row of the home page's "latest in the feed" strip: the item plus just enough of its name to link.
@@ -294,14 +322,218 @@ export type DirectoryBundle = {
   counts: { dependencyCards: number; sourcedClaims: number };
 };
 
-// What getDossier(slug) ships: the dossier, the cards it references, and the accounts its feed cites
-// (handle/tier/role only — never `note`).
+// A "competes with" card on a dossier's Overview tab: same tree leaf first (direct), then same
+// domain (adjacent). Summary arrives pre-truncated; metric is the peer's headline figure.
+export type PeerRef = {
+  slug: string;
+  name: string;
+  symbol: string | null;
+  summary: string;
+  lifecycle: Lifecycle;
+  direct: boolean;
+  leaf: string;
+  metric: Metric | null;
+};
+
+// What getDossier(slug) ships: the dossier, the cards it references, its peers and taxonomy
+// placement, and the accounts its feed cites (handle/tier/role only — never `note`).
 export type DossierBundle = {
   dossier: Dossier;
   site: SiteConfig;
   dependencies: Record<string, DependencyRef>;
   accounts: AccountRef[];
+  peers: PeerRef[];
+  tree: TreeRef | null;
 };
+
+// --- Visitor-facing taxonomy (IA ruling) --------------------------------------------
+
+export type SectionDef = { id: string; label: string; description: string; domains: string[] };
+
+// Order is the home-page order. Labels are visitor words; ids are the home anchor slugs
+// (`/#launchpads`); domains are census `tree.primary` domains.
+export const SECTIONS: SectionDef[] = [
+  {
+    id: "launchpads",
+    label: "Launchpads",
+    description: "Where new tokens launch — bonding curves and pools that graduate into open trading.",
+    domains: ["launch"],
+  },
+  {
+    id: "rwa-products",
+    label: "RWA products",
+    description: "Plays built on tokenized stocks and other real-world assets — baskets, vaults, paired tokens.",
+    domains: ["rwa-products"],
+  },
+  {
+    id: "trading-venues",
+    label: "Trading venues",
+    description: "Where tokens change hands — native AMMs, aggregators, and the fee layers on top.",
+    domains: ["trading"],
+  },
+  {
+    id: "yield-lp",
+    label: "Yield & LP",
+    description: "Vaults and managers that put deposits and LP positions to work.",
+    domains: ["yield"],
+  },
+  {
+    id: "agents",
+    label: "Agents",
+    description: "AI agents that launch tokens, trade, or transact on the chain.",
+    domains: ["agents"],
+  },
+  {
+    id: "credit",
+    label: "Credit",
+    description: "Borrowing and lending against on-chain collateral.",
+    domains: ["credit"],
+  },
+  {
+    id: "nft-treasuries",
+    label: "NFT treasuries",
+    description: "NFT collections whose holders claim a treasury or fee stream.",
+    domains: ["nft-treasury"],
+  },
+  {
+    id: "markets",
+    label: "Markets",
+    description: "Prediction markets and options.",
+    domains: ["markets"],
+  },
+  {
+    id: "tooling-infra",
+    label: "Tooling & infra",
+    description: "Scanners, lockers, payments and privacy — the plumbing around everything else.",
+    domains: ["tooling", "privacy"],
+  },
+];
+
+export function sectionForDomain(domain: string | null | undefined): SectionDef | null {
+  if (!domain) return null;
+  return SECTIONS.find((s) => s.domains.includes(domain)) ?? null;
+}
+
+export const METRIC_KIND_LABEL: Record<MetricKind, string> = {
+  tvl: "TVL",
+  volume_24h: "24h volume",
+  fees_24h: "24h fees",
+  revenue_24h: "24h revenue",
+  market_cap: "market cap",
+  holders: "holders",
+};
+
+// Basis wording for rank lines — always "reported", never bare (hard rule: ranks name their basis).
+export const RANK_BASIS_LABEL: Record<MetricKind, string> = {
+  tvl: "reported TVL",
+  volume_24h: "reported 24h volume",
+  fees_24h: "reported 24h fees",
+  revenue_24h: "reported 24h revenue",
+  market_cap: "reported market cap",
+  holders: "reported holders",
+};
+
+// Plural cohort nouns for rank lines: ranks are computed within the flat census category
+// (scripts/lib/score.mjs), so the cohort is named by category, not by home section.
+const CATEGORY_PLURAL: Record<string, string> = {
+  Launchpad: "launchpads",
+  "Fee-routing protocol": "fee-routing protocols",
+  Aggregator: "aggregators",
+  "Prediction market": "prediction markets",
+  "Stock-paired token": "stock-paired tokens",
+  "RWA distributor": "RWA distributors",
+  "RWA baskets": "RWA baskets",
+  "Index vault": "index vaults",
+  "Oracle / infra": "oracle & infra plays",
+  "NFT / treasury": "NFT-treasury plays",
+  CDP: "CDPs",
+  Lending: "lending protocols",
+  "Agent / execution": "agent plays",
+  "Scanner / tooling": "scanner & tooling plays",
+  Yield: "yield protocols",
+  Options: "options venues",
+};
+
+// "#1 of 2 launchpads by reported 24h fees" — the only way a rank ever renders.
+export function rankLine(rank: Rank, category: string): string {
+  const cohort = CATEGORY_PLURAL[category] ?? `${category.toLowerCase()} projects`;
+  return `#${rank.position} of ${rank.of} ${cohort} by ${RANK_BASIS_LABEL[rank.basis]}`;
+}
+
+// Leaf slugs -> visitor words for the dossier header chip and peer cards.
+const LEAF_LABEL: Record<string, string> = {
+  "bonding-curve": "bonding curve",
+  "stock-paired-factory": "stock-paired factory",
+  "uni-pool-launch": "Uniswap-pool launch",
+  "other-pad": "launchpad",
+  "hook-programmable": "programmable hooks",
+  aggregator: "aggregator",
+  "amm-native": "native AMM",
+  "perps-native": "native perps",
+  "hook-mev": "MEV hooks",
+  "stock-paired-token": "stock-paired token",
+  "tax-distributor": "tax distributor",
+  "redeemable-basket": "redeemable basket",
+  "index-vault": "index vault",
+  "reserve-currency": "reserve currency",
+  "synthetic-asset": "synthetic assets",
+  "ad-space": "ad space",
+  "token-bound-nft": "token-bound NFT",
+  cdp: "CDP",
+  "isolated-money-market": "isolated money market",
+  "credit-overlay": "credit overlay",
+  "agent-execution": "agent execution",
+  "agent-launch-layer": "agent launch layer",
+  "agent-identity": "agent identity",
+  "savings-vault": "savings vault",
+  "lp-manager": "LP manager",
+  "fee-router": "fee router",
+  "private-transfer": "private transfers",
+  scanner: "scanner",
+  "machine-payments": "machine payments",
+  locker: "locker",
+  prediction: "prediction market",
+  options: "options",
+  "nft-fee-claim": "NFT fee claim",
+  names: "name service",
+};
+
+export function leafLabel(leaf: string): string {
+  return LEAF_LABEL[leaf] ?? leaf.replace(/-/g, " ");
+}
+
+// "$86.5M" / "$4.7M" / "56,062" (holders take no $). Mono display everywhere it renders.
+export function formatMetricValue(metric: Pick<Metric, "kind" | "value">): string {
+  if (metric.kind === "holders") return metric.value.toLocaleString("en-US");
+  const v = metric.value;
+  if (v >= 1e12) return `$${(v / 1e12).toFixed(1)}T`;
+  if (v >= 1e9) return `$${(v / 1e9).toFixed(1)}B`;
+  if (v >= 1e6) return `$${(v / 1e6).toFixed(1)}M`;
+  if (v >= 1e3) return `$${(v / 1e3).toFixed(0)}K`;
+  return `$${v.toLocaleString("en-US")}`;
+}
+
+// The one figure a row or card leads with: the rank basis when ranked, else the first
+// reported kind in display priority. Null when nothing is reported.
+const HEADLINE_PRIORITY: MetricKind[] = ["tvl", "volume_24h", "fees_24h", "revenue_24h", "market_cap", "holders"];
+
+export function headlineMetric(derived: Pick<Derived, "metrics" | "rank">): Metric | null {
+  if (derived.rank) {
+    const basis = derived.metrics.find((m) => m.kind === derived.rank!.basis);
+    if (basis) return basis;
+  }
+  for (const kind of HEADLINE_PRIORITY) {
+    const m = derived.metrics.find((x) => x.kind === kind);
+    if (m) return m;
+  }
+  return null;
+}
+
+// Title-attr caveat for a reported figure (hard rule: every reported number carries its
+// as-of); the visible `reported` chip sits next to the value.
+export function reportedTitle(asOf: string): string {
+  return `as of ${asOf} — reported by the source, not verified by Proofline`;
+}
 
 // --- Labels -----------------------------------------------------------------
 
