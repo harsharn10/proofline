@@ -31,8 +31,8 @@ subjects:
     lifecycle: mainnet
     live_evidence: [llama-fees, llama-volume, official-post, docs]
     handle: "@ponsdotfamily"
-    llama: { fees_24h: 4700000, revenue_24h: 868850, vol_24h: 85870000 }
-    note: Missing from Llama DEX ranking and launchpad-TVL table. Busiest native fee machine.
+    llama: { fees_24h: 4700000, revenue_24h: 868850, vol_24h: 86499622 }
+    note: Llama DEX now lists Pons V2 $86.5m 24h (3rd on chain after Uni V4/V3). Official 31 Aug $4B lifetime volume, $20.93M creator payouts in 47d, 29% $PONS burned. Busiest native fee machine.
 
   - slug: mancer
     name: Mancer
@@ -70,12 +70,13 @@ subjects:
   - slug: stonkbroker
     name: StonkBrokers
     tree_primary: nft-treasury/token-bound-nft
-    tree_secondary: [launch/nft-gated-launch]
+    tree_secondary: [launch/nft-gated-launch, markets/options, yield/lp-manager]
     lifecycle: mainnet
     live_evidence: [llama-tvl, llama-fees]
     handle: "@ClutchMarkets"
     llama: { tvl: 25599049, fees_24h: 33776, revenue_24h: 18835 }
-    note: Llama parent TVL $26m vs launchpad-page $1.05m — child/parent split. Confirm.
+    llama: { tvl: 25599049, fees_24h: 33776, revenue_24h: 18835, anvil_vol_24h: 199585, pad_vol_24h: 113903 }
+    note: Llama parent TVL $26m vs launchpad-page $1.05m — child/parent split. Confirm. STORMM (Stock Token Optimized Regenerative Market Maker) is a Uni v4 hook overlay: LP earns swap fees + options premiums. Leverage Machine (NFT options Long Boi/Shorty, no liquidations) announced Sep 2026 — same control plane, not a new slug. Founder @OxSimpleFarmer. Not Arrows, not Delta, not Hookr.
 
   - slug: index
     name: The Index
@@ -437,6 +438,14 @@ subjects:
     handle: "@hoodfunfamily"
     note: Fair-launch bonding curve → locked Uni v3. Last official "coming soon" 31 Jul. openpump lists it as a 4663 pad on 29 Aug. Not $HFUN Pons token. Not fefe-hood.fun.
 
+  - slug: stonks-fun
+    name: Stonks.fun
+    tree_primary: launch/other-pad
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@stonksdotfun"
+    note: DN-404 + Doppler pad. Fees burn $STONKS. Builder @nikshepsvn. $REDACTED ZEC-pair launched here. Rebrand to RWA baskets announced. Not StonkBrokers.
+
 # --- DEPENDENCIES (cite, no profile) ---
 dependencies:
   - { name: Uniswap, tree_primary: trading/amm-imported, handle: "@Uniswap", llama_tvl_rh: 133000000, note: "V2+V3+V4. ~80% of spot volume." }
@@ -532,7 +541,12 @@ observe:
     - { name: Rallypad, handle: "@rallypadfun", note: "Livestream launches." }
     - { name: ObsidianSwap, handle: "@ObsidianSwap", note: "Cross-chain to/from RH." }
     - { name: Ponscade, handle: "@PonscadeRH", ca: "0x7086a13aa868b2bf8ed98a86ce1daac62eb6a856", note: "Arcade game, not a protocol." }
-    - { name: STORMM / Sleuth TGE, note: "aixbt 27 Aug — StonkBrokers on-chain options infra + Sleuth TGE. Confirm @ClutchMarkets. Do not merge with @sleuth_ai (Base tool)." }
+    - { name: STORMM / Sleuth TGE, note: "STORMM confirmed official @ClutchMarkets 29 Aug article. Sleuth TGE still only aixbt — confirm. Do not merge with @sleuth_ai (Base tool)." }
+    - { name: HookOS, note: "Llama launchpad row, 0 vol. Possible Hookr sibling — do not merge until handle/CA." }
+    - { name: SwapHood, note: "Llama V2/V3 DEX rows. Native AMM? Handle unknown." }
+    - { name: Hoodit, note: "Llama DEX dust." }
+    - { name: HoodFrens, note: "Llama SoFi row." }
+    - { name: YOWL, handle: "@YowlonHood", ca: "0x062939bB32EaBD47A522FE48872F41E04017a095", note: "yowl.trade Morpho. Related to stonks.fun. Graduation/app until mechanism is independent." }
 
 # --- GRADUATION (do not auto-file) ---
 graduation:
@@ -546,7 +560,7 @@ graduation:
     - { name: SAFEHOOD, pad: pons, ca: "0x663492eab45ed21d6bdd7836efdc1a9cd51ae199", handle: "@safehoodonrh", note: "Sinjoh tek buyback+4x airdrop. Not census Safehood protocol." }
     - { name: PONGO, pad: pons, ca: "0xedAee44320107CAa714BaAEc486261A87F27022d", handle: "@Pongorh", note: "Dog-meme narrative. ATH ~$5.5m. Bag until own machine." }
     - { name: HOOD10, note: "CASHCAT whale buy ~$4.6m MC. Graduation." }
-    - { name: CETS, note: "Winner-list meme ~$23-33m. Stock-payout claim unverified. No official handle this round." }
+    - { name: CETS, note: "Do not file as RH-native. Gate Alpha + FOMO: Cets On Gold is BSC 0xB0c2aB5af4028461acE3f6e1C33a4eE1404E7777. Winner-lists mix chains. Need a Robinhood CA before treating as a 4663 bag." }
     - { name: HFUN, pad: pons, ca: "0x01224f6012e02ba6d4602613c638c5b1d428b609", note: "Not the hood.fun pad." }
     - { name: FOMO token, ca: "0xecda99a916f0b3863840884047339ddbe4dffb9d", note: "Not FOMO the trading venue (fomo.family) and not clan.tech." }
     - { name: REDACTED, pad: stonksfun, note: "ZEC-pair meme on StonksFun. Pad handle unconfirmed." }
