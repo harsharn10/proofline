@@ -1,0 +1,407 @@
+# Robinhood Chain ecosystem map — 2026-08-31 intake
+# Not content/. Human decides coverage. No skip-list.
+#
+# Axes (see 2026-08-31-ecosystem-tree.md):
+#   coverage_class: subject | dependency | observe | graduation
+#   tree_primary:   domain/category
+#   tree_secondary: extra leaves
+#   lifecycle:      mainnet | beta | announced | testnet-only | unknown
+#   live_evidence:  llama-tvl | llama-fees | llama-volume | official-post | docs | explorer | unverified-claim
+#
+# Llama TVL figures are chain-slice, USD, 2026-08-31 api.llama.fi/protocols.
+# Pons often has no TVL row; use fees/volume.
+
+meta:
+  as_of: 2026-08-31
+  llama_rh_protocol_rows: 133
+  sources:
+    - https://api.llama.fi/protocols
+    - https://defillama.com/chain/robinhood-chain
+    - https://defillama.com/protocol/pons
+    - https://defillama.com/revenue/chain/robinhood-chain
+    - https://docs.robinhood.com/chain
+    - research/inbox/grok-2026-08-30/
+
+# --- SUBJECTS (native plays: census 14 + qualified candidates) ---
+subjects:
+  - slug: pons
+    name: Pons
+    tree_primary: launch/bonding-curve
+    tree_secondary: [trading/amm-native]
+    lifecycle: mainnet
+    live_evidence: [llama-fees, llama-volume, official-post, docs]
+    handle: "@ponsdotfamily"
+    llama: { fees_24h: 4700000, revenue_24h: 868850, vol_24h: 85870000 }
+    note: Missing from Llama DEX ranking and launchpad-TVL table. Busiest native fee machine.
+
+  - slug: mancer
+    name: Mancer
+    tree_primary: trading/aggregator
+    tree_secondary: [nft-treasury/nft-fee-claim]
+    lifecycle: beta
+    live_evidence: [official-post]
+    handle: "@MancerXYZ"
+    llama: null
+    note: X 2026-08-14 beta live (Mancers/StonkBrokers gated). X 2026-08-25 router+order audit in progress, public after. Census mainnet may be early.
+
+  - slug: artificial-inu
+    name: Artificial Inu
+    tree_primary: rwa-products/stock-paired-token
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: null
+    note: LONG flagship. Pair/vault/fee story — not a graduation dump.
+
+  - slug: longshot
+    name: Longshot
+    tree_primary: launch/stock-paired-factory
+    tree_secondary: [trading/perps-imported]
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@uselongshot"
+
+  - slug: long
+    name: LONG
+    tree_primary: launch/stock-paired-factory
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@longdotxyz"
+
+  - slug: stonkbroker
+    name: StonkBrokers
+    tree_primary: nft-treasury/token-bound-nft
+    tree_secondary: [launch/nft-gated-launch]
+    lifecycle: mainnet
+    live_evidence: [llama-tvl, llama-fees]
+    handle: "@ClutchMarkets"
+    llama: { tvl: 25599049, fees_24h: 33776, revenue_24h: 18835 }
+    note: Llama parent TVL $26m vs launchpad-page $1.05m — child/parent split. Confirm.
+
+  - slug: index
+    name: The Index
+    tree_primary: rwa-products/tax-distributor
+    lifecycle: mainnet
+    live_evidence: [llama-fees, official-post]
+    handle: "@TheIndexFi"
+    llama: { revenue_24h: 24321, revenue_7d: 151043 }
+
+  - slug: arrow
+    name: Arrow Finance
+    tree_primary: credit/cdp
+    tree_secondary: [launch/other-pad]
+    lifecycle: announced   # claimed mainnet 2026-08-31 09:30 ET; confirm after open
+    live_evidence: [official-post]
+    handle: "@ArrowFinanceio"
+    note: Sherlock review claimed complete. Separate Llama rows ArrowPad.fun / ArrowPad are pads, not the CDP.
+
+  - slug: bankr
+    name: Bankr
+    tree_primary: agents/agent-execution
+    tree_secondary: [launch/stock-paired-factory]
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@bankrbot"
+    note: Continuously deploying stock-paired tokens (TSM, MSFT, QQQ, …). Those tokens are graduations.
+
+  - slug: meridian
+    name: Meridian
+    tree_primary: trading/perps-native
+    tree_secondary: [markets/prediction]
+    lifecycle: mainnet     # census said announced; Llama TVL says live
+    live_evidence: [llama-tvl]
+    handle: "@meridiandotxyz"
+    llama: { perps_tvl: 2506139, predict_tvl: 265431 }
+    note: Two Llama products, one handle. Census lifecycle stale.
+
+  - slug: statics-protocol
+    name: Statics Protocol
+    tree_primary: rwa-products/redeemable-basket
+    lifecycle: mainnet
+    live_evidence: [docs]
+    handle: null
+
+  - slug: safehood
+    name: Safehood
+    tree_primary: launch/uni-pool-launch
+    lifecycle: mainnet
+    live_evidence: [docs]
+    handle: null
+
+  - slug: robinhood-index-vaults
+    name: Robinhood Index Vaults
+    tree_primary: rwa-products/index-vault
+    lifecycle: testnet-only
+    live_evidence: [docs]
+    handle: null
+
+  - slug: vimen
+    name: Vimen
+    tree_primary: rwa-products/redeemable-basket
+    lifecycle: mainnet
+    live_evidence: [llama-tvl, docs]
+    handle: "@vimenprotocol"
+    llama: { tvl: 9208 }
+
+  # candidates that already have a mechanism + live evidence (not yet in census)
+  - slug: up
+    name: up
+    tree_primary: trading/amm-native
+    lifecycle: mainnet
+    live_evidence: [llama-tvl, llama-fees, llama-volume, official-post]
+    handle: "@uponrh"
+    llama: { tvl_v3: 7762409, tvl_v2: 700656, vol_24h: 37130000, revenue_24h: 72972 }
+    note: Native (3,3). Highest native AMM TVL after Uniswap.
+
+  - slug: fables
+    name: Fables
+    tree_primary: trading/amm-native
+    lifecycle: mainnet
+    live_evidence: [llama-tvl, llama-volume, official-post]
+    handle: "@fablesfi"
+    llama: { tvl: 2244192, vol_24h: 11880000 }
+    note: Uniswap v4 hooks / $PROLOGUE. Bio CA unverified.
+
+  - slug: denar
+    name: Denar
+    tree_primary: credit/isolated-money-market
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@DenarMarkets"
+    note: Claimed live 2026-08-30. CA in post unverified. Not on Llama RH TVL dump.
+
+  - slug: longbow
+    name: Longbow
+    tree_primary: credit/credit-overlay
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@longbowlend"
+    note: Morpho + Pons. TVL/volume claims unverified on Llama this pass.
+
+  - slug: noxa
+    name: NOXA Fun
+    tree_primary: launch/other-pad
+    lifecycle: mainnet
+    live_evidence: [llama-tvl, llama-fees]
+    handle: "@Noxa_Fi"
+    llama: { tvl: 5425289, fees_24h: 123438, revenue_24h: 0 }
+
+  - slug: virtuals
+    name: Virtuals Protocol
+    tree_primary: agents/agent-launch-layer
+    lifecycle: mainnet
+    live_evidence: [llama-fees, official-post]
+    handle: "@virtuals_io"
+    llama: { revenue_24h: 22571, revenue_30d: 400084 }
+    note: Layer, not every agent. Schema enum has no agent-launch-layer yet.
+
+  - slug: netnet
+    name: NetNet Capital
+    tree_primary: rwa-products/reserve-currency
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@NetNetCap"
+    llama: { tvl: 0 }
+    note: Claims $7.5m treasury and largest AAPL/NVDA/SPCX token holdings. Llama TVL 0. Enum gap.
+
+  - slug: tickeryard
+    name: TickerYard
+    tree_primary: rwa-products/synthetic-asset
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@TickerYardHQ"
+    note: yBTC, WBTC Arbitrum → RH. Enum gap (synthetic-asset).
+
+  - slug: earn-protocol
+    name: EARN
+    tree_primary: yield/savings-vault
+    lifecycle: unknown
+    live_evidence: [official-post]
+    handle: "@EARNONHOOD"
+    note: Bio CA unverified. "Coming soon" 2026-08-30.
+
+  - slug: l4va
+    name: L4VA
+    tree_primary: rwa-products/stock-paired-token
+    lifecycle: unknown
+    live_evidence: [official-post]
+    handle: "@L4VAprotocol"
+
+  - slug: delta
+    name: Delta
+    tree_primary: yield/lp-manager
+    lifecycle: mainnet
+    live_evidence: [llama-tvl, official-post]
+    handle: "@deltaliquidity"
+    llama: { tvl: 16201 }
+    note: Bio CA 0xe8ff…a791 unverified.
+
+  - slug: snuggle
+    name: Snuggle
+    tree_primary: yield/lp-manager
+    lifecycle: mainnet
+    live_evidence: [llama-tvl, llama-fees]
+    handle: "@SnuggleFi"
+    llama: { tvl: 3077872, revenue_24h: 14749 }
+
+  - slug: sherwood
+    name: Sherwood
+    tree_primary: privacy/private-transfer
+    lifecycle: mainnet
+    live_evidence: [llama-tvl]
+    handle: "@sherw00d_cash"
+    llama: { tvl: 80196 }
+    note: Enum gap (privacy).
+
+  - slug: squeeze
+    name: Squeeze
+    tree_primary: tooling/scanner
+    lifecycle: announced
+    live_evidence: [official-post]
+    handle: "@UseSqueeze_RH"
+    note: Short-interest product. 4 followers, brand-new.
+
+  - slug: agent-name-service
+    name: Agent Name Service
+    tree_primary: agents/agent-identity
+    lifecycle: unknown
+    live_evidence: [official-post]
+    handle: "@RHAgentNS"
+    note: .agent namespace. Enum gap.
+
+  - slug: hookr
+    name: Hookr
+    tree_primary: launch/hook-programmable
+    lifecycle: mainnet
+    live_evidence: [official-post, docs]
+    handle: "@Hookrfun"
+    cas:
+      token: "0x18E674231A58c239Dc7DaeDcffE15Ec3A24cff5c"
+      launchpad: "0xaAed6fab06D53311220F35421Dda5cc6D6e9d6C3"
+      hook: "0xd0005624Da88a688BcaB3DBFB4d1Cb23d32Ca0CC"
+    note: Uniswap v4 hook launchpad + hook marketplace. Not Pons, not Mancer, not Delta, not What The Hook. Builder Nodar / 0xzaps. Gen 5 claimed live. Not in Llama dump.
+
+  - slug: what-the-hook
+    name: What The Hook
+    tree_primary: trading/hook-mev
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@whatthehookv4"
+    note: MEV-inside-v4-hook. Pays traders/LPs. Token WTH on DexScreener. Do not merge with Hookr.
+
+  - slug: quotrons
+    name: Quotrons
+    tree_primary: nft-treasury/token-bound-nft
+    tree_secondary: [rwa-products/stock-paired-token]
+    lifecycle: mainnet
+    live_evidence: [official-post, docs]
+    handle: "@Quotrons404"
+    cas:
+      token: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
+      router: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
+      hook: "0x62E200Cc8e4D95cf622f40Dd70f407C883EcB0cc"
+    note: ERC-404 4444 terminals. Burn liquid token to hardwire NFT; rewards in 10 stock tokens via one QUOTRON/WETH pool. V1 exploit, V2 new collection. Missed in first map. Not StonkBrokers.
+
+  - slug: pools-trade
+    name: pools.trade
+    tree_primary: launch/uni-pool-launch
+    lifecycle: mainnet
+    live_evidence: [official-post]
+    handle: "@pools_dot_fun"
+    note: Uniswap Labs pad (Uniswap blog 2026-08-05). Active mint URLs on X. Not Pons.
+
+# --- DEPENDENCIES (cite, no profile) ---
+dependencies:
+  - { name: Uniswap, tree_primary: trading/amm-imported, handle: "@Uniswap", llama_tvl_rh: 133000000, note: "V2+V3+V4. ~80% of spot volume." }
+  - { name: Morpho Blue, tree_primary: credit/lending-primitive, handle: "@Morpho", llama_tvl_rh: 414785143 }
+  - { name: Steakhouse Financial, tree_primary: credit/morpho-curator, handle: "@SteakhouseFi", llama_tvl_rh: 473745242, note: "Curator on Morpho, not a separate primitive." }
+  - { name: Lighter, tree_primary: trading/perps-imported, handle: "@Lighter_xyz", llama_tvl_rh: 47912701 }
+  - { name: Arcus, tree_primary: trading/perps-imported, tree_secondary: [trading/prop-amm], handle: "@arcus_xyz", llama_tvl_rh: 19978227 }
+  - { name: Spark Savings, tree_primary: chain-infra/stablecoin, handle: "@sparkfinance", llama_tvl_rh: 28726816 }
+  - { name: Chainlink, tree_primary: chain-infra/oracle, handle: "@chainlink" }
+  - { name: USDG / Paxos, tree_primary: chain-infra/stablecoin, handle: null }
+  - { name: LayerZero V2, tree_primary: chain-infra/bridge, handle: "@LayerZero_Core", llama_tvl_rh: 1437917 }
+  - { name: Symbiosis, tree_primary: chain-infra/bridge, handle: "@symbiosis_fi", llama_tvl_rh: 265998 }
+  - { name: Alchemy, tree_primary: chain-infra/rpc-aa, handle: null }
+  - { name: OpenSea, tree_primary: nft-treasury/nft-marketplace, handle: null, llama: { revenue_24h: 28454 } }
+  - { name: Sushi, tree_primary: trading/amm-imported, handle: "@SushiSwap", llama_tvl_rh: 1699229 }
+  - { name: PancakeSwap, tree_primary: trading/amm-imported, handle: "@PancakeSwap" }
+  - { name: Curve, tree_primary: trading/amm-imported, handle: "@CurveFinance", llama_tvl_rh: 347513 }
+  - { name: UNCX, tree_primary: tooling/locker, handle: "@UNCX_token", llama_tvl_rh: 9409140 }
+  - { name: KyberSwap, tree_primary: trading/aggregator, handle: null, note: "Multi-chain aggregator. Revenue on RH; still dependency unless native control plane found." }
+  - { name: Rialto, tree_primary: trading/prop-amm, handle: null, note: "Official partner list. Low Llama spot volume this pass." }
+  - { name: Stock Tokens (issuer), tree_primary: rwa-products/stock-token-issuer, handle: "@RobinhoodCrypto", note: "Never a standalone profile." }
+
+# --- OBSERVE (Llama/X, not yet qualified as subject) ---
+observe:
+  native_amms:
+    - { name: GIGA, handle: "@giga_dex", llama_tvl: 507796, vol_24h: 24070000 }
+    - { name: RamsesX, handle: "@RamsesExchange", llama_tvl: 1665103 }
+    - { name: Alandale, handle: "@alandalexyz", llama_tvl: 625877 }
+    - { name: Orvex, handle: "@OrvexFi", llama_tvl: 292808 }
+    - { name: Ekubo / STONX, handle: "@EkuboProtocol", llama_tvl: 1467878 }
+    - { name: Deepstate, handle: "@josephdelong", llama_tvl: 157805 }
+    - { name: What The Hook, handle: "@whatthehookv4", llama_tvl: 1933892 }
+  credit:
+    - { name: Native Credit Pool, handle: "@native_fi", llama_tvl: 317210 }
+    - { name: Accountable, handle: "@AccountableData", llama_tvl: 499801 }
+    - { name: Sharewoods, handle: "@SharewoodsFi", llama_tvl: 2, tree: credit/rwa-lending }
+    - { name: USDAX Finance, handle: "@Usdax_Finance", llama_tvl: 0, tree: credit/cdp }
+    - { name: TermMax, handle: "@TermMaxFi", llama_tvl: 0 }
+    - { name: Gami Labs, handle: "@GamiLabs", llama_tvl: 568145, tree: credit/morpho-curator }
+  other_pads:  # Llama launchpad page + API. Mechanism unclassified.
+    - { name: token.select, handle: "@selectfdn", llama_tvl: 352903 }
+    - { name: Sentry, handle: "@sentrylauncher", llama_tvl: 123452 }
+    - { name: Coinbarrel, handle: "@UseCoinbarrel", llama_tvl: 53958 }
+    - { name: Flap sh, handle: null, revenue_24h: 9747 }
+    - { name: LetsCash, handle: null, revenue_24h: 8672 }
+    - { name: Bags, handle: null, revenue_24h: 7816 }
+    - { name: o1.exchange, handle: null, revenue_24h: 6867 }
+    - { name: basedbid, handle: "@basedbidx", llama_tvl: 40648 }
+    - { name: Peeps, handle: "@peepsdotwtf", llama_tvl: 25517 }
+    - { name: RaiseHood, handle: "@RaiseHood", llama_tvl: 18097 }
+    - { name: Based Alpha, handle: "@BasedOneX", llama_tvl: 14645 }
+    - { name: MerryForge, handle: "@merryforge", llama_tvl: 13439 }
+    - { name: Boardwalk, handle: "@useboardwalk", llama_tvl: 6754 }
+    - { name: DexLaunch, handle: "@dexlaunchfun", llama_tvl: 8605 }
+    - { name: Unihood, handle: "@unihoodotfun", llama_tvl: 3418 }
+    - { name: RobinFun, handle: "@robinfunxyz", llama_tvl: 1938 }
+    - { name: RH.fun, handle: "@RHdotfun", llama_tvl: 1679 }
+    - { name: ArrowPad.fun, handle: "@Arrowpadfun", llama_tvl: 590, note: "Not Arrow Finance CDP." }
+    - { name: HoodMint, handle: "@HoodMintFun", llama_tvl: 582 }
+    - { name: Frontier, handle: "@frontierhood", llama_tvl: 458 }
+    - { name: popi, HoodPump, Mixpad, DOTT, H00D, ymym.meme, BlueFun, keep.coffee, AvaLove, LuckyLaunch, BowYard }
+  yield_games:
+    - { name: SLVR, handle: "@S_L_V_R_FUN", revenue_24h: 27306, tree: yield/gamified-mining }
+    - { name: StockRip, handle: "@stockripx", llama_tvl: 171099 }
+    - { name: T3tris Finance, handle: "@0xT3tris", llama_tvl: 781861 }
+    - { name: DexFi Aggregator, handle: "@DexFinance", llama_tvl: 938256 }
+    - { name: Saffron Vaults, handle: "@saffron", llama_tvl: 258782 }
+    - { name: EZManager / EZMoney, handle: "@EZManagerCL" }
+    - { name: Astro, handle: "@astrofungame", llama_tvl: 85441 }
+    - { name: Fake Wall Street, handle: "@fwsfun", llama_tvl: 15114 }
+    - { name: STOCKMON, handle: "@stockmonrh", llama_tvl: 21418 }
+    - { name: Orchard, LUNA, MinePea, Orixium, BowStop, ROAR, STEEL }
+  markets:
+    - { name: Hoodbets, handle: "@hoodbetsxyz", llama_tvl: 1060 }
+    - { name: wambo.fun, handle: "@Wambofun", llama_tvl: 0 }
+  privacy:
+    - { name: Privacy Cash, handle: "@theprivacycash", llama_tvl: 3857 }
+  telegram_exec:
+    - { name: GMGN, llama: { revenue_24h: 1110000 }, note: "Largest revenue line on the chain. Wrapper, not a native play." }
+    - { name: Maestro, llama: { revenue_24h: 36938 } }
+  builders_named_on_x_not_on_llama:
+    - { name: GoMintly, handle: "@GoMintly", note: "Agent-managed LP on tokenized equities. Virtuals ecosystem recap." }
+    - { name: Gwood Finance, handle: "@GwoodFinance" }
+    - { name: pools.fun, handle: "@pools_dot_fun" }
+    - { name: FoxPad, handle: null, note: "Launchpad vs FOX mascot — keep as observe until handle confirmed." }
+    - { name: MaxFi, Quotrons, Atlas, Robindex, RSTOCKS, Oakmont, HOOD10, RoodFi }
+
+# --- GRADUATION (do not auto-file) ---
+graduation:
+  rule: "A token minted by Pons, LONG, Bankr, StonkBrokers, NOXA, or any other pad is graduation until it has its own protocol/vault/fee machine."
+  examples_today:
+    - { name: TAYSOM, pad: bankr, pair: TSM, ca: "0x9965de8400b382164e4dbF6dc0E5035cfFE28ba3", source: "@bankrbot 2026-08-31" }
+    - { name: SBC, pad: bankr, pair: MSFT, ca: "0x1965765e00c4047879289Eec1a3702C2aAF9DbA3" }
+    - { name: CQ, pad: bankr, pair: QQQ, ca: "0xFE995FAAE56956aD78833bf8cc26fa014E4D5BA3" }
+    - { name: PIGGY, pad: pons, note: "@ponspiggybank full-reserve claim — still a pad output until mechanism is documented independently." }
+    - { name: Harmonic Agents token, pad: pons, note: "Agent that claims Pons collector fees. Could graduate to agents/agent-product if control plane is real." }
