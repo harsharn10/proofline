@@ -3,6 +3,7 @@ import path from "node:path";
 import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
+import { headlineMetric } from "./types";
 import type {
   AccountEntry,
   AccountRef,
@@ -18,10 +19,14 @@ import type {
   Derived,
   LatestFeedItem,
   Link,
+  Metric,
+  PeerRef,
+  Rank,
   Research,
   Review,
   SiteConfig,
   SourceEntry,
+  TreeRef,
 } from "./types";
 
 // Repo layout (docs/superpowers/specs/2026-08-30-content-system-design.md §4):
@@ -88,8 +93,9 @@ type ProjectFile = {
 
 type SourcesFile = { slug: string; sources: SourceEntry[] };
 type FeedFile = { slug: string; items: Dossier["feed"] };
-// The subset of census.yaml the site reads: the official handle per slug (schema/census.schema.json).
-type CensusEntry = { slug: string; handle?: string };
+// The subset of census.yaml the site reads: the official handle and the desk's taxonomy
+// placement per slug (schema/census.schema.json).
+type CensusEntry = { slug: string; handle?: string; tree?: { primary?: string; secondary?: string[] } };
 
 type DerivedFile = {
   generated_at: string;
@@ -97,6 +103,26 @@ type DerivedFile = {
   projects: Record<string, Record<string, unknown>>;
   trending: string[];
 };
+
+// derived.json values pass through these narrow gates so a malformed emitter row degrades to
+// "nothing reported" rather than rendering garbage numbers.
+function sanitizeMetrics(raw: unknown): Metric[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(
+    (m): m is Metric =>
+      !!m &&
+      typeof m === "object" &&
+      typeof (m as Metric).kind === "string" &&
+      typeof (m as Metric).value === "number" &&
+      typeof (m as Metric).as_of === "string",
+  );
+}
+
+function sanitizeRank(raw: unknown): Rank | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Rank;
+  return typeof r.basis === "string" && typeof r.position === "number" && typeof r.of === "number" ? r : null;
+}
 
 // Site contract (README "Site contract"): pick exactly the fields the site may render.
 // Never widen this to spread the raw derived.json entry — that would let
@@ -115,6 +141,8 @@ function pickDerived(raw: Record<string, unknown> | undefined, slug: string, cov
       factorPercents: { security: null, engineering: null, transparency: null, maturity: null, economic: null },
       trending: false,
       trendingAccounts: [],
+      metrics: [],
+      rank: null,
     };
   }
   return {
@@ -137,6 +165,8 @@ function pickDerived(raw: Record<string, unknown> | undefined, slug: string, cov
     trendingAccounts: Array.isArray(raw.trendingAccounts)
       ? raw.trendingAccounts.filter((h): h is string => typeof h === "string")
       : [],
+    metrics: sanitizeMetrics(raw.metrics),
+    rank: sanitizeRank(raw.rank),
   };
 }
 
@@ -162,6 +192,7 @@ type ServerContent = {
   changelog: ChangelogEntry[];
   accounts: AccountEntry[];
   handleBySlug: Record<string, string>;
+  treeBySlug: Record<string, TreeRef>;
   generatedAt: string;
 };
 
@@ -178,6 +209,17 @@ function loadContent(): ServerContent {
 
   const handleBySlug: Record<string, string> = {};
   for (const row of census) if (row.handle) handleBySlug[row.slug] = row.handle;
+
+  // tree.primary ("launch/bonding-curve") -> { domain, leaf }: the home sections and the
+  // dossier's peer set both key off this placement.
+  const treeBySlug: Record<string, TreeRef> = {};
+  for (const row of census) {
+    const primary = row.tree?.primary;
+    if (typeof primary === "string" && primary.includes("/")) {
+      const [domain, ...leafParts] = primary.split("/");
+      treeBySlug[row.slug] = { domain: domain!, leaf: leafParts.join("/") };
+    }
+  }
 
   const dependencies: Record<string, DependencyCard> = {};
   for (const file of fs.readdirSync(path.join(contentDir, "dependencies")).filter((f) => f.endsWith(".yaml"))) {
@@ -229,6 +271,7 @@ function loadContent(): ServerContent {
     changelog: changelogAll,
     accounts,
     handleBySlug,
+    treeBySlug,
     generatedAt: derivedFile.generated_at,
   };
 }
@@ -244,10 +287,15 @@ function getCachedContent(): ServerContent {
 
 // --- Slices ------------------------------------------------------------------------
 
-const LATEST_FEED_COUNT = 10;
+// Home shows only the newest 5 — the full firehose lives on /feed (IA brief: declutter home).
+const LATEST_FEED_COUNT = 5;
 const LATEST_FEED_BODY_MAX = 240;
 
-function toDirectoryEntry(d: Dossier, handleBySlug: Record<string, string>): DirectoryEntry {
+function toDirectoryEntry(
+  d: Dossier,
+  handleBySlug: Record<string, string>,
+  treeBySlug: Record<string, TreeRef>,
+): DirectoryEntry {
   return {
     slug: d.slug,
     name: d.name,
@@ -260,7 +308,44 @@ function toDirectoryEntry(d: Dossier, handleBySlug: Record<string, string>): Dir
     handle: handleBySlug[d.slug] ?? null,
     feedCount: d.feed.length,
     reviewedAt: d.review.reviewed_at,
+    tree: treeBySlug[d.slug] ?? null,
   };
+}
+
+const PEER_LIMIT = 6;
+const PEER_SUMMARY_MAX = 110;
+
+function truncate(text: string, max: number): string {
+  return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+}
+
+// "Competes with" (IA ruling): same tree leaf first (direct), then same domain (adjacent),
+// never self; up to 6. Within each bucket, names with reported figures lead, best rank first.
+function peersFor(dossier: Dossier, all: Dossier[], treeBySlug: Record<string, TreeRef>): PeerRef[] {
+  const tree = treeBySlug[dossier.slug];
+  if (!tree) return [];
+  const pool = all.filter((d) => d.slug !== dossier.slug && treeBySlug[d.slug]?.domain === tree.domain);
+  const order = (a: Dossier, b: Dossier) => {
+    const am = headlineMetric(a.derived) ? 0 : 1;
+    const bm = headlineMetric(b.derived) ? 0 : 1;
+    if (am !== bm) return am - bm;
+    const ar = a.derived.rank?.position ?? Number.MAX_SAFE_INTEGER;
+    const br = b.derived.rank?.position ?? Number.MAX_SAFE_INTEGER;
+    if (ar !== br) return ar - br;
+    return a.name.localeCompare(b.name);
+  };
+  const direct = pool.filter((d) => treeBySlug[d.slug]!.leaf === tree.leaf).sort(order);
+  const adjacent = pool.filter((d) => treeBySlug[d.slug]!.leaf !== tree.leaf).sort(order);
+  return [...direct, ...adjacent].slice(0, PEER_LIMIT).map((d) => ({
+    slug: d.slug,
+    name: d.name,
+    symbol: d.symbol,
+    summary: truncate(d.summary, PEER_SUMMARY_MAX),
+    lifecycle: d.lifecycle,
+    direct: treeBySlug[d.slug]!.leaf === tree.leaf,
+    leaf: treeBySlug[d.slug]!.leaf,
+    metric: headlineMetric(d.derived),
+  }));
 }
 
 function latestFeed(dossiers: Dossier[]): LatestFeedItem[] {
@@ -297,7 +382,7 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
   const content = getCachedContent();
   return {
     site: content.site,
-    entries: content.dossiers.map((d) => toDirectoryEntry(d, content.handleBySlug)),
+    entries: content.dossiers.map((d) => toDirectoryEntry(d, content.handleBySlug, content.treeBySlug)),
     latestFeed: latestFeed(content.dossiers),
     generatedAt: content.generatedAt,
     counts: {
@@ -326,6 +411,8 @@ export const getDossier = createServerFn({ method: "GET" })
       site: content.site,
       dependencies,
       accounts: dossier ? accountRefs(dossier.feed, content.accounts) : [],
+      peers: dossier ? peersFor(dossier, content.dossiers, content.treeBySlug) : [],
+      tree: dossier ? (content.treeBySlug[dossier.slug] ?? null) : null,
     };
   });
 
@@ -348,6 +435,18 @@ export const getChangelog = createServerFn({ method: "GET" }).handler(async () =
     names: content.dossiers.map((d) => ({ slug: d.slug, symbol: d.symbol, name: d.name })),
   };
 });
+
+// /feed — the full cross-name firehose (home keeps only the newest 5): every item with just
+// enough of its name to link it. Bodies ship whole; this page is the archive.
+export const getFeed = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{ items: LatestFeedItem[]; generatedAt: string }> => {
+    const content = getCachedContent();
+    const items = content.dossiers
+      .flatMap((d) => d.feed.map((item) => ({ name: { slug: d.slug, symbol: d.symbol, name: d.name }, item })))
+      .sort((a, b) => b.item.date.localeCompare(a.item.date));
+    return { items, generatedAt: content.generatedAt };
+  },
+);
 
 // The whole-file export (header ExportMenu): every full dossier, fetched only when someone clicks
 // export — never as part of a page load. Carries no account rows.
@@ -382,5 +481,8 @@ export const getSiteMeta = createServerFn({ method: "GET" }).handler(async () =>
     trendingCount: content.dossiers.filter((d) => d.derived.trending).length,
     corrections: content.site.corrections,
     chainId: content.site.chain.id,
+    // Slim rows for the topbar jump-box — search lives in the topbar and goes straight
+    // to a dossier, so every page needs the name list (49 tiny rows).
+    names: content.dossiers.map((d) => ({ slug: d.slug, symbol: d.symbol, name: d.name })),
   };
 });
