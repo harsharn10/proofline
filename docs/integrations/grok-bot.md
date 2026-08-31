@@ -52,6 +52,11 @@ today, with two changes required by the evaluation:
     explorer_source_verified: null # null | true | false — Blockscout's contract-source flag, NOT the evidence class "verified"
   ```
 
+  For a proxy, `explorer_source_verified` applies to the proxy shell unless the implementation was
+  checked separately. Add `explorer_source_verification_scope: proxy-shell-only` and
+  `implementation_source_verified: null | true | false`; never let verified generic proxy source imply
+  that the implementation or product behavior was verified.
+
   Default both booleans to `null`. Never encode status in the key name (`token_candidate`, `h33_docs`)
   — that was the §2.8 defect in the last intake.
 
@@ -324,7 +329,8 @@ This round:
    — the one ledger. Do not also write 2026-08-31-accounts.yaml; it is retired.
 2. For every address you record, write the full record from grok-bot.md §2.1 — { value, chain, source,
    seen, exists_on_4663, explorer_source_verified } — defaulting the two verification fields to null.
-   Never infer verification from a key name.
+   Never infer verification from a key name. For a proxy, label proxy-shell verification separately
+   and leave implementation_source_verified null until the implementation itself is checked.
 3. For every claim, cite a post id/URL + handle + date, or a docs/explorer URL. No number without a
    source, no claim without a date.
 4. Never write a conduct verdict about a person, team, or account. Use only: handle-collision |
