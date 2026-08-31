@@ -91,14 +91,46 @@ subjects:
     name: Arrow Finance
     tree_primary: credit/cdp
     tree_secondary: []
-    lifecycle: announced   # claimed mainnet 2026-08-31 09:30 ET; confirm after open
-    live_evidence: [official-post]
+    lifecycle: announced   # official app loaded 2026-08-31; token CAs exist on 4663; CDP machine contracts unlabeled; no Llama CDP row
+    live_evidence: [official-post, explorer]
     handle: "@ArrowFinanceio"
     cas:
-      ausd: "0x4f11d7603D1B0D0f021Db552D8A6d88d7fa38ecf"
-      token: "0xf2915d1e3C1B0c769d0c756Ec43F1c1f6c99cD03"
-      pad_not_cdp: "0x1Badc838AAe6ac41829180744ea2e1C89b452aAe"
-    note: CDP still announced (open 09:30 ET). Explorer 4663 — aUSD/Arrow USD 21 holders source-unverified; ARROW/ArrowToken 6886 holders source-verified; same creator. Token existing ≠ CDP live. Pad factory is ArrowPad. Not Arrows 0xD71b7b4e.
+      ausd:
+        value: "0x4f11d7603D1B0D0f021Db552D8A6d88d7fa38ecf"
+        chain: "robinhood-chain"
+        source: "docs"
+        seen: "2026-08-31"
+        exists_on_4663: true
+        explorer_source_verified: false
+      token:
+        value: "0xf2915d1e3C1B0c769d0c756Ec43F1c1f6c99cD03"
+        chain: "robinhood-chain"
+        source: "docs"
+        seen: "2026-08-31"
+        exists_on_4663: true
+        explorer_source_verified: true
+      pad_not_cdp:
+        value: "0x1Badc838AAe6ac41829180744ea2e1C89b452aAe"
+        chain: "robinhood-chain"
+        source: "explorer"
+        seen: "2026-08-31"
+        exists_on_4663: true
+        explorer_source_verified: true
+      pair:
+        value: "0xE40d98D88038e0B844f844dce6Ae3c79ec01ec53"
+        chain: "robinhood-chain"
+        source: "docs"
+        seen: "2026-08-31"
+        exists_on_4663: null
+        explorer_source_verified: null
+      lp:
+        value: "0x5bb059c1ca8ffc0A97cD09ce93D0fddfb4230224"
+        chain: "robinhood-chain"
+        source: "third-party"
+        seen: "2026-08-31"
+        exists_on_4663: null
+        explorer_source_verified: null
+    note: "Official staking app loaded 2026-08-31 20:00 UTC at staking.arrowfinance.io (read-only TVL $58,865.23). Token CAs exist on 4663: aUSD/Arrow USD 23 holders, explorer source not verified; ARROW/ArrowToken 7140 holders, explorer source verified. CDP machine contracts unlabeled. No Llama CDP protocol row. Token existing is not CDP-live. Pad factory is ArrowPad Launchpad, not the CDP. Not Arrows 0xD71b7b4e. Not ArrowPad @Arrowpadfun. Not @ArrowFinanceHQ / @arrowfinances."
 
   - slug: bankr
     name: Bankr
