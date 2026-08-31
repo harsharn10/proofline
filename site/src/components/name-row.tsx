@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
-import { LIFECYCLE_LABEL, lifecycleTone, type Dossier } from "@/data/types";
+import { LIFECYCLE_LABEL, lifecycleTone, type DirectoryEntry } from "@/data/types";
 
-export function NameRow({ dossier }: { dossier: Dossier }) {
+export function NameRow({ dossier }: { dossier: DirectoryEntry }) {
   return (
     <Link
       to="/n/$slug"

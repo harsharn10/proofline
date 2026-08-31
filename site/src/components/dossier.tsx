@@ -9,14 +9,14 @@ import { Section } from "@/components/section";
 import {
   LIFECYCLE_LABEL,
   LINK_KIND_LABEL,
+  NOT_VERIFIED,
   correctionsLink,
   dexScreenerSearchUrl,
   explorerTokenUrl,
   lifecycleTone,
   riskTone,
-  type AccountEntry,
   type Dossier as DossierData,
-  type DependencyCard,
+  type DependencyRef,
   type Gap,
   type Finding,
   type SiteConfig,
@@ -47,41 +47,31 @@ function GapList({ items }: { items: Gap[] }) {
   );
 }
 
-function TrendingChip({ accounts }: { accounts: AccountEntry[] }) {
+// The handles come from derived.trendingAccounts (build/derived.json) — the same computation that set
+// the flag. The site never rebuilds this list from tiers or feed dates.
+function TrendingChip({ handles }: { handles: string[] }) {
   return (
     <div className="flex items-center gap-1.5">
       <Badge tone="warn">Trending</Badge>
-      {accounts.length > 0 ? (
-        <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-subtle">
-          {accounts.map((a) => a.handle).join(" · ")}
-        </span>
+      {handles.length > 0 ? (
+        <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-subtle">{handles.join(" · ")}</span>
       ) : null}
     </div>
   );
-}
-
-// Which tier:top accounts drove this dossier's trending signal, for display only — the
-// trending boolean itself always comes from derived.trending (build/derived.json).
-function trendingCtAccounts(dossier: DossierData, accounts: AccountEntry[]): AccountEntry[] {
-  const ctHandles = new Set(dossier.feed.filter((i) => i.kind === "ct" && i.account).map((i) => i.account));
-  return accounts.filter((a) => a.tier === "top" && ctHandles.has(a.handle));
 }
 
 export function Dossier({
   dossier,
   site,
   dependencies,
-  accounts,
 }: {
   dossier: DossierData;
   site: SiteConfig;
-  dependencies: Record<string, DependencyCard>;
-  accounts: AccountEntry[];
+  dependencies: Record<string, DependencyRef>;
 }) {
   const { derived } = dossier;
-  const trendingAccounts = derived.trending ? trendingCtAccounts(dossier, accounts) : [];
   const blockscoutDeployments = dossier.deployments.filter(
-    (d) => d.chain === "robinhood-chain" && d.address !== "not-verified",
+    (d) => d.chain === "robinhood-chain" && d.address !== NOT_VERIFIED,
   );
   const correction = correctionsLink(site.corrections.destination);
 
@@ -98,16 +88,19 @@ export function Dossier({
           <p className="mt-1 text-base text-muted">{dossier.name}</p>
         </div>
         <div className="flex items-center gap-2">
-          {derived.trending ? <TrendingChip accounts={trendingAccounts} /> : null}
+          {derived.trending ? <TrendingChip handles={derived.trendingAccounts} /> : null}
           <Badge tone={lifecycleTone(dossier.lifecycle)}>{LIFECYCLE_LABEL[dossier.lifecycle]}</Badge>
         </div>
       </div>
 
+      {/* Site contract: `label` is the only display string and `provisional` the only de-emphasis
+          flag. A null score means the number is suppressed — a stub, or a full profile whose
+          confidence is below the display threshold — and the label says why. */}
       <div className="mt-4">
-        {derived.label ? (
+        {derived.score === null ? (
           <div className="inline-flex flex-wrap items-center gap-2 rounded-sm border border-dashed border-border px-3 py-2">
-            <Badge tone="muted">{dossier.coverage === "stub" ? "Stub" : "Provisional"}</Badge>
-            <p className="text-sm text-muted">{derived.label}</p>
+            <Badge tone="muted">{dossier.coverage === "stub" ? "Stub" : "Insufficient evidence"}</Badge>
+            <p className="text-sm text-muted">{derived.label ?? "Research pending / insufficient evidence"}</p>
           </div>
         ) : (
           <div className="flex flex-wrap items-center gap-3 rounded-sm border border-border bg-surface px-3 py-2">
@@ -237,7 +230,7 @@ export function Dossier({
         </div>
         <FeedList items={dossier.feed.map((item) => ({ item }))} />
         <p className="mt-3 text-xs text-subtle">
-          Company = project posts. What people are saying = CT. On-chain = prints. Risk = collisions and traps.
+          Company = project posts. What people are saying = CT. On-chain = observed activity. Risk = collisions and cautions.
         </p>
       </section>
 

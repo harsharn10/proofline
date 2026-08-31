@@ -28,7 +28,9 @@ export const Route = createFileRoute("/n/$slug")({
 });
 
 function NamePage() {
-  const { dossier, site, dependencies, accounts } = Route.useLoaderData();
+  // The loader also carries `accounts` (handle/tier/role for the handles this feed cites — never a
+  // note); the dossier reads its trending handles from derived.trendingAccounts and does not need it.
+  const { dossier, site, dependencies } = Route.useLoaderData();
   return (
     <div className="min-h-dvh bg-bg text-fg">
       <div className="mx-auto max-w-3xl px-4 pt-4 sm:px-6">
@@ -40,7 +42,7 @@ function NamePage() {
           All names
         </Link>
       </div>
-      <Dossier dossier={dossier} site={site} dependencies={dependencies} accounts={accounts} />
+      <Dossier dossier={dossier} site={site} dependencies={dependencies} />
     </div>
   );
 }

@@ -14,7 +14,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { site, dossiers } = Route.useLoaderData();
+  // `entries` is the directory slice (no findings, research, sources or feeds) and `latestFeed`
+  // the 10 newest items across every name — both cut server-side in content-server.ts.
+  const { site, entries: dossiers, latestFeed } = Route.useLoaderData();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("all");
 
@@ -29,7 +31,8 @@ function Home() {
         (d.symbol ?? "").toLowerCase().includes(needle) ||
         d.name.toLowerCase().includes(needle) ||
         d.summary.toLowerCase().includes(needle) ||
-        d.slug.includes(needle)
+        d.slug.includes(needle) ||
+        (d.handle ?? "").toLowerCase().includes(needle)
       );
     });
   }, [q, cat, dossiers]);
@@ -37,15 +40,6 @@ function Home() {
   const fullCount = dossiers.filter((d) => d.coverage === "full").length;
   const trendingDossiers = dossiers.filter((d) => d.derived.trending);
   const trendingCount = trendingDossiers.length;
-
-  const latestFeed = useMemo(
-    () =>
-      dossiers
-        .flatMap((d) => d.feed.map((item) => ({ dossier: d, item })))
-        .sort((a, b) => b.item.date.localeCompare(a.item.date))
-        .slice(0, 10),
-    [dossiers],
-  );
 
   return (
     <div className="min-h-dvh bg-bg text-fg">
@@ -110,6 +104,10 @@ function Home() {
                 >
                   {d.symbol ?? d.name}
                   <Badge tone="warn">Trending</Badge>
+                  {/* Count of the counting accounts behind the flag, straight from derived.json. */}
+                  <span className="font-mono text-[11px] tabular-nums text-subtle">
+                    {d.derived.trendingAccounts.length} account{d.derived.trendingAccounts.length === 1 ? "" : "s"}
+                  </span>
                 </Link>
               ))}
             </div>

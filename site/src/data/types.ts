@@ -37,10 +37,13 @@ export type DeploymentRole =
   | "timelock"
   | "other";
 
+// The address sentinel for a deployment whose address has not been located yet (schema/shared.schema.json).
+export const NOT_VERIFIED = "not-verified";
+
 export type Deployment = {
   label: string;
   chain: Chain;
-  address: string; // 0x…, base58, or the sentinel "not-verified"
+  address: string; // 0x…, base58, or the sentinel NOT_VERIFIED
   issuer?: string;
   ticker?: string;
   role: DeploymentRole;
@@ -155,6 +158,31 @@ export type Derived = {
     economic: number | null;
   };
   trending: boolean;
+  // The counting accounts behind `trending` (scripts/lib/trending.mjs), computed by `npm run score` —
+  // the site renders this list and never recomputes it from tiers or feed dates.
+  trendingAccounts: string[];
+};
+
+// What the directory (`/`) and the changelog need per name — no findings, research, sources or feed
+// bodies (final review I6: the full bundle was 561 KB at 49 names and grows with every record).
+export type DirectoryEntry = {
+  slug: string;
+  name: string;
+  symbol: string | null;
+  category: string;
+  lifecycle: Lifecycle;
+  coverage: Coverage;
+  summary: string;
+  derived: Derived;
+  handle: string | null; // the project's official X handle from census.yaml, when it has one
+  feedCount: number;
+  reviewedAt: string; // review.reviewed_at — the stub sort key
+};
+
+// One row of the home page's "latest in the feed" strip: the item plus just enough of its name to link.
+export type LatestFeedItem = {
+  name: { slug: string; symbol: string | null; name: string };
+  item: FeedItem;
 };
 
 export type Dossier = {
@@ -212,12 +240,27 @@ export type DependencyCard = {
   sources: SourceEntry[];
 };
 
-// Mirrors schema/accounts.schema.json's `tier` enum exactly. Only `top` (with role alpha/kol) counts
-// toward trending (scripts/lib/trending.mjs) and only `top` accounts render as trending sources
-// (components/dossier.tsx trendingCtAccounts) — `watch`, `downweight` and `skip` must never be treated
-// as sources by any code that adds a case here without also handling the other three.
+// The slice of a dependency card a dossier page carries for the cards it references — enough to
+// label and link the chip. Controls, failure modes and sources live on /d/$id (getDependency).
+export type DependencyRef = Pick<DependencyCard, "id" | "name" | "kind" | "summary" | "deployments">;
+
+// Mirrors schema/accounts.schema.json's `tier` and `role` enums exactly. Only `top` (with role alpha/kol)
+// counts toward trending (scripts/lib/trending.mjs); the site never derives trending sources from tiers —
+// it renders Derived.trendingAccounts. `watch`, `downweight` and `skip` must never be treated as sources.
 export type AccountTier = "top" | "watch" | "downweight" | "skip";
-export type AccountEntry = { handle: string; name?: string; tier: AccountTier; note?: string };
+export type AccountRole = "project" | "alpha" | "kol" | "data" | "infra" | "media";
+// The full accounts.yaml row, read server-side only. `note` is a maintainer's working note about an
+// account and never leaves the server (final review I6): pages get AccountRef.
+export type AccountEntry = {
+  handle: string;
+  name?: string;
+  tier: AccountTier;
+  role?: AccountRole;
+  slug?: string;
+  followers?: number;
+  note?: string;
+};
+export type AccountRef = { handle: string; tier: AccountTier; role: AccountRole | null };
 
 export type SiteConfig = {
   name: string;
@@ -240,13 +283,21 @@ export type SiteConfig = {
   disclaimer: string;
 };
 
-export type ContentBundle = {
+// What getContent() ships to the directory: directory entries and the newest feed items, nothing else.
+export type DirectoryBundle = {
   site: SiteConfig;
-  dossiers: Dossier[];
-  dependencies: Record<string, DependencyCard>;
-  changelog: ChangelogEntry[];
-  accounts: AccountEntry[];
+  entries: DirectoryEntry[];
+  latestFeed: LatestFeedItem[];
   generatedAt: string; // build/derived.json generated_at — when scores were last computed
+};
+
+// What getDossier(slug) ships: the dossier, the cards it references, and the accounts its feed cites
+// (handle/tier/role only — never `note`).
+export type DossierBundle = {
+  dossier: Dossier;
+  site: SiteConfig;
+  dependencies: Record<string, DependencyRef>;
+  accounts: AccountRef[];
 };
 
 // --- Labels -----------------------------------------------------------------
@@ -336,29 +387,10 @@ export function riskTone(risk: RiskLevel | null): Tone {
   }
 }
 
-export function evidenceTone(evidenceClass: EvidenceClass): Tone {
-  switch (evidenceClass) {
-    case "verified":
-      return "live";
-    case "disputed":
-      return "warn";
-    case "unknown":
-      return "muted";
-    case "claim":
-    case "inference":
-    default:
-      return "default";
-  }
-}
-
 // --- Small link builders -------------------------------------------------------
 
 export function xProfileUrl(handle: string): string {
   return `https://x.com/${handle.replace(/^@/, "")}`;
-}
-
-export function xSearchUrl(query: string): string {
-  return `https://x.com/search?q=${encodeURIComponent(query)}&src=typed_query&f=live`;
 }
 
 export function dexScreenerSearchUrl(query: string): string {

@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { CopyAddress } from "@/components/copy-address";
-import { CHAIN_LABEL, explorerTokenUrl, type Deployment } from "@/data/types";
+import { CHAIN_LABEL, NOT_VERIFIED, explorerTokenUrl, type Deployment } from "@/data/types";
 
 // Shared by the dossier and dependency pages — one deployment card layout everywhere a
 // deployment list appears, ticker shown inline when the deployment carries one.
@@ -26,7 +26,7 @@ export function DeploymentGrid({ deployments, explorerBase }: { deployments: Dep
             {d.issuer ? ` · ${d.issuer}` : ""}
             {d.ticker ? ` · ${d.ticker}` : ""}
           </p>
-          {d.address === "not-verified" ? (
+          {d.address === NOT_VERIFIED ? (
             <p className="mt-2 text-xs text-muted">Address not yet located.</p>
           ) : (
             <div className="mt-2">

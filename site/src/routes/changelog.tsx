@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
-import { getContent } from "@/data/content-server";
+import { getChangelog } from "@/data/content-server";
 import { type ChangelogEntry, type ChangelogSeverity, type Tone } from "@/data/types";
 import { formatDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/changelog")({
-  loader: () => getContent(),
+  loader: () => getChangelog(),
   component: ChangelogPage,
 });
 
@@ -25,9 +25,9 @@ function severityTone(severity: ChangelogSeverity): Tone {
 }
 
 function ChangelogPage() {
-  const { dossiers, changelog } = Route.useLoaderData();
+  const { names, changelog } = Route.useLoaderData();
 
-  const dossierBySlug = useMemo(() => new Map(dossiers.map((d) => [d.slug, d])), [dossiers]);
+  const dossierBySlug = useMemo(() => new Map(names.map((d) => [d.slug, d])), [names]);
 
   // Group newest-first: entries sort by date desc, then bucket by date preserving that order.
   const groups = useMemo(() => {

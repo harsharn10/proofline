@@ -30,7 +30,11 @@ const projects = {};
 const rows = [];
 for (const [slug, p] of [...content.projects].sort(([a], [b]) => a.localeCompare(b))) {
   const d = derive(p);
-  d.trending = trendingBySlug.get(slug)?.trending ?? false;
+  const t = trendingBySlug.get(slug);
+  d.trending = t?.trending ?? false;
+  // The counting accounts behind the flag (tier top, role alpha/kol, ct item inside the window) — the site
+  // renders this list instead of recomputing it with its own rule (final review I4).
+  d.trendingAccounts = t?.trending ? t.accounts : [];
   projects[slug] = d;
   rows.push([slug.padEnd(24), p.coverage.padEnd(5), String(d.score ?? "—").padStart(3), d.provisional ? "*" : " ",
     String(d.confidence ?? "—").padStart(3) + "%", (d.risk ?? "—").padEnd(9), d.override ? `override ${d.override.level}` : "", d.trending ? "trending" : "", d.label ?? ""].join("  "));
