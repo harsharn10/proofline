@@ -160,12 +160,15 @@ have not already been sent. A merge creates review-queue items; it does not auth
 
 Credentials (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, optional `SITE_URL`, `PROFILE_PATH`) come from
 `.env.local` (gitignored) locally, or from repo secrets in CI. `/review` reads the pending queue and
-stores approve/reject decisions plus edited channel copy in `ops/telegram-review.json`. A controller
-supplies a GitHub token for the current review session; the server verifies that account's write
-access, uses the token only for that action, and never persists it on Render or in browser storage.
-Prefer a fine-grained token scoped only to this repository with Contents read/write. From an already
-authenticated GitHub CLI, `gh auth token | pbcopy` copies the current token without printing it when
-its existing scopes are acceptable.
+stores approve/reject decisions plus edited channel copy in `ops/telegram-review.json`. The route and
+its server functions are hidden behind HTTP Basic authentication: use `github` as the username and a
+GitHub token as the password. The server admits only GitHub user `harsharn10` with write access to this
+repository, requires the credential on every request, caches successful GitHub verification for at
+most 30 seconds, and never persists the token on Render or in browser storage. Prefer a fine-grained
+token scoped only to this repository with Contents read/write.
+From an already authenticated GitHub CLI, `gh auth token | pbcopy` copies the current token without
+printing it when its existing scopes are acceptable. Close the browser session to clear its HTTP auth
+cache. The route is absent from public navigation and sends `noindex`/private no-store headers.
 `channel_enabled: false` pauses every delivery. Sent-state lives in
 `ops/telegram-state.json`. `publish.yml` runs on main pushes, but the sender exits without posting
 unless the channel is enabled and at least one unsent entry is explicitly approved.

@@ -28,9 +28,6 @@ export function SiteHeader() {
         <Link to="/changelog" activeProps={{ className: "on" }}>
           Changelog
         </Link>
-        <Link to="/review" activeProps={{ className: "on" }}>
-          Review
-        </Link>
       </nav>
       <div className="right">
         <TopbarSearch names={meta.names} />
