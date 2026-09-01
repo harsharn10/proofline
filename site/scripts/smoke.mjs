@@ -6,13 +6,33 @@
 //   npm run build && npm run smoke
 
 import { spawn } from "node:child_process";
+import fs from "node:fs";
 
 const PORT = Number(process.env.SMOKE_PORT ?? 8081); // override when 8081 is taken by another worktree's server
 const BASE = `http://localhost:${PORT}`;
-const ROUTES = ["/", "/n/pons", "/n/pons?tab=evidence", "/feed", "/methodology", "/changelog", "/review", "/d/stock-tokens"];
+const ROUTES = [
+  "/",
+  "/n/pons",
+  "/n/pons?tab=evidence",
+  "/feed",
+  "/methodology",
+  "/changelog",
+  "/d/stock-tokens",
+];
 const READY_TIMEOUT_MS = 30_000;
 const READY_POLL_MS = 300;
 const BANNED_IN_DOSSIER = ["uncapped", "securityRaw"];
+
+function reviewServerFunctions() {
+  const directory = ".output/server/_ssr";
+  const file = fs.readdirSync(directory).find((name) => name.startsWith("review-server-"));
+  if (!file) throw new Error("built review server functions were not found");
+  const compiled = fs.readFileSync(`${directory}/${file}`, "utf8");
+  return [...compiled.matchAll(/id: "([a-f0-9]+)",\s*name: "([^"]+)"/g)].map((match) => ({
+    id: match[1],
+    name: match[2],
+  }));
+}
 
 function startPreview() {
   const child = spawn("npm", ["run", "preview", "--", "--port", String(PORT), "--strictPort"], {
@@ -53,11 +73,50 @@ async function main() {
       if (!ok) failures.push(`${route} returned ${res.status}, expected 200`);
     }
 
+    const reviewRes = await fetch(`${BASE}/review`, { redirect: "manual" });
+    const reviewBody = await reviewRes.text();
+    const reviewPrivate =
+      reviewRes.status === 401 &&
+      reviewRes.headers.get("www-authenticate")?.startsWith("Basic ") &&
+      reviewRes.headers.get("cache-control")?.includes("no-store") &&
+      reviewRes.headers.get("x-robots-tag")?.includes("noindex") &&
+      !reviewBody.includes("Channel review");
+    console.log(
+      `  ${reviewPrivate ? "ok  " : "FAIL"} /review -> ${reviewRes.status} with auth challenge`,
+    );
+    if (!reviewPrivate) failures.push("/review must challenge without returning private content");
+
+    const functions = reviewServerFunctions();
+    if (functions.length !== 2) failures.push("expected both review server functions in the build");
+    for (const serverFunction of functions) {
+      const method = serverFunction.name === "getReviewQueue" ? "GET" : "POST";
+      const res = await fetch(`${BASE}/_serverFn/${serverFunction.id}`, {
+        method,
+        redirect: "manual",
+        headers: {
+          origin: BASE,
+          "sec-fetch-site": "same-origin",
+          "x-tsr-serverFn": "true",
+        },
+      });
+      const body = await res.text();
+      const isPrivate =
+        res.status === 401 &&
+        res.headers.get("www-authenticate")?.startsWith("Basic ") &&
+        !body.includes("channelEnabled");
+      console.log(
+        `  ${isPrivate ? "ok  " : "FAIL"} ${serverFunction.name} -> ${res.status} with auth challenge`,
+      );
+      if (!isPrivate) failures.push(`${serverFunction.name} must reject unauthenticated requests`);
+    }
+
     const dossierRes = await fetch(`${BASE}/n/pons`);
     const dossierHtml = await dossierRes.text();
     for (const banned of BANNED_IN_DOSSIER) {
       if (dossierHtml.includes(banned)) {
-        failures.push(`/n/pons HTML contains "${banned}" — a raw/uncapped score field leaked to the page`);
+        failures.push(
+          `/n/pons HTML contains "${banned}" — a raw/uncapped score field leaked to the page`,
+        );
       } else {
         console.log(`  ok   /n/pons has no "${banned}" in the HTML`);
       }
@@ -69,9 +128,17 @@ async function main() {
   } finally {
     // Kill the whole process group: child.kill() would stop npm but orphan vite, whose open
     // stdio pipe keeps a CI step alive indefinitely (the 2026-08-31 Validate hang).
-    try { process.kill(-child.pid, "SIGTERM"); } catch { child.kill("SIGTERM"); }
+    try {
+      process.kill(-child.pid, "SIGTERM");
+    } catch {
+      child.kill("SIGTERM");
+    }
     await new Promise((r) => setTimeout(r, 1500));
-    try { process.kill(-child.pid, "SIGKILL"); } catch { /* already gone */ }
+    try {
+      process.kill(-child.pid, "SIGKILL");
+    } catch {
+      /* already gone */
+    }
   }
 
   if (failures.length > 0) {
@@ -79,7 +146,7 @@ async function main() {
     for (const f of failures) console.error(`  - ${f}`);
     process.exit(1);
   }
-  console.log("\nsmoke: ok — every route is 200, no uncapped leakage on /n/pons");
+  console.log("\nsmoke: ok — public routes work and private review surfaces reject anonymous access");
 }
 
 main();

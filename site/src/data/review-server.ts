@@ -3,6 +3,13 @@ import path from "node:path";
 import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import type { ChangelogEntry } from "./types";
+import {
+  REVIEW_BRANCH,
+  REVIEW_REPOSITORY,
+  githubJson,
+  reviewFunctionProtection,
+  type ReviewPrincipal,
+} from "./review-auth";
 
 export type ReviewStatus = "pending" | "approved" | "rejected" | "sent";
 
@@ -36,13 +43,13 @@ export type ReviewQueueItem = {
 export type ReviewQueue = {
   channelEnabled: boolean;
   repository: string;
+  viewer: string;
   lastSentAt: string | null;
   counts: Record<ReviewStatus, number>;
   items: ReviewQueueItem[];
 };
 
 type ModerateRequest = {
-  githubToken: string;
   action: "approve" | "reject" | "reset" | "set-channel";
   channelEnabled?: boolean;
   items?: Array<{ key: string; title?: string; detail?: string }>;
@@ -52,8 +59,6 @@ type GitHubContent = { sha: string; content: string; encoding: string };
 
 const REVIEW_PATH = "ops/telegram-review.json";
 const CHANGELOG_PATH = "content/changelog.yaml";
-const REPOSITORY = "harsharn10/proofline";
-const BRANCH = "main";
 
 function repoRoot(): string {
   const cwd = process.cwd();
@@ -72,7 +77,7 @@ function readJson<T>(file: string, fallback: T): T {
   }
 }
 
-function loadQueue(): ReviewQueue {
+function loadQueue(viewer: string): ReviewQueue {
   const root = repoRoot();
   const changelog = YAML.parse(
     fs.readFileSync(path.join(root, CHANGELOG_PATH), "utf8"),
@@ -123,7 +128,8 @@ function loadQueue(): ReviewQueue {
 
   return {
     channelEnabled: ledger.channel_enabled === true,
-    repository: REPOSITORY,
+    repository: REVIEW_REPOSITORY,
+    viewer,
     lastSentAt: sentState.last_sent_at ?? null,
     counts,
     items,
@@ -133,13 +139,6 @@ function loadQueue(): ReviewQueue {
 function validateModeration(input: unknown): ModerateRequest {
   if (!input || typeof input !== "object") throw new Error("Invalid moderation request.");
   const value = input as Partial<ModerateRequest>;
-  if (
-    typeof value.githubToken !== "string" ||
-    value.githubToken.trim().length < 20 ||
-    value.githubToken.length > 500
-  ) {
-    throw new Error("A valid GitHub token is required.");
-  }
   if (!value.action || !["approve", "reject", "reset", "set-channel"].includes(value.action)) {
     throw new Error("Unknown moderation action.");
   }
@@ -171,61 +170,38 @@ function validateModeration(input: unknown): ModerateRequest {
   return value as ModerateRequest;
 }
 
-function githubHeaders(token: string): Record<string, string> {
-  return {
-    accept: "application/vnd.github+json",
-    authorization: `Bearer ${token}`,
-    "x-github-api-version": "2022-11-28",
-    "user-agent": "proofline-review-controller",
-  };
-}
-
-async function githubJson<T>(url: string, token: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, {
-    ...init,
-    headers: { ...githubHeaders(token), ...(init?.headers ?? {}) },
-  });
-  if (!response.ok) {
-    const detail = (await response.text()).slice(0, 300);
-    throw new Error(`GitHub rejected the moderation update (${response.status}): ${detail}`);
-  }
-  return (await response.json()) as T;
-}
-
 function decodeContent(file: GitHubContent): string {
   if (file.encoding !== "base64") throw new Error("Unexpected GitHub content encoding.");
   return Buffer.from(file.content.replace(/\n/g, ""), "base64").toString("utf8");
 }
 
-export const getReviewQueue = createServerFn({ method: "GET" }).handler(
-  async (): Promise<ReviewQueue> => loadQueue(),
-);
+function requirePrincipal(
+  context: { reviewPrincipal?: ReviewPrincipal } | undefined,
+): ReviewPrincipal {
+  if (!context?.reviewPrincipal) throw new Error("Review authentication is required.");
+  return context.reviewPrincipal;
+}
+
+export const getReviewQueue = createServerFn({ method: "GET" })
+  .middleware([reviewFunctionProtection])
+  .handler(async ({ context }): Promise<ReviewQueue> => loadQueue(requirePrincipal(context).login));
 
 export const moderateTelegram = createServerFn({ method: "POST" })
+  .middleware([reviewFunctionProtection])
   .validator(validateModeration)
-  .handler(async ({ data }): Promise<{ ok: true; commit: string; message: string }> => {
-    // The credential comes from the controller's current browser tab. It is used for this request
-    // only: never written to disk, returned to the client, or stored in Render configuration.
-    const githubToken = data.githubToken.trim();
-    const api = `https://api.github.com/repos/${REPOSITORY}`;
-    const [reviewFile, changelogFile, user, repository] = await Promise.all([
+  .handler(async ({ data, context }): Promise<{ ok: true; commit: string; message: string }> => {
+    const { githubToken, login } = requirePrincipal(context);
+    const api = `https://api.github.com/repos/${REVIEW_REPOSITORY}`;
+    const [reviewFile, changelogFile] = await Promise.all([
       githubJson<GitHubContent>(
-        `${api}/contents/${REVIEW_PATH}?ref=${encodeURIComponent(BRANCH)}`,
+        `${api}/contents/${REVIEW_PATH}?ref=${encodeURIComponent(REVIEW_BRANCH)}`,
         githubToken,
       ),
       githubJson<GitHubContent>(
-        `${api}/contents/${CHANGELOG_PATH}?ref=${encodeURIComponent(BRANCH)}`,
+        `${api}/contents/${CHANGELOG_PATH}?ref=${encodeURIComponent(REVIEW_BRANCH)}`,
         githubToken,
       ),
-      githubJson<{ login: string }>("https://api.github.com/user", githubToken),
-      githubJson<{ full_name: string; permissions?: { push?: boolean } }>(api, githubToken),
     ]);
-    if (
-      repository.full_name.toLowerCase() !== REPOSITORY.toLowerCase() ||
-      repository.permissions?.push !== true
-    ) {
-      throw new Error(`GitHub account ${user.login} does not have write access to ${REPOSITORY}.`);
-    }
 
     const ledger = JSON.parse(decodeContent(reviewFile)) as ReviewLedger;
     ledger.version = 1;
@@ -246,7 +222,7 @@ export const moderateTelegram = createServerFn({ method: "POST" })
         ledger.decisions[item.key] = {
           status: data.action === "approve" ? "approved" : "rejected",
           reviewed_at: reviewedAt,
-          reviewer: user.login,
+          reviewer: login,
           ...(data.action === "approve" && item.title ? { title: item.title.trim() } : {}),
           ...(data.action === "approve" && item.detail ? { detail: item.detail.trim() } : {}),
         };
@@ -260,7 +236,7 @@ export const moderateTelegram = createServerFn({ method: "POST" })
           : `ops: ${data.action} ${data.items?.length ?? 0} Telegram update(s)`,
       content: Buffer.from(`${JSON.stringify(ledger, null, 2)}\n`).toString("base64"),
       sha: reviewFile.sha,
-      branch: BRANCH,
+      branch: REVIEW_BRANCH,
     };
     const saved = await githubJson<{ commit: { sha: string } }>(
       `${api}/contents/${REVIEW_PATH}`,
