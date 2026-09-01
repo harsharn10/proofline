@@ -7,9 +7,15 @@
     "node": ">=20"
   },
   "scripts": {
+    "build": "npm run cloudflare:build",
     "validate": "node scripts/validate.mjs",
     "validate:release": "node scripts/validate.mjs --release",
     "score": "node scripts/score.mjs",
+    "cloudflare:build": "npm ci --prefix site && npm --prefix site run build:cloudflare",
+    "cloudflare:deploy": "site/node_modules/.bin/wrangler deploy --config wrangler.jsonc",
+    "cloudflare:preview": "site/node_modules/.bin/wrangler versions upload --config wrangler.jsonc",
+    "cloudflare:dry": "site/node_modules/.bin/wrangler deploy --dry-run --config wrangler.jsonc",
+    "cloudflare:test": "npm run cloudflare:dry && npm --prefix site run cloudflare:smoke",
     "seed": "node scripts/seed-stubs.mjs",
     "test": "node scripts/validate.mjs && node scripts/test.mjs",
     "telegram": "node scripts/telegram-digest.mjs",

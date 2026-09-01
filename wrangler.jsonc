@@ -1,0 +1,18 @@
+{
+  "$schema": "site/node_modules/wrangler/config-schema.json",
+  "name": "proofline",
+  "compatibility_date": "2026-08-03",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "site/.output/server/index.mjs",
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "site/.output/public"
+  },
+  "no_bundle": true,
+  "rules": [
+    {
+      "type": "ESModule",
+      "globs": ["**/*.mjs", "**/*.js"]
+    }
+  ]
+}
