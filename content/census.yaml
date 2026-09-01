@@ -10,7 +10,7 @@
   name: Pons
   category: Launchpad
   lifecycle: mainnet
-  coverage: stub          # flips to full when the research record lands (PRD §13, §14 step 4)
+  coverage: full          # first full record, 2026-08-31 (PRD §13, §14 step 4); approver pending → provisional
   official_links:
     - { kind: site, url: https://ponsfamily.com }
     - { kind: x, url: https://x.com/ponsdotfamily }
@@ -18,10 +18,10 @@
   handle: "@ponsdotfamily"
   tree: { primary: launch/bonding-curve, secondary: [trading/amm-native] }
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: dominant native launchpad; desk reports the PONS token contract on Blockscout 4663 and DefiLlama fee/volume rows", verified: false }
-    native_play:       { value: true, note: "Launchpad with V2 curve graduating to Uniswap v4", verified: false }
-    citable:           { value: true, note: "Official site listed in PRD Appendix A; X handle from the desk", verified: false }
-    research_story:    { value: true, note: "User funds sit in the curve pre-graduation; quote assets ETH, USDG, Stock Tokens", verified: false }
+    deployed_on_chain: { value: true, note: "Fourteen documented v1/v2 contracts reproduced on Blockscout 4663 on 2026-08-31 (twelve with verified source) plus the owner Safe; DefiLlama fee/volume rows", verified: true }
+    native_play:       { value: true, note: "Launchpad built for chain 4663 with two documented generations: v1 (fixed-supply token into a locked Uniswap V3 WETH pool) and v2 (bonding curve graduating into a locked Uniswap v4 pool, pairable against approved assets)", verified: true }
+    citable:           { value: true, note: "Official site listed in PRD Appendix A; v1 and v2 docs read 2026-08-31; X handle from the desk", verified: true }
+    research_story:    { value: true, note: "Owner rights over fee recipients, pairing assets and graduation components held by a 2-of-3 Safe with no timelock; v2 deployed and unaudited behind a creator allowlist; v2 quote assets include tokenised stocks", verified: true }
 
 - slug: mancer
   name: Mancer

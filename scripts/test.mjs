@@ -277,7 +277,7 @@ async function makeContent(mutate = () => {}) {
   const entry = (id) => `  - id: ${id}\n    url: https://example.com/${id}\n    publisher: Example\n    kind: docs\n    accessed_at: 2026-08-30T00:00:00Z\n    claim: Fixture\n    excerpt: n/a\n    hash: null\n    archive_url: null\n    researcher: harsharn10\n    available: true\n`;
   await appendFile(ledgerPath, entry("S98") + entry("S99")); // ids no real ledger uses
   const research = await readFile(researchPath, "utf8");
-  await writeFile(researchPath, research.replace("## Identity\n\n_Research pending._", "## Identity\n\nPons is a launchpad. [claim S98]"));
+  await writeFile(researchPath, research.replace("## Identity\n\n", "## Identity\n\nFixture citation. [claim S98]\n\n")); // pons.md is researched now; insert rather than replace the pending line
   const cited = await validateContent(tmp);
   // A feed item citing S99 counts as a citation; a feed item attributed to a skip-tier account warns.
   const feedItem = (body) => `slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ct\n    title: T\n    body: ${JSON.stringify(body)}\n    account: "@spam"\n    sources: [S99]\n`;

@@ -3,11 +3,15 @@ name: Pons
 symbol: PONS
 category: Launchpad
 lifecycle: mainnet
-coverage: stub
-summary: "Native launchpad on Robinhood Chain: tokens launch on a V2 bonding curve and graduate to Uniswap v4; quote assets include ETH, USDG and Stock Tokens."
+coverage: full
+summary: "Native launchpad on Robinhood Chain with two documented generations: v1 launches fixed-supply tokens straight into locked Uniswap V3 WETH pools; v2 sells from a bonding curve that graduates into a permanently locked Uniswap v4 pool and can pair against approved assets such as tokenised stocks. Per its docs v2 is deployed, creator-allowlisted and still under audit."
 official_links:
   - kind: site
     url: https://ponsfamily.com
+  - kind: docs
+    url: https://docs.ponsfamily.com
+  - kind: docs
+    url: https://docs.ponsfamily.com/docs/v2
   - kind: x
     url: https://x.com/ponsdotfamily
 dependencies:
@@ -19,24 +23,127 @@ deployments:
     chain: robinhood-chain
     address: "0x39dBED3a2bd333467115dE45665cC57F813C4571"
     role: token
-    verified: false
+    verified: true
     sources:
-      - S3
+      - S17
+      - S13
+      - S14
       - S6
+      - S3
       - S4
-  - label: Active launch factory (workbook sheet 02)
+  - label: v1 active launch factory (PonsLaunchFactory)
     chain: robinhood-chain
     address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
     role: factory
+    verified: true
+    sources:
+      - S18
+      - S13
+      - S4
+  - label: v1 active locker (PonsLaunchLocker)
+    chain: robinhood-chain
+    address: "0x736D76699C26D0d966744cAe304C000d471f7F35"
+    role: vault
+    verified: true
+    sources:
+      - S19
+      - S13
+  - label: v1 legacy factory (source not verified on the explorer)
+    chain: robinhood-chain
+    address: "0x0c37a24F5D23A486FA692d1500881d698B1F77a4"
+    role: factory
     verified: false
     sources:
-      - S4
-  - label: V2 curve / graduation router
+      - S20
+      - S13
+  - label: v1 legacy locker (source not verified on the explorer)
     chain: robinhood-chain
-    address: not-verified
-    role: router
+    address: "0x31ca5E101941A93A7DD6d0497928700625CF54B5"
+    role: vault
     verified: false
-    sources: []
+    sources:
+      - S21
+      - S13
+  - label: v2 launch factory (PonsV2LaunchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S22
+      - S16
+  - label: v2 Uniswap v4 hook (V2MemeHook)
+    chain: robinhood-chain
+    address: "0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044"
+    role: other
+    verified: true
+    sources:
+      - S23
+      - S16
+  - label: v2 fee escrow (V2FeeEscrow)
+    chain: robinhood-chain
+    address: "0xd3AFEB2a57f70eF218Aa82451c51B2fb0416Ac9e"
+    role: vault
+    verified: true
+    sources:
+      - S24
+      - S16
+  - label: v2 buyback vault (V2BuybackVault)
+    chain: robinhood-chain
+    address: "0x42df2a798f82289E177311362e8f5ccC45c1219c"
+    role: vault
+    verified: true
+    sources:
+      - S25
+      - S16
+  - label: v2 launch locker (V2LaunchLocker)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: true
+    sources:
+      - S26
+      - S16
+  - label: v2 launch-and-buy router (PonsV2LaunchAndBuy)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: true
+    sources:
+      - S27
+      - S16
+  - label: v2 launch deployer (PonsV2LaunchDeployer)
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: other
+    verified: true
+    sources:
+      - S28
+      - S16
+  - label: v2 graduation executor (V2GraduationExecutor)
+    chain: robinhood-chain
+    address: "0xC7819B64A1dAECD7eC19856d026cb14EfBd89046"
+    role: other
+    verified: true
+    sources:
+      - S29
+      - S16
+  - label: v2 graduation guard (PonsV2GraduationGuard)
+    chain: robinhood-chain
+    address: "0xf5695117b99B6f6401e67d4195BD653628176C6C"
+    role: other
+    verified: true
+    sources:
+      - S30
+      - S16
+  - label: Owner of the factories, lockers, hook and buyback vault — Safe 2-of-3 (SafeL2 1.4.1)
+    chain: robinhood-chain
+    address: "0x263ed295dAFaE1d9AAdD6E56c4B6F9f38eE019Dd"
+    role: multisig
+    verified: true
+    sources:
+      - S31
+      - S33
 metrics:
   - kind: fees_24h
     value: 4700000
@@ -65,43 +172,220 @@ review:
   methodology_version: proofline-v1.0
   reviewed_at: 2026-08-31
   published_at: null
+scoring:
+  security:
+    deployment_verifiability:
+      level: partial
+      evidence: [S17, S18, S19, S22, S23, S24, S25, S26, S27, S28, S29, S30, S20, S21, S33]
+      note: "Twelve of the fourteen documented contracts were opened on Blockscout with verified source and no proxy; the owner Safe (a verified SafeProxy) was also opened. The contract names match the docs' labels; the v1 legacy factory and locker have unverified source, and per-launch curves, tokens and pools are not enumerated. Full needs those two contracts' source verified (or retired from scope) and a mapped sample of per-launch contracts."
+    privileged_power:
+      level: zero
+      evidence: [S22, S23, S19, S33]
+      note: "A 2-of-3 Safe holds owner() directly and the verified ABIs let it change protocol and creator fee recipients and shares, the hook fee, pairing-asset approvals and economics, launch configs, the graduation executor and launch deployer, and call rescue functions; neither locker has an unlock path. No credit until a source read shows those setters are bounded and cannot reach a live curve's reserves or a graduation in flight — that would justify partial."
+    authorization_topology:
+      level: partial
+      evidence: [S31, S33]
+      note: "The owner is a Safe (SafeL2 1.4.1) with a threshold of 2 across three EOA signers on every owned contract; signer identities and independence are unknown, one signer has never transacted, and the Safe's scope covers every privileged function. Full needs identified independent signers or a documented signer policy."
+    timelock_exit_window:
+      level: zero
+      evidence: [S33, S16, S22]
+      note: "No timelock sits between the Safe and the contracts; owner setters execute immediately. The only documented delay is the three-day window on a Pons-proposed creator-fee-recipient takeover (docs, not read from source). Partial needs an enforced delay on owner actions, or a source read showing no owner action can change fund logic for existing launches."
+    audit_deployment_match:
+      level: zero
+      evidence: [S16, S13]
+      note: "The v2 docs name three reviews in progress and say no audit has closed; the v1 docs do not mention an audit; no report was found in this review. Partial needs a published report; full needs its scope to cover the deployed commit with material findings resolved."
+    continuous_safeguards:
+      level: zero
+      evidence: [S16, S13]
+      note: "A security contact address is published; no bug bounty, monitoring, pause/response design or incident process was found. The v2 graduation guard and seven-day stall return are protocol mechanics, not operational safeguards. Partial needs a bounty or a published response process."
+    incident_handling:
+      level: full
+      evidence: [S5, S6, S7, S8, S12, S32]
+      note: "No incident affecting Pons contracts was found across the official account, third-party X coverage, the DefiLlama protocol page and history, or the explorer's same-ticker token page; the two address confusions on X are communications issues, not contract incidents. Drops on any disclosed incident without a postmortem."
+  factors:
+    engineering:
+      level: mixed
+      positive:
+        - "Explorer-verified source for twelve contracts (Solidity 0.8.30 for v1, 0.8.35 for v2), with names matching the docs' labels"
+        - "Detailed integration docs for both generations: events, reads, CREATE2 launch addresses, quote maths, Uniswap v4 pool reconstruction"
+      negative:
+        - "No public repository, test suite, CI or release history linked from the site or docs"
+        - "The v1 legacy factory and locker have unverified source"
+      missing:
+        - "Repository and tests"
+        - "Source read of the owner-gated functions"
+        - "Copied-code comparison against known launchpad codebases"
+      evidence: [S18, S19, S22, S23, S24, S25, S26, S27, S28, S29, S30, S13, S16]
+    transparency:
+      level: mixed
+      positive:
+        - "Operating entity named (Pons Labs, LLC) with a published contact address"
+        - "Fee splits, revenue policy (including that the 80% buyback allocation is not immutable yet) and audit status disclosed"
+        - "Risk disclosures on both docs pages"
+      negative:
+        - "The docs do not name the owner Safe or its signers"
+        - "No audit report published"
+        - "No named contributors"
+      missing:
+        - "Signer identities and signer policy"
+        - "Audit reports"
+        - "Incident process"
+      evidence: [S1, S13, S16, S33]
+    maturity:
+      level: mixed
+      positive:
+        - "v1 live since block 8600612 with a second generation shipped and legacy pools still trading"
+        - "Material third-party activity: about $86M 24h and $295M 30d volume on 2026-08-31 per DefiLlama"
+        - "No known incident"
+      negative:
+        - "The chain itself is two months old; v2 is weeks old, creator-allowlisted and unaudited"
+      missing:
+        - "Operational history beyond August 2026"
+        - "Monitoring and response evidence"
+        - "Adapter-to-generation mapping for the activity figures"
+      evidence: [S13, S16, S14, S15, S7, S18, S22]
+    economic:
+      level: mixed
+      positive:
+        - "Liquidity locked by design on both generations, with no unlock path in either locker's ABI"
+        - "Fee split fixed per launch at creation; v2 creator tax capped and fixed"
+        - "No oracle dependency: curve and AMM pricing"
+      negative:
+        - "The v1 revenue policy (80% buyback TWAP) is mutable by the protocol"
+        - "v2 custom pairs import the pairing asset's issuer, transfer and price risk (tokenised stocks, USDG)"
+        - "Hook-level fee parameters are owner-mutable"
+      missing:
+        - "Concentration of launched tokens and holders"
+        - "Identity of the v1 fee recipient and buyback wallet"
+        - "Per-launch fee-policy reads"
+      evidence: [S13, S16, S19, S26, S23]
+  confidence:
+    primary_source_coverage: 70
+    onchain_verification: 60
+    independent_corroboration: 45
+    freshness: 95
+    review_completeness: 50
+  risk:
+    assessed: Elevated
+    reason: "PRD §6.4 Elevated applies: v2 is a new production system with meaningful fund exposure that its own docs call unaudited, no audit was found for v1, and the owner Safe's undelayed setters over fee routing and graduation components are not yet bounded by a source read. Not High: every material contract is identifiable and verifiable, the lockers expose no liquidity exit, and no unilateral drain, mint or freeze path is evidenced. The assessed level already meets the §6.4 floor, so no numeric override is recorded."
 findings:
   positive:
-    - text: Pons publishes an official site at https://ponsfamily.com.
+    - text: Pons publishes an official site at https://ponsfamily.com, docs for both protocol generations at https://docs.ponsfamily.com and an X account at https://x.com/ponsdotfamily.
       class: claim
       sources:
         - S1
-    - text: Pons publishes an official X account at https://x.com/ponsdotfamily.
-      class: claim
-      sources:
+        - S13
+        - S16
         - S2
-    - text: The desk's auditor reported the PONS token contract present on Blockscout 4663 with 56,062 holders and its contract source code verified on Blockscout (the explorer's flag, per the desk — not Proofline verification).
+    - text: All fourteen documented Pons addresses are contracts on chain 4663; twelve of them (the PONS token, the v1 active factory and locker, and all nine v2 contracts) have explorer-verified source and no proxy, with contract names matching the docs' labels; the owner Safe found by reading owner() is a verified SafeProxy.
+      class: verified
+      sources:
+        - S17
+        - S18
+        - S19
+        - S22
+        - S23
+        - S24
+        - S25
+        - S26
+        - S27
+        - S28
+        - S29
+        - S30
+        - S20
+        - S21
+        - S31
+    - text: Neither the v1 nor the v2 launch locker exposes an unlock or withdraw function in its verified ABI, so the owner has no liquidity exit path there; no listed address has an EIP-1967 implementation or admin slot set.
+      class: verified
+      sources:
+        - S19
+        - S26
+        - S33
+    - text: The owner of the factories, lockers, hook and buyback vault is a Safe (SafeL2 1.4.1) with a 2-of-3 threshold, not an externally owned account.
+      class: verified
+      sources:
+        - S31
+        - S33
+    - text: "Per its docs, the v1 factory creates a fixed-supply token and a locked Uniswap V3 WETH pool in one transaction, with no bonding curve and no later migration; the docs publish the active and legacy factory and locker addresses, event signatures and read examples for independent indexers."
       class: claim
       sources:
-        - S6
+        - S13
+    - text: "Per its docs, Pons v2 sells each launch from a bonding curve and graduates it into a permanently locked Uniswap v4 pool with no unlock path, no mint, no freeze and no post-launch tax increase; fee rates and the creator/protocol split are fixed when a launch is created."
+      class: claim
+      sources:
+        - S16
+    - text: The v2 docs name three security reviews in progress (SB Security, Dingbats, Pashov Audit Group) and commit to publishing the reports in full when they close.
+      class: claim
+      sources:
+        - S16
     - text: The official account posted $4B in lifetime volume (31 Aug), $20.93M paid to token creators in 47 days (30 Aug) and 29% of PONS supply burned (29 Aug).
       class: claim
       sources:
         - S5
-    - text: DefiLlama listed Pons V2 with roughly $86.5M 24h volume and $4.7M 24h fees on 2026-08-31.
+    - text: DefiLlama's fees and DEX volume APIs returned about $85.9M of 24-hour volume and $5.34M of 24-hour fees for Pons at the 2026-08-31 access time, and its protocol page listed Pons V2 with roughly $86.5M 24h volume and $4.7M 24h fees the same day (third-party adapter output, not reproduced onchain).
       class: claim
       sources:
+        - S14
+        - S15
         - S7
         - S3
   risk:
-    - text: The workbook records a token with the PONS ticker at a different address (0xe306c19C72131B0a8f311648fa63FE8CeDf44571, 92 holders); only the address above is treated as the project token.
+    - text: "That 2-of-3 Safe holds the owner role directly, with no timelock: on the v2 factory and hook it can change protocol and creator fee recipients and shares, the hook fee, pairing-asset approvals and economics, launch configs, the graduation executor and launch deployer, and call rescue functions; whether these setters are bounded or limited to future launches was not read from source in this review."
+      class: inference
+      sources:
+        - S22
+        - S23
+        - S19
+        - S33
+    - text: The three Safe signers are externally owned accounts whose holders are not identified in any reviewed source; one of them has never sent a transaction.
+      class: inference
+      sources:
+        - S33
+        - S1
+        - S13
+        - S16
+    - text: "The v2 docs say no audit has closed and to treat v2 as unaudited until reports are published; the v1 docs do not mention an audit, and no report, bug bounty or incident-response process was found for either generation."
       class: claim
       sources:
+        - S16
+        - S13
+    - text: Pons says 80% of v1 protocol fees currently fund a manual TWAP buyback of PONS and that this allocation is not immutable yet.
+      class: claim
+      sources:
+        - S13
+    - text: "Team-reviewed community takeovers can redirect a token's creator-fee payout wallet; on v2 a Pons-proposed takeover executes after a three-day public delay, and Pons can return a launch's collected funds if it stays stuck between the two graduation steps for seven days."
+      class: claim
+      sources:
+        - S13
+        - S16
+    - text: The v1 legacy factory, which created the PONS token, and the v1 legacy locker have no verified source on the explorer.
+      class: verified
+      sources:
+        - S20
+        - S21
+        - S17
+    - text: "Graduation only records that the curve sold out (v2) or that a WETH threshold was reached (v1); it is not a quality, liquidity or exit guarantee, and a v2 launch paired against a tokenised stock or other approved asset carries that asset's price and transfer risk on top of its own."
+      class: claim
+      sources:
+        - S13
+        - S16
+    - text: A second verified contract named Pons with the PONS symbol exists at 0xe306c19C72131B0a8f311648fa63FE8CeDf44571 (MIMEToken, 92 holders), created by an address that is not a Pons factory; only 0x39dB…4571 is treated as the project token.
+      class: verified
+      sources:
+        - S32
         - S4
     - text: An Ethereum address circulating under the $PONS cashtag (0x07f5b682…) is not a contract on chain 4663 per the desk's explorer check; two accounts, including Longbow's official one, posted it as the Pons token.
       class: claim
       sources:
         - S6
+        - S11
         - S5
   missing:
-    - text: Curve, factory and graduation-router deployment map not yet reproduced on Blockscout (the workbook names one active factory; it says several versions exist)
-    - text: Privileged roles over the curve and graduation path unknown
-    - text: An independent audit was not found in this review
-    - text: Team identity and repository not yet located
+    - text: Bounds and scope of the owner-callable setters and rescue functions on the v2 factory, hook and v1 locker (a source read), and whether any owner action can reach a live curve's reserves or a graduation in flight
+    - text: Independent audit reports (three v2 reviews in progress per the docs), a bug bounty and an incident-response process were not found in this review
+    - text: Public source repository, test suite, release history and named technical contributors not yet located
+    - text: Per-launch curve, token and pool contracts not enumerated; the v1 legacy factory and locker have no verified source on the explorer
   unresolved:
-    - text: "Whether 0xA5aAb3F0… is the only active factory: the workbook says 'multiple factory versions' exist."
+    - text: Which docs generation each DefiLlama adapter (Pons V1, Pons V2) tracks, and how the reported volume splits between v1 pools and v2 curves
+    - text: Whether the v1 protocol-fee recipient and the wallet running the 80% buyback TWAP are the Safe or another address (not read in this pass)
+    - text: Whether factory generations beyond the docs' v1 active/legacy pair and the v2 stack exist (the workbook says 'multiple factory versions')

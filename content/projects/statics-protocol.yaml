@@ -4,7 +4,7 @@ symbol: STATICS
 category: RWA baskets
 lifecycle: beta
 coverage: stub
-summary: Native protocol for redeemable multi-asset baskets, an Operator NFT reserve and self-backed credit; Genesis epoch live on mainnet per the project, with the hooks DEX and credit not yet enabled.
+summary: "Native protocol whose fixed-supply Genesis token and Operator NFT system the project reports live on Robinhood mainnet; the redeemable multi-asset basket, Statics Dollar, lending and general-pool suite follows a separate rollout, with the hooks DEX and credit not yet enabled per the project."
 official_links:
   - kind: site
     url: https://staticsprotocol.com
@@ -14,6 +14,8 @@ official_links:
     url: https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/
   - kind: docs
     url: https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/
+  - kind: github
+    url: https://github.com/EqualFiLabs/statics
   - kind: x
     url: https://x.com/StaticsProtocol
 dependencies:
@@ -61,6 +63,14 @@ findings:
       class: claim
       sources:
         - S5
+    - text: Statics says its Genesis token and 5,555-token Operator collection are live on Robinhood mainnet.
+      class: claim
+      sources:
+        - S1
+    - text: EqualFi Labs publishes the Statics contracts, tests, SDK, deployment tooling and design documentation in a public repository under a BUSL-1.1 license.
+      class: claim
+      sources:
+        - S9
     - text: The workbook records a fixed 1B supply with 800M sold across six Doppler curves at launch and 5,555 Operator NFTs each backed by 180k STATICS plus a compounding ETH reserve.
       class: claim
       sources:
@@ -70,16 +80,29 @@ findings:
       sources:
         - S8
   risk:
+    - text: The official security model says the broader multi-asset and Statics Dollar diamonds remain subject to independent review before production use, and that the repository test suite is not an external audit.
+      class: claim
+      sources:
+        - S10
+    - text: Both diamonds remain upgradeable through a shared timelock until a future reviewed cut removes Diamond-cut authority.
+      class: claim
+      sources:
+        - S2
+        - S10
+    - text: Permissionless basket constituents can exhibit rebases, blocklists, arbitrary burns or hostile callbacks that the protocol does not make safe.
+      class: claim
+      sources:
+        - S10
     - text: Per the project's own posts the hooks DEX is not live, credit is not enabled and the Genesis epoch is in progress; the census lifecycle was moved from mainnet to beta on that reading.
       class: claim
       sources:
         - S8
         - S6
   missing:
-    - text: Mainnet addresses beyond the token (docs reference a testnet deployment page)
-    - text: Deployed governance and timelock configuration vs the documented seven-day target
-    - text: An independent audit was not found in this review
-    - text: Upgrade authority
+    - text: Mainnet Genesis contract addresses in an official deployment manifest (the docs' manifest is testnet-only, chain 46630); the STATICS token address comes from the workbook and is not reproduced
+    - text: Deployed mainnet governance, signer threshold and timelock configuration versus the documented seven-day default
+    - text: Independent audit report, scope, covered commit and remediation status — an independent audit was not found in this review
+    - text: Onchain confirmation that the public repository matches the deployed Genesis contracts; upgrade authority as deployed
     - text: USDstx is a design, not a deployment
   unresolved:
     - text: The workbook warns to separate Genesis mainnet addresses from leftover testnet (chain 46630) addresses in the docs.

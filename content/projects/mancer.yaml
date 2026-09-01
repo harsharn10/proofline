@@ -4,7 +4,7 @@ symbol: MANCER
 category: Aggregator
 lifecycle: beta
 coverage: stub
-summary: Native DEX aggregator with resting orders, in a gated beta for Chain Mancers and StonkBrokers holders; the project says its router and order contracts are under audit; a Shield product is announced.
+summary: "Native DEX aggregator and non-custodial order layer (routed swaps, signed limit and stop orders, OCO brackets, recurring buys), in a gated beta for Chain Mancers and StonkBrokers holders; the project says its router and order contracts are under audit; a Shield product is announced."
 official_links:
   - kind: site
     url: https://mancer.xyz
@@ -46,6 +46,14 @@ findings:
       class: claim
       sources:
         - S2
+    - text: Mancer says swaps enforce a user-accepted minimum output onchain and revert below it, and that tokens behind a signed order stay in the user's wallet until the fill executes.
+      class: claim
+      sources:
+        - S2
+    - text: Mancer documents three order-exit paths — a free signed cancellation honored by its executor, an onchain cancellation, and revoking the token allowance.
+      class: claim
+      sources:
+        - S2
     - text: Mancer publishes an official whitepaper at https://mancer.xyz/whitepaper.pdf.
       class: claim
       sources:
@@ -64,16 +72,26 @@ findings:
       sources:
         - S6
   risk:
+    - text: The free cancellation path depends on Mancer's executor honoring a signed cancellation; a chain-enforced exit requires an onchain cancellation or an allowance revocation.
+      class: inference
+      sources:
+        - S2
+    - text: Users approve a single Mancer contract that the docs say forwards trades only to an allowlisted set of venue contracts; the reviewed page does not say who controls that allowlist or whether changes are delayed.
+      class: inference
+      sources:
+        - S2
     - text: No public-open post was found through 2026-08-31; the census lifecycle was moved from mainnet to beta on the desk's reading of the project's own posts.
       class: claim
       sources:
         - S8
         - S5
   missing:
-    - text: Router address not yet located; the $MANCER token address comes from the workbook and is not reproduced
-    - text: Non-custodial order claim not verified against contracts
+    - text: Router, settlement, executor and token addresses not yet located; the $MANCER token address comes from the workbook and is not reproduced
+    - text: Non-custodial and minimum-output claims not yet reproduced against deployed contracts
+    - text: Venue allowlist ownership and change controls not documented in the reviewed page
+    - text: Audit announced 2026-08-25 — no report, scope or covered deployment found in this review
+    - text: Executor availability, key management and monitoring not independently verified
     - text: NFT fee-claim mechanics unverified
-    - text: Audit announced 2026-08-25 — no report found in this review
     - text: "Shield: announced only — no deployment evidence reviewed"
   unresolved:
     - text: Whether the audit announced on 2026-08-25 has been published; no report was found in this review.
