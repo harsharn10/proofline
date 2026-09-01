@@ -69,6 +69,10 @@ function entryKey(entry: ChangelogEntry): string {
   return `${entry.date}|${entry.slug}|${entry.type}|${entry.title}`;
 }
 
+function isChannelCandidate(entry: ChangelogEntry): boolean {
+  return entry.channel_candidate === true;
+}
+
 function readJson<T>(file: string, fallback: T): T {
   try {
     return JSON.parse(fs.readFileSync(file, "utf8")) as T;
@@ -103,6 +107,7 @@ function loadQueue(viewer: string): ReviewQueue {
   }
 
   const items = changelog
+    .filter(isChannelCandidate)
     .map((entry): ReviewQueueItem => {
       const key = entryKey(entry);
       const decision = ledger.decisions[key];
@@ -207,7 +212,7 @@ export const moderateTelegram = createServerFn({ method: "POST" })
     ledger.version = 1;
     ledger.decisions ??= {};
     const currentEntries = YAML.parse(decodeContent(changelogFile)) as ChangelogEntry[];
-    const currentKeys = new Set(currentEntries.map(entryKey));
+    const currentKeys = new Set(currentEntries.filter(isChannelCandidate).map(entryKey));
     const reviewedAt = new Date().toISOString();
 
     if (data.action === "set-channel") {

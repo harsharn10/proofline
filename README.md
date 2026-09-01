@@ -150,7 +150,9 @@ value skips ahead by the tie size (`1, 1, 3`, never `1, 2`). `npm run score` mer
 ## Telegram digest
 
 `node scripts/telegram-digest.mjs` (PRD §9.2) sends only controller-approved changelog entries that
-have not already been sent. A merge creates review-queue items; it does not authorize a channel post:
+have not already been sent. Only entries explicitly marked `channel_candidate: true` create
+review-queue items; ordinary content and changelog merges update the site without touching Telegram.
+An opted-in entry still does not authorize a channel post:
 
     npm run telegram             # send
     npm run telegram:dry         # preview only, sends nothing, state unchanged

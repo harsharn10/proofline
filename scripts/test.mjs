@@ -422,9 +422,10 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 {
   const entries = [
     { date: "2026-08-30", slug: "pons", type: "coverage", severity: "Info", title: "Initial stub opened", detail: "x" },
-    { date: "2026-08-31", slug: "pons", type: "score", severity: "Material", title: "Score published", detail: "<b>&" },
+    { date: "2026-08-31", slug: "pons", type: "score", severity: "Material", title: "Score published", detail: "<b>&", channel_candidate: true },
   ];
   const unsent = selectUnsent(entries, { sent_keys: ["2026-08-30|pons|coverage|Initial stub opened"] });
+  const allCandidates = selectUnsent(entries, { sent_keys: [] }, { all: true });
   const approved = selectApproved(
     entries,
     { sent_keys: ["2026-08-30|pons|coverage|Initial stub opened"] },
@@ -446,6 +447,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   const chunks = chunkMessage("a".repeat(3000) + "\n\n" + "b".repeat(3000), 4096);
   try {
     assert.equal(unsent.length, 1);
+    assert.deepEqual(allCandidates, [entries[1]], "--all cannot bypass explicit channel opt-in");
     assert.equal(approved.length, 1, "only approved and unsent entries publish");
     assert.equal(approved[0].title, "Controller title", "approved title override");
     assert.equal(approved[0].detail, "Controller detail", "approved detail override");
