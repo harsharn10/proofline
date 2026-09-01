@@ -20,6 +20,7 @@ import {
 import { validateContent } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
+import { validateNameIntake } from "./lib/name-intake.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
@@ -211,7 +212,7 @@ async function makeContent(mutate = () => {}) {
   const s = parse(await readFile(new URL("../fixtures/clean/sources.yaml", import.meta.url), "utf8"));
   const content = {
     site: { maintainer: { id: "fixture" }, corrections: { destination: "https://example.com/corrections" }, chain: { checked: "2026-08-30" } },
-    census: [{ slug: "clean", name: p.name, category: p.category, lifecycle: p.lifecycle, coverage: p.coverage }],
+    census: [{ slug: "clean", name: p.name, identity: { aliases: [], symbols: [p.symbol], entity_kind: "protocol", chain_scope: "unknown", status: "provisional" }, category: p.category, lifecycle: p.lifecycle, coverage: p.coverage }],
     projects: new Map([["clean", p]]), sources: new Map([["clean", s]]), research: new Map([["clean", "stub"]]),
     dependencies: new Map(), changelog: [{ slug: "clean" }],
     feed: new Map(), accounts: [],
@@ -228,6 +229,13 @@ async function makeContent(mutate = () => {}) {
   const coverageDrift = crossCheck(await makeContent((c) => { c.census[0].coverage = "stub"; c.census[0].coverage = "full"; c.projects.get("clean").coverage = "stub"; }));
   const nameDrift = crossCheck(await makeContent((c) => { c.census[0].name = "Other"; }));
   const categoryDrift = crossCheck(await makeContent((c) => { c.census[0].category = "CDP"; }));
+  const symbolDrift = crossCheck(await makeContent((c) => { c.census[0].identity.symbols = []; }));
+  const aliasCollision = crossCheck(await makeContent((c) => {
+    c.census.push({ slug: "other", name: "Other", identity: { aliases: ["Clean Fixture"], symbols: [], entity_kind: "unknown", chain_scope: "unknown", status: "provisional" }, category: "CDP", lifecycle: "announced", coverage: "stub" });
+  }));
+  const duplicateFeedId = crossCheck(await makeContent((c) => {
+    c.feed.set("clean", { slug: "clean", items: [{ id: "same", sources: [] }, { id: "same", sources: [] }] });
+  }));
   const noChangelog = crossCheck(await makeContent((c) => { c.changelog = []; }));
   const card = { id: "dep", name: "Dep", kind: "dex", summary: "x", controls: [{ power: "p", holder: "h", note: "n", class: "verified", sources: ["S9"] }], failure_modes: [], sources: [] };
   const depDangling = crossCheck(await makeContent((c) => { c.dependencies.set("dep", card); }));
@@ -239,6 +247,9 @@ async function makeContent(mutate = () => {}) {
     assert.ok(coverageDrift.errors.some((e) => e.includes("coverage")), "census coverage ≠ project coverage");
     assert.ok(nameDrift.errors.some((e) => e.includes("name")), "census name ≠ project name");
     assert.ok(categoryDrift.errors.some((e) => e.includes("category")), "census category ≠ project category");
+    assert.ok(symbolDrift.errors.some((e) => e.includes("identity.symbols")), "project symbol must remain in canonical identity");
+    assert.ok(aliasCollision.errors.some((e) => e.includes("collides with canonical slug")), "normalized aliases cannot map to two slugs");
+    assert.ok(duplicateFeedId.errors.some((e) => e.includes("duplicate item id")), "feed ids are stable and unique");
     assert.ok(noChangelog.errors.some((e) => e.includes("changelog")), "census slug without a changelog entry");
     assert.ok(depDangling.errors.some((e) => e.includes("S9") && e.includes("dependencies/dep")), "dependency control cites an id missing from its own ledger");
     console.log("ok   crossCheck rules");
@@ -599,7 +610,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 // Task 5 — census schema: optional handle (X pattern) and tree { primary, secondary[] }.
 {
   const base = () => ({
-    slug: "denar", name: "Denar", category: "Lending", lifecycle: "mainnet", coverage: "stub", official_links: [],
+    slug: "denar", name: "Denar", identity: { aliases: [], symbols: ["DENAR"], entity_kind: "protocol", chain_scope: "unknown", status: "provisional" }, category: "Lending", lifecycle: "mainnet", coverage: "stub", official_links: [],
     discovery_source: "desk", qualifying: Object.fromEntries(["deployed_on_chain", "native_play", "citable", "research_story"].map((k) => [k, { value: true, note: "n", verified: false }])),
   });
   const cases = [
@@ -607,6 +618,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     [{ ...base(), handle: "DenarMarkets" }, 1, "handle needs @"],
     [{ ...base(), tree: { primary: "credit/isolated-money-market" } }, 0, "tree primary only"],
     [{ ...base(), tree: { primary: "credit/isolated-money-market", secondary: ["yield/savings-vault"] } }, 0, "tree with secondary"],
+    [{ ...base(), tree: { primary: "other/uncontrolled-domain" } }, 1, "tree domain must use the canonical taxonomy"],
     [{ ...base(), tree: { secondary: ["x"] } }, 1, "tree needs primary"],
     [{ ...base(), tree: { primary: "x", tertiary: [] } }, 1, "tree rejects unknown keys"],
   ];
@@ -614,6 +626,51 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     for (const [data, want, why] of cases) assert.equal(validateAgainst("census", [data]).length > 0 ? 1 : 0, want, why);
     console.log("ok   census schema handle/tree");
   } catch (err) { failures++; console.error(`FAIL census schema handle/tree: ${err.message}`); }
+}
+
+// New-name intake: complete taxonomy, referential integrity, authenticity and conflicts.
+{
+  const template = parse(await readFile("docs/templates/name-intake.yaml", "utf8"));
+  const valid = validateNameIntake(template, { census: [] });
+  const dangling = structuredClone(template);
+  dangling.claims[0].source_ids = ["SRC-99"];
+  const danglingErrors = validateNameIntake(dangling, { census: [] });
+  const ungroundedVerified = structuredClone(template);
+  ungroundedVerified.identity.status = "verified";
+  const verifiedErrors = validateNameIntake(ungroundedVerified, { census: [] });
+  const mainnet = structuredClone(template);
+  mainnet.lifecycle = "mainnet";
+  const mainnetErrors = validateNameIntake(mainnet, { census: [] });
+  const taxonomyDrift = structuredClone(template);
+  taxonomyDrift.taxonomy.primary_domain = "yield";
+  const taxonomyErrors = validateNameIntake(taxonomyDrift, { census: [] });
+  const unrelatedReproduction = structuredClone(template);
+  unrelatedReproduction.sources.push({ ...structuredClone(template.sources[0]), id: "SRC-2", url: "https://example.com/unrelated" });
+  unrelatedReproduction.reproductions.push({ id: "REP-1", method: "other", source_ids: ["SRC-2"], checked_at: "2026-09-01T12:00:00Z", result: "Checked an unrelated source." });
+  unrelatedReproduction.claims[0].class = "verified";
+  unrelatedReproduction.claims[0].reproduction_ids = ["REP-1"];
+  const reproductionErrors = validateNameIntake(unrelatedReproduction, { census: [] });
+  const unresolved = structuredClone(template);
+  unresolved.reproductions.push({ id: "REP-1", method: "document-scope", source_ids: ["SRC-1"], checked_at: "2026-09-01T12:00:00Z", result: "Checked the announcement text." });
+  unresolved.claims[2].class = "verified";
+  unresolved.claims[2].reproduction_ids = ["REP-1"];
+  unresolved.claims.push({ id: "CLM-8", field: "lifecycle", value: "beta", class: "disputed", source_ids: ["SRC-1"], reproduction_ids: [], observed_at: "2026-09-01T12:00:00Z" });
+  unresolved.conflicts.push({ id: "CON-lifecycle", field: "lifecycle", claim_ids: ["CLM-3", "CLM-8"], status: "open", resolution: null });
+  const unresolvedErrors = validateNameIntake(unresolved, { census: [] });
+  const collision = validateNameIntake(template, {
+    census: [{ slug: "example", name: "Example Protocol", identity: { aliases: [] } }],
+  });
+  try {
+    assert.deepEqual(valid, [], "standard name template passes");
+    assert.ok(danglingErrors.some((error) => error.includes("missing source SRC-99")), "dangling source rejected");
+    assert.ok(verifiedErrors.some((error) => error.includes("verified identity requires")), "identity cannot self-verify");
+    assert.ok(mainnetErrors.some((error) => error.includes("mainnet requires")), "mainnet requires reproduction");
+    assert.ok(taxonomyErrors.some((error) => error.includes("matching taxonomy.primary-domain claim")), "taxonomy must agree with its claim");
+    assert.ok(reproductionErrors.some((error) => error.includes("share a source")), "verified claim must be grounded in its reproduction");
+    assert.ok(unresolvedErrors.some((error) => error.includes("open conflict") && error.includes("verified claim")), "open conflict blocks verification");
+    assert.ok(collision.some((error) => error.includes("possible_matches")), "normalized canonical match must be disclosed");
+    console.log("ok   standardized name intake");
+  } catch (err) { failures++; console.error(`FAIL standardized name intake: ${err.message}`); }
 }
 
 // Task 2 — feed schema: kind enum and account handle pattern.

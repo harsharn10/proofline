@@ -128,30 +128,31 @@ hit, not just under `--release`. `content/accounts.yaml` is deliberately off the
 
 ### 2.5 Census candidates — proposal only, not a direct write
 
-A name that isn't in `content/census.yaml` yet never gets written there by the desk. Instead, propose it
-as raw intake:
+A name that isn't in `content/census.yaml` never gets written there by the desk. Create exactly one
+record at `research/inbox/names/<slug>.yaml`, following
+[`docs/templates/name-intake.yaml`](../templates/name-intake.yaml) and
+`schema/name-intake.schema.json`. `npm run validate` checks every YAML file in that directory,
+including all references between sources, reproductions, claims, requirements and conflicts.
 
-```yaml
-# research/inbox/<date>-census-candidates.yaml
-candidates:
-  - slug: example-protocol
-    name: Example Protocol
-    category: Lending          # schema/shared.schema.json category enum
-    lifecycle: announced       # see the lifecycle rule in §3 — a tweet is never "mainnet"
-    official_links:
-      - { kind: x, url: "https://x.com/exampleprotocol" }
-    discovery_source: "Grok field desk round 24, x-fill-24.md"
-    handle: "@exampleprotocol"
-    qualifying:
-      deployed_on_chain: { value: true, note: "Factory contract on 4663, unverified", verified: false }
-      native_play: { value: true, note: "Built for chain 4663; not a Stock Token or day-one infra", verified: false }
-      citable: { value: true, note: "Official X account and docs site", verified: false }
-      research_story: { value: true, note: "Lending vault with user-supplied collateral", verified: false }
-```
+The record is a dossier, not a discovery note. It must contain:
 
-This file isn't schema-validated by `npm run validate` — it's a proposal in the shape of
-`schema/census.schema.json` for a human to review and, if it holds up, add to `content/census.yaml` by
-hand (PRD §2.1: "Add names only when they meet the four tests").
+- canonical-name proposal, aliases, symbols, entity kind, chain scope and identity status;
+- category, primary taxonomy domain and controlled mechanism tags;
+- every candidate official link with its authenticity status and supporting source ids;
+- dated sources, with authority and authenticity classified separately;
+- atomic claims by field, never an unsourced paragraph that mixes several claims;
+- reproduction records for anything marked `class: verified`;
+- a disposition for all nine required research areas: identity, product, deployment, control,
+  security, team, economics, activity and communications;
+- the four census qualifying tests, each supported or explicitly `unknown`;
+- all conflicting claims and every possible match against the canonical census.
+
+If the normalized name or alias matches a canonical row, list that row under `possible_matches`.
+Ticker-only matches are weak signals and never justify a merge. If the slug is already canonical,
+do not open a second name record; submit ordinary feed/source updates for that slug.
+
+The old aggregate `<date>-census-candidates.yaml` format is retired. Existing historical files remain
+as intake evidence, but every new name uses the validated one-file-per-name format.
 
 ## 3. Evidence rules
 
@@ -167,6 +168,53 @@ hand (PRD §2.1: "Add names only when they meet the four tests").
   `mainnet` (PRD §2.3). 24 of the last intake's 39 `mainnet` calls rested on `official-post` alone; that
   is the single most-repeated defect to fix.
 - **One canonical account ledger** — `account-desk.yaml`, not two files that can disagree.
+
+### 3.1 Source authority is field-specific
+
+There is no universal "official source wins" rule. Resolve the specific field using the strongest
+source capable of proving it:
+
+| Field | Strongest evidence first |
+| --- | --- |
+| Contract/address/role | reproduced RPC or explorer result → docs naming the same chain/address → official announcement → third party |
+| Official identity | bidirectional site/docs/handle cross-link → repository-organization cross-link → one-sided social claim → directory/media |
+| Lifecycle | reproduced onchain activity → docs publishing live addresses → official launch claim → media/social |
+| Audit | audit artifact whose scope and commit match deployment → auditor announcement → project claim |
+| Metric | reproduced onchain query → primary API/dashboard → named aggregator → social claim |
+| Team/control | signed/onchain role or first-party legal/docs record → attributable repository → official social → third party |
+
+Freshness breaks a tie only when two sources cover the same chain, contract, version and measurement
+window. A newer tweet does not supersede an older reproduced deployment merely because it is newer.
+
+### 3.2 Conflict resolution
+
+Conflicting values are stored as separate atomic claims and joined by a `CON-*` record. Never replace
+one with the other, average numbers, or let the most recent PR win. While a material conflict is open:
+
+- identity status is `conflicted` when the name, official handle/domain or ownership is disputed;
+- lifecycle cannot be promoted to `mainnet` from the disputed claim;
+- the disputed value cannot become a verified finding, score input or channel post;
+- both claims remain attributable and visible to the controller.
+
+A conflict becomes `resolved` only after a non-bot controller records the winning claim ids, at least
+one reproduction id, a dated rationale and their identity. Losing claims remain in the record as
+disputed/superseded evidence; they are never deleted.
+
+### 3.3 Authenticity and merging names
+
+Never merge on display name, logo, ticker, bio wording or one account's assertion. Treat two records
+as the same entity only when at least two strong identifiers agree, with at least one reproduced:
+
+- official domain and handle link to each other;
+- verified deployment, deployer or ownership graph is shared;
+- official repository/docs identify the same product and chain;
+- a migration announcement explicitly links the old and new identity.
+
+When a controller approves a merge, keep the older accepted slug unless the official identity changed,
+union aliases and sources, remap incoming source ids above the current maximum, deduplicate by normalized
+URL plus claim (not URL alone), and merge feed items by stable item id. Any same id with different
+content is a hard conflict. Canonical scalar fields are resolved from evidence—never last-write-wins.
+Record a correction/changelog entry whenever a public name, lifecycle, deployment or conclusion changes.
 
 ## 4. What it must never write
 
@@ -257,7 +305,8 @@ daily cadence that always opens a PR, even an empty one, defeats the purpose of 
 
 1. **`validate.yml`** runs on the PR: root `npm test` (schema validation + scoring/rule tests, including
    the voice/conduct lint — a hype word in a feed item or a conduct word in an account note fails this
-   job unconditionally, not just under `--release`), the site's `typecheck` + `build`, and a smoke test
+   job unconditionally, not just under `--release`; every `research/inbox/names/*.yaml` dossier is also
+   schema- and reference-validated), the site's `typecheck` + `build`, and a smoke test
    against the built site. This is what actually catches a malformed feed item or source entry — even
    though §2 asks the desk to only write when "the shape validates," CI is the real backstop.
 2. **`automerge-feed.yml`** does not run on the PR itself — it triggers on `validate.yml`'s own
@@ -296,8 +345,8 @@ required repo settings.
    a deletion or a removed line) plus `research/inbox/**` when the shape validates. Every PR waits for
    controller review after CI passes; none auto-merge. Channel delivery is separately approved in
    `/review` after content lands.
-8. New census names go into a `research/inbox/<date>-census-candidates.yaml` proposal (§2.5), never
-   straight into `content/census.yaml`.
+8. Every new name gets one validated `research/inbox/names/<slug>.yaml` dossier (§2.5), never an
+   aggregate candidates list and never a direct write to `content/census.yaml`.
 9. `content/projects/**`, `scoring`, `review.approver`, and `content/changelog.yaml` stay off-limits —
    you never touch scores or approvals.
 10. Quote every YAML free-text value and keep keys unique — a ledger that fails to parse is a bug you
@@ -331,11 +380,12 @@ This round:
    never intent ("drainer", "impersonator", "farm", "scammer").
 5. lifecycle: mainnet requires evidence beyond the project's own post (explorer, DefiLlama chain-slice,
    or docs with addresses). A tweet alone is lifecycle: announced.
-6. If — and only if — you're confident of the shape (you know the census slug, the claim is dated and
-   sourced), also draft content/feed/<slug>.yaml items and/or content/sources/<slug>.yaml entries, or an
-   additive content/accounts.yaml row (always tier: watch). If you're proposing a name that isn't in
-   the census yet, write it to research/inbox/<date>-census-candidates.yaml instead (§2.5) — never
-   content/census.yaml or content/projects/** directly.
+6. If the name already has a canonical census slug and the claim is dated and sourced, draft
+   content/feed/<slug>.yaml items and/or additive content/sources/<slug>.yaml entries, or an additive
+   content/accounts.yaml row (always tier: watch). For a new name, create
+   research/inbox/names/<slug>.yaml from docs/templates/name-intake.yaml. Complete all nine research
+   requirements; represent missing work as not-found, not by omitting a field. Record possible matches
+   and every conflict. Never write content/census.yaml or content/projects/** directly.
 7. Never write scoring, review.approver, or content/changelog.yaml.
 8. Open your changes as a PR:
    - Create branch grok/<YYYY-MM-DD> from main's current head:

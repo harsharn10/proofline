@@ -229,6 +229,16 @@ as a pull request from a `grok/<YYYY-MM-DD>` branch, opened via the GitHub REST 
 — what it may collect, where it may write, what it must never write, evidence rules, and the exact
 file shapes — is [`docs/integrations/grok-bot.md`](docs/integrations/grok-bot.md).
 
+`content/census.yaml` is the canonical name registry. Every row carries an `identity` taxonomy:
+aliases, symbols, entity kind, chain scope and `verified | provisional | conflicted` status. New names
+never enter that registry directly from automation. Grok submits one validated dossier at
+`research/inbox/names/<slug>.yaml`, using [`docs/templates/name-intake.yaml`](docs/templates/name-intake.yaml).
+The dossier separates sources, reproductions and atomic claims; covers identity, product, deployment,
+control, security, team, economics, activity and communications; and records possible matches and
+conflicts. `npm run validate` checks its schema and all internal references. Conflicts are never
+last-write-wins: [`docs/integrations/grok-bot.md`](docs/integrations/grok-bot.md) §3 defines field-specific
+source precedence, authenticity, resolution and merge rules.
+
 ## Voice and conduct lint
 
 `scripts/lib/voice.mjs` has two scans, both case-insensitive and whole-word, run by `npm run validate`

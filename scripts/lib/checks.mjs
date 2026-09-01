@@ -5,6 +5,10 @@ export const PLACEHOLDER_APPROVERS = new Set(["tbd", "none", "todo", "na", "n-a"
 /** Census fields that are duplicated in the project file and must agree. */
 const MIRRORED_FIELDS = ["name", "category", "lifecycle", "coverage"];
 
+function normalizeIdentity(value) {
+  return String(value ?? "").normalize("NFKC").toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
 /** Collect every S-id referenced anywhere inside a project object. */
 export function referencedSourceIds(project) {
   const ids = new Set();
@@ -21,6 +25,27 @@ export function crossCheck(content) {
   const censusSlugs = new Set(content.census.map((c) => c.slug));
   const changelogSlugs = new Set(content.changelog.map((e) => e.slug));
 
+  // Census is the canonical identity registry. Names and aliases may not normalize to two slugs;
+  // a ticker is deliberately excluded because tickers are not unique identifiers.
+  const identityNames = new Map();
+  const censusHandles = new Map();
+  for (const row of content.census) {
+    for (const value of [row.name, ...(row.identity?.aliases ?? [])]) {
+      const normalized = normalizeIdentity(value);
+      const prior = identityNames.get(normalized);
+      if (prior && prior !== row.slug)
+        errors.push(`census identity "${value}" on ${row.slug} collides with canonical slug ${prior}`);
+      else if (normalized) identityNames.set(normalized, row.slug);
+    }
+    if (row.handle) {
+      const handle = row.handle.toLowerCase();
+      const prior = censusHandles.get(handle);
+      if (prior && prior !== row.slug)
+        warnings.push(`census handle ${row.handle} is shared by ${prior} and ${row.slug} — confirm they are distinct names`);
+      else censusHandles.set(handle, row.slug);
+    }
+  }
+
   // 1:1:1:1 — census ⇔ projects ⇔ sources ⇔ research; every census slug has history
   for (const slug of censusSlugs) {
     for (const [kind, map] of [["projects", content.projects], ["sources", content.sources], ["research", content.research]])
@@ -34,6 +59,8 @@ export function crossCheck(content) {
     if (project.slug !== slug) errors.push(`projects/${slug}: slug field is "${project.slug}"`);
     const census = content.census.find((c) => c.slug === slug);
     if (census) for (const f of MIRRORED_FIELDS) if (census[f] !== project[f]) errors.push(`projects/${slug}: ${f} "${project[f]}" ≠ census "${census[f]}"`);
+    if (census && project.symbol && !census.identity?.symbols?.includes(project.symbol))
+      errors.push(`census ${slug}: identity.symbols does not include project symbol ${project.symbol}`);
 
     const { researcher, approver } = project.review ?? {};
     if (approver !== undefined && approver === researcher) errors.push(`projects/${slug}: approver must be a different person from researcher`);
@@ -74,9 +101,27 @@ export function crossCheck(content) {
     if (!censusSlugs.has(slug)) errors.push(`feed/${slug} is not in census.yaml`);
     if (feedFile.slug !== slug) errors.push(`feed/${slug}: slug field is "${feedFile.slug}"`);
     const ledgerIds = new Set((content.sources.get(slug)?.sources ?? []).map((s) => s.id));
-    for (const item of feedFile.items ?? [])
+    const itemIds = new Set();
+    for (const item of feedFile.items ?? []) {
+      if (itemIds.has(item.id)) errors.push(`feed/${slug}: duplicate item id ${item.id}`);
+      itemIds.add(item.id);
       for (const id of item.sources ?? [])
         if (!ledgerIds.has(id)) errors.push(`feed/${slug}: item ${item.id} references ${id} which is not in sources/${slug}.yaml`);
+    }
+  }
+
+  // Re-use of a product deployment across canonical names is never silently merged. Shared admins,
+  // multisigs and infrastructure are expected, but token/factory/router/vault collisions need eyes.
+  const deploymentOwners = new Map();
+  for (const [slug, project] of content.projects) {
+    for (const deployment of project.deployments ?? []) {
+      if (deployment.address === "not-verified" || ["admin", "multisig", "timelock", "implementation"].includes(deployment.role)) continue;
+      const key = `${deployment.chain}:${deployment.address.toLowerCase()}`;
+      const prior = deploymentOwners.get(key);
+      if (prior && prior.slug !== slug)
+        warnings.push(`deployment ${deployment.address} (${deployment.chain}) appears on ${prior.slug} and ${slug}; resolve identity before merging either record`);
+      else deploymentOwners.set(key, { slug, role: deployment.role });
+    }
   }
 
   return { errors, warnings };

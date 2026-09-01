@@ -3,6 +3,8 @@
 # been reproduced on Blockscout or the project's own contracts yet. `handle` is the X account the desk treats as
 # official; `tree` is the desk's placement (category stays the PRD enum). Names the desk parked as `observe:` or
 # `graduation:` are not rows here — see research/inbox/grok-2026-08-30/HARVEST.md.
+# `identity` is the canonical name registry: aliases/symbols are lookup keys, entity_kind and chain_scope use the
+# shared taxonomy, and status remains provisional or conflicted until the identity has been reproduced and reviewed.
 
 # --- PRD seed set ---
 
@@ -11,6 +13,12 @@
   category: Launchpad
   lifecycle: mainnet
   coverage: full          # first full record, 2026-08-31 (PRD §13, §14 step 4); approver pending → provisional
+  identity:
+    aliases: []
+    symbols: ["PONS"]
+    entity_kind: protocol
+    chain_scope: robinhood-native
+    status: verified
   official_links:
     - { kind: site, url: https://ponsfamily.com }
     - { kind: x, url: https://x.com/ponsdotfamily }
@@ -28,6 +36,12 @@
   category: Aggregator
   lifecycle: beta
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["MANCER"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://mancer.xyz }
     - { kind: docs, url: https://mancer.xyz/docs }
@@ -47,6 +61,12 @@
   category: Stock-paired token
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["AI"]
+    entity_kind: token
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://artificialinu.com }
     - { kind: x, url: https://x.com/ArtificiallyInu }
@@ -64,6 +84,12 @@
   category: Fee-routing protocol
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://www.uselongshot.xyz }
     - { kind: x, url: https://x.com/uselongshot }
@@ -81,6 +107,12 @@
   category: Launchpad
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: app, url: https://app.long.xyz }
     - { kind: x, url: https://x.com/longdotxyz }
@@ -98,6 +130,12 @@
   category: NFT / treasury
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["STONKBROKER"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://stonkbrokers.cash }
     - { kind: x, url: https://x.com/ClutchMarkets }
@@ -115,6 +153,12 @@
   category: RWA distributor
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["INDEX"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://theindex.finance }
     - { kind: x, url: https://x.com/TheIndexFi }
@@ -132,6 +176,12 @@
   category: CDP
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["ARROW"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: docs, url: https://app.arrowfinance.io/docs }
     - { kind: x, url: https://x.com/ArrowFinanceio }
@@ -149,6 +199,12 @@
   category: Agent / execution
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/bankrbot }
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31 (handle)
@@ -165,6 +221,12 @@
   category: Prediction market
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/meridiandotxyz }
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31 (handle, Llama TVL rows)
@@ -181,6 +243,12 @@
   category: RWA baskets
   lifecycle: beta
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["STATICS"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://staticsprotocol.com }
     - { kind: docs, url: https://docs.staticsprotocol.com/docs/rollout/ }
@@ -201,6 +269,12 @@
   category: Launchpad
   lifecycle: announced
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: github, url: https://github.com/opengrid1/Launchpad }
     - { kind: site, url: https://www.safehood.fun }
@@ -219,6 +293,12 @@
   category: Index vault
   lifecycle: testnet-only
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["rIDX"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: github, url: https://github.com/nsvoud-dev/robinhood-index-vaults }
   discovery_source: Prototype seed profile 2026-08-30; restored by product owner; Grok desk map 2026-08-31
@@ -234,6 +314,12 @@
   category: RWA baskets
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: github, url: https://github.com/vimenprotocol/vimen }
     - { kind: site, url: https://vimen.org }
@@ -254,6 +340,12 @@
   category: Fee-routing protocol
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["UP"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://up33.xyz }
     - { kind: x, url: https://x.com/uponrh }
@@ -271,6 +363,12 @@
   category: Fee-routing protocol
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["PROLOGUE"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/fablesfi }
   discovery_source: Grok desk map 2026-08-31 (trading/amm-native; Llama TVL and volume); workbook sheet 06
@@ -287,6 +385,12 @@
   category: Lending
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["DENAR"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/DenarMarkets }
   discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (credit/isolated-money-market)
@@ -303,6 +407,12 @@
   category: Lending
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["BOW"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://longbow.cash }
     - { kind: x, url: https://x.com/longbowlend }
@@ -320,6 +430,12 @@
   category: Launchpad
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://noxa.fun }
     - { kind: x, url: https://x.com/Noxa_Fi }
@@ -337,6 +453,12 @@
   category: Agent / execution
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["VIRTUAL"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://virtuals.io }
     - { kind: x, url: https://x.com/virtuals_io }
@@ -354,6 +476,12 @@
   category: RWA baskets
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["NET"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/NetNetCap }
   discovery_source: Grok desk map 2026-08-31 (rwa-products/reserve-currency)
@@ -370,6 +498,12 @@
   category: Oracle / infra
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: infrastructure
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://tickeryard.com }
     - { kind: x, url: https://x.com/TickerYardHQ }
@@ -387,6 +521,12 @@
   category: Yield
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["EARN"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://earnonhood.com }
     - { kind: x, url: https://x.com/EARNONHOOD }
@@ -404,6 +544,12 @@
   category: Stock-paired token
   lifecycle: announced
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["L4VA"]
+    entity_kind: token
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://l4va.org }
     - { kind: x, url: https://x.com/L4VAprotocol }
@@ -421,6 +567,12 @@
   category: Yield
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["DELTA"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/deltaliquidity }
   discovery_source: Grok desk map 2026-08-31 (yield/lp-manager; Llama TVL)
@@ -437,6 +589,12 @@
   category: Yield
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/SnuggleFi }
   discovery_source: Grok desk map 2026-08-31 (yield/lp-manager; Llama TVL and revenue)
@@ -453,6 +611,12 @@
   category: Scanner / tooling
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: tool
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/sherw00d_cash }
   discovery_source: Grok desk map 2026-08-31 (privacy/private-transfer; Llama TVL); workbook sheet 02 ($WOOD)
@@ -469,6 +633,12 @@
   category: Scanner / tooling
   lifecycle: announced
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: tool
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/UseSqueeze_RH }
   discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (tooling/scanner)
@@ -485,6 +655,12 @@
   category: Scanner / tooling
   lifecycle: announced
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: tool
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/RHAgentNS }
   discovery_source: Grok desk map 2026-08-31 (agents/agent-identity; lifecycle unknown)
@@ -501,6 +677,12 @@
   category: Launchpad
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["HOOKR"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://hookr.fun }
     - { kind: x, url: https://x.com/Hookrfun }
@@ -518,6 +700,12 @@
   category: Fee-routing protocol
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["WTH"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/whatthehookv4 }
   discovery_source: Grok desk map 2026-08-31 (trading/hook-mev; Llama TVL in the observe list)
@@ -534,6 +722,12 @@
   category: NFT / treasury
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["QUOTRON"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://quotrons.cash }
     - { kind: x, url: https://x.com/Quotrons404 }
@@ -551,6 +745,12 @@
   category: Launchpad
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/pools_dot_fun }
   discovery_source: Grok desk map 2026-08-31 (launch/uni-pool-launch); workbook sheet 04
@@ -567,6 +767,12 @@
   category: Agent / execution
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["WIRE"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/wirebotRH }
   discovery_source: Grok desk map 2026-08-31 (agents/agent-execution; fill rounds 2, 9)
@@ -583,6 +789,12 @@
   category: Yield
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://maxfi.tech }
     - { kind: x, url: https://x.com/MAXFILABS }
@@ -600,6 +812,12 @@
   category: Prediction market
   lifecycle: announced
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/sight_hood }
   discovery_source: Grok desk map 2026-08-31 (markets/prediction; fill rounds 2, 11)
@@ -616,6 +834,12 @@
   category: Scanner / tooling
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["MESH"]
+    entity_kind: tool
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/MeshGateway }
   discovery_source: Grok desk map 2026-08-31 (tooling/machine-payments; fill round 2)
@@ -632,6 +856,12 @@
   category: Launchpad
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://foxpad.app }
     - { kind: x, url: https://x.com/fox_onrh }
@@ -649,6 +879,12 @@
   category: Aggregator
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["SCOPL"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://scopl.live }
     - { kind: x, url: https://x.com/scopl_live }
@@ -666,6 +902,12 @@
   category: NFT / treasury
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["WEBSITE"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/notawebsite_rh }
   discovery_source: Grok desk map 2026-08-31 (rwa-products/ad-space; fill round 2)
@@ -682,6 +924,12 @@
   category: Launchpad
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/lemondotfun }
   discovery_source: Grok desk map 2026-08-31 (launch/other-pad; fill rounds 3, 4, 6, 10)
@@ -698,6 +946,12 @@
   category: Scanner / tooling
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["ROBINDEX"]
+    entity_kind: tool
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://robindex.pro/about }
     - { kind: x, url: https://x.com/robindexpro }
@@ -715,6 +969,12 @@
   category: Yield
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["VYNEX"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/UseVynex }
   discovery_source: Grok desk map 2026-08-31 (yield/savings-vault; fill round 5)
@@ -731,6 +991,12 @@
   category: Fee-routing protocol
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["INJOH"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/SinjohDeFi }
   discovery_source: Grok desk map 2026-08-31 (yield/fee-router; fill round 6)
@@ -747,6 +1013,12 @@
   category: Scanner / tooling
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["LOCK"]
+    entity_kind: tool
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://hoodlock.tech }
     - { kind: x, url: https://x.com/HoodLockRH }
@@ -764,6 +1036,12 @@
   category: Options
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["ARROWS"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: site, url: https://arrows.finance }
     - { kind: x, url: https://x.com/arrowsonhood }
@@ -781,6 +1059,12 @@
   category: Launchpad
   lifecycle: announced
   coverage: stub
+  identity:
+    aliases: []
+    symbols: []
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/hoodfunfamily }
   discovery_source: Grok desk map 2026-08-31 (launch/bonding-curve; fill round 6)
@@ -797,6 +1081,12 @@
   category: Launchpad
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["STONKS"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/stonksdotfun }
   discovery_source: Grok desk map 2026-08-31 (launch/other-pad; fill round 7)
@@ -813,6 +1103,12 @@
   category: Fee-routing protocol
   lifecycle: mainnet
   coverage: stub
+  identity:
+    aliases: []
+    symbols: ["HOOD"]
+    entity_kind: protocol
+    chain_scope: unknown
+    status: provisional
   official_links:
     - { kind: x, url: https://x.com/SwapHoodFi }
   discovery_source: Grok desk map 2026-08-31 (trading/amm-native; fill rounds 12, 13, 15, 17)

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
-const NAMES = ["site", "census", "project", "sources", "dependency", "changelog", "feed", "accounts"];
+const NAMES = ["site", "census", "project", "sources", "dependency", "changelog", "feed", "accounts", "name-intake"];
 const ajv = new Ajv({ allErrors: true, strict: true, strictTypes: false, strictTuples: false });
 addFormats(ajv);
 
