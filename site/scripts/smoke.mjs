@@ -41,13 +41,17 @@ async function reviewServerFunctions() {
 }
 
 function startPreview() {
-  const cloudflare = process.env.SMOKE_RUNTIME === "cloudflare";
-  const args = cloudflare
+  const runtime = process.env.SMOKE_RUNTIME;
+  const command = runtime === "node-server" ? "node" : "npm";
+  const args = runtime === "cloudflare"
     ? ["run", "cloudflare:dev", "--", "--port", String(PORT)]
-    : ["run", "preview", "--", "--port", String(PORT), "--strictPort"];
-  const child = spawn("npm", args, {
+    : runtime === "node-server"
+      ? [".output/server/index.mjs"]
+      : ["run", "preview", "--", "--port", String(PORT), "--strictPort"];
+  const child = spawn(command, args, {
     stdio: ["ignore", "pipe", "pipe"],
     detached: true, // own process group, so we can kill vite (npm's grandchild) too
+    env: { ...process.env, PORT: String(PORT) },
   });
   let output = "";
   child.stdout.on("data", (d) => (output += d));
@@ -81,6 +85,9 @@ async function main() {
       const ok = res.status === 200;
       console.log(`  ${ok ? "ok  " : "FAIL"} ${route} -> ${res.status}`);
       if (!ok) failures.push(`${route} returned ${res.status}, expected 200`);
+      const csp = res.headers.get("content-security-policy") ?? "";
+      if (!csp.includes("default-src 'self'") || !csp.includes("object-src 'none'") || !csp.includes("frame-ancestors 'none'"))
+        failures.push(`${route} is missing the required Content-Security-Policy`);
     }
 
     const reviewRes = await fetch(`${BASE}/review`, { redirect: "manual" });
@@ -90,6 +97,7 @@ async function main() {
       reviewRes.headers.get("www-authenticate")?.startsWith("Basic ") &&
       reviewRes.headers.get("cache-control")?.includes("no-store") &&
       reviewRes.headers.get("x-robots-tag")?.includes("noindex") &&
+      reviewRes.headers.get("content-security-policy")?.includes("default-src 'self'") &&
       !reviewBody.includes("Channel review");
     console.log(
       `  ${reviewPrivate ? "ok  " : "FAIL"} /review -> ${reviewRes.status} with auth challenge`,

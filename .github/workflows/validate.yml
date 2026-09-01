@@ -40,17 +40,17 @@ jobs:
         working-directory: site
         run: npm ci
 
-      - name: Site typecheck
+      - name: Site test (typecheck + Markdown security regression)
         working-directory: site
-        run: npm run typecheck
+        run: npm test
 
-      - name: Site build
+      - name: Render node-server build
         working-directory: site
-        run: npm run build
+        run: npm run build:render
 
-      - name: Site smoke test (boots the build, hits every loader route, checks for uncapped leakage)
+      - name: Render node-server smoke test
         working-directory: site
-        run: npm run smoke
+        run: npm run smoke:render
 
       - name: Cloudflare Workers build
         working-directory: site

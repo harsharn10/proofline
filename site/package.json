@@ -11,6 +11,8 @@
     "dev": "vite dev --port 8080",
     "prebuild": "npm --prefix .. run score",
     "build": "vite build",
+    "prebuild:render": "npm --prefix .. run score",
+    "build:render": "NITRO_PRESET=node-server vite build",
     "prebuild:cloudflare": "npm --prefix .. run score",
     "build:cloudflare": "NITRO_PRESET=cloudflare_module vite build",
     "deploy:cloudflare": "wrangler deploy --config ../wrangler.jsonc",
@@ -20,10 +22,11 @@
     "cloudflare:smoke": "SMOKE_RUNTIME=cloudflare SMOKE_PORT=8799 node scripts/smoke.mjs",
     "preview": "vite preview",
     "smoke": "node scripts/smoke.mjs",
+    "smoke:render": "SMOKE_RUNTIME=node-server SMOKE_PORT=8798 node scripts/smoke.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test": "npm run typecheck"
+    "test": "npm run typecheck && node scripts/markdown-security.mts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
@@ -39,6 +42,7 @@
     "marked": "^16.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "sanitize-html": "^2.17.7",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.3.0",
     "tw-animate-css": "^1.3.4",
@@ -50,6 +54,7 @@
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "@types/sanitize-html": "^2.16.1",
     "@vitejs/plugin-react": "^5.2.0",
     "eslint": "^9.20.0",
     "eslint-config-prettier": "^10.1.1",

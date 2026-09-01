@@ -21,6 +21,7 @@ export const OVERRIDE_CAPS = { Critical: 29, High: 59, Elevated: null };
 export const RISK_ORDER = ["Low", "Moderate", "Elevated", "High", "Critical"];
 export const PENDING_LABEL = "Research pending / insufficient evidence";
 export const PENDING_CONFIDENCE_CAP = 69;
+export const UNAPPROVED_APPROVERS = new Set(["pending", "tbd", "none", "todo", "na", "n-a"]);
 // Display thresholds (spec §6): below PROVISIONAL the number is hidden; below FULL_WEIGHT it shows as provisional.
 export const PROVISIONAL_CONFIDENCE = 50;
 export const FULL_WEIGHT_CONFIDENCE = 70;
@@ -73,7 +74,7 @@ export function confidence(inputs, approver) {
     if (typeof v !== "number") return null;
     sum += (weight / 100) * v;
   }
-  return approver === "pending" ? Math.min(sum, PENDING_CONFIDENCE_CAP) : sum;
+  return UNAPPROVED_APPROVERS.has(approver) ? Math.min(sum, PENDING_CONFIDENCE_CAP) : sum;
 }
 
 export function applyOverride(score, override) {

@@ -1,4 +1,5 @@
 import { marked } from "marked";
+import sanitizeHtml from "sanitize-html";
 import type { ResearchSection } from "./types";
 
 const HTML_COMMENT = /<!--[\s\S]*?-->/g;
@@ -10,16 +11,54 @@ function stripHtmlComments(text: string): string {
   return text.replace(HTML_COMMENT, "");
 }
 
-// Evidence tags must be swapped for their badge markup before marked runs, so the raw
-// HTML survives marked's inline-token pass untouched (spec §5.5, task-3 brief step 1).
-function replaceEvidenceTags(text: string): string {
-  return text.replace(EVIDENCE_TAG, (_match, evidenceClass: string, idsRaw: string) => {
+const SAFE_MARKDOWN_TAGS = [
+  "h1", "h2", "h3", "h4", "h5", "h6", "p", "br", "hr", "blockquote",
+  "ul", "ol", "li", "strong", "em", "del", "code", "pre", "a",
+  "table", "thead", "tbody", "tfoot", "tr", "th", "td",
+];
+
+function extractEvidenceTags(text: string): { markdown: string; badges: string[]; placeholder: string } {
+  const badges: string[] = [];
+  const placeholder = `PROOFLINE_EVIDENCE_${crypto.randomUUID().replaceAll("-", "")}_`;
+  const markdown = text.replace(EVIDENCE_TAG, (_match, evidenceClass: string, idsRaw: string) => {
     const ids = idsRaw.trim().split(/\s+/).filter(Boolean);
     const idsText = ids.join(" ");
     const label = ids.length > 0 ? `${evidenceClass} · ${idsText}` : evidenceClass;
     const dataAttr = ids.length > 0 ? ` data-sources="${idsText}"` : "";
-    return `<span class="ev ev-${evidenceClass}"${dataAttr}>${label}</span>`;
+    const index = badges.push(`<span class="ev ev-${evidenceClass}"${dataAttr}>${label}</span>`) - 1;
+    return `${placeholder}${index}_END`;
   });
+  return { markdown, badges, placeholder };
+}
+
+function renderSafeMarkdown(raw: string, { evidence = false } = {}): string {
+  const extracted = evidence
+    ? extractEvidenceTags(raw)
+    : { markdown: raw, badges: [], placeholder: "PROOFLINE_NO_EVIDENCE_" };
+  const rendered = marked.parse(extracted.markdown, { async: false }) as string;
+  const safe = sanitizeHtml(rendered, {
+    allowedTags: SAFE_MARKDOWN_TAGS,
+    allowedAttributes: {
+      a: ["href", "title", "rel"],
+      code: ["class"],
+      th: ["align"],
+      td: ["align"],
+    },
+    allowedClasses: { code: [/^language-[a-z0-9_-]+$/i] },
+    allowedSchemes: ["http", "https", "mailto"],
+    allowProtocolRelative: false,
+    enforceHtmlBoundary: true,
+    transformTags: {
+      a: (_tagName, attribs) => ({
+        tagName: "a",
+        attribs: { ...attribs, rel: "nofollow noopener noreferrer" },
+      }),
+    },
+  });
+  return safe.replace(
+    new RegExp(`${extracted.placeholder}(\\d+)_END`, "g"),
+    (_match, index: string) => extracted.badges[Number(index)] ?? "",
+  );
 }
 
 function renderSectionBody(raw: string): string {
@@ -27,8 +66,7 @@ function renderSectionBody(raw: string): string {
   if (stripped === PENDING || stripped === "") {
     return `<p class="text-sm text-muted">Research pending.</p>`;
   }
-  const tagged = replaceEvidenceTags(stripped);
-  return marked.parse(tagged, { async: false }) as string;
+  return renderSafeMarkdown(stripped, { evidence: true });
 }
 
 /**
@@ -55,5 +93,5 @@ export function parseResearchMarkdown(raw: string): { sections: ResearchSection[
  * methodology page renders the full document top to bottom.
  */
 export function renderWholeMarkdown(raw: string): string {
-  return marked.parse(stripHtmlComments(raw), { async: false }) as string;
+  return renderSafeMarkdown(stripHtmlComments(raw));
 }

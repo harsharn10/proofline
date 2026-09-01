@@ -54,7 +54,7 @@
     "deployments": { "type": "array", "items": { "$ref": "shared#/$defs/deployment" } },
     "metrics": { "type": "array", "items": { "$ref": "#/$defs/metric" } },
     "review": { "type": "object", "additionalProperties": false, "required": ["researcher","approver","methodology_version","reviewed_at","published_at"],
-      "properties": { "researcher": { "type": "string", "pattern": "^[a-z0-9-]+$" }, "approver": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+      "properties": { "researcher": { "type": "string", "pattern": "^[a-z0-9-]+$" }, "approver": { "type": "string", "pattern": "^(?!(?:tbd|none|todo|na|n-a)$)[a-z0-9-]+$" },
         "methodology_version": { "const": "proofline-v1.0" }, "reviewed_at": { "type": "string", "format": "date" }, "published_at": { "type": ["string","null"], "format": "date" } } },
     "scoring": { "type": "object", "additionalProperties": false, "required": ["security","factors","confidence","risk"],
       "properties": {

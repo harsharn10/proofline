@@ -71,6 +71,18 @@ for (const [name, want] of Object.entries(expected)) {
   } catch (err) { failures++; console.error(`FAIL low-confidence: ${err.message}`); }
 }
 
+// Placeholder approver values must never bypass the pending-review confidence cap.
+{
+  const placeholder = parse(await readFile(new URL("../fixtures/clean/project.yaml", import.meta.url), "utf8"));
+  placeholder.review.approver = "tbd";
+  const got = derive(placeholder);
+  try {
+    assert.equal(got.confidence, 69);
+    assert.equal(got.provisional, true);
+    console.log("ok   placeholder approver cap");
+  } catch (err) { failures++; console.error(`FAIL placeholder approver cap: ${err.message}`); }
+}
+
 // Unscored factor renormalizes weights instead of scoring zero.
 {
   const p = parse(await readFile(new URL("../fixtures/clean/project.yaml", import.meta.url), "utf8"));
@@ -120,6 +132,7 @@ for (const name of Object.keys(expected)) {
   const unknownNoSources = await errsWith((p) => { p.findings.positive[0] = { text: "Unclear.", class: "unknown" }; });
   const typo = await errsWith((p) => { p.scoring.overide = { level: "High", reason: "x", evidence: ["S1"] }; });
   const missingKey = await errsWith((p) => { delete p.review.approver; });
+  const placeholderApprover = await errsWith((p) => { p.review.approver = "tbd"; });
   try {
     assert.ok(fullNoEvidence.length > 0, "full with no evidence fails");
     assert.deepEqual(zeroNoEvidence, [], "zero with no evidence passes");
@@ -135,6 +148,7 @@ for (const name of Object.keys(expected)) {
     assert.deepEqual(unknownNoSources, [], "class: unknown without sources passes");
     assert.ok(typo.some((e) => e.includes("(overide)")), "additionalProperties error names the key");
     assert.ok(missingKey.some((e) => e.includes("(approver)")), "required error names the key");
+    assert.ok(placeholderApprover.length > 0, "placeholder approver is rejected by schema");
     console.log("ok   project schema rules");
   } catch (err) { failures++; console.error(`FAIL project schema rules: ${err.message}`); }
 }
@@ -234,7 +248,14 @@ async function makeContent(mutate = () => {}) {
     c.census.push({ slug: "other", name: "Other", identity: { aliases: ["Clean Fixture"], symbols: [], entity_kind: "unknown", chain_scope: "unknown", status: "provisional" }, category: "CDP", lifecycle: "announced", coverage: "stub" });
   }));
   const duplicateFeedId = crossCheck(await makeContent((c) => {
-    c.feed.set("clean", { slug: "clean", items: [{ id: "same", sources: [] }, { id: "same", sources: [] }] });
+    c.feed.set("clean", { slug: "clean", items: [{ id: "same", sources: ["S1"] }, { id: "same", sources: ["S1"] }] });
+  }));
+  const duplicateCensusSlug = crossCheck(await makeContent((c) => { c.census.push(structuredClone(c.census[0])); }));
+  const duplicateMetricKind = crossCheck(await makeContent((c, p) => {
+    p.metrics = [
+      { kind: "tvl", value: 100, currency: "USD", as_of: "2026-08-31", class: "claim", sources: ["S1"] },
+      { kind: "tvl", value: 90, currency: "USD", as_of: "2026-08-30", class: "claim", sources: ["S1"] },
+    ];
   }));
   const noChangelog = crossCheck(await makeContent((c) => { c.changelog = []; }));
   const card = { id: "dep", name: "Dep", kind: "dex", summary: "x", controls: [{ power: "p", holder: "h", note: "n", class: "verified", sources: ["S9"] }], failure_modes: [], sources: [] };
@@ -243,13 +264,15 @@ async function makeContent(mutate = () => {}) {
     assert.deepEqual(clean.errors, [], "consistent tree has no errors");
     assert.deepEqual(clean.warnings, [], "consistent tree has no warnings");
     assert.ok(selfApproved.errors.some((e) => e.includes("different person")), "approver === researcher");
-    assert.ok(placeholder.warnings.some((w) => w.includes("tbd")), "placeholder approver warns");
+    assert.ok(placeholder.errors.some((e) => e.includes("tbd")), "placeholder approver is a hard error");
     assert.ok(coverageDrift.errors.some((e) => e.includes("coverage")), "census coverage ≠ project coverage");
     assert.ok(nameDrift.errors.some((e) => e.includes("name")), "census name ≠ project name");
     assert.ok(categoryDrift.errors.some((e) => e.includes("category")), "census category ≠ project category");
     assert.ok(symbolDrift.errors.some((e) => e.includes("identity.symbols")), "project symbol must remain in canonical identity");
     assert.ok(aliasCollision.errors.some((e) => e.includes("collides with canonical slug")), "normalized aliases cannot map to two slugs");
     assert.ok(duplicateFeedId.errors.some((e) => e.includes("duplicate item id")), "feed ids are stable and unique");
+    assert.ok(duplicateCensusSlug.errors.some((e) => e.includes("duplicate slug clean")), "census slugs are unique");
+    assert.ok(duplicateMetricKind.errors.some((e) => e.includes("duplicate metric kind tvl")), "metric kinds are unique per project");
     assert.ok(noChangelog.errors.some((e) => e.includes("changelog")), "census slug without a changelog entry");
     assert.ok(depDangling.errors.some((e) => e.includes("S9") && e.includes("dependencies/dep")), "dependency control cites an id missing from its own ledger");
     console.log("ok   crossCheck rules");
@@ -675,14 +698,18 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 
 // Task 2 — feed schema: kind enum and account handle pattern.
 {
-  const feedBase = () => ({ slug: "pons", items: [{ id: "f1", date: "2026-08-20", kind: "company", title: "T", body: "B" }] });
+  const feedBase = () => ({ slug: "pons", items: [{ id: "f1", date: "2026-08-20", kind: "company", title: "T", body: "B", sources: ["S1"] }] });
   const newsKind = validateAgainst("feed", { slug: "pons", items: [{ ...feedBase().items[0], kind: "news" }] });
   const badAccount = validateAgainst("feed", { slug: "pons", items: [{ ...feedBase().items[0], account: "longbow" }] });
   const ok = validateAgainst("feed", feedBase());
+  const noSources = validateAgainst("feed", { slug: "pons", items: [{ id: "f1", date: "2026-08-20", kind: "company", title: "T", body: "B" }] });
+  const emptySources = validateAgainst("feed", { slug: "pons", items: [{ id: "f1", date: "2026-08-20", kind: "company", title: "T", body: "B", sources: [] }] });
   try {
     assert.ok(newsKind.length > 0, "kind: news is rejected");
     assert.ok(badAccount.length > 0, "account without a leading @ is rejected");
     assert.deepEqual(ok, [], "a well-formed feed file passes");
+    assert.ok(noSources.length > 0, "feed item without ledger evidence is rejected");
+    assert.ok(emptySources.length > 0, "feed item with an empty source list is rejected");
     console.log("ok   feed schema");
   } catch (err) { failures++; console.error(`FAIL feed schema: ${err.message}`); }
 }

@@ -4,6 +4,13 @@ import {
   authenticateReviewRequest,
   reviewAuthChallenge,
 } from "@/data/review-auth";
+import { applySiteSecurityHeaders } from "@/data/security-headers";
+
+const siteSecurityHeaders = createMiddleware().server(async ({ next }) => {
+  const result = await next();
+  applySiteSecurityHeaders(result.response.headers);
+  return result;
+});
 
 const reviewProtection = createMiddleware().server(
   async ({ next, request, pathname }) => {
@@ -20,5 +27,5 @@ const reviewProtection = createMiddleware().server(
 );
 
 export const startInstance = createStart(() => ({
-  requestMiddleware: [reviewProtection],
+  requestMiddleware: [siteSecurityHeaders, reviewProtection],
 }));
