@@ -11,6 +11,7 @@
     "dev": "vite dev --port 8080",
     "prebuild": "npm --prefix .. run score",
     "build": "vite build",
+    "prebuild:cloudflare": "npm --prefix .. run score",
     "build:cloudflare": "NITRO_PRESET=cloudflare_module vite build",
     "deploy:cloudflare": "wrangler deploy --config ../wrangler.jsonc",
     "preview:cloudflare": "wrangler versions upload --config ../wrangler.jsonc",
