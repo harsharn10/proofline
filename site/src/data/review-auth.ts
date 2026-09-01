@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { createMiddleware } from "@tanstack/react-start";
 import { getResponseHeaders } from "@tanstack/react-start/server";
+import { applySiteSecurityHeaders } from "./security-headers";
 
 export const REVIEW_REPOSITORY = "harsharn10/proofline";
 export const REVIEW_BRANCH = "main";
@@ -144,12 +145,9 @@ function requestOrigins(request: Request): Set<string> {
 }
 
 export function applyReviewSecurityHeaders(headers: Headers): void {
+  applySiteSecurityHeaders(headers);
   headers.set("cache-control", "private, no-store, max-age=0");
-  headers.set("content-security-policy", "frame-ancestors 'none'");
-  headers.set("referrer-policy", "no-referrer");
   headers.set("vary", "Authorization");
-  headers.set("x-content-type-options", "nosniff");
-  headers.set("x-frame-options", "DENY");
   headers.set("x-robots-tag", "noindex, nofollow, noarchive");
 }
 

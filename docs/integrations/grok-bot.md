@@ -89,7 +89,7 @@ items:
     body: "@0xkekov posted that the 24h volume figure @ponsdotfamily cited does not match DexScreener's pool page; both figures link to their sources."
     account: "@0xkekov"       # optional — the CT handle the item is about, if any
     sourceUrl: https://x.com/0xkekov/status/1234567890
-    sources: [S9]             # optional — S-ids that must already exist in content/sources/<slug>.yaml
+    sources: [S9]             # required — S-ids that must already exist in content/sources/<slug>.yaml
 ```
 
 `kind: company` is for the project's own official posts (these never vote on trending). `date` is the

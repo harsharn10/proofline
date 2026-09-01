@@ -1,7 +1,7 @@
-import { FULL_WEIGHT_CONFIDENCE } from "./score.mjs";
+import { FULL_WEIGHT_CONFIDENCE, UNAPPROVED_APPROVERS } from "./score.mjs";
 
 /** Approver values that mean "nobody yet" but are not the literal `pending` the cap keys on. */
-export const PLACEHOLDER_APPROVERS = new Set(["tbd", "none", "todo", "na", "n-a"]);
+export const PLACEHOLDER_APPROVERS = new Set([...UNAPPROVED_APPROVERS].filter((value) => value !== "pending"));
 /** Census fields that are duplicated in the project file and must agree. */
 const MIRRORED_FIELDS = ["name", "category", "lifecycle", "coverage"];
 
@@ -22,7 +22,11 @@ export function referencedSourceIds(project) {
 
 export function crossCheck(content) {
   const errors = [], warnings = [];
-  const censusSlugs = new Set(content.census.map((c) => c.slug));
+  const censusSlugs = new Set();
+  for (const row of content.census) {
+    if (censusSlugs.has(row.slug)) errors.push(`census.yaml: duplicate slug ${row.slug}`);
+    censusSlugs.add(row.slug);
+  }
   const changelogSlugs = new Set(content.changelog.map((e) => e.slug));
 
   // Census is the canonical identity registry. Names and aliases may not normalize to two slugs;
@@ -64,7 +68,13 @@ export function crossCheck(content) {
 
     const { researcher, approver } = project.review ?? {};
     if (approver !== undefined && approver === researcher) errors.push(`projects/${slug}: approver must be a different person from researcher`);
-    if (PLACEHOLDER_APPROVERS.has(approver)) warnings.push(`projects/${slug}: approver "${approver}" looks like a placeholder — use the literal pending until a second person approves`);
+    if (PLACEHOLDER_APPROVERS.has(approver)) errors.push(`projects/${slug}: approver "${approver}" is a placeholder — use the literal pending until a second person approves`);
+
+    const metricKinds = new Set();
+    for (const metric of project.metrics ?? []) {
+      if (metricKinds.has(metric.kind)) errors.push(`projects/${slug}: duplicate metric kind ${metric.kind}`);
+      metricKinds.add(metric.kind);
+    }
 
     const ledger = content.sources.get(slug);
     const ledgerIds = new Set((ledger?.sources ?? []).map((s) => s.id));
@@ -137,8 +147,8 @@ export function releaseCheck(content, derivedBySlug) {
     if (project.coverage !== "full") continue;
     for (const a of project.deployments ?? []) if (!a.verified) errors.push(`projects/${slug}: deployment "${a.label}" is not verified on a full profile`);
     const d = derivedBySlug?.get(slug);
-    if (project.review?.approver === "pending" && d && d.uncappedConfidence >= FULL_WEIGHT_CONFIDENCE)
-      errors.push(`projects/${slug}: approver pending but uncapped confidence ${d.uncappedConfidence} ≥ ${FULL_WEIGHT_CONFIDENCE} — needs second-person approval`);
+    if (UNAPPROVED_APPROVERS.has(project.review?.approver) && d && d.uncappedConfidence >= FULL_WEIGHT_CONFIDENCE)
+      errors.push(`projects/${slug}: approver ${project.review?.approver} but uncapped confidence ${d.uncappedConfidence} ≥ ${FULL_WEIGHT_CONFIDENCE} — needs second-person approval`);
   }
   return errors;
 }

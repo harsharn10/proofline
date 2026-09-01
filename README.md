@@ -98,9 +98,10 @@ example).
 ## Feed, accounts and trending
 
 `content/feed/<slug>.yaml` is an optional per-project activity feed: `{ slug, items: [{ id, date, kind, title, body,
-account?, sourceUrl?, sources? }] }`. `kind` is `company | ct | onchain | risk`; `account` is a CT handle matching
-`^@[A-Za-z0-9_]{1,15}$`. A feed file's `slug` must be a census slug, and any `sources` ids it cites must exist in that
-slug's ledger — same rule as a project file. `date` is the post date; when an intake recorded a post without its date,
+sources, account?, sourceUrl? }] }`. Every item requires at least one ledger `S-id`; `kind` is
+`company | ct | onchain | risk`; `account` is a CT handle matching `^@[A-Za-z0-9_]{1,15}$`. A feed file's `slug` must
+be a census slug, and its `sources` ids must exist in that slug's ledger — same rule as a project file. `date` is the
+post date; when an intake recorded a post without its date,
 the item is dated to the capture date and the body says so ("captured by the desk on 2026-08-31; original post date not
 recorded").
 
@@ -135,7 +136,8 @@ handle. `npm run score` merges the result into
 a harvested metric is a number a third party published, never independently reproduced, so it can never be
 `verified`; `sources` is one or more ledger ids (`crossCheck` errors if any of them is missing from that slug's
 `sources/<slug>.yaml`, the same rule as everywhere else a project cites a source — no schema-level special case was
-needed, `referencedSourceIds()` already walks any array keyed `sources` generically).
+needed, `referencedSourceIds()` already walks any array keyed `sources` generically). A project may carry at most one
+current metric per `kind`; metric history belongs in dated evidence rather than a second ambiguous current row.
 
 `scripts/lib/score.mjs`'s `computeRanks()` derives per-project category ranks from `metrics[]` — nothing is ever
 typed into a rank field by hand. Within each census `category`, it picks **one basis** for the whole category: the
