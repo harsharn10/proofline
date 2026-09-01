@@ -1,10 +1,8 @@
 name: Publish
 
-# Runs on every push to main — and on explicit dispatch: automerge-feed.yml calls
-# `gh workflow run publish.yml --ref main` after squash-merging a grok/ PR, because merges made with
-# GITHUB_TOKEN never fire push-triggered workflows. Recomputes derived scores and, when there is
-# something new, sends the Telegram digest. GitHub's own [skip ci] convention (used by the "Commit
-# telegram state" step below) keeps the push trigger from re-firing on the state commit.
+# Runs on every push to main and on explicit dispatch. Recomputes derived scores, then asks the
+# approval-only Telegram sender for eligible entries. A merge creates pending review items; it does
+# not authorize delivery. Only approvals in ops/telegram-review.json can be sent.
 on:
   push:
     branches: [main]
@@ -12,6 +10,12 @@ on:
 
 permissions:
   contents: write
+
+# Approval commits can arrive seconds apart. Serialize deliveries and always check out the latest
+# main so a queued run sees any sent-state commit made by the run before it.
+concurrency:
+  group: proofline-channel-publish
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -25,6 +29,9 @@ jobs:
       SITE_URL: ${{ secrets.SITE_URL }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -38,7 +45,7 @@ jobs:
 
       # Skipped (not failed) when the repo secrets aren't set, so forks and secret-less CI runs stay
       # green.
-      - name: Telegram digest
+      - name: Telegram digest (approved entries only)
         id: digest
         if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
         run: npm run telegram
@@ -54,6 +61,9 @@ jobs:
           if ! git diff --quiet -- ops/telegram-state.json; then
             git add ops/telegram-state.json
             git commit -m "chore: update telegram state [skip ci]"
+            # A controller may have committed another decision while this message was sending.
+            # Preserve that newer decision, then place sent-state on top of it.
+            git pull --rebase origin main
             git push
           else
             echo "No telegram state changes to commit."

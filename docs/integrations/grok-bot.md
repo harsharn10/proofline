@@ -31,9 +31,9 @@ number itself against a primary source and can cite that reproduction.
 
 Two tiers: raw intake, which always goes to `research/inbox/**`, and content-system files, which the
 desk may write directly **only when the shape validates**. Of those, `content/feed/**`,
-`content/sources/**` (additions/edits only) and `research/inbox/**` are covered by the
-`automerge-feed.yml` workflow (§8) and merge on their own once CI passes; `content/accounts.yaml` (§2.4)
-is a direct write too, but always waits for a human to merge — see §2.4.
+`content/sources/**` (additions/edits only) and `research/inbox/**` are classified by the
+`automerge-feed.yml` workflow (§9), but never merged by it. Every PR waits for controller review;
+`content/accounts.yaml` (§2.4) receives the stricter out-of-allowlist warning.
 
 ### 2.1 Raw intake — `research/inbox/**` (always allowed)
 
@@ -51,6 +51,11 @@ today, with two changes required by the evaluation:
     exists_on_4663: null           # null | true | false — only x-fill-style Blockscout checks flip this
     explorer_source_verified: null # null | true | false — Blockscout's contract-source flag, NOT the evidence class "verified"
   ```
+
+  For a proxy, `explorer_source_verified` applies to the proxy shell unless the implementation was
+  checked separately. Add `explorer_source_verification_scope: proxy-shell-only` and
+  `implementation_source_verified: null | true | false`; never let verified generic proxy source imply
+  that the implementation or product behavior was verified.
 
   Default both booleans to `null`. Never encode status in the key name (`token_candidate`, `h33_docs`)
   — that was the §2.8 defect in the last intake.
@@ -117,10 +122,9 @@ Only additive, low-risk changes: a new row (always `tier: watch` — the desk ne
 only the maintainer promotes), or a `note`/`slug` correction on an existing row. Notes describe
 observable behavior only, never conduct — `npm run validate` lints for hype and conduct words
 (`drainer`, `impersonator`, `farm`, `scammer`, `insider`, …) and fails the check unconditionally on a
-hit, not just under `--release`. Unlike §2.2/§2.3, a PR that touches only this file still does not
-auto-merge: `content/accounts.yaml` is deliberately off the `automerge-feed.yml` allowlist (a tier or
-note change about a named account always gets a human's eyes before it ships) — CI passing just means
-it's ready for that human to merge.
+hit, not just under `--release`. `content/accounts.yaml` is deliberately off the
+`automerge-feed.yml` allowlist (a tier or note change about a named account always gets extra scrutiny)
+— CI passing just means it's ready for a controller to review and merge.
 
 ### 2.5 Census candidates — proposal only, not a direct write
 
@@ -246,7 +250,7 @@ API from outside).
 ## 8. Cadence
 
 Every 6 hours. Skip the PR entirely when a round finds nothing that changes a file (§5). A weekly or
-daily cadence that always opens a PR, even an empty one, defeats the purpose of the auto-merge path in
+daily cadence that always opens a PR, even an empty one, defeats the purpose of the intake path in
 §9 below — reviewers should only ever see a PR when there's something in it.
 
 ## 9. What happens after the PR opens
@@ -259,23 +263,16 @@ daily cadence that always opens a PR, even an empty one, defeats the purpose of 
 2. **`automerge-feed.yml`** does not run on the PR itself — it triggers on `validate.yml`'s own
    *completion* (`workflow_run`, so it always runs the version of this workflow committed to `main`, not
    whatever the PR's branch contains) and only for a `grok/**` branch. If Validate did not succeed,
-   nothing else happens: no comment, no merge attempt. If it succeeded, the job asks GitHub's API for the
+   nothing else happens: no comment. If it succeeded, the job asks GitHub's API for the
    exact list of changed files (not `git diff`, which can hide a rename): every file must be an addition
    or an in-place edit under `content/feed/**`, `content/sources/**`, or `research/inbox/**` —
    **`content/accounts.yaml` is not on this list**, a tier or note change there always needs a human — and
-   a modified file under `content/sources/**` may only add lines, never remove or rewrite one. If every
-   file clears that bar, the job squash-merges the PR (`gh pr merge --squash --delete-branch`) and then
-   explicitly triggers `publish.yml` (see 3 below) — it never relies on GitHub's native auto-merge feature,
-   any branch-protection setting, or an approval step. If anything fails the check, it leaves one
-   "needs human review" comment on the PR (not one per push) naming what tripped it, and stops; a human
-   merges it manually after reviewing.
-3. **`publish.yml`** runs `npm run score` (recomputing derived scores, including `trending`) and sends the
-   Telegram digest for anything new, silently skipped if the Telegram secrets aren't configured. It fires
-   on every push to `main` — which covers a human clicking "Merge" in the GitHub UI — but a squash-merge
-   made by `automerge-feed.yml` uses the workflow's own token, and GitHub never fires push-triggered
-   workflows from that token's commits. That's why step 2 above dispatches `publish.yml` explicitly
-   (`gh workflow run publish.yml --ref main`) right after merging a grok PR — without it, an auto-merged
-   round would sit on `main` unscored and undigested until something else happened to push.
+   a modified file under `content/sources/**` may only add lines, never remove or rewrite one. The job
+   never merges or dispatches publishing. It comments either "waiting for controller" or "needs
+   controller review," and a controller decides whether to merge.
+3. **`publish.yml`** runs `npm run score` and invokes the Telegram sender on every push to `main`, but
+   merging is not channel approval. New changelog entries remain pending in `/review`. The sender only
+   delivers entries explicitly approved in `ops/telegram-review.json`, only while the channel is enabled.
 
 See the root [`README.md`](../../README.md) "CI" section for the workflow files themselves and the
 required repo settings.
@@ -296,9 +293,9 @@ required repo settings.
 6. `lifecycle: mainnet` requires evidence beyond the project's own post — a tweet makes it `announced`,
    not `mainnet`.
 7. You may now write directly to `content/feed/**` and `content/sources/**` (additions/edits only, never
-   a deletion or a removed line) plus `research/inbox/**` when the shape validates — those auto-merge
-   after CI passes. `content/accounts.yaml` is a PR like any other write but always waits for a human to
-   merge it, even an additive `tier: watch` row; anything outside this set waits for a human too.
+   a deletion or a removed line) plus `research/inbox/**` when the shape validates. Every PR waits for
+   controller review after CI passes; none auto-merge. Channel delivery is separately approved in
+   `/review` after content lands.
 8. New census names go into a `research/inbox/<date>-census-candidates.yaml` proposal (§2.5), never
    straight into `content/census.yaml`.
 9. `content/projects/**`, `scoring`, `review.approver`, and `content/changelog.yaml` stay off-limits —
@@ -324,7 +321,8 @@ This round:
    — the one ledger. Do not also write 2026-08-31-accounts.yaml; it is retired.
 2. For every address you record, write the full record from grok-bot.md §2.1 — { value, chain, source,
    seen, exists_on_4663, explorer_source_verified } — defaulting the two verification fields to null.
-   Never infer verification from a key name.
+   Never infer verification from a key name. For a proxy, label proxy-shell verification separately
+   and leave implementation_source_verified null until the implementation itself is checked.
 3. For every claim, cite a post id/URL + handle + date, or a docs/explorer URL. No number without a
    source, no claim without a date.
 4. Never write a conduct verdict about a person, team, or account. Use only: handle-collision |
@@ -347,6 +345,7 @@ This round:
    - Open the PR: POST /repos/harsharn10/proofline/pulls, title "feed: <YYYY-MM-DD>", head
      "grok/<YYYY-MM-DD>", base "main".
    - If nothing changed this round, skip the branch and the PR — do not open an empty PR.
+   - Never enable auto-merge or merge the PR. A controller reviews every PR after CI passes.
 9. Run again in 6 hours.
 
 Your token is scoped to this repo only: Contents read/write, Pull requests read/write, no other

@@ -149,8 +149,8 @@ value skips ahead by the tie size (`1, 1, 3`, never `1, 2`). `npm run score` mer
 
 ## Telegram digest
 
-`node scripts/telegram-digest.mjs` (PRD §9.2) sends changelog entries not yet sent, batched into one
-message, and never sends when there's nothing new:
+`node scripts/telegram-digest.mjs` (PRD §9.2) sends only controller-approved changelog entries that
+have not already been sent. A merge creates review-queue items; it does not authorize a channel post:
 
     npm run telegram             # send
     npm run telegram:dry         # preview only, sends nothing, state unchanged
@@ -159,13 +159,19 @@ message, and never sends when there's nothing new:
     npm run telegram:chat-id     # look up your chat id
 
 Credentials (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, optional `SITE_URL`, `PROFILE_PATH`) come from
-`.env.local` (gitignored) locally, or from repo secrets in CI. Sent-state lives in
-`ops/telegram-state.json` — tracked in git (moved out of `build/`, which is gitignored and
-regenerated, precisely so the digest remembers what it already sent across CI runs). `publish.yml` runs
-the digest and commits the updated state back on every push to `main` — which includes a human clicking
-"Merge" in the GitHub UI, but not a squash-merge done by `automerge-feed.yml` with its own token (GitHub
-never fires push-triggered workflows from `GITHUB_TOKEN`'s own commits); that path dispatches
-`publish.yml` explicitly right after merging instead (see "CI" below).
+`.env.local` (gitignored) locally, or from repo secrets in CI. `/review` reads the pending queue and
+stores approve/reject decisions plus edited channel copy in `ops/telegram-review.json`. The route and
+its server functions are hidden behind HTTP Basic authentication: use `github` as the username and a
+GitHub token as the password. The server admits only GitHub user `harsharn10` with write access to this
+repository, requires the credential on every request, caches successful GitHub verification for at
+most 30 seconds, and never persists the token on Render or in browser storage. Prefer a fine-grained
+token scoped only to this repository with Contents read/write.
+From an already authenticated GitHub CLI, `gh auth token | pbcopy` copies the current token without
+printing it when its existing scopes are acceptable. Close the browser session to clear its HTTP auth
+cache. The route is absent from public navigation and sends `noindex`/private no-store headers.
+`channel_enabled: false` pauses every delivery. Sent-state lives in
+`ops/telegram-state.json`. `publish.yml` runs on main pushes, but the sender exits without posting
+unless the channel is enabled and at least one unsent entry is explicitly approved.
 
 ## CI
 
@@ -178,31 +184,34 @@ Three workflows under `.github/workflows/`:
   --release` step with `continue-on-error: true` so release blockers (corrections contact, verified
   deployments, approvals) show up in the log without failing the check, then the site's `npm ci && npm
   run typecheck && npm run build && npm run smoke` (the smoke test boots the build and asserts every
-  route is 200 with no `uncapped` leakage — see "Site contract" above). This job's pass/fail is the only
-  gate `automerge-feed.yml` trusts.
+  route is 200 with no `uncapped` leakage — see "Site contract" above). `automerge-feed.yml` reads the
+  result only to classify the PR and comment; it never merges.
 - **`automerge-feed.yml`** — triggers on `validate.yml`'s own completion (`workflow_run`, so it always
   runs the copy of this file committed to `main`, never a PR's copy) for a `grok/**` head branch that
   Validate just passed. It finds the PR, asks the GitHub API for its exact file list (not `git diff`,
   which can hide a rename), and requires every file to be an addition or in-place edit under
   `content/feed/**`, `content/sources/**` (additions-only — any removed line rejects it) or
   `research/inbox/**` — `content/accounts.yaml` is deliberately **not** on this list, a tier or note
-  change there always needs a human. If everything clears, it squash-merges
-  (`gh pr merge --squash --delete-branch`) and then runs `gh workflow run publish.yml --ref main`
-  explicitly (see "Telegram digest" above for why) — no approval step, no dependency on GitHub's native
-  auto-merge or on branch protection. Otherwise it leaves one de-duplicated "needs human review" comment
-  and exits 0 without merging.
-- **`publish.yml`** — on push to `main`, and on the explicit dispatch above. `npm run score`, then the
-  Telegram digest, skipped rather than failed when `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` aren't set
-  as repo secrets; commits `ops/telegram-state.json` back with `[skip ci]` if it changed.
+  change there always needs a human. The workflow never merges or dispatches publishing. Allowlisted
+  PRs receive one "waiting for controller" comment; anything else receives "needs controller review."
+- **`publish.yml`** — on push to `main` and explicit dispatch. `npm run score`, then the approval-only
+  Telegram sender, skipped rather than failed when Telegram secrets are absent; commits
+  `ops/telegram-state.json` back with `[skip ci]` only after an approved delivery.
 
 Required repo secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `SITE_URL` (all optional — absent
-means the digest step is skipped, not failed). `GITHUB_TOKEN` is automatic; `automerge-feed.yml` needs
-`contents: write`, `pull-requests: write` and `actions: write` (the last one to dispatch `publish.yml`).
+means the digest step is skipped, not failed). `GITHUB_TOKEN` is automatic; `automerge-feed.yml` only
+needs `pull-requests: write` for its comments.
 
-`automerge-feed.yml` doesn't need "Allow auto-merge" or any branch-protection setting to work — it
-merges itself via the API. Adding `validate.yml`'s job as a required status check in branch protection
-on `main` is still worth doing as a second line of defense (it stops anyone, human or bot, from merging
-past a red check some other way), just not required for this workflow specifically.
+Leave repository auto-merge disabled. Adding `validate.yml`'s job as a required status check in branch
+protection on `main` is still worth doing as a second line of defense.
+
+## Deployment
+
+Production is deployed to Render from `main` using [`render.yaml`](render.yaml); Render's GitHub
+deployment status and the `/` health check are the production signals. This repository has no
+Cloudflare Workers configuration. A `Workers Builds: proofline` check from a connected Cloudflare app
+is therefore not a production gate and should be disconnected in the provider's Git integration rather
+than added to `automerge-feed.yml`.
 
 ## Grok Bot
 
@@ -221,8 +230,8 @@ over a project's `summary`, its findings text, feed `title`/`body`, research Mar
   vapor, "send it", plus "print"/"prints" only when it reads as market-cap-speak (close to "mcap",
   "market cap" or "FDV"). A hit in a project's `summary`, findings or research Markdown is a warning
   that `npm run validate:release` turns into an error; a hit in a feed `title`/`body` or an account
-  `note` is an error unconditionally, because those files sit on the `automerge-feed.yml` auto-merge
-  path and CI is the only backstop there (final review C3).
+  `note` is an error unconditionally, so unsafe copy cannot pass the intake gate even before the
+  controller reviews it (final review C3).
 - **Conduct** (`conductWarnings`) flags verdicts about a named person, team or account — drainer,
   scammer, scam, impersonator, fraud, fraudster, insider, honeypot, ponzi, "same person as" (plus,
   in an account note only, impersonation, farm/farmed, scams, insiders, fraudulent, malicious,
