@@ -111,6 +111,22 @@ export function reviewAuthChallenge(): Response {
   });
 }
 
+function reviewOriginRejection(): Response {
+  return new Response("Cross-origin moderation is forbidden.", {
+    status: 403,
+    headers: {
+      "cache-control": "private, no-store, max-age=0",
+      "content-security-policy": "frame-ancestors 'none'",
+      "content-type": "text/plain; charset=utf-8",
+      "referrer-policy": "no-referrer",
+      vary: "Authorization, Origin",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-robots-tag": "noindex, nofollow, noarchive",
+    },
+  });
+}
+
 export function applyReviewSecurityHeaders(headers: Headers): void {
   headers.set("cache-control", "private, no-store, max-age=0");
   headers.set("content-security-policy", "frame-ancestors 'none'");
@@ -123,6 +139,11 @@ export function applyReviewSecurityHeaders(headers: Headers): void {
 
 export const reviewFunctionProtection = createMiddleware().server(
   async ({ next, request }) => {
+    if (request.method !== "GET") {
+      const origin = request.headers.get("origin");
+      if (!origin || origin !== new URL(request.url).origin) return reviewOriginRejection();
+    }
+
     const reviewPrincipal = await authenticateReviewRequest(request);
     if (!reviewPrincipal) return reviewAuthChallenge();
 
