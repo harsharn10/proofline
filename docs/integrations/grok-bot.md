@@ -3,6 +3,13 @@
 This is the contract for any Grok field desk contributing to Proofline: what to collect, where it is
 allowed to write, what it must never write, how to open a PR for it, and what happens after.
 
+This is the Grok-specific annex to [`../research-system.md`](../research-system.md). The shared research
+system controls assignment, packet shape, field ownership, conflict handling, branch isolation, and
+publication. If this annex conflicts with that document, the shared research system wins. Grok writes a
+packet from [`../templates/research-packet-v1.md`](../templates/research-packet-v1.md) for every assigned
+slug; direct feed/source proposals are outputs for the compiler to reconcile, not a substitute for the
+packet.
+
 It replaces the current process — a 15-minute-loop-shaped, interactive session running
 `.grok/workflows/rh-field-round.rhai` with the `rh-field-ops` and `rh-account-desk` skills, which live on
 `research/ecosystem-baseline:.grok/…` (that branch, not this one) — which commits directly to that branch
@@ -151,6 +158,10 @@ If the normalized name or alias matches a canonical row, list that row under `po
 Ticker-only matches are weak signals and never justify a merge. If the slug is already canonical,
 do not open a second name record; submit ordinary feed/source updates for that slug.
 
+Use `docs/taxonomy.md` for classification rationale and display mapping. The current flat `category`
+field remains a transitional schema requirement; do not invent a misleading value when the product
+leaf has no safe current mapping—record the taxonomy gap in the packet for controller review.
+
 The old aggregate `<date>-census-candidates.yaml` format is retired. Existing historical files remain
 as intake evidence, but every new name uses the validated one-file-per-name format.
 
@@ -234,9 +245,9 @@ Record a correction/changelog entry whenever a public name, lifecycle, deploymen
 - **PR-only.** Every change reaches `main` by pull request. Never `git checkout`, `git stash`, or
   `git add -A` in a checkout another agent might be using — that class of operation produced the
   accidental mixed commit on `origin/site` (`29b8da5`) that this contract exists partly to prevent.
-- **One branch per round, named `grok/<YYYY-MM-DD>`**, created from `main`'s current head. Reuse the
-  same day's branch for more than one round if it's still open; don't open a second PR for the same
-  day unless the first has merged or closed.
+- **One branch per run, named `grok/<YYYYMMDD>/<work-id>`**, created from `main`'s current head.
+  Never reuse a branch for another run and never share it with SuperGrok or another producer. The work
+  ID, base SHA, owned slugs, and allowed paths must match the packet header and PR body.
 - **Skip the PR when there's nothing new.** No empty rounds, no placeholder commits.
 
 ## 6. Opening a PR — GitHub REST API
@@ -248,15 +259,15 @@ to the API directly rather than using `git`. All calls are to `https://api.githu
 1. **Get `main`'s current commit SHA:**
    `GET /repos/harsharn10/proofline/git/refs/heads/main`
 
-2. **Create the day's branch from it** (skip if it already exists):
+2. **Create the run branch from it**:
    `POST /repos/harsharn10/proofline/git/refs`
    ```json
-   { "ref": "refs/heads/grok/2026-08-31", "sha": "<main's commit sha>" }
+   { "ref": "refs/heads/grok/20260901/<work-id>", "sha": "<main's commit sha>" }
    ```
 
 3. **For each file you're adding or changing**, first check whether it already exists on the branch (to
    get its blob `sha` — required for an update, omitted for a new file):
-   `GET /repos/harsharn10/proofline/contents/<path>?ref=grok/2026-08-31`
+   `GET /repos/harsharn10/proofline/contents/<path>?ref=grok/20260901/<work-id>`
 
    Then write it:
    `PUT /repos/harsharn10/proofline/contents/<path>`
@@ -264,7 +275,7 @@ to the API directly rather than using `git`. All calls are to `https://api.githu
    {
      "message": "feed: 2026-08-31 round 3 — pons volume dispute",
      "content": "<base64-encoded file content>",
-     "branch": "grok/2026-08-31",
+     "branch": "grok/20260901/<work-id>",
      "sha": "<blob sha, only when updating an existing file>"
    }
    ```
@@ -274,14 +285,14 @@ to the API directly rather than using `git`. All calls are to `https://api.githu
    ```json
    {
      "title": "feed: 2026-08-31",
-     "head": "grok/2026-08-31",
+     "head": "grok/20260901/<work-id>",
      "base": "main",
      "body": "Round summary: files touched, rows added/changed, corrections issued. Link the x-fill notes."
    }
    ```
 
-   If a PR already exists for the day's branch, `PUT` more files onto it instead of opening a second
-   PR — commits after the first push update it automatically.
+   Subsequent corrections for the same run update this PR. A new assignment gets a new work ID,
+   branch, packet, and PR.
 
 ## 7. Token scope
 
@@ -328,8 +339,8 @@ required repo settings.
 
 ## 10. What changed in your process (10 lines)
 
-1. You no longer commit directly to `research/ecosystem-baseline` or any shared branch — every round
-   opens a PR from `grok/<date>` via the GitHub REST API (§6).
+1. You no longer commit directly to `research/ecosystem-baseline` or any shared branch — every run
+   opens a PR from `grok/<YYYYMMDD>/<work-id>` via the GitHub REST API (§6).
 2. You no longer run `git checkout`, `git stash`, or `git add -A` in a checkout — you write files
    through the API instead.
 3. `2026-08-31-accounts.yaml` is retired. `account-desk.yaml` is the one account ledger; add `slug:` to
@@ -363,40 +374,44 @@ round, including the evidence rules (§3), the forbidden paths (§4), and the ex
 
 This round:
 
-1. Run your normal scout + specialist pass (X search, chain numbers, account desk, collision audit) as
+1. Copy docs/templates/research-packet-v1.md to
+   research/inbox/packets/<slug>/<work-id>.md for every assigned slug. Fill the assignment header with
+   the exact producer, base SHA, owned slug, tier, and allowed paths. Read docs/research-system.md and
+   docs/taxonomy.md; use their ownership, classification, conflict, and event rules.
+2. Run your normal scout + specialist pass (X search, chain numbers, account desk, collision audit) as
    `research/ecosystem-baseline:.grok/workflows/rh-field-round.rhai` and its skills (rh-field-ops,
    rh-account-desk) describe — except where this contract overrides them (§4, item 4 of §10). Write
    your working notes to research/inbox/<date>-x-fill-N.md and update research/inbox/account-desk.yaml
    — the one ledger. Do not also write 2026-08-31-accounts.yaml; it is retired.
-2. For every address you record, write the full record from grok-bot.md §2.1 — { value, chain, source,
+3. For every address you record, write the full record from grok-bot.md §2.1 — { value, chain, source,
    seen, exists_on_4663, explorer_source_verified } — defaulting the two verification fields to null.
    Never infer verification from a key name. For a proxy, label proxy-shell verification separately
    and leave implementation_source_verified null until the implementation itself is checked.
-3. For every claim, cite a post id/URL + handle + date, or a docs/explorer URL. No number without a
+4. For every claim, cite a post id/URL + handle + date, or a docs/explorer URL. No number without a
    source, no claim without a date.
-4. Never write a conduct verdict about a person, team, or account. Use only: handle-collision |
+5. Never write a conduct verdict about a person, team, or account. Use only: handle-collision |
    unconfirmed-official | third-party-link | copypasta-pattern | wrong-chain | ca-collision, each with
    evidence: <post id/URL, date>. Describe behavior ("an address with the same ticker posted from…"),
    never intent ("drainer", "impersonator", "farm", "scammer").
-5. lifecycle: mainnet requires evidence beyond the project's own post (explorer, DefiLlama chain-slice,
+6. lifecycle: mainnet requires evidence beyond the project's own post (explorer, DefiLlama chain-slice,
    or docs with addresses). A tweet alone is lifecycle: announced.
-6. If the name already has a canonical census slug and the claim is dated and sourced, draft
+7. If the name already has a canonical census slug and the claim is dated and sourced, draft
    content/feed/<slug>.yaml items and/or additive content/sources/<slug>.yaml entries, or an additive
    content/accounts.yaml row (always tier: watch). For a new name, create
    research/inbox/names/<slug>.yaml from docs/templates/name-intake.yaml. Complete all nine research
    requirements; represent missing work as not-found, not by omitting a field. Record possible matches
    and every conflict. Never write content/census.yaml or content/projects/** directly.
-7. Never write scoring, review.approver, or content/changelog.yaml.
-8. Open your changes as a PR:
-   - Create branch grok/<YYYY-MM-DD> from main's current head:
+8. Never write scoring, review.approver, or content/changelog.yaml.
+9. Open your changes as a PR:
+   - Create branch grok/<YYYYMMDD>/<work-id> from main's current head:
      POST /repos/harsharn10/proofline/git/refs
    - Write each changed file with PUT /repos/harsharn10/proofline/contents/<path> on that branch
      (GET first if the file already exists, to get its blob sha).
    - Open the PR: POST /repos/harsharn10/proofline/pulls, title "feed: <YYYY-MM-DD>", head
-     "grok/<YYYY-MM-DD>", base "main".
+     "grok/<YYYYMMDD>/<work-id>", base "main".
    - If nothing changed this round, skip the branch and the PR — do not open an empty PR.
    - Never enable auto-merge or merge the PR. A controller reviews every PR after CI passes.
-9. Run again in 6 hours.
+10. Run again in 6 hours.
 
 Your token is scoped to this repo only: Contents read/write, Pull requests read/write, no other
 permission. If you don't have one, stop and ask a human to mint one — do not fall back to a broader

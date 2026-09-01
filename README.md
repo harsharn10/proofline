@@ -3,6 +3,13 @@
 Evidence-backed research profiles for native Robinhood Chain plays. Research, not advice.
 Spec: `PRD.md`. Content-system design: `docs/superpowers/specs/2026-08-30-content-system-design.md`.
 
+Current research operations are defined by [`docs/research-system.md`](docs/research-system.md). The
+standard agent handoff is [`docs/templates/research-packet-v1.md`](docs/templates/research-packet-v1.md),
+and controlled product/display labels are defined in [`docs/taxonomy.md`](docs/taxonomy.md). These
+current contracts supersede conflicting instructions in dated handoffs, inbox notes, and historical
+implementation plans. Producer annexes: [`Grok Bot`](docs/integrations/grok-bot.md) and
+[`SuperGrok verifier`](docs/integrations/supergrok.md).
+
 ## Commands
 
     npm install
@@ -62,6 +69,12 @@ shape of each server function's response.
 4. `npm run validate`.
 
 ## Researching a project (stub → full)
+
+Start from a reviewed research packet. Agents write one
+`research/inbox/packets/<slug>/<work-id>.md` using the packet template; a single assigned compiler maps
+it into the canonical files below. Grok/SuperGrok packets, profile publication, site-feed placement, and
+Telegram eligibility are separate decisions. See the research-system flow before editing canonical
+content.
 
 1. Add every source you open to `content/sources/<slug>.yaml` first (`S1`, `S2`, …) with `accessed_at`, `claim`, `excerpt`.
 2. Write `content/research/<slug>.md`. Every material sentence ends with `[verified S3]`, `[claim S7]`, `[inference S3 S4]`, `[disputed S9]` or `[unknown]`.
