@@ -117,6 +117,24 @@ export type SourceEntry = {
 
 export type ChangelogType = "score" | "risk" | "stage" | "finding" | "correction" | "coverage";
 export type ChangelogSeverity = "Info" | "Review" | "Material" | "Risk";
+export type ChannelEvent =
+  | "new-coverage"
+  | "research-update"
+  | "risk-alert"
+  | "correction"
+  | "breaking"
+  | "trending"
+  | "roundup";
+export type ChannelDelivery = "immediate" | "same-day" | "roundup";
+
+export type ChannelPublication = {
+  event: ChannelEvent;
+  delivery: ChannelDelivery;
+  headline: string;
+  summary: string;
+  why_it_matters?: string[];
+  watch_next?: string;
+};
 
 // `unknown` fails createServerFn's serializable-return check, so prior/new are typed as a
 // concrete JSON value rather than Record<string, unknown> (changelog.schema.json just says
@@ -133,7 +151,7 @@ export type ChangelogEntry = {
   prior: Record<string, JsonValue> | null;
   new: Record<string, JsonValue> | null;
   reviewer: string;
-  channel_candidate?: boolean;
+  channel?: ChannelPublication;
   methodology_version: string;
 };
 
