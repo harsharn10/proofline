@@ -6,7 +6,6 @@
 //   npm run build && npm run smoke
 
 import { spawn } from "node:child_process";
-import fs from "node:fs";
 
 const PORT = Number(process.env.SMOKE_PORT ?? 8081); // override when 8081 is taken by another worktree's server
 const BASE = `http://localhost:${PORT}`;
@@ -23,14 +22,21 @@ const READY_TIMEOUT_MS = 30_000;
 const READY_POLL_MS = 300;
 const BANNED_IN_DOSSIER = ["uncapped", "securityRaw"];
 
-function reviewServerFunctions() {
-  const directory = ".output/server/_ssr";
-  const file = fs.readdirSync(directory).find((name) => name.startsWith("review-server-"));
-  if (!file) throw new Error("built review server functions were not found");
-  const compiled = fs.readFileSync(`${directory}/${file}`, "utf8");
-  return [...compiled.matchAll(/id: "([a-f0-9]+)",\s*name: "([^"]+)"/g)].map((match) => ({
-    id: match[1],
-    name: match[2],
+async function reviewServerFunctions() {
+  const html = await fetch(`${BASE}/`).then((response) => response.text());
+  const asset = html.match(/src="(\/assets\/index-[^"]+\.js)"/)?.[1];
+  if (!asset) throw new Error("built client entry was not found");
+  const compiled = await fetch(BASE + asset).then((response) => response.text());
+  const marker = Math.max(compiled.indexOf("`/review`"), compiled.indexOf('"/review"'));
+  if (marker < 0) throw new Error("built review route was not found");
+  const reviewPrefix = compiled.slice(Math.max(0, marker - 2_000), marker);
+  const definitions = [
+    ...reviewPrefix.matchAll(/method:[`'"](GET|POST)[`'"][\s\S]{0,400}?([a-f0-9]{64})/g),
+  ];
+  return definitions.slice(-2).map((match) => ({
+    method: match[1],
+    id: match[2],
+    name: match[1] === "GET" ? "getReviewQueue" : "moderateTelegram",
   }));
 }
 
@@ -86,12 +92,11 @@ async function main() {
     );
     if (!reviewPrivate) failures.push("/review must challenge without returning private content");
 
-    const functions = reviewServerFunctions();
+    const functions = await reviewServerFunctions();
     if (functions.length !== 2) failures.push("expected both review server functions in the build");
     for (const serverFunction of functions) {
-      const method = serverFunction.name === "getReviewQueue" ? "GET" : "POST";
       const res = await fetch(`${BASE}/_serverFn/${serverFunction.id}`, {
-        method,
+        method: serverFunction.method,
         redirect: "manual",
         headers: {
           origin: BASE,
