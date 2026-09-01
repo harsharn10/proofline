@@ -19,7 +19,7 @@ The v1 leaf registry is already the right *shape*: entity kind, domain, leaf, me
 6. **Brand collisions are filed as one slug or the wrong slug.** Arrow Finance CDP vs ArrowPad.fun; census Safehood vs Pons-graduated SAFEHOOD token; FoxPad vs FOX mascot; @Robin_Pad vs @RobinPAD_MEME; Arc Liquidity vs Arcus perps; pools.trade vs pools.fun.
 7. **Flat `category` is still stretched.** TickerYard (`rwa-products/synthetic-asset`) is stored as `Oracle / infra`. notawebsite (`rwa-products/ad-space`) is stored as `NFT / treasury`. Bankr is `Agent / execution` while also running a stock-paired factory. The tree is honest; the enum is not.
 
-Highest-impact moves: add two leaves (wallet-mirror basket, livestream/attention pad), stop using `other-pad` as a home, map imported TVL to imported leaves, and keep pad-output tokens on `launch/graduation-token` until they have an independent control plane.
+Highest-impact moves: add two leaves (wallet-mirror basket, livestream/attention pad), stop using `other-pad` as a home, map imported TVL to imported leaves, keep pad-output tokens on `launch/graduation-token` until they have an independent control plane, and **map pad-coins to pad + official stock quote + cohort rank** so NVDA-paired tickers are not interchangeable (TAX-GROK-009). Put (4,4) flywheel DEXes under trading/DEX, not as a peer of Launchpad.
 
 ## 2. Coverage matrix
 
@@ -251,6 +251,29 @@ Receipt IDs: R-LLAMA, R-MAP
 Confidence: medium
 ```
 
+### TAX-GROK-009
+
+```
+Proposal ID: TAX-GROK-009
+Change type: mapping
+Proposed key and display label:
+  dual launchpad+dex (Pons)
+  dex_family: imported | native-amm | flywheel-44 (up, SwapHood)
+  pad-coin edges: launched_on, quote_asset, quote_ca, pair_rank
+Parent domain: launch + trading + (pad-coin as child, not a domain)
+Definition: Names are typed as launchpad, dex, both, lending, or pad-coin. A pad-coin card must name its pad, the official stock it is quoted against, and its rank in that stock’s pair cohort. (4,4) is a DEX child (fee-to-token flywheel), not a top-level category.
+Includes: Pons as both; up/SwapHood as 4,4 DEX; AI as LONG×official NVDA rank-1; BONER as pad-coin×HIMS.
+Excludes: Filing CASHCAT as a protocol; filing FOMO/Pump.fun as pads; merging every $NVDA ticker into Artificial Inu; calling Pons “the DEX.”
+Distinguishing test: Can a reader answer: is this a pad, a venue, both, a loan market, or a coin — and if a coin, which pad and which registry stock?
+Motivating candidate slugs: artificial-inu, pons, up, swaphood, bankr, long, cashcat, boner (featured, not census)
+Affected canonical slugs: pons, up, swaphood, fables, what-the-hook, artificial-inu, long, bankr, denar, longbow, arrow
+Current fallback mapping: flat Launchpad / Aggregator / Fee-routing / Stock-paired token
+Migration impact: display/mapping first; schema later. No silent census rewrites.
+Conflicts or alternatives considered: one “meme” leaf (rejected). one “RWA” leaf for all NVDA pairs (rejected).
+Receipt IDs: R-CENSUS, R-TAX, R-MAP
+Confidence: high
+```
+
 ## 4. Canonical stress test
 
 Do not rewrite these rows. Recommend controller review against the definitions above.
@@ -294,6 +317,103 @@ Do not rewrite these rows. Recommend controller review against the definitions a
 6. **Meridian** — one slug with secondary prediction leaf, or two evidence records (perps vs predict) under the same brand?
 7. **Should `launch/other-pad` be deprecated** after a compiler pass, or kept as an honest holding pen? Recommendation: keep, but never as a reader-facing card title (“Token launchpad, mechanism not classified”).
 8. **Flat category enum** — freeze it and display from the tree, or migrate now? This assignment cannot touch schema. The stress-test rows are the migration queue.
+
+## 8. Mapping model (parent / child / dual) — TAX-GROK-009
+
+Controller feedback: we have launchpads, DEXes, some that are both, coins of launchpads, lending, and (4,4) protocols as a DEX child. People must see **which stock a meme is paired to**, **which pad minted it**, and **which NVDA pair is the real one** so they do not buy the ticker collision. This section is the mapping, not a new dump of tokens.
+
+### 8.1 Object types (parents)
+
+These are kinds of *names*, not a single flat category. A name has one primary type and may carry a dual flag.
+
+```
+name
+├── launchpad          mints tokens (Pons, Flap, LONG, Bankr, Clanker, hood.fun)
+├── dex                spot venue
+│   ├── imported       Uniswap v2/v3/v4
+│   ├── native-amm     Fables, GIGA (if native)
+│   └── 4,4 / flywheel up (3,3-style emissions + buyback), SwapHood (h33 / HOOD buybacks)
+├── both               launchpad whose post-graduation swaps are a DEX
+│                      Pons: curve at launch, Uni v4 swap fees after — Llama fees $4.73m
+│                      StonkBrokers: nft-gated launch + STORMM overlay
+├── lending            Morpho (dependency), Denar, Longbow, Arrow CDP, Native Credit Pool
+├── pad-coin           child of a launchpad, not a protocol until it has its own machine
+└── stock-token        official quote asset (dependency, never a standalone profile)
+```
+
+`(4,4)` is **not** a top-level domain. It is a child of DEX: native AMM whose swap fees are routed into a protocol token (buyback, ve/h33, rebase). Census already stuffed these into `Fee-routing protocol`. Keep them under trading; stop using that enum as if it were a product family equal to Launchpad.
+
+| Name | Primary | Dual | 4,4 child? |
+| --- | --- | --- | --- |
+| Pons | launchpad | **yes — DEX after graduation** | no (fees buy PONS; that is pad-token, not a veDEX) |
+| LONG | launchpad (stock-paired factory) | no | no |
+| Bankr | launchpad + agent-execution | stock-paired factory is secondary | no |
+| Uniswap | dex / imported | no | no |
+| up | dex / 4,4 | no | **yes** — census: (3,3)-style emissions and buyback |
+| SwapHood | dex / 4,4 | no | **yes** — 95% fees buy HOOD into h33 backing |
+| Fables | dex / native-amm | no | review (fee-routing enum today) |
+| What The Hook | dex / hook | no | no — MEV hook, not a flywheel token |
+| Arrow | lending / CDP | pad only if ArrowPad is the same control plane (it is not) | no |
+| Denar / Longbow | lending | no | no |
+| Artificial Inu | pad-coin | — | — |
+| CASHCAT | pad-coin / mascot | — | — |
+
+### 8.2 Required edges on every pad-coin
+
+A launchpad coin is not “a meme.” The card has to carry the graph:
+
+```
+TICKER · display name
+Pad-coin · launched on <PAD> · quoted vs official <STOCK>
+<Pad 24h volume> · rank #<n> of <STOCK>-paired coins by pool volume
+Quote CA must match registry <0x…>
+```
+
+| Edge | Why |
+| --- | --- |
+| `launched_on` → pad slug | BONER is not a protocol; it is a Pons (or other) output |
+| `quote_asset` → official stock ticker + registry CA | AI/NVDA is not “an NVDA”; the quote must be `0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec` (hoodfi) / registry NVDA, not a fake `$NVDA` ticker |
+| `pair_rank` in that stock’s cohort | 40 NVDA pools on hoodfi.io; ~32% of NVDA pool activity is memes quoting NVDA. Rank by 24h volume / TVL |
+| `pad_volume` | people use pad volume to tell a real factory from a clone |
+
+Do **not** file the stock token as the parent of the meme. Official NVDA is a **dependency / quote leg**. The parent of $AI is **LONG**. The quote is **NVDA**.
+
+### 8.3 NVDA cohort (do not buy the wrong one)
+
+hoodfi.io (checked this pass): NVDA spot $41.5m / 40 pools; $19.3m is NVDA-as-quote. Uniswap v3 takes the NVDA/USDG book; the **top meme/NVDA book is AI/NVDA**.
+
+| Rank (meme×NVDA) | Token | Pad | Note |
+| --- | --- | --- | --- |
+| 1 | **AI / Artificial Inu** | **LONG** | Flagship. ~$162–180m mcap this pass. LONG claimed ~20% of circulating NVDA stock tokens in the AI pool (18 Aug). Census slug `artificial-inu`. |
+| — | REALSTONK / REAL | Bankr | Same quote asset, different pad, much smaller (Jul: ~$0.64m FDV). |
+| — | microduck / NVDA | Pons v2 | Different pad again. |
+| **trap** | token named NVIDA / ticker **$NVDA** | Bankr | CA `0x775C8f9EFd250D238b5009a2B2a977e1e095CBA3` — a meme whose *ticker* is NVDA, paired to official NVDA. This is why the card must show pad + quote CA, not ticker. |
+
+Same pattern for HIMS (BONER), SPCX (SPACEHOOD), TSM (TAYSOM), MSFT (SBC). One stock → many children → **one ranked cohort**, never one leaf called “NVDA coins.”
+
+Pons can also mint stock-paired coins (v2 quote assets include stocks). LONG/Bankr are the factories that *defined* the meta; Pons is the volume pad that also does it. That is a pad attribute (`supports_stock_quote: true`), not a reason to merge Pons into LONG.
+
+### 8.4 Standard card, by type
+
+**Launchpad:** name, mechanism child (curve / stock-paired factory / social-deploy / …), 24h launch volume, 24h post-grad DEX volume if dual.
+
+**DEX:** imported vs native vs 4,4. 4,4 card line: “Native DEX · fees to {token}.”
+
+**Both:** primary launchpad, secondary DEX, both volumes shown.
+
+**Pad-coin:** ticker, pad, official stock pair + CA, rank in that pair cohort, pad volume. Never a numeric protocol score.
+
+**Lending:** primitive (Morpho) vs isolated market (Denar) vs overlay (Longbow) vs CDP (Arrow). Not a DEX.
+
+### 8.5 What this adds to the leaf registry
+
+No one-leaf-per-brand. Three mapping fields the current schema does not store on a play:
+
+1. `dual: launchpad+dex` (Pons)
+2. `launched_on` + `quote_asset` + `quote_ca` on pad-coins
+3. `dex_family: imported | native-amm | flywheel-44` under trading
+
+Until schema v2, keep these in the packet / census tree secondary + a mapping table. Display them on the card anyway.
 
 ## 7. Standard view (every name, including pending)
 
