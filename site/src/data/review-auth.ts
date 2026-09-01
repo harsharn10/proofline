@@ -127,6 +127,22 @@ function reviewOriginRejection(): Response {
   });
 }
 
+function requestOrigins(request: Request): Set<string> {
+  const origins = new Set([new URL(request.url).origin]);
+  const forwardedProtocol = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const protocol = forwardedProtocol === "http" || forwardedProtocol === "https"
+    ? forwardedProtocol
+    : new URL(request.url).protocol.slice(0, -1);
+  const hosts = [
+    request.headers.get("host"),
+    request.headers.get("x-forwarded-host")?.split(",")[0]?.trim(),
+  ];
+  for (const host of hosts) {
+    if (host) origins.add(`${protocol}://${host}`);
+  }
+  return origins;
+}
+
 export function applyReviewSecurityHeaders(headers: Headers): void {
   headers.set("cache-control", "private, no-store, max-age=0");
   headers.set("content-security-policy", "frame-ancestors 'none'");
@@ -141,7 +157,7 @@ export const reviewFunctionProtection = createMiddleware().server(
   async ({ next, request }) => {
     if (request.method !== "GET") {
       const origin = request.headers.get("origin");
-      if (!origin || origin !== new URL(request.url).origin) return reviewOriginRejection();
+      if (!origin || !requestOrigins(request).has(origin)) return reviewOriginRejection();
     }
 
     const reviewPrincipal = await authenticateReviewRequest(request);
