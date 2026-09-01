@@ -204,6 +204,14 @@ merges itself via the API. Adding `validate.yml`'s job as a required status chec
 on `main` is still worth doing as a second line of defense (it stops anyone, human or bot, from merging
 past a red check some other way), just not required for this workflow specifically.
 
+## Deployment
+
+Production is deployed to Render from `main` using [`render.yaml`](render.yaml); Render's GitHub
+deployment status and the `/` health check are the production signals. This repository has no
+Cloudflare Workers configuration. A `Workers Builds: proofline` check from a connected Cloudflare app
+is therefore not a production gate and should be disconnected in the provider's Git integration rather
+than added to `automerge-feed.yml`.
+
 ## Grok Bot
 
 Automated research intake (X posts, on-chain events, official announcements) reaches this repo only

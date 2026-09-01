@@ -2,9 +2,9 @@ slug: arrow
 name: Arrow Finance
 symbol: ARROW
 category: CDP
-lifecycle: announced
+lifecycle: mainnet
 coverage: stub
-summary: Native CDP minting aUSD against Stock Tokens, ETFs, WETH and USDG, dated by the project to open 2026-08-31 09:30 ET after a Sherlock review; an ArrowPad launchpad shares the brand.
+summary: Native CDP minting aUSD against Stock Tokens, ETFs, WETH and USDG; the official app showed active markets and live protocol balances after its 2026-08-31 mainnet launch. An ArrowPad launchpad shares the brand.
 official_links:
   - kind: docs
     url: https://app.arrowfinance.io/docs
@@ -68,6 +68,11 @@ findings:
       class: claim
       sources:
         - S2
+    - text: On 2026-08-31 the official account announced that Arrow CDP v1 was live, and the official app showed Robinhood Chain markets, outstanding aUSD, collateralization and stability-pool balances without requiring a connected wallet.
+      class: claim
+      sources:
+        - S9
+        - S13
     - text: "The official account posted pre-open parameters: 16 collateral markets (stables, WETH, tokenized equities and indices), 75–90% initial maximum LTV, about $1.6M aggregate aUSD borrow cap, and equity or index collateral usable only during US cash hours (09:30–16:00 ET) with WETH and stables 24/7."
       class: claim
       sources:
@@ -94,10 +99,10 @@ findings:
       sources:
         - S4
   missing:
-    - text: Whether the CDP opened on 2026-08-31 — not confirmed in this review
     - text: CDP core and stability-pool addresses not located
     - text: Sherlock report and covered commit not reviewed
     - text: Admin powers over caps, listings and the US-hours collateral switch
     - text: ArrowPad factory controls
   unresolved:
-    - text: "Whether the CDP opened at 09:30 ET on 2026-08-31: the desk's last check preceded the open and found no 'we're live' post. Lifecycle stays announced until an official post or on-chain activity is reviewed."
+    - text: The app's overview and analytics pages showed different aUSD-outstanding totals during the 2026-08-31 review.
+    - text: The live app's market count and LTV values differed from the official documentation reviewed the same day.
