@@ -9,7 +9,7 @@ import { spawn } from "node:child_process";
 
 const PORT = Number(process.env.SMOKE_PORT ?? 8081); // override when 8081 is taken by another worktree's server
 const BASE = `http://localhost:${PORT}`;
-const ROUTES = ["/", "/n/pons", "/n/pons?tab=evidence", "/feed", "/methodology", "/changelog", "/d/stock-tokens"];
+const ROUTES = ["/", "/n/pons", "/n/pons?tab=evidence", "/feed", "/methodology", "/changelog", "/review", "/d/stock-tokens"];
 const READY_TIMEOUT_MS = 30_000;
 const READY_POLL_MS = 300;
 const BANNED_IN_DOSSIER = ["uncapped", "securityRaw"];

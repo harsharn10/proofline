@@ -9,7 +9,7 @@ import { validateAgainst } from "./lib/schemas.mjs";
 import { crossCheck, releaseCheck } from "./lib/checks.mjs";
 import { checkResearch, tagIds, REQUIRED_HEADINGS } from "./lib/research-md.mjs";
 import { loadContent } from "./lib/load.mjs";
-import { selectUnsent, buildDigest, chunkMessage, readDotEnv } from "./lib/telegram.mjs";
+import { selectUnsent, selectApproved, buildDigest, chunkMessage, readDotEnv } from "./lib/telegram.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
@@ -425,12 +425,32 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     { date: "2026-08-31", slug: "pons", type: "score", severity: "Material", title: "Score published", detail: "<b>&" },
   ];
   const unsent = selectUnsent(entries, { sent_keys: ["2026-08-30|pons|coverage|Initial stub opened"] });
+  const approved = selectApproved(
+    entries,
+    { sent_keys: ["2026-08-30|pons|coverage|Initial stub opened"] },
+    {
+      channel_enabled: true,
+      decisions: {
+        "2026-08-31|pons|score|Score published": {
+          status: "approved",
+          title: "Controller title",
+          detail: "Controller detail",
+        },
+      },
+    },
+  );
+  const paused = selectApproved(entries, { sent_keys: [] }, { channel_enabled: false, decisions: {} });
   const projects = new Map([["pons", { name: "Pons" }]]);
   const derived = new Map([["pons", { score: 64, provisional: true, risk: "Elevated", confidence: 57 }]]);
   const text = buildDigest(unsent, { siteName: "Proofline", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
   const chunks = chunkMessage("a".repeat(3000) + "\n\n" + "b".repeat(3000), 4096);
   try {
     assert.equal(unsent.length, 1);
+    assert.equal(approved.length, 1, "only approved and unsent entries publish");
+    assert.equal(approved[0].title, "Controller title", "approved title override");
+    assert.equal(approved[0].detail, "Controller detail", "approved detail override");
+    assert.equal(approved[0].review_key, "2026-08-31|pons|score|Score published", "override preserves immutable sent key");
+    assert.deepEqual(paused, [], "paused channel publishes nothing");
     assert.ok(text.includes("<b>Pons</b>"), "name bold");
     assert.ok(text.includes("Score 64/100 (provisional) · Elevated risk · 57% confidence"), "numbers line");
     assert.ok(text.includes("https://x.test/n/pons"), "profile link");

@@ -3,11 +3,12 @@ name: Validate
 # Every PR, and every push to main: prove the content system and the site still build. Pushes to other
 # branches are covered by their PR run — a `push: ["**"]` trigger ran everything twice per PR commit.
 #
-# automerge-feed.yml keys off this workflow's conclusion, so the only things allowed to fail the job
-# are the real gates: root `npm test`, site typecheck, site build. Release blockers (corrections
+# The feed gate reads this workflow's conclusion before classifying and commenting on Grok PRs, so
+# the only things allowed to fail the job are the real gates: root `npm test`, site typecheck, site
+# build. Release blockers (corrections
 # contact, verified deployments, approvals) run as a step with continue-on-error so they show up in
 # the log without failing the check — a separate job with continue-on-error still reports a failed
-# check run on the PR, which is what broke the old auto-merge design.
+# check run on the PR, which is what broke the old gate design.
 on:
   pull_request:
   push:
