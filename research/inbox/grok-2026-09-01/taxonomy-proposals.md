@@ -306,7 +306,7 @@ Motivating candidate slugs: gluehook, hookos, twofold, stormm
 Affected canonical slugs: what-the-hook, hookr, stonkbroker
 Current fallback mapping: hook ≈ launchpad or fee-routing
 Migration impact: review-only
-Conflicts or alternatives considered: a domain hooks/ (rejected — mechanism tag already exists; the job still needs a product leaf).
+Conflicts or alternatives considered: a domain hooks/ (rejected — hook is a mechanism concept, but `hook` is not in the current controlled tag set; the product job still needs a leaf).
 Receipt IDs: R-TAX, R-MAP
 Confidence: high
 ```
