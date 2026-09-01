@@ -113,6 +113,23 @@ async function main() {
         `  ${isPrivate ? "ok  " : "FAIL"} ${serverFunction.name} -> ${res.status} with auth challenge`,
       );
       if (!isPrivate) failures.push(`${serverFunction.name} must reject unauthenticated requests`);
+
+      if (serverFunction.method === "POST") {
+        const crossOrigin = await fetch(`${BASE}/_serverFn/${serverFunction.id}`, {
+          method: "POST",
+          redirect: "manual",
+          headers: {
+            origin: "https://attacker.invalid",
+            "sec-fetch-site": "cross-site",
+            "x-tsr-serverFn": "true",
+          },
+        });
+        const rejectsCrossOrigin = crossOrigin.status === 403;
+        console.log(
+          `  ${rejectsCrossOrigin ? "ok  " : "FAIL"} ${serverFunction.name} rejects cross-origin writes`,
+        );
+        if (!rejectsCrossOrigin) failures.push("moderation must reject cross-origin writes");
+      }
     }
 
     const dossierRes = await fetch(`${BASE}/n/pons`);
