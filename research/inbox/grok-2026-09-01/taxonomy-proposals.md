@@ -21,6 +21,8 @@ The v1 leaf registry is already the right *shape*: entity kind, domain, leaf, me
 
 Highest-impact moves: add two leaves (wallet-mirror basket, livestream/attention pad), stop using `other-pad` as a home, map imported TVL to imported leaves, keep pad-output tokens on `launch/graduation-token` until they have an independent control plane, and **map pad-coins to pad + official stock quote + cohort rank** so NVDA-paired tickers are not interchangeable (TAX-GROK-009). Put (4,4) flywheel DEXes under trading/DEX, not as a peer of Launchpad.
 
+The missing piece is not more leaves. It is **labeling discipline** (TAX-GROK-010), lifted from Eregion without copying L0–L9: atoms map, not brands; every parent has a decision rule, worked examples, and a deliberate exclusion; every leaf assignment carries a why-mapped one-liner; dual placement is an atom split with a volume/revenue split, never a hybrid slug like `CDP + launchpad`; quiet cells stay quiet.
+
 ## 2. Coverage matrix
 
 Fit is against the *current* v1 registry. Proposal IDs apply only where the current leaf is lossy, missing, or ambiguous.
@@ -274,6 +276,26 @@ Receipt IDs: R-CENSUS, R-TAX, R-MAP
 Confidence: high
 ```
 
+### TAX-GROK-010
+
+```
+Proposal ID: TAX-GROK-010
+Change type: mapping
+Proposed key and display label: labeling doctrine (Eregion lift) — decision rule, why-mapped, atoms, honest quiet
+Parent domain: all (does not add a domain; constrains how every parent/child is labeled)
+Definition: RH does not copy Eregion's L0–L9 AI/robotics stack. It copies the classification craft: (1) define the parent in one sentence; (2) state the decision rule the taxonomy actually uses; (3) give 2–3 worked mappings plus one deliberate exclusion; (4) require a why-mapped one-liner per leaf; (5) map atoms, not companies; (6) dual-map only when two machines exist, with a volume split; (7) render honest quiet when a sub-cell is empty. Fill-source tags [M] machine · [C] curated · [J] judgment · [D] derived.
+Includes: Pons dual-map (launch atom + venue atom); Tesla-style atom split applied to LONG vs $AI vs official NVDA; (4,4) as a DEX sub-cell because two real names exist (up, SwapHood).
+Excludes: Copying L0–L9 onto RH. Filing a brand as one leaf because the brand is famous. Inventing `CDP + launchpad`. Averaging Pons-the-pad with PONS-the-token. Calling FOMO a launchpad. Calling every NVDA ticker an RWA product.
+Distinguishing test: Can a reader, looking only at the card, say why this name sits here, what it is not, and which atom was mapped — without seeing a raw slug?
+Motivating candidate slugs: pons, long, bankr, artificial-inu, up, swaphood, denar, arrow, gmgn, meridian
+Affected canonical slugs: every census row that currently shows a stretched flat category (tickeryard, website, bankr, sherwood, netnet, meridian, up, fables, what-the-hook)
+Current fallback mapping: leaf registry + TAX-GROK-009 object types, without the explainer a layer page needs
+Migration impact: packet Classification section + display. No census rewrite. No L0–L9 schema.
+Conflicts or alternatives considered: treating taxonomy.md axes as sufficient (rejected — axes without decision rules become junk drawers). One hybrid label per brand (rejected, already forbidden).
+Receipt IDs: R-TAX, R-CENSUS, R-MAP; Eregion docs/site-page-specs.md §2, packet-template-v2 Classification, MASTER_SPEC labeling doctrine, Tesla packet atoms
+Confidence: high
+```
+
 ## 4. Canonical stress test
 
 Do not rewrite these rows. Recommend controller review against the definitions above.
@@ -306,6 +328,10 @@ Do not rewrite these rows. Recommend controller review against the definitions a
 | Popularity / Llama revenue as a taxonomy rule | GMGN would become a native DEX. Rejected. |
 | `media/` leaf for Hood Insider | Not a product. Role=observe, leaf=null. |
 | Merging on ticker | Arrow vs Arrows vs ArrowPad; Arc vs Arcus; FOMO token vs FOMO venue; HFUN vs hood.fun. |
+| Copying Eregion L0–L9 onto RH | Wrong stack. Lift the *craft* (decision rules, why-mapped, atoms), not the AI/robotics layers. |
+| Hybrid slug (`CDP + launchpad`, `Agent + factory`) as the card title | Axes stay separate. Dual is two atoms with a split, never a concatenated label. |
+| Labeling the brand, averaging the machines | Eregion: “label the asset, not the company.” Pons-the-pad ≠ PONS-the-token ≠ CASHCAT. |
+| One-member sub-cells minted for a single brand | Eregion capability rule: mint only with ≥2 real names or 1 + credible pipeline. (4,4) qualifies (up + SwapHood). `livestream-pad` is a proposal, not a published leaf, until Rallypad is confirmed. |
 
 ## 6. Open questions
 
@@ -317,6 +343,8 @@ Do not rewrite these rows. Recommend controller review against the definitions a
 6. **Meridian** — one slug with secondary prediction leaf, or two evidence records (perps vs predict) under the same brand?
 7. **Should `launch/other-pad` be deprecated** after a compiler pass, or kept as an honest holding pen? Recommendation: keep, but never as a reader-facing card title (“Token launchpad, mechanism not classified”).
 8. **Flat category enum** — freeze it and display from the tree, or migrate now? This assignment cannot touch schema. The stress-test rows are the migration queue.
+9. **Packet Classification section** — TAX-GROK-010 wants a why-mapped one-liner per leaf, as Eregion packets already require. That is a template change (`docs/templates/research-packet-v1.md`), which this assignment cannot edit. Recommend controller add it.
+10. **Parent-page narratives** — arc / why now / deciding question per domain (launch, trading, credit, rwa-products). Drafted in §9.4 as collector copy; not site copy. Keep out of `content/` until the controller wants them on Icarus doors.
 
 ## 8. Mapping model (parent / child / dual) — TAX-GROK-009
 
@@ -438,3 +466,205 @@ Rules for that view, from this pass:
 - Graduation tokens stay graduation until an independent machine is evidenced.
 - Dependencies cite the subject files; they do not get a standalone profile.
 - Identity collisions stay visible as possible-match, never silently merged.
+- Every mapped leaf carries a why-mapped one-liner (TAX-GROK-010). The card’s one sentence is that line, not a slogan.
+
+## 9. Labeling doctrine — Eregion lift (TAX-GROK-010)
+
+Eregion’s layer page job, from `docs/site-page-specs.md` §2: define the layer in plain language, **explain why each name is mapped here** (teaching the classification model, not listing names), and show structure — sub-cells, chokepoints, open questions, honest quiet. RH needs the same job on launch / trading / credit / rwa-products. It does **not** need L0–L9, value-chain slots, or robotics sub-cells.
+
+Fill-source, as Eregion: **[M]** machine (Llama, Dune, hoodfi, registry CA) · **[C]** curated (census leaf, closed vocabulary) · **[J]** judgment (why-mapped, dual flag, atom split) · **[D]** derived (pair_rank from volume). A card that mixes these without saying so is slop.
+
+### 9.1 Doctrine (the one-page analyst card)
+
+Lifted from Eregion’s labeling doctrine and onboarding rules, rewritten for RH. Each line is a mapping constraint, not a vibe.
+
+1. **Label the atom, not the brand.** Averaging unrelated machines under one slug is the wrong granularity — split it. Pons-the-pad, PONS-the-token, and CASHCAT are three atoms. Tesla’s vehicles vs Optimus is the same move; LONG vs $AI vs official NVDA is the RH case. [J]
+2. **Split a real atom only when you would tag that part differently.** Bankr’s agent-execution and its stock-paired factory, yes. Tesla’s HR department, no. Custom silicon under FSD, no (embedded, not a fifth product). A “roadmap perps” tab on a pad, no. [J]
+3. **Multi-tag is the default; a concatenated hybrid is forbidden.** Primary leaf + secondary leaves + object type + edges. Never `CDP + launchpad` as a stored or displayed category (taxonomy.md already bans this; the doctrine is why). [C]
+4. **Every interesting name ends in a leaf mint-or-match.** No peer set = unfinished record. Mint a sub-cell only with ≥2 real names or 1 + credible pipeline (Eregion capability rule). `(4,4)` qualifies: up + SwapHood. Do not mint `Rallypad-leaf`. [C]
+5. **NULL beats a wrong guess.** Unknown mechanism → `other-pad` as a holding pen with the card line “Token launchpad, mechanism not classified,” not a confident wrong child. Missing quote CA → do not invent the registry address. [C]
+6. **Announcements are not mainnet.** `lifecycle: announced` (Denar) is not `mainnet`. Vendor claims < buyer behavior (Llama volume, hoodfi pools, registry CA). [M]
+7. **Vendor marketing < demonstrated mechanism.** Classify by the contract/doc, not the website category. [C]
+8. **Hold contradictory edges.** Partner-and-competitor is normal (Pons graduates into Uniswap; Uniswap is also the imported DEX parent). Tension is the signal. [J]
+9. **No naked labels, no naked edges.** Why-mapped one-liner + receipt + as-of, or it does not ship. [C/J]
+10. **Closed vocabulary: add or retire, never silently swap.** A changed definition is a new leaf. The compiler resolves disagreements; the last agent to write does not win (taxonomy.md §5.7). [C]
+
+### 9.2 The boundary rule (RH analogue of “owns the metal”)
+
+Eregion’s exemplar: *owns/leases the metal → L3; software on others’ metal → L6; both → both, with the revenue split.* RH’s exemplar is origin, not metal:
+
+```
+originates the mint          → launchpad
+originates the pool/book     → dex
+originates credit            → lending
+mint AND pool, one control   → both, with a volume split (launch vol vs post-grad vol)
+output of a mint             → pad-coin; parent = pad; quote = official stock (dependency)
+official registry asset      → stock-token (quote leg, never parent of a meme)
+wraps someone else's mint/book → surface / execution frontend (observe) — not a pad, not a dex
+```
+
+That single rule is what stops FOMO from becoming a launchpad, GMGN from becoming a DEX, official NVDA from becoming the parent of $AI, and Pons from being filed as “the DEX.”
+
+### 9.3 Parent pages — definition, rule, worked examples, exclusion, sub-cells
+
+Each parent below is the RH equivalent of an Eregion layer page §2.2–2.4. Not site copy. Mapping copy the compiler and packets should obey.
+
+#### Launchpad
+
+**Definition.** A product that *originates* a token mint on RH via a documented mechanism. [C]
+
+**Decision rule.** If it does not originate the mint, it is not a pad — it is a surface, a frontend, or a coin. Mechanism child is what happens in the contracts at launch, not the brand. [C]
+
+**Worked examples.**
+- **Pons** — bonding-curve mint, then Uni v4 post-grad swaps it still takes fees on. Launch atom + venue atom. Dual-map, volume split. Why-mapped: *“Mints on a curve; keeps fee on the book after graduation.”* [M+J]
+- **LONG** — stock-paired factory. The mint *is* a pair against an official registry stock. Why-mapped: *“Factory that quotes memes vs official stocks; not a curve.”* [C]
+- **Bankr** — agent-execution is the durable machine; stock-paired factory is a secondary atom. Why-mapped: *“Agent platform that also runs a stock-paired factory — factory is secondary, not a DEX.”* [J]
+
+**Deliberate exclusion.** **FOMO / Pump.fun / GMGN** look like “where coins happen.” They do not originate the mint. Surfaces and execution frontends, role=`observe`. Why-not-mapped: *“Discovery or routing over other pads’ output.”* [J]
+
+**Sub-cells.** bonding-curve · stock-paired-factory · uni-pool-launch · hook-programmable · nft-gated-launch · livestream-pad *(proposed, TAX-GROK-002)* · creator-pad *(proposed)* · other-pad *(holding pen, never a card title)*. Honest quiet: livestream and creator-keep are thin; say “expansion inbound” rather than stuffing Rallypad/Ctrl Fi into bonding-curve. [C]
+
+#### DEX (trading)
+
+**Definition.** A venue that originates or hosts the pool or orderbook. [C]
+
+**Decision rule.** Custody/originate the pool → DEX. Wrap someone else’s → `trading/telegram-exec`, observe. Native vs imported is a control-plane test, not a TVL test. `(4,4)` is a child of DEX: native AMM whose swap fees are routed into a protocol token (buyback / ve / h33 / rebase) — not a peer of Launchpad, not `Fee-routing protocol` as a product family. [C]
+
+**Worked examples.**
+- **Uniswap** — imported AMM dependency. Why-mapped: *“The book most pads graduate into; imported, not native.”* [C]
+- **up** — native AMM, (3,3)-style emissions and buyback. Why-mapped: *“Native DEX · fees to the protocol token — 4,4 child.”* [C]
+- **SwapHood** — 95% of fees buy HOOD into h33. Why-mapped: *“Native DEX · flywheel-44, HOOD buyback into h33.”* [C]
+
+**Deliberate exclusion.** **GMGN** is the largest Llama revenue line on the chain and is a wrapper. Why-not-mapped: *“Routes onto venues it does not control.”* **What The Hook** is a MEV hook, not a flywheel token — do not file it as 4,4 because the flat enum says fee-routing. [M+J]
+
+**Sub-cells.** imported · native-amm · flywheel-44 · aggregator · hook-mev · perps-native · perps-imported · telegram-exec. Honest quiet: several observe AMMs (GIGA, Alandale, Orvex) are *ambiguous* native vs imported — leave them ambiguous until a control-plane receipt exists. TVL is not nativeness (TAX-GROK-008). [C]
+
+#### Both (dual-map)
+
+**Definition.** One control plane, two machines — a mint and a venue — dual-tagged with a volume split. [J]
+
+**Decision rule.** Same as Eregion’s “both → both, with the revenue split.” Do not invent a hybrid stored label. Primary is the durable origin (almost always the mint); secondary is the venue. Show both volumes. [J]
+
+**Worked example.** **Pons** — Llama fees ~$4.73m sit on the post-grad book, but the product people use to *create* a coin is the curve. Primary launchpad, secondary DEX, both numbers on the card. [M+J]
+
+**Deliberate exclusion.** **Bankr** is launchpad + agent, not launchpad + DEX. **Arrow** is a CDP; ArrowPad.fun is a different control plane — do not dual-map them onto one slug. **Meridian** is perps + predict on one brand: secondary `markets/prediction`, not “both” in the launchpad+DEX sense. [J]
+
+#### Lending (credit)
+
+**Definition.** A product that originates credit — isolated market, CDP, primitive, overlay, Morpho curator, or uncollateralized. [C]
+
+**Decision rule.** Originates a loan or vault of loans → credit. A DEX with a lending tab on the website is still a DEX until the loan machine has its own control plane. Morpho is a dependency; a RH curator on Morpho is `credit/morpho-curator`. [C]
+
+**Worked examples.**
+- **Arrow** — CDP. Why-mapped: *“Mints against collateral; not a pad.”* [C]
+- **Denar / Native Credit Pool** — isolated money market. Why-mapped: *“Isolated lending market.”* Denar is `announced`; do not display as mainnet. [C]
+- **Longbow** — credit overlay. Why-mapped: *“Overlay on a primitive, not the primitive.”* [C]
+- **Gami Labs** — Morpho curator. Why-mapped: *“Curates Morpho vaults on RH; imported primitive underneath.”* [C]
+
+**Deliberate exclusion.** **up / SwapHood** route fees to a token. That is a DEX flywheel, not lending. **Pons** taking swap fees is not a money market. [J]
+
+**Sub-cells.** lending-primitive · morpho-curator · isolated-money-market · cdp · credit-overlay · rwa-lending · uncollateralized. Honest quiet: this parent is thin. Render “expansion inbound” rather than stretching DEX names into credit to fill the grid. [C]
+
+#### Pad-coin (child, not a domain)
+
+**Definition.** Output of a launchpad. Not a protocol until it has an independent control plane. The parent is the **pad**. The quote, when stock-paired, is an **official stock token** (dependency). Rank is inside that stock’s pair cohort. [C]
+
+**Decision rule.** If you would not tag the token’s *machine* differently from “this pad minted me,” it stays `launch/graduation-token` + pad-coin object type. `rwa-products/stock-paired-token` is a secondary leaf only when the pairing is the durable mechanism (LONG/Bankr factory output), never a reason to call the meme an RWA product as if it were the stock. [J]
+
+**Worked examples.**
+- **AI / Artificial Inu** — launched on **LONG**, quoted vs official **NVDA** (`0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec` / registry), **rank 1** of the NVDA-paired meme cohort. Why-mapped: *“LONG pad-coin · official NVDA · rank 1 of that pair — not the stock, not a protocol.”* [M+C]
+- **BONER** — pad-coin × official **HIMS**. Same shape. [C]
+- **REALSTONK / REAL** — same official NVDA quote, **Bankr** pad, much smaller. Why-mapped: *“Bankr pad-coin · official NVDA · not rank 1.”* The point of rank is that this exists and is not AI. [M]
+
+**Deliberate exclusion.** Token named NVIDA, ticker **$NVDA**, CA `0x775C8f9EFd250D238b5009a2B2a977e1e095CBA3` (Bankr) — a meme whose *ticker* is NVDA, paired to official NVDA. Why-not-mapped-as-the-stock: *“Ticker collision; quote CA is the tell, not the ticker string.”* Official NVDA is never the parent of $AI. [M+J]
+
+**Required edges** (from TAX-GROK-009): `launched_on`, `quote_asset`, `quote_ca`, `pair_rank` [D], `pad_volume` [M].
+
+#### Stock-token (dependency)
+
+**Definition.** Official registry quote asset. Role=`dependency`. Never a standalone profile, never the parent of a meme. [C]
+
+**Deliberate exclusion.** Filing “NVDA coins” as children of NVDA. The parent of $AI is LONG. The quote is NVDA. [J]
+
+### 9.4 Parent narratives (arc / why now / deciding question)
+
+Eregion form, from `docs/sector-narratives.md`: three beats, receipted; plus who holds the power and where the money enters. Information, not advice. Collector draft only.
+
+**Launch.** *Arc.* RH went from a stock-token venue to a factory chain: pads mint coins, some against official stocks, then graduate into Uni books. *Why now.* Pons is the fee engine; LONG/Bankr defined the stock-paired meta; Dune shows Flap as launch-count spam against Pons as volume. *Deciding question.* Which mint mechanism actually produces the books people trade — curve, stock-paired factory, or Uni-pool — and does pad volume distinguish the real factory from the clone? *Resolves on* pad volume, graduation volume, and quote-CA matches. *Power:* Pons (volume), LONG/Bankr (stock-pair meta). *Money enters:* pad-coins (AI/NVDA, BONER/HIMS) and pad tokens (PONS) — descriptive, not advised. [M+C]
+
+**Trading.** *Arc.* Imported Uniswap is the default book; native AMMs and 4,4 flywheels are trying to keep fees on RH. *Why now.* up and SwapHood are stuffed into `Fee-routing protocol` as if that were a peer of Launchpad. *Deciding question.* Is a native AMM actually native (control plane on RH) or an imported fork with TVL? *Resolves on* admin/control-plane receipts, not Llama TVL. *Power:* Uniswap (imported book), Pons post-grad, 4,4 tokens. *Honest quiet:* GIGA/Alandale/Orvex stay ambiguous. [C+J]
+
+**Credit.** *Arc.* Morpho is the imported primitive; native isolated markets and CDPs are trying to form. *Why now.* Lending is a real parent with almost no live subjects. *Deciding question.* Does RH grow a native credit market, or remain a Morpho sidecar? *Resolves on* Denar/Native Credit Pool mainnet evidence, Arrow usage. *Honest state:* thin — render “expansion inbound,” do not fill with DEXes. [C]
+
+**Stock-paired / RWA quote.** *Arc.* Official stock tokens are the quote asset; the interesting objects are memes quoting them. *Why now.* Many NVDA-paired coins; ticker collisions (NVIDA / $NVDA). *Deciding question.* Which pair is the real book, and does the quote CA match the registry? *Resolves on* hoodfi/Uni cohort rank + registry CA. *Power:* stock-token issuer (dependency), LONG factory, the rank-1 pair (AI). *Money enters:* the ranked pad-coin, not the ticker string. [M+C]
+
+### 9.5 Why-mapped column (required intake field)
+
+Eregion packets: “One line of rationale per tag (these become the layer-page why-mapped column).” RH packets should carry the same Classification block. This assignment cannot edit `docs/templates/research-packet-v1.md`; the shape to add is:
+
+```
+## Classification
+entity_kind: …
+primary_domain: …
+primary_leaf: <path> — <one-line why-mapped>
+secondary_leaves:
+  - <path> — <one-line why-mapped>
+object_type: launchpad | dex | both | lending | pad-coin | stock-token | …
+dex_family: imported | native-amm | flywheel-44   # dex/both only
+launched_on / quote_asset / quote_ca / pair_rank  # pad-coin only
+role / lifecycle / coverage / evidence_state
+```
+
+Worked why-mapped lines for the names that currently collapse:
+
+| Name | Why-mapped |
+| --- | --- |
+| Pons | Mints on a bonding curve; keeps fee on the Uni v4 book after graduation — launch atom + venue atom. |
+| LONG | Stock-paired factory; the mint is a pair against an official registry stock, not a curve. |
+| Bankr | Agent execution is the durable machine; stock-paired factory is a secondary atom, not a DEX. |
+| Uniswap | Imported AMM; the book most pads graduate into. Dependency, not a native venue. |
+| up | Native AMM whose swap fees buy the protocol token — 4,4 child of DEX, not a launchpad. |
+| SwapHood | Native AMM; 95% fees buy HOOD into h33 — flywheel-44, not “fee-routing” as a peer of Launchpad. |
+| Fables | Native AMM. Review the fee-routing enum; the tree is the honest label. |
+| What The Hook | MEV-redistribution hook, not a 4,4 flywheel. |
+| Artificial Inu | LONG pad-coin · official NVDA · rank 1 of the NVDA-paired cohort — not the stock, not a protocol. |
+| REALSTONK | Bankr pad-coin · official NVDA · same quote, different pad, not rank 1. |
+| NVIDA / $NVDA trap | Bankr meme whose ticker is NVDA; CA `0x775C…CBA3` — ticker collision, not the registry asset. |
+| BONER | Pad-coin quoted vs official HIMS; parent is the pad, not HIMS. |
+| CASHCAT | Pons mascot / pad-coin, not a protocol. |
+| GMGN | Execution frontend wrapping RH venues it does not control — observe, not a DEX. |
+| FOMO / Pump.fun | Discovery surfaces, not pads. |
+| Arrow | CDP. ArrowPad.fun is a different control plane — do not merge. |
+| Denar | Isolated lending market, announced — credit, not trading, not mainnet. |
+| Meridian | Perps venue primary; prediction is a secondary atom on the same brand. |
+| TickerYard | Synthetic-asset leaf; the flat enum “Oracle / infra” is a stretch. |
+| MosaicETF | Wallet-mirror basket (proposed leaf) — copies a wallet, claims redeemability; not an index vault. |
+
+### 9.6 What we are *not* lifting from Eregion
+
+- L0–L9 stack, L8.C component tree, value-chain slots (`actuation`, `precision-components`, …).
+- Chokepoint scores / 5, purity, signed baskets, expression menus — those are fund-analyst machinery, not a chain map.
+- SectorTags of six robotics words.
+- Company-as-security thesis purity.
+
+What we *are* lifting: decision rules, why-mapped, atoms, dual-with-split, worked exclusion, honest quiet, fill-source honesty, closed vocabulary, NULL > wrong, mint-or-match, announcements ≠ production.
+
+### 9.7 Standard view, after doctrine
+
+The card contract in §7 plus TAX-GROK-009 type lines, now with the why-mapped sentence as the body:
+
+```
+NAME · SYMBOL
+<plain-English parent · sub-cell>          e.g. Launchpad · bonding-curve
+                                           e.g. Native DEX · 4,4
+                                           e.g. Pad-coin · LONG × official NVDA · rank 1
+<Lifecycle> · <Coverage> · <Evidence>
+
+<why-mapped one-liner>
+
+Secondary: <leaf> · <leaf>
+Role: subject | dependency | observe | graduation
+Updated <date> · as-of <date>
+```
+
+A visitor leaves understanding *why it is here*, not having seen a list. That is the Eregion test. RH fails it today whenever a card says `Fee-routing protocol`, `RWA`, or `$NVDA` without pad + quote CA + rank.
