@@ -1,5 +1,6 @@
 import { validateContent } from "./lib/validate-content.mjs";
 import { validateNameIntakeDirectory } from "./lib/name-intake.mjs";
+import { validateResearchPacketDirectory } from "./lib/research-packet.mjs";
 
 const args = process.argv.slice(2);
 const release = args.includes("--release");
@@ -9,6 +10,8 @@ const { errors, warnings, content } = await validateContent(root, { release });
 if (root === "content") {
   const intake = await validateNameIntakeDirectory();
   errors.push(...intake.errors);
+  const packets = await validateResearchPacketDirectory();
+  errors.push(...packets.errors);
 }
 
 for (const w of warnings) console.warn(`warn  ${w}`);

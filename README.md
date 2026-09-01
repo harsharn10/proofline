@@ -246,7 +246,8 @@ compatibility configuration in case a Vercel deployment is intentionally restore
 ## Grok Bot
 
 Automated research intake (X posts, on-chain events, official announcements) reaches this repo only
-as a pull request from a `grok/<YYYY-MM-DD>` branch, opened via the GitHub REST API. The full contract
+as a pull request from a `grok/<YYYYMMDD>/<work-id>` branch, opened via the GitHub REST API. The full
+contract
 — what it may collect, where it may write, what it must never write, evidence rules, and the exact
 file shapes — is [`docs/integrations/grok-bot.md`](docs/integrations/grok-bot.md).
 
@@ -259,6 +260,13 @@ control, security, team, economics, activity and communications; and records pos
 conflicts. `npm run validate` checks its schema and all internal references. Conflicts are never
 last-write-wins: [`docs/integrations/grok-bot.md`](docs/integrations/grok-bot.md) §3 defines field-specific
 source precedence, authenticity, resolution and merge rules.
+
+Lossless collector, verifier and compiler handoffs live at
+`research/inbox/packets/<slug>/<work-id>.md`. `npm run validate` enforces their v1 headers, complete
+section structure, full base SHA, work/date and path agreement, owned-slug/allowed-path boundaries,
+producer roles, prior-packet requirements, work-ID consistency, and controller/channel authority
+limits. When one work ID legitimately spans several slugs, every packet must repeat the same assignment
+header.
 
 ## Voice and conduct lint
 

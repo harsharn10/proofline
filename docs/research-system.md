@@ -203,8 +203,14 @@ migration:
   verifier packet rather than impersonating Grok in a candidate dossier.
 - canonical census/project files do not yet preserve all mechanism tags, provenance, reproductions, or
   conflict records;
-- feed IDs and source IDs are not yet fully idempotent;
-- packet shape and assignment ownership are not yet machine-validated.
+- feed IDs and source IDs are not yet fully idempotent.
+
+`npm run validate` now checks every Markdown packet under `research/inbox/packets/**`: required
+frontmatter and sections, full base SHA, work/date consistency, packet path, exact allowed paths,
+owned-slug containment, producer/role boundaries, prior-packet requirements, consistent assignment
+headers when a work ID spans multiple slugs, and collector/verifier attempts to set controller or
+channel disposition. Evidence completeness and the truth of receipts still require the independent
+verification and controller passes above.
 
 Until those migrations land, the packet is the lossless handoff and the compiler records any field it
 cannot safely emit under `Deferred canonical mappings` in the operations log.

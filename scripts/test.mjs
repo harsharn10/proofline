@@ -21,6 +21,7 @@ import { validateContent } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
 import { validateNameIntake } from "./lib/name-intake.mjs";
+import { validateResearchPacket, validateResearchPacketDirectory } from "./lib/research-packet.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
@@ -694,6 +695,89 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.ok(collision.some((error) => error.includes("possible_matches")), "normalized canonical match must be disclosed");
     console.log("ok   standardized name intake");
   } catch (err) { failures++; console.error(`FAIL standardized name intake: ${err.message}`); }
+}
+
+// Research packets: machine-enforce provenance, ownership, path isolation and the complete handoff shape.
+{
+  const template = await readFile("docs/templates/research-packet-v1.md", "utf8");
+  const packet = ({
+    slug = "example",
+    name = "Example Protocol",
+    workId = "WORK-20260901-grok-example",
+    producer = "grok-bot",
+    role = "collector",
+    tier = "seed",
+    prior = "null",
+  } = {}) => template
+    .replaceAll("WORK-YYYYMMDD-producer-slug", workId)
+    .replace("producer: producer-id", `producer: ${producer}`)
+    .replace("role: collector # collector | verifier | compiler", `role: ${role} # collector | verifier | compiler`)
+    .replace("base_sha: full-40-character-main-sha", `base_sha: ${"a".repeat(40)}`)
+    .replaceAll("project-slug", slug)
+    .replaceAll("Project Name", name)
+    .replace("packet_tier: seed # seed | full | update", `packet_tier: ${tier} # seed | full | update`)
+    .replace("as_of: YYYY-MM-DDTHH:MM:SSZ", "as_of: 2026-09-01T12:00:00Z")
+    .replace("prior_packet: null", `prior_packet: ${prior}`)
+    .replace("- Channel disposition: `not-evaluated | pending | publish | roundup | site-only | hold`", "- Channel disposition: not-evaluated");
+  const pathFor = (slug, workId) => `research/inbox/packets/${slug}/${workId}.md`;
+  const validText = packet();
+  const validPath = pathFor("example", "WORK-20260901-grok-example");
+  const verifierText = packet({
+    workId: "WORK-20260901-supergrok-example",
+    producer: "supergrok-bot",
+    role: "verifier",
+    prior: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  });
+  const invalidSha = validText.replace(`base_sha: ${"a".repeat(40)}`, "base_sha: abc123");
+  const outsideOwnership = validText.replace(
+    `  - ${validPath}`,
+    `  - ${validPath}\n  - content/projects/example.yaml`,
+  );
+  const wrongSection = validText.replace("## 7. Control and security", "## 7. Control & security");
+  const duplicateSection = `${validText}\n## 7. Control and security\nDuplicate.\n`;
+  const controllerDecision = validText.replace("- Controller disposition:", "- Controller disposition: approved");
+  const channelDecision = validText.replace("- Channel disposition: not-evaluated", "- Channel disposition: publish");
+  try {
+    assert.deepEqual(validateResearchPacket(validText, validPath), [], "complete collector packet passes");
+    assert.deepEqual(
+      validateResearchPacket(verifierText, pathFor("example", "WORK-20260901-supergrok-example")),
+      [],
+      "verifier packet with prior work passes",
+    );
+    assert.ok(validateResearchPacket(invalidSha, validPath).some((error) => error.includes("base_sha")), "short base SHA rejected");
+    assert.ok(validateResearchPacket(validText, "research/inbox/packets/wrong/file.md").some((error) => error.includes("packet path")), "path/header mismatch rejected");
+    assert.ok(validateResearchPacket(outsideOwnership, validPath).some((error) => error.includes("does not own")), "collector cannot claim canonical profile path");
+    assert.ok(validateResearchPacket(wrongSection, validPath).some((error) => error.includes("missing required section")), "renamed required section rejected");
+    assert.ok(validateResearchPacket(duplicateSection, validPath).some((error) => error.includes("duplicate required section")), "duplicate required section rejected");
+    assert.ok(validateResearchPacket(controllerDecision, validPath).some((error) => error.includes("Controller disposition")), "collector cannot approve its packet");
+    assert.ok(validateResearchPacket(channelDecision, validPath).some((error) => error.includes("Channel disposition")), "collector cannot authorize channel publication");
+    assert.ok(validateResearchPacket(
+      packet({ workId: "WORK-20260901-supergrok-example", producer: "supergrok-bot", role: "verifier" }),
+      pathFor("example", "WORK-20260901-supergrok-example"),
+    ).some((error) => error.includes("require prior_packet")), "verifier must identify prior work");
+
+    const directory = await mkdtemp(join(tmpdir(), "proofline-packets-"));
+    try {
+      const sharedWork = "WORK-20260901-grok-shared";
+      await mkdir(join(directory, "one"), { recursive: true });
+      await mkdir(join(directory, "two"), { recursive: true });
+      const sharedPaths = [pathFor("one", sharedWork), pathFor("two", sharedWork)];
+      const sharedPacket = (slug, name) => packet({ slug, name, workId: sharedWork })
+        .replace(`owned_slugs: [${slug}]`, "owned_slugs: [one, two]")
+        .replace(`  - ${pathFor(slug, sharedWork)}`, sharedPaths.map((path) => `  - ${path}`).join("\n"));
+      await writeFile(join(directory, "one", `${sharedWork}.md`), sharedPacket("one", "One"));
+      await writeFile(join(directory, "two", `${sharedWork}.md`), sharedPacket("two", "Two"));
+      const sharedResult = await validateResearchPacketDirectory(directory);
+      assert.deepEqual(sharedResult.errors, [], "one assignment may carry consistent packets for multiple slugs");
+
+      await writeFile(join(directory, "two", `${sharedWork}.md`), packet({ slug: "two", name: "Two", workId: sharedWork }));
+      const directoryResult = await validateResearchPacketDirectory(directory);
+      assert.ok(directoryResult.errors.some((error) => error.includes("assignment header inconsistent")), "a reused work id cannot describe two assignments");
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+    console.log("ok   research packet contract");
+  } catch (err) { failures++; console.error(`FAIL research packet contract: ${err.message}`); }
 }
 
 // Task 2 — feed schema: kind enum and account handle pattern.
