@@ -51,3 +51,14 @@ jobs:
       - name: Site smoke test (boots the build, hits every loader route, checks for uncapped leakage)
         working-directory: site
         run: npm run smoke
+
+      - name: Cloudflare Workers build
+        working-directory: site
+        run: npm run build:cloudflare
+
+      - name: Cloudflare Workers package check
+        run: npm run cloudflare:dry
+
+      - name: Cloudflare Workers smoke test
+        working-directory: site
+        run: npm run cloudflare:smoke

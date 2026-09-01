@@ -1,8 +1,7 @@
-import fs from "node:fs";
-import path from "node:path";
 import { createHash } from "node:crypto";
 import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
+import rawContent from "virtual:proofline-content";
 import type {
   ChannelDelivery,
   ChannelEvent,
@@ -73,11 +72,7 @@ type GitHubContent = { sha: string; content: string; encoding: string };
 
 const REVIEW_PATH = "ops/telegram-review.json";
 const CHANGELOG_PATH = "content/changelog.yaml";
-
-function repoRoot(): string {
-  const cwd = process.cwd();
-  return cwd.endsWith(`${path.sep}site`) ? path.resolve(cwd, "..") : cwd;
-}
+const SENT_STATE_PATH = "ops/telegram-state.json";
 
 function entryKey(entry: ChangelogEntry): string {
   return `${entry.date}|${entry.slug}|${entry.type}|${entry.title}`;
@@ -112,44 +107,28 @@ function prooflineView(derived: {
   return `${derived.score}/100 · ${derived.risk} risk\n${derived.confidence}% confidence${derived.provisional ? " · Provisional" : ""}`;
 }
 
-function readJson<T>(file: string, fallback: T): T {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8")) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function loadQueue(viewer: string): ReviewQueue {
-  const root = repoRoot();
-  const changelog = YAML.parse(
-    fs.readFileSync(path.join(root, CHANGELOG_PATH), "utf8"),
-  ) as ChangelogEntry[];
-  const ledger = readJson<ReviewLedger>(path.join(root, REVIEW_PATH), {
-    version: 2,
-    channel_enabled: false,
-    decisions: {},
-  });
-  const sentState = readJson<SentState>(path.join(root, "ops/telegram-state.json"), {
-    sent_keys: [],
-  });
+async function loadQueue(principal: ReviewPrincipal): Promise<ReviewQueue> {
+  const api = `https://api.github.com/repos/${REVIEW_REPOSITORY}`;
+  const contentUrl = (file: string) =>
+    `${api}/contents/${file}?ref=${encodeURIComponent(REVIEW_BRANCH)}`;
+  const [changelogFile, reviewFile, sentStateFile] = await Promise.all([
+    githubJson<GitHubContent>(contentUrl(CHANGELOG_PATH), principal.githubToken),
+    githubJson<GitHubContent>(contentUrl(REVIEW_PATH), principal.githubToken),
+    githubJson<GitHubContent>(contentUrl(SENT_STATE_PATH), principal.githubToken),
+  ]);
+  const changelog = YAML.parse(decodeContent(changelogFile)) as ChangelogEntry[];
+  const ledger = JSON.parse(decodeContent(reviewFile)) as ReviewLedger;
+  const sentState = JSON.parse(decodeContent(sentStateFile)) as SentState;
   const sent = new Set(sentState.sent_keys ?? []);
-  const derived = readJson<{
+  const derived = JSON.parse(rawContent.derived) as {
     projects?: Record<
       string,
       { score?: number | null; risk?: string | null; confidence?: number | null; provisional?: boolean }
     >;
-  }>(path.join(root, "build", "derived.json"), { projects: {} });
+  };
 
-  const names = new Map<string, string>();
-  const projectDir = path.join(root, "content", "projects");
-  for (const file of fs.readdirSync(projectDir).filter((name) => name.endsWith(".yaml"))) {
-    const project = YAML.parse(fs.readFileSync(path.join(projectDir, file), "utf8")) as {
-      slug: string;
-      name: string;
-    };
-    names.set(project.slug, project.name);
-  }
+  const census = YAML.parse(rawContent.census) as Array<{ slug: string; name: string }>;
+  const names = new Map(census.map((entry) => [entry.slug, entry.name]));
 
   const items = changelog
     .filter(isChannelCandidate)
@@ -192,7 +171,7 @@ function loadQueue(viewer: string): ReviewQueue {
   return {
     channelEnabled: ledger.channel_enabled === true,
     repository: REVIEW_REPOSITORY,
-    viewer,
+    viewer: principal.login,
     lastSentAt: sentState.last_sent_at ?? null,
     counts,
     items,
@@ -295,7 +274,7 @@ function requirePrincipal(
 
 export const getReviewQueue = createServerFn({ method: "GET" })
   .middleware([reviewFunctionProtection])
-  .handler(async ({ context }): Promise<ReviewQueue> => loadQueue(requirePrincipal(context).login));
+  .handler(async ({ context }): Promise<ReviewQueue> => loadQueue(requirePrincipal(context)));
 
 export const moderateTelegram = createServerFn({ method: "POST" })
   .middleware([reviewFunctionProtection])

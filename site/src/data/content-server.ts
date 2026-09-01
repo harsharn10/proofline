@@ -1,7 +1,6 @@
-import fs from "node:fs";
-import path from "node:path";
 import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
+import rawContent from "virtual:proofline-content";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
 import { headlineMetric } from "./types";
 import type {
@@ -29,20 +28,12 @@ import type {
   TreeRef,
 } from "./types";
 
-// Repo layout (docs/superpowers/specs/2026-08-30-content-system-design.md §4):
-//   proofline/content/...   proofline/build/derived.json   proofline/site/  (this app)
-// Dev runs with cwd at site/; a root-level CI build may run with cwd at the repo root.
-function repoRoot(): string {
-  const cwd = process.cwd();
-  return cwd.endsWith(`${path.sep}site`) ? path.resolve(cwd, "..") : cwd;
+function parseYaml<T>(raw: string): T {
+  return YAML.parse(raw) as T;
 }
 
-function parseYamlFile<T>(filePath: string): T {
-  return YAML.parse(fs.readFileSync(filePath, "utf8")) as T;
-}
-
-function parseJsonFile<T>(filePath: string): T {
-  return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
+function parseJson<T>(raw: string): T {
+  return JSON.parse(raw) as T;
 }
 
 // loadContent() builds the whole bundle in one pass for every server function — a missing
@@ -50,25 +41,25 @@ function parseJsonFile<T>(filePath: string): T {
 // and every dossier page. Missing → fallback silently (feed files are legitimately
 // optional). Present-but-unparsable → warn server-side naming the file, then fall back the
 // same as missing.
-function readYamlOrWarn<T>(filePath: string, slug: string, fallback: T): T {
-  if (!fs.existsSync(filePath)) return fallback;
+function readYamlOrWarn<T>(raw: string | undefined, label: string, slug: string, fallback: T): T {
+  if (raw === undefined) return fallback;
   try {
-    return parseYamlFile<T>(filePath);
+    return parseYaml<T>(raw);
   } catch (err) {
     console.warn(
-      `[content-server] ${slug}: failed to parse ${filePath} — ${err instanceof Error ? err.message : String(err)}`,
+      `[content-server] ${slug}: failed to parse ${label} — ${err instanceof Error ? err.message : String(err)}`,
     );
     return fallback;
   }
 }
 
-function readResearchOrWarn(filePath: string, slug: string): Research {
-  if (!fs.existsSync(filePath)) return { sections: [] };
+function readResearchOrWarn(raw: string | undefined, slug: string): Research {
+  if (raw === undefined) return { sections: [] };
   try {
-    return parseResearchMarkdown(fs.readFileSync(filePath, "utf8"));
+    return parseResearchMarkdown(raw);
   } catch (err) {
     console.warn(
-      `[content-server] ${slug}: failed to parse ${filePath} — ${err instanceof Error ? err.message : String(err)}`,
+      `[content-server] ${slug}: failed to parse research/${slug}.md — ${err instanceof Error ? err.message : String(err)}`,
     );
     return { sections: [] };
   }
@@ -197,15 +188,11 @@ type ServerContent = {
 };
 
 function loadContent(): ServerContent {
-  const root = repoRoot();
-  const contentDir = path.join(root, "content");
-  const buildDir = path.join(root, "build");
-
-  const site = parseYamlFile<SiteConfig>(path.join(contentDir, "site.yaml"));
-  const changelogAll = parseYamlFile<ChangelogEntry[]>(path.join(contentDir, "changelog.yaml"));
-  const accounts = parseYamlFile<AccountEntry[]>(path.join(contentDir, "accounts.yaml"));
-  const census = parseYamlFile<CensusEntry[]>(path.join(contentDir, "census.yaml"));
-  const derivedFile = parseJsonFile<DerivedFile>(path.join(buildDir, "derived.json"));
+  const site = parseYaml<SiteConfig>(rawContent.site);
+  const changelogAll = parseYaml<ChangelogEntry[]>(rawContent.changelog);
+  const accounts = parseYaml<AccountEntry[]>(rawContent.accounts);
+  const census = parseYaml<CensusEntry[]>(rawContent.census);
+  const derivedFile = parseJson<DerivedFile>(rawContent.derived);
 
   const handleBySlug: Record<string, string> = {};
   for (const row of census) if (row.handle) handleBySlug[row.slug] = row.handle;
@@ -222,22 +209,27 @@ function loadContent(): ServerContent {
   }
 
   const dependencies: Record<string, DependencyCard> = {};
-  for (const file of fs.readdirSync(path.join(contentDir, "dependencies")).filter((f) => f.endsWith(".yaml"))) {
-    const card = parseYamlFile<DependencyCard>(path.join(contentDir, "dependencies", file));
+  for (const raw of Object.values(rawContent.dependencies)) {
+    const card = parseYaml<DependencyCard>(raw);
     dependencies[card.id] = card;
   }
 
-  const projectFiles = fs.readdirSync(path.join(contentDir, "projects")).filter((f) => f.endsWith(".yaml"));
-  const dossiers: Dossier[] = projectFiles.map((file) => {
+  const dossiers: Dossier[] = Object.entries(rawContent.projects).map(([file, raw]) => {
     const slug = file.replace(/\.yaml$/, "");
-    const project = parseYamlFile<ProjectFile>(path.join(contentDir, "projects", file));
-    const sourcesFile = readYamlOrWarn<SourcesFile>(path.join(contentDir, "sources", `${slug}.yaml`), slug, {
+    const project = parseYaml<ProjectFile>(raw);
+    const sourcesFile = readYamlOrWarn<SourcesFile>(
+      rawContent.sources[`${slug}.yaml`],
+      `sources/${slug}.yaml`,
       slug,
-      sources: [],
-    });
-    const research = readResearchOrWarn(path.join(contentDir, "research", `${slug}.md`), slug);
-    const feedPath = path.join(contentDir, "feed", `${slug}.yaml`);
-    const feedFile = readYamlOrWarn<FeedFile | null>(feedPath, slug, null);
+      { slug, sources: [] },
+    );
+    const research = readResearchOrWarn(rawContent.research[`${slug}.md`], slug);
+    const feedFile = readYamlOrWarn<FeedFile | null>(
+      rawContent.feed[`${slug}.yaml`],
+      `feed/${slug}.yaml`,
+      slug,
+      null,
+    );
     const feed = feedFile ? [...feedFile.items].sort((a, b) => b.date.localeCompare(a.date)) : [];
     const changelog = changelogAll
       .filter((entry) => entry.slug === slug)
@@ -460,10 +452,8 @@ export const getExportBundle = createServerFn({ method: "GET" }).handler(async (
 // readYamlOrWarn guards, which are legitimately optional.
 export const getMethodology = createServerFn({ method: "GET" }).handler(async () => {
   const content = getCachedContent();
-  const root = repoRoot();
-  const raw = fs.readFileSync(path.join(root, "content", "methodology.md"), "utf8");
   return {
-    html: renderWholeMarkdown(raw),
+    html: renderWholeMarkdown(rawContent.methodology),
     methodologyVersion: content.site.methodology_version,
   };
 });

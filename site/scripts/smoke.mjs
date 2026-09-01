@@ -41,7 +41,11 @@ async function reviewServerFunctions() {
 }
 
 function startPreview() {
-  const child = spawn("npm", ["run", "preview", "--", "--port", String(PORT), "--strictPort"], {
+  const cloudflare = process.env.SMOKE_RUNTIME === "cloudflare";
+  const args = cloudflare
+    ? ["run", "cloudflare:dev", "--", "--port", String(PORT)]
+    : ["run", "preview", "--", "--port", String(PORT), "--strictPort"];
+  const child = spawn("npm", args, {
     stdio: ["ignore", "pipe", "pipe"],
     detached: true, // own process group, so we can kill vite (npm's grandchild) too
   });

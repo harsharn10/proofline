@@ -1,0 +1,16 @@
+declare module "virtual:proofline-content" {
+  const content: {
+    site: string;
+    changelog: string;
+    accounts: string;
+    census: string;
+    methodology: string;
+    derived: string;
+    dependencies: Record<string, string>;
+    projects: Record<string, string>;
+    sources: Record<string, string>;
+    research: Record<string, string>;
+    feed: Record<string, string>;
+  };
+  export default content;
+}
