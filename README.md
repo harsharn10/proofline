@@ -216,11 +216,17 @@ protection on `main` is still worth doing as a second line of defense.
 
 ## Deployment
 
-Production is deployed to Render from `main` using [`render.yaml`](render.yaml); Render's GitHub
-deployment status and the `/` health check are the production signals. This repository has no
-Cloudflare Workers configuration. A `Workers Builds: proofline` check from a connected Cloudflare app
-is therefore not a production gate and should be disconnected in the provider's Git integration rather
-than added to `automerge-feed.yml`.
+The canonical production site is [proofline-892b.onrender.com](https://proofline-892b.onrender.com),
+deployed from `main` using [`render.yaml`](render.yaml). Render's GitHub deployment status and the `/`
+health check are the production signals.
+
+Cloudflare Workers is retained as a secondary deployment target. [`wrangler.jsonc`](wrangler.jsonc)
+and the `cloudflare:*` scripts build the same site for Workers; the `Workers Builds: proofline` check
+validates that secondary target. It is not the canonical production signal and does not control the
+Telegram publishing gate.
+
+Vercel is not currently connected or deployed. [`site/vercel.json`](site/vercel.json) remains only as
+compatibility configuration in case a Vercel deployment is intentionally restored later.
 
 ## Grok Bot
 
