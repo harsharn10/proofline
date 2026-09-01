@@ -1,12 +1,13 @@
-// Publish-triggered Telegram digest (PRD §9.2): sends changelog entries not yet sent, batched into one
-// message. Never sends when there is nothing new. Credentials come from .env.local (gitignored) or the env.
+// Approval-triggered Telegram digest (PRD §9.2): sends only changelog entries explicitly approved in
+// ops/telegram-review.json and not yet sent, batched into one message. A merge alone never authorizes
+// channel delivery. Credentials come from .env.local (gitignored) or the env.
 //   node scripts/telegram-digest.mjs --dry-run            preview, send nothing, keep state
 //   node scripts/telegram-digest.mjs --since 2026-08-30   only entries on/after a date
 //   node scripts/telegram-digest.mjs --all --limit 5      ignore sent-state, cap entries
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { loadContent } from "./lib/load.mjs";
 import { derive } from "./lib/score.mjs";
-import { selectUnsent, buildDigest, chunkMessage, readDotEnv, entryKey } from "./lib/telegram.mjs";
+import { selectApproved, buildDigest, chunkMessage, readDotEnv, entryKey } from "./lib/telegram.mjs";
 
 const args = process.argv.slice(2);
 const flag = (n) => args.includes(n);
@@ -22,6 +23,9 @@ const siteUrl = env.SITE_URL ?? "", profilePath = env.PROFILE_PATH ?? "/n/";
 const STATE = "ops/telegram-state.json";
 let state = { sent_keys: [] };
 try { state = JSON.parse(await readFile(STATE, "utf8")); } catch { /* first run */ }
+const REVIEW = "ops/telegram-review.json";
+let review = { version: 1, channel_enabled: false, decisions: {} };
+try { review = JSON.parse(await readFile(REVIEW, "utf8")); } catch { /* fail closed */ }
 
 const content = await loadContent("content");
 
@@ -39,10 +43,16 @@ if (testOnly) {
   console.log("Test message sent. No digest state changed.");
   process.exit(0);
 }
-let entries = selectUnsent(content.changelog, state, { since, all })
+let entries = selectApproved(content.changelog, state, review, { since, all })
   .sort((a, b) => a.date.localeCompare(b.date) || a.slug.localeCompare(b.slug));
 if (limit > 0) entries = entries.slice(0, limit);
-if (!entries.length) { console.log("No material research changes since the last digest — nothing sent."); process.exit(0); }
+if (!entries.length) {
+  const reason = review.channel_enabled === true
+    ? "No approved, unsent research changes — nothing sent."
+    : "Channel delivery is paused in ops/telegram-review.json — nothing sent.";
+  console.log(reason);
+  process.exit(0);
+}
 if (markSent) {
   state.sent_keys = [...new Set([...(state.sent_keys ?? []), ...entries.map(entryKey)])];
   await mkdir("ops", { recursive: true });
