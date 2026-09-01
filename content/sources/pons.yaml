@@ -137,7 +137,7 @@ sources:
     publisher: Pons Labs, LLC
     kind: docs
     accessed_at: 2026-08-31T19:52:55Z
-    claim: Current launches use locked Uniswap V3 WETH pools with no curve or migration; the docs publish fees, revenue policy, contracts and integration methods.
+    claim: v1 launches use locked Uniswap V3 WETH pools with no curve or migration; the v1 page publishes fees, revenue policy, contracts and integration methods.
     excerpt: There is no bonding curve and no migration later.
     hash: null
     archive_url: null
@@ -192,7 +192,7 @@ sources:
     publisher: Blockscout (Robinhood Chain explorer)
     kind: explorer
     accessed_at: 2026-08-31T23:10:00Z
-    claim: "The v1 active factory 0xA5aA…1feB is a verified-source, non-proxy contract named PonsLaunchFactory; owner-callable writes in its ABI: addDexConfig, addLaunchConfig, updateLaunchConfig, setDexStatus, setLaunchEnabled, setLaunchFee, setWhitelistedLauncher, transferOwnership/acceptOwnership/renounceOwnership."
+    claim: "The v1 active factory 0xA5aA…1feB is a verified-source, non-proxy contract named PonsLaunchFactory; write functions named in its ABI: addDexConfig, addLaunchConfig, updateLaunchConfig, setDexStatus, setLaunchEnabled, setLaunchFee, setWhitelistedLauncher, transferOwnership/acceptOwnership/renounceOwnership."
     excerpt: "is_contract true; is_verified true; name PonsLaunchFactory; proxy_type null; creator 0xda4bCee76B29EFEc9697Fcf663601c2042043968; compiler v0.8.30; verified_at 2026-07-13; is_fully_verified true; license none"
     hash: null
     archive_url: null
@@ -236,7 +236,7 @@ sources:
     publisher: Blockscout (Robinhood Chain explorer)
     kind: explorer
     accessed_at: 2026-08-31T23:10:00Z
-    claim: "The v2 factory 0x7eD5…EC7e is a verified-source, non-proxy contract named PonsV2LaunchFactory; owner-callable writes in its ABI include addLaunchConfig, updateLaunchConfig, setLaunchEnabled, setLaunchFee, setWhitelistedLauncher, setPairTokenApproved, setPairTokenEconomics, setSnipeTaxSeconds, setSnipeTaxStartBps, setMaxCreatorTaxBps, setGraduationExecutor, setLaunchDeployer, setLaunchForwarder, setBuybackEnabled, setCreatorFeeRecipient, transferCreatorFeeRecipient, executeCreatorFeeRecipientChange, cancelCreatorFeeRecipientChange, rescueCurveFees, rescueSweptGraduation, forceSweptGraduation, plus launchToken, launchTokenFor, graduate, createGraduatedPool and ownership transfer."
+    claim: "The v2 factory 0x7eD5…EC7e is a verified-source, non-proxy contract named PonsV2LaunchFactory; write functions named in its ABI include addLaunchConfig, updateLaunchConfig, setLaunchEnabled, setLaunchFee, setWhitelistedLauncher, setPairTokenApproved, setPairTokenEconomics, setSnipeTaxSeconds, setSnipeTaxStartBps, setMaxCreatorTaxBps, setGraduationExecutor, setLaunchDeployer, setLaunchForwarder, setBuybackEnabled, setCreatorFeeRecipient, transferCreatorFeeRecipient, executeCreatorFeeRecipientChange, cancelCreatorFeeRecipientChange, rescueCurveFees, rescueSweptGraduation, forceSweptGraduation, plus launchToken, launchTokenFor, graduate, createGraduatedPool and ownership transfer."
     excerpt: "is_contract true; is_verified true; name PonsV2LaunchFactory; proxy_type null; creator 0xFdDE5a1E3cDF791Da71E49F817D70C7ceD72CC36; creation tx 0x3817f297…; compiler v0.8.35; verified_at 2026-08-04; is_fully_verified true"
     hash: null
     archive_url: null
@@ -247,7 +247,7 @@ sources:
     publisher: Blockscout (Robinhood Chain explorer)
     kind: explorer
     accessed_at: 2026-08-31T23:10:00Z
-    claim: "The v2 hook 0xE5e7…e044 is a verified-source, non-proxy contract named V2MemeHook; owner-callable writes in its ABI include setProtocolFeeRecipient, setProtocolFeeShareBps, setHookFeeBps, setCreatorFeeRecipient, setBuybackEnabled, setBuybackBurnBps, setBuybackVault, setFactory, setFeeSweepOperator, setMaxInternalPriceImpactBps, rescuePoolFees, sweepPoolFees, registerPool and ownership transfer, alongside the Uniswap v4 hook callbacks."
+    claim: "The v2 hook 0xE5e7…e044 is a verified-source, non-proxy contract named V2MemeHook; write functions named in its ABI include setProtocolFeeRecipient, setProtocolFeeShareBps, setHookFeeBps, setCreatorFeeRecipient, setBuybackEnabled, setBuybackBurnBps, setBuybackVault, setFactory, setFeeSweepOperator, setMaxInternalPriceImpactBps, rescuePoolFees, sweepPoolFees, registerPool and ownership transfer, alongside the Uniswap v4 hook callbacks."
     excerpt: "is_contract true; is_verified true; name V2MemeHook; proxy_type null; creator 0x4e59b44847b379578588920cA78FbF26c0B4956C (CREATE2 deployer); compiler v0.8.35; verified_at 2026-08-03"
     hash: null
     archive_url: null
@@ -354,11 +354,11 @@ sources:
     available: true
   - id: S33
     url: https://rpc.mainnet.chain.robinhood.com
-    publisher: Robinhood Chain public RPC (chain id 4663), eth_call / eth_getStorageAt reads at block 51242016
+    publisher: Robinhood Chain public RPC (chain id 4663), eth_call / eth_getStorageAt reads at blocks 51242016 and 51485300
     kind: other
-    accessed_at: 2026-08-31T23:04:29Z
-    claim: "owner() on the v1 active and legacy factories and lockers, the v2 factory, hook, buyback vault, launch locker and launch-and-buy router returns 0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd; that address answers getThreshold() = 2, getOwners() = three externally owned accounts (0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e, 0x3825e7b3ff17637b08219e99d78b6c622b73f5b7, 0xfa31fe751c203a623b52fad26b4063abc2ffdf50 — code size 0, nonces 35 / 4 / 0) and VERSION() = 1.4.1; every listed Pons address has code, none has an EIP-1967 implementation or admin slot set, and paused() reverts on all of them."
-    excerpt: "eth_chainId 0x1237; eth_call owner() → 0x263ed295…19dd on 10 of 15 addresses (the token, fee escrow, launch deployer, graduation executor and guard revert); getThreshold() → 2; getOwners() → 3 addresses; VERSION() → 1.4.1; eth_getStorageAt EIP-1967 slots → 0 everywhere; latest block 51242265 at 2026-08-31T23:05:28Z"
+    accessed_at: 2026-09-01T05:54:21Z
+    claim: "owner() on nine of the fourteen documented Pons addresses returns 0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd; that address answers getThreshold() = 2, getOwners() = three externally owned accounts (0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e, 0x3825e7b3ff17637b08219e99d78b6c622b73f5b7, 0xfa31fe751c203a623b52fad26b4063abc2ffdf50 — code size 0, nonces 35 / 4 / 0) and VERSION() = 1.4.1; every listed Pons address has code, none has an EIP-1967 implementation or admin slot set, and paused() reverts on all of them; at block 51485300 the Safe returned no modules and its guard storage slot was zero."
+    excerpt: "eth_chainId 0x1237; owner() → 0x263ed295…19dd on 9 of 14 documented addresses (token, fee escrow, launch deployer, graduation executor and guard revert; Safe has no owner()); getThreshold() → 2; getOwners() → 3 EOAs; VERSION() → 1.4.1; EIP-1967 slots → 0. At block 51485300 (2026-09-01T05:54:21Z), getModulesPaginated(0x1,10) → [] / next 0x1; guard slot 0x4a204f…c34c8 → 0x0."
     hash: null
     archive_url: null
     researcher: harsharn10

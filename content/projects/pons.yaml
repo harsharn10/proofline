@@ -177,7 +177,7 @@ scoring:
     deployment_verifiability:
       level: partial
       evidence: [S17, S18, S19, S22, S23, S24, S25, S26, S27, S28, S29, S30, S20, S21, S33]
-      note: "Thirteen of the fifteen documented contracts were opened on Blockscout with verified source and no proxy, and their names match the docs' labels; the v1 legacy factory and locker are unverified and per-launch curves, tokens and pools are not enumerated. Full needs those two contracts verified (or retired from scope) and a mapped sample of per-launch contracts."
+      note: "Twelve of the fourteen documented contracts were opened on Blockscout with verified source and no proxy; the owner Safe (a verified SafeProxy) was also opened. The contract names match the docs' labels; the v1 legacy factory and locker have unverified source, and per-launch curves, tokens and pools are not enumerated. Full needs those two contracts' source verified (or retired from scope) and a mapped sample of per-launch contracts."
     privileged_power:
       level: zero
       evidence: [S22, S23, S19, S33]
@@ -200,13 +200,13 @@ scoring:
       note: "A security contact address is published; no bug bounty, monitoring, pause/response design or incident process was found. The v2 graduation guard and seven-day stall return are protocol mechanics, not operational safeguards. Partial needs a bounty or a published response process."
     incident_handling:
       level: full
-      evidence: [S5, S6, S8, S32]
-      note: "No incident affecting Pons contracts was found across the desk's X monitoring rounds, DefiLlama history or the explorer; the two address confusions on X are communications issues, not contract incidents. Drops on any disclosed incident without a postmortem."
+      evidence: [S5, S6, S7, S8, S12, S32]
+      note: "No incident affecting Pons contracts was found across the official account, third-party X coverage, the DefiLlama protocol page and history, or the explorer's same-ticker token page; the two address confusions on X are communications issues, not contract incidents. Drops on any disclosed incident without a postmortem."
   factors:
     engineering:
       level: mixed
       positive:
-        - "Explorer-verified source for thirteen contracts (Solidity 0.8.30 for v1, 0.8.35 for v2), with names matching the docs' labels"
+        - "Explorer-verified source for twelve contracts (Solidity 0.8.30 for v1, 0.8.35 for v2), with names matching the docs' labels"
         - "Detailed integration docs for both generations: events, reads, CREATE2 launch addresses, quote maths, Uniswap v4 pool reconstruction"
       negative:
         - "No public repository, test suite, CI or release history linked from the site or docs"
@@ -277,7 +277,7 @@ findings:
         - S13
         - S16
         - S2
-    - text: All fifteen documented Pons addresses are contracts on chain 4663; thirteen of them (the PONS token, the v1 active factory and locker, and all nine v2 contracts) have explorer-verified source and no proxy, with contract names matching the docs' labels.
+    - text: All fourteen documented Pons addresses are contracts on chain 4663; twelve of them (the PONS token, the v1 active factory and locker, and all nine v2 contracts) have explorer-verified source and no proxy, with contract names matching the docs' labels; the owner Safe found by reading owner() is a verified SafeProxy.
       class: verified
       sources:
         - S17
@@ -292,6 +292,9 @@ findings:
         - S28
         - S29
         - S30
+        - S20
+        - S21
+        - S31
     - text: Neither the v1 nor the v2 launch locker exposes an unlock or withdraw function in its verified ABI, so the owner has no liquidity exit path there; no listed address has an EIP-1967 implementation or admin slot set.
       class: verified
       sources:
