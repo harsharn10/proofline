@@ -19,7 +19,7 @@ function ReviewPage() {
   const router = useRouter();
   const [filter, setFilter] = useState<ReviewStatus | "all">("pending");
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [controllerToken, setControllerToken] = useState("");
+  const [githubToken, setGithubToken] = useState("");
   const [drafts, setDrafts] = useState<Record<string, { title: string; detail: string }>>(() =>
     Object.fromEntries(
       queue.items.map((item) => [
@@ -57,7 +57,7 @@ function ReviewPage() {
     try {
       const result = await moderateTelegram({
         data: {
-          controllerToken,
+          githubToken,
           action,
           items: selectedItems.map((item) => ({
             key: item.key,
@@ -83,7 +83,7 @@ function ReviewPage() {
     setNotice(null);
     try {
       const result = await moderateTelegram({
-        data: { controllerToken, action: "set-channel", channelEnabled: enabled },
+        data: { githubToken, action: "set-channel", channelEnabled: enabled },
       });
       setNotice({
         kind: "ok",
@@ -136,22 +136,21 @@ function ReviewPage() {
 
       <section className="controller-panel" aria-label="Channel controls">
         <label>
-          <span>Controller key</span>
+          <span>GitHub review token</span>
           <input
             type="password"
-            value={controllerToken}
-            onChange={(event) => setControllerToken(event.target.value)}
-            placeholder={
-              queue.configured ? "Required to save decisions" : "Configure deployment secrets first"
-            }
+            value={githubToken}
+            onChange={(event) => setGithubToken(event.target.value)}
+            placeholder="Fine-grained token with Contents write"
             autoComplete="off"
+            spellCheck={false}
           />
         </label>
         <div className="controller-actions">
           <button
             type="button"
             className="ctl primary"
-            disabled={busy || !queue.configured || !selectedItems.length}
+            disabled={busy || !githubToken.trim() || !selectedItems.length}
             onClick={() => apply("approve")}
           >
             Approve selected
@@ -159,7 +158,7 @@ function ReviewPage() {
           <button
             type="button"
             className="ctl reject"
-            disabled={busy || !queue.configured || !selectedItems.length}
+            disabled={busy || !githubToken.trim() || !selectedItems.length}
             onClick={() => apply("reject")}
           >
             Reject
@@ -167,7 +166,7 @@ function ReviewPage() {
           <button
             type="button"
             className="ctl"
-            disabled={busy || !queue.configured || !selectedItems.length}
+            disabled={busy || !githubToken.trim() || !selectedItems.length}
             onClick={() => apply("reset")}
           >
             Reset
@@ -176,17 +175,24 @@ function ReviewPage() {
           <button
             type="button"
             className="ctl"
-            disabled={busy || !queue.configured}
+            disabled={busy || !githubToken.trim()}
             onClick={() => setChannel(!queue.channelEnabled)}
           >
             {queue.channelEnabled ? "Pause channel" : "Enable channel"}
           </button>
+          <button
+            type="button"
+            className="ctl"
+            disabled={busy || !githubToken}
+            onClick={() => setGithubToken("")}
+          >
+            Forget token
+          </button>
         </div>
-        {!queue.configured ? (
-          <p className="config-note">
-            Read-only until REVIEW_ADMIN_TOKEN and REVIEW_GITHUB_TOKEN are configured on Render.
-          </p>
-        ) : null}
+        <p className="config-note credential-note">
+          Used only for this action and kept in this tab's memory. Nothing is stored on Render or in
+          browser storage.
+        </p>
         {notice ? <p className={`review-notice ${notice.kind}`}>{notice.text}</p> : null}
       </section>
 
