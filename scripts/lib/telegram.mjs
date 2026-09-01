@@ -1,14 +1,37 @@
 // Pure helpers for the publish-triggered Telegram digest (PRD §9.2). No I/O here.
+import { createHash } from "node:crypto";
 
 export const DISCLAIMER = "Research opinion only — not an audit, guarantee or investment advice.";
+
+export const EVENT_LABELS = {
+  "new-coverage": "NEW COVERAGE",
+  "research-update": "RESEARCH UPDATE",
+  "risk-alert": "RISK ALERT",
+  correction: "CORRECTION",
+  breaking: "DEVELOPING",
+  trending: "TRENDING",
+  roundup: "ROUNDUP",
+};
 
 export function entryKey(e) {
   return e.review_key ?? `${e.date}|${e.slug}|${e.type}|${e.title}`;
 }
 
-/** Only an explicit true opts a changelog entry into channel review and delivery. */
+/** Only an explicit structured publication opts a changelog entry into channel review. */
 export function isChannelCandidate(entry) {
-  return entry?.channel_candidate === true;
+  return entry?.channel != null && typeof entry.channel === "object";
+}
+
+export function publicationFingerprint(publication) {
+  return createHash("sha256").update(JSON.stringify(publication)).digest("hex");
+}
+
+export function decisionIsCurrent(entry, decision) {
+  return Boolean(
+    decision?.copy &&
+      decision.source_fingerprint === publicationFingerprint(entry.channel) &&
+      decision.copy_fingerprint === publicationFingerprint(decision.copy),
+  );
 }
 
 /** Channel candidates not yet sent (by key), optionally filtered by date. */
@@ -21,20 +44,22 @@ export function selectUnsent(entries, state, { since = null, all = false } = {})
 
 /**
  * Select only controller-approved entries. Approval is keyed to the immutable changelog key;
- * optional title/detail overrides change channel copy without rewriting the research record.
+ * source and copy fingerprints must still match, and approved copy never rewrites research.
  */
 export function selectApproved(entries, state, review, { since = null, all = false } = {}) {
   if (review?.channel_enabled !== true) return [];
   const decisions = review?.decisions ?? {};
   return selectUnsent(entries, state, { since, all })
-    .filter((entry) => decisions[entryKey(entry)]?.status === "approved")
+    .filter((entry) => {
+      const decision = decisions[entryKey(entry)];
+      return decision?.status === "approved" && decisionIsCurrent(entry, decision);
+    })
     .map((entry) => {
       const decision = decisions[entryKey(entry)];
       return {
         ...entry,
         review_key: entryKey(entry),
-        title: typeof decision.title === "string" && decision.title.trim() ? decision.title.trim() : entry.title,
-        detail: typeof decision.detail === "string" && decision.detail.trim() ? decision.detail.trim() : entry.detail,
+        channel: decision.copy,
       };
     });
 }
@@ -43,21 +68,83 @@ export function escapeHtml(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-export function formatEntry(e, project, derived, { siteUrl = "", profilePath = "/n/" } = {}) {
-  const name = project?.name ?? e.slug;
-  const head = `<b>${escapeHtml(name)}</b> · ${escapeHtml(e.severity.toUpperCase())} · ${escapeHtml(e.type)}`;
-  const numbers =
-    derived && derived.score !== null && derived.score !== undefined
-      ? `Score ${derived.score}/100${derived.provisional ? " (provisional)" : ""} · ${derived.risk} risk · ${derived.confidence}% confidence`
-      : "Research pending / insufficient evidence";
-  const url = siteUrl ? `${siteUrl.replace(/\/$/, "")}${profilePath}${e.slug}` : null;
-  return [head, escapeHtml(e.title), escapeHtml(e.detail), numbers, url].filter(Boolean).join("\n");
+function prooflineView(derived) {
+  if (!derived || derived.score === null || derived.score === undefined) {
+    return "Research pending / insufficient evidence";
+  }
+  return [
+    `${derived.score}/100 · ${derived.risk} risk`,
+    `${derived.confidence}% confidence${derived.provisional ? " · Provisional" : ""}`,
+  ].join("\n");
 }
 
-export function buildDigest(entries, { siteName, date, projects, derivedBySlug, siteUrl, profilePath, disclaimer = DISCLAIMER }) {
-  const header = `<b>${escapeHtml(siteName.toUpperCase())} / ROBINHOOD CHAIN</b>\nResearch digest · ${date}`;
-  const body = entries.map((e) => formatEntry(e, projects.get(e.slug), derivedBySlug.get(e.slug), { siteUrl, profilePath }));
-  return [header, ...body, escapeHtml(disclaimer)].join("\n\n");
+export function formatPublication(
+  entry,
+  project,
+  derived,
+  { siteUrl = "", profilePath = "/n/", disclaimer = DISCLAIMER } = {},
+) {
+  const publication = entry.channel;
+  const name = project?.name ?? entry.slug;
+  const label = EVENT_LABELS[publication.event] ?? publication.event.toUpperCase();
+  const url = siteUrl ? `${siteUrl.replace(/\/$/, "")}${profilePath}${entry.slug}` : null;
+  const why = publication.why_it_matters?.length
+    ? ["<b>Why it matters</b>", ...publication.why_it_matters.map((line) => `• ${escapeHtml(line)}`)].join("\n")
+    : null;
+  const watch = publication.watch_next
+    ? `<b>What we’re watching</b>\n${escapeHtml(publication.watch_next)}`
+    : null;
+  const trendNote =
+    publication.event === "trending" ? "<i>Trending measures attention — not quality or endorsement.</i>" : null;
+  const link = url ? `<a href="${escapeHtml(url)}">Read the full ${escapeHtml(name)} research →</a>` : null;
+  return [
+    `<b>${escapeHtml(label)} · ${escapeHtml(name.toUpperCase())}</b>`,
+    `<b>${escapeHtml(publication.headline)}</b>`,
+    escapeHtml(publication.summary),
+    why,
+    `<b>Proofline view</b>\n${escapeHtml(prooflineView(derived))}`,
+    watch,
+    trendNote,
+    link,
+    `<i>${escapeHtml(disclaimer)}</i>`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function formatRoundupEntry(entry, project, { siteUrl = "", profilePath = "/n/" } = {}) {
+  const publication = entry.channel;
+  const name = project?.name ?? entry.slug;
+  const label = EVENT_LABELS[publication.event] ?? publication.event.toUpperCase();
+  const url = siteUrl ? `${siteUrl.replace(/\/$/, "")}${profilePath}${entry.slug}` : null;
+  const link = url ? `\n<a href="${escapeHtml(url)}">Open research →</a>` : "";
+  return `<b>${escapeHtml(name)} · ${escapeHtml(label)}</b>\n${escapeHtml(publication.headline)}\n${escapeHtml(publication.summary)}${link}`;
+}
+
+export function buildMessages(
+  entries,
+  { siteName, date, projects, derivedBySlug, siteUrl, profilePath, disclaimer = DISCLAIMER },
+) {
+  const direct = entries
+    .filter((entry) => entry.channel.delivery !== "roundup")
+    .flatMap((entry) =>
+      chunkMessage(
+        formatPublication(entry, projects.get(entry.slug), derivedBySlug.get(entry.slug), {
+          siteUrl,
+          profilePath,
+          disclaimer,
+        }),
+      ),
+    );
+  const roundup = entries.filter((entry) => entry.channel.delivery === "roundup");
+  if (!roundup.length) return direct;
+  const roundupText = [
+    `<b>${escapeHtml(siteName.toUpperCase())} ROUNDUP · ${escapeHtml(date)}</b>`,
+    `${roundup.length} research update${roundup.length === 1 ? "" : "s"} selected by the Proofline desk.`,
+    ...roundup.map((entry) => formatRoundupEntry(entry, projects.get(entry.slug), { siteUrl, profilePath })),
+    `<i>${escapeHtml(disclaimer)}</i>`,
+  ].join("\n\n");
+  return [...direct, ...chunkMessage(roundupText)];
 }
 
 /** Split on blank lines so no message exceeds Telegram's 4096-char limit. */

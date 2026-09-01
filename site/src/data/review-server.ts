@@ -1,8 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
-import type { ChangelogEntry } from "./types";
+import type {
+  ChannelDelivery,
+  ChannelEvent,
+  ChannelPublication,
+  ChangelogEntry,
+} from "./types";
 import {
   REVIEW_BRANCH,
   REVIEW_REPOSITORY,
@@ -11,18 +17,25 @@ import {
   type ReviewPrincipal,
 } from "./review-auth";
 
-export type ReviewStatus = "pending" | "approved" | "rejected" | "sent";
+export type ReviewStatus =
+  | "pending"
+  | "approved"
+  | "roundup"
+  | "held"
+  | "site-only"
+  | "sent";
 
 type ReviewDecision = {
-  status: "approved" | "rejected";
+  status: Exclude<ReviewStatus, "pending" | "sent">;
   reviewed_at: string;
   reviewer: string;
-  title?: string;
-  detail?: string;
+  source_fingerprint: string;
+  copy_fingerprint: string;
+  copy: ChannelPublication;
 };
 
 type ReviewLedger = {
-  version: 1;
+  version: 2;
   channel_enabled: boolean;
   decisions: Record<string, ReviewDecision>;
 };
@@ -34,8 +47,9 @@ export type ReviewQueueItem = {
   status: ReviewStatus;
   entry: ChangelogEntry;
   projectName: string;
-  channelTitle: string;
-  channelDetail: string;
+  channelCopy: ChannelPublication;
+  prooflineView: string;
+  approvalInvalidated: boolean;
   reviewer: string | null;
   reviewedAt: string | null;
 };
@@ -50,9 +64,9 @@ export type ReviewQueue = {
 };
 
 type ModerateRequest = {
-  action: "approve" | "reject" | "reset" | "set-channel";
+  action: "publish" | "roundup" | "site-only" | "hold" | "reset" | "set-channel";
   channelEnabled?: boolean;
-  items?: Array<{ key: string; title?: string; detail?: string }>;
+  items?: Array<{ key: string; copy?: ChannelPublication }>;
 };
 
 type GitHubContent = { sha: string; content: string; encoding: string };
@@ -70,7 +84,32 @@ function entryKey(entry: ChangelogEntry): string {
 }
 
 function isChannelCandidate(entry: ChangelogEntry): boolean {
-  return entry.channel_candidate === true;
+  return entry.channel !== undefined;
+}
+
+function publicationFingerprint(publication: ChannelPublication): string {
+  return createHash("sha256").update(JSON.stringify(publication)).digest("hex");
+}
+
+function decisionIsCurrent(entry: ChangelogEntry, decision: ReviewDecision | undefined): boolean {
+  return Boolean(
+    entry.channel &&
+      decision?.copy &&
+      decision.source_fingerprint === publicationFingerprint(entry.channel) &&
+      decision.copy_fingerprint === publicationFingerprint(decision.copy),
+  );
+}
+
+function prooflineView(derived: {
+  score?: number | null;
+  risk?: string | null;
+  confidence?: number | null;
+  provisional?: boolean;
+} | undefined): string {
+  if (derived?.score === null || derived?.score === undefined) {
+    return "Research pending / insufficient evidence";
+  }
+  return `${derived.score}/100 · ${derived.risk} risk\n${derived.confidence}% confidence${derived.provisional ? " · Provisional" : ""}`;
 }
 
 function readJson<T>(file: string, fallback: T): T {
@@ -87,7 +126,7 @@ function loadQueue(viewer: string): ReviewQueue {
     fs.readFileSync(path.join(root, CHANGELOG_PATH), "utf8"),
   ) as ChangelogEntry[];
   const ledger = readJson<ReviewLedger>(path.join(root, REVIEW_PATH), {
-    version: 1,
+    version: 2,
     channel_enabled: false,
     decisions: {},
   });
@@ -95,6 +134,12 @@ function loadQueue(viewer: string): ReviewQueue {
     sent_keys: [],
   });
   const sent = new Set(sentState.sent_keys ?? []);
+  const derived = readJson<{
+    projects?: Record<
+      string,
+      { score?: number | null; risk?: string | null; confidence?: number | null; provisional?: boolean }
+    >;
+  }>(path.join(root, "build", "derived.json"), { projects: {} });
 
   const names = new Map<string, string>();
   const projectDir = path.join(root, "content", "projects");
@@ -111,14 +156,20 @@ function loadQueue(viewer: string): ReviewQueue {
     .map((entry): ReviewQueueItem => {
       const key = entryKey(entry);
       const decision = ledger.decisions[key];
-      const status: ReviewStatus = sent.has(key) ? "sent" : (decision?.status ?? "pending");
+      const decisionCurrent = decisionIsCurrent(entry, decision);
+      const status: ReviewStatus = sent.has(key)
+        ? "sent"
+        : decisionCurrent
+          ? decision.status
+          : "pending";
       return {
         key,
         status,
         entry,
         projectName: names.get(entry.slug) ?? entry.slug,
-        channelTitle: decision?.title?.trim() || entry.title,
-        channelDetail: decision?.detail?.trim() || entry.detail,
+        channelCopy: decisionCurrent ? decision.copy : entry.channel!,
+        prooflineView: prooflineView(derived.projects?.[entry.slug]),
+        approvalInvalidated: Boolean(decision && !decisionCurrent && !sent.has(key)),
         reviewer: decision?.reviewer ?? null,
         reviewedAt: decision?.reviewed_at ?? null,
       };
@@ -128,7 +179,14 @@ function loadQueue(viewer: string): ReviewQueue {
         b.entry.date.localeCompare(a.entry.date) || a.projectName.localeCompare(b.projectName),
     );
 
-  const counts: Record<ReviewStatus, number> = { pending: 0, approved: 0, rejected: 0, sent: 0 };
+  const counts: Record<ReviewStatus, number> = {
+    pending: 0,
+    approved: 0,
+    roundup: 0,
+    held: 0,
+    "site-only": 0,
+    sent: 0,
+  };
   for (const item of items) counts[item.status]++;
 
   return {
@@ -144,7 +202,12 @@ function loadQueue(viewer: string): ReviewQueue {
 function validateModeration(input: unknown): ModerateRequest {
   if (!input || typeof input !== "object") throw new Error("Invalid moderation request.");
   const value = input as Partial<ModerateRequest>;
-  if (!value.action || !["approve", "reject", "reset", "set-channel"].includes(value.action)) {
+  if (
+    !value.action ||
+    !["publish", "roundup", "site-only", "hold", "reset", "set-channel"].includes(
+      value.action,
+    )
+  ) {
     throw new Error("Unknown moderation action.");
   }
   if (value.action === "set-channel") {
@@ -157,22 +220,65 @@ function validateModeration(input: unknown): ModerateRequest {
   for (const item of value.items) {
     if (!item || typeof item.key !== "string" || item.key.length > 500)
       throw new Error("Invalid update key.");
-    if (
-      item.title !== undefined &&
-      (typeof item.title !== "string" || item.title.trim().length < 1 || item.title.length > 180)
-    ) {
-      throw new Error("Channel titles must be between 1 and 180 characters.");
-    }
-    if (
-      item.detail !== undefined &&
-      (typeof item.detail !== "string" ||
-        item.detail.trim().length < 1 ||
-        item.detail.length > 2400)
-    ) {
-      throw new Error("Channel details must be between 1 and 2,400 characters.");
-    }
+    if (value.action === "reset") continue;
+    validatePublication(item.copy);
   }
   return value as ModerateRequest;
+}
+
+const CHANNEL_EVENTS = new Set<ChannelEvent>([
+  "new-coverage",
+  "research-update",
+  "risk-alert",
+  "correction",
+  "breaking",
+  "trending",
+  "roundup",
+]);
+const CHANNEL_DELIVERIES = new Set<ChannelDelivery>(["immediate", "same-day", "roundup"]);
+
+function validatePublication(copy: ChannelPublication | undefined): asserts copy is ChannelPublication {
+  if (!copy || typeof copy !== "object") throw new Error("Complete channel copy is required.");
+  if (!CHANNEL_EVENTS.has(copy.event)) throw new Error("Select a valid channel event.");
+  if (!CHANNEL_DELIVERIES.has(copy.delivery)) throw new Error("Select a valid delivery lane.");
+  if (typeof copy.headline !== "string" || !copy.headline.trim() || copy.headline.length > 180) {
+    throw new Error("Channel headlines must be between 1 and 180 characters.");
+  }
+  if (typeof copy.summary !== "string" || !copy.summary.trim() || copy.summary.length > 1200) {
+    throw new Error("Channel summaries must be between 1 and 1,200 characters.");
+  }
+  if (
+    copy.why_it_matters !== undefined &&
+    (!Array.isArray(copy.why_it_matters) ||
+      copy.why_it_matters.length < 1 ||
+      copy.why_it_matters.length > 2 ||
+      new Set(copy.why_it_matters.map((line) => line.trim())).size !==
+        copy.why_it_matters.length ||
+      copy.why_it_matters.some(
+        (line) => typeof line !== "string" || !line.trim() || line.length > 400,
+      ))
+  ) {
+    throw new Error("Why it matters must contain one or two lines of at most 400 characters.");
+  }
+  if (
+    copy.watch_next !== undefined &&
+    (typeof copy.watch_next !== "string" || !copy.watch_next.trim() || copy.watch_next.length > 500)
+  ) {
+    throw new Error("What we’re watching must be at most 500 characters.");
+  }
+}
+
+function normalizePublication(copy: ChannelPublication): ChannelPublication {
+  return {
+    event: copy.event,
+    delivery: copy.delivery,
+    headline: copy.headline.trim(),
+    summary: copy.summary.trim(),
+    ...(copy.why_it_matters?.length
+      ? { why_it_matters: copy.why_it_matters.map((line) => line.trim()) }
+      : {}),
+    ...(copy.watch_next?.trim() ? { watch_next: copy.watch_next.trim() } : {}),
+  };
 }
 
 function decodeContent(file: GitHubContent): string {
@@ -209,27 +315,44 @@ export const moderateTelegram = createServerFn({ method: "POST" })
     ]);
 
     const ledger = JSON.parse(decodeContent(reviewFile)) as ReviewLedger;
-    ledger.version = 1;
+    ledger.version = 2;
     ledger.decisions ??= {};
     const currentEntries = YAML.parse(decodeContent(changelogFile)) as ChangelogEntry[];
-    const currentKeys = new Set(currentEntries.filter(isChannelCandidate).map(entryKey));
+    const currentByKey = new Map(
+      currentEntries.filter(isChannelCandidate).map((entry) => [entryKey(entry), entry]),
+    );
     const reviewedAt = new Date().toISOString();
 
     if (data.action === "set-channel") {
       ledger.channel_enabled = data.channelEnabled === true;
     } else {
       for (const item of data.items ?? []) {
-        if (!currentKeys.has(item.key)) throw new Error(`Update is no longer current: ${item.key}`);
+        const currentEntry = currentByKey.get(item.key);
+        if (!currentEntry?.channel) throw new Error(`Update is no longer current: ${item.key}`);
         if (data.action === "reset") {
           delete ledger.decisions[item.key];
           continue;
         }
+        validatePublication(item.copy);
+        const copy = normalizePublication({
+          ...item.copy,
+          ...(data.action === "roundup" ? { delivery: "roundup" as const } : {}),
+        });
+        const decisionStatus: ReviewDecision["status"] =
+          data.action === "publish"
+            ? "approved"
+            : data.action === "roundup"
+              ? "roundup"
+              : data.action === "site-only"
+                ? "site-only"
+                : "held";
         ledger.decisions[item.key] = {
-          status: data.action === "approve" ? "approved" : "rejected",
+          status: decisionStatus,
           reviewed_at: reviewedAt,
           reviewer: login,
-          ...(data.action === "approve" && item.title ? { title: item.title.trim() } : {}),
-          ...(data.action === "approve" && item.detail ? { detail: item.detail.trim() } : {}),
+          source_fingerprint: publicationFingerprint(currentEntry.channel),
+          copy_fingerprint: publicationFingerprint(copy),
+          copy,
         };
       }
     }
@@ -238,7 +361,7 @@ export const moderateTelegram = createServerFn({ method: "POST" })
       message:
         data.action === "set-channel"
           ? `ops: ${ledger.channel_enabled ? "resume" : "pause"} Telegram delivery`
-          : `ops: ${data.action} ${data.items?.length ?? 0} Telegram update(s)`,
+          : `ops: ${data.action} ${data.items?.length ?? 0} channel update(s)`,
       content: Buffer.from(`${JSON.stringify(ledger, null, 2)}\n`).toString("base64"),
       sha: reviewFile.sha,
       branch: REVIEW_BRANCH,

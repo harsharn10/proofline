@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import {
   getReviewQueue,
@@ -6,6 +6,7 @@ import {
   type ReviewQueueItem,
   type ReviewStatus,
 } from "@/data/review-server";
+import type { ChannelDelivery, ChannelEvent, ChannelPublication } from "@/data/types";
 
 export const Route = createFileRoute("/review")({
   loader: () => getReviewQueue(),
@@ -15,20 +16,54 @@ export const Route = createFileRoute("/review")({
   component: ReviewPage,
 });
 
-const FILTERS: Array<ReviewStatus | "all"> = ["pending", "approved", "rejected", "sent", "all"];
+const FILTERS: Array<ReviewStatus | "all"> = [
+  "pending",
+  "approved",
+  "roundup",
+  "held",
+  "site-only",
+  "sent",
+  "all",
+];
+const STATUSES: ReviewStatus[] = ["pending", "approved", "roundup", "held", "site-only", "sent"];
+const EVENTS: Array<{ value: ChannelEvent; label: string }> = [
+  { value: "new-coverage", label: "New coverage" },
+  { value: "research-update", label: "Research update" },
+  { value: "risk-alert", label: "Risk alert" },
+  { value: "correction", label: "Correction" },
+  { value: "breaking", label: "Developing / breaking" },
+  { value: "trending", label: "Trending" },
+  { value: "roundup", label: "Roundup" },
+];
+const DELIVERIES: Array<{ value: ChannelDelivery; label: string }> = [
+  { value: "immediate", label: "Immediate" },
+  { value: "same-day", label: "Same day" },
+  { value: "roundup", label: "Roundup" },
+];
+
+function initialDrafts(items: ReviewQueueItem[]): Record<string, ChannelPublication> {
+  return Object.fromEntries(items.map((item) => [item.key, item.channelCopy]));
+}
+
+function copyForRequest(copy: ChannelPublication): ChannelPublication {
+  const why = copy.why_it_matters?.map((line) => line.trim()).filter(Boolean).slice(0, 2);
+  return {
+    event: copy.event,
+    delivery: copy.delivery,
+    headline: copy.headline.trim(),
+    summary: copy.summary.trim(),
+    ...(why?.length ? { why_it_matters: why } : {}),
+    ...(copy.watch_next?.trim() ? { watch_next: copy.watch_next.trim() } : {}),
+  };
+}
 
 function ReviewPage() {
   const queue = Route.useLoaderData();
   const router = useRouter();
   const [filter, setFilter] = useState<ReviewStatus | "all">("pending");
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [drafts, setDrafts] = useState<Record<string, { title: string; detail: string }>>(() =>
-    Object.fromEntries(
-      queue.items.map((item) => [
-        item.key,
-        { title: item.channelTitle, detail: item.channelDetail },
-      ]),
-    ),
+  const [drafts, setDrafts] = useState<Record<string, ChannelPublication>>(() =>
+    initialDrafts(queue.items),
   );
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
@@ -38,6 +73,10 @@ function ReviewPage() {
     [filter, queue.items],
   );
   const selectedItems = queue.items.filter((item) => selected.has(item.key));
+
+  useEffect(() => {
+    setDrafts(initialDrafts(queue.items));
+  }, [queue.items]);
 
   function toggle(key: string) {
     setSelected((current) => {
@@ -52,7 +91,7 @@ function ReviewPage() {
     setSelected(new Set(visible.filter((item) => item.status !== "sent").map((item) => item.key)));
   }
 
-  async function apply(action: "approve" | "reject" | "reset") {
+  async function apply(action: "publish" | "roundup" | "site-only" | "hold" | "reset") {
     if (!selectedItems.length) return;
     setBusy(true);
     setNotice(null);
@@ -62,7 +101,9 @@ function ReviewPage() {
           action,
           items: selectedItems.map((item) => ({
             key: item.key,
-            ...(action === "approve" ? drafts[item.key] : {}),
+            ...(action === "reset"
+              ? {}
+              : { copy: copyForRequest(drafts[item.key] ?? item.channelCopy) }),
           })),
         },
       });
@@ -105,9 +146,9 @@ function ReviewPage() {
           <p className="eyebrow">Controller</p>
           <h1>Channel review</h1>
           <p className="desc">
-            Only changelog entries explicitly nominated for the retail channel appear here. Edit the
-            channel copy, approve only what belongs, or reject it. Nothing publishes without an
-            explicit approval and an enabled channel.
+            Research records everything; this queue decides what the retail channel sees. Edit the
+            exact card, then publish it, save it for a roundup, hold it, or keep it site-only.
+            Changing source content or approved copy automatically invalidates approval.
           </p>
         </div>
         <div className={`channel-state ${queue.channelEnabled ? "live" : "paused"}`}>
@@ -122,7 +163,7 @@ function ReviewPage() {
       </section>
 
       <section className="review-stats" aria-label="Review queue counts">
-        {(["pending", "approved", "rejected", "sent"] as ReviewStatus[]).map((status) => (
+        {STATUSES.map((status) => (
           <button
             key={status}
             type="button"
@@ -145,17 +186,33 @@ function ReviewPage() {
             type="button"
             className="ctl primary"
             disabled={busy || !selectedItems.length}
-            onClick={() => apply("approve")}
+            onClick={() => apply("publish")}
           >
-            Approve selected
+            Publish selected
+          </button>
+          <button
+            type="button"
+            className="ctl"
+            disabled={busy || !selectedItems.length}
+            onClick={() => apply("roundup")}
+          >
+            Add to roundup
           </button>
           <button
             type="button"
             className="ctl reject"
             disabled={busy || !selectedItems.length}
-            onClick={() => apply("reject")}
+            onClick={() => apply("site-only")}
           >
-            Reject
+            Site only
+          </button>
+          <button
+            type="button"
+            className="ctl"
+            disabled={busy || !selectedItems.length}
+            onClick={() => apply("hold")}
+          >
+            Hold
           </button>
           <button
             type="button"
@@ -219,7 +276,7 @@ function ReviewPage() {
               key={item.key}
               item={item}
               selected={selected.has(item.key)}
-              draft={drafts[item.key] ?? { title: item.channelTitle, detail: item.channelDetail }}
+              draft={drafts[item.key] ?? item.channelCopy}
               onToggle={() => toggle(item.key)}
               onDraft={(draft) => {
                 setDrafts((current) => ({ ...current, [item.key]: draft }));
@@ -242,11 +299,12 @@ function ReviewCard({
 }: {
   item: ReviewQueueItem;
   selected: boolean;
-  draft: { title: string; detail: string };
+  draft: ChannelPublication;
   onToggle: () => void;
-  onDraft: (draft: { title: string; detail: string }) => void;
+  onDraft: (draft: ChannelPublication) => void;
 }) {
-  const changed = draft.title !== item.entry.title || draft.detail !== item.entry.detail;
+  const changed = JSON.stringify(draft) !== JSON.stringify(item.entry.channel);
+  const eventLabel = EVENTS.find((event) => event.value === draft.event)?.label ?? draft.event;
   return (
     <article className={`review-card ${selected ? "selected" : ""}`}>
       <div className="review-card-top">
@@ -262,34 +320,101 @@ function ReviewCard({
         <div className="review-meta">
           <span>{item.entry.date}</span>
           <b>{item.projectName}</b>
-          <span>{item.entry.type}</span>
+          <span>{eventLabel}</span>
+          <span>{draft.delivery}</span>
           <span className={`review-status ${item.status}`}>{item.status}</span>
           {changed ? <span className="review-status edited">edited copy</span> : null}
+          {item.approvalInvalidated ? (
+            <span className="review-status invalidated">approval invalidated</span>
+          ) : null}
         </div>
       </div>
       <div className="review-fields">
         <label>
-          <span>Channel title</span>
+          <span>Event</span>
+          <select
+            value={draft.event}
+            disabled={item.status === "sent"}
+            onChange={(event) => onDraft({ ...draft, event: event.target.value as ChannelEvent })}
+          >
+            {EVENTS.map((event) => (
+              <option key={event.value} value={event.value}>
+                {event.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Recommended delivery</span>
+          <select
+            value={draft.delivery}
+            disabled={item.status === "sent"}
+            onChange={(event) =>
+              onDraft({ ...draft, delivery: event.target.value as ChannelDelivery })
+            }
+          >
+            {DELIVERIES.map((delivery) => (
+              <option key={delivery.value} value={delivery.value}>
+                {delivery.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="review-field-wide">
+          <span>Headline</span>
           <input
-            value={draft.title}
+            value={draft.headline}
             disabled={item.status === "sent"}
             maxLength={180}
-            onChange={(event) => onDraft({ ...draft, title: event.target.value })}
+            onChange={(event) => onDraft({ ...draft, headline: event.target.value })}
+          />
+        </label>
+        <label className="review-field-wide">
+          <span>Summary</span>
+          <textarea
+            value={draft.summary}
+            disabled={item.status === "sent"}
+            rows={3}
+            maxLength={1200}
+            onChange={(event) => onDraft({ ...draft, summary: event.target.value })}
           />
         </label>
         <label>
-          <span>Channel detail</span>
+          <span>Why it matters · one point per line, max two</span>
           <textarea
-            value={draft.detail}
+            value={(draft.why_it_matters ?? []).join("\n")}
             disabled={item.status === "sent"}
             rows={3}
-            maxLength={2400}
-            onChange={(event) => onDraft({ ...draft, detail: event.target.value })}
+            maxLength={801}
+            onChange={(event) => {
+              const { why_it_matters: _why, ...rest } = draft;
+              const lines = event.target.value
+                .split("\n")
+                .slice(0, 2);
+              onDraft(lines.some((line) => line.length > 0) ? { ...rest, why_it_matters: lines } : rest);
+            }}
+          />
+        </label>
+        <label>
+          <span>What we’re watching</span>
+          <textarea
+            value={draft.watch_next ?? ""}
+            disabled={item.status === "sent"}
+            rows={3}
+            maxLength={500}
+            onChange={(event) => {
+              const { watch_next: _watch, ...rest } = draft;
+              onDraft(event.target.value ? { ...rest, watch_next: event.target.value } : rest);
+            }}
           />
         </label>
       </div>
+      <TelegramPreview item={item} draft={draft} />
       <div className="review-card-foot">
-        <span>{item.entry.severity} severity · research record remains unchanged</span>
+        <span>
+          {item.entry.severity} severity · source record remains unchanged · exact copy locks on
+          publish
+        </span>
         {item.reviewer ? (
           <span>reviewed by {item.reviewer}</span>
         ) : (
@@ -297,5 +422,45 @@ function ReviewCard({
         )}
       </div>
     </article>
+  );
+}
+
+function TelegramPreview({ item, draft }: { item: ReviewQueueItem; draft: ChannelPublication }) {
+  const label =
+    draft.event === "breaking"
+      ? "DEVELOPING"
+      : (EVENTS.find((event) => event.value === draft.event)?.label ?? draft.event).toUpperCase();
+  return (
+    <section className="telegram-preview" aria-label="Telegram text preview">
+      <span className="telegram-preview-label">Telegram preview</span>
+      <b className="telegram-kicker">
+        {label} · {item.projectName.toUpperCase()}
+      </b>
+      <strong>{draft.headline || "Headline required"}</strong>
+      <p>{draft.summary || "Summary required"}</p>
+      {draft.why_it_matters?.length ? (
+        <div>
+          <b>Why it matters</b>
+          {draft.why_it_matters.map((line) => (
+            <p key={line}>• {line}</p>
+          ))}
+        </div>
+      ) : null}
+      <div>
+        <b>Proofline view</b>
+        <p>{item.prooflineView}</p>
+      </div>
+      {draft.watch_next ? (
+        <div>
+          <b>What we’re watching</b>
+          <p>{draft.watch_next}</p>
+        </div>
+      ) : null}
+      {draft.event === "trending" ? (
+        <em>Trending measures attention — not quality or endorsement.</em>
+      ) : null}
+      <a tabIndex={-1}>Read the full {item.projectName} research →</a>
+      <em>Research opinion only — not an audit, guarantee or investment advice.</em>
+    </section>
   );
 }

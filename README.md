@@ -150,9 +150,12 @@ value skips ahead by the tie size (`1, 1, 3`, never `1, 2`). `npm run score` mer
 ## Telegram digest
 
 `node scripts/telegram-digest.mjs` (PRD §9.2) sends only controller-approved changelog entries that
-have not already been sent. Only entries explicitly marked `channel_candidate: true` create
+have not already been sent. Only entries carrying a structured `channel` publication create
 review-queue items; ordinary content and changelog merges update the site without touching Telegram.
-An opted-in entry still does not authorize a channel post:
+The publication declares its event (`new-coverage | research-update | risk-alert | correction |
+breaking | trending | roundup`), recommended delivery (`immediate | same-day | roundup`), retail
+headline and summary, and optional `why_it_matters[]` / `watch_next` copy. An opted-in entry still
+does not authorize a channel post:
 
     npm run telegram             # send
     npm run telegram:dry         # preview only, sends nothing, state unchanged
@@ -162,7 +165,11 @@ An opted-in entry still does not authorize a channel post:
 
 Credentials (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, optional `SITE_URL`, `PROFILE_PATH`) come from
 `.env.local` (gitignored) locally, or from repo secrets in CI. `/review` reads the pending queue and
-stores approve/reject decisions plus edited channel copy in `ops/telegram-review.json`. The route and
+stores publish/roundup/site-only/hold decisions plus edited channel copy in
+`ops/telegram-review.json`. Each decision fingerprints both the source publication and exact copy;
+a later change invalidates approval and returns the item to pending. The sender publishes individual
+event cards and combines entries deliberately approved for roundup delivery. Full editorial rules
+and card templates live in `docs/channel-publishing.md`. The route and
 its server functions are hidden behind HTTP Basic authentication: use `github` as the username and a
 GitHub token as the password. The server admits only GitHub user `harsharn10` with write access to this
 repository, requires the credential on every request, caches successful GitHub verification for at

@@ -9,7 +9,14 @@ import { validateAgainst } from "./lib/schemas.mjs";
 import { crossCheck, releaseCheck } from "./lib/checks.mjs";
 import { checkResearch, tagIds, REQUIRED_HEADINGS } from "./lib/research-md.mjs";
 import { loadContent } from "./lib/load.mjs";
-import { selectUnsent, selectApproved, buildDigest, chunkMessage, readDotEnv } from "./lib/telegram.mjs";
+import {
+  selectUnsent,
+  selectApproved,
+  buildMessages,
+  chunkMessage,
+  publicationFingerprint,
+  readDotEnv,
+} from "./lib/telegram.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
@@ -418,12 +425,35 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   if (bad) { failures++; console.error("FAIL content derive"); } else console.log(`ok   content derive (${content.projects.size} projects)`);
 }
 
-// Telegram digest helpers: unsent selection, HTML escaping, numbers line, links, chunking, dotenv.
+// Telegram publication helpers: opt-in, exact-copy approval, event cards, roundups and chunking.
 {
+  const channel = {
+    event: "new-coverage",
+    delivery: "same-day",
+    headline: "Score published",
+    summary: "A <b>full</b> research record is now available.",
+    why_it_matters: ["Owner controls remain material."],
+    watch_next: "Audit and timelock evidence.",
+  };
+  const approvedCopy = { ...channel, headline: "Controller headline" };
   const entries = [
     { date: "2026-08-30", slug: "pons", type: "coverage", severity: "Info", title: "Initial stub opened", detail: "x" },
-    { date: "2026-08-31", slug: "pons", type: "score", severity: "Material", title: "Score published", detail: "<b>&", channel_candidate: true },
+    { date: "2026-08-31", slug: "pons", type: "score", severity: "Material", title: "Score published", detail: "<b>&", channel },
   ];
+  const schemaEntry = {
+    ...entries[1],
+    prior: null,
+    new: { score: 41 },
+    reviewer: "harsharn10",
+    methodology_version: "proofline-v1.0",
+  };
+  const legacyCandidate = { ...schemaEntry, channel_candidate: true };
+  delete legacyCandidate.channel;
+  const oversizedWhy = structuredClone(schemaEntry);
+  oversizedWhy.channel.why_it_matters = ["one", "two", "three"];
+  const validChannelSchema = validateAgainst("changelog", [schemaEntry]);
+  const legacyChannelSchema = validateAgainst("changelog", [legacyCandidate]);
+  const invalidChannelSchema = validateAgainst("changelog", [oversizedWhy]);
   const unsent = selectUnsent(entries, { sent_keys: ["2026-08-30|pons|coverage|Initial stub opened"] });
   const allCandidates = selectUnsent(entries, { sent_keys: [] }, { all: true });
   const approved = selectApproved(
@@ -434,33 +464,69 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
       decisions: {
         "2026-08-31|pons|score|Score published": {
           status: "approved",
-          title: "Controller title",
-          detail: "Controller detail",
+          source_fingerprint: publicationFingerprint(channel),
+          copy_fingerprint: publicationFingerprint(approvedCopy),
+          copy: approvedCopy,
         },
       },
     },
   );
+  const staleApproval = selectApproved(
+    [{ ...entries[1], channel: { ...channel, summary: "Source copy changed." } }],
+    { sent_keys: [] },
+    {
+      channel_enabled: true,
+      decisions: {
+        "2026-08-31|pons|score|Score published": {
+          status: "approved",
+          source_fingerprint: publicationFingerprint(channel),
+          copy_fingerprint: publicationFingerprint(approvedCopy),
+          copy: approvedCopy,
+        },
+      },
+    },
+  );
+  const tamperedCopy = selectApproved(entries, { sent_keys: [] }, {
+    channel_enabled: true,
+    decisions: {
+      "2026-08-31|pons|score|Score published": {
+        status: "approved",
+        source_fingerprint: publicationFingerprint(channel),
+        copy_fingerprint: publicationFingerprint(approvedCopy),
+        copy: { ...approvedCopy, headline: "Changed after approval" },
+      },
+    },
+  });
   const paused = selectApproved(entries, { sent_keys: [] }, { channel_enabled: false, decisions: {} });
   const projects = new Map([["pons", { name: "Pons" }]]);
-  const derived = new Map([["pons", { score: 64, provisional: true, risk: "Elevated", confidence: 57 }]]);
-  const text = buildDigest(unsent, { siteName: "Proofline", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
+  const derived = new Map([["pons", { score: 41, provisional: true, risk: "Elevated", confidence: 64 }]]);
+  const messages = buildMessages(approved, { siteName: "Proofline", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
+  const roundupEntries = approved.map((entry) => ({ ...entry, channel: { ...entry.channel, delivery: "roundup" } }));
+  const roundupMessages = buildMessages(roundupEntries, { siteName: "Proofline", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
   const chunks = chunkMessage("a".repeat(3000) + "\n\n" + "b".repeat(3000), 4096);
   try {
     assert.equal(unsent.length, 1);
+    assert.deepEqual(validChannelSchema, [], "structured publication passes changelog schema");
+    assert.ok(legacyChannelSchema.length > 0, "legacy candidate boolean is rejected");
+    assert.ok(invalidChannelSchema.length > 0, "publication limits are enforced");
     assert.deepEqual(allCandidates, [entries[1]], "--all cannot bypass explicit channel opt-in");
     assert.equal(approved.length, 1, "only approved and unsent entries publish");
-    assert.equal(approved[0].title, "Controller title", "approved title override");
-    assert.equal(approved[0].detail, "Controller detail", "approved detail override");
+    assert.equal(approved[0].channel.headline, "Controller headline", "approved exact copy used");
     assert.equal(approved[0].review_key, "2026-08-31|pons|score|Score published", "override preserves immutable sent key");
+    assert.deepEqual(staleApproval, [], "source edits invalidate approval");
+    assert.deepEqual(tamperedCopy, [], "copy edits invalidate approval");
     assert.deepEqual(paused, [], "paused channel publishes nothing");
-    assert.ok(text.includes("<b>Pons</b>"), "name bold");
-    assert.ok(text.includes("Score 64/100 (provisional) · Elevated risk · 57% confidence"), "numbers line");
-    assert.ok(text.includes("https://x.test/n/pons"), "profile link");
-    assert.ok(text.includes("&lt;b&gt;&amp;"), "html escaped");
+    assert.equal(messages.length, 1, "one direct publication produces one card");
+    assert.ok(messages[0].includes("<b>NEW COVERAGE · PONS</b>"), "event kicker");
+    assert.ok(messages[0].includes("41/100 · Elevated risk"), "proofline view");
+    assert.ok(messages[0].includes("64% confidence · Provisional"), "confidence line");
+    assert.ok(messages[0].includes("https://x.test/n/pons"), "profile link");
+    assert.ok(messages[0].includes("A &lt;b&gt;full&lt;/b&gt; research record"), "html escaped");
+    assert.ok(roundupMessages[0].includes("<b>PROOFLINE ROUNDUP · 2026-08-31</b>"), "roundup card");
     assert.equal(chunks.length, 2, "chunked");
     assert.deepEqual(readDotEnv("A=1\n# c\nB=\"two words\"\n"), { A: "1", B: "two words" });
-    console.log("ok   telegram digest");
-  } catch (err) { failures++; console.error(`FAIL telegram digest: `); }
+    console.log("ok   telegram publications");
+  } catch (err) { failures++; console.error(`FAIL telegram publications: ${err.message}`); }
 }
 
 // Task 2 / Task 5 — computeTrending: distinct counting accounts with `kind: ct` items dated inside the window.
