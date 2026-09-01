@@ -6,10 +6,17 @@ export function entryKey(e) {
   return e.review_key ?? `${e.date}|${e.slug}|${e.type}|${e.title}`;
 }
 
-/** Changelog entries not yet sent (by key), optionally filtered by date. */
+/** Only an explicit true opts a changelog entry into channel review and delivery. */
+export function isChannelCandidate(entry) {
+  return entry?.channel_candidate === true;
+}
+
+/** Channel candidates not yet sent (by key), optionally filtered by date. */
 export function selectUnsent(entries, state, { since = null, all = false } = {}) {
   const sent = new Set(state?.sent_keys ?? []);
-  return entries.filter((e) => (all || !sent.has(entryKey(e))) && (!since || e.date >= since));
+  return entries.filter(
+    (e) => isChannelCandidate(e) && (all || !sent.has(entryKey(e))) && (!since || e.date >= since),
+  );
 }
 
 /**

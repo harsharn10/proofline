@@ -105,9 +105,9 @@ function ReviewPage() {
           <p className="eyebrow">Controller</p>
           <h1>Channel review</h1>
           <p className="desc">
-            Research can land on the site without landing in Telegram. Edit the channel copy,
-            approve only what belongs, or reject it. Nothing publishes without an explicit approval
-            and an enabled channel.
+            Only changelog entries explicitly nominated for the retail channel appear here. Edit the
+            channel copy, approve only what belongs, or reject it. Nothing publishes without an
+            explicit approval and an enabled channel.
           </p>
         </div>
         <div className={`channel-state ${queue.channelEnabled ? "live" : "paused"}`}>

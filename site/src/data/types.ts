@@ -133,6 +133,7 @@ export type ChangelogEntry = {
   prior: Record<string, JsonValue> | null;
   new: Record<string, JsonValue> | null;
   reviewer: string;
+  channel_candidate?: boolean;
   methodology_version: string;
 };
 
