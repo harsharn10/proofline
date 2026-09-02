@@ -4,6 +4,8 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, cp, rm, writeFile, appendFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+import { registerHooks } from "node:module";
 import { derive, SECURITY_MAX, PROVISIONAL_CONFIDENCE, FULL_WEIGHT_CONFIDENCE, computeRanks } from "./lib/score.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { crossCheck, releaseCheck } from "./lib/checks.mjs";
@@ -20,6 +22,7 @@ import {
 import { validateContent } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
+import { meetsShareBar as meetsShareBarCore } from "./lib/share-bar.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
@@ -850,6 +853,118 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.deepEqual(tied.get("r"), { basis: "tvl", position: 3, of: 3, cohort: "oracle / infra" }, "next distinct value skips to 3 (standard competition ranking)");
     console.log("ok   computeRanks");
   } catch (err) { failures++; console.error(`FAIL computeRanks: ${err.message}`); }
+}
+
+// Icarus home/category rules execute from the actual TypeScript module. Lightweight module hooks
+// replace its server-only imports so these fixtures test the exported pure rules without a browser.
+{
+  const dataModule = (source) => `data:text/javascript,${encodeURIComponent(source)}`;
+  const contentServerUrl = pathToFileURL(join(process.cwd(), "site/src/data/content-server.ts")).href;
+  const startMock = dataModule(
+    `export function createServerFn(){const chain={validator(){return chain},handler(fn){return fn}};return chain}`,
+  );
+  const contentMock = dataModule(`export default {}`);
+  const markdownMock = dataModule(
+    `export const parseResearchMarkdown=()=>({sections:[]});export const renderWholeMarkdown=()=>""`,
+  );
+  const typesMock = dataModule(`
+    export const headlineMetric=()=>null;
+    export const SECTION_KPIS={launchpads:["volume24h","launches24h","liquidityUsd","holders"],tokens:["liquidityUsd","volume24h","holders","priceChange24h"]};
+  `);
+  const hooks = registerHooks({
+    resolve(specifier, context, nextResolve) {
+      if (specifier === "@tanstack/react-start") return { url: startMock, shortCircuit: true };
+      if (specifier === "virtual:proofline-content") return { url: contentMock, shortCircuit: true };
+      if (context.parentURL?.startsWith(contentServerUrl) && specifier === "./markdown")
+        return { url: markdownMock, shortCircuit: true };
+      if (context.parentURL?.startsWith(contentServerUrl) && specifier === "./types")
+        return { url: typesMock, shortCircuit: true };
+      return nextResolve(specifier, context);
+    },
+  });
+  const rules = await import(`${contentServerUrl}?home-rules-test`);
+  hooks.deregister();
+
+  const now = Date.parse("2026-09-02T21:00:00Z");
+  const entry = (slug, overrides = {}) => ({
+    slug,
+    name: slug,
+    symbol: slug.toUpperCase(),
+    role: "subject",
+    officialConfirmed: true,
+    hasContractOn4663: true,
+    shareBarMetric: "liquidity",
+    summary: `${slug} summary`,
+    reviewedAt: "2026-09-01T00:00:00Z",
+    tree: { sectionId: "launchpads" },
+    factoryLaunches24h: 0,
+    kpis: {
+      status: "live",
+      liquidityUsd: 30_000,
+      tvl: null,
+      volume24h: 100,
+      firstPairAt: "2026-09-01T00:00:00Z",
+      readAt: "2026-09-02T21:00:00Z",
+    },
+    ...overrides,
+  });
+  const pons = entry("pons", { kpis: { ...entry("x").kpis, volume24h: 200 } });
+  const ai = entry("artificial-inu", {
+    tree: { sectionId: "tokens" },
+    kpis: { ...entry("x").kpis, volume24h: 300 },
+  });
+  const noxa = entry("noxa", { hasContractOn4663: false });
+  const announced = entry("sight", {
+    hasContractOn4663: false,
+    reviewedAt: "2026-09-02T00:00:00Z",
+    kpis: { ...entry("x").kpis, status: "announced", liquidityUsd: null, volume24h: null, firstPairAt: null },
+  });
+  const olderAnnouncement = entry("wire", {
+    hasContractOn4663: false,
+    reviewedAt: "2026-08-20T00:00:00Z",
+    kpis: { ...entry("x").kpis, status: "announced", liquidityUsd: null, volume24h: null, firstPairAt: null },
+  });
+  try {
+    assert.equal(meetsShareBarCore(pons), true, "Pons clears the shared predicate");
+    assert.equal(rules.meetsShareBar(ai), true, "Artificial Inu clears the site predicate");
+    assert.equal(rules.meetsShareBar(noxa), false, "NOXA without a located contract fails");
+    assert.equal(rules.meetsShareBar(announced), false, "announced names fail the live share bar");
+
+    const trending = rules.trendingNow([pons, ai, noxa, announced], {
+      pons: [{ at: "2026-09-01T21:00:00Z", volume_h24: 100 }],
+    });
+    assert.deepEqual(trending.map((item) => item.entry.slug), ["artificial-inu", "pons"]);
+    assert.equal(trending[0].change24h, null, "change omitted without an earlier snapshot");
+    assert.equal(trending[1].change24h, 100, "change uses the snapshot nearest 24h earlier");
+
+    assert.deepEqual(rules.newLaunches([pons, ai, announced], now).map((item) => item.slug), ["artificial-inu", "pons"]);
+    assert.equal(rules.notListedCount([entry("factory", { factoryLaunches24h: 12 })], [pons, ai]), 10);
+    assert.deepEqual(rules.announcedNow([olderAnnouncement, announced]).map((item) => item.slug), ["sight", "wire"]);
+
+    const leaders = rules.sectionLeaders(
+      { id: "launchpads", label: "Launchpads", description: "" },
+      [pons, announced, olderAnnouncement],
+    );
+    assert.deepEqual(leaders.map((item) => [item.entry.slug, item.announced]), [
+      ["pons", false],
+      ["sight", true],
+      ["wire", true],
+    ]);
+
+    const latest = rules.latestFromIcarus(
+      [{ date: "2026-09-02", slug: "pons", title: "Read", detail: "Detail" }],
+      [{
+        name: { slug: "artificial-inu", symbol: "AI", name: "Artificial Inu" },
+        item: { date: "2026-09-01", title: "Post", body: "Body", kind: "ct", account: "@ai" },
+      }],
+      2,
+    );
+    assert.deepEqual(latest.map((item) => item.kind), ["icarus", "post"]);
+    console.log("ok   Icarus home and category rules");
+  } catch (err) {
+    failures++;
+    console.error(`FAIL Icarus home and category rules: ${err.message}`);
+  }
 }
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }
