@@ -28,7 +28,8 @@ const trendingBySlug = computeTrending(feedItemsBySlug, content.accounts, {
 });
 
 // Ranks: one basis per cohort (the tree leaf's reader-facing section), computed over every project's own `metrics[]`.
-const leafBySlug = new Map(content.census.map((row) => [row.slug, row.tree?.primary]));
+// Watchlist rows (census role: observe) are listed, never ranked or scored.
+const leafBySlug = new Map(content.census.filter((row) => row.role !== "observe").map((row) => [row.slug, row.tree?.primary]));
 const ranksBySlug = computeRanks([...content.projects.values()].map((p) => ({ slug: p.slug, cohort: cohortForLeaf(leafBySlug.get(p.slug)), metrics: p.metrics ?? [] })));
 
 const projects = {};

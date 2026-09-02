@@ -48,6 +48,9 @@ findings:
       sources:
         - S3
   risk:
+    - text: "owner() on the EARN token contract returns 0xeb7c…0862, the verified Airlock contract that also owns the EARN, Statics and Artificial Inu tokens; the token's owner-only functions are controlled by shared launch infrastructure, not by a project-held key or multisig."
+      class: verified
+      sources: [S6]
     - text: The name collides with Robinhood Earn, the Morpho-based USDG lending product inside the Robinhood app, which has no token; the two are unrelated per the workbook.
       class: claim
       sources:

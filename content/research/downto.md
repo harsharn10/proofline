@@ -1,10 +1,10 @@
 ---
-slug: virtuals
+slug: downto
 coverage: stub
 methodology_version: proofline-v1.0
 ---
 
-# Virtuals Protocol — research record
+# Down to Finance — research record
 
 ## Identity
 

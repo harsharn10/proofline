@@ -1,0 +1,34 @@
+id: virtuals
+name: Virtuals Protocol (Robinhood Chain instance)
+kind: infra
+summary: "Multi-chain AI-agent launch layer with a Robinhood Chain instance; DefiLlama lists its revenue on this chain. Imported infrastructure, not a native play: individual agents launched through it are the graduations, and the multi-chain VIRTUAL token is not this chain's book. Moved from a census row to a dependency card on 2026-09-02 (PRD §2.2; taxonomy review TAX-GROK-008)."
+controls:
+  - { power: Agent launch contracts (Robinhood Chain instance), holder: Not located, note: "No chain-4663 address for the launch layer was found in either intake; which entity controls the deployment is unknown", class: unknown, sources: [] }
+failure_modes:
+  - { text: "A change to the launch layer's fees or rules reaches every agent launched through it on this chain.", class: unknown, sources: [] }
+  - { text: "The multi-chain VIRTUAL token and the Robinhood Chain instance are distinct; a multi-chain market cap is not the chain's book.", class: claim, sources: [S2] }
+sources:
+  - id: S1
+    key: a4178841f6d1e5f7
+    url: https://defillama.com/chain/robinhood-chain
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-08-31T00:00:00Z
+    claim: "Virtuals revenue on Robinhood Chain: $22,571 24h and $400,084 30d on 2026-08-31, as copied into the chain map; not reproduced"
+    excerpt: "Chain-slice figures as listed by DefiLlama on 2026-08-31 (copied from the research intake; not reproduced)."
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true
+  - id: S2
+    key: 7d9ecf73555a3c17
+    url: https://github.com/harsharn10/proofline/blob/main/research/inbox/grok-2026-08-30/chain-file.json
+    publisher: Chain File dossiers (intake, 2026-08-30)
+    kind: third-party-data
+    accessed_at: 2026-08-31T00:00:00Z
+    claim: "FalconX primer figures as carried by the dossier (4,500+ agents, $150M+ agent volume, $2.3M+ raised on the Robinhood Chain instance, 19 Jul) and the note that the VIRTUAL token and the chain instance are distinct"
+    excerpt: "Intake artifact committed to the research inbox. Nothing in it is verified until reproduced on Blockscout or an official page."
+    hash: null
+    archive_url: null
+    researcher: harsharn10
+    available: true

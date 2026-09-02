@@ -17,7 +17,7 @@ export function PeerCards({ peers }: { peers: PeerRef[] }) {
   return (
     <div className="peercards">
       {peers.map((p) => {
-        const quiet = p.coverage !== "full" && !p.metric;
+        const quiet = p.role === "observe" || (p.coverage !== "full" && !p.metric);
         return (
           <Link key={p.slug} to="/n/$slug" params={{ slug: p.slug }} className={quiet ? "peercard quiet" : "peercard"}>
             <span className="ph">

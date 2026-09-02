@@ -65,6 +65,9 @@ export type Findings = {
 
 export type Lifecycle = "mainnet" | "beta" | "announced" | "inactive" | "testnet-only";
 export type Coverage = "full" | "stub";
+// census.yaml `role`: a subject is researched and may be scored; an observe row is the watchlist —
+// listed for completeness, never ranked or scored (it fails a qualifying test).
+export type CensusRole = "subject" | "observe";
 
 export type Review = {
   researcher: string;
@@ -113,6 +116,33 @@ export type SourceEntry = {
   archive_url: string | null;
   researcher: string;
   available: boolean;
+};
+
+// Machine-read chain facts from content/pulled/<slug>.yaml (scripts/pull.mjs; schema/pulled.schema.json).
+// Dated, never hand-edited. The site renders them as-is and never recomputes ownership from them.
+export type PulledAddress = {
+  address: string;
+  label: string | null;
+  role: DeploymentRole | null;
+  is_contract: boolean | null;
+  source_verified: boolean | null;
+  contract_name: string | null;
+  proxy: { type: "eip1967" | "none" | "unknown"; implementation: string | null; admin: string | null };
+  owner: string | null;
+  owner_type: "eoa" | "contract" | "safe" | "unknown" | "none";
+  safe: { threshold: number | null; signers: string[] | null } | null;
+  created_block: number | null;
+  created_at: string | null;
+  holders: number | null;
+  errors: Array<{ step: string; message: string }>;
+};
+export type PulledFile = {
+  slug: string;
+  pulled_at: string;
+  chain: "robinhood-chain";
+  addresses: PulledAddress[];
+  metrics: Array<{ kind: MetricKind; value: number; as_of: string; source_url: string }>;
+  errors: Array<{ step: string; message: string }>;
 };
 
 export type ChangelogType = "score" | "risk" | "stage" | "finding" | "correction" | "coverage";
@@ -170,6 +200,9 @@ export type Metric = {
   as_of: string;
   class: "claim";
   sources: string[];
+  // Set when the figure came from content/pulled (scripts/pull.mjs) rather than the project file: the
+  // receipt is the URL the puller read, not a ledger id.
+  source_url?: string;
 };
 
 // Cohort rank from derived.json: position within the reader-facing section of the project's tree
@@ -216,11 +249,14 @@ export type DirectoryEntry = {
   category: string;
   lifecycle: Lifecycle;
   coverage: Coverage;
+  role: CensusRole;
   summary: string;
   derived: Derived;
   feedCount: number;
   // census tree.primary placement — the home page's section grouping and the card's product label.
   tree: TreeRef | null;
+  // Holder count of the project's token contract from content/pulled, when read. Chip figure of last resort.
+  holders: number | null;
 };
 
 // A dependency card as the home page lists it: enough to label and link the chip.
@@ -239,6 +275,7 @@ export type Dossier = {
   category: string;
   lifecycle: Lifecycle;
   coverage: Coverage;
+  role: CensusRole;
   summary: string;
   links: Link[];
   dependencies: string[]; // ids into the top-level `dependencies` map
@@ -250,6 +287,7 @@ export type Dossier = {
   sources: SourceEntry[];
   changelog: ChangelogEntry[];
   derived: Derived;
+  pulled: PulledFile | null;
 };
 
 export type DependencyControl = {
@@ -349,6 +387,7 @@ export type PeerRef = {
   summary: string;
   lifecycle: Lifecycle;
   coverage: Coverage;
+  role: CensusRole;
   direct: boolean;
   leafLabel: string;
   metric: Metric | null;
@@ -429,11 +468,15 @@ export function reportedTitle(asOf: string): string {
 
 // --- Labels -----------------------------------------------------------------
 
-// Coverage states in reader words (docs/taxonomy.md §2 display mapping).
+// Coverage states in reader words (docs/taxonomy.md §2 display mapping). A watchlist row shows
+// "Watchlist" in place of its coverage word.
 export const COVERAGE_LABEL: Record<Coverage, string> = {
   full: "Full research",
   stub: "Initial research",
 };
+export function coverageWord(coverage: Coverage, role: CensusRole): string {
+  return role === "observe" ? "Watchlist" : COVERAGE_LABEL[coverage];
+}
 
 // Evidence classes in reader words; defined on /methodology.
 export const EVIDENCE_LABEL: Record<EvidenceClass, string> = {

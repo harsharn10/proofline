@@ -293,6 +293,7 @@
   category: RWA index vault
   lifecycle: testnet-only
   coverage: stub
+  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
   identity:
     aliases: []
     symbols: ["rIDX"]
@@ -448,29 +449,6 @@
     citable:           { value: true, note: "Site from the dossier and X account from the desk", verified: false }
     research_story:    { value: true, note: "Launch fee flows and who controls the factory; clone sites use the name", verified: false }
 
-- slug: virtuals
-  name: Virtuals Protocol
-  category: Agent launch platform
-  lifecycle: mainnet
-  coverage: stub
-  identity:
-    aliases: []
-    symbols: ["VIRTUAL"]
-    entity_kind: protocol
-    chain_scope: unknown
-    status: provisional
-  official_links:
-    - { kind: site, url: https://virtuals.io }
-    - { kind: x, url: https://x.com/virtuals_io }
-  discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (agents/agent-launch-layer; Llama revenue)
-  handle: "@virtuals_io"
-  tree: { primary: agents/agent-launch-layer }
-  qualifying:
-    deployed_on_chain: { value: true, note: "DefiLlama lists Virtuals revenue on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
-    native_play:       { value: false, note: "Imported multi-chain agent launch layer; by the desk's own native rule and PRD §2.2 this is a dependency/observe (EVAL 2026-08-31 §5, T2); its Robinhood Chain revenue does not make it native", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Agent launch and fee mechanics on this chain; bridged versus native token instance", verified: false }
-
 - slug: netnet
   name: NetNet Capital
   category: Reserve-backed currency
@@ -544,6 +522,7 @@
   category: Stock-paired token
   lifecycle: announced
   coverage: stub
+  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
   identity:
     aliases: []
     symbols: ["L4VA"]
@@ -633,6 +612,7 @@
   category: Market scanner
   lifecycle: announced
   coverage: stub
+  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
   identity:
     aliases: []
     symbols: []
@@ -655,6 +635,7 @@
   category: Agent identity service
   lifecycle: announced
   coverage: stub
+  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
   identity:
     aliases: []
     symbols: []
@@ -856,6 +837,7 @@
   category: Launchpad · mechanism not classified
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
   identity:
     aliases: []
     symbols: []
@@ -946,6 +928,7 @@
   category: Market scanner
   lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
+  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
   identity:
     aliases: []
     symbols: ["ROBINDEX"]
@@ -1119,3 +1102,27 @@
     native_play:       { value: true, note: "Native AMM (a PancakeSwap V3 fork per the explorer contract name) with a HOOD emissions, fee and buyback flywheel into h33", verified: false }
     citable:           { value: true, note: "X account; docs referenced as a gitbook without a URL in the intake", verified: false }
     research_story:    { value: true, note: "Emissions and buyback control; team states it holds no HOOD or LP; ticker collides with the HOOD Stock Token", verified: false }
+- slug: downto
+  name: Down to Finance
+  category: Redeemable RWA basket
+  lifecycle: announced
+  coverage: stub
+  identity:
+    aliases: ["Down To Finance", "DETF"]
+    symbols: ["DTF"]
+    entity_kind: protocol
+    chain_scope: robinhood-native
+    status: provisional
+  official_links:
+    - { kind: site, url: https://downto.finance }
+    - { kind: app, url: https://app.downto.finance/explore }
+    - { kind: docs, url: https://app.downto.finance/learn }
+    - { kind: x, url: https://x.com/downto_finance }
+  discovery_source: grok-bot packet WORK-20260902-grok-bot-downto (PR #46), compiled 2026-09-02
+  handle: "@downto_finance"
+  tree: { primary: rwa-products/redeemable-basket, secondary: [launch/graduation-token] }
+  qualifying:
+    deployed_on_chain: { value: true, note: "DTF token (a PonsV2LauncherToken) and the DETF package factories are verified contracts on chain 4663 per explorer reads on 2026-09-02 (packet REP-1, REP-2); whether any DETF basket has been created is an open question", verified: true }
+    native_play:       { value: true, note: "Claimed permissionless DETF baskets (mint, hold, bond) with chain-4663 package factories named in the app; the fee-accruing token launched on Pons v2", verified: false }
+    citable:           { value: true, note: "Official site, app and learn pages; X handle taken from the verified token constructor, not an opened profile", verified: false }
+    research_story:    { value: true, note: "Basket mechanism, fee routing to DTF and control of the package factories and proxies (deployer is a single key); audits marked pending on the app footer", verified: false }

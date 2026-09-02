@@ -25,3 +25,14 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: d35b9287c667691c
+- date: 2026-09-02
+  slug: artificial-inu
+  type: finding
+  severity: Review
+  title: Token owner is the shared Airlock launch contract
+  detail: A 2026-09-02 chain read found owner() on the Artificial Inu token returns 0xeb7c…0862, the verified Airlock contract, which also owns the EARN, Statics and Artificial Inu tokens. Control of the token's owner-only functions sits with shared launch infrastructure rather than a project-held key. Recorded as a verified risk finding with the RPC read as the source.
+  prior: null
+  new: null
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+  review_key: 93510a893b40b8c2

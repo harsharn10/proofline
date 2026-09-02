@@ -25,3 +25,14 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 715788ef6202cb1a
+- date: 2026-09-02
+  slug: earn-protocol
+  type: finding
+  severity: Review
+  title: Token owner is the shared Airlock launch contract
+  detail: A 2026-09-02 chain read found owner() on the EARN token returns 0xeb7c…0862, the verified Airlock contract, which also owns the EARN, Statics and Artificial Inu tokens. Control of the token's owner-only functions sits with shared launch infrastructure rather than a project-held key. Recorded as a verified risk finding with the RPC read as the source.
+  prior: null
+  new: null
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+  review_key: 422e1a9e872f0e80

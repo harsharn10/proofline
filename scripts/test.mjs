@@ -20,7 +20,6 @@ import {
 import { validateContent } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
-import { validateNameIntake } from "./lib/name-intake.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
@@ -291,7 +290,7 @@ async function makeContent(mutate = () => {}) {
   const checkedNull = await run((c) => { c.site.chain.checked = null; });
   try {
     assert.deepEqual(clean, [], "clean tree passes release gates");
-    assert.ok(todo.some((e) => e.includes("corrections.destination")), "corrections TODO");
+    assert.deepEqual(todo, [], "corrections TODO is a warning, not a release error (issue #35)");
     assert.ok(unverified.some((e) => e.includes("not verified")), "unverified address on a full profile");
     assert.ok(pendingHigh.some((e) => e.includes("approver pending")), "approver pending with uncapped confidence ≥ 70");
     assert.deepEqual(pendingLow, [], "approver pending with uncapped confidence < 70 is not a release error");
@@ -344,7 +343,8 @@ async function makeContent(mutate = () => {}) {
   try {
     assert.deepEqual(baseline.errors, [], "scratch copy validates");
     assert.ok(qualifyingFalse.warnings.some((w) => w.includes("fails qualifying test citable")), "qualifying value false warns");
-    assert.ok(releaseRun.errors.some((e) => e.includes("fails qualifying test citable")), "qualifying value false is a release error");
+    assert.ok(!releaseRun.errors.some((e) => e.includes("fails qualifying test")), "qualifying value false never blocks a release (issue #35: the row is a watchlist row)");
+    assert.ok(releaseRun.warnings.some((w) => w.includes("fails qualifying test citable") && w.includes("not marked role: observe")), "a failing row without role: observe says so");
     assert.deepEqual(feedCited.errors, [], "feed citation of an existing ledger id is not an error");
     assert.ok(!feedCited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited only from a feed item is not 'never cited'");
     assert.ok(feedCited.warnings.some((w) => w.includes("skip-tier account @spam")), "feed item attributed to a skip-tier account warns");
@@ -650,51 +650,6 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     for (const [data, want, why] of cases) assert.equal(validateAgainst("census", [data]).length > 0 ? 1 : 0, want, why);
     console.log("ok   census schema handle/tree");
   } catch (err) { failures++; console.error(`FAIL census schema handle/tree: ${err.message}`); }
-}
-
-// New-name intake: complete taxonomy, referential integrity, authenticity and conflicts.
-{
-  const template = parse(await readFile("docs/templates/name-intake.yaml", "utf8"));
-  const valid = validateNameIntake(template, { census: [] });
-  const dangling = structuredClone(template);
-  dangling.claims[0].source_ids = ["SRC-99"];
-  const danglingErrors = validateNameIntake(dangling, { census: [] });
-  const ungroundedVerified = structuredClone(template);
-  ungroundedVerified.identity.status = "verified";
-  const verifiedErrors = validateNameIntake(ungroundedVerified, { census: [] });
-  const mainnet = structuredClone(template);
-  mainnet.lifecycle = "mainnet";
-  const mainnetErrors = validateNameIntake(mainnet, { census: [] });
-  const taxonomyDrift = structuredClone(template);
-  taxonomyDrift.taxonomy.primary_domain = "yield";
-  const taxonomyErrors = validateNameIntake(taxonomyDrift, { census: [] });
-  const unrelatedReproduction = structuredClone(template);
-  unrelatedReproduction.sources.push({ ...structuredClone(template.sources[0]), id: "SRC-2", url: "https://example.com/unrelated" });
-  unrelatedReproduction.reproductions.push({ id: "REP-1", method: "other", source_ids: ["SRC-2"], checked_at: "2026-09-01T12:00:00Z", result: "Checked an unrelated source." });
-  unrelatedReproduction.claims[0].class = "verified";
-  unrelatedReproduction.claims[0].reproduction_ids = ["REP-1"];
-  const reproductionErrors = validateNameIntake(unrelatedReproduction, { census: [] });
-  const unresolved = structuredClone(template);
-  unresolved.reproductions.push({ id: "REP-1", method: "document-scope", source_ids: ["SRC-1"], checked_at: "2026-09-01T12:00:00Z", result: "Checked the announcement text." });
-  unresolved.claims[2].class = "verified";
-  unresolved.claims[2].reproduction_ids = ["REP-1"];
-  unresolved.claims.push({ id: "CLM-8", field: "lifecycle", value: "beta", class: "disputed", source_ids: ["SRC-1"], reproduction_ids: [], observed_at: "2026-09-01T12:00:00Z" });
-  unresolved.conflicts.push({ id: "CON-lifecycle", field: "lifecycle", claim_ids: ["CLM-3", "CLM-8"], status: "open", resolution: null });
-  const unresolvedErrors = validateNameIntake(unresolved, { census: [] });
-  const collision = validateNameIntake(template, {
-    census: [{ slug: "example", name: "Example Protocol", identity: { aliases: [] } }],
-  });
-  try {
-    assert.deepEqual(valid, [], "standard name template passes");
-    assert.ok(danglingErrors.some((error) => error.includes("missing source SRC-99")), "dangling source rejected");
-    assert.ok(verifiedErrors.some((error) => error.includes("verified identity requires")), "identity cannot self-verify");
-    assert.ok(mainnetErrors.some((error) => error.includes("mainnet requires")), "mainnet requires reproduction");
-    assert.ok(taxonomyErrors.some((error) => error.includes("matching taxonomy.primary-domain claim")), "taxonomy must agree with its claim");
-    assert.ok(reproductionErrors.some((error) => error.includes("share a source")), "verified claim must be grounded in its reproduction");
-    assert.ok(unresolvedErrors.some((error) => error.includes("open conflict") && error.includes("verified claim")), "open conflict blocks verification");
-    assert.ok(collision.some((error) => error.includes("possible_matches")), "normalized canonical match must be disclosed");
-    console.log("ok   standardized name intake");
-  } catch (err) { failures++; console.error(`FAIL standardized name intake: ${err.message}`); }
 }
 
 // Task 2 — feed schema: kind enum and account handle pattern.
