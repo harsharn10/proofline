@@ -35,6 +35,43 @@ export function referencedSourceIds(project) {
   return ids;
 }
 
+/** Contract-plus-pair evidence used by the one-time lifecycle migration. */
+export function mainnetReceiptFromPulled(pulled) {
+  if (pulled?.chain !== "robinhood-chain") return null;
+  const pairs = (pulled.market?.pairs ?? []).filter((pair) => pair?.pair_address);
+  if (!pairs.length) return null;
+  const contracts = (pulled.addresses ?? []).filter((row) => row?.is_contract === true && /^0x[0-9a-fA-F]{40}$/.test(row.address ?? ""));
+  if (!contracts.length) return null;
+  const marketAddress = String(pulled.market?.token_address ?? "").toLowerCase();
+  const contract = contracts.find((row) => row.address.toLowerCase() === marketAddress) ?? contracts[0];
+  if (!contract.created_at) return null;
+  return { address: contract.address, createdAt: contract.created_at };
+}
+
+function pulledContractHasActivity(pulled) {
+  if (pulled?.chain !== "robinhood-chain") return false;
+  const contracts = new Set((pulled.addresses ?? []).filter((row) => row?.is_contract === true).map((row) => String(row.address).toLowerCase()));
+  return (pulled.activity?.addresses ?? []).some((row) => {
+    if (!contracts.has(String(row.address).toLowerCase())) return false;
+    return Boolean(row.last_tx_at) || Number(row.transactions_count ?? 0) > 0 || Number(row.token_transfers_count ?? 0) > 0;
+  });
+}
+
+/** Warn when a typed Announced lifecycle disagrees with machine reads. */
+export function lifecycleDriftWarnings(census, pulledBySlug) {
+  const warnings = [];
+  for (const row of census ?? []) {
+    if (row.lifecycle !== "announced") continue;
+    const pulled = pulledBySlug?.get(row.slug);
+    if (!pulled || pulled.chain !== "robinhood-chain") continue;
+    const pairCreated = (pulled.market?.pairs ?? []).some((pair) => pair?.pair_address);
+    const activeContract = pulledContractHasActivity(pulled);
+    if (pairCreated || activeContract)
+      warnings.push(`census: ${row.slug} is announced but pulled chain reads show ${pairCreated ? "a market pair" : "contract activity"} on 4663`);
+  }
+  return warnings;
+}
+
 export function crossCheck(content) {
   const errors = [], warnings = [];
   const censusSlugs = new Set();
