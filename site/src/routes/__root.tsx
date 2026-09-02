@@ -26,12 +26,12 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "stylesheet", href: appCss },
     ],
-    // Applies the saved theme before first paint (no flash of the wrong theme): reads
-    // localStorage in a try/catch — a private-mode failure falls through to dark default.
+    // Applies the theme before first paint (no flash of the wrong theme): the saved choice first,
+    // then the system preference, inside a try/catch — a private-mode failure falls through to dark.
     scripts: [
       {
         children:
-          'try{var t=localStorage.getItem("proofline.theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t)}}catch(e){}',
+          'try{var t=localStorage.getItem("proofline.theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}if(t==="light"){document.documentElement.setAttribute("data-theme","light")}}catch(e){}',
       },
     ],
   }),

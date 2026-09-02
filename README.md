@@ -3,17 +3,18 @@
 Evidence-backed research profiles for native Robinhood Chain plays. Research, not advice.
 Spec: `PRD.md`. Content-system design: `docs/superpowers/specs/2026-08-30-content-system-design.md`.
 
-Current research operations are defined by [`docs/research-system.md`](docs/research-system.md). The
-standard agent handoff is [`docs/templates/research-packet-v1.md`](docs/templates/research-packet-v1.md),
-and controlled product/display labels are defined in [`docs/taxonomy.md`](docs/taxonomy.md). These
-current contracts supersede conflicting instructions in dated handoffs, inbox notes, and historical
-implementation plans. Producer annexes: [`Grok Bot`](docs/integrations/grok-bot.md) and
-[`SuperGrok verifier`](docs/integrations/supergrok.md).
+Research operations are defined by one contract, [`docs/research-system.md`](docs/research-system.md):
+objects, who may write which paths, roles, the packet format (§5), branch and PR protocol, evidence
+and conflict rules. Controlled product and display labels are in [`docs/taxonomy.md`](docs/taxonomy.md)
+with the machine copy in `schema/taxonomy.json`. Producer notes restate the contract for one producer:
+[`Grok desk`](docs/integrations/grok-bot.md) and [`SuperGrok verifier`](docs/integrations/supergrok.md).
+Grok's runtime skills live in `.grok/`. Dated inbox notes and historical implementation plans are
+evidence, not instructions.
 
 ## Commands
 
     npm install
-    npm run validate          # schemas + cross-references + research markdown checks
+    npm run validate          # schemas + cross-references + research markdown checks + strict parse of research/inbox YAML
     npm run validate:release  # same, plus launch blockers (corrections contact, verified deployments, approvals)
     npm run score             # derive score / confidence / risk for every project → build/derived.json
     npm run seed              # create stub files for any census entry that has none (never overwrites)
@@ -28,7 +29,7 @@ If a number on the site is wrong, the fix is in an input or in `score.mjs`, neve
 ## Layout
 
     content/site.yaml               name, maintainer, corrections contact, chain facts, trending config, disclaimer
-    content/census.yaml             the coverage universe; one entry per play with the four qualifying tests, optional handle + tree placement
+    content/census.yaml             the coverage universe; one entry per play with the four qualifying tests, handle, tree placement
     content/projects/<slug>.yaml    structured record: identity, deployments, dependencies, scoring inputs, findings
     content/sources/<slug>.yaml     source ledger — every S-id cited anywhere for that slug lives here
     content/research/<slug>.md      narrative record, 11 fixed sections, every material sentence tagged
@@ -38,9 +39,18 @@ If a number on the site is wrong, the fix is in an input or in `score.mjs`, neve
     content/accounts.yaml           CT accounts tracked for the trending signal (handle, tier, role, slug, followers)
     content/changelog.yaml          dated record of every published change
     content/methodology.md          generated from PRD §6–7 (see Task 5 in the plan for the extraction command)
-    schema/                         JSON Schema for each file type
-    scripts/                        validate, score, seed, test
+    research/inbox/assignments/     controller-written assignments: packet header + objective, one per work id
+    research/inbox/packets/<slug>/  agent handoffs (packet v2, research-system §5); the only path a collector or verifier writes
+    docs/templates/                 research-packet-v2.md — the worked packet every producer copies
+    schema/                         JSON Schema for each file type; schema/taxonomy.json is the leaf and section registry
+    scripts/                        validate, score, seed, test, migrations
     fixtures/                       worked scoring examples with hand-calculated expected values
+    .grok/                          Grok's runtime skills and workflow, rewritten to the research contract
+
+Everything under `content/` is written by the compiler (Codex, Claude or the owner) from packets, or by
+a machine script. Collectors and verifiers never write it. Two paths above are contracts, not files
+yet: `research/inbox/packets/` appears with the first packet PR, and `content/pulled/<slug>.yaml`
+(onchain and DefiLlama facts from `scripts/pull.mjs`, Codex assignment C2) is planned.
 
 ### Site contract
 
@@ -60,26 +70,42 @@ shape of each server function's response.
 
 ## Adding a project
 
-1. Add an entry to `content/census.yaml` with all four qualifying tests (PRD §2.1). A test may carry
-   `value: false` with a `note` explaining why — the row stays in the census either way, so the universe
-   stays visible; `validate` warns on it and `validate:release` blocks release until it's resolved.
-2. Add its facts to `scripts/seed-data.mjs` (symbol, summary, dependencies, known deployments, missing-evidence list).
-3. `npm run seed` — creates `projects/`, `sources/`, `research/` files for it and appends an "Initial stub opened"
-   entry to `content/changelog.yaml` (validate requires one per census slug).
-4. `npm run validate`.
+A name enters the census from a seed packet (`research/inbox/packets/<slug>/<work-id>.md`,
+research-system §5), never from an agent writing `content/census.yaml`. Copy
+[`docs/templates/research-packet-v2.md`](docs/templates/research-packet-v2.md) to file one; `npm run
+validate` checks it against `schema/packet.schema.json`. The compiler turns the packet into a row.
+Until `scripts/compile-packet.mjs` lands (Codex assignment C1), the compiler does it by hand:
+
+1. Add an entry to `content/census.yaml` from the packet's identity and classification blocks, with all
+   four qualifying tests (PRD §2.1). A test may carry `value: false` with a `note` explaining why — the
+   row stays in the census either way, so the universe stays visible; `validate` warns on it and
+   `validate:release` blocks release until it's resolved. `tree.primary` must be a leaf from
+   `schema/taxonomy.json`; `category` is derived from the leaf (`scripts/migrations/derive-category-from-leaf.mjs`).
+   Packet coverage `seed` becomes `coverage: stub`; a packet lifecycle of `unknown` cannot become a row.
+2. `npm run seed` — reads the newest packet for every census slug that has no `projects/`, `sources/` or
+   `research/` file yet and opens all three from it: symbol from `identity.symbols`, summary from the
+   body's "What it is", official links from `links[]`, deployments from `deployments[]` (address
+   `not-verified` until `exists_on_4663` is true), the source ledger from `receipts[]` and the
+   missing-evidence list from `gaps[]`. It also appends an "Initial stub opened" entry to
+   `content/changelog.yaml` (validate requires one per census slug). A slug with no packet gets a
+   `NULL — …` placeholder stub and a warning. Existing files are never overwritten.
+3. `npm run validate`.
 
 ## Researching a project (stub → full)
 
-Start from a reviewed research packet. Agents write one
-`research/inbox/packets/<slug>/<work-id>.md` using the packet template; a single assigned compiler maps
-it into the canonical files below. Grok/SuperGrok packets, profile publication, site-feed placement, and
-Telegram eligibility are separate decisions. See the research-system flow before editing canonical
-content.
+Start from a reviewed packet. A collector files one full-tier
+`research/inbox/packets/<slug>/<work-id>.md` from `docs/templates/research-packet-v2.md`; a verifier
+files its own packet with `prior_packet` set; a single assigned compiler maps them into the canonical
+files below. `npm run validate` gates every packet on `schema/packet.schema.json`: packet-local ids
+must resolve, a `verified` claim needs a reproduction, `lifecycle: mainnet` needs evidence beyond the
+project's own post, and a collector or verifier may not resolve a conflict. Packet acceptance, profile
+publication, site-feed placement and Telegram eligibility are separate decisions (research-system §8).
+The compiler's steps:
 
-1. Add every source you open to `content/sources/<slug>.yaml` first (`S1`, `S2`, …) with `accessed_at`, `claim`, `excerpt`.
+1. Add every source the packet cites to `content/sources/<slug>.yaml` (`S1`, `S2`, …, new ids above the current maximum, never renumbered) with `accessed_at`, `claim`, `excerpt`.
 2. Write `content/research/<slug>.md`. Every material sentence ends with `[verified S3]`, `[claim S7]`, `[inference S3 S4]`, `[disputed S9]` or `[unknown]`.
    A full profile may not leave any of sections 2–9 as `_Research pending._`.
-3. Fill `scoring:` in `content/projects/<slug>.yaml` (Pons has a commented skeleton). Every level needs `evidence: [S..]` and a note.
+3. Fill `scoring:` in `content/projects/<slug>.yaml` (Pons has a worked example). Every level needs `evidence: [S..]` and a note.
 4. Set `coverage: full` in the project file, the research front matter and `census.yaml`.
 5. Add a `changelog.yaml` entry (`type: score` or `coverage`, prior → new).
 6. `npm run validate && npm run score`. Open a PR; the approver sets `review.approver` to their id.
@@ -115,8 +141,9 @@ sources, account?, sourceUrl? }] }`. Every item requires at least one ledger `S-
 `company | ct | onchain | risk`; `account` is a CT handle matching `^@[A-Za-z0-9_]{1,15}$`. A feed file's `slug` must
 be a census slug, and its `sources` ids must exist in that slug's ledger — same rule as a project file. `date` is the
 post date; when an intake recorded a post without its date,
-the item is dated to the capture date and the body says so ("captured by the desk on 2026-08-31; original post date not
-recorded").
+the item is dated to the capture date and the body says so ("captured on 2026-08-31; original post date not
+recorded"). New item ids are content hashes (research-system §8), written by the compiler; the older
+positional ids (`pons-14`) stay until the compiler rewrites the file.
 
 `content/accounts.yaml` is the list of CT accounts worth tracking: `[{ handle, name?, tier, role?, slug?, followers?,
 note? }]`. `tier` is `top | watch | downweight | skip`: `downweight` = scrape, never count toward trending; `skip` =
@@ -129,7 +156,8 @@ words (drainer, impersonator, farm, scammer, insider, …) unconditionally (see 
 2026-08-30/31 intake built the initial ledger from the research desk's own account file
 (`scripts/intake/2026-08-31/build-accounts.mjs`, one-shot — see "Status" below); that script mapped the desk's
 `builder` role to `project` (team accounts never trend), `farm` to `kol`, and `follow: false` + `listen: low` rows
-to `downweight`.
+to `downweight`. Account changes now arrive as packet claims (`account.<handle>.<axis>`) and the compiler
+writes the file.
 
 `site.yaml`'s `trending: { min_accounts, window_days }` (3 accounts / 7 days by default) drives `computeTrending()`
 (`scripts/lib/trending.mjs`): a project is trending when at least `min_accounts` distinct counting accounts have each
@@ -204,20 +232,21 @@ Three workflows under `.github/workflows/`:
 - **`validate.yml`** — every PR, and every push to `main` (not to other branches — a PR run already
   covers those, and a `push: ["**"]` trigger would double-run every PR commit). One job: root
   `npm ci && npm test` (schema validation + scoring/rule tests — a voice hit in a feed item or a conduct
-  hit anywhere fails this unconditionally, not just under `--release`), a `node scripts/validate.mjs
+  hit anywhere fails this unconditionally, not just under `--release`; every YAML file under
+  `research/inbox/` must parse strictly), a `node scripts/validate.mjs
   --release` step with `continue-on-error: true` so release blockers (corrections contact, verified
   deployments, approvals) show up in the log without failing the check, then the site's `npm ci && npm
   run typecheck && npm run build && npm run smoke` (the smoke test boots the build and asserts every
   route is 200 with no `uncapped` leakage — see "Site contract" above). `automerge-feed.yml` reads the
   result only to classify the PR and comment; it never merges.
 - **`automerge-feed.yml`** — triggers on `validate.yml`'s own completion (`workflow_run`, so it always
-  runs the copy of this file committed to `main`, never a PR's copy) for a `grok/**` head branch that
+  runs the copy of this file committed to `main`, never a PR's copy) for a producer head branch that
   Validate just passed. It finds the PR, asks the GitHub API for its exact file list (not `git diff`,
-  which can hide a rename), and requires every file to be an addition or in-place edit under
-  `content/feed/**`, `content/sources/**` (additions-only — any removed line rejects it) or
-  `research/inbox/**` — `content/accounts.yaml` is deliberately **not** on this list, a tier or note
-  change there always needs a human. The workflow never merges or dispatches publishing. Allowlisted
-  PRs receive one "waiting for controller" comment; anything else receives "needs controller review."
+  which can hide a rename), and requires every file to be an addition or in-place edit under the
+  intake allowlist. The contract allowlist (research-system §2) is `research/inbox/packets/**` and
+  `research/inbox/assignments/**` for `grok/**`, `grok-heavy/**`, `supergrok/**` and `codex/**`
+  branches. The workflow never merges or dispatches publishing. Allowlisted PRs receive one "waiting
+  for controller" comment; anything else receives "needs controller review."
 - **`publish.yml`** — on push to `main` and explicit dispatch. `npm run score`, then the approval-only
   Telegram sender, skipped rather than failed when Telegram secrets are absent; commits
   `ops/telegram-state.json` back with `[skip ci]` only after an approved delivery.
@@ -243,22 +272,21 @@ Telegram publishing gate.
 Vercel is not currently connected or deployed. [`site/vercel.json`](site/vercel.json) remains only as
 compatibility configuration in case a Vercel deployment is intentionally restored later.
 
-## Grok Bot
+## Producers
 
-Automated research intake (X posts, on-chain events, official announcements) reaches this repo only
-as a pull request from a `grok/<YYYY-MM-DD>` branch, opened via the GitHub REST API. The full contract
-— what it may collect, where it may write, what it must never write, evidence rules, and the exact
-file shapes — is [`docs/integrations/grok-bot.md`](docs/integrations/grok-bot.md).
+Automated research (X posts, onchain events, official announcements, verification passes) reaches
+this repo only as a pull request from a `<producer>/<YYYYMMDD>/<work-id>` branch, opened through the
+GitHub REST API, containing one packet per assigned slug under `research/inbox/packets/`. Producer ids
+are `grok-heavy`, `grok-bot`, `supergrok`, `codex`, `claude`, or a GitHub id; every bot commit carries
+a `Producer: <id>` trailer. Producers never write `content/`. The compiler maps packets into
+`content/`; conflicts are never last-write-wins ([`docs/research-system.md`](docs/research-system.md)
+§7 has the field-specific source precedence, authenticity, resolution and merge rules).
 
 `content/census.yaml` is the canonical name registry. Every row carries an `identity` taxonomy:
 aliases, symbols, entity kind, chain scope and `verified | provisional | conflicted` status. New names
-never enter that registry directly from automation. Grok submits one validated dossier at
-`research/inbox/names/<slug>.yaml`, using [`docs/templates/name-intake.yaml`](docs/templates/name-intake.yaml).
-The dossier separates sources, reproductions and atomic claims; covers identity, product, deployment,
-control, security, team, economics, activity and communications; and records possible matches and
-conflicts. `npm run validate` checks its schema and all internal references. Conflicts are never
-last-write-wins: [`docs/integrations/grok-bot.md`](docs/integrations/grok-bot.md) §3 defines field-specific
-source precedence, authenticity, resolution and merge rules.
+never enter it directly from automation. The one-file-per-name dossier under `research/inbox/names/`
+and `docs/templates/name-intake.yaml` are gone: the packet frontmatter is the dossier, and
+`schema/packet.schema.json` is the schema that used to validate them.
 
 ## Voice and conduct lint
 
@@ -283,13 +311,17 @@ over a project's `summary`, its findings text, feed `title`/`body`, research Mar
 ## Status
 
 Seeded 2026-08-30 with 14 stubs; expanded 2026-08-31 to 49 stubs from the Grok research intake (see
-`research/inbox/grok-2026-08-30/HARVEST.md` — every address `verified: false`, every statement `class: claim`). No full
-profiles yet. `corrections.destination` in `site.yaml` is `TODO` and blocks `validate:release` on purpose.
+`research/inbox/grok-2026-08-30/HARVEST.md` — every address `verified: false`, every statement `class: claim`).
+One full profile (`pons`, scored via PR #10). `corrections.destination` in `site.yaml` is `TODO` and
+blocks `validate:release` on purpose. Open work from the 2026-09-01 review is drafted as issues under
+`docs/reviews/2026-09-01/issues/`.
 
 Intake tooling: `content/` is canonical now — the merge from the 2026-08-30/31 Grok intake is done (Task
 5), and `scripts/intake/2026-08-31/{import-chain-file,harvest-data,apply-harvest,build-accounts}.mjs`
 that did it are one-shot, quarantined under `scripts/intake/2026-08-31/` (see the README there).
 `apply-harvest.mjs` and `build-accounts.mjs` refuse to run without `--overwrite` because they regenerate
-their target files wholesale — don't re-run them against reviewed content. `node
+their target files wholesale — don't re-run them against reviewed content. Two of them
+(`apply-harvest.mjs`, `harvest-metrics.mjs`) no longer load at all: they import the retired
+`scripts/seed-data.mjs`, and they stay only as the record of that pass. `node
 scripts/build-dependency-cards.mjs` (skeleton cards, never overwrites an existing one) is not one-shot
 and stays at the top level; it's still the right tool for a new dependency card.

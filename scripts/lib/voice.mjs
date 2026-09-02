@@ -31,6 +31,14 @@ const CONDUCT_PHRASES = ["same person as"];
 // vs "a yield farm"); applied to `accounts[].note` only, on top of the list above (fix round 1 ruling E).
 const NOTE_CONDUCT_WORDS = ["impersonation", "farm", "farms", "farmed", "scams", "insiders", "fraudulent", "malicious", "phishing", "shady", "sketchy"];
 
+// Reader-facing internal vocabulary: names for the research operation and its machinery ("the desk", the
+// producer bots, the compiler and controller roles, "S-id" for a ledger id). They leak process into published
+// prose and mean nothing to a reader. Applied to changelog title/detail, project summaries and findings, and
+// research Markdown. Matching is case-sensitive apart from a leading "The"/"the": Squeeze's own product is
+// literally named "the Desk" and "grok" is an ordinary verb, so a case-insensitive scan would flag both.
+const INTERNAL_VOCABULARY = ["the desk", "desk's", "Grok", "SuperGrok", "the compiler", "the controller", "S-id"];
+const vocabRe = (term) => new RegExp(`\\b${term.replace(/^the /, "[Tt]he ").replace(/\s+/g, "\\s+")}\\b`);
+
 /**
  * Whole-word, case-insensitive scan for conduct verdicts. Pass `{ note: true }` for an account note to
  * add the note-only words.
@@ -56,4 +64,10 @@ export function voiceWarnings(text, where) {
   if (PRINT_NEAR_TRIGGER_RE.test(text)) out.push(`${where}: banned phrase "print/prints … mcap/market cap/FDV"`);
 
   return out;
+}
+
+/** Scan of `text` for the internal-vocabulary list; same shape as voiceWarnings. */
+export function vocabularyWarnings(text, where) {
+  if (!text) return [];
+  return INTERNAL_VOCABULARY.filter((term) => vocabRe(term).test(text)).map((term) => `${where}: internal vocabulary "${term}"`);
 }

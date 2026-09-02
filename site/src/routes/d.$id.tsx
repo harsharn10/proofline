@@ -4,7 +4,7 @@ import { EvidenceTag } from "@/components/evidence-tag";
 import { Section } from "@/components/section";
 import { dejargon, hostLabel } from "@/lib/dejargon";
 import { getDependency } from "@/data/content-server";
-import { DEPENDENCY_KIND_LABEL } from "@/data/types";
+import { DEPENDENCY_KIND_LABEL, NOT_VERIFIED } from "@/data/types";
 
 export const Route = createFileRoute("/d/$id")({
   loader: async ({ params }) => {
@@ -18,8 +18,8 @@ export const Route = createFileRoute("/d/$id")({
       <p className="eyebrow">Not on file</p>
       <h1 className="text-2xl font-bold tracking-tight">That dependency is not in the file yet.</h1>
       <p className="honest mt-3 max-w-prose">
-        Dependencies get their own card when a name's research pulls in a shared piece of
-        infrastructure — an issuer asset, a DEX, an oracle, a venue.
+        Dependencies get their own card when a name's research pulls in a shared piece of infrastructure:
+        an issuer asset, a DEX, an oracle, a venue.
       </p>
       <Link to="/" className="backlink mt-6">
         ← back to the file
@@ -28,8 +28,15 @@ export const Route = createFileRoute("/d/$id")({
   ),
 });
 
+// A dependency card. Sections render only when they hold something (rule 1); one honest line
+// covers whatever is still empty.
 function DependencyPage() {
   const { dependency, site } = Route.useLoaderData();
+  const deployments = (dependency.deployments ?? []).filter((d) => d.address !== NOT_VERIFIED);
+  const missing: string[] = [];
+  if (dependency.controls.length === 0) missing.push("who controls it");
+  if (dependency.failure_modes.length === 0) missing.push("how it can fail");
+  if (deployments.length === 0) missing.push("its deployments");
 
   return (
     <>
@@ -40,13 +47,20 @@ function DependencyPage() {
       </div>
       <article className="wrap narrow pb-10">
         <p className="eyebrow" style={{ marginTop: 8 }}>
-          {DEPENDENCY_KIND_LABEL[dependency.kind]}
+          Dependency · {DEPENDENCY_KIND_LABEL[dependency.kind]}
         </p>
         <h1 className="text-2xl font-bold tracking-tight">{dependency.name}</h1>
         <p className="lead mt-4">{dejargon(dependency.summary)}</p>
 
-        <Section title="Controls" hint={dependency.controls.length > 0 ? "who holds which power" : undefined}>
-          {dependency.controls.length > 0 ? (
+        {missing.length > 0 ? (
+          <p className="honestpanel mt-5">
+            <b>Shared infrastructure, not a research subject.</b> This card does not yet record {missing.join(", ")}.
+            It is cited from the profiles that depend on it.
+          </p>
+        ) : null}
+
+        {dependency.controls.length > 0 ? (
+          <Section title="Controls" hint="who holds which power">
             <div className="tblwrap">
               <table className="grid">
                 <thead>
@@ -71,41 +85,33 @@ function DependencyPage() {
                 </tbody>
               </table>
             </div>
-          ) : (
-            <p className="honest">No controls recorded yet.</p>
-          )}
-        </Section>
+          </Section>
+        ) : null}
 
-        <Section title="Failure modes">
-          {dependency.failure_modes.length > 0 ? (
+        {dependency.failure_modes.length > 0 ? (
+          <Section title="Failure modes" hint="what breaks for the plays that rely on it">
             <div className="atomlist">
               {dependency.failure_modes.map((f, i) => (
                 <div key={i} className="atom">
-                  <span className="kd">
-                    {f.class}
-                    {f.sources.length > 0 ? ` · ${f.sources.join(" ")}` : ""}
-                  </span>
+                  <EvidenceTag evidenceClass={f.class} sources={f.sources} />
                   <p>{dejargon(f.text)}</p>
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="honest">None recorded.</p>
-          )}
-        </Section>
+          </Section>
+        ) : null}
 
-        <Section title="Deployments">
-          <DeploymentGrid deployments={dependency.deployments ?? []} explorerBase={site.chain.explorer} />
-        </Section>
+        {deployments.length > 0 ? (
+          <Section title="Deployments" hint="reproduced on the explorer unless marked claimed">
+            <DeploymentGrid deployments={deployments} explorerBase={site.chain.explorer} />
+          </Section>
+        ) : null}
 
-        <Section
-          title="Sources"
-          hint={dependency.sources.length > 0 ? `${dependency.sources.length} in the ledger` : undefined}
-        >
-          {dependency.sources.length > 0 ? (
+        {dependency.sources.length > 0 ? (
+          <Section title="Sources" hint="what each claim rests on">
             <ol className="m-0 list-none p-0">
               {dependency.sources.map((s) => (
-                <li key={s.id} className="srcrow">
+                <li key={s.id} id={s.id} className="srcrow">
                   <span className="sid">{s.id}</span>
                   <div className="min-w-0">
                     <div className="sh">
@@ -120,10 +126,8 @@ function DependencyPage() {
                 </li>
               ))}
             </ol>
-          ) : (
-            <p className="honest">No sources recorded yet.</p>
-          )}
-        </Section>
+          </Section>
+        ) : null}
       </article>
     </>
   );

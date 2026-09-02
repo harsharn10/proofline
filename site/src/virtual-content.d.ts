@@ -6,11 +6,13 @@ declare module "virtual:proofline-content" {
     census: string;
     methodology: string;
     derived: string;
+    taxonomy: string;
     dependencies: Record<string, string>;
     projects: Record<string, string>;
     sources: Record<string, string>;
     research: Record<string, string>;
     feed: Record<string, string>;
+    pulled: Record<string, string>;
   };
   export default content;
 }

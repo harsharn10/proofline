@@ -10,24 +10,13 @@ function kindTone(kind: FeedItem["kind"]): Tone {
   return "muted";
 }
 
-// A posted number is a claim until reproduced — the caveat lives in this small amber
-// badge, not in prose parentheses (brief rule 3).
-function isReported(item: FeedItem): boolean {
-  return (item.kind === "company" || item.kind === "ct") && /\d/.test(item.title);
-}
-
-// `name` is set on the home page's cross-name strip (it links each item to its dossier)
-// and omitted on a dossier's own feed.
+// `name` is set on the cross-name feed page (it links each item to its dossier) and omitted on a
+// dossier's own feed. A feed item is what an account posted, not a verified fact — /methodology
+// says so once; there is no per-item badge.
 export type FeedListItem = { item: FeedItem; name?: { slug: string; symbol: string | null; name: string } };
 
 export function FeedList({ items }: { items: FeedListItem[] }) {
-  if (items.length === 0) {
-    return (
-      <p className="honest">
-        No feed items yet. When the project posts or an account posts about a name, it lands here.
-      </p>
-    );
-  }
+  if (items.length === 0) return null;
 
   return (
     <ol className="list-none p-0 m-0">
@@ -43,7 +32,6 @@ export function FeedList({ items }: { items: FeedListItem[] }) {
                   {name.symbol ?? name.name}
                 </Link>
               ) : null}
-              {isReported(item) ? <Badge tone="warn">reported</Badge> : null}
               {receiptHref ? (
                 <a className="receipt" href={receiptHref} target="_blank" rel="noreferrer">
                   {item.account ?? hostLabel(receiptHref)}

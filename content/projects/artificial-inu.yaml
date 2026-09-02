@@ -35,14 +35,6 @@ review:
   published_at: null
 findings:
   positive:
-    - text: Artificial Inu publishes an official site at https://artificialinu.com.
-      class: claim
-      sources:
-        - S1
-    - text: Artificial Inu publishes an official X account at https://x.com/ArtificiallyInu.
-      class: claim
-      sources:
-        - S2
     - text: The official account posted that the AI/NVDA pool and community vault held about $1.7M of NVDA (up $250k day over day on 29 Aug), 8,599 NVDA in total, and that this was 20.16% of all tokenized NVDA on Robinhood Chain.
       class: claim
       sources:
@@ -56,7 +48,10 @@ findings:
       class: claim
       sources:
         - S5
-  risk: []
+  risk:
+    - text: "owner() on the Artificial Inu token contract returns 0xeb7c…0862, the verified Airlock contract that also owns the EARN, Statics and Artificial Inu tokens; the token's owner-only functions are controlled by shared launch infrastructure, not by a project-held key or multisig."
+      class: verified
+      sources: [S9]
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from PRD Appendix A not yet reproduced on Blockscout

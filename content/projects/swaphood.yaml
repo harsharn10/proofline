@@ -1,7 +1,7 @@
 slug: swaphood
 name: SwapHood
 symbol: HOOD
-category: Fee-routing protocol
+category: Native AMM
 lifecycle: mainnet
 coverage: stub
 summary: Native AMM (a PancakeSwap V3 fork per the explorer contract name) with HOOD emissions to LPs, fees to HOOD buybacks and buybacks into h33 backing.
@@ -59,15 +59,11 @@ review:
   published_at: null
 findings:
   positive:
-    - text: SwapHood publishes an official X account at https://x.com/SwapHoodFi.
-      class: claim
-      sources:
-        - S1
     - text: The official account describes a flywheel of HOOD emissions (about 2,375 per day, 5M maximum) to LPs, protocol fees used for HOOD buybacks (633.93 HOOD for 0.012 ETH on 2026-08-28) and buybacks raising the backing of h33; the team states it holds no HOOD and no LP.
       class: claim
       sources:
         - S3
-    - text: The desk's auditor reported the HOOD token present on Blockscout 4663 with 395 holders and its contract source code verified on the explorer (per the desk, not Proofline verification), and DefiLlama lists SwapHood V3 with about $126–130k 24h volume.
+    - text: The HOOD token is present on Blockscout 4663 with 395 holders and its contract source code verified on the explorer — the explorer's own flag, not independent Proofline verification — and DefiLlama lists SwapHood V3 with about $126–130k 24h volume.
       class: claim
       sources:
         - S5
@@ -83,9 +79,9 @@ findings:
         - S5
         - S2
   missing:
-    - text: Addresses reported by the desk not reproduced here
+    - text: Addresses reported during intake not reproduced here
     - text: Emissions controller and buyback executor
     - text: An independent audit was not found in this review
     - text: Docs URL (referenced as a gitbook without a link)
   unresolved:
-    - text: The h33 token and V2 factory addresses come from the project's gitbook and were not checked on the explorer by the desk.
+    - text: The h33 token and V2 factory addresses come from the project's gitbook and were not checked on the explorer in this review.

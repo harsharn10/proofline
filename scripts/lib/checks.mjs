@@ -1,4 +1,5 @@
 import { FULL_WEIGHT_CONFIDENCE, UNAPPROVED_APPROVERS } from "./score.mjs";
+import { leafLabel } from "./taxonomy.mjs";
 
 /** Approver values that mean "nobody yet" but are not the literal `pending` the cap keys on. */
 export const PLACEHOLDER_APPROVERS = new Set([...UNAPPROVED_APPROVERS].filter((value) => value !== "pending"));
@@ -7,6 +8,20 @@ const MIRRORED_FIELDS = ["name", "category", "lifecycle", "coverage"];
 
 function normalizeIdentity(value) {
   return String(value ?? "").normalize("NFKC").toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+/**
+ * Normalizes a URL for the "is this the official link" comparison (pipeline audit 2026-09-01 §7): lowercase
+ * host, no `www.`, no trailing slash. An unparseable URL is returned trimmed so it still compares equal to
+ * itself without throwing.
+ */
+export function normalizeUrl(raw) {
+  try {
+    const u = new URL(raw);
+    const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    const path = u.pathname.replace(/\/+$/, "");
+    return `${host}${path}${u.search}`;
+  } catch { return String(raw ?? "").trim(); }
 }
 
 /** Collect every S-id referenced anywhere inside a project object. */
@@ -26,6 +41,11 @@ export function crossCheck(content) {
   for (const row of content.census) {
     if (censusSlugs.has(row.slug)) errors.push(`census.yaml: duplicate slug ${row.slug}`);
     censusSlugs.add(row.slug);
+    // The flat category is derived from the tree leaf (schema/taxonomy.json). A row whose category
+    // disagrees with its leaf is the defect the 2026-09-01 review found on 10 rows; never let it back in.
+    const want = leafLabel(row.tree?.primary);
+    if (!want) errors.push(`census.yaml: ${row.slug}: tree.primary ${row.tree?.primary} is not a leaf in schema/taxonomy.json`);
+    else if (row.category !== want) errors.push(`census.yaml: ${row.slug}: category "${row.category}" must equal the leaf label "${want}" (run scripts/migrations/derive-category-from-leaf.mjs)`);
   }
   const changelogSlugs = new Set(content.changelog.map((e) => e.slug));
 

@@ -1,7 +1,8 @@
 # Proofline taxonomy and display labels
 
-Status: normative vocabulary design, version 1, 2026-09-01. Current JSON schemas remain the machine
-gate until the taxonomy v2 migration lands.
+Status: normative vocabulary, version 2, 2026-09-01. The machine copy is `schema/taxonomy.json` (leaf
+keys, display labels, reader-facing sections) and the leaf enum in `schema/shared.schema.json`. This
+document explains the vocabulary; the JSON is what validates. Keep them identical.
 
 The original SuperGrok export used broad categories (`official-rwa`, `protocol`, `hybrid`, `infra`,
 `launchpad`, `culture`, `pair`, `watch`) and statuses (`official`, `live`, `launching`, `upcoming`,
@@ -20,7 +21,7 @@ Proofline classifies each name across separate axes. Never invent a combined lab
 | Product leaf | one primary plus zero or more secondary leaves from §3 | What does it actually do? |
 | Mechanisms | controlled multi-select tags | How does it work? |
 | Ecosystem role | subject, dependency, observe, graduation | Why is it in the research universe? |
-| Lifecycle | mainnet, beta, testnet-only, announced, inactive, unknown | Can a user use it now? |
+| Lifecycle | mainnet, beta, testnet-only, announced, inactive; `unknown` in a packet only, never in the census | Can a user use it now? |
 | Coverage | candidate, seed, full | How much research has been completed? |
 | Evidence state | verified, partly-verified, claimed, conflicted, unverified | How strongly is the displayed conclusion supported? |
 
@@ -66,8 +67,8 @@ to the conclusion shown on the card; one verified deployment does not make the e
 
 ## 3. Product-leaf registry
 
-The leaf registry is the controlled replacement for free-form `tree` paths. A name may have one primary
-leaf and multiple secondary leaves, each with a one-line rationale in its research packet.
+The leaf registry is the only classification. A name has one primary leaf and zero or more secondary
+leaves, each with a one-line rationale in its research packet. The display label comes from the leaf.
 
 ### Launch
 
@@ -78,21 +79,28 @@ leaf and multiple secondary leaves, each with a one-line rationale in its resear
 | `launch/stock-paired-factory` | Stock-paired token factory |
 | `launch/uni-pool-launch` | Uniswap-pool launchpad |
 | `launch/nft-gated-launch` | NFT-gated launchpad |
-| `launch/other-pad` | Token launchpad |
-| `launch/graduation-token` | Launchpad-graduated asset |
+| `launch/other-pad` | Launchpad · mechanism not classified |
+| `launch/graduation-token` | Launchpad-graduated token |
+
+`launch/other-pad` is a holding pen for a pad whose mechanism has not been established. It never
+displays as a bare category; the label above is the only reader-facing form.
 
 ### Trading
 
 | Leaf | Display label |
 | --- | --- |
 | `trading/amm-native` | Native AMM |
-| `trading/amm-imported` | Imported AMM dependency |
+| `trading/amm-imported` | Imported AMM |
 | `trading/aggregator` | Trading aggregator |
 | `trading/hook-mev` | MEV-redistribution hook |
 | `trading/perps-native` | Native perpetuals exchange |
 | `trading/perps-imported` | Imported perpetuals venue |
 | `trading/prop-amm` | Proprietary-liquidity AMM |
-| `trading/telegram-exec` | Telegram trading interface |
+| `trading/exec-frontend` | Trading frontend / bot |
+
+`trading/exec-frontend` replaced `trading/telegram-exec` on 2026-09-01. It covers Telegram bots,
+trading apps and interfaces that wrap venues they do not control (GMGN, Maestro, Banana Gun, Moby).
+Files that still say `telegram-exec` are historical.
 
 ### Credit
 
@@ -134,7 +142,7 @@ leaf and multiple secondary leaves, each with a one-line rationale in its resear
 | --- | --- |
 | `nft-treasury/token-bound-nft` | Token-bound treasury NFT |
 | `nft-treasury/nft-fee-claim` | NFT fee-claim product |
-| `nft-treasury/nft-marketplace` | NFT marketplace dependency |
+| `nft-treasury/nft-marketplace` | NFT marketplace |
 
 ### Markets
 
@@ -180,11 +188,37 @@ leaf and multiple secondary leaves, each with a one-line rationale in its resear
 | `chain-infra/custody` | Custody infrastructure |
 | `chain-infra/analytics` | Chain analytics |
 
-Adding a leaf requires one taxonomy change that supplies its stored path, display label, definition,
-allowed domain, and migration decision for existing records. Agents may propose new leaves in a packet;
-they may not publish them inline.
+Adding or renaming a leaf is one change to `schema/taxonomy.json`, `schema/shared.schema.json` and
+this file, with a definition, allowed domain, and a migration decision for existing records. Agents may
+propose new leaves in a packet; they may not publish them inline.
 
-## 4. Mechanism tags
+## 4. Reader-facing sections
+
+The site groups names into ten sections. A name's section comes from `tree.primary` only: a leaf
+override first, then the leaf's domain.
+
+| Section | Leaves | What the reader sees |
+| --- | --- | --- |
+| Launchpads | `launch/*` except `launch/graduation-token` | Where new tokens launch |
+| Tokens | `launch/graduation-token`, `rwa-products/stock-paired-token` | Tokens that came out of a launchpad or pair against a tokenized stock |
+| Trading | `trading/*` | Native AMMs, aggregators, perps, hooks, frontends |
+| Credit | `credit/*` | Borrowing and lending against onchain collateral |
+| Yield | `yield/*` | Vaults and managers that put deposits and LP positions to work |
+| RWA products | `rwa-products/*` except `rwa-products/stock-paired-token` | Baskets, vaults and distributors built on tokenized stocks |
+| Agents | `agents/*` | AI agents that launch tokens, trade or transact |
+| NFT treasuries | `nft-treasury/*` | Collections whose holders claim a treasury or fee stream |
+| Markets | `markets/*` | Prediction markets and options |
+| Tooling & privacy | `tooling/*`, `privacy/*` | Scanners, lockers, payments and privacy |
+
+Rules:
+
+1. Tokens is exactly `launch/graduation-token` plus `rwa-products/stock-paired-token`. Those rows carry
+   ecosystem role `graduation` or `observe`. They are listed and never scored (PRD §2.2 keeps memes out
+   of the research subjects; readers still expect to find them).
+2. `chain-infra/*` has no section. Those names are dependency cards only.
+3. Rank cohorts are the section: the domain, with the Tokens and Tooling & privacy groupings above.
+
+## 5. Mechanism tags
 
 Mechanism tags are capabilities, not card titles. The current controlled starting set is:
 
@@ -195,7 +229,7 @@ Mechanism tags are capabilities, not card titles. The current controlled startin
 The `other` mechanism is temporary intake only. A full profile must replace it with a reviewed tag or
 record an explicit taxonomy gap.
 
-## 5. Classification rules
+## 6. Classification rules
 
 1. Classify by demonstrated product mechanism, not a project's self-selected marketing category.
 2. Imported infrastructure and native products may share a mechanism but have different ecosystem roles.
@@ -206,16 +240,21 @@ record an explicit taxonomy gap.
 5. `lifecycle: mainnet` can coexist with incomplete research. Lifecycle and evidence state never imply
    one another.
 6. The primary leaf is what best explains the durable mechanism. Secondary leaves describe material,
-   evidenced capabilities—not keywords or roadmap aspirations.
+   evidenced capabilities, not keywords or roadmap aspirations.
 7. Taxonomy disagreements are claims with receipts and rationale. The compiler resolves them; the last
    agent to write does not win.
 
-## 6. Current-schema mapping
+## 7. Current-schema mapping
 
-Until taxonomy v2 is implemented, `content/census.yaml.category` and
-`content/projects/<slug>.yaml.category` retain the existing flat enum, while `census.tree.primary` and
-`tree.secondary[]` carry the product leaves. The compiler must preserve the packet's proposed entity
-kind, mechanisms, ecosystem role, evidence state, and rationale under deferred mappings when no
-canonical field exists. `candidate` remains intake-only, `seed` maps to current `coverage: stub`, and
-`full` maps to current `coverage: full`. Do not stretch a misleading flat category just to make a new
-leaf publishable.
+`census.tree.primary` and `tree.secondary[]` carry the product leaves and are the only classification.
+The flat `category` field on census and project rows is derived from the primary leaf's display label
+by `scripts/migrations/derive-category-from-leaf.mjs`, and `npm run validate` fails when a row's
+`category` is not that label (`scripts/lib/checks.mjs`). Nobody sets it by hand. It stays in the schema
+only until every consumer reads `tree.primary`.
+
+Coverage: packets use `candidate | seed | full`; the census and project schemas accept `full | stub`.
+`seed` compiles to `stub`, `full` to `full`, and `candidate` never becomes a census row. Lifecycle
+`unknown` is packet-only; the compiler will not create or change a census row from it. The compiler
+keeps a packet's entity kind, mechanisms, ecosystem role, evidence state and rationale in the packet and
+names the packet in the changelog detail when no canonical field exists for them
+(`docs/research-system.md` §5).

@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pulled",
+  "title": "Pulled facts",
+  "$comment": "Machine-owned output of scripts/pull.mjs. One file per census slug at content/pulled/<slug>.yaml, fully regenerated every run and never hand-edited. Address, chain and role vocabularies are shared with schema/shared.schema.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slug", "pulled_at", "chain", "addresses", "metrics", "errors"],
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "pulled_at": { "type": "string", "format": "date-time" },
+    "chain": { "const": "robinhood-chain" },
+    "addresses": { "type": "array", "items": { "$ref": "#/$defs/pulledAddress" } },
+    "metrics": { "type": "array", "items": { "$ref": "#/$defs/pulledMetric" } },
+    "errors": { "type": "array", "items": { "$ref": "#/$defs/pullError" } }
+  },
+  "$defs": {
+    "pullError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["step", "message"],
+      "properties": {
+        "step": { "enum": ["rpc", "blockscout", "llama"] },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "pulledAddress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "address", "label", "role", "is_contract", "source_verified", "contract_name",
+        "proxy", "owner", "owner_type", "safe", "created_block", "created_at", "holders", "errors"
+      ],
+      "properties": {
+        "address": { "$ref": "shared#/$defs/address" },
+        "label": { "type": ["string", "null"] },
+        "role": { "$ref": "shared#/$defs/role" },
+        "is_contract": { "type": ["boolean", "null"] },
+        "source_verified": { "type": ["boolean", "null"] },
+        "contract_name": { "type": ["string", "null"] },
+        "proxy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "implementation", "admin"],
+          "properties": {
+            "type": { "enum": ["eip1967", "none", "unknown"] },
+            "implementation": { "oneOf": [{ "$ref": "shared#/$defs/address" }, { "type": "null" }] },
+            "admin": { "oneOf": [{ "$ref": "shared#/$defs/address" }, { "type": "null" }] }
+          }
+        },
+        "owner": { "oneOf": [{ "$ref": "shared#/$defs/address" }, { "type": "null" }] },
+        "owner_type": { "enum": ["eoa", "contract", "safe", "unknown", "none"] },
+        "safe": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["threshold", "signers"],
+              "properties": {
+                "threshold": { "type": ["integer", "null"], "minimum": 0 },
+                "signers": {
+                  "oneOf": [
+                    { "type": "array", "items": { "$ref": "shared#/$defs/address" } },
+                    { "type": "null" }
+                  ]
+                }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "created_block": { "type": ["integer", "null"], "minimum": 0 },
+        "created_at": { "type": ["string", "null"], "format": "date-time" },
+        "holders": { "type": ["integer", "null"], "minimum": 0 },
+        "errors": { "type": "array", "items": { "$ref": "#/$defs/pullError" } }
+      }
+    },
+    "pulledMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value", "as_of", "source_url"],
+      "properties": {
+        "kind": { "enum": ["tvl", "volume_24h", "fees_24h", "revenue_24h"] },
+        "value": { "type": "number" },
+        "as_of": { "type": "string", "format": "date-time" },
+        "source_url": { "type": "string", "format": "uri" }
+      }
+    }
+  }
+}

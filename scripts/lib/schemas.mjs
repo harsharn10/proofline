@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
-const NAMES = ["site", "census", "project", "sources", "dependency", "changelog", "feed", "accounts", "name-intake"];
+const NAMES = ["site", "census", "project", "sources", "dependency", "changelog", "feed", "accounts", "packet"];
 const ajv = new Ajv({ allErrors: true, strict: true, strictTypes: false, strictTuples: false });
 addFormats(ajv);
 
@@ -10,8 +10,17 @@ const load = (name) => JSON.parse(readFileSync(new URL(`../../schema/${name}.sch
 ajv.addSchema(load("source-entry")); // shared $ref target for sources.yaml and dependency ledgers; registered under its $id
 ajv.addSchema(load("shared")); // shared $ref target for category/chain/address/role/deployment; registered under its $id
 
+/** schema/taxonomy.json is the leaf registry; the packet schema carries a mirror that this replaces at load. */
+export const TAXONOMY_LEAVES = Object.keys(
+  JSON.parse(readFileSync(new URL("../../schema/taxonomy.json", import.meta.url), "utf8")).leaves,
+);
+
 const validators = {};
-for (const name of NAMES) validators[name] = ajv.compile(load(name));
+for (const name of NAMES) {
+  const schema = load(name);
+  if (name === "packet") schema.$defs.taxonomyLeaf.enum = TAXONOMY_LEAVES;
+  validators[name] = ajv.compile(schema);
+}
 
 /** Returns [] when valid, else human-readable messages. */
 export function validateAgainst(name, data) {

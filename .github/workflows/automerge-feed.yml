@@ -1,8 +1,9 @@
-name: Feed PR gate
+name: Packet PR gate
 
-# Grok Bot contract (docs/integrations/grok-bot.md §9): after Validate succeeds on a grok/<date>
-# branch, this workflow classifies the PR and comments. It never merges or dispatches publishing;
-# a controller reviews the PR before anything lands on main.
+# Producer contract (decisions.md D3; docs/integrations/grok-bot.md §9): after Validate succeeds on a
+# producer branch (grok/, grok-heavy/, supergrok/ or codex/), this workflow classifies the PR and
+# comments. It never merges or dispatches publishing; a controller reviews the PR before anything
+# lands on main.
 #
 # Trigger is `workflow_run` on Validate's completion, NOT `pull_request` (final review C1):
 #   - this file is read from `main`, so a PR cannot alter the gate it is judged by;
@@ -12,11 +13,12 @@ name: Feed PR gate
 #
 # The file list comes from the pulls API, which reports renames and deletions explicitly — `git diff
 # --name-only` collapses a rename to its destination (final review C2). Every file must be `added` or
-# `modified`, carry no `previous_filename`, and sit under the allowlist; a modified source ledger must
-# be additions-only. `content/accounts.yaml` is deliberately NOT on the allowlist: tier and note
-# changes need extra eyes. Anything off the allowlist gets exactly one "needs human review" comment;
-# allowlisted PRs get a "waiting for controller" comment. Permissions are comment-only so a merge
-# command cannot be reintroduced accidentally.
+# `modified`, carry no `previous_filename`, and sit under the allowlist, which is
+# research/inbox/packets/** and research/inbox/assignments/** only: collectors and verifiers write
+# packets, and the compiler is the sole writer under content/ (decisions.md D3), so any content/ path —
+# feed, sources and accounts included — gets the "needs controller review" comment. Anything off the
+# allowlist gets exactly one such comment; allowlisted PRs get a "waiting for controller" comment.
+# Permissions are comment-only so a merge command cannot be reintroduced accidentally.
 on:
   workflow_run:
     workflows: ["Validate"]
@@ -29,7 +31,10 @@ jobs:
   classify:
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
-      startsWith(github.event.workflow_run.head_branch, 'grok/')
+      (startsWith(github.event.workflow_run.head_branch, 'grok/') ||
+      startsWith(github.event.workflow_run.head_branch, 'grok-heavy/') ||
+      startsWith(github.event.workflow_run.head_branch, 'supergrok/') ||
+      startsWith(github.event.workflow_run.head_branch, 'codex/'))
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,14 +60,16 @@ jobs:
           echo "PR #$NUMBER at $HEAD"
           echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
 
-      - name: Check the PR's file list against the allowlist
+      - name: Check the PR's file list against the packet allowlist
         if: steps.pr.outputs.number != ''
         id: paths
         env:
           PR: ${{ steps.pr.outputs.number }}
         run: |
           BAD=""
-          # 1. Every file: status added|modified, no previous_filename, path under the allowlist.
+          # Every file: status added|modified, no previous_filename, path under the packet allowlist.
+          # There is no additions-only ledger check any more: content/sources/ is off the allowlist, so a
+          # producer touching it is already flagged as outside-allowlist.
           FILES="$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[] | [.status, .filename, (.previous_filename // "")] | @tsv')"
           echo "Files in PR #$PR (status, path, previous path):"
           echo "$FILES"
@@ -74,30 +81,20 @@ jobs:
             esac
             if [ -n "$PREVIOUS" ]; then BAD="$BAD renamed-from:$PREVIOUS"; continue; fi
             case "$FILENAME" in
-              content/feed/*|content/sources/*|research/inbox/*) ;;
+              research/inbox/packets/*|research/inbox/assignments/*) ;;
               *) BAD="$BAD outside-allowlist:$FILENAME" ;;
             esac
           done <<< "$FILES"
-          # 2. A modified source ledger may only add lines: any removed line (other than a `---` header)
-          #    in the API's patch, any deletion count, or a missing patch (diff too large) → human.
-          SOURCES="$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[] | select(.status == "modified" and (.filename | startswith("content/sources/"))) | [.filename, (.deletions | tostring), (.patch // "" | @base64)] | @tsv')"
-          while IFS=$'\t' read -r FILENAME DELETIONS PATCH_B64; do
-            [ -z "$FILENAME" ] && continue
-            if [ -z "$PATCH_B64" ]; then BAD="$BAD no-patch:$FILENAME"; continue; fi
-            if [ "$DELETIONS" != "0" ]; then BAD="$BAD deletions:$FILENAME"; continue; fi
-            REMOVED="$(printf '%s' "$PATCH_B64" | base64 -d | grep -E '^-' | grep -vE '^---' || true)"
-            if [ -n "$REMOVED" ]; then BAD="$BAD removed-lines:$FILENAME"; fi
-          done <<< "$SOURCES"
           if [ -n "$BAD" ]; then
-            echo "Needs extra-eyes review:$BAD"
+            echo "Needs controller review:$BAD"
             echo "allowlisted=false" >> "$GITHUB_OUTPUT"
             echo "reasons=$BAD" >> "$GITHUB_OUTPUT"
           else
-            echo "Every file is an addition or in-place modification under the allowlist — still waits for a controller."
+            echo "Every file is an addition or in-place modification under research/inbox/packets/ or research/inbox/assignments/ — still waits for a controller."
             echo "allowlisted=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Comment — needs human review (once per PR)
+      - name: Comment — needs controller review (once per PR)
         if: steps.pr.outputs.number != '' && steps.paths.outputs.allowlisted == 'false'
         env:
           PR: ${{ steps.pr.outputs.number }}
@@ -109,7 +106,7 @@ jobs:
             echo "Already commented (comment id(s): $EXISTING) — not repeating."
             exit 0
           fi
-          BODY="needs controller review. This workflow never merges. Extra eyes are required because the PR renames, deletes or rewrites something, or touches a path outside content/feed/, content/sources/ (additions only) and research/inbox/.
+          BODY="needs controller review. This workflow never merges. Extra eyes are required because the PR renames, deletes or rewrites something, or touches a path outside the packet allowlist: research/inbox/packets/ and research/inbox/assignments/. Canonical files under content/ are written only by the compiler after controller review, never by a producer PR.
 
           Reasons:$REASONS
 
@@ -127,7 +124,7 @@ jobs:
             echo "Already commented (comment id(s): $EXISTING) — not repeating."
             exit 0
           fi
-          BODY="Validate passed and the diff is inside the intake allowlist. The bot cannot merge it. A controller must review and merge the PR; channel delivery remains a separate approval in /review.
+          BODY="Validate passed and this packet PR is waiting for controller: every file is an addition or in-place modification under research/inbox/packets/ or research/inbox/assignments/. This workflow cannot merge it. A controller reviews the packet, compiles any canonical change into content/ separately, and merges; channel delivery remains a separate approval in /review.
 
           <!-- $MARKER -->"
           gh pr comment "$PR" --repo "$REPO" --body "$BODY"

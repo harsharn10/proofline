@@ -27,6 +27,7 @@ function prooflineContent(): Plugin {
       };
       const directory = (relative: string, extension: string) => {
         const folder = path.join(repositoryRoot, relative);
+        if (!fs.existsSync(folder)) return {};
         return Object.fromEntries(
           fs.readdirSync(folder)
             .filter((file) => file.endsWith(extension))
@@ -41,11 +42,13 @@ function prooflineContent(): Plugin {
         census: read("content/census.yaml"),
         methodology: read("content/methodology.md"),
         derived: read("build/derived.json"),
+        taxonomy: read("schema/taxonomy.json"),
         dependencies: directory("content/dependencies", ".yaml"),
         projects: directory("content/projects", ".yaml"),
         sources: directory("content/sources", ".yaml"),
         research: directory("content/research", ".md"),
         feed: directory("content/feed", ".yaml"),
+        pulled: directory("content/pulled", ".yaml"),
       };
       return `export default ${JSON.stringify(snapshot)};`;
     },

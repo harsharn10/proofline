@@ -13,6 +13,8 @@ const ROUTES = [
   "/",
   "/n/pons",
   "/n/pons?tab=evidence",
+  "/n/pons?tab=feed",
+  "/n/hoodfun",
   "/feed",
   "/methodology",
   "/changelog",

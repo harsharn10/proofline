@@ -1,8 +1,8 @@
-import { useLoaderData } from "@tanstack/react-router";
+import { Link, useLoaderData } from "@tanstack/react-router";
 import { correctionsLink } from "@/data/types";
 
-// Hairline-top footer: mono tagline, one quiet disclaimer, faint mono meta line.
-// Corrections config comes from the root route's loader, same as SiteHeader.
+// Hairline-top footer: the disclaimer from content/site.yaml, one mono meta line. The corrections
+// link renders only when a destination exists — a call to action with nothing to click is noise.
 export function SiteFooter() {
   const meta = useLoaderData({ from: "__root__" });
   const correction = correctionsLink(meta.corrections.destination);
@@ -10,14 +10,11 @@ export function SiteFooter() {
   return (
     <footer className="sitefooter">
       <div className="wrap">
-        <p className="tag">Research the launch. Ignore the hype.</p>
-        <p className="disc">
-          Proofline publishes research, not advice. Profiles are not audits, safety ratings, or
-          recommendations.
-        </p>
+        <p className="disc">{meta.disclaimer.trim()}</p>
         <p className="ver">
           <span>proofline · robinhood chain {meta.chainId}</span>
-          {correction.href ? <a href={correction.href}>{correction.label}</a> : <span>{correction.label}</span>}
+          <Link to="/methodology">how to read a profile</Link>
+          {correction.href ? <a href={correction.href}>{correction.label}</a> : null}
         </p>
       </div>
     </footer>

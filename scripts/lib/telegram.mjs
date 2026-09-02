@@ -13,8 +13,22 @@ export const EVENT_LABELS = {
   roundup: "ROUNDUP",
 };
 
+/**
+ * The pre-review_key identity, date|slug|type|title. It is still what ops/telegram-state.json sent_keys
+ * recorded before 2026-09-01 and what the /review page writes ops/telegram-review.json decisions under, so
+ * every lookup below accepts it alongside the stable key.
+ */
+export function legacyEntryKey(e) {
+  return `${e.date}|${e.slug}|${e.type}|${e.title}`;
+}
+
+/** Stable key: sha1 of the legacy identity, first 16 hex — written into the changelog by scripts/migrations/add-review-keys.mjs. */
+export function reviewKeyFor(e) {
+  return createHash("sha1").update(legacyEntryKey(e)).digest("hex").slice(0, 16);
+}
+
 export function entryKey(e) {
-  return e.review_key ?? `${e.date}|${e.slug}|${e.type}|${e.title}`;
+  return e.review_key ?? legacyEntryKey(e);
 }
 
 /** Only an explicit structured publication opts a changelog entry into channel review. */
@@ -37,8 +51,9 @@ export function decisionIsCurrent(entry, decision) {
 /** Channel candidates not yet sent (by key), optionally filtered by date. */
 export function selectUnsent(entries, state, { since = null, all = false } = {}) {
   const sent = new Set(state?.sent_keys ?? []);
+  const wasSent = (e) => sent.has(entryKey(e)) || sent.has(legacyEntryKey(e));
   return entries.filter(
-    (e) => isChannelCandidate(e) && (all || !sent.has(entryKey(e))) && (!since || e.date >= since),
+    (e) => isChannelCandidate(e) && (all || !wasSent(e)) && (!since || e.date >= since),
   );
 }
 
@@ -49,13 +64,14 @@ export function selectUnsent(entries, state, { since = null, all = false } = {})
 export function selectApproved(entries, state, review, { since = null, all = false } = {}) {
   if (review?.channel_enabled !== true) return [];
   const decisions = review?.decisions ?? {};
+  const decisionFor = (entry) => decisions[entryKey(entry)] ?? decisions[legacyEntryKey(entry)];
   return selectUnsent(entries, state, { since, all })
     .filter((entry) => {
-      const decision = decisions[entryKey(entry)];
+      const decision = decisionFor(entry);
       return decision?.status === "approved" && decisionIsCurrent(entry, decision);
     })
     .map((entry) => {
-      const decision = decisions[entryKey(entry)];
+      const decision = decisionFor(entry);
       return {
         ...entry,
         review_key: entryKey(entry),

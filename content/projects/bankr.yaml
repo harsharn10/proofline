@@ -1,7 +1,7 @@
 slug: bankr
 name: Bankr
 symbol: null
-category: Agent / execution
+category: Agent execution platform
 lifecycle: announced
 coverage: stub
 summary: Agent execution surface on Robinhood Chain that launches tokens from X and runs its own stock-paired factory; the tokens it launches are graduations, not subjects.
@@ -26,15 +26,11 @@ review:
   published_at: null
 findings:
   positive:
-    - text: Bankr publishes an official X account at https://x.com/bankrbot.
-      class: claim
-      sources:
-        - S1
     - text: The workbook's Dune extract records about 85k tokens launched and 11k traded through Bankr, 2,244 paired to a Stock Token, with roughly 36% of its volume on RWA pairs.
       class: claim
       sources:
         - S3
-    - text: The desk observed the account deploying stock-paired tokens (TSM, MSFT, QQQ pairs) on 2026-08-31; those tokens are pad outputs, not subjects.
+    - text: Proofline observed the account deploying stock-paired tokens (TSM, MSFT, QQQ pairs) on 2026-08-31; those tokens are pad outputs, not subjects.
       class: claim
       sources:
         - S5

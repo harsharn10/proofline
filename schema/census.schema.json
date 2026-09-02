@@ -3,7 +3,7 @@
   "$id": "census",
   "type": "array",
   "items": { "type": "object", "additionalProperties": false,
-    "required": ["slug","name","identity","category","lifecycle","coverage","official_links","discovery_source","qualifying"],
+    "required": ["slug","name","identity","category","lifecycle","coverage","official_links","discovery_source","qualifying","tree"],
     "properties": {
       "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
       "name": { "type": "string", "minLength": 1 },
@@ -22,7 +22,7 @@
           "deployed_on_chain": { "$ref": "#/$defs/test" }, "native_play": { "$ref": "#/$defs/test" }, "citable": { "$ref": "#/$defs/test" }, "research_story": { "$ref": "#/$defs/test" } } }
     } },
   "$defs": {
-    "treePath": { "type": "string", "pattern": "^(launch|rwa-products|trading|yield|agents|tooling|credit|nft-treasury|markets|privacy|chain-infra)/[a-z0-9-]+$" },
+    "treePath": { "$ref": "shared#/$defs/taxonomyLeaf" },
     "test": { "type": "object", "additionalProperties": false, "required": ["value","note","verified"],
     "properties": { "value": { "type": "boolean" }, "note": { "type": "string", "minLength": 1 }, "verified": { "type": "boolean" } } } }
 }

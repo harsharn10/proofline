@@ -141,16 +141,19 @@ export const RANK_PRIORITY = ["tvl", "volume_24h", "fees_24h", "revenue_24h"];
  * @param {Array<{slug: string, category: string, metrics?: Array<{kind: string, value: number}>}>} projects
  * @returns {Map<string, {basis: string, position: number, of: number}>} slug -> rank, only for ranked projects
  */
+// Ranks are computed inside a cohort: the reader-facing section of the project's tree leaf
+// (scripts/lib/taxonomy.mjs cohortForLeaf), never the flat category. Each project passed in carries
+// { slug, cohort: { id, label }, metrics }. A project with no cohort is never ranked.
 export function computeRanks(projects) {
-  const byCategory = new Map();
+  const byCohort = new Map();
   for (const p of projects) {
-    if (!p.metrics?.length) continue;
-    if (!byCategory.has(p.category)) byCategory.set(p.category, []);
-    byCategory.get(p.category).push(p);
+    if (!p.metrics?.length || !p.cohort?.id) continue;
+    if (!byCohort.has(p.cohort.id)) byCohort.set(p.cohort.id, { label: p.cohort.label, members: [] });
+    byCohort.get(p.cohort.id).members.push(p);
   }
 
   const result = new Map();
-  for (const members of byCategory.values()) {
+  for (const { label: cohort, members } of byCohort.values()) {
     let basis = null;
     for (const kind of RANK_PRIORITY) {
       const count = members.filter((p) => p.metrics.some((m) => m.kind === kind)).length;
@@ -167,7 +170,7 @@ export function computeRanks(projects) {
     ranked.forEach((p, i) => {
       if (p.value !== prevValue) position = i + 1;
       prevValue = p.value;
-      result.set(p.slug, { basis, position, of });
+      result.set(p.slug, { basis, position, of, cohort });
     });
   }
   return result;

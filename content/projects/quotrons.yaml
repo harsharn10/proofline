@@ -1,7 +1,7 @@
 slug: quotrons
 name: Quotrons
 symbol: QUOTRON
-category: NFT / treasury
+category: Token-bound treasury NFT
 lifecycle: announced
 coverage: stub
 summary: "4,444 ERC-404 terminals: burning the liquid token hardwires an NFT that earns one of ten Stock Tokens from a 3% pool fee."
@@ -47,15 +47,7 @@ review:
   published_at: null
 findings:
   positive:
-    - text: Quotrons publishes an official site at https://quotrons.cash.
-      class: claim
-      sources:
-        - S1
-    - text: Quotrons publishes an official X account at https://x.com/Quotrons404.
-      class: claim
-      sources:
-        - S2
-    - text: Project docs, as summarised by the desk, describe 4,444 ERC-404 terminals where burning the liquid token permanently hardwires an NFT that can claim Stock Token rewards, with one QUOTRON/WETH Uniswap v4 pool and ten reward conversion routes (NVDA, AAPL, TSLA, GME, SPCX, SPY, PLTR, NFLX, RDDT, MSTR).
+    - text: Project docs, as summarised by Proofline, describe 4,444 ERC-404 terminals where burning the liquid token permanently hardwires an NFT that can claim Stock Token rewards, with one QUOTRON/WETH Uniswap v4 pool and ten reward conversion routes (NVDA, AAPL, TSLA, GME, SPCX, SPY, PLTR, NFLX, RDDT, MSTR).
       class: claim
       sources:
         - S5
@@ -69,11 +61,14 @@ findings:
       sources:
         - S5
   risk:
+    - text: "owner() on the QUOTRONS token and the QuotronWethHook returns 0x7171…7866, which the explorer marks as an EIP-7702 delegated account: one externally owned key delegating to smart-account code, not a multisig, with no timelock in the ownership chain."
+      class: verified
+      sources: [S8]
     - text: The project discloses a recovery Safe and a blacklist guardian role for V2; who holds those keys and what they can do to user terminals is not documented in the intake.
       class: claim
       sources:
         - S5
-    - text: The desk flagged @QUOTRONGenesis as a mint account not treated as official, and treats @QuotronsDesktop (mint 2026-09-01) as a related drop until the same control plane is confirmed.
+    - text: Proofline flagged @QUOTRONGenesis as a mint account not treated as official, and treats @QuotronsDesktop (mint 2026-09-01) as a related drop until the same control plane is confirmed.
       class: claim
       sources:
         - S6
@@ -85,4 +80,4 @@ findings:
     - text: V1 exploit postmortem not reviewed
     - text: Whether the Desktop drop shares the same control plane
   unresolved:
-    - text: A 25 Aug CT post claimed the same developer as RobinWifHat and a coming pad with a fee split; the desk did not verify it. A secondary source noted the reward venue on Ink had not run an epoch as of 2026-08-29; whether Robinhood Chain V2 epochs run independently is unchecked.
+    - text: A 25 Aug CT post claimed the same developer as RobinWifHat and a coming pad with a fee split; Proofline did not verify it. A secondary source noted the reward venue on Ink had not run an epoch as of 2026-08-29; whether Robinhood Chain V2 epochs run independently is unchecked.

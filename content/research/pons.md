@@ -24,7 +24,7 @@ Proofline opened each of these addresses on Blockscout on 2026-08-31. All fourte
 
 No EIP-1967 implementation or admin slot is set on any listed address and none of them exposes `paused()`, which is consistent with the docs' statement that deployed contracts are immutable and replaced as a whole set; per-launch curves, tokens and pools were not enumerated in this pass. [verified S33] [inference S13 S16 S33]
 
-A second verified contract named Pons with the PONS symbol exists at `0xe306c19C72131B0a8f311648fa63FE8CeDf44571` (MIMEToken, 92 holders), created by `0xF193…7964` rather than by a Pons factory, and the Ethereum address circulating under the $PONS cashtag is not a contract on chain 4663 per the desk's explorer check. Only `0x39dB…4571` is treated as the project token. [verified S32] [claim S4 S6 S11]
+A second verified contract named Pons with the PONS symbol exists at `0xe306c19C72131B0a8f311648fa63FE8CeDf44571` (MIMEToken, 92 holders), created by `0xF193…7964` rather than by a Pons factory, and the Ethereum address circulating under the $PONS cashtag is not a contract on chain 4663 per the intake explorer check. Only `0x39dB…4571` is treated as the project token. [verified S32] [claim S4 S6 S11]
 
 ## Control
 
@@ -84,7 +84,7 @@ The seed description ("V2 bonding curve graduating to Uniswap v4; quote assets E
 
 The official X account posted $4B in lifetime volume (31 Aug), $20.93M paid to token creators in 47 days (30 Aug) and 29% of PONS supply burned (29 Aug); none of these figures was reproduced. [claim S5]
 
-Two accounts, including Longbow's official one, posted an Ethereum address under the $PONS cashtag that the desk's explorer check found is not a contract on chain 4663, and a third-party post claimed $PONS is live on Solana; neither is a Robinhood Chain explorer check. [claim S6 S11 S10]
+Two accounts, including Longbow's official one, posted an Ethereum address under the $PONS cashtag that an explorer check during intake found is not a contract on chain 4663, and a third-party post claimed $PONS is live on Solana; neither is a Robinhood Chain explorer check. [claim S6 S11 S10]
 
 ## Findings
 
@@ -92,10 +92,10 @@ Strongest positive evidence: two docs generations with published addresses that 
 
 ## Sources
 
-- S1 — Pons site, reviewed by the desk on 2026-08-31 and re-read during intake the same day.
+- S1 — Pons site, reviewed on 2026-08-31 and re-read during intake the same day.
 - S2 — @ponsdotfamily on X (census link).
-- S3–S8, S12 — Grok desk intake artifacts and the DefiLlama protocol page as copied into them.
-- S9–S11 — third-party X posts recorded by the desk.
+- S3–S8, S12 — Research intake artifacts and the DefiLlama protocol page as copied into them.
+- S9–S11 — third-party X posts recorded during intake.
 - S13 — Pons docs, v1 page (docs.ponsfamily.com), reviewed 2026-08-31.
 - S14 / S15 — DefiLlama fees and DEX volume APIs, accessed 2026-08-31.
 - S16 — Pons docs, v2 page (docs.ponsfamily.com/docs/v2), read 2026-08-31 during intake.

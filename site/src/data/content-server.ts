@@ -4,8 +4,6 @@ import rawContent from "virtual:proofline-content";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
 import { headlineMetric } from "./types";
 import type {
-  AccountEntry,
-  AccountRef,
   ChangelogEntry,
   Deployment,
   DependencyCard,
@@ -20,13 +18,21 @@ import type {
   Link,
   Metric,
   PeerRef,
+  PulledFile,
   Rank,
   Research,
   Review,
+  SectionDef,
   SiteConfig,
   SourceEntry,
   TreeRef,
 } from "./types";
+
+// schema/taxonomy.json — the one taxonomy. Sections in home order; leaves keyed by "domain/leaf".
+type TaxonomyFile = {
+  sections: Array<SectionDef & { domains: string[]; leaves?: string[] }>;
+  leaves: Record<string, { label: string }>;
+};
 
 function parseYaml<T>(raw: string): T {
   return YAML.parse(raw) as T;
@@ -112,7 +118,9 @@ function sanitizeMetrics(raw: unknown): Metric[] {
 function sanitizeRank(raw: unknown): Rank | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Rank;
-  return typeof r.basis === "string" && typeof r.position === "number" && typeof r.of === "number" ? r : null;
+  return typeof r.basis === "string" && typeof r.position === "number" && typeof r.of === "number" && typeof r.cohort === "string"
+    ? r
+    : null;
 }
 
 // Site contract (README "Site contract"): pick exactly the fields the site may render.
@@ -129,7 +137,6 @@ function pickDerived(raw: Record<string, unknown> | undefined, slug: string, cov
       confidence: null,
       risk: null,
       override: null,
-      factorPercents: { security: null, engineering: null, transparency: null, maturity: null, economic: null },
       trending: false,
       trendingAccounts: [],
       metrics: [],
@@ -145,13 +152,6 @@ function pickDerived(raw: Record<string, unknown> | undefined, slug: string, cov
     confidence: (raw.confidence as number | null) ?? null,
     risk: (raw.risk as Derived["risk"]) ?? null,
     override: (raw.override as Derived["override"]) ?? null,
-    factorPercents: (raw.factorPercents as Derived["factorPercents"]) ?? {
-      security: null,
-      engineering: null,
-      transparency: null,
-      maturity: null,
-      economic: null,
-    },
     trending: Boolean(raw.trending),
     trendingAccounts: Array.isArray(raw.trendingAccounts)
       ? raw.trendingAccounts.filter((h): h is string => typeof h === "string")
@@ -178,34 +178,42 @@ function directorySortKey(dossiers: Dossier[]): Dossier[] {
 // whole thing — so page payloads stay small and account notes never reach a browser.
 type ServerContent = {
   site: SiteConfig;
+  sections: SectionDef[];
   dossiers: Dossier[];
   dependencies: Record<string, DependencyCard>;
   changelog: ChangelogEntry[];
-  accounts: AccountEntry[];
-  handleBySlug: Record<string, string>;
   treeBySlug: Record<string, TreeRef>;
   generatedAt: string;
 };
 
+// Resolve "launch/bonding-curve" against the taxonomy: label from the leaf table, section by leaf
+// override first (Tokens), then by domain. Unknown leaf -> null (validate rejects it upstream).
+function resolveTree(primary: string | undefined, taxonomy: TaxonomyFile): TreeRef | null {
+  if (typeof primary !== "string" || !primary.includes("/")) return null;
+  const leafDef = taxonomy.leaves[primary];
+  if (!leafDef) return null;
+  const [domain, ...leafParts] = primary.split("/");
+  const section =
+    taxonomy.sections.find((s) => (s.leaves ?? []).includes(primary)) ??
+    taxonomy.sections.find((s) => s.domains.includes(domain!)) ??
+    null;
+  return { domain: domain!, leaf: leafParts.join("/"), label: leafDef.label, sectionId: section?.id ?? null };
+}
+
 function loadContent(): ServerContent {
   const site = parseYaml<SiteConfig>(rawContent.site);
   const changelogAll = parseYaml<ChangelogEntry[]>(rawContent.changelog);
-  const accounts = parseYaml<AccountEntry[]>(rawContent.accounts);
   const census = parseYaml<CensusEntry[]>(rawContent.census);
   const derivedFile = parseJson<DerivedFile>(rawContent.derived);
+  const taxonomy = parseJson<TaxonomyFile>(rawContent.taxonomy);
+  const sections: SectionDef[] = taxonomy.sections.map(({ id, label, description }) => ({ id, label, description }));
 
-  const handleBySlug: Record<string, string> = {};
-  for (const row of census) if (row.handle) handleBySlug[row.slug] = row.handle;
-
-  // tree.primary ("launch/bonding-curve") -> { domain, leaf }: the home sections and the
-  // dossier's peer set both key off this placement.
+  // tree.primary ("launch/bonding-curve") -> { domain, leaf, label, sectionId }: the home sections,
+  // the dossier eyebrow and the peer set all key off this placement.
   const treeBySlug: Record<string, TreeRef> = {};
   for (const row of census) {
-    const primary = row.tree?.primary;
-    if (typeof primary === "string" && primary.includes("/")) {
-      const [domain, ...leafParts] = primary.split("/");
-      treeBySlug[row.slug] = { domain: domain!, leaf: leafParts.join("/") };
-    }
+    const tree = resolveTree(row.tree?.primary, taxonomy);
+    if (tree) treeBySlug[row.slug] = tree;
   }
 
   const dependencies: Record<string, DependencyCard> = {};
@@ -231,6 +239,7 @@ function loadContent(): ServerContent {
       null,
     );
     const feed = feedFile ? [...feedFile.items].sort((a, b) => b.date.localeCompare(a.date)) : [];
+    const pulled = readYamlOrWarn<PulledFile | null>(rawContent.pulled[`${slug}.yaml`], `pulled/${slug}.yaml`, slug, null);
     const changelog = changelogAll
       .filter((entry) => entry.slug === slug)
       .sort((a, b) => b.date.localeCompare(a.date));
@@ -252,17 +261,17 @@ function loadContent(): ServerContent {
       feed,
       sources: sourcesFile.sources,
       changelog,
-      derived: pickDerived(derivedFile.projects[slug], slug, project.coverage),
+      derived: withPulledMetrics(pickDerived(derivedFile.projects[slug], slug, project.coverage), pulled),
+      pulled,
     };
   });
 
   return {
     site,
+    sections,
     dossiers: directorySortKey(dossiers),
     dependencies,
     changelog: changelogAll,
-    accounts,
-    handleBySlug,
     treeBySlug,
     generatedAt: derivedFile.generated_at,
   };
@@ -283,11 +292,7 @@ function getCachedContent(): ServerContent {
 const LATEST_FEED_COUNT = 5;
 const LATEST_FEED_BODY_MAX = 240;
 
-function toDirectoryEntry(
-  d: Dossier,
-  handleBySlug: Record<string, string>,
-  treeBySlug: Record<string, TreeRef>,
-): DirectoryEntry {
+function toDirectoryEntry(d: Dossier, treeBySlug: Record<string, TreeRef>): DirectoryEntry {
   return {
     slug: d.slug,
     name: d.name,
@@ -297,11 +302,29 @@ function toDirectoryEntry(
     coverage: d.coverage,
     summary: d.summary,
     derived: d.derived,
-    handle: handleBySlug[d.slug] ?? null,
     feedCount: d.feed.length,
-    reviewedAt: d.review.reviewed_at,
     tree: treeBySlug[d.slug] ?? null,
+    holders: tokenHolders(d.pulled),
   };
+}
+
+// A pulled DefiLlama figure fills in for a metric kind the project file does not carry. Project
+// metrics (ledger-cited claims) always win; pulled figures never change a rank, which npm run score
+// computes from the project file alone.
+function withPulledMetrics(derived: Derived, pulled: PulledFile | null): Derived {
+  if (!pulled || pulled.metrics.length === 0) return derived;
+  const have = new Set(derived.metrics.map((m) => m.kind));
+  const extra: Metric[] = pulled.metrics
+    .filter((m) => !have.has(m.kind) && typeof m.value === "number" && m.value > 0)
+    .map((m) => ({ kind: m.kind, value: m.value, currency: m.kind === "holders" ? undefined : "USD", as_of: m.as_of.slice(0, 10), class: "claim", sources: [], source_url: m.source_url }));
+  return extra.length ? { ...derived, metrics: [...derived.metrics, ...extra] } : derived;
+}
+
+// The holder count of the project's token contract (role token, else the first address with one).
+function tokenHolders(pulled: PulledFile | null): number | null {
+  if (!pulled) return null;
+  const token = pulled.addresses.find((a) => a.role === "token" && a.holders !== null);
+  return token?.holders ?? pulled.addresses.find((a) => a.holders !== null)?.holders ?? null;
 }
 
 const PEER_LIMIT = 6;
@@ -334,60 +357,37 @@ function peersFor(dossier: Dossier, all: Dossier[], treeBySlug: Record<string, T
     symbol: d.symbol,
     summary: truncate(d.summary, PEER_SUMMARY_MAX),
     lifecycle: d.lifecycle,
+    coverage: d.coverage,
     direct: treeBySlug[d.slug]!.leaf === tree.leaf,
-    leaf: treeBySlug[d.slug]!.leaf,
+    leafLabel: treeBySlug[d.slug]!.label,
     metric: headlineMetric(d.derived),
   }));
-}
-
-function latestFeed(dossiers: Dossier[]): LatestFeedItem[] {
-  return dossiers
-    .flatMap((d) => d.feed.map((item) => ({ name: { slug: d.slug, symbol: d.symbol, name: d.name }, item })))
-    .sort((a, b) => b.item.date.localeCompare(a.item.date))
-    .slice(0, LATEST_FEED_COUNT)
-    .map(({ name, item }) => ({
-      name,
-      item: {
-        ...item,
-        body: item.body.length > LATEST_FEED_BODY_MAX ? `${item.body.slice(0, LATEST_FEED_BODY_MAX - 1).trimEnd()}…` : item.body,
-      },
-    }));
 }
 
 function toDependencyRef(card: DependencyCard): DependencyRef {
   return { id: card.id, name: card.name, kind: card.kind, summary: card.summary, deployments: card.deployments };
 }
 
-// Handle, tier and role for the accounts a feed cites — never `note`.
-function accountRefs(feed: Dossier["feed"], accounts: AccountEntry[]): AccountRef[] {
-  const cited = new Set(feed.map((item) => item.account).filter((h): h is string => Boolean(h)));
-  return accounts
-    .filter((a) => cited.has(a.handle))
-    .map((a) => ({ handle: a.handle, tier: a.tier, role: a.role ?? null }));
-}
-
 // --- Server functions ---------------------------------------------------------------
 
-// The directory: one slim entry per name plus the newest feed items across every name. No research
-// HTML, no source ledgers, no findings, no full feeds (final review I6).
+// The directory: the sections in order, one slim entry per name, and the dependency cards as chips.
+// No research HTML, no source ledgers, no findings, no feeds.
 export const getContent = createServerFn({ method: "GET" }).handler(async (): Promise<DirectoryBundle> => {
   const content = getCachedContent();
   return {
     site: content.site,
-    entries: content.dossiers.map((d) => toDirectoryEntry(d, content.handleBySlug, content.treeBySlug)),
-    latestFeed: latestFeed(content.dossiers),
+    sections: content.sections,
+    entries: content.dossiers.map((d) => toDirectoryEntry(d, content.treeBySlug)),
+    dependencies: Object.values(content.dependencies)
+      .map((c) => ({ id: c.id, name: c.name, kind: c.kind }))
+      .sort((a, b) => a.name.localeCompare(b.name)),
     generatedAt: content.generatedAt,
-    counts: {
-      dependencyCards: Object.keys(content.dependencies).length,
-      sourcedClaims:
-        content.dossiers.reduce((n, d) => n + d.sources.length, 0) +
-        Object.values(content.dependencies).reduce((n, c) => n + c.sources.length, 0),
-    },
   };
 });
 
-// One dossier, the cards it references (label/link only — /d/$id carries the rest), and handle/tier/role
-// for the accounts its feed cites. `dossier` is null for an unknown slug so the route can 404.
+// One dossier, the cards it references (label/link only — /d/$id carries the rest), its peers (full
+// records only; a stub page has no room for them) and its taxonomy placement. `dossier` is null for
+// an unknown slug so the route can 404.
 export const getDossier = createServerFn({ method: "GET" })
   .validator((slug: string) => slug)
   .handler(async ({ data: slug }): Promise<Omit<DossierBundle, "dossier"> & { dossier: Dossier | null }> => {
@@ -398,13 +398,14 @@ export const getDossier = createServerFn({ method: "GET" })
       const card = content.dependencies[id];
       if (card) dependencies[id] = toDependencyRef(card);
     }
+    const tree = dossier ? (content.treeBySlug[dossier.slug] ?? null) : null;
     return {
       dossier,
       site: content.site,
       dependencies,
-      accounts: dossier ? accountRefs(dossier.feed, content.accounts) : [],
-      peers: dossier ? peersFor(dossier, content.dossiers, content.treeBySlug) : [],
-      tree: dossier ? (content.treeBySlug[dossier.slug] ?? null) : null,
+      peers: dossier && dossier.coverage === "full" ? peersFor(dossier, content.dossiers, content.treeBySlug) : [],
+      tree,
+      section: tree?.sectionId ? (content.sections.find((s) => s.id === tree.sectionId) ?? null) : null,
     };
   });
 
@@ -455,6 +456,8 @@ export const getMethodology = createServerFn({ method: "GET" }).handler(async ()
   return {
     html: renderWholeMarkdown(rawContent.methodology),
     methodologyVersion: content.site.methodology_version,
+    chain: content.site.chain,
+    trending: content.site.trending,
   };
 });
 
@@ -468,8 +471,8 @@ export const getSiteMeta = createServerFn({ method: "GET" }).handler(async () =>
     tagline: content.site.tagline,
     updated: content.generatedAt,
     namesOnFile: content.dossiers.length,
-    trendingCount: content.dossiers.filter((d) => d.derived.trending).length,
     corrections: content.site.corrections,
+    disclaimer: content.site.disclaimer,
     chainId: content.site.chain.id,
     // Slim rows for the topbar jump-box — search lives in the topbar and goes straight
     // to a dossier, so every page needs the name list (49 tiny rows).

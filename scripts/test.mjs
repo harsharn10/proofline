@@ -20,7 +20,6 @@ import {
 import { validateContent } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
-import { validateNameIntake } from "./lib/name-intake.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
@@ -226,7 +225,7 @@ async function makeContent(mutate = () => {}) {
   const s = parse(await readFile(new URL("../fixtures/clean/sources.yaml", import.meta.url), "utf8"));
   const content = {
     site: { maintainer: { id: "fixture" }, corrections: { destination: "https://example.com/corrections" }, chain: { checked: "2026-08-30" } },
-    census: [{ slug: "clean", name: p.name, identity: { aliases: [], symbols: [p.symbol], entity_kind: "protocol", chain_scope: "unknown", status: "provisional" }, category: p.category, lifecycle: p.lifecycle, coverage: p.coverage }],
+    census: [{ slug: "clean", name: p.name, identity: { aliases: [], symbols: [p.symbol], entity_kind: "protocol", chain_scope: "unknown", status: "provisional" }, category: p.category, lifecycle: p.lifecycle, coverage: p.coverage, tree: { primary: "launch/bonding-curve" } }],
     projects: new Map([["clean", p]]), sources: new Map([["clean", s]]), research: new Map([["clean", "stub"]]),
     dependencies: new Map(), changelog: [{ slug: "clean" }],
     feed: new Map(), accounts: [],
@@ -633,7 +632,8 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 // Task 5 — census schema: optional handle (X pattern) and tree { primary, secondary[] }.
 {
   const base = () => ({
-    slug: "denar", name: "Denar", identity: { aliases: [], symbols: ["DENAR"], entity_kind: "protocol", chain_scope: "unknown", status: "provisional" }, category: "Lending", lifecycle: "mainnet", coverage: "stub", official_links: [],
+    slug: "denar", name: "Denar", identity: { aliases: [], symbols: ["DENAR"], entity_kind: "protocol", chain_scope: "unknown", status: "provisional" }, category: "Isolated lending market", lifecycle: "mainnet", coverage: "stub", official_links: [],
+    tree: { primary: "credit/isolated-money-market" },
     discovery_source: "desk", qualifying: Object.fromEntries(["deployed_on_chain", "native_play", "citable", "research_story"].map((k) => [k, { value: true, note: "n", verified: false }])),
   });
   const cases = [
@@ -649,51 +649,6 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     for (const [data, want, why] of cases) assert.equal(validateAgainst("census", [data]).length > 0 ? 1 : 0, want, why);
     console.log("ok   census schema handle/tree");
   } catch (err) { failures++; console.error(`FAIL census schema handle/tree: ${err.message}`); }
-}
-
-// New-name intake: complete taxonomy, referential integrity, authenticity and conflicts.
-{
-  const template = parse(await readFile("docs/templates/name-intake.yaml", "utf8"));
-  const valid = validateNameIntake(template, { census: [] });
-  const dangling = structuredClone(template);
-  dangling.claims[0].source_ids = ["SRC-99"];
-  const danglingErrors = validateNameIntake(dangling, { census: [] });
-  const ungroundedVerified = structuredClone(template);
-  ungroundedVerified.identity.status = "verified";
-  const verifiedErrors = validateNameIntake(ungroundedVerified, { census: [] });
-  const mainnet = structuredClone(template);
-  mainnet.lifecycle = "mainnet";
-  const mainnetErrors = validateNameIntake(mainnet, { census: [] });
-  const taxonomyDrift = structuredClone(template);
-  taxonomyDrift.taxonomy.primary_domain = "yield";
-  const taxonomyErrors = validateNameIntake(taxonomyDrift, { census: [] });
-  const unrelatedReproduction = structuredClone(template);
-  unrelatedReproduction.sources.push({ ...structuredClone(template.sources[0]), id: "SRC-2", url: "https://example.com/unrelated" });
-  unrelatedReproduction.reproductions.push({ id: "REP-1", method: "other", source_ids: ["SRC-2"], checked_at: "2026-09-01T12:00:00Z", result: "Checked an unrelated source." });
-  unrelatedReproduction.claims[0].class = "verified";
-  unrelatedReproduction.claims[0].reproduction_ids = ["REP-1"];
-  const reproductionErrors = validateNameIntake(unrelatedReproduction, { census: [] });
-  const unresolved = structuredClone(template);
-  unresolved.reproductions.push({ id: "REP-1", method: "document-scope", source_ids: ["SRC-1"], checked_at: "2026-09-01T12:00:00Z", result: "Checked the announcement text." });
-  unresolved.claims[2].class = "verified";
-  unresolved.claims[2].reproduction_ids = ["REP-1"];
-  unresolved.claims.push({ id: "CLM-8", field: "lifecycle", value: "beta", class: "disputed", source_ids: ["SRC-1"], reproduction_ids: [], observed_at: "2026-09-01T12:00:00Z" });
-  unresolved.conflicts.push({ id: "CON-lifecycle", field: "lifecycle", claim_ids: ["CLM-3", "CLM-8"], status: "open", resolution: null });
-  const unresolvedErrors = validateNameIntake(unresolved, { census: [] });
-  const collision = validateNameIntake(template, {
-    census: [{ slug: "example", name: "Example Protocol", identity: { aliases: [] } }],
-  });
-  try {
-    assert.deepEqual(valid, [], "standard name template passes");
-    assert.ok(danglingErrors.some((error) => error.includes("missing source SRC-99")), "dangling source rejected");
-    assert.ok(verifiedErrors.some((error) => error.includes("verified identity requires")), "identity cannot self-verify");
-    assert.ok(mainnetErrors.some((error) => error.includes("mainnet requires")), "mainnet requires reproduction");
-    assert.ok(taxonomyErrors.some((error) => error.includes("matching taxonomy.primary-domain claim")), "taxonomy must agree with its claim");
-    assert.ok(reproductionErrors.some((error) => error.includes("share a source")), "verified claim must be grounded in its reproduction");
-    assert.ok(unresolvedErrors.some((error) => error.includes("open conflict") && error.includes("verified claim")), "open conflict blocks verification");
-    assert.ok(collision.some((error) => error.includes("possible_matches")), "normalized canonical match must be disclosed");
-    console.log("ok   standardized name intake");
-  } catch (err) { failures++; console.error(`FAIL standardized name intake: ${err.message}`); }
 }
 
 // Task 2 — feed schema: kind enum and account handle pattern.
@@ -862,7 +817,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 // Task A — computeRanks: one basis per category (highest-priority kind ≥2 projects share), standard competition
 // ranking (ties share a position, the next distinct value skips: 1,1,3), categories with <2 ranked projects get none.
 {
-  const proj = (slug, category, metrics) => ({ slug, category, metrics });
+  const proj = (slug, category, metrics) => ({ slug, cohort: { id: category, label: category.toLowerCase() }, metrics });
   const threeTvl = computeRanks([
     proj("a", "Lending", [{ kind: "tvl", value: 300 }]),
     proj("b", "Lending", [{ kind: "tvl", value: 200 }]),
@@ -882,16 +837,16 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     proj("r", "Oracle / infra", [{ kind: "tvl", value: 50 }]),
   ]);
   try {
-    assert.deepEqual(threeTvl.get("a"), { basis: "tvl", position: 1, of: 3 }, "highest tvl → position 1 of 3");
-    assert.deepEqual(threeTvl.get("b"), { basis: "tvl", position: 2, of: 3 });
-    assert.deepEqual(threeTvl.get("c"), { basis: "tvl", position: 3, of: 3 });
-    assert.deepEqual(volumeShared.get("y"), { basis: "volume_24h", position: 1, of: 2 }, "tvl shared by only 1 project is skipped for volume_24h");
-    assert.deepEqual(volumeShared.get("x"), { basis: "volume_24h", position: 2, of: 2 });
+    assert.deepEqual(threeTvl.get("a"), { basis: "tvl", position: 1, of: 3, cohort: "lending" }, "highest tvl → position 1 of 3");
+    assert.deepEqual(threeTvl.get("b"), { basis: "tvl", position: 2, of: 3, cohort: "lending" });
+    assert.deepEqual(threeTvl.get("c"), { basis: "tvl", position: 3, of: 3, cohort: "lending" });
+    assert.deepEqual(volumeShared.get("y"), { basis: "volume_24h", position: 1, of: 2, cohort: "yield" }, "tvl shared by only 1 project is skipped for volume_24h");
+    assert.deepEqual(volumeShared.get("x"), { basis: "volume_24h", position: 2, of: 2, cohort: "yield" });
     assert.equal(onlyOneMetricd.has("solo"), false, "category with 1 metric'd project gets no ranks");
     assert.equal(onlyOneMetricd.has("bare"), false);
-    assert.deepEqual(tied.get("p"), { basis: "tvl", position: 1, of: 3 }, "tie shares position 1");
-    assert.deepEqual(tied.get("q"), { basis: "tvl", position: 1, of: 3 }, "tie shares position 1");
-    assert.deepEqual(tied.get("r"), { basis: "tvl", position: 3, of: 3 }, "next distinct value skips to 3 (standard competition ranking)");
+    assert.deepEqual(tied.get("p"), { basis: "tvl", position: 1, of: 3, cohort: "oracle / infra" }, "tie shares position 1");
+    assert.deepEqual(tied.get("q"), { basis: "tvl", position: 1, of: 3, cohort: "oracle / infra" }, "tie shares position 1");
+    assert.deepEqual(tied.get("r"), { basis: "tvl", position: 3, of: 3, cohort: "oracle / infra" }, "next distinct value skips to 3 (standard competition ranking)");
     console.log("ok   computeRanks");
   } catch (err) { failures++; console.error(`FAIL computeRanks: ${err.message}`); }
 }

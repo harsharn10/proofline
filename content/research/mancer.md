@@ -58,7 +58,7 @@ The strongest documented property is the absence of deposited order custody: tok
 
 - S2 — [Mancer documentation](https://mancer.xyz/docs), reviewed 2026-08-31.
 - S1, S3, S4 — site, whitepaper and X account (census links).
-- S5–S8 — Grok desk intake artifacts (ecosystem map, workbook, X fills).
+- S5–S8 — Research intake artifacts (ecosystem map, workbook, X fills).
 
 See `content/sources/mancer.yaml` for every entry's accessed_at, claim and excerpt.
 
