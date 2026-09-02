@@ -1,6 +1,6 @@
 # Channel publishing
 
-The changelog is Proofline's complete research record. The Telegram channel is a selective retail
+The changelog is Icarus's complete research record. The Telegram channel is a selective retail
 publication, so a research change reaches the private review queue only when its changelog entry
 contains a structured `channel` object.
 
@@ -38,8 +38,8 @@ changes and routine coverage stubs stay site-only.
 channel:
   event: new-coverage
   delivery: same-day
-  headline: Pons enters Proofline coverage with Elevated risk
-  summary: Proofline completed its first full review...
+  headline: Pons enters Icarus with Elevated risk
+  summary: Icarus completed its first full review...
   why_it_matters:
     - Owner actions can take effect without a documented delay.
     - The project's own documentation describes the system as unaudited.
@@ -51,8 +51,8 @@ Event values are `new-coverage`, `research-update`, `risk-alert`, `correction`, 
 
 ## Card system
 
-Proofline publishes **text cards**, not image cards. The sender uses Telegram `sendMessage` with
-HTML formatting. Project names, the current Proofline view, the research link and the disclaimer are
+Icarus publishes **text cards**, not image cards. The sender uses Telegram `sendMessage` with
+HTML formatting. Project names, the current Icarus view, the research link and the disclaimer are
 added automatically; editors write only the structured publication object.
 
 There are two rendered formats:
@@ -71,13 +71,13 @@ authored, issue-level roundup record.
 
 | Card | Kicker | Default delivery | Must include | Do not publish when |
 | --- | --- | --- | --- | --- |
-| New coverage | `NEW COVERAGE · PROJECT` | Same day | What is now covered; the main conclusion; score, confidence and risk are added automatically; one or two decision-relevant implications; what could change the view | The record is only a routine stub or has no retail conclusion |
+| New profile | `NEW PROFILE · PROJECT` | Same day | What is now reviewed; the main conclusion; Control, evidence percentage and risk are added automatically; one or two decision-relevant implications; what could change the view | The record has no retail conclusion yet |
 | Research update | `RESEARCH UPDATE · PROJECT` | Same day | The exact conclusion that changed; prior → current value when applicable; the evidence that caused the change; what remains unresolved | Sources were added but the conclusion did not change |
 | Risk alert | `RISK ALERT · PROJECT` | Immediate | The concrete risk; affected product, deployment or users; observed status versus unknowns; immediate evidence to watch | The concern is speculative, stale or not retail-relevant |
-| Correction | `CORRECTION · PROJECT` | Immediate | What Proofline previously said; the corrected statement; why it changed; whether score, risk, lifecycle or address changed | The edit is only wording, spelling or internal metadata |
+| Correction | `CORRECTION · PROJECT` | Immediate | What Icarus previously said; the corrected statement; why it changed; whether Control, risk, lifecycle or address changed | The edit is only wording, spelling or internal metadata |
 | Developing | `DEVELOPING · PROJECT` | Immediate | What happened; the timestamp or current status; what is verified, claimed and still unknown; the next confirmation point | The only source is rumor or the update is not time-sensitive |
 | Trending | `TRENDING · PROJECT` | Same day or roundup | The threshold crossing; the substantive catalyst; counting-account context when useful; an explicit separation between attention and quality | Attention rose without a substantive catalyst |
-| Roundup | `PROOFLINE ROUNDUP · DATE` | Roundup | Date; item count; for each item: project, event label, headline, summary and research link; global disclaimer | There is only one urgent item that deserves a full event card |
+| Roundup | `ICARUS ROUNDUP · DATE` | Roundup | Date; item count; for each item: project, event label, headline, summary and research link; global disclaimer | There is only one urgent item that deserves a full event card |
 
 The trending caution — “Trending measures attention — not quality or endorsement.” — is inserted
 automatically. A roundup receives one disclaimer at the bottom rather than one disclaimer per item.
@@ -91,7 +91,7 @@ automatically. A roundup receives one disclaimer at the bottom rather than one d
 | Headline | Yes | — | 1–180 characters |
 | Summary | Yes | — | 1–1,200 characters |
 | Why it matters | Yes, when the card brief calls for it | Heading and bullets | 1–2 unique bullets; 400 characters each |
-| Proofline view | No | Score/risk and confidence/provisional state from derived data | Never hand-edit |
+| Icarus view | No | Control, risk, evidence percentage and second-review state from calculated data | Never hand-edit |
 | What we’re watching | Yes, when there is a concrete next evidence point | Heading | Up to 500 characters |
 | Trending caution | No | Added to trending event cards | Fixed copy |
 | Research link | No | Built from the site URL and project slug | — |
@@ -117,15 +117,15 @@ Why it matters
 • Retail implication
 • Primary risk or opportunity
 
-Proofline view
-Score and risk
-Confidence and provisional status
+Icarus view
+Control and risk
+Evidence percentage and second-review status
 
 What we're watching
 The evidence that could change the assessment.
 
+Icarus is powered by Project Proofline. Automated research may be incomplete, delayed or inaccurate. It is not investment advice; read the sources and do your own research.
 Read the full research →
-Research opinion only — not an audit, guarantee or investment advice.
 ```
 
 Posts should normally stay between 500 and 900 characters. A reader should understand the event,
@@ -133,31 +133,31 @@ impact and evidence status without opening the link. Technical substantiation be
 research record.
 
 Conditional sections are omitted cleanly: no `why_it_matters` means no “Why it matters” block; no
-`watch_next` means no “What we’re watching” block. The Proofline view, link and disclaimer remain.
+`watch_next` means no “What we’re watching” block. The Icarus view, link and disclaimer remain.
 
 ## Roundup card format
 
 Approved items with `delivery: roundup` are combined into this structure:
 
 ```text
-PROOFLINE ROUNDUP · YYYY-MM-DD
+ICARUS ROUNDUP · YYYY-MM-DD
 
-N research updates selected by the Proofline desk.
+N research updates selected by Icarus.
 
-Project · EVENT
-Plain-language headline
-One concise explanation of what changed.
-Open research →
+Icarus is powered by Project Proofline. Automated research may be incomplete, delayed or inaccurate. It is not investment advice; read the sources and do your own research.
 
 Project · EVENT
 Plain-language headline
 One concise explanation of what changed.
 Open research →
 
-Research opinion only — not an audit, guarantee or investment advice.
+Project · EVENT
+Plain-language headline
+One concise explanation of what changed.
+Open research →
 ```
 
-Roundup entries intentionally omit the full “Why it matters,” “Proofline view” and “What we’re
+Roundup entries intentionally omit the full “Why it matters,” “Icarus view” and “What we’re
 watching” blocks. Put the essential conclusion and implication in the headline and summary. If an
 item cannot be understood in that compact form, publish it as a same-day event card instead.
 
@@ -193,7 +193,7 @@ Use these prompts to fill the worksheet; they are not additional schema fields.
 
 ## Copy rules
 
-- Lead with the change, not with Proofline announcing that it found a change.
+- Lead with the change, not with Icarus announcing that it found a change.
 - Use exact states: `verified`, `claim`, `inference`, `disputed` or `unknown`.
 - Put prior → current values in the copy when a score, risk band, lifecycle or deployment changed.
 - Name the affected chain, deployment or product when ambiguity could cause a reader to act on the

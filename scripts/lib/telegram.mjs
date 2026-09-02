@@ -1,10 +1,11 @@
 // Pure helpers for the publish-triggered Telegram digest (PRD §9.2). No I/O here.
 import { createHash } from "node:crypto";
 
-export const DISCLAIMER = "Research opinion only — not an audit, guarantee or investment advice.";
+export const DISCLAIMER =
+  "Icarus is powered by Project Proofline. This automated research may be incomplete, delayed or inaccurate. It is not an audit, guarantee or investment advice. Read the sources and do your own research.";
 
 export const EVENT_LABELS = {
-  "new-coverage": "NEW COVERAGE",
+  "new-coverage": "NEW PROFILE",
   "research-update": "RESEARCH UPDATE",
   "risk-alert": "RISK ALERT",
   correction: "CORRECTION",
@@ -84,14 +85,19 @@ export function escapeHtml(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function prooflineView(derived) {
+function icarusView(derived) {
   if (!derived || derived.score === null || derived.score === undefined) {
-    return "Research pending / insufficient evidence";
+    return "Not yet reviewed";
   }
   return [
-    `${derived.score}/100 · ${derived.risk} risk`,
-    `${derived.confidence}% confidence${derived.provisional ? " · Provisional" : ""}`,
-  ].join("\n");
+    `Control ${derived.score}/100 · evidence ${derived.confidence}%${derived.provisional ? " · awaiting second review" : ""}`,
+    derived.risk ? `${derived.risk} risk` : null,
+  ].filter(Boolean).join("\n");
+}
+
+/** The site and Telegram consume the same generated share-bar decision. */
+export function selectShareBar(entries, shareBar) {
+  return entries.filter((entry) => shareBar?.[entry.slug] === true);
 }
 
 export function formatPublication(
@@ -118,11 +124,11 @@ export function formatPublication(
     `<b>${escapeHtml(publication.headline)}</b>`,
     escapeHtml(publication.summary),
     why,
-    `<b>Proofline view</b>\n${escapeHtml(prooflineView(derived))}`,
+    `<b>Icarus view</b>\n${escapeHtml(icarusView(derived))}`,
     watch,
     trendNote,
-    link,
     `<i>${escapeHtml(disclaimer)}</i>`,
+    link,
   ]
     .filter(Boolean)
     .join("\n\n");
@@ -156,9 +162,9 @@ export function buildMessages(
   if (!roundup.length) return direct;
   const roundupText = [
     `<b>${escapeHtml(siteName.toUpperCase())} ROUNDUP · ${escapeHtml(date)}</b>`,
-    `${roundup.length} research update${roundup.length === 1 ? "" : "s"} selected by the Proofline desk.`,
-    ...roundup.map((entry) => formatRoundupEntry(entry, projects.get(entry.slug), { siteUrl, profilePath })),
+    `${roundup.length} research update${roundup.length === 1 ? "" : "s"} selected by Icarus.`,
     `<i>${escapeHtml(disclaimer)}</i>`,
+    ...roundup.map((entry) => formatRoundupEntry(entry, projects.get(entry.slug), { siteUrl, profilePath })),
   ].join("\n\n");
   return [...direct, ...chunkMessage(roundupText)];
 }
