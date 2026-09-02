@@ -159,4 +159,3 @@ export async function readLpLocks(client, pairs = [], { lockers = new Set() } = 
   }
   return { lp, errors };
 }
-

@@ -64,4 +64,3 @@ export function attributeCreator(creatorAddress, launchpads) {
   const creator = normalAddress(creatorAddress);
   return creator ? launchpads.get(creator) ?? null : null;
 }
-
