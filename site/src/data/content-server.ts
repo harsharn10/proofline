@@ -2,7 +2,13 @@ import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
-import { headlineMetric, SECTION_KPIS } from "./types";
+import {
+  DEFAULT_KPIS,
+  SECTION_KPIS,
+  dexScreenerSearchUrl,
+  explorerTokenUrl,
+  headlineMetric,
+} from "./types";
 // Shared with scripts/score.mjs so site and Telegram eligibility cannot drift.
 // @ts-expect-error The repository-level helper is intentionally plain ESM.
 import { meetsShareBar as meetsShareBarCore } from "../../../scripts/lib/share-bar.mjs";
@@ -41,6 +47,14 @@ type TaxonomyFile = {
   sections: Array<SectionDef & { domains: string[]; leaves?: string[] }>;
   leaves: Record<string, { label: string }>;
 };
+
+// `vite.config.ts` predates the optional daily backfills. Keeping this glob here confines the
+// compatibility bridge to the card bundle; a missing directory simply produces an empty object.
+const rawCardSeries = import.meta.glob("../../../content/pulled/series/*.json", {
+  eager: true,
+  query: "?raw",
+  import: "default",
+}) as Record<string, string>;
 
 function parseYaml<T>(raw: string): T {
   return YAML.parse(raw) as T;
@@ -94,6 +108,7 @@ type ProjectFile = {
   deployments: Deployment[];
   review: Review;
   findings: Findings;
+  themes?: string[];
 };
 
 type SourcesFile = { slug: string; sources: SourceEntry[] };
@@ -106,6 +121,23 @@ type CensusEntry = {
   role?: "subject" | "observe";
   identity: { entity_kind: DirectoryEntry["entityKind"]; status: DirectoryEntry["identityStatus"] };
   tree?: { primary?: string; secondary?: string[] };
+  flags?: Array<string | { type?: string }>;
+};
+
+type PulledCardFields = {
+  market?: {
+    top10_share?: number | null;
+    launchpad?: { slug: string; via: "factory" | "creator"; address: string } | null;
+  } | null;
+  structure?: {
+    mint?: "owner-can-mint" | "no-mint-function" | "unknown";
+    lp?: Array<{
+      pair: string | null;
+      locked_share: number | null;
+      holder_kind: "burn" | "locker" | "burn-and-locker" | "none" | null;
+      reason: string | null;
+    }>;
+  } | null;
 };
 
 type DerivedFile = {
@@ -235,6 +267,7 @@ function loadContent(): ServerContent {
   const roleBySlug: Record<string, "subject" | "observe"> = {};
   const censusBySlug = new Map(census.map((row) => [row.slug, row]));
   for (const row of census) {
+    censusBySlug.set(row.slug, row);
     const tree = resolveTree(row.tree?.primary, taxonomy);
     if (tree) treeBySlug[row.slug] = tree;
     roleBySlug[row.slug] = row.role === "observe" ? "observe" : "subject";
@@ -265,6 +298,10 @@ function loadContent(): ServerContent {
     const feed = feedFile ? [...feedFile.items].sort((a, b) => b.date.localeCompare(a.date)) : [];
     const pulled = readYamlOrWarn<PulledFile | null>(rawContent.pulled[`${slug}.yaml`], `pulled/${slug}.yaml`, slug, null);
     const history = parseHistory(rawContent.pulledHistory[`${slug}.jsonl`]);
+    const seriesPath = Object.keys(rawCardSeries).find((path) => path.endsWith(`/${slug}.json`));
+    const dailySeries = parseDailySeries(seriesPath ? rawCardSeries[seriesPath] : undefined);
+    const censusRow = censusBySlug.get(slug);
+    const pulledCard = pulled as (PulledFile & PulledCardFields) | null;
     const changelog = changelogAll
       .filter((entry) => entry.slug === slug)
       .sort((a, b) => b.date.localeCompare(a.date));
@@ -290,6 +327,29 @@ function loadContent(): ServerContent {
       derived: withPulledMetrics(pickDerived(derivedFile.projects[slug], slug, project.coverage), pulled),
       pulled,
       kpis: kpisFor({ lifecycle: project.lifecycle, deployments: project.deployments }, pulled, history, buildNow),
+      card: {
+        officialConfirmed: officialSurfaceConfirmed(project.official_links, censusRow),
+        handle: censusRow?.handle ?? null,
+        themes: Array.isArray(project.themes) ? project.themes.filter((tag) => typeof tag === "string").slice(0, 5) : [],
+        history: history.map((point) => ({
+          at: point.at,
+          holders: point.holders ?? null,
+          volume24h: point.volume_h24 ?? null,
+          trades24h: point.trades_h24 ?? null,
+          launches24h: point.launches_24h ?? null,
+          revenue24h: point.revenue_24h ?? null,
+        })),
+        dailySeries,
+        top10Share: pulledCard?.market?.top10_share ?? null,
+        launchpad: pulledCard?.market?.launchpad ?? null,
+        mint: pulledCard?.structure?.mint ?? null,
+        liquidityLocks: (pulledCard?.structure?.lp ?? []).map((row) => ({
+          pair: row.pair,
+          lockedShare: row.locked_share,
+          holderKind: row.holder_kind,
+          reason: row.reason,
+        })),
+      },
     };
   });
 
@@ -330,9 +390,7 @@ function toDirectoryEntry(
 ): DirectoryEntry {
   const tree = treeBySlug[d.slug] ?? null;
   const census = censusBySlug.get(d.slug);
-  const officialConfirmed =
-    d.links.some((link) => link.kind === "site" || link.kind === "docs") &&
-    census?.identity.status !== "conflicted";
+  const officialConfirmed = officialSurfaceConfirmed(d.links, census);
   const hasContractOn4663 =
     d.pulled?.addresses.some((address) => address.is_contract === true) ?? false;
   const factoryLaunches24h =
@@ -519,6 +577,31 @@ export function latestFromIcarus(
     .slice(0, Math.max(0, n));
 }
 
+function parseDailySeries(raw: string | undefined): Record<string, Array<{ at: string; value: number }>> {
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const result: Record<string, Array<{ at: string; value: number }>> = {};
+    for (const [key, rows] of Object.entries(parsed)) {
+      if (!Array.isArray(rows)) continue;
+      const points = rows.flatMap((row) => {
+        if (!Array.isArray(row) || row.length < 2 || typeof row[0] !== "string" || typeof row[1] !== "number") return [];
+        return [{ at: row[0], value: row[1] }];
+      });
+      if (points.length > 0) result[key] = points;
+    }
+    return result;
+  } catch {
+    return {};
+  }
+}
+
+function officialSurfaceConfirmed(links: Link[], census: CensusEntry | undefined): boolean {
+  const hasOfficialSurface = links.some((link) => link.kind === "site" || link.kind === "docs");
+  const flags = (census?.flags ?? []).map((flag) => (typeof flag === "string" ? flag : flag.type ?? ""));
+  return hasOfficialSurface && census?.identity.status !== "conflicted" && !flags.includes("unconfirmed-official");
+}
+
 // Change over `days`: the latest snapshot against the newest one at least that many days older.
 function deltaFrom(history: HistoryPoint[], key: "holders", days: number): number | null {
   if (history.length < 2) return null;
@@ -618,6 +701,52 @@ function toDependencyRef(card: DependencyCard): DependencyRef {
   return { id: card.id, name: card.name, kind: card.kind, summary: card.summary, deployments: card.deployments };
 }
 
+function sourceLinksFor(dossier: Dossier, site: SiteConfig): DossierBundle["related"][number]["sourceLinks"] {
+  const market = dexScreenerSearchUrl(dossier.symbol ?? dossier.name);
+  const address = dossier.pulled?.addresses.find((row) => row.role === "token")?.address ?? dossier.pulled?.addresses[0]?.address;
+  const explorer = address ? explorerTokenUrl(site.chain.explorer, address) : undefined;
+  const llama = dossier.pulled?.metrics.find((metric) => metric.kind === "tvl")?.source_url;
+  return {
+    liquidityUsd: market,
+    volume24h: market,
+    trades24h: market,
+    priceChange24h: market,
+    fdv: market,
+    ...(explorer ? { holders: explorer, holdersDelta7d: explorer, launches24h: explorer, txnsTotal: explorer } : {}),
+    ...(llama ? { tvl: llama } : {}),
+  };
+}
+
+function relatedFor(
+  dossier: Dossier,
+  all: Dossier[],
+  treeBySlug: Record<string, TreeRef>,
+  site: SiteConfig,
+): DossierBundle["related"] {
+  const sectionId = treeBySlug[dossier.slug]?.sectionId;
+  if (!sectionId) return [];
+  const key = (SECTION_KPIS[sectionId] ?? DEFAULT_KPIS)[0]!;
+  return all
+    .filter((entry) => treeBySlug[entry.slug]?.sectionId === sectionId)
+    .sort((a, b) => {
+      const av = a.kpis[key];
+      const bv = b.kpis[key];
+      if (typeof av === "number" && typeof bv === "number" && av !== bv) return bv - av;
+      if ((av === null) !== (bv === null)) return av === null ? 1 : -1;
+      return a.name.localeCompare(b.name);
+    })
+    .map((entry) => ({
+      slug: entry.slug,
+      name: entry.name,
+      symbol: entry.symbol,
+      kpis: entry.kpis,
+      score: entry.derived.score,
+      officialConfirmed: entry.card.officialConfirmed,
+      launchpad: entry.card.launchpad?.slug ?? null,
+      sourceLinks: sourceLinksFor(entry, site),
+    }));
+}
+
 // --- Server functions ---------------------------------------------------------------
 
 // The directory: the sections in order, one slim entry per name, and the dependency cards as chips.
@@ -665,6 +794,7 @@ export const getDossier = createServerFn({ method: "GET" })
       tree,
       section: tree?.sectionId ? (content.sections.find((s) => s.id === tree.sectionId) ?? null) : null,
       now: content.now,
+      related: dossier ? relatedFor(dossier, content.dossiers, content.treeBySlug, content.site) : [],
     };
   });
 

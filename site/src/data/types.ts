@@ -395,6 +395,31 @@ export type Dossier = {
   derived: Derived;
   pulled: PulledFile | null;
   kpis: Kpis;
+  // Card-only facts normalized by content-server. These stay deliberately narrow so future
+  // puller/compiler fields can land without shipping raw files or guessing in the browser.
+  card: {
+    officialConfirmed: boolean;
+    handle: string | null;
+    themes: string[];
+    history: Array<{
+      at: string;
+      holders: number | null;
+      volume24h: number | null;
+      trades24h: number | null;
+      launches24h: number | null;
+      revenue24h: number | null;
+    }>;
+    dailySeries: Record<string, Array<{ at: string; value: number }>>;
+    top10Share: number | null;
+    launchpad: { slug: string; via: "factory" | "creator"; address: string } | null;
+    mint: "owner-can-mint" | "no-mint-function" | "unknown" | null;
+    liquidityLocks: Array<{
+      pair: string | null;
+      lockedShare: number | null;
+      holderKind: "burn" | "locker" | "burn-and-locker" | "none" | null;
+      reason: string | null;
+    }>;
+  };
 };
 
 export type DependencyControl = {
@@ -515,6 +540,16 @@ export type DossierBundle = {
   tree: TreeRef | null;
   section: SectionDef | null;
   now: number;
+  related: Array<{
+    slug: string;
+    name: string;
+    symbol: string | null;
+    kpis: Kpis;
+    score: number | null;
+    officialConfirmed: boolean;
+    launchpad: string | null;
+    sourceLinks: Partial<Record<KpiKey, string>>;
+  }>;
 };
 
 // --- Visitor-facing taxonomy ------------------------------------------------------------
