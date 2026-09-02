@@ -1,6 +1,6 @@
 # Grok Heavy assignment: seed packets, batch 1
 
-Status: assigned. Open a draft PR from the branch named at the end of this file and keep it in draft.
+Status: kicked off 2026-09-02 on branch `grok-heavy/20260902/WORK-20260902-grok-heavy-seed-batch-1`. Commit packets to this branch; the draft PR is already open.
 
 ```yaml
 contract_version: proofline-research-v2
