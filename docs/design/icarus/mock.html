@@ -1,0 +1,510 @@
+<title>Icarus Registry Mock</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --s0:#f7f7f5;--s1:#efefec;--s2:#ffffff;
+  --t1:#111214;--t2:#5a5c60;--t3:#8b8e93;
+  --rh:#00c805;--good:#078f3a;--good-bg:#e3f9e9;--bad:#d64500;--bad-bg:#fdebe3;--warn:#a86400;--warn-bg:#fbf1db;--acc:#0b6bcb;
+  --line:rgba(17,18,20,.12);--line-soft:rgba(17,18,20,.06);
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;
+  --mono:"SF Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --s0:#0b0c0d;--s1:#161719;--s2:#111214;
+  --t1:#f2f3f4;--t2:#a7aaae;--t3:#6f7378;
+  --rh:#00c805;--good:#2fd56a;--good-bg:#0e2e19;--bad:#ff6a2b;--bad-bg:#3a1a0d;--warn:#f5b342;--warn-bg:#3a2a0d;--acc:#7cb6f0;
+  --line:rgba(242,243,244,.12);--line-soft:rgba(242,243,244,.06);
+}}
+:root[data-theme="dark"]{
+  --s0:#0b0c0d;--s1:#161719;--s2:#111214;
+  --t1:#f2f3f4;--t2:#a7aaae;--t3:#6f7378;
+  --rh:#00c805;--good:#2fd56a;--good-bg:#0e2e19;--bad:#ff6a2b;--bad-bg:#3a1a0d;--warn:#f5b342;--warn-bg:#3a2a0d;--acc:#7cb6f0;
+  --line:rgba(242,243,244,.12);--line-soft:rgba(242,243,244,.06);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--s0);color:var(--t1);font-family:var(--sans);font-size:13px;line-height:1.5;font-variant-numeric:tabular-nums}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.mono{font-family:var(--mono);font-size:11px}
+svg.i{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;flex-shrink:0}
+/* bar */
+.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:18px;padding:10px 20px;background:var(--s2);border-bottom:0.5px solid var(--line)}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.06em;font-size:13px}
+.logo .mark{width:22px;height:22px;border-radius:6px;background:var(--rh);display:inline-flex;align-items:center;justify-content:center}
+.logo .mark svg{width:14px;height:14px;stroke:#062d12;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav{display:flex;gap:14px}
+.nav a{color:var(--t2);font-size:13px;padding:4px 0;border-bottom:2px solid transparent}
+.nav a.on{color:var(--t1);border-bottom-color:var(--rh)}
+.bar .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.jump{width:190px;background:var(--s1);border:0.5px solid var(--line);border-radius:8px;padding:5px 10px;font:inherit;color:var(--t1)}
+.jump::placeholder{color:var(--t3)}
+.tgl{font-size:12px;color:var(--t2);border:0.5px solid var(--line);border-radius:999px;padding:3px 10px}
+.tg{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--good);background:var(--good-bg);border-radius:999px;padding:3px 10px;font-weight:500}
+.note{background:var(--warn-bg);color:var(--warn);font-size:12px;padding:6px 20px;border-bottom:0.5px solid var(--line)}
+.note b{font-weight:600}
+.wrap{max-width:1060px;margin:0 auto;padding:20px 16px 60px}
+.screen{display:none}.screen.on{display:block}
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:end}
+.hero h1{font-size:28px;font-weight:700;letter-spacing:-.02em;margin:10px 0 8px;text-wrap:balance;line-height:1.15}
+.hero h1 span{color:var(--good)}
+.hero p{color:var(--t2);max-width:60ch;margin:0;font-size:14px}
+.eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.statbox{background:var(--s2);border:0.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--t2)}
+.statbox b{color:var(--t1);font-weight:600;font-size:16px;display:block}
+.statbox .g{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
+.statbox .u{font-size:11px;color:var(--t3);margin-top:8px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.pill{font-size:12px;padding:4px 11px;border-radius:999px;background:var(--s2);border:0.5px solid var(--line);color:var(--t1)}
+.pill small{color:var(--t3);margin-left:3px}
+.pill:hover{border-color:var(--t2)}
+.sec{margin-top:26px}
+.sech{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 2px 8px}
+.sech h2{font-size:14px;font-weight:600;margin:0}
+.sech .hint{font-size:11px;color:var(--t3)}
+.sech .hint a{color:var(--acc)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:var(--s2);border:0.5px solid var(--line);border-radius:12px;padding:14px}
+.card h3{font-size:13px;font-weight:600;margin:0 0 2px;display:flex;align-items:center;gap:6px}
+.card .d{font-size:11.5px;color:var(--t3);margin:0 0 6px}
+.mlist{list-style:none;margin:0;padding:0}
+.mlist li a,.mlist li>span.rowlike{display:flex;gap:9px;align-items:baseline;padding:6px 0;border-top:0.5px solid var(--line-soft);font-size:12.5px}
+.mlist li:first-child a{border-top:none}
+.mlist .rk{color:var(--t3);font-size:11px;width:12px;flex-shrink:0}
+.mlist b{font-weight:500}
+.mlist .why{color:var(--t3);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.mlist .v{margin-left:auto;font-weight:500;white-space:nowrap}
+.mlist .chg{font-size:11px;width:52px;text-align:right;flex-shrink:0}
+.up{color:var(--good)}.dn{color:var(--bad)}
+.more{display:block;margin-top:6px;font-size:11.5px;color:var(--acc)}
+/* status pill */
+.st{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:2px 8px;border-radius:999px;border:0.5px solid var(--line);color:var(--t2);white-space:nowrap}
+.st i{width:6px;height:6px;border-radius:50%;background:var(--t3);display:inline-block}
+.st.live{color:var(--good);background:var(--good-bg);border-color:transparent}.st.live i{background:var(--good)}
+.st.quiet{color:var(--warn);background:var(--warn-bg);border-color:transparent}.st.quiet i{background:var(--warn)}
+.st.dorm{color:var(--bad);background:var(--bad-bg);border-color:transparent}.st.dorm i{background:var(--bad)}
+.ago{color:var(--t3);font-size:11px;margin-left:6px}
+.ph{color:var(--t3);font-style:italic}
+/* research feed */
+.rf{list-style:none;margin:0;padding:0}
+.rf li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px 0;border-top:0.5px solid var(--line-soft)}
+.rf li:first-child{border-top:none}
+.rf .when{font-size:11px;color:var(--t3);padding-top:2px}
+.rf .who{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--t2);background:var(--s1);border-radius:999px;padding:1px 8px;margin-right:6px}
+.rf .ttl{font-weight:500}
+.rf p{margin:2px 0 4px;color:var(--t2);font-size:12.5px;max-width:84ch}
+.rf .links{display:flex;gap:6px;flex-wrap:wrap}
+.lk{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--acc);background:var(--s1);border-radius:999px;padding:2px 8px}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{font-weight:400;color:var(--t3);font-size:11px;text-align:right;padding:6px 8px;border-bottom:0.5px solid var(--line)}
+td{padding:9px 8px;text-align:right;border-bottom:0.5px solid var(--line-soft);white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+tr.row{cursor:pointer}tr.row:hover td{background:var(--s1)}tr.me td{background:var(--s1)}
+td .nm{font-weight:500}td .sub{display:block;color:var(--t3);font-size:11px}
+tr.dim td,td.dim{color:var(--t3)}
+/* dossier */
+.top{display:flex;align-items:flex-start;gap:12px}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--s1);border:0.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--t2);flex-shrink:0}
+.ttl2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ttl2 .nm{font-size:18px;font-weight:600}
+.ttl2 .sym{color:var(--t3);font-size:12px}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:500;white-space:nowrap}
+.badge.ok{background:var(--good-bg);color:var(--good)}.badge.warn{background:var(--warn-bg);color:var(--warn)}.badge.ctl{background:var(--s1);color:var(--t2);border:0.5px solid var(--line)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--s1);border:0.5px solid var(--line);color:var(--t2);display:inline-flex;gap:5px;align-items:center}
+.tag b{font-weight:500;color:var(--t1)}
+.tag a b{color:var(--acc)}
+.seg{display:flex;background:var(--s1);border-radius:8px;padding:2px;margin-left:auto;flex-shrink:0}
+.seg button{padding:4px 12px;font-size:12px;border-radius:6px;color:var(--t2);border:0.5px solid transparent}
+.seg button.on{background:var(--s2);color:var(--t1);border-color:var(--line)}
+.sum{margin:12px 0 0;padding:10px 12px;background:var(--s1);border-radius:8px;line-height:1.55;color:var(--t2)}
+.sum b{color:var(--t1);font-weight:500}
+.sum .links{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.cols{display:grid;grid-template-columns:200px minmax(0,1fr) 230px;gap:16px;margin-top:14px;padding-top:14px;border-top:0.5px solid var(--line)}
+.lbl{font-size:11px;color:var(--t3);margin:0 0 6px 2px;display:flex;align-items:center;gap:5px}
+.grp{background:var(--s1);border-radius:8px;margin-bottom:10px}
+.r{display:flex;justify-content:space-between;gap:8px;padding:7px 10px;border-top:0.5px solid var(--line-soft);font-size:12px}
+.r:first-child{border-top:none}
+.r span:first-child{color:var(--t2);flex-shrink:0}.r span:last-child{text-align:right}
+.r .g{color:var(--good)}.r .w{color:var(--warn)}.r .b{color:var(--bad)}.r .mu{color:var(--t3)}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.m{background:var(--s1);border-radius:8px;padding:10px 12px}
+.m small{font-size:11px;color:var(--t2);display:block}
+.m b{font-size:20px;font-weight:600;display:block;line-height:1.2;margin-top:2px}
+.m i{font-style:normal;font-size:11px;color:var(--t3)}
+.chart-h{display:flex;justify-content:space-between;align-items:center;margin:14px 2px 6px;gap:8px;flex-wrap:wrap}
+.series{display:flex;gap:4px}
+.series button{font-size:11px;padding:3px 9px;border-radius:999px;border:0.5px solid var(--line);color:var(--t2)}
+.series button.on{background:var(--t1);color:var(--s2);border-color:var(--t1)}
+.chart-h .ctx{font-size:11px;color:var(--t3)}
+.chart{height:210px;position:relative;background:var(--s1);border-radius:8px;padding:8px}
+.facts{display:flex;gap:14px;margin:8px 2px 0;font-size:11px;color:var(--t2);flex-wrap:wrap}
+.facts a{color:var(--acc)}
+.say div{padding:8px 10px;border-top:0.5px solid var(--line-soft);font-size:11.5px;line-height:1.4}
+.say div:first-child{border-top:none}
+.say em{font-style:normal;color:var(--t3);display:flex;gap:6px;align-items:center;margin-top:2px}
+.say em a{color:var(--acc)}
+.below{margin-top:16px;padding-top:14px;border-top:0.5px solid var(--line)}
+.find{padding:9px 0;border-top:0.5px solid var(--line-soft)}
+.find:first-child{border-top:none}
+.find .k{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--t3)}
+.find .k.risk{color:var(--bad)}
+.find p{margin:2px 0 0;font-size:13px;max-width:84ch}
+sup{font-size:9px;color:var(--acc);margin-left:1px}
+.tabs{display:flex;gap:2px;margin-top:14px;border-bottom:0.5px solid var(--line)}
+.tabs button{padding:8px 12px;font-size:12.5px;color:var(--t2);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--t1);border-bottom-color:var(--rh)}
+.back{display:inline-block;color:var(--t2);font-size:12px;margin-bottom:10px}
+.legend{display:flex;gap:12px;margin-top:6px;font-size:11px;color:var(--t3)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.foot{margin-top:40px;color:var(--t3);font-size:11.5px;border-top:0.5px solid var(--line);padding-top:12px}
+@media (max-width:820px){.hero{grid-template-columns:1fr}.grid3,.grid2{grid-template-columns:1fr}.cols{grid-template-columns:1fr}.strip{grid-template-columns:repeat(2,1fr)}.jump,.nav{display:none}.rf li{grid-template-columns:1fr}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 7 7 6 6 0 0 0 3-5 9 9 0 0 0 6-8 3 3 0 0 0-3-3 9 9 0 0 0-8 6 6 6 0 0 0-5 3"/><path d="M7 14a6 6 0 0 0-3 6 6 6 0 0 0 6-3"/><circle cx="15" cy="9" r="1"/></symbol>
+  <symbol id="i-cat" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592-5.592a2.41 2.41 0 0 0 0-3.408l-7.71-7.71A2 2 0 0 0 11.172 3H6a3 3 0 0 0-3 3"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M6.8 11a6 6 0 1 0 10.4 0L12 3z"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15 19 4M18 5l2 2M15 8l2 2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3a12 12 0 0 0 8.5 3A12 12 0 0 1 12 21 12 12 0 0 1 3.5 6 12 12 0 0 0 12 3"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M16 3.13a4 4 0 0 1 0 7.75M21 21v-2a4 4 0 0 0-3-3.85"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 12c2-2.96 0-7-1-8 0 3.04-1.77 4.31-3 5.5-2 2-3 5.5-3 7a7 7 0 0 0 14 0c0-2.5-2-5.5-4-7 0 2-2 3-3 2.5"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M12 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6M11 13l9-9M15 4h5v5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M8 9h8M8 13h6M9 18h-3a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-5l-5 3v-3"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M10 14 21 3M21 3l-6.5 18a.55.55 0 0 1-1 0L10 14l-7-3.5a.55.55 0 0 1 0-1z"/></symbol>
+  <symbol id="i-feather" viewBox="0 0 24 24"><path d="M4 20l16-16M5 19c6 0 12-3 14-14C8 7 5 13 5 19"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M10 5a2 2 0 1 1 4 0 7 7 0 0 1 4 6v3a4 4 0 0 0 2 3H4a4 4 0 0 0 2-3v-3a7 7 0 0 1 4-6M9 17v1a3 3 0 0 0 6 0v-1"/></symbol>
+</svg>
+
+<div class="bar">
+  <a class="logo" href="#/"><span class="mark"><svg><use href="#i-feather"/></svg></span>ICARUS</a>
+  <nav class="nav"><a href="#/" class="on">Registry</a><a href="#/">Feed</a><a href="#/">How to read this</a></nav>
+  <div class="right"><input class="jump" placeholder="Jump to a name"><a class="tg" href="#/"><svg class="i"><use href="#i-send"/></svg>Telegram</a><button class="tgl" id="tgl">theme</button></div>
+</div>
+<div class="note"><b>Mock v2, 2 Sept 2026.</b> Regular numbers are today's reads from DexScreener, Blockscout and DefiLlama. <span class="ph">Italic grey values are placeholders for data we do not pull yet.</span> Charts show example series until snapshots accrue. Click any row.</div>
+
+<!-- ───────────── HOME ───────────── -->
+<section class="screen on wrap" id="home">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Robinhood Chain · 4663</div>
+      <h1>Icarus: building the <span>Robinhood Registry</span></h1>
+      <p>Icarus researches and tracks what is new on Robinhood Chain and keeps you current here and on Telegram. Touch grass when it's quiet. Catch up fast when it's busy.</p>
+    </div>
+    <div class="statbox">
+      <div class="g"><div><b>49</b>names on file</div><div><b>27</b>live on chain</div><div><b>804</b>launches today</div><div><b>$183M</b>volume 24h</div></div>
+      <div class="u">Chain read 2 Sept, 21:26 UTC · refreshes every 6 hours</div>
+    </div>
+  </div>
+  <div class="pills">
+    <a class="pill" href="#/s/launchpads">Launchpads <small>11</small></a><a class="pill" href="#/">Tokens <small>3</small></a><a class="pill" href="#/">Trading <small>7</small></a><a class="pill" href="#/">Credit <small>3</small></a><a class="pill" href="#/">Yield <small>6</small></a><a class="pill" href="#/">RWA products <small>8</small></a><a class="pill" href="#/">Agents <small>3</small></a><a class="pill" href="#/">NFT treasuries <small>2</small></a><a class="pill" href="#/">Markets <small>2</small></a><a class="pill" href="#/">Tooling &amp; privacy <small>5</small></a>
+  </div>
+
+  <div class="sec">
+    <div class="sech"><h2>Right now</h2><span class="hint">from on-chain data · only names that clear the bar: a confirmed official surface, a located contract, and at least $25K of liquidity</span></div>
+    <div class="grid3">
+      <div class="card">
+        <h3><svg class="i"><use href="#i-trend"/></svg>Trending</h3><p class="d">most 24h volume, live names</p>
+        <ol class="mlist">
+          <li><a href="#/t/artificial-inu"><span class="rk">1</span><b>AI</b><span class="why">stock-paired · NVDA</span><span class="v">$80.9M</span><span class="chg up">+56.7%</span></a></li>
+          <li><a href="#/n/pons"><span class="rk">2</span><b>PONS</b><span class="why">bonding-curve launchpad</span><span class="v">$75.4M</span><span class="chg dn">−0.7%</span></a></li>
+          <li><a href="#/"><span class="rk">3</span><b>STONKBROKER</b><span class="why">token-bound NFTs</span><span class="v">$12.1M</span><span class="chg dn">−21.2%</span></a></li>
+          <li><a href="#/"><span class="rk">4</span><b>INDEX</b><span class="why">fee-funded RWA distributor</span><span class="v">$6.4M</span><span class="chg up">+54.3%</span></a></li>
+          <li><a href="#/"><span class="rk">5</span><b>DELTA</b><span class="why">liquidity manager</span><span class="v">$5.5M</span><span class="chg dn">−16.6%</span></a></li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3><svg class="i"><use href="#i-rocket"/></svg>New launches</h3><p class="d">first pool under 14 days old, above the bar</p>
+        <ol class="mlist">
+          <li><a href="#/"><span class="st live"><i></i>Live</span><b>DENAR</b><span class="why">isolated lending market</span><span class="v">2 d</span></a></li>
+          <li><a href="#/"><span class="st live"><i></i>Live</span><b>STATICS</b><span class="why">redeemable RWA basket</span><span class="v">6 d</span></a></li>
+          <li><a href="#/"><span class="st live"><i></i>Live</span><b>VYNEX</b><span class="why">savings vault</span><span class="v">6 d</span></a></li>
+          <li><a href="#/"><span class="st live"><i></i>Live</span><b>DTF</b><span class="why">DETF baskets · Pons v2 launch</span><span class="v">8 d</span></a></li>
+          <li><span class="rowlike ph">Pons graduations below $25K liquidity are not listed: 804 today</span></li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3><svg class="i"><use href="#i-bell"/></svg>Announced</h3><p class="d">official surface confirmed, nothing on chain yet</p>
+        <ol class="mlist">
+          <li><a href="#/"><b>Sight</b><span class="why">prediction market · Genesis NFT mint 2 Sept</span><span class="v">2 d</span></a></li>
+          <li><a href="#/"><b>Arrows</b><span class="why">options on tokenized stocks</span><span class="v">9 d</span></a></li>
+          <li><a href="#/"><b>Hookr v2</b><span class="why">hook marketplace</span><span class="v">12 d</span></a></li>
+          <li><a href="#/"><b>Wire</b><span class="why">command layer on Pons</span><span class="v">14 d</span></a></li>
+          <li><a href="#/"><b>hood.fun</b><span class="why">fair-launch pad</span><span class="v">21 d</span></a></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sech"><h2>By category</h2><span class="hint">leaders by the number that matters for each · open a category for the full ranking</span></div>
+    <div class="grid3">
+      <div class="card"><h3><svg class="i"><use href="#i-rocket"/></svg><a href="#/s/launchpads">Launchpads</a> <span class="ph" style="font-style:normal;font-weight:400">11</span></h3><p class="d">by 24h volume</p>
+        <ol class="mlist"><li><a href="#/n/pons"><span class="rk">1</span><b>Pons</b><span class="v">$75.4M</span></a></li><li><a href="#/"><span class="rk">2</span><b>Hookr</b><span class="v">$3.6M</span></a></li><li><a href="#/"><span class="rk">3</span><b>FoxPad</b><span class="v">$275K</span></a></li><li><a href="#/"><span class="rk">4</span><b>NOXA Fun</b><span class="v dn">$7.1K</span></a></li></ol><a class="more" href="#/s/launchpads">All 11 →</a></div>
+      <div class="card"><h3><svg class="i"><use href="#i-tag"/></svg><a href="#/">Tokens</a> <span class="ph" style="font-style:normal;font-weight:400">3</span></h3><p class="d">by liquidity</p>
+        <ol class="mlist"><li><a href="#/t/artificial-inu"><span class="rk">1</span><b>AI</b><span class="v">$1.2M</span></a></li><li><a href="#/"><span class="rk">2</span><b>DTF</b><span class="v">$310K</span></a></li><li><a href="#/"><span class="rk">3</span><b>L4VA</b><span class="v dim">announced</span></a></li></ol><a class="more" href="#/">All 3 →</a></div>
+      <div class="card"><h3><svg class="i"><use href="#i-trend"/></svg><a href="#/">Trading</a> <span class="ph" style="font-style:normal;font-weight:400">7</span></h3><p class="d">by 24h volume</p>
+        <ol class="mlist"><li><a href="#/"><span class="rk">1</span><b>up</b><span class="v">$2.4M</span></a></li><li><a href="#/"><span class="rk">2</span><b>Fables</b><span class="v">$1.1M</span></a></li><li><a href="#/"><span class="rk">3</span><b>SwapHood</b><span class="v">$16K</span></a></li><li><a href="#/"><span class="rk">4</span><b>Mancer</b><span class="v dim">beta</span></a></li></ol><a class="more" href="#/">All 7 →</a></div>
+      <div class="card"><h3><svg class="i"><use href="#i-key"/></svg><a href="#/">Credit</a> <span class="ph" style="font-style:normal;font-weight:400">3</span></h3><p class="d">by TVL</p>
+        <ol class="mlist"><li><a href="#/"><span class="rk">1</span><b>Arrow</b><span class="v">$3.8M liq</span></a></li><li><a href="#/"><span class="rk">2</span><b>Denar</b><span class="v">new</span></a></li><li><a href="#/"><span class="rk">3</span><b>Longbow</b><span class="v dim">announced</span></a></li></ol><a class="more" href="#/">All 3 →</a></div>
+      <div class="card"><h3><svg class="i"><use href="#i-drop"/></svg><a href="#/">Yield</a> <span class="ph" style="font-style:normal;font-weight:400">6</span></h3><p class="d">by TVL</p>
+        <ol class="mlist"><li><a href="#/"><span class="rk">1</span><b>Snuggle</b><span class="v">$4.1M</span></a></li><li><a href="#/"><span class="rk">2</span><b>Delta</b><span class="v">$15K</span></a></li><li><a href="#/"><span class="rk">3</span><b>Vynex</b><span class="v">new</span></a></li></ol><a class="more" href="#/">All 6 →</a></div>
+      <div class="card"><h3><svg class="i"><use href="#i-cat"/></svg><a href="#/">RWA products</a> <span class="ph" style="font-style:normal;font-weight:400">8</span></h3><p class="d">by TVL</p>
+        <ol class="mlist"><li><a href="#/"><span class="rk">1</span><b>Vimen</b><span class="v">$9.7K</span></a></li><li><a href="#/"><span class="rk">2</span><b>Index</b><span class="v">$6.4M vol</span></a></li><li><a href="#/"><span class="rk">3</span><b>Statics</b><span class="v">new</span></a></li></ol><a class="more" href="#/">All 8 →</a></div>
+    </div>
+    <div class="legend"><span>Agents · NFT treasuries · Markets · Tooling &amp; privacy below the fold in the real page</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sech"><h2>Latest from Icarus</h2><span class="hint">every research pull, with its sources · <a href="#/">full feed →</a> · <a href="#/">get it on Telegram →</a></span></div>
+    <div class="card" style="padding:4px 14px">
+      <ul class="rf">
+        <li><span class="when">2 Sept · 21:26</span><div><span class="who"><svg class="i"><use href="#i-feather"/></svg>Icarus</span><span class="ttl">Chain read: 34 names refreshed</span><p>Pons at 804 launches and $75.4M for the day; AI up 57% on $80.9M; NOXA Fun unchanged for 31 days and now marked dormant.</p><div class="links"><a class="lk" href="#/n/pons">Pons</a><a class="lk" href="#/t/artificial-inu">AI</a><a class="lk" href="#/">DexScreener <svg class="i"><use href="#i-ext"/></svg></a></div></div></li>
+        <li><span class="when">2 Sept · 14:05</span><div><span class="who"><svg class="i"><use href="#i-feather"/></svg>Icarus</span><span class="ttl">Down to Finance enters the registry</span><p>DETF baskets; the DTF token is a Pons v2 launch owned by the Pons factory line; package factories exist with verified source; deployer is a single key. Basket machine not yet seen live.</p><div class="links"><a class="lk" href="#/">Profile</a><a class="lk" href="#/">downto.finance <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/">Explorer <svg class="i"><use href="#i-ext"/></svg></a></div></div></li>
+        <li><span class="when">2 Sept · 06:42</span><div><span class="who"><svg class="i"><use href="#i-feather"/></svg>Icarus</span><span class="ttl">Three tokens share one owner</span><p>The Artificial Inu, EARN and Statics tokens are all owned by LONG's Airlock contract. Quotrons and its hook are owned by a single-key smart account.</p><div class="links"><a class="lk" href="#/t/artificial-inu">AI</a><a class="lk" href="#/">EARN</a><a class="lk" href="#/">Statics</a><a class="lk" href="#/">Quotrons</a></div></div></li>
+        <li><span class="when">31 Aug</span><div><span class="who"><svg class="i"><use href="#i-msg"/></svg>@ponsdotfamily</span><span class="ttl">$4B lifetime volume claimed</span><p>The account posted that $4B in total volume had been traded through Pons. Project claim, not reproduced.</p><div class="links"><a class="lk" href="#/">Post <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/n/pons">Pons</a></div></div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot">Every number links to its source on the profile. Status is computed from on-chain data, never typed. Research, not advice.</div>
+</section>
+
+<!-- ───────────── CATEGORY: LAUNCHPADS ───────────── -->
+<section class="screen wrap" id="s-launchpads">
+  <a class="back" href="#/">← Registry</a>
+  <div class="hero" style="align-items:start">
+    <div><div class="eyebrow">Category</div><h1 style="margin-top:6px">Launchpads <span style="color:var(--t3);font-weight:400;font-size:18px">11</span></h1><p>Where new tokens launch: bonding curves and pools that graduate into open trading. One pad does most of the chain's launching; the rest are small, quiet, or not yet live.</p></div>
+    <div class="statbox"><div class="g"><div><b>5</b>live</div><div><b>1</b>dormant</div><div><b>804</b>launches today</div><div><b>$79.5M</b>volume 24h</div></div><div class="u">Rails these run on: Uniswap · USDG · Stock Tokens</div></div>
+  </div>
+  <div class="pills"><span class="pill" style="border-color:var(--t2)">All <small>11</small></span><a class="pill" href="#/s/launchpads">Live <small>5</small></a><a class="pill" href="#/s/launchpads">Announced <small>5</small></a><a class="pill" href="#/s/launchpads">Watchlist <small>1</small></a></div>
+  <div class="sec">
+    <div class="sech"><h2>Ranked by 24h volume</h2><span class="hint">hover any figure for its source</span></div>
+    <div class="card" style="padding:0">
+    <table><colgroup><col style="width:28%"><col style="width:15%"><col><col><col><col><col style="width:9%"></colgroup>
+      <tr><th>Name</th><th style="text-align:left">Status</th><th>Vol 24h</th><th>Launches 24h</th><th>Liquidity</th><th>Holders</th><th>Control</th></tr>
+      <tr class="row" data-go="#/n/pons"><td><span class="nm">Pons</span><span class="sub">Bonding-curve launchpad · v1 pools, v2 curve into Uniswap v4</span></td><td style="text-align:left"><span class="st live"><i></i>Live</span><span class="ago">1 h ago</span></td><td>$75.4M</td><td>804</td><td>$13.1M</td><td>63,319</td><td>41/100</td></tr>
+      <tr class="row"><td><span class="nm">Hookr</span><span class="sub">Programmable-hook launchpad</span></td><td style="text-align:left"><span class="st live"><i></i>Live</span><span class="ago">1 h ago</span></td><td>$3.6M</td><td>0</td><td>$822K</td><td>5,410</td><td>—</td></tr>
+      <tr class="row"><td><span class="nm">FoxPad</span><span class="sub">Launchpad · mechanism not classified</span></td><td style="text-align:left"><span class="st live"><i></i>Live</span><span class="ago">1 h ago</span></td><td>$275K</td><td>—</td><td>$189K</td><td>4,491</td><td class="dim">watchlist</td></tr>
+      <tr class="row"><td><span class="nm">Longshot</span><span class="sub">Stock-paired token factory</span></td><td style="text-align:left"><span class="st live"><i></i>Live</span><span class="ago">28 h ago</span></td><td>$18</td><td>—</td><td>$4.4K</td><td>61</td><td>—</td></tr>
+      <tr class="row"><td><span class="nm">Safehood</span><span class="sub">Uniswap-pool launchpad</span></td><td style="text-align:left"><span class="st live"><i></i>Live</span><span class="ago">46 h ago</span></td><td>—</td><td>—</td><td>—</td><td>60</td><td>—</td></tr>
+      <tr class="row dim"><td><span class="nm">NOXA Fun</span><span class="sub">Launchpad · mechanism not classified</span></td><td style="text-align:left"><span class="st dorm"><i></i>Dormant</span><span class="ago">31 d ago</span></td><td>$7.1K</td><td>0</td><td>$32K</td><td>2,081</td><td>—</td></tr>
+      <tr class="row dim"><td><span class="nm">hood.fun</span><span class="sub">Bonding-curve launchpad</span></td><td style="text-align:left"><span class="st"><i></i>Announced</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr class="row dim"><td><span class="nm">Lemon</span><span class="sub">Launchpad · mechanism not classified</span></td><td style="text-align:left"><span class="st"><i></i>Announced</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr class="row dim"><td><span class="nm">LONG</span><span class="sub">Stock-paired token factory</span></td><td style="text-align:left"><span class="st"><i></i>Announced</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr class="row dim"><td><span class="nm">pools.trade</span><span class="sub">Uniswap-pool launchpad</span></td><td style="text-align:left"><span class="st"><i></i>Announced</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr class="row dim"><td><span class="nm">Stonks.fun</span><span class="sub">Launchpad · mechanism not classified</span></td><td style="text-align:left"><span class="st"><i></i>Announced</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    </table></div>
+    <div class="legend"><span>Dash = not read, never zero</span><span>Announced = nothing located on chain yet</span></div>
+  </div>
+</section>
+
+<!-- ───────────── TOKEN CARD: AI ───────────── -->
+<section class="screen wrap" id="t-artificial-inu">
+  <a class="back" href="#/">← Tokens</a>
+  <div class="card">
+    <div class="top">
+      <div class="avatar">AI</div>
+      <div style="min-width:0">
+        <div class="ttl2"><span class="nm">Artificial Inu</span><span class="sym">AI</span><span class="badge ok"><svg class="i"><use href="#i-check"/></svg>Official · links confirmed</span><span class="st live"><i></i>Live<span class="ago" style="margin-left:4px">12 min ago</span></span></div>
+        <div class="tags">
+          <span class="tag"><svg class="i"><use href="#i-rocket"/></svg>Launchpad <a href="#/"><b>LONG</b></a></span>
+          <span class="tag"><svg class="i"><use href="#i-cat"/></svg><b>Stock-paired token</b></span>
+          <span class="tag"><svg class="i"><use href="#i-tag"/></svg><b>NVDA</b></span>
+          <span class="tag"><svg class="i"><use href="#i-tag"/></svg><b class="ph">AI · dog</b></span>
+          <span class="tag"><svg class="i"><use href="#i-cal"/></svg><b>Jul 14, 2026</b></span>
+          <span class="tag"><svg class="i"><use href="#i-drop"/></svg>Liquidity <b>Uniswap v4</b></span>
+        </div>
+      </div>
+      <div class="seg"><button class="on">Daily</button><button>Weekly</button><button>Monthly</button></div>
+    </div>
+    <div class="sum"><b>Flagship LONG launch.</b> $AI is paired to tokenized NVDA, with a vault the project says accumulates NVDA. The token contract is owned by LONG's Airlock contract, not a project key, so LONG's infrastructure controls its owner-only functions. Not audited. Largest stock-paired token on the chain by volume.
+      <div class="links"><a class="lk" href="#/">artificialinu.xyz <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/">Docs <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/">@artificialinu <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/">DexScreener <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/">Explorer <svg class="i"><use href="#i-ext"/></svg></a></div>
+    </div>
+    <div class="cols">
+      <div>
+        <p class="lbl">Official</p>
+        <div class="grp">
+          <div class="r"><span>Contract</span><span class="mono">0x2E8c…1e18</span></div>
+          <div class="r"><span>Deployer</span><span class="mono">0x77b0…d3a4</span></div>
+          <div class="r"><span>Treasury</span><span class="mu">not on file</span></div>
+          <div class="r"><span>Audit</span><span class="mu">None</span></div>
+        </div>
+        <p class="lbl">Structure</p>
+        <div class="grp">
+          <div class="r"><span>Ownership</span><span class="w">Airlock (LONG)</span></div>
+          <div class="r"><span>Liquidity</span><span class="ph">not checked</span></div>
+          <div class="r"><span>Mint</span><span class="ph">not checked</span></div>
+          <div class="r"><span>Top 10 hold</span><span class="ph">41%</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="strip">
+          <div class="m"><small>Holders</small><b>33,231</b><i class="ph">+210 today</i></div>
+          <div class="m"><small>Market cap</small><b class="ph">$118M</b><i>$0.118</i></div>
+          <div class="m"><small>Volume</small><b>$80.9M</b><i>24h</i></div>
+          <div class="m"><small>Trades</small><b>34,120</b><i>24h</i></div>
+        </div>
+        <div class="chart-h"><div class="series" data-chart="c1"><button class="on" data-s="holders">Holders</button><button data-s="volume">Volume</button><button data-s="trades">Trades</button></div><span class="ctx" id="ctx1">last 30 days · example series until snapshots accrue</span></div>
+        <div class="chart"><canvas id="c1"></canvas></div>
+        <div class="facts"><span><svg class="i"><use href="#i-users"/></svg>Top 10 hold <span class="ph">41%</span></span><span><svg class="i"><use href="#i-flame"/></svg>Txns 61,204</span><a href="#/"><svg class="i"><use href="#i-ext"/></svg>Price chart on DexScreener</a></div>
+      </div>
+      <div>
+        <p class="lbl"><svg class="i"><use href="#i-msg"/></svg>What people are saying</p>
+        <div class="grp say">
+          <div>Vault claims 2.1M NVDA accumulated<em>@artificialinu · 31 Aug · <a href="#/">post</a></em></div>
+          <div>“The NVDA-paired play everyone copied”<em>@0xSammy · 30 Aug · <a href="#/">post</a></em></div>
+          <div>Pair listed on DexScreener<em>on-chain · 14 Jul · <a href="#/">pool</a></em></div>
+          <div>Icarus: owner is LONG's Airlock contract<em>Icarus · 2 Sept · <a href="#/">read</a></em></div>
+        </div>
+      </div>
+    </div>
+    <div class="below">
+      <div class="sech"><h2 style="font-size:12.5px">Related · stock-paired tokens on Robinhood Chain</h2><span class="hint">3 tokens · sorted by liquidity</span></div>
+      <table><colgroup><col style="width:32%"><col><col><col><col><col style="width:14%"></colgroup>
+        <tr><th>Token</th><th>Liquidity</th><th>Vol 24h</th><th>Holders</th><th>Top 10</th><th>Launchpad</th></tr>
+        <tr class="me"><td><span class="dot" style="background:var(--good)"></span>Artificial Inu</td><td style="font-weight:500">$1.2M</td><td>$80.9M</td><td>33,231</td><td class="ph">41%</td><td>LONG</td></tr>
+        <tr class="row"><td><span class="dot" style="background:var(--good)"></span>Down to Finance</td><td>$310K</td><td>$96K</td><td>8,828</td><td class="ph">—</td><td>Pons v2</td></tr>
+        <tr class="row dim"><td><span class="dot" style="background:var(--t3)"></span>L4VA</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      </table>
+      <div class="legend"><span><span class="dot" style="background:var(--good)"></span>Official</span><span><span class="dot" style="background:var(--t3)"></span>Unclaimed</span></div>
+    </div>
+    <div class="below">
+      <div class="tabs"><button class="on">Commentary</button><button>Contracts</button><button>Sources</button></div>
+      <div style="margin-top:8px">
+        <div class="find"><div class="k risk">Risk · checked on chain</div><p>owner() on the AI token returns the verified Airlock contract, which also owns the EARN and Statics tokens; owner-only functions are controlled by LONG's launch infrastructure, not a project-held key.<sup>9</sup></p></div>
+        <div class="find"><div class="k">From the project</div><p>The project says a vault accumulates NVDA from trading fees; the vault address and its holdings were not located in this review.<sup>3</sup> <sup>5</sup></p></div>
+        <div class="find"><div class="k">Open</div><p>Not found yet: the vault contract, fee routing as deployed, and any audit.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── PROJECT CARD: PONS ───────────── -->
+<section class="screen wrap" id="n-pons">
+  <a class="back" href="#/s/launchpads">← Launchpads</a>
+  <div class="card">
+    <div class="top">
+      <div class="avatar">PO</div>
+      <div style="min-width:0">
+        <div class="ttl2"><span class="nm">Pons</span><span class="sym">PONS</span><span class="badge ok"><svg class="i"><use href="#i-check"/></svg>Official · links confirmed</span><span class="st live"><i></i>Live<span class="ago" style="margin-left:4px">1 h ago</span></span><span class="badge ctl"><svg class="i"><use href="#i-shield"/></svg>Control 41/100 · evidence 64% · awaiting second review</span></div>
+        <div class="tags">
+          <span class="tag"><svg class="i"><use href="#i-cat"/></svg><b>Launchpad</b></span>
+          <span class="tag"><svg class="i"><use href="#i-tag"/></svg><b>Bonding curve</b></span>
+          <span class="tag"><svg class="i"><use href="#i-cal"/></svg>Mainnet <b>Jul 13, 2026</b></span>
+          <span class="tag"><svg class="i"><use href="#i-drop"/></svg>Graduates into <b>Uniswap v3 / v4</b></span>
+          <span class="tag"><svg class="i"><use href="#i-key"/></svg>Owner <b>2-of-3 Safe</b></span>
+          <span class="tag"><svg class="i"><use href="#i-shield"/></svg>Audit <b>none matched</b></span>
+        </div>
+      </div>
+      <div class="seg"><button class="on">Daily</button><button>Weekly</button><button>Monthly</button></div>
+    </div>
+    <div class="sum"><b>The chain's dominant launchpad.</b> Two generations: v1 launches fixed-supply tokens into locked Uniswap v3 pools; v2 sells from a bonding curve that graduates into a locked v4 pool and can pair against tokenized stocks. 804 launches in the last day and $75.4M of volume across its pools. A 2-of-3 Safe holds the owner role with no timelock; it can change fee recipients, hook fees and launch configs. Deployed code has no matched audit.
+      <div class="links"><a class="lk" href="#/">ponsfamily.com <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/">Docs v1 <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/">Docs v2 <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/">@ponsdotfamily <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/">DexScreener <svg class="i"><use href="#i-ext"/></svg></a><a class="lk" href="#/">Explorer <svg class="i"><use href="#i-ext"/></svg></a></div>
+    </div>
+    <div class="cols">
+      <div>
+        <p class="lbl">Official</p>
+        <div class="grp">
+          <div class="r"><span>Token</span><span class="mono">0x39dB…4571</span></div>
+          <div class="r"><span>v2 factory</span><span class="mono">0x7eD5…EC7e</span></div>
+          <div class="r"><span>Contracts</span><span>15 read</span></div>
+          <div class="r"><span>Audit</span><span class="mu">None</span></div>
+        </div>
+        <p class="lbl">Structure</p>
+        <div class="grp">
+          <div class="r"><span>Ownership</span><span class="w">2-of-3 Safe</span></div>
+          <div class="r"><span>Timelock</span><span class="b">None</span></div>
+          <div class="r"><span>Upgradeable</span><span class="g">No proxies</span></div>
+          <div class="r"><span>Fees</span><span class="w">Owner can change</span></div>
+          <div class="r"><span>Token owner</span><span class="g">None</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="strip">
+          <div class="m"><small>Volume</small><b>$75.4M</b><i>24h · 3 pools</i></div>
+          <div class="m"><small>Launches</small><b>804</b><i>24h</i></div>
+          <div class="m"><small>Revenue</small><b>$869K</b><i>24h · DefiLlama</i></div>
+          <div class="m"><small>Holders</small><b>63,319</b><i class="ph">+1,180 today</i></div>
+        </div>
+        <div class="chart-h"><div class="series" data-chart="c2"><button class="on" data-s="launches">Launches</button><button data-s="revenue">Revenue</button><button data-s="holders">Holders</button></div><span class="ctx" id="ctx2">last 30 days · example series until snapshots accrue</span></div>
+        <div class="chart"><canvas id="c2"></canvas></div>
+        <div class="facts"><span><svg class="i"><use href="#i-flame"/></svg>114K trades 24h</span><span>12,007 txns to Pons contracts, 24h</span><a href="#/"><svg class="i"><use href="#i-ext"/></svg>DefiLlama</a><a href="#/"><svg class="i"><use href="#i-ext"/></svg>Explorer</a></div>
+      </div>
+      <div>
+        <p class="lbl"><svg class="i"><use href="#i-msg"/></svg>What people are saying</p>
+        <div class="grp say">
+          <div>$4B lifetime volume claimed<em>@ponsdotfamily · 31 Aug · <a href="#/">post</a></em></div>
+          <div>Third-party snapshot: 63% share of chain fees<em>@0xSammy · 31 Aug · <a href="#/">post</a></em></div>
+          <div>DefiLlama lists Pons v2<em>on-chain · 31 Aug · <a href="#/">page</a></em></div>
+          <div>Icarus: Safe changed a creator fee recipient<em>Icarus · 1 h ago · <a href="#/">tx</a></em></div>
+        </div>
+      </div>
+    </div>
+    <div class="below">
+      <div class="sech"><h2 style="font-size:12.5px">Related · launchpads on Robinhood Chain</h2><span class="hint">5 live · sorted by 24h volume · <a href="#/s/launchpads">all 11 →</a></span></div>
+      <table><colgroup><col style="width:32%"><col><col><col><col><col style="width:12%"></colgroup>
+        <tr><th>Launchpad</th><th>Vol 24h</th><th>Launches 24h</th><th>Liquidity</th><th>Holders</th><th>Control</th></tr>
+        <tr class="me"><td><span class="dot" style="background:var(--good)"></span>Pons</td><td style="font-weight:500">$75.4M</td><td>804</td><td>$13.1M</td><td>63,319</td><td>41/100</td></tr>
+        <tr class="row"><td><span class="dot" style="background:var(--t3)"></span>Hookr</td><td>$3.6M</td><td>0</td><td>$822K</td><td>5,410</td><td>—</td></tr>
+        <tr class="row"><td><span class="dot" style="background:var(--t3)"></span>FoxPad</td><td>$275K</td><td>—</td><td>$189K</td><td>4,491</td><td class="dim">watchlist</td></tr>
+        <tr class="row"><td><span class="dot" style="background:var(--t3)"></span>Longshot</td><td>$18</td><td>—</td><td>$4.4K</td><td>61</td><td>—</td></tr>
+      </table>
+    </div>
+    <div class="below">
+      <div class="tabs"><button class="on">Commentary</button><button>Contracts · 15</button><button>Sources · 33</button></div>
+      <div style="margin-top:8px">
+        <div class="find"><div class="k risk">Risk · from the evidence</div><p>The 2-of-3 Safe holds the owner role directly, with no timelock: on the v2 factory and hook it can change fee recipients and shares, the hook fee, pairing-asset approvals, launch configs and the graduation executor, and call rescue functions.<sup>22</sup> <sup>23</sup> <sup>19</sup> <sup>33</sup></p></div>
+        <div class="find"><div class="k risk">Risk · from the evidence</div><p>The three Safe signers are externally owned accounts whose holders are not identified in any reviewed source; one of them has never sent a transaction.<sup>33</sup> <sup>1</sup></p></div>
+        <div class="find"><div class="k">Checked on chain</div><p>All fourteen documented addresses are contracts on chain 4663; twelve have verified source and no proxy; the owner Safe found by reading owner() is a verified SafeProxy.<sup>17</sup> <sup>18</sup> <sup>31</sup></p></div>
+        <div class="find"><div class="k">Checked on chain</div><p>Neither the v1 nor the v2 launch locker exposes an unlock or withdraw function in its verified ABI, so the owner has no liquidity exit path there.<sup>19</sup> <sup>26</sup></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var screens={"#/":"home","#/s/launchpads":"s-launchpads","#/t/artificial-inu":"t-artificial-inu","#/n/pons":"n-pons"};
+  function show(){var h=location.hash||"#/";var id=screens[h]||"home";document.querySelectorAll(".screen").forEach(function(s){s.classList.toggle("on",s.id===id)});window.scrollTo(0,0);}
+  window.addEventListener("hashchange",show);show();
+  document.querySelectorAll("tr.row[data-go]").forEach(function(tr){tr.addEventListener("click",function(){location.hash=tr.getAttribute("data-go")})});
+  document.querySelectorAll(".seg button,.tabs button").forEach(function(b){b.addEventListener("click",function(){b.parentNode.querySelectorAll("button").forEach(function(x){x.classList.remove("on")});b.classList.add("on")})});
+  var root=document.documentElement,tgl=document.getElementById("tgl");
+  function label(){var t=root.getAttribute("data-theme");tgl.textContent=t==="dark"?"light":t==="light"?"dark":"theme"}
+  try{var saved=localStorage.getItem("icarus.mock.theme");if(saved==="light"||saved==="dark")root.setAttribute("data-theme",saved)}catch(e){}
+  label();
+  tgl.addEventListener("click",function(){var cur=root.getAttribute("data-theme");var sys=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";var next=(cur||sys)==="dark"?"light":"dark";root.setAttribute("data-theme",next);try{localStorage.setItem("icarus.mock.theme",next)}catch(e){}label();charts.forEach(function(c){c.destroy()});charts=[];build();});
+
+  // charts: example series (real snapshots begin 2 Sept)
+  var days=Array.from({length:30},function(_,i){var d=new Date(2026,7,4+i);return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})});
+  var series={
+    c1:{holders:{v:[24100,24900,25600,26200,26900,27300,27800,28400,28900,29300,29800,30100,30500,30900,31200,31500,31800,32000,32200,32400,32500,32600,32700,32800,32900,33000,33050,33100,33180,33231],fmt:function(v){return Math.round(v/1000)+"k"},type:"line"},
+        volume:{v:[3.1,2.8,4.2,5.1,3.9,6.2,7.8,5.5,4.9,6.1,8.4,9.2,7.7,6.3,5.8,7.1,9.9,12.4,10.8,9.1,8.7,11.2,14.6,18.3,22.1,26.4,31.2,41.8,51.6,80.9],fmt:function(v){return "$"+v+"M"},type:"bar"},
+        trades:{v:[4100,3900,5200,6100,4800,7200,8900,6400,5900,7100,9400,10200,8800,7300,6900,8100,11000,13600,12100,10400,9800,12500,15900,19800,23400,27100,30800,33000,33800,34120],fmt:function(v){return Math.round(v/1000)+"k"},type:"bar"}},
+    c2:{launches:{v:[310,342,298,388,410,377,455,502,468,521,590,612,577,540,598,644,701,688,732,755,710,769,801,788,823,806,779,812,796,804],fmt:function(v){return v},type:"bar"},
+        revenue:{v:[210,230,205,260,280,255,310,340,318,355,402,418,393,368,407,438,478,468,499,514,483,524,545,536,560,548,530,553,541,869],fmt:function(v){return "$"+v+"K"},type:"bar"},
+        holders:{v:[41200,42100,43000,44100,45000,45800,46900,47800,48500,49400,50600,51500,52200,53000,53900,54800,55700,56400,57100,57900,58600,59300,59900,60500,61100,61600,62100,62600,63000,63319],fmt:function(v){return Math.round(v/1000)+"k"},type:"line"}}
+  };
+  var charts=[];
+  function build(){
+    var cs=getComputedStyle(root),ink=cs.getPropertyValue("--t1").trim(),mut=cs.getPropertyValue("--t3").trim(),grid=cs.getPropertyValue("--line-soft").trim(),rh=cs.getPropertyValue("--good").trim();
+    Object.keys(series).forEach(function(id){
+      var el=document.getElementById(id);if(!el||typeof Chart==="undefined")return;
+      var wrap=document.querySelector('.series[data-chart="'+id+'"]');var key=wrap.querySelector("button.on").dataset.s;var s=series[id][key];
+      var ch=new Chart(el,{type:s.type,data:{labels:days,datasets:[{data:s.v,borderColor:ink,backgroundColor:s.type==="bar"?rh:"transparent",borderWidth:1.5,pointRadius:0,tension:0.3,borderRadius:2}]},
+        options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return s.fmt(c.parsed.y)}}}},
+        scales:{x:{grid:{display:false},ticks:{color:mut,font:{size:10},maxTicksLimit:6}},y:{grid:{color:grid},ticks:{color:mut,font:{size:10},maxTicksLimit:4,callback:function(v){return s.fmt(v)}}}}}});
+      charts.push(ch);
+      wrap.querySelectorAll("button").forEach(function(b){b.onclick=function(){wrap.querySelectorAll("button").forEach(function(x){x.classList.remove("on")});b.classList.add("on");var ns=series[id][b.dataset.s];ch.config.type=ns.type;ch.data.datasets[0].data=ns.v;ch.data.datasets[0].backgroundColor=ns.type==="bar"?rh:"transparent";ch.options.plugins.tooltip.callbacks.label=function(c){return ns.fmt(c.parsed.y)};ch.options.scales.y.ticks.callback=function(v){return ns.fmt(v)};ch.update();}});
+    });
+  }
+  build();
+})();
+</script>
