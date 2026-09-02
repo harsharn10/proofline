@@ -1,0 +1,38 @@
+# One entry per published change for earn-protocol. Newest last.
+- date: 2026-08-31
+  slug: earn-protocol
+  type: coverage
+  severity: Info
+  title: Initial stub opened
+  detail: Identity, official links and lifecycle recorded from the seed census. No evidence score until research lands.
+  prior: null
+  new:
+    coverage: stub
+    lifecycle: mainnet
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+  review_key: a56a627fc5be4290
+- date: 2026-08-31
+  slug: earn-protocol
+  type: stage
+  severity: Review
+  title: Lifecycle mainnet → announced
+  detail: "Fix round 1 ruling C: mainnet requires evidence beyond the project's own posts (explorer, a DefiLlama chain-slice row, or docs that publish addresses). EARN's mainnet status rests on the project's zap posts and bio address (EVAL 2026-08-31 §5, test 1 ◐). Recorded as announced with a missing-evidence line until independent evidence is reviewed."
+  prior:
+    lifecycle: mainnet
+  new:
+    lifecycle: announced
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+  review_key: 715788ef6202cb1a
+- date: 2026-09-02
+  slug: earn-protocol
+  type: finding
+  severity: Review
+  title: Token owner is the shared Airlock launch contract
+  detail: A 2026-09-02 chain read found owner() on the EARN token returns 0xeb7c…0862, the verified Airlock contract, which also owns the EARN, Statics and Artificial Inu tokens. Control of the token's owner-only functions sits with shared launch infrastructure rather than a project-held key. Recorded as a verified risk finding with the RPC read as the source.
+  prior: null
+  new: null
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+  review_key: 422e1a9e872f0e80
