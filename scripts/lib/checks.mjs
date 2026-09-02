@@ -115,6 +115,9 @@ export function crossCheck(content) {
       });
   }
   for (const [i, e] of content.changelog.entries()) if (!censusSlugs.has(e.slug)) errors.push(`changelog[${i}]: slug "${e.slug}" is not in census.yaml`);
+  for (const [slug, entries] of content.changelogBySlug ?? new Map())
+    for (const [i, entry] of entries.entries())
+      if (entry.slug !== slug) errors.push(`changelog/${slug}.yaml[${i}]: slug field is "${entry.slug}"`);
 
   // Account handles are unique, compared case-insensitively (X handles are). A duplicate row would otherwise
   // resolve silently — last wins in build-accounts, first wins in countsForTrending.

@@ -36,7 +36,7 @@ function prooflineContent(): Plugin {
       };
       const snapshot = {
         site: read("content/site.yaml"),
-        changelog: read("content/changelog.yaml"),
+        changelog: directory("content/changelog", ".yaml"),
         accounts: read("content/accounts.yaml"),
         census: read("content/census.yaml"),
         methodology: read("content/methodology.md"),

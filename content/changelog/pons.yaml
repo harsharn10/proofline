@@ -1,0 +1,80 @@
+# One entry per published change for pons. Newest last.
+- date: 2026-08-30
+  slug: pons
+  type: coverage
+  severity: Info
+  title: Initial stub opened
+  detail: Identity, official links and lifecycle recorded from the seed census. No evidence score until research lands.
+  prior: null
+  new:
+    coverage: stub
+    lifecycle: mainnet
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+  review_key: 7d38521ae2057eae
+- date: 2026-08-31
+  slug: pons
+  type: finding
+  severity: Material
+  title: Two protocol generations documented; addresses reproduced on Blockscout
+  detail: "Research intake of the 2026-08-31 research pass plus the v2 docs page read during intake: Pons v1 (fixed-supply token straight into a locked Uniswap V3 WETH pool) and v2 (bonding curve graduating into a permanently locked Uniswap v4 pool, pairable against approved assets, three audits in progress and none closed) both operate. All fourteen documented addresses are contracts on chain 4663, twelve with verified source and no proxy; owner() on the factories, lockers, hook and buyback vault is a 2-of-3 Safe with no timelock. The seed summary described v2 only; the summary now names both generations."
+  prior:
+    summary: "Native launchpad on Robinhood Chain: tokens launch on a V2 bonding curve and graduate to Uniswap v4; quote assets include ETH, USDG and Stock Tokens."
+    deployments_verified: 0
+  new:
+    summary: Two documented generations (v1 locked Uniswap V3 WETH pools; v2 bonding curve into a locked Uniswap v4 pool); v2 deployed, creator-allowlisted and under audit per its docs
+    deployments_verified: 13
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+  review_key: 2a5e2b60f6da9cfd
+- date: 2026-08-31
+  slug: pons
+  type: coverage
+  severity: Review
+  title: Coverage stub → full
+  detail: "Research record complete across all eleven sections (identity, deployment, control, security, engineering, team, product and economics, communications, findings, sources, review metadata) after the 2026-08-31 research pass, the v2 docs read, a Blockscout reproduction of every documented address and RPC reads of the owner Safe. First full record on the site. Approver pending: confidence is capped at 69 and the number shows as provisional until a second reviewer approves."
+  prior:
+    coverage: stub
+  new:
+    coverage: full
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+  review_key: 85ac551bb8060886
+- date: 2026-08-31
+  slug: pons
+  type: score
+  severity: Review
+  title: First evidence score — 41 provisional, 64% confidence, Elevated risk
+  detail: "Security 8/35 (deployment verifiability partial; authorization topology partial — 2-of-3 Safe; incident handling full; privileged power, timelock, audit match and safeguards zero — no timelock, no closed audit, owner setters not yet bounded by a source read). Engineering, transparency, maturity and economic each mixed (50). Confidence 64 (primary sources 70, onchain 60, corroboration 45, freshness 95, review completeness 50); single researcher, approver pending. Risk Elevated per PRD §6.4 (new production system its docs call unaudited, undelayed owner powers); no numeric override. What raises it: a source read bounding the owner setters, a published audit matching the deployed commit, a timelock or documented signer policy, a bounty or incident process."
+  prior:
+    score: null
+    confidence: null
+    risk: null
+  new:
+    score: 41
+    provisional: true
+    confidence: 64
+    risk: Elevated
+  reviewer: harsharn10
+  channel:
+    event: new-coverage
+    delivery: same-day
+    headline: Pons enters Proofline coverage with Elevated risk
+    summary: Proofline completed its first full review of Pons. The product is live and its owner is an identifiable 2-of-3 Safe, but the deployed system has no timelock and no closed audit matched to the deployed code.
+    why_it_matters:
+      - Owner actions can take effect without a documented delay.
+      - The project's own documentation describes the system as unaudited.
+    watch_next: A deployed-code audit, timelock, clearer signer policy, or a source-level bound on owner setters would materially improve the assessment.
+  methodology_version: proofline-v1.0
+  review_key: bd574d478c334672
+- date: 2026-09-02
+  slug: pons
+  type: finding
+  severity: Info
+  title: Legacy v1 factory and locker marked reproduced on the explorer
+  detail: "The v1 legacy factory (0x0c37a24F…77a4) and legacy locker (0x31ca5E10…54B5) were opened on Blockscout on 2026-08-31 and confirmed to be contracts on chain 4663 (ledger S20, S21), so their deployment rows now carry verified: true. Their source code is still not verified on the explorer; the labels keep saying so and the deployment_verifiability input stays partial."
+  prior: null
+  new: null
+  reviewer: harsharn10
+  methodology_version: proofline-v1.0
+  review_key: 308e5124fca61014
