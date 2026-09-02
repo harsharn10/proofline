@@ -1,5 +1,5 @@
 slug: swaphood
-pulled_at: 2026-09-02T21:05:36.588Z # chain head 52877457 at read time
+pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
@@ -93,33 +93,33 @@ metrics:
     as_of: 2026-09-02T19:19:11.000Z
     source_url: https://api.llama.fi/protocol/swaphood-v2
   - kind: fees_24h
-    value: 22.48
-    as_of: 2026-09-02T21:05:36.588Z
+    value: 23.4
+    as_of: 2026-09-02T22:38:55.976Z
     source_url: https://api.llama.fi/summary/fees/swaphood-v2?dataType=dailyFees
   - kind: revenue_24h
-    value: 23.46
-    as_of: 2026-09-02T21:05:36.588Z
+    value: 23.4
+    as_of: 2026-09-02T22:38:55.976Z
     source_url: https://api.llama.fi/summary/fees/swaphood-v2?dataType=dailyRevenue
   - kind: volume_24h
-    value: 2346
-    as_of: 2026-09-02T21:05:36.588Z
+    value: 2339
+    as_of: 2026-09-02T22:38:55.976Z
     source_url: https://api.llama.fi/summary/dexs/swaphood-v2?dataType=dailyVolume
 market:
   token_address: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
-  pulled_at: 2026-09-02T21:05:36.588Z
+  pulled_at: 2026-09-02T22:38:55.976Z
   pairs:
     - dex: swaphood
       pair_address: "0xeA7ba72BE3baaB20546bFdA880b7E285E5a51168"
       quote_symbol: WETH
-      price_usd: 0.1261
-      liquidity_usd: 2930.89
-      volume_h24: 2338.26
-      volume_h6: 292.44
+      price_usd: 0.1122
+      liquidity_usd: 2758.91
+      volume_h24: 2417.67
+      volume_h6: 371.85
       txns_h24:
-        buys: 34
-        sells: 25
-      price_change_h24: 10.05
-      fdv: 18369
+        buys: 32
+        sells: 27
+      price_change_h24: -8.96
+      fdv: 16369
       created_at: 2026-07-12T20:18:23.000Z
     - dex: uniswap
       pair_address: "0xc92a5cf82c06b03e04488ae20b047e2af11fa4451cbd274838b9944b0eee73ee"
@@ -127,7 +127,7 @@ market:
       price_usd: 0.125
       liquidity_usd: 927.57
       volume_h24: 508.89
-      volume_h6: 61.84
+      volume_h6: 57.46
       txns_h24:
         buys: 10
         sells: 14
@@ -139,37 +139,65 @@ market:
       quote_symbol: WETH
       price_usd: 0.00004826
       liquidity_usd: 0
-      volume_h24: 239.74
-      volume_h6: 107.54
+      volume_h24: 215.57
+      volume_h6: 83.61
       txns_h24:
-        buys: 48
-        sells: 40
+        buys: 44
+        sells: 36
       price_change_h24: -100
       fdv: 7
       created_at: 2026-07-15T23:53:01.000Z
     - dex: swaphood
       pair_address: "0xA2263fbba5b52aD06Eb5Fd427CeCF59F1Ce27E48"
       quote_symbol: HOOD
-      price_usd: 1.49
-      liquidity_usd: 769.41
-      volume_h24: 0.23
-      volume_h6: 0
+      price_usd: 1.31
+      liquidity_usd: 744.78
+      volume_h24: 12.85
+      volume_h6: 12.61
       txns_h24:
-        buys: 1
+        buys: 2
         sells: 0
-      price_change_h24: null
-      fdv: 9152
+      price_change_h24: -11.81
+      fdv: 8071
       created_at: 2026-07-16T17:06:32.000Z
-  liquidity_usd: 4627.87
-  volume_h24: 3087.12
-  trades_h24: 172
-  price_usd: 0.1261
-  price_change_h24: 10.05
-  fdv: 18369
+  liquidity_usd: 4431.26
+  volume_h24: 3154.98
+  trades_h24: 165
+  price_usd: 0.1122
+  price_change_h24: -8.96
+  fdv: 16369
   first_pair_at: 2026-07-12T20:18:23.000Z
+  top10_share: 0.8451807362821502
+  top10_share_ex_pools: 0.7451809588134403
+  top10_as_of: 2026-09-02T22:38:55.976Z
+  launchpad: null
+  errors:
+    - step: launchpad
+      message: creator 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb did not match a known factory, curve or launcher deployer
+structure:
+  pulled_at: 2026-09-02T22:38:55.976Z
+  mint: owner-can-mint
+  renounced: false
+  lp:
+    - pair: "0xeA7ba72BE3baaB20546bFdA880b7E285E5a51168"
+      locked_share: 0
+      holder_kind: none
+      reason: null
+    - pair: "0xc92a5cf82c06b03e04488ae20b047e2af11fa4451cbd274838b9944b0eee73ee"
+      locked_share: null
+      holder_kind: null
+      reason: v3/v4 position; not checked
+    - pair: "0xa3a7494BA9aFF9B7936bD3CB07D120abe2e9eF90"
+      locked_share: 0
+      holder_kind: none
+      reason: null
+    - pair: "0xA2263fbba5b52aD06Eb5Fd427CeCF59F1Ce27E48"
+      locked_share: 0
+      holder_kind: none
+      reason: null
   errors: []
 activity:
-  pulled_at: 2026-09-02T21:05:36.588Z
+  pulled_at: 2026-09-02T22:38:55.976Z
   addresses:
     - address: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
       label: HOOD token (SwapHood Token — not the Robinhood HOOD Stock Token)
