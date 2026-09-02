@@ -126,7 +126,7 @@ claims:                               # class: verified|claim|disputed|unknown
 conflicts:
   - { id: CON-1, field: deployment.address, claim_ids: [CLM-3, CLM-11], status: open, resolution: null }
 events:                               # type: company|ct|onchain|risk
-  - { id: EVT-1, type: onchain, title: "Factory owner is a single key", summary: "owner() on the basket factory returns an externally owned account.", occurred_at: 2026-09-02T13:40:00Z, observed_at: 2026-09-02T13:40:00Z, affected_fields: [control.owner], evidence_state: verified, impact: "One key controls the factory.", site_recommendation: update, channel_recommendation: not-evaluated, receipt_ids: [R-5] }
+  - { id: EVT-1, type: onchain, title: "Factory owner is a single key", summary: "owner() on the basket factory returns an externally owned account.", occurred_at: 2026-09-02T13:40:00Z, observed_at: 2026-09-02T13:40:00Z, affected_fields: [control.owner], evidence_state: verified, impact: material, site_recommendation: profile, channel_recommendation: none, receipt_ids: [R-5] }
 receipts:                             # kind: official-site|docs|whitepaper|social|explorer|repository|audit|announcement|third-party-data|news|other
   - { id: R-5, publisher: Blockscout, title: "Address page 0x...", url: "https://robinhoodchain.blockscout.com/address/0x...", published_at: null, accessed_at: 2026-09-02T13:40:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-3], excerpt: "Contract, verified source, name BasketFactory, created in tx 0x... block 51234567" }
 gaps:
