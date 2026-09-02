@@ -30,6 +30,7 @@
       "title": { "type": "string", "minLength": 1 }, "detail": { "type": "string", "minLength": 1 },
       "prior": { "type": ["object","null"] }, "new": { "type": ["object","null"] },
       "reviewer": { "type": "string", "minLength": 1 },
+      "review_key": { "type": "string", "pattern": "^[a-f0-9]{12,40}$" },
       "channel": { "$ref": "#/$defs/channelPublication" },
       "methodology_version": { "const": "proofline-v1.0" }
     } }

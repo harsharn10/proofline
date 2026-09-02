@@ -98,8 +98,10 @@ function TabLink({ id, label, current }: { id: DossierTab; label: string; curren
 const EXPLORER_CHIP_CAP = 3;
 const ROLE_ORDER: Deployment["role"][] = ["token", "factory", "router", "vault", "multisig"];
 
+// A contract name in parentheses ("(PonsLaunchFactory)") is the best chip text; a caveat in
+// parentheses ("(source not verified on the explorer)") is not — that one stays in the tooltip.
 function chipName(d: Deployment): string {
-  const paren = d.label.match(/\(([^)]+)\)/);
+  const paren = d.label.match(/\(([^)\s]+)\)/);
   if (paren) return paren[1]!;
   return cleanLabel(d.label).split(/\s+/).slice(0, 3).join(" ");
 }

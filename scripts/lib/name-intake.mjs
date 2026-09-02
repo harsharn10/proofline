@@ -10,6 +10,11 @@ export function normalizeIdentity(value) {
     .replace(/[^a-z0-9]+/g, "");
 }
 
+// Machine producer ids (decisions.md D2). Any of them, or a human GitHub id, may file a dossier; none may
+// resolve a conflict — resolution is a controller's call — so the resolver check rejects the whole list.
+export const PRODUCER_IDS = ["grok-heavy", "grok-bot", "supergrok", "codex", "claude"];
+const MACHINE_RESOLVERS = new Set(PRODUCER_IDS.map(normalizeIdentity));
+
 function duplicates(values) {
   const seen = new Set(), duplicate = new Set();
   for (const value of values) seen.has(value) ? duplicate.add(value) : seen.add(value);
@@ -74,7 +79,7 @@ export function validateNameIntake(record, { census = [] } = {}) {
       reproductionRefs(conflict.resolution.reproduction_ids, `conflict ${conflict.id} resolution`);
       for (const id of conflict.resolution.winning_claim_ids)
         if (!conflict.claim_ids.includes(id)) err(`conflict ${conflict.id} winner ${id} is not one of its claims`);
-      if (normalizeIdentity(conflict.resolution.resolver) === "grokbot")
+      if (MACHINE_RESOLVERS.has(normalizeIdentity(conflict.resolution.resolver)))
         err(`conflict ${conflict.id} must be resolved by a non-bot controller`);
     } else if (conflict.claim_ids.some((id) => claimById.get(id)?.class === "verified")) {
       err(`open conflict ${conflict.id} cannot contain a verified claim`);

@@ -6,8 +6,8 @@ On `/n/pons` the Overview renders one chip per `deployments[]` entry, 15 chips r
 `explorer · vault`, `explorer · other`, `explorer · factory`, which tells the reader nothing. Two chips
 both read `docs` because Pons has a v1 and a v2 docs link.
 
-Note: the 2026-09-01 site decisions (review §5.3) replace the project page header and link row. Check
-the rebuilt dossier before doing this work; if the new header already meets the spec below, close.
+Note: the 2026-09-01 site rebuild replaces the project page header and link row. Check the rebuilt
+dossier before doing this work; if the new header already meets the spec below, close.
 
 ## Spec
 

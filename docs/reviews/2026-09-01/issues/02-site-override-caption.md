@@ -7,9 +7,9 @@ project has an override. `OVERRIDE_CAPS.Elevated` is `null` in `scripts/lib/scor
 caps at 29 and High at 59), so an Elevated override caps nothing and the caption would be false. No
 project records an override yet, so this is latent.
 
-Note: the 2026-09-01 site decisions (review §5.3, cuts list) remove the override caption from the
-dossier entirely. Check whether the rebuilt dossier still renders it before doing this work. If the
-caption is gone, close this issue.
+Note: the 2026-09-01 site rebuild removes the override caption from the dossier entirely. Check
+whether the rebuilt dossier still renders it before doing this work. If the caption is gone, close
+this issue.
 
 ## Fix, if the caption stays
 

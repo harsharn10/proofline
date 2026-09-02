@@ -64,7 +64,7 @@ Statics provides unusually detailed public architecture and threat-model documen
 - S2 — [Timelock and roles](https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/), reviewed 2026-08-31.
 - S3 — [Robinhood testnet deployment](https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/), retained as testnet-only context.
 - S4, S5 — site and X account (census links).
-- S6–S8 — Grok desk intake artifacts (ecosystem map, workbook, X fills).
+- S6–S8 — Research intake artifacts (ecosystem map, workbook, X fills).
 - S9 — [EqualFiLabs/statics](https://github.com/EqualFiLabs/statics), reviewed 2026-08-31.
 - S10 — [Statics security model](https://github.com/EqualFiLabs/statics/blob/master/SECURITY.md), reviewed 2026-08-31.
 

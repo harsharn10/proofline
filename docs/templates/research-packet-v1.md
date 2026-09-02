@@ -1,5 +1,6 @@
 ---
-contract_version: proofline-research-v1
+# This frontmatter is the machine-validated dossier (decisions.md D2, schema/packet.schema.json); the Markdown body is narrative.
+contract_version: proofline-research-v2
 work_id: WORK-YYYYMMDD-producer-slug
 producer: producer-id
 role: collector # collector | verifier | compiler
@@ -228,4 +229,5 @@ claim.
 - Files proposed or changed:
 - Validation commands and results:
 - Controller disposition:
-- Channel disposition: `not-evaluated | pending | publish | roundup | site-only | hold`
+<!-- Channel disposition allowed values: not-evaluated | pending | publish | roundup | site-only | hold. Collectors and verifiers leave not-evaluated; only the controller sets anything else. -->
+- Channel disposition: not-evaluated

@@ -1,210 +1,243 @@
 # Proofline research system
 
-Status: normative operating contract, version 1, 2026-09-01.
+Status: normative operating contract, version 2, 2026-09-02. Replaces version 1.
 
-This document defines how collectors, verification agents, the orchestrator, controllers, and the
-publisher work on the same corpus without overwriting one another. `PRD.md` remains the product and
-editorial authority. The files under `schema/` are the currently enforced machine contract. When this
-document describes a planned field that the current schemas do not yet accept, the packet retains it
-until a reviewed schema migration and emitter can preserve it canonically.
+This is the one contract for everyone who touches the corpus: Grok Heavy, the scheduled Grok desk,
+SuperGrok, Codex, Claude, and the owner. `PRD.md` stays the product and editorial authority. The files
+under `schema/` are the enforced machine contract. The producer notes under `docs/integrations/` and
+the runtime skills under `.grok/` restate this document for one producer. Where they differ, this
+document wins. Dated files under `research/inbox/` other than `packets/` and `assignments/` are
+historical evidence, not instructions.
 
-Dated handoffs, `docs/superpowers/**`, and legacy dated artifacts under `research/inbox/**` are
-historical evidence, not current operating instructions. The validated `research/inbox/names/**` queue
-and new `research/inbox/packets/**` handoffs remain active. Agent-specific instructions, including
-`docs/integrations/grok-bot.md`, are subordinate to this document.
+## 1. Objects
 
-## 1. The durable objects
-
-Do not make one file answer every question. Proofline has five distinct objects:
-
-| Object | Purpose | Writer |
+| Object | Where | Writer |
 | --- | --- | --- |
-| Research packet | One agent run's evidence, reasoning, gaps, and proposed updates | Assigned collector or verifier |
-| Canonical profile | Current reviewed identity, research, findings, metrics, and scoring inputs | One compiler for the slug |
-| Event record | Append-only observation that may change a profile or feed | Collector proposes; compiler reconciles |
-| Changelog publication | Reviewed statement of what changed in canonical coverage | Controller/compiler |
-| Channel publication | Optional retail message derived from a changelog publication | Controller/publisher |
+| Packet | `research/inbox/packets/<slug>/<work-id>.md` | one collector or verifier, one per run |
+| Canonical profile | `content/census.yaml` row, `content/projects/<slug>.yaml`, `content/research/<slug>.md`, `content/sources/<slug>.yaml`, `content/feed/<slug>.yaml` | the compiler |
+| Pulled facts | `content/pulled/<slug>.yaml` | `scripts/pull.mjs` only, dated, never hand-edited |
+| Changelog | `content/changelog.yaml` | the compiler |
+| Channel publication | `channel:` object on a changelog entry, decisions in `ops/telegram-review.json` | controller, then publisher |
 
-A profile merge never implies a Telegram post. An event can update the site feed without changing the
-profile. A packet can be rejected without deleting the evidence it collected.
+A packet can be rejected without deleting the evidence it holds. A profile merge never implies a
+Telegram post. An event can reach the site feed without changing the profile.
 
 ## 2. Field ownership
 
-Every field has exactly one ownership class:
+Ownership is by path. A PR that writes outside its class is refused.
 
-- **Entity-owned:** identity, product description, mechanics, deployments, control, security,
-  economics, risks, narrative, gaps, and receipts. The canonical project profile is the single writer;
-  packets propose changes to it.
-- **Shared ecosystem fact:** facts read by several profiles, such as a dependency, common deployment,
-  market rank, or chain-wide metric. Store once and reference it; do not make copied prose authoritative.
-- **Machine-owned:** derived score, confidence, risk label, rank, trending state, and publication
-  fingerprints. Agents never type these results into intake.
-- **Editorial-owned:** approval, conflict resolution, correction disposition, channel eligibility, and
-  channel copy. Collectors and verifiers may recommend but never decide these fields.
+| Class | Producers | May write |
+| --- | --- | --- |
+| Collector, verifier | `grok-heavy`, `grok-bot`, `supergrok` | `research/inbox/packets/<slug>/<work-id>.md` for the assigned slugs. Reads `research/inbox/assignments/`. Nothing under `content/`. |
+| Compiler | `codex`, `claude`, or the owner, through `scripts/compile-packet.mjs` (Codex C1; by hand until it lands) | `content/census.yaml`, `content/projects/`, `content/sources/`, `content/feed/`, `content/research/`, `content/changelog.yaml`, `content/accounts.yaml` |
+| Machine | `scripts/pull.mjs` (Codex C2), `npm run score` | `content/pulled/<slug>.yaml`, `build/` |
+| Editorial | the controller | `research/inbox/assignments/<work-id>.md`, `review.approver`, conflict resolutions, corrections, the `channel:` object, `ops/telegram-review.json` |
 
-The compiler refuses a proposal that attempts to write a field outside its ownership class.
+Scores, confidence, risk, rank, trending and publication fingerprints are derived. Nobody types them.
+CI (`automerge-feed.yml`) classifies PRs from `grok/**`, `grok-heavy/**`, `supergrok/**` and
+`codex/**` branches: the allowlist is `research/inbox/packets/**` and `research/inbox/assignments/**`.
+It comments and never merges.
 
 ## 3. Roles
 
-### Collector — Grok Bot or another scout
+- **Collector** (Grok Heavy or the Grok desk): finds leads, official announcements, receipts, atomic
+  claims, candidate events and possible identity matches. Proposes taxonomy and lifecycle with a
+  rationale. Never sets scores, approval, conflict resolution, canonical identity or channel state.
+- **Verifier** (SuperGrok): reproduces identity cross-links, deployments, control paths, activity and
+  metrics from a collector packet or a canonical profile. Files its own packet with `role: verifier`
+  and `prior_packet` set. Never edits the collector packet and never becomes a second canonical writer.
+- **Compiler** (Codex, Claude or the owner): owns one slug at a time. Rebases on `main`, maps packet
+  fields into the schemas, assigns source ids, deduplicates, keeps conflicts open, writes the canonical
+  diff and the changelog entry. Last write never wins.
+- **Controller** (the owner or a named delegate): writes assignments, approves identity merges,
+  conflict resolutions, scoring judgments, corrections and canonical publication. Approval is a real
+  action by a real id, never a placeholder.
+- **Publisher**: sends only fingerprinted channel items approved in `/review`.
 
-Collects discovery leads, official announcements, source artifacts, atomic claims, candidate events,
-and possible identity matches. It may propose taxonomy and lifecycle values with rationale. It does not
-set scoring inputs, approve research, resolve conflicts, edit canonical identity, or decide channel
-publication.
+## 4. Assignment, branch and PR protocol
 
-### Verifier — SuperGrok or an independently assigned pass
+The controller writes `research/inbox/assignments/<work-id>.md`: a fenced YAML block with the packet
+header fields of §5 (through `allowed_paths`) plus the objective in prose. The packet header copies
+it. `work_id` is `WORK-<YYYYMMDD>-<producer>-<slug>`.
 
-Reproduces identity cross-links, deployments, contract roles, control paths, activity, and metrics.
-It challenges the collector's classification and records counter-evidence. It writes a separate
-verifier packet whose `prior_packet` points to the collector packet; it does not race the collector on
-the same file, erase claims, or declare itself the approver.
-
-### Compiler/reconciler — Codex or assigned controller agent
-
-Owns exactly one canonical slug at a time. It rebases onto current `main`, deduplicates evidence and
-events, maps packet fields into the current schemas, preserves conflicts, and prepares the canonical
-diff. It never treats last write as strongest evidence.
-
-### Controller — human owner or expressly delegated reviewer
-
-Approves identity merges, material conflict resolutions, methodology/scoring judgments, corrections,
-and final canonical publication. Approval must be attributable to a real controller action, not a
-free-text placeholder supplied by a collector.
-
-### Publisher
-
-Reads reviewed changelog publications. It cannot create research conclusions. It sends only an exact,
-fingerprinted channel item approved through the channel review controls.
-
-## 4. Assignment and branch protocol
-
-One assignment owns one or more explicitly listed slugs and allowed paths. Before research begins, its
-packet header records:
-
-- stable `work_id` and producer identity;
-- role (`collector`, `verifier`, or `compiler`);
-- base commit SHA and as-of time;
-- owned slugs and allowed paths;
-- packet tier (`seed`, `full`, or `update`);
-- prior packet or event cursor, when applicable.
-
-Branches are unique per producer and run:
+Branch, one form only:
 
 ```text
 <producer>/<YYYYMMDD>/<work-id>
 ```
 
-Examples: `grok/20260901/WORK-20260901-grok-pons` and
-`supergrok/20260901/WORK-20260901-supergrok-pons-verify`.
+Example: `grok-heavy/20260901/WORK-20260901-grok-heavy-mancer`. One PR per run. The PR title is the
+work id. The PR body is the packet frontmatter header. Every commit message ends with the trailer
+`Producer: <id>`. Never share a branch between producers, never push onto another producer's branch,
+never merge or enable auto-merge. A collector run that finds nothing new opens no branch and no PR.
+A verifier run always files its packet so the checks have an audit trail.
 
-Never share a daily branch between Grok, SuperGrok, or another agent. Use one PR per run. The
-orchestrator serializes changes to global files and prevents two compilers from owning the same slug.
-Collectors can work concurrently only when their packets and allowed paths do not overlap.
+## 5. Packet v2
 
-The PR body repeats the work ID, base SHA, producer, owned slugs, packet paths, sources added, conflicts,
-and requested disposition. Empty runs do not create branches or PRs.
+One file per run: `research/inbox/packets/<slug>/<work-id>.md`. YAML frontmatter is the dossier and
+validates against `schema/packet.schema.json` (Codex C3; the controller checks by hand until it lands).
+The markdown body is the narrative.
 
-## 5. Packet contract
+Header: `contract_version: proofline-research-v2` · `work_id` · `producer` (`grok-heavy | grok-bot |
+supergrok | codex | claude | <github id>`) · `role` (`collector | verifier | compiler`) · `base_sha`
+(full 40-character `main` SHA) · `slug` · `name` · `packet_tier` (`seed | full | update`) · `as_of`
+(ISO-8601 with timezone) · `prior_packet` (path or null) · `owned_slugs[]` · `allowed_paths[]`.
 
-Copy `docs/templates/research-packet-v1.md` to:
+Dossier blocks:
 
-```text
-research/inbox/packets/<slug>/<work-id>.md
-```
+- `identity` {canonical_name, aliases[], symbols[], entity_kind, chain_scope, official_domain,
+  official_handle, repository, possible_matches[] {slug, signals[], contrary_signals[]}}.
+- `classification` {primary_leaf, secondary_leaves[], mechanism_tags[], ecosystem_role, lifecycle,
+  coverage_recommendation, evidence_state, rationale}. Vocabulary: `docs/taxonomy.md`.
+- `qualifying` {deployed_on_chain, native_play, citable, research_story}, each {status
+  (`pass | fail | unknown`), claim_ids[], note}.
+- `links[]` {kind (`site | app | docs | whitepaper | x | github | telegram | discord | other`), url,
+  authenticity (`confirmed | unconfirmed | conflicted`)}.
+- `deployments[]` {label, role, address {value, chain, source (`bio | docs | audit | explorer |
+  third-party`), seen, exists_on_4663, explorer_source_verified}, receipt_ids[]}. Both booleans default
+  to `null`. Verified proxy source never implies a verified implementation.
+- `metrics[]` {kind, value, currency, as_of, window, method, class, receipt_ids[]}.
+- `claims[]` `CLM-n` {field, value, class, observed_at, receipt_ids[], reproduction_ids[], supersedes}.
+- `conflicts[]` `CON-n` {field, claim_ids[], material_effect, status (`open | resolved`), resolution
+  {winning_claim_ids[], reproduction_ids[], rationale, resolver, resolved_at} left empty by collectors
+  and verifiers}.
+- `events[]` `EVT-n` {type (`company | ct | onchain | risk`), occurred_at, observed_at,
+  affected_fields[], evidence_state (`verified | claim | disputed | unknown`), impact (`routine |
+  material | urgent`), site_recommendation (`feed | profile | both | none`), channel_recommendation
+  (`none | review`), receipt_ids[]}.
+- `receipts[]` `R-n` {publisher, title, url, published_at, accessed_at, kind (the source-entry kinds),
+  authority (`onchain | primary | independent | aggregator | social | unknown`), authenticity,
+  supports[], excerpt (500 characters or fewer)}.
+- `gaps[]` {priority (`P0 | P1 | P2`), question, checked, next}.
 
-The packet is one file. Every required section is present. Use `NULL — <reason>` for an attempted field
-that could not be established; absence is not completion. Every material claim points to a packet
-receipt. Quantitative claims include value, unit, measurement window, as-of time, and methodology.
+Ids are packet-local, start at 1, and are never reused. An update packet continues numbering from the
+highest id in `prior_packet`. Claim classes are `verified | claim | inference | disputed | unknown`;
+`verified` requires at least one `reproduction_id`. A required field the producer attempted and could
+not establish is written as the string `NULL — <reason>`. Omission is not completion.
 
-Packet tiers are cumulative:
+Vocabulary bridges until the schemas migrate:
 
-- **Seed:** assignment, identity, taxonomy, lifecycle, product, official links, qualifying tests,
-  atomic claims, conflicts, gaps, and receipts.
-- **Full:** seed plus deployments, control/security, team/provenance, economics/activity,
-  dependencies, material risks, and linked fresh verifier dispositions for all three passes.
-- **Update:** declares the prior reviewed state and includes only new/superseded claims plus the full
-  receipts, conflicts, verification, and update sections. It never silently rewrites a prior assertion.
+- Coverage: packets use `candidate | seed | full`. The census and project schemas accept `full | stub`.
+  The compiler maps `seed` to `stub` and `full` to `full`. `candidate` never becomes a census row.
+- Lifecycle: a packet may say `unknown`. The census never does. The compiler refuses to create or change
+  a census row from a packet whose lifecycle is `unknown`; the gap is filed and the row stays as it was.
+- `lifecycle: mainnet` needs an explorer or RPC receipt, a DefiLlama chain-slice figure, or docs that
+  publish live addresses. A project post alone is `announced`.
+- Qualifying tests: `pass` compiles to `value: true`, `fail` and `unknown` to `value: false` with the
+  note; `verified: true` only when every cited claim is `verified`.
+- Account proposals (tier, role, slug, note, flags for an X handle) are claims with field
+  `account.<handle>.<axis>`; the compiler writes `content/accounts.yaml`.
 
-A seed upgrades to full by adding evidence and sections, not by discarding the seed's history.
+Body sections, in this order: What it is · Why it matters · What could go wrong · Product and
+mechanics · Control and security · Team and provenance · Economics and activity · Material risks ·
+Verification passes · Operations log. Every material sentence cites `[R-n]`.
 
-## 6. Research flow and hard gates
+Tiers: **seed** = frontmatter required, body optional. **full** = both, with all three verification
+passes (receipts, numbers, adversarial) recorded. **update** = frontmatter with `supersedes: <prior
+work_id>`, only new or superseded claims and events, their receipts, and the Operations log. An update
+never rewrites a prior assertion; it supersedes it by id.
 
-1. **Assign:** orchestrator checks canonical coverage and assigns one slug, tier, base SHA, and scope.
-2. **Dedupe:** researcher checks canonical names, aliases, domains, handles, repositories, deployments,
-   and other pending packets. Possible matches are recorded even when rejected.
-3. **Collect:** collector fills the packet with atomic claims and receipts.
-4. **Verify:** fresh verifier packets check receipts, numeric consistency, and the strongest adverse
-   explanation without rewriting the collector packet.
-5. **Reconcile:** one compiler maps supported fields into canonical files, remaps source IDs, and
-   records every dropped or deferred proposal.
-6. **Validate:** schema, cross-reference, scoring, site, release-policy, and stale-base checks run.
-7. **Review:** controller resolves material conflicts and approves or requests changes on the exact head.
-8. **Merge:** canonical content lands; the site may update.
-9. **Channel decision:** an optional, separate editorial decision chooses publish, roundup, site-only,
-   hold, or reset. No channel object means no Telegram candidate.
+A discovery round files one seed packet with `slug: discovery-inventory`. Each name is a claim with
+field `candidate` and value `<proposed-slug> | <name> | <handle> | <domain>`, with receipts and its
+matching signals under `identity.possible_matches`. Accepted names get their own seed packet later.
+
+## 6. Flow and hard gates
+
+1. **Assign.** The controller checks coverage and writes the assignment: slug, tier, base SHA, scope.
+2. **Dedupe.** The producer checks canonical names, aliases, domains, handles, repositories,
+   deployments and pending packets. Possible matches are recorded even when rejected.
+3. **Collect.** The collector files atomic claims with receipts.
+4. **Verify.** The verifier reproduces, checks numbers, and records the strongest contrary explanation
+   in its own packet.
+5. **Compile.** The compiler maps supported fields into canonical files, assigns ids, and records every
+   dropped or deferred proposal in the changelog detail.
+6. **Validate.** `npm run validate`, cross-checks, scoring, site build, release policy, stale-base check.
+7. **Review.** The controller resolves material conflicts and approves the exact head.
+8. **Merge.** Canonical content lands; the site may update.
+9. **Channel decision.** A separate editorial choice: publish, roundup, site-only, hold, reset.
+   No `channel:` object means no Telegram candidate.
 
 Hard stops:
 
-- open material identity conflict;
-- a `verified` claim without an independent reproduction;
-- an address, metric, or event without evidence;
-- a stale base that overlaps another merged change to the same slug or global file;
-- unresolved same-ID/different-content collision;
-- missing verifier dispositions for a full packet;
-- collector-written scoring, approval, correction, or channel decision.
+- a PR that touches a path outside the packet's `allowed_paths` or its writer class;
+- frontmatter that fails the schema, or ids that do not resolve inside the packet;
+- an open material identity conflict;
+- a `verified` claim, metric or deployment without a reproduction id;
+- an address, metric or event without a receipt;
+- `lifecycle: mainnet` without the §5 bar, or `lifecycle: unknown` reaching the census;
+- a stale base that overlaps another merged change to the same slug or a global file;
+- the same id with different content on merge;
+- a full packet without its three verification passes;
+- a collector or verifier writing scores, approval, corrections or channel decisions.
 
-## 7. Evidence, authenticity, and conflicts
+## 7. Evidence, authenticity and conflicts
 
-Evidence strength is field-specific. Use the strongest source capable of proving the exact field and
-scope. A project post may prove that the project made a claim; it does not independently prove a live
-deployment, contract role, metric, audit scope, or official identity.
+Evidence strength is field-specific. A project post proves that the project said something. It does
+not prove a live deployment, a contract role, a metric, an audit scope or an official identity.
 
-Source identity is normalized URL plus an atomic-claim fingerprint. The same URL may support multiple
-claims. Event identity is platform plus stable external event/post ID; when none exists, use a hash of
-normalized source, subject, event type, and occurrence time. Positional IDs such as `<slug>-14` are not
-stable identities.
+| Field | Strongest evidence first |
+| --- | --- |
+| Contract, address, role | reproduced RPC or explorer result, then docs naming the same chain and address, then official announcement, then third party |
+| Official identity | bidirectional site, docs and handle cross-link, then repository-organization link, then one-sided social claim, then directory or media |
+| Lifecycle | reproduced onchain activity, then docs publishing live addresses, then official launch claim, then media or social |
+| Audit | audit artifact whose scope and commit match the deployment, then auditor announcement, then project claim |
+| Metric | reproduced onchain query, then primary API or dashboard, then named aggregator, then social claim |
+| Team, control | signed or onchain role, or first-party legal or docs record, then attributable repository, then official social, then third party |
 
-Conflicting claims remain separate. Never average them, replace the older one, or select the newest PR.
-While a material conflict is open, quarantine the affected identity, lifecycle, deployment, metric,
-finding, score input, and channel publication. Resolution requires:
+Freshness breaks a tie only when two sources cover the same chain, contract, version and window. A
+newer post does not replace an older reproduced deployment because it is newer.
 
-- winning claim IDs;
-- at least one reproduction;
-- field-specific evidence rationale;
-- controller identity and timestamp;
-- preservation of losing claims as disputed or superseded.
+Conflicts: conflicting values stay as separate claims joined by a `CON-n` record. Never replace one
+with the other, average numbers, or let the latest PR win. While a material conflict is open, identity
+status is `conflicted` when the name, handle, domain or ownership is disputed; lifecycle cannot be
+promoted from the disputed claim; the disputed value cannot become a verified finding, score input or
+channel post. A conflict resolves only when a controller records the winning claim ids, at least one
+reproduction id, a dated rationale and their id. Losing claims stay as disputed or superseded.
 
-## 8. Updates, feed, and publication
+Identity merges: never on display name, logo, ticker, bio wording or one account's assertion. Two
+records are one entity only when at least two strong identifiers agree and one is reproduced: domain
+and handle link to each other; a verified deployment, deployer or ownership graph is shared; official
+repository or docs identify the same product and chain; a migration announcement links old and new.
+On an approved merge the compiler keeps the older accepted slug unless the official identity changed,
+unions aliases and sources, deduplicates sources by normalized URL plus claim, merges feed items by
+stable id, and writes a correction entry when a public name, lifecycle, deployment or conclusion changes.
 
-Every proposed event records:
+Conduct: never write a verdict about a person, team or account. The only flags are `handle-collision
+| unconfirmed-official | third-party-link | copypasta-pattern | wrong-chain | ca-collision`, each with
+a receipt. Describe what was posted, never intent. `npm run validate` fails on conduct words.
 
-- stable event ID, subject slug, type, occurrence time, observation time, and source IDs;
-- affected profile fields and whether this supersedes an earlier event or claim;
-- evidence status (`verified`, `claim`, `disputed`, or `unknown`);
-- impact (`routine`, `material`, `urgent`) with rationale;
-- proposed site disposition and optional channel recommendation.
+## 8. Updates, feed and publication
 
-The compiler makes three independent decisions:
+Stable ids are content hashes, never positions. Normalize a URL by lowercasing scheme and host,
+dropping the fragment, dropping `utm_*`, `ref`, `s` and `t` query parameters, and dropping a trailing
+slash. Normalize text by trimming and collapsing whitespace. Hash = SHA-1 of the UTF-8 parts joined by
+`|`; the id is the first 16 hex characters.
 
-1. Does this change durable profile state?
-2. Does this belong in the public site feed?
-3. Is it eligible for channel review?
+- Source entry identity: `sha1(normalized url | normalized claim)`. The ledger keeps `S<n>` as the
+  display id; the compiler assigns new ids above the current maximum and never renumbers. Same hash
+  means the same entry. Same `S<n>` with a different hash is a hard conflict.
+- Feed item `id`: `sha1(normalized sourceUrl | slug | date | normalized title)`. `date` is the post
+  date; a post captured without its date is dated to the capture date and the body says so.
+- Changelog `review_key`: `sha1(date | slug | type | title)` computed once when the entry is created
+  (`reviewKeyFor` in `scripts/lib/telegram.mjs`) and never recomputed, so a later title edit does not
+  mint a new key. The sender prefers it over the title-based fallback.
 
-Routine source additions, wording changes, internal metadata, and ordinary stubs remain site-only.
-Channel criteria and card format live in `docs/channel-publishing.md`.
+For every event the compiler makes three independent decisions: does it change durable profile state,
+does it belong in the site feed, is it eligible for channel review. Routine source additions, wording
+changes, internal metadata and ordinary stubs stay site-only. Channel criteria, the publication object
+and the card format live in `docs/channel-publishing.md`.
 
-## 9. Current transition constraints
+## 9. Retired
 
-The packet contract is immediately usable for all agents. Some structured storage still needs a schema
-migration:
-
-- `schema/name-intake.schema.json` currently hardcodes `researcher: grok-bot`; SuperGrok must submit a
-  verifier packet rather than impersonating Grok in a candidate dossier.
-- canonical census/project files do not yet preserve all mechanism tags, provenance, reproductions, or
-  conflict records;
-- feed IDs and source IDs are not yet fully idempotent;
-- packet shape and assignment ownership are not yet machine-validated.
-
-Until those migrations land, the packet is the lossless handoff and the compiler records any field it
-cannot safely emit under `Deferred canonical mappings` in the operations log.
+- `docs/templates/name-intake.yaml`, `schema/name-intake.schema.json` and `research/inbox/names/` as
+  a format. The packet frontmatter is the dossier. The files go when `schema/packet.schema.json`
+  lands (Codex C3); nobody files a new dossier there.
+- Direct producer writes to `content/feed/`, `content/sources/`, `content/accounts.yaml` and
+  `research/inbox/account-desk.yaml`. Proposals go in the packet; the compiler writes.
+- The aggregate `<date>-census-candidates.yaml` format and the `name-inventory.yaml` shape. Existing
+  files stay as historical evidence; new discovery rounds file a packet (§5).
+- The `research/ecosystem-baseline` branch workflow, direct commits and pushes by any producer, and the
+  old intent-verdict flag words (replaced by the six flags in §7).
+- Dated handoff files. Open work is tracked as issues (`docs/reviews/<date>/issues/` drafts).
+- Positional feed ids such as `<slug>-14` for new items. Existing ids stay until the compiler rewrites
+  the file.

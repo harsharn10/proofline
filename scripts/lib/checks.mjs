@@ -10,6 +10,20 @@ function normalizeIdentity(value) {
   return String(value ?? "").normalize("NFKC").toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
+/**
+ * Normalizes a URL for the "is this the official link" comparison (pipeline audit 2026-09-01 §7): lowercase
+ * host, no `www.`, no trailing slash. An unparseable URL is returned trimmed so it still compares equal to
+ * itself without throwing.
+ */
+export function normalizeUrl(raw) {
+  try {
+    const u = new URL(raw);
+    const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    const path = u.pathname.replace(/\/+$/, "");
+    return `${host}${path}${u.search}`;
+  } catch { return String(raw ?? "").trim(); }
+}
+
 /** Collect every S-id referenced anywhere inside a project object. */
 export function referencedSourceIds(project) {
   const ids = new Set();

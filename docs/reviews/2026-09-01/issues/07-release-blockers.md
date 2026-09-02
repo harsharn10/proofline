@@ -6,7 +6,7 @@ labels: owner-decision
 open on disk.
 
 1. `content/site.yaml` `corrections.destination: TODO`. Needs a real email or form URL. Owner input
-   required; decision D6 of 2026-09-01 says leave it `TODO` until the owner supplies one. Do not
+   required: the 2026-09-01 decision is to leave it `TODO` until the owner supplies one. Do not
    invent one.
 2. `content/site.yaml` `chain.checked: null`. Set to the date the chain constants (`id`, `rpc`,
    `explorer`) were re-checked against `https://docs.robinhood.com`. An agent may do the check and set
