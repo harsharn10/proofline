@@ -1,6 +1,6 @@
 # Codex assignment: schema/packet.schema.json and retiring name-intake
 
-Status: assigned. Open a draft PR from the branch named at the end of this file and keep it in draft.
+Status: kicked off 2026-09-02 on branch `codex/20260902/WORK-20260902-codex-packet-schema`. Commit packets to this branch; the draft PR is already open.
 
 ```yaml
 contract_version: proofline-research-v2
