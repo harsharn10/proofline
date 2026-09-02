@@ -2,7 +2,7 @@
 // review keys, and producer ids. Same shape as test.mjs — plain node asserts, one `ok <name>` line per
 // group, non-zero exit on any failure. Run from the repo root: node scripts/test-pipeline.mjs
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, cp, rm, writeFile, appendFile, readFile } from "node:fs/promises";
+import { mkdtemp, mkdir, cp, rm, writeFile, appendFile, readFile, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parse } from "yaml";
@@ -12,6 +12,10 @@ import { validateContent } from "./lib/validate-content.mjs";
 import { normalizeUrl } from "./lib/checks.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { entryKey, legacyEntryKey, reviewKeyFor, selectUnsent, selectApproved, publicationFingerprint } from "./lib/telegram.mjs";
+import { addSourceKeys, sourceKeyFor } from "./migrations/add-source-keys.mjs";
+import { addFeedHashIds, feedIdFor } from "./migrations/add-feed-hash-ids.mjs";
+import { splitChangelog } from "./migrations/split-changelog.mjs";
+import { addReviewKeys } from "./migrations/add-review-keys.mjs";
 import { parsePacket, validatePacket, PRODUCER_IDS } from "./lib/packet.mjs";
 
 let failures = 0;
@@ -62,7 +66,7 @@ await test("changelog lint catches internal vocabulary", async () => {
     await cp("content", root, { recursive: true });
     const { errors: baseline } = await validateContent(root);
     assert.deepEqual(baseline, [], "the live content tree validates clean");
-    await appendFile(join(root, "changelog.yaml"), [
+    await appendFile(join(root, "changelog", "pons.yaml"), [
       "- date: 2026-09-01", "  slug: pons", "  type: finding", "  severity: Info", "  title: Fixture entry",
       "  detail: The desk found nothing new, per Grok.", "  prior: null", "  new: null", "  reviewer: harsharn10",
       "  methodology_version: proofline-v1.0", "",
@@ -101,7 +105,10 @@ await test("entryKey prefers review_key", async () => {
   assert.equal(selectApproved([keyed], { sent_keys: [] }, { channel_enabled: true, decisions: { [reviewKeyFor(e)]: decision } }).length, 1, "a decision under the stable key approves too");
 
   // The live files: every entry carries the key the migration computes, and every recorded sent key resolves.
-  const changelog = parse(await readFile("content/changelog.yaml", "utf8"));
+  const changelog = (await Promise.all(
+    (await readdir("content/changelog")).filter((name) => name.endsWith(".yaml")).sort()
+      .map(async (name) => parse(await readFile(join("content/changelog", name), "utf8"))),
+  )).flat();
   for (const entry of changelog) assert.equal(entry.review_key, reviewKeyFor(entry), `review_key on ${legacyEntryKey(entry)}`);
   assert.equal(new Set(changelog.map(entryKey)).size, changelog.length, "review keys are unique");
   const state = JSON.parse(await readFile("ops/telegram-state.json", "utf8"));
@@ -165,6 +172,83 @@ await test("official-link source counts as cited", async () => {
     await writeFile(projectPath, text.replace("url: https://mancer.xyz\n", "url: https://mancer.xyz/changed\n"));
     const { warnings: after } = await validateContent(root);
     assert.ok(after.includes(uncitedS1), "S1 is flagged once its URL no longer matches any official link");
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+// 6. Stable-id migrations: exact formulas, format-preserving reruns, feed fallback and changelog split.
+await test("stable-id and per-slug changelog migrations are idempotent", async () => {
+  const root = await mkdtemp(join(tmpdir(), "proofline-stable-ids-"));
+  const content = join(root, "content");
+  try {
+    for (const dir of ["sources", "dependencies", "feed"]) await mkdir(join(content, dir), { recursive: true });
+    await writeFile(join(content, "sources", "alpha.yaml"), [
+      "slug: alpha", "sources:", "  - id: S1", "    url: https://EXAMPLE.com/docs/?utm_source=x&ref=y#part",
+      "    publisher: Alpha", "    kind: docs", "    accessed_at: 2026-09-02T00:00:00Z",
+      "    claim: Alpha publishes   its deployment.", "    excerpt: Deployment page.", "    hash: null",
+      "    archive_url: null", "    researcher: codex", "    available: true", "",
+    ].join("\n"));
+    await writeFile(join(content, "dependencies", "dep.yaml"), [
+      "id: dep", "name: Dependency", "kind: other", "summary: Test dependency.", "controls: []", "failure_modes: []",
+      "sources:", "  - id: S1", "    url: https://dep.example/", "    publisher: Dependency", "    kind: official-site",
+      "    accessed_at: 2026-09-02T00:00:00Z", "    claim: Dependency site", "    excerpt: Site.", "    hash: null",
+      "    archive_url: null", "    researcher: codex", "    available: true", "",
+    ].join("\n"));
+    await writeFile(join(content, "feed", "alpha.yaml"), [
+      "slug: alpha", "items:", "  - id: alpha-1", "    date: 2026-09-02", "    kind: company",
+      "    title: Deployment published", "    body: The deployment was published.", "    sources:", "      - S1", "",
+    ].join("\n"));
+    const changelogEntries = [
+      { date: "2026-09-01", slug: "alpha", type: "coverage", severity: "Info", title: "Initial stub opened", detail: "Opened.", prior: null, new: { coverage: "stub" }, reviewer: "codex", methodology_version: "proofline-v1.0" },
+      { date: "2026-09-02", slug: "beta", type: "finding", severity: "Info", title: "Source added", detail: "Added.", prior: null, new: null, reviewer: "codex", methodology_version: "proofline-v1.0" },
+    ];
+    await writeFile(join(content, "changelog.yaml"), `${changelogEntries.map((entry) => [
+      `- date: ${entry.date}`, `  slug: ${entry.slug}`, `  type: ${entry.type}`, `  severity: ${entry.severity}`,
+      `  title: ${entry.title}`, `  detail: ${entry.detail}`, "  prior: null", entry.new ? "  new:\n    coverage: stub" : "  new: null",
+      `  reviewer: ${entry.reviewer}`, `  methodology_version: ${entry.methodology_version}`,
+    ].join("\n")).join("\n")}\n`);
+
+    const sourceRun = await addSourceKeys(content);
+    assert.equal(sourceRun.added, 2);
+    const sourceFile = parse(await readFile(join(content, "sources", "alpha.yaml"), "utf8"));
+    assert.equal(sourceFile.sources[0].key, sourceKeyFor(sourceFile.sources[0]));
+    assert.match(sourceFile.sources[0].key, /^[a-f0-9]{16}$/);
+    const sourceSnapshot = await readFile(join(content, "sources", "alpha.yaml"), "utf8");
+    assert.equal((await addSourceKeys(content)).added, 0);
+    assert.equal(await readFile(join(content, "sources", "alpha.yaml"), "utf8"), sourceSnapshot);
+
+    const feedRun = await addFeedHashIds(join(content, "feed"), { redirectPath: join(root, "build", "redirects.json") });
+    assert.equal(feedRun.changed, 1);
+    const feedFile = parse(await readFile(join(content, "feed", "alpha.yaml"), "utf8"));
+    assert.equal(feedFile.items[0].id, feedIdFor({ ...feedFile.items[0], slug: "alpha", sourceUrl: sourceFile.sources[0].url }));
+    assert.equal(feedRun.redirects.alpha["alpha-1"], feedFile.items[0].id);
+    const feedSnapshot = await readFile(join(content, "feed", "alpha.yaml"), "utf8");
+    assert.equal((await addFeedHashIds(join(content, "feed"), { redirectPath: join(root, "build", "redirects.json") })).changed, 0);
+    assert.equal(await readFile(join(content, "feed", "alpha.yaml"), "utf8"), feedSnapshot);
+
+    const split = await splitChangelog(content);
+    assert.deepEqual(split, { entries: 2, files: 2, changed: true });
+    assert.equal((await splitChangelog(content)).changed, false);
+    const reviewRun = await addReviewKeys(join(content, "changelog"));
+    assert.equal(reviewRun.added, 2);
+    assert.equal((await addReviewKeys(join(content, "changelog"))).added, 0);
+    for (const name of ["alpha.yaml", "beta.yaml"]) {
+      const rows = parse(await readFile(join(content, "changelog", name), "utf8"));
+      assert.equal(rows.length, 1);
+      assert.equal(rows[0].slug, name.replace(".yaml", ""));
+      assert.equal(rows[0].review_key, reviewKeyFor(rows[0]));
+    }
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+await test("changelog filename must match every entry slug", async () => {
+  const root = await mkdtemp(join(tmpdir(), "proofline-changelog-slug-"));
+  try {
+    await cp("content", root, { recursive: true });
+    const path = join(root, "changelog", "pons.yaml");
+    const text = await readFile(path, "utf8");
+    await writeFile(path, text.replace("  slug: pons\n", "  slug: arrow\n"));
+    const { errors } = await validateContent(root);
+    assert.ok(errors.some((error) => error.includes('changelog/pons.yaml[0]: slug field is "arrow"')), errors.join("\n"));
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 

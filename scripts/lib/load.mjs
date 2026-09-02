@@ -24,15 +24,16 @@ async function readYamlOrDefault(path, fallback) {
 export async function loadContent(root = "content") {
   const site = await readYaml(join(root, "site.yaml"));
   const census = await readYaml(join(root, "census.yaml"));
-  const changelog = await readYaml(join(root, "changelog.yaml"));
   const accounts = await readYamlOrDefault(join(root, "accounts.yaml"), []);
 
-  const projects = new Map(), sources = new Map(), research = new Map(), dependencies = new Map(), feed = new Map();
+  const projects = new Map(), sources = new Map(), research = new Map(), dependencies = new Map(), feed = new Map(), changelogBySlug = new Map();
   for (const p of await readDir(join(root, "projects"), ".yaml")) projects.set(basename(p, ".yaml"), await readYaml(p));
   for (const p of await readDir(join(root, "sources"), ".yaml")) sources.set(basename(p, ".yaml"), await readYaml(p));
   for (const p of await readDir(join(root, "research"), ".md")) research.set(basename(p, ".md"), await readFile(p, "utf8"));
   for (const p of await readDir(join(root, "dependencies"), ".yaml")) dependencies.set(basename(p, ".yaml"), await readYaml(p));
   for (const p of await readDir(join(root, "feed"), ".yaml")) feed.set(basename(p, ".yaml"), await readYaml(p));
+  for (const p of await readDir(join(root, "changelog"), ".yaml")) changelogBySlug.set(basename(p, ".yaml"), await readYaml(p));
+  const changelog = [...changelogBySlug.values()].flat();
 
-  return { site, census, projects, sources, research, dependencies, changelog, feed, accounts };
+  return { site, census, projects, sources, research, dependencies, changelog, changelogBySlug, feed, accounts };
 }

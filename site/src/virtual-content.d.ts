@@ -1,7 +1,7 @@
 declare module "virtual:proofline-content" {
   const content: {
     site: string;
-    changelog: string;
+    changelog: Record<string, string>;
     accounts: string;
     census: string;
     methodology: string;

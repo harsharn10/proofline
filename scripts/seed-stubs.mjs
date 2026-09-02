@@ -4,6 +4,7 @@
 // slug with no packet gets an honest `NULL — …` placeholder stub and a warning, never a guess.
 // Existing files are never overwritten, so a re-run on a seeded census writes nothing.
 import { readFile, writeFile, mkdir, access } from "node:fs/promises";
+import { join } from "node:path";
 import { parse, stringify } from "yaml";
 import { readLatestPacket, validatePacket, sectionParagraph } from "./lib/packet.mjs";
 import { REQUIRED_HEADINGS, PENDING_LINE } from "./lib/research-md.mjs";
@@ -16,18 +17,21 @@ const PENDING_SUMMARY = "NULL — research pending";
 
 // Stub date: today unless SEED_DATE=YYYY-MM-DD is set (the first 14 stubs were seeded 2026-08-30).
 const DATE = process.env.SEED_DATE ?? new Date().toISOString().slice(0, 10), AT = `${DATE}T00:00:00Z`;
-const CHANGELOG = "content/changelog.yaml";
 const exists = (p) => access(p).then(() => true, () => false);
 const census = parse(await readFile("content/census.yaml", "utf8"));
-for (const d of ["content/projects", "content/sources", "content/research"]) await mkdir(d, { recursive: true });
+for (const d of ["content/projects", "content/sources", "content/research", "content/changelog"]) await mkdir(d, { recursive: true });
 
-/** Append one entry to changelog.yaml as text, so the file's comments and existing formatting survive. */
+/** Append one entry to its per-slug changelog as text, so comments and existing formatting survive. */
 async function appendChangelog(entry) {
+  const path = join("content/changelog", `${entry.slug}.yaml`);
   const errs = validateAgainst("changelog", [entry]);
-  if (errs.length) { console.error(`${CHANGELOG}: ${errs.join("; ")}`); process.exit(1); }
-  let text = await readFile(CHANGELOG, "utf8").catch((e) => { if (e.code !== "ENOENT") throw e; return "# One entry per published change. Newest last.\n"; });
+  if (errs.length) { console.error(`${path}: ${errs.join("; ")}`); process.exit(1); }
+  let text = await readFile(path, "utf8").catch((e) => {
+    if (e.code !== "ENOENT") throw e;
+    return `# One entry per published change for ${entry.slug}. Newest last.\n`;
+  });
   if (text.length && !text.endsWith("\n")) text += "\n";
-  await writeFile(CHANGELOG, text + stringify([entry]));
+  await writeFile(path, text + stringify([entry]));
 }
 
 /** Turn a validated packet into the stub's facts: identity, summary, links, deployments, gaps, ledger. */

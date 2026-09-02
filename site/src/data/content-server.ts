@@ -202,7 +202,9 @@ function resolveTree(primary: string | undefined, taxonomy: TaxonomyFile): TreeR
 
 function loadContent(): ServerContent {
   const site = parseYaml<SiteConfig>(rawContent.site);
-  const changelogAll = parseYaml<ChangelogEntry[]>(rawContent.changelog);
+  const changelogAll = Object.entries(rawContent.changelog).flatMap(([file, raw]) =>
+    readYamlOrWarn<ChangelogEntry[]>(raw, `changelog/${file}`, file.replace(/\.yaml$/, ""), []),
+  );
   const census = parseYaml<CensusEntry[]>(rawContent.census);
   const derivedFile = parseJson<DerivedFile>(rawContent.derived);
   const taxonomy = parseJson<TaxonomyFile>(rawContent.taxonomy);
