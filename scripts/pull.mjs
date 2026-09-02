@@ -24,7 +24,7 @@
 // complete one by its errors[] rather than by a missing field. `--rpc-only` skips Blockscout
 // entirely. One blocked address never fails the run.
 //
-// Usage: node scripts/pull.mjs [--slug <slug>] [--rpc-only] [--dry]
+// Usage: node scripts/pull.mjs [--slug <slug>] [--only <slug,slug>] [--rpc-only] [--dry]
 
 import { readFile, readdir } from "node:fs/promises";
 import { join, basename } from "node:path";
@@ -47,6 +47,9 @@ import {
   emptyActivity,
 } from "./lib/pull/activity.mjs";
 import { writePulled, createValidator, appendHistory, snapshotFrom } from "./lib/pull/write.mjs";
+import { buildLaunchpadIndex, excludedHolderAddresses, attributeCreator } from "./lib/pull/attribution.mjs";
+import { readTop10, readMintAndRenounce, readLpLocks } from "./lib/pull/token.mjs";
+import { writeSeries } from "./lib/pull/series.mjs";
 
 const CHAIN = "robinhood-chain";
 const CONCURRENCY = 4;
@@ -56,14 +59,20 @@ const BLOCKSCOUT_CONCURRENCY = 2;
 const NOT_VERIFIED = "not-verified";
 
 function parseArgs(argv) {
-  const args = { slug: null, rpcOnly: false, dry: false };
+  const args = { only: null, rpcOnly: false, dry: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === "--slug") args.slug = argv[++i] ?? null;
-    else if (a.startsWith("--slug=")) args.slug = a.slice(7);
+    if (a === "--slug") args.only = [argv[++i] ?? ""];
+    else if (a.startsWith("--slug=")) args.only = [a.slice(7)];
+    else if (a === "--only") args.only = String(argv[++i] ?? "").split(",");
+    else if (a.startsWith("--only=")) args.only = a.slice(7).split(",");
     else if (a === "--rpc-only") args.rpcOnly = true;
     else if (a === "--dry" || a === "--dry-run") args.dry = true;
     else throw new Error(`unknown argument ${a}`);
+  }
+  if (args.only) {
+    args.only = [...new Set(args.only.map((slug) => slug.trim()).filter(Boolean))];
+    if (args.only.length === 0) throw new Error("--only requires one or more comma-separated slugs");
   }
   return args;
 }
@@ -113,7 +122,8 @@ export function tokenAddressFor(addresses = []) {
 export function countErrors(doc) {
   const addressErrors = (doc.addresses ?? []).reduce((n, a) => n + (a.errors?.length ?? 0), 0);
   const activityErrors = (doc.activity?.addresses ?? []).reduce((n, a) => n + (a.errors?.length ?? 0), 0);
-  return addressErrors + activityErrors + (doc.market?.errors?.length ?? 0) + (doc.errors?.length ?? 0);
+  return addressErrors + activityErrors + (doc.market?.errors?.length ?? 0) +
+    (doc.structure?.errors?.length ?? 0) + (doc.errors?.length ?? 0);
 }
 
 /**
@@ -139,6 +149,8 @@ export function summaryLine(slug, doc) {
     `${a.filter((x) => x.holders !== null).length} holders`,
     `${doc.metrics.length} metrics`,
     `${doc.market?.pairs?.length ?? 0} pairs`,
+    `${doc.market?.top10_share !== null && doc.market?.top10_share !== undefined ? "top-10" : "no top-10"}`,
+    `${doc.structure?.lp?.filter((row) => row.locked_share !== null).length ?? 0} LP reads`,
     `${doc.activity?.txns_24h ?? "—"} txns/24h`,
     `${countErrors(doc)} errors`,
   ];
@@ -156,8 +168,9 @@ async function main() {
   for (const f of projectFiles) projects.set(basename(f, ".yaml"), await readYaml(join("content/projects", f)));
 
   const targets = [];
+  const wanted = args.only ? new Set(args.only) : null;
   for (const row of census) {
-    if (args.slug && row.slug !== args.slug) continue;
+    if (wanted && !wanted.has(row.slug)) continue;
     const project = projects.get(row.slug);
     if (!project) continue;
     const addresses = addressesFor(project);
@@ -166,12 +179,21 @@ async function main() {
     const ledger = await readYaml(join("content/sources", `${row.slug}.yaml`)).catch(() => null);
     const hasLlama = Boolean(findLlamaSlug(ledger?.sources ?? []));
     if (addresses.length === 0 && !hasLlama) continue;
-    targets.push({ slug: row.slug, addresses });
+    targets.push({ slug: row.slug, addresses, llamaSlug: hasLlama ? findLlamaSlug(ledger?.sources ?? []) : null });
   }
-  if (args.slug && targets.length === 0) {
-    console.error(`no census slug "${args.slug}" with a ${CHAIN} address or a DefiLlama receipt`);
-    process.exit(1);
+  if (wanted) {
+    const found = new Set(targets.map((target) => target.slug));
+    const missing = [...wanted].filter((slug) => !found.has(slug));
+    if (missing.length) throw new Error(`no census slug with a ${CHAIN} address or DefiLlama receipt: ${missing.join(", ")}`);
   }
+
+  const priorPulled = [];
+  for (const file of (await readdir("content/pulled")).filter((name) => name.endsWith(".yaml"))) {
+    const doc = await readYaml(join("content/pulled", file)).catch(() => null);
+    if (doc) priorPulled.push(doc);
+  }
+  const launchpads = buildLaunchpadIndex(priorPulled);
+  const holderExclusions = excludedHolderAddresses(priorPulled);
 
   const pace = createPacer(250);
   const deps = { pace };
@@ -199,7 +221,9 @@ async function main() {
 
   const totals = {
     addresses: 0, owners: 0, safes: 0, proxies: 0, holders: 0, metrics: 0,
-    pairs: 0, markets: 0, txns24h: 0, launches24h: 0, capped: 0, errors: 0, files: 0, snapshots: 0,
+    pairs: 0, markets: 0, top10: 0, top10ExPools: 0, launchpads: 0, mint: 0, renounced: 0,
+    lp: 0, revenue24h: 0, revenueSeries: 0, txns24h: 0, launches24h: 0, capped: 0,
+    errors: 0, files: 0, snapshots: 0,
   };
   const failures = [];
   const safeThresholdOne = [];
@@ -210,6 +234,7 @@ async function main() {
   const errorCounts = new Map();
 
   for (const target of targets) {
+    const slugStarted = Date.now();
     const addresses = await mapWithConcurrency(target.addresses, CONCURRENCY, async (entry) => {
       const rpcResult = await readRpc(rpc, entry.address);
       const bsResult = args.rpcOnly
@@ -232,27 +257,63 @@ async function main() {
     // than leaving a reader to guess whether the lookup ran.
     const tokenAddress = tokenAddressFor(target.addresses);
     let market = null;
+    let structure = null;
     if (!args.rpcOnly) {
       market = tokenAddress
         ? await readMarket(dexscreener, tokenAddress, { pulledAt })
         : emptyMarket(pulledAt, [
             { step: "no token address", message: `no ${CHAIN} deployment with role token` },
           ]);
+
+      if (tokenAddress) {
+        const top10 = await readTop10(blockscout, tokenAddress, {
+          pulledAt,
+          excluded: holderExclusions,
+          pairAddresses: market.pairs.map((pair) => pair.pair_address),
+        });
+        let launchpad = null;
+        try {
+          const creation = await blockscout.address(tokenAddress);
+          const creator = creation?.creator_address_hash ?? null;
+          launchpad = attributeCreator(creator, launchpads);
+          if (!creator) {
+            market.errors.push({ step: "launchpad", message: `addresses/${tokenAddress} did not return creator_address_hash or creation_tx_hash` });
+          } else if (!launchpad) {
+            market.errors.push({ step: "launchpad", message: `creator ${creator} did not match a known factory, curve or launcher deployer` });
+          }
+        } catch (e) {
+          market.errors.push({ step: "launchpad", message: `addresses/${tokenAddress}: ${e.message}` });
+        }
+        market = { ...market, ...top10, launchpad, errors: [...market.errors, ...top10.errors] };
+
+        const tokenRow = addresses.find((row) => row.address.toLowerCase() === tokenAddress.toLowerCase());
+        const ownership = await readMintAndRenounce(blockscout, tokenAddress, tokenRow?.owner ?? null);
+        const locks = await readLpLocks(blockscout, market.pairs, { lockers: holderExclusions });
+        structure = {
+          pulled_at: pulledAt,
+          mint: ownership.mint,
+          renounced: ownership.renounced,
+          lp: locks.lp,
+          errors: [...ownership.errors, ...locks.errors],
+        };
+      }
     }
 
     const sourceLedger = await readYaml(join("content/sources", `${target.slug}.yaml`)).catch(() => null);
     const llamaSlug = findLlamaSlug(sourceLedger?.sources ?? []);
     let metrics = [];
+    let revenueSeries = null;
     const slugErrors = [...runErrors];
     if (llamaSlug) {
       const out = await readProtocol(llama, llamaSlug, { asOf: pulledAt });
       metrics = out.metrics;
+      revenueSeries = out.revenueSeries;
       slugErrors.push(...out.errors);
     }
 
     const doc = {
       slug: target.slug, pulled_at: pulledAt, chain: CHAIN,
-      addresses, metrics, market, activity, errors: slugErrors,
+      addresses, metrics, market, structure, activity, errors: slugErrors,
     };
 
     try {
@@ -263,8 +324,13 @@ async function main() {
         // failed validation actually happened.
         appendHistory(target.slug, snapshotFrom(doc));
         totals.snapshots++;
+        if (llamaSlug) {
+          await writeSeries(target.slug, revenueSeries ?? [], { dry: false });
+        }
       }
-      console.log(`${summaryLine(target.slug, doc)}${args.dry ? `  (would write ${path})` : ""}`);
+      if (args.dry && llamaSlug) await writeSeries(target.slug, revenueSeries ?? [], { dry: true });
+      const elapsed = ((Date.now() - slugStarted) / 1000).toFixed(1);
+      console.log(`${summaryLine(target.slug, doc)} · ${elapsed}s${args.dry ? `  (would write ${path})` : ""}`);
     } catch (e) {
       failures.push({ slug: target.slug, message: e.message });
       console.error(`${target.slug.padEnd(24)} NOT WRITTEN: ${e.message}`);
@@ -277,6 +343,14 @@ async function main() {
     totals.proxies += addresses.filter((a) => a.proxy.type === "eip1967").length;
     totals.holders += addresses.filter((a) => a.holders !== null).length;
     totals.metrics += metrics.length;
+    if (market?.top10_share !== null && market?.top10_share !== undefined) totals.top10++;
+    if (market?.top10_share_ex_pools !== null && market?.top10_share_ex_pools !== undefined) totals.top10ExPools++;
+    if (market?.launchpad) totals.launchpads++;
+    if (structure?.mint && structure.mint !== "unknown") totals.mint++;
+    if (structure?.renounced !== null && structure?.renounced !== undefined) totals.renounced++;
+    totals.lp += structure?.lp?.filter((row) => row.locked_share !== null).length ?? 0;
+    if (metrics.some((metric) => metric.kind === "revenue_24h")) totals.revenue24h++;
+    if ((revenueSeries?.length ?? 0) > 0) totals.revenueSeries++;
     totals.errors += countErrors(doc);
     for (const a of addresses) {
       if (a.owner_type === "safe" && a.safe?.threshold === 1) {
@@ -311,6 +385,7 @@ async function main() {
       }
     }
     for (const a of addresses) for (const e of a.errors) tally(errorCounts, e);
+    for (const e of structure?.errors ?? []) tally(errorCounts, e);
     for (const e of slugErrors) tally(errorCounts, e);
   }
 
@@ -321,6 +396,13 @@ async function main() {
       `${totals.holders} holder counts · ${totals.metrics} metrics · ${totals.markets} markets · ` +
       `${totals.pairs} pairs · ${totals.txns24h} txns/24h · ${totals.launches24h} launches/24h · ` +
       `${totals.errors} errors · ${seconds}s`,
+  );
+  console.log(
+    `coverage of ${targets.length} located names · top10 ${totals.top10}/${targets.length} · ` +
+      `top10 ex pools ${totals.top10ExPools}/${targets.length} · launchpad ${totals.launchpads}/${targets.length} · ` +
+      `mint ${totals.mint}/${targets.length} · renounced ${totals.renounced}/${targets.length} · ` +
+      `LP reads ${totals.lp} · revenue 24h ${totals.revenue24h}/${targets.length} · ` +
+      `revenue series ${totals.revenueSeries}/${targets.length}`,
   );
   for (const f of safeThresholdOne) {
     console.log(`1-of-${f.signers ?? "?"} Safe owns ${f.slug} ${f.address} (owner ${f.owner})`);

@@ -161,6 +161,22 @@ export type PulledMarket = {
   price_change_h24: number | null;
   fdv: number | null;
   first_pair_at: string | null;
+  top10_share: number | null;
+  top10_share_ex_pools: number | null;
+  top10_as_of: string | null;
+  launchpad: { slug: string; via: "factory" | "creator"; address: string } | null;
+  errors: Array<{ step: string; message: string }>;
+};
+export type PulledStructure = {
+  pulled_at: string;
+  mint: "owner-can-mint" | "no-mint-function" | "unknown";
+  renounced: boolean | null;
+  lp: Array<{
+    pair: string | null;
+    locked_share: number | null;
+    holder_kind: "burn" | "locker" | "burn-and-locker" | "none" | null;
+    reason: string | null;
+  }>;
   errors: Array<{ step: string; message: string }>;
 };
 // Blockscout activity read per address (scripts/lib/pull/activity.mjs).
@@ -189,6 +205,7 @@ export type PulledFile = {
   addresses: PulledAddress[];
   metrics: Array<{ kind: MetricKind; value: number; as_of: string; source_url: string }>;
   market?: PulledMarket | null;
+  structure?: PulledStructure | null;
   activity?: PulledActivity | null;
   errors: Array<{ step: string; message: string }>;
 };

@@ -3,6 +3,7 @@
 // all-chain total (assignment: "chain-slice TVL, never the all-chain total").
 
 import { requestJson } from "./http.mjs";
+import { revenueDaily } from "./series.mjs";
 
 export const LLAMA_BASE = "https://api.llama.fi";
 
@@ -43,8 +44,10 @@ export function latestChainTvl(body, chain = LLAMA_CHAIN) {
 
 /** 24h total for the Robinhood Chain slice of a /summary response; falls back to nothing. */
 export function chainTotal24h(body, chain = LLAMA_CHAIN) {
-  const slice = body?.chainBreakdown?.[chain];
-  const value = slice?.total24h;
+  const breakdown = body?.chainBreakdown;
+  const value = breakdown && typeof breakdown === "object"
+    ? breakdown?.[chain]?.total24h
+    : body?.total24h;
   if (typeof value !== "number" || !Number.isFinite(value)) return null;
   return value;
 }
@@ -65,6 +68,7 @@ export function createLlamaClient({ base = LLAMA_BASE, deps = {} } = {}) {
 export async function readProtocol(client, llamaSlug, { asOf, chain = LLAMA_CHAIN } = {}) {
   const metrics = [];
   const errors = [];
+  let revenueSeries = [];
   const record = (message) => errors.push({ step: "llama", message });
 
   const tvlUrl = client.protocolUrl(llamaSlug);
@@ -82,13 +86,20 @@ export async function readProtocol(client, llamaSlug, { asOf, chain = LLAMA_CHAI
   ];
   for (const { kind, url } of summaries) {
     try {
-      const value = chainTotal24h(await client.get(url), chain);
+      const body = await client.get(url);
+      const value = chainTotal24h(body, chain);
       if (value !== null) metrics.push({ kind, value, as_of: asOf, source_url: url });
+      else if (kind === "revenue_24h") record(`revenue_24h ${llamaSlug}: Robinhood Chain value not returned`);
+      if (kind === "revenue_24h") {
+        revenueSeries = revenueDaily(body, { chain });
+        if (revenueSeries.length === 0) record(`revenue_daily ${llamaSlug}: Robinhood Chain series not returned`);
+      }
     } catch (e) {
-      // A protocol with no fees or no DEX adapter answers 404; that is an absence, not a failure.
-      if (!/HTTP 404/.test(e.message)) record(`${kind} ${llamaSlug}: ${e.message}`);
+      // Revenue is a requested field, so even an expected 404 must explain its null value. The
+      // older optional fees/DEX reads keep their existing quiet-absence behaviour.
+      if (kind === "revenue_24h" || !/HTTP 404/.test(e.message)) record(`${kind} ${llamaSlug}: ${e.message}`);
     }
   }
 
-  return { metrics, errors };
+  return { metrics, errors, revenueSeries };
 }

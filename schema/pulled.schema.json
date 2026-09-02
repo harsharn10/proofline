@@ -13,6 +13,7 @@
     "addresses": { "type": "array", "items": { "$ref": "#/$defs/pulledAddress" } },
     "metrics": { "type": "array", "items": { "$ref": "#/$defs/pulledMetric" } },
     "market": { "oneOf": [{ "$ref": "#/$defs/pulledMarket" }, { "type": "null" }] },
+    "structure": { "oneOf": [{ "$ref": "#/$defs/pulledStructure" }, { "type": "null" }] },
     "activity": { "oneOf": [{ "$ref": "#/$defs/pulledActivity" }, { "type": "null" }] },
     "errors": { "type": "array", "items": { "$ref": "#/$defs/pullError" } }
   },
@@ -134,7 +135,8 @@
       "additionalProperties": false,
       "required": [
         "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
-        "price_usd", "price_change_h24", "fdv", "first_pair_at", "errors"
+        "price_usd", "price_change_h24", "fdv", "first_pair_at", "top10_share",
+        "top10_share_ex_pools", "top10_as_of", "launchpad", "errors"
       ],
       "properties": {
         "token_address": { "oneOf": [{ "$ref": "shared#/$defs/address" }, { "type": "null" }] },
@@ -147,6 +149,47 @@
         "price_change_h24": { "type": ["number", "null"] },
         "fdv": { "type": ["number", "null"] },
         "first_pair_at": { "type": ["string", "null"], "format": "date-time" },
+        "top10_share": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "top10_share_ex_pools": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "top10_as_of": { "type": ["string", "null"], "format": "date-time" },
+        "launchpad": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["slug", "via", "address"],
+              "properties": {
+                "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+                "via": { "enum": ["factory", "creator"] },
+                "address": { "$ref": "shared#/$defs/address" }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "errors": { "type": "array", "items": { "$ref": "#/$defs/pullStepError" } }
+      }
+    },
+    "lpLock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pair", "locked_share", "holder_kind", "reason"],
+      "properties": {
+        "pair": { "type": ["string", "null"] },
+        "locked_share": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "holder_kind": { "enum": ["burn", "locker", "burn-and-locker", "none", null] },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+    "pulledStructure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pulled_at", "mint", "renounced", "lp", "errors"],
+      "properties": {
+        "pulled_at": { "type": "string", "format": "date-time" },
+        "mint": { "enum": ["owner-can-mint", "no-mint-function", "unknown"] },
+        "renounced": { "type": ["boolean", "null"] },
+        "lp": { "type": "array", "items": { "$ref": "#/$defs/lpLock" } },
         "errors": { "type": "array", "items": { "$ref": "#/$defs/pullStepError" } }
       }
     },

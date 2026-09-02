@@ -57,6 +57,8 @@ export function createBlockscoutClient({ base = BLOCKSCOUT_BASE, deps = {} } = {
   return {
     address: (addr) => get(`/api/v2/addresses/${addr}`),
     token: (addr) => get(`/api/v2/tokens/${addr}`),
+    tokenHolders: (addr) => get(`/api/v2/tokens/${addr}/holders`),
+    smartContract: (addr) => get(`/api/v2/smart-contracts/${addr}`),
     transaction: (hash) => get(`/api/v2/transactions/${hash}`),
   };
 }

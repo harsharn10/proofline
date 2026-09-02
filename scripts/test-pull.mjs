@@ -35,6 +35,19 @@ import {
   readAddress as readBlockscout,
 } from "./lib/pull/blockscout.mjs";
 import { findLlamaSlug, latestChainTvl, chainTotal24h } from "./lib/pull/llama.mjs";
+import { buildLaunchpadIndex, excludedHolderAddresses, attributeCreator } from "./lib/pull/attribution.mjs";
+import {
+  parseTokenDetails,
+  parseHolderPage,
+  shareOfSupply,
+  readTop10,
+  parseVerifiedAbi,
+  classifyMint,
+  readMintAndRenounce,
+  lockedHolderSummary,
+  readLpLocks,
+} from "./lib/pull/token.mjs";
+import { revenueDaily } from "./lib/pull/series.mjs";
 import {
   parsePair,
   parsePairs,
@@ -347,6 +360,109 @@ test("takes the Robinhood Chain slice, never the all-chain total", () => {
   assert.equal(latestChainTvl({ chainTvls: { "Robinhood Chain": { tvl: [] } } }), null);
   assert.equal(chainTotal24h({ total24h: 999, chainBreakdown: { "Robinhood Chain": { total24h: 4557472 } } }), 4557472);
   assert.equal(chainTotal24h({ total24h: 999, chainBreakdown: { Base: { total24h: 1 } } }), null);
+  assert.equal(chainTotal24h({ total24h: 999 }), 999);
+});
+
+test("takes only the Robinhood Chain revenue series, sorted and capped", () => {
+  const points = revenueDaily({
+    totalDataChartBreakdown: [
+      [1788307200, { Base: { adapter: 999 }, "Robinhood Chain": { v1: 4, v2: 6 } }],
+      [1788220800, { "Robinhood Chain": { v1: 3 } }],
+    ],
+  });
+  assert.deepEqual(points, [["2026-09-01", 3], ["2026-09-02", 10]]);
+  assert.deepEqual(revenueDaily({ totalDataChart: [[1788307200, 7]] }), [["2026-09-02", 7]]);
+  assert.deepEqual(revenueDaily({ totalDataChartBreakdown: [[1788307200, { Base: 7 }]] }), []);
+});
+
+// --- token concentration, attribution and structure ----------------------
+
+test("computes top-10 supply share and excludes pools and lockers", async () => {
+  const pair = "0x1111111111111111111111111111111111111111";
+  const locker = "0x2222222222222222222222222222222222222222";
+  const items = [pair, locker, ...Array.from({ length: 8 }, (_, i) => `0x${String(i + 3).padStart(40, "0")}`)]
+    .map((hash) => ({ address: { hash }, value: "10" }));
+  const client = {
+    token: async () => ({ total_supply: "1000", type: "ERC-20" }),
+    tokenHolders: async () => ({ items }),
+  };
+  const out = await readTop10(client, "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", {
+    pulledAt: "2026-09-02T00:00:00.000Z",
+    excluded: new Set([locker]),
+    pairAddresses: [pair],
+  });
+  assert.equal(out.top10_share, 0.1);
+  assert.equal(out.top10_share_ex_pools, 0.08);
+  assert.equal(out.top10_as_of, "2026-09-02T00:00:00.000Z");
+  assert.deepEqual(out.errors, []);
+  assert.deepEqual(parseTokenDetails({ total_supply: "10", type: "ERC-20" }), { total_supply: "10", type: "ERC-20" });
+  assert.equal(parseHolderPage({ items }).length, 10);
+  assert.equal(shareOfSupply([{ value: "1" }], "0"), null);
+});
+
+test("attributes creators from pulled factories and known launcher deployers", () => {
+  const factory = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const locker = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+  const docs = [{
+    slug: "pons",
+    addresses: [
+      { address: factory, role: "factory", label: "Pons factory" },
+      { address: locker, role: "vault", label: "Launch locker" },
+    ],
+  }];
+  const index = buildLaunchpadIndex(docs, []);
+  assert.deepEqual(attributeCreator(factory.toUpperCase().replace("0X", "0x"), index), {
+    slug: "pons", via: "factory", address: factory,
+  });
+  assert.equal(attributeCreator("0xcccccccccccccccccccccccccccccccccccccccc", index), null);
+  assert.deepEqual([...excludedHolderAddresses(docs)], [locker]);
+});
+
+test("classifies mint and renounce only from a verified ABI and an owner read", async () => {
+  const abi = { is_verified: true, abi: [{ type: "function", name: "mint" }] };
+  assert.equal(parseVerifiedAbi(abi).verified, true);
+  assert.deepEqual(classifyMint(parseVerifiedAbi(abi), "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"), {
+    mint: "owner-can-mint", error: null,
+  });
+  assert.equal(classifyMint(parseVerifiedAbi({ abi: null }), null).mint, "unknown");
+  assert.equal(classifyMint(parseVerifiedAbi({ is_verified: true, abi: [{ type: "function", name: "transfer" }] }), null).mint, "no-mint-function");
+
+  const out = await readMintAndRenounce(
+    { smartContract: async () => ({ is_verified: true, abi: [{ type: "function", name: "transfer" }] }) },
+    "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    ZERO_ADDRESS,
+  );
+  assert.equal(out.mint, "no-mint-function");
+  assert.equal(out.renounced, true);
+  assert.deepEqual(out.errors, []);
+});
+
+test("reads ERC-20 LP locks and marks v3/v4 positions as not checked", async () => {
+  const pair = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const locker = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+  const client = {
+    token: async (address) => {
+      assert.equal(address, pair);
+      return { type: "ERC-20", total_supply: "100" };
+    },
+    tokenHolders: async () => ({ items: [
+      { address: { hash: ZERO_ADDRESS }, value: "20" },
+      { address: { hash: locker }, value: "30" },
+      { address: { hash: "0xcccccccccccccccccccccccccccccccccccccccc" }, value: "50" },
+    ] }),
+  };
+  const out = await readLpLocks(client, [
+    { pair_address: pair },
+    { pair_address: `0x${"1".repeat(64)}` },
+  ], { lockers: new Set([locker]) });
+  assert.deepEqual(out.lp[0], {
+    pair, locked_share: 0.5, holder_kind: "burn-and-locker", reason: null,
+  });
+  assert.deepEqual(out.lp[1], {
+    pair: `0x${"1".repeat(64)}`, locked_share: null, holder_kind: null,
+    reason: "v3/v4 position; not checked",
+  });
+  assert.deepEqual(lockedHolderSummary([], "100", new Set()), { locked_share: 0, holder_kind: "none" });
 });
 
 // --- census selection and schema -----------------------------------------
@@ -396,7 +512,7 @@ test("a sample document validates against schema/pulled.schema.json", () => {
 
   assert.deepEqual(validate(doc), []);
   assert.deepEqual(Object.keys(doc), [
-    "slug", "pulled_at", "chain", "addresses", "metrics", "market", "activity", "errors",
+    "slug", "pulled_at", "chain", "addresses", "metrics", "market", "structure", "activity", "errors",
   ]);
   assert.equal(Object.keys(doc.addresses[0])[0], "address");
 
@@ -404,7 +520,7 @@ test("a sample document validates against schema/pulled.schema.json", () => {
   assert.match(yaml, /pulled_at: .*# chain head 52364777 at read time/);
   assert.match(
     summaryLine("pons", doc),
-    /pons\s+1 addresses · 1 owners · 1 safes · 1 holders · 1 metrics · 0 pairs · — txns\/24h · 1 errors/,
+    /pons\s+1 addresses · 1 owners · 1 safes · 1 holders · 1 metrics · 0 pairs · no top-10 · 0 LP reads · — txns\/24h · 1 errors/,
   );
 });
 
@@ -708,8 +824,9 @@ test("the snapshot takes the token holder count, the market totals and the TVL m
     metrics: [
       { kind: "volume_24h", value: 94220826 },
       { kind: "tvl", value: 9208000 },
+      { kind: "revenue_24h", value: 909887 },
     ],
-    market: { liquidity_usd: 1000, volume_h24: 500, trades_h24: 21, price_usd: 0.42, fdv: 900 },
+    market: { liquidity_usd: 1000, volume_h24: 500, trades_h24: 21, price_usd: 0.42, fdv: 900, top10_share: 0.41 },
     activity: { addresses: [{ transactions_count: 10 }, { transactions_count: 5 }, { transactions_count: null }], launches_24h: 3 },
   });
   assert.deepEqual(snap, {
@@ -723,6 +840,8 @@ test("the snapshot takes the token holder count, the market totals and the TVL m
     txns_total: 15,
     launches_24h: 3,
     tvl: 9208000,
+    revenue_24h: 909887,
+    top10_share: 0.41,
   });
 });
 
@@ -764,7 +883,18 @@ test("a document carrying both new blocks validates and keeps its key order", ()
       price_change_h24: 1.5,
       fdv: 1000,
       first_pair_at: new Date(JULY).toISOString(),
+      top10_share: 0.1,
+      top10_share_ex_pools: 0.08,
+      top10_as_of: "2026-09-02T14:00:03.000Z",
+      launchpad: { slug: "pons", via: "factory", address: "0x0c37a24f5d23a486fa692d1500881d698b1f77a4" },
       errors: [{ step: "dexscreener", message: "token-pairs: HTTP 503" }],
+    },
+    structure: {
+      pulled_at: "2026-09-02T14:00:03.000Z",
+      mint: "no-mint-function",
+      renounced: true,
+      lp: [{ pair: "0x10CC6BD38112cAc182db90B6a71d8Bb5939526bA", locked_share: 0.5, holder_kind: "burn", reason: null }],
+      errors: [],
     },
     activity: {
       pulled_at: "2026-09-02T14:00:03.000Z",
@@ -791,14 +921,14 @@ test("a document carrying both new blocks validates and keeps its key order", ()
 
   assert.deepEqual(validate(doc), []);
   assert.deepEqual(Object.keys(doc), [
-    "slug", "pulled_at", "chain", "addresses", "metrics", "market", "activity", "errors",
+    "slug", "pulled_at", "chain", "addresses", "metrics", "market", "structure", "activity", "errors",
   ]);
   assert.deepEqual(Object.keys(doc.market.pairs[0]), [
     "dex", "pair_address", "quote_symbol", "price_usd", "liquidity_usd", "volume_h24",
     "volume_h6", "txns_h24", "price_change_h24", "fdv", "created_at",
   ]);
   assert.equal(countErrors(doc), 2);
-  assert.match(summaryLine("pons", doc), /2 pairs · 2000 txns\/24h · 2 errors/);
+  assert.match(summaryLine("pons", doc), /2 pairs · top-10 · 1 LP reads · 2000 txns\/24h · 2 errors/);
 
   // The 34 files written before these blocks existed still validate: both are optional.
   const older = orderDocument({
@@ -806,6 +936,7 @@ test("a document carrying both new blocks validates and keeps its key order", ()
     addresses: [], metrics: [], errors: [],
   });
   assert.equal(older.market, null);
+  assert.equal(older.structure, null);
   assert.equal(older.activity, null);
   assert.deepEqual(validate(older), []);
   assert.equal(errorKey({ step: "rpc", message: "eth_getCode 0xA5aAb3F0c6EeadF30Ef: boom" }), "rpc: eth_getCode <hex>: boom");
