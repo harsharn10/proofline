@@ -12,6 +12,8 @@
     "chain": { "const": "robinhood-chain" },
     "addresses": { "type": "array", "items": { "$ref": "#/$defs/pulledAddress" } },
     "metrics": { "type": "array", "items": { "$ref": "#/$defs/pulledMetric" } },
+    "market": { "oneOf": [{ "$ref": "#/$defs/pulledMarket" }, { "type": "null" }] },
+    "activity": { "oneOf": [{ "$ref": "#/$defs/pulledActivity" }, { "type": "null" }] },
     "errors": { "type": "array", "items": { "$ref": "#/$defs/pullError" } }
   },
   "$defs": {
@@ -21,6 +23,16 @@
       "required": ["step", "message"],
       "properties": {
         "step": { "enum": ["rpc", "blockscout", "llama"] },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "pullStepError": {
+      "$comment": "Same shape as pullError with a free-form step. The market and activity blocks name the step that failed rather than the producer that ran it — 'no token address', 'txns_24h capped' — because their failures are conditions, not endpoints. Keeping them off the pullError enum leaves the 34 existing files byte-compatible.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["step", "message"],
+      "properties": {
+        "step": { "type": "string", "minLength": 1 },
         "message": { "type": "string", "minLength": 1 }
       }
     },
@@ -84,6 +96,91 @@
         "value": { "type": "number" },
         "as_of": { "type": "string", "format": "date-time" },
         "source_url": { "type": "string", "format": "uri" }
+      }
+    },
+    "marketPair": {
+      "$comment": "pair_address is an unconstrained string, not shared#/$defs/address: Uniswap v4 pools on this chain are identified by a 32-byte pool id rather than a 20-byte address.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dex", "pair_address", "quote_symbol", "price_usd", "liquidity_usd", "volume_h24",
+        "volume_h6", "txns_h24", "price_change_h24", "fdv", "created_at"
+      ],
+      "properties": {
+        "dex": { "type": ["string", "null"] },
+        "pair_address": { "type": ["string", "null"] },
+        "quote_symbol": { "type": ["string", "null"] },
+        "price_usd": { "type": ["number", "null"] },
+        "liquidity_usd": { "type": ["number", "null"] },
+        "volume_h24": { "type": ["number", "null"] },
+        "volume_h6": { "type": ["number", "null"] },
+        "txns_h24": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["buys", "sells"],
+          "properties": {
+            "buys": { "type": "integer", "minimum": 0 },
+            "sells": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "price_change_h24": { "type": ["number", "null"] },
+        "fdv": { "type": ["number", "null"] },
+        "created_at": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "pulledMarket": {
+      "$comment": "DexScreener's view of the project's own token. liquidity_usd, volume_h24 and trades_h24 are sums over every pair; price_usd, price_change_h24 and fdv come from the single deepest pair, because a depth-blind average is a price nobody could trade at.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
+        "price_usd", "price_change_h24", "fdv", "first_pair_at", "errors"
+      ],
+      "properties": {
+        "token_address": { "oneOf": [{ "$ref": "shared#/$defs/address" }, { "type": "null" }] },
+        "pulled_at": { "type": "string", "format": "date-time" },
+        "pairs": { "type": "array", "items": { "$ref": "#/$defs/marketPair" } },
+        "liquidity_usd": { "type": ["number", "null"] },
+        "volume_h24": { "type": ["number", "null"] },
+        "trades_h24": { "type": ["integer", "null"], "minimum": 0 },
+        "price_usd": { "type": ["number", "null"] },
+        "price_change_h24": { "type": ["number", "null"] },
+        "fdv": { "type": ["number", "null"] },
+        "first_pair_at": { "type": ["string", "null"], "format": "date-time" },
+        "errors": { "type": "array", "items": { "$ref": "#/$defs/pullStepError" } }
+      }
+    },
+    "activityAddress": {
+      "$comment": "txns_24h counts transactions TO the address in the last 24 hours, walked newest-first and capped at 40 pages. launches_24h is the subset whose method name starts with launch/create/deploy/mint, and is null for any address the census does not call a factory.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "address", "label", "role", "transactions_count", "token_transfers_count",
+        "last_tx_at", "last_method", "txns_24h", "launches_24h", "errors"
+      ],
+      "properties": {
+        "address": { "$ref": "shared#/$defs/address" },
+        "label": { "type": ["string", "null"] },
+        "role": { "type": ["string", "null"] },
+        "transactions_count": { "type": ["integer", "null"], "minimum": 0 },
+        "token_transfers_count": { "type": ["integer", "null"], "minimum": 0 },
+        "last_tx_at": { "type": ["string", "null"], "format": "date-time" },
+        "last_method": { "type": ["string", "null"] },
+        "txns_24h": { "type": ["integer", "null"], "minimum": 0 },
+        "launches_24h": { "type": ["integer", "null"], "minimum": 0 },
+        "errors": { "type": "array", "items": { "$ref": "#/$defs/pullStepError" } }
+      }
+    },
+    "pulledActivity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pulled_at", "addresses", "last_activity_at", "txns_24h", "launches_24h"],
+      "properties": {
+        "pulled_at": { "type": "string", "format": "date-time" },
+        "addresses": { "type": "array", "items": { "$ref": "#/$defs/activityAddress" } },
+        "last_activity_at": { "type": ["string", "null"], "format": "date-time" },
+        "txns_24h": { "type": ["integer", "null"], "minimum": 0 },
+        "launches_24h": { "type": ["integer", "null"], "minimum": 0 }
       }
     }
   }

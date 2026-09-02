@@ -35,8 +35,38 @@ import {
   readAddress as readBlockscout,
 } from "./lib/pull/blockscout.mjs";
 import { findLlamaSlug, latestChainTvl, chainTotal24h } from "./lib/pull/llama.mjs";
-import { orderDocument, createValidator, toYaml } from "./lib/pull/write.mjs";
-import { addressesFor, mergeAddress, summaryLine } from "./pull.mjs";
+import {
+  parsePair,
+  parsePairs,
+  aggregatePairs,
+  topLiquidityPair,
+  createDexscreenerClient,
+  readMarket,
+  emptyMarket,
+} from "./lib/pull/dexscreener.mjs";
+import {
+  parseCounters,
+  parseTransactionsPage,
+  countRecentInbound,
+  isLaunchMethod,
+  readAddressActivity,
+  aggregateActivity,
+  toQuery,
+} from "./lib/pull/activity.mjs";
+import {
+  orderDocument,
+  createValidator,
+  toYaml,
+  appendHistory,
+  readHistory,
+  deltaFrom,
+  snapshotFrom,
+  parseHistory,
+} from "./lib/pull/write.mjs";
+import { addressesFor, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey } from "./pull.mjs";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 let failures = 0;
 const tests = [];
@@ -365,12 +395,17 @@ test("a sample document validates against schema/pulled.schema.json", () => {
   });
 
   assert.deepEqual(validate(doc), []);
-  assert.deepEqual(Object.keys(doc), ["slug", "pulled_at", "chain", "addresses", "metrics", "errors"]);
+  assert.deepEqual(Object.keys(doc), [
+    "slug", "pulled_at", "chain", "addresses", "metrics", "market", "activity", "errors",
+  ]);
   assert.equal(Object.keys(doc.addresses[0])[0], "address");
 
   const yaml = toYaml(doc, { blockNumber: 52364777 });
   assert.match(yaml, /pulled_at: .*# chain head 52364777 at read time/);
-  assert.match(summaryLine("pons", doc), /pons\s+1 addresses · 1 owners · 1 safes · 1 holders · 1 metrics · 1 errors/);
+  assert.match(
+    summaryLine("pons", doc),
+    /pons\s+1 addresses · 1 owners · 1 safes · 1 holders · 1 metrics · 0 pairs · — txns\/24h · 1 errors/,
+  );
 });
 
 test("an invalid document is rejected before it can reach disk", () => {
@@ -384,6 +419,396 @@ test("an invalid document is rejected before it can reach disk", () => {
     errors: [],
   });
   assert.ok(validate(bad).length > 0);
+});
+
+// --- DexScreener: pairs, aggregation, chain filter ------------------------
+
+const JULY = Date.UTC(2026, 6, 1);
+const AUGUST = Date.UTC(2026, 7, 1);
+
+/** One raw DexScreener pair, overridable field by field. */
+const rawPair = (over = {}) => ({
+  chainId: "robinhood",
+  dexId: "uniswap",
+  pairAddress: "0x10CC6BD38112cAc182db90B6a71d8Bb5939526bA",
+  baseToken: { address: "0x39dBED3a2bd333467115dE45665cC57F813C4571", symbol: "PONS" },
+  quoteToken: { symbol: "WETH" },
+  priceUsd: "0.5",
+  liquidity: { usd: 100 },
+  volume: { h24: 10, h6: 5 },
+  txns: { h24: { buys: 3, sells: 4 } },
+  priceChange: { h24: 1.5 },
+  fdv: 1000,
+  pairCreatedAt: JULY,
+  ...over,
+});
+
+test("aggregates pairs: sums depth, volume and trades, quotes the deepest pool", () => {
+  const pairs = parsePairs([
+    rawPair(),
+    rawPair({
+      dexId: "0swap",
+      // A Uniswap v4 pool id is 32 bytes, not an address — it must survive parsing untouched.
+      pairAddress: "0x4be9657ec9002e528f4f17a5c43edc525a07f888f7b180c2afbf75e096c4f38a",
+      priceUsd: "0.42",
+      liquidity: { usd: 900 },
+      volume: { h24: 90, h6: 40 },
+      txns: { h24: { buys: 10, sells: 2 } },
+      priceChange: { h24: -3 },
+      fdv: 900,
+      pairCreatedAt: AUGUST,
+    }),
+    rawPair({ dexId: "giga", liquidity: undefined, volume: { h24: 5 }, txns: { h24: { buys: 1, sells: 1 } }, pairCreatedAt: undefined }),
+  ]);
+
+  assert.equal(pairs.length, 3);
+  assert.equal(pairs[1].pair_address, "0x4be9657ec9002e528f4f17a5c43edc525a07f888f7b180c2afbf75e096c4f38a");
+  assert.equal(pairs[2].liquidity_usd, null);
+  assert.equal(pairs[2].volume_h6, null);
+  assert.equal(pairs[2].created_at, null);
+
+  const agg = aggregatePairs(pairs);
+  assert.equal(agg.liquidity_usd, 1000);
+  assert.equal(agg.volume_h24, 105);
+  assert.equal(agg.trades_h24, 21);
+  // Price, change and FDV all come from the deepest pool, never from an average across depths.
+  assert.equal(topLiquidityPair(pairs).dex, "0swap");
+  assert.equal(agg.price_usd, 0.42);
+  assert.equal(agg.price_change_h24, -3);
+  assert.equal(agg.fdv, 900);
+  assert.equal(agg.first_pair_at, new Date(JULY).toISOString());
+
+  // No pairs at all is every figure null, not zero.
+  assert.deepEqual(aggregatePairs([]), {
+    liquidity_usd: null, volume_h24: null, trades_h24: null,
+    price_usd: null, price_change_h24: null, fdv: null, first_pair_at: null,
+  });
+});
+
+test("the fallback endpoint's all-chain body is filtered down to Robinhood Chain", () => {
+  const body = { pairs: [rawPair(), rawPair({ chainId: "base", dexId: "aerodrome" }), rawPair({ chainId: "solana" })] };
+  const pairs = parsePairs(body);
+  assert.equal(pairs.length, 1);
+  assert.equal(pairs[0].dex, "uniswap");
+  assert.equal(pairs[0].quote_symbol, "WETH");
+  assert.deepEqual(pairs[0].txns_h24, { buys: 3, sells: 4 });
+  assert.deepEqual(parsePairs({}), []);
+  assert.deepEqual(parsePairs(null), []);
+});
+
+test("a failed token-pairs call falls back, and a second failure is recorded not thrown", async () => {
+  const fetchImpl = stubFetch({
+    "/token-pairs/v1/": { status: 500, body: "upstream" },
+    "/latest/dex/tokens/": { status: 200, body: { pairs: [rawPair()] } },
+  });
+  const client = createDexscreenerClient({ deps: { fetchImpl, sleepImpl: async () => {}, attempts: 1 } });
+  const ok = await readMarket(client, "0x39dBED3a2bd333467115dE45665cC57F813C4571", { pulledAt: "2026-09-02T00:00:00.000Z" });
+  assert.equal(ok.pairs.length, 1);
+  assert.deepEqual(ok.errors, []);
+  assert.equal(ok.liquidity_usd, 100);
+
+  const dead = stubFetch({ "api.dexscreener.com": { status: 500, body: "upstream" } });
+  const broken = createDexscreenerClient({ deps: { fetchImpl: dead, sleepImpl: async () => {}, attempts: 1 } });
+  const out = await readMarket(broken, "0x39dBED3a2bd333467115dE45665cC57F813C4571", { pulledAt: "2026-09-02T00:00:00.000Z" });
+  assert.equal(out.pairs.length, 0);
+  assert.equal(out.errors.length, 2);
+  assert.ok(out.errors.every((e) => e.step === "dexscreener"));
+
+  // A slug with no token deployment says so rather than looking like a token that does not trade.
+  const none = emptyMarket("2026-09-02T00:00:00.000Z", [{ step: "no token address", message: "none" }]);
+  assert.equal(none.token_address, null);
+  assert.equal(none.errors[0].step, "no token address");
+  assert.equal(tokenAddressFor([{ address: "0xaaa", role: "vault" }]), null);
+  assert.equal(tokenAddressFor([{ address: "0xaaa", role: "vault" }, { address: "0xbbb", role: "token" }]), "0xbbb");
+});
+
+// --- Blockscout activity: counters, 24h paging, launches ------------------
+
+test("counters arrive as strings and become integers or null", () => {
+  assert.deepEqual(
+    parseCounters({ transactions_count: "266144", token_transfers_count: "1065034", gas_usage_count: "1869480323779" }),
+    { transactions_count: 266144, token_transfers_count: 1065034, gas_usage_count: 1869480323779 },
+  );
+  assert.deepEqual(parseCounters({ transactions_count: "n/a" }), {
+    transactions_count: null, token_transfers_count: null, gas_usage_count: null,
+  });
+  assert.deepEqual(parseCounters(null), {
+    transactions_count: null, token_transfers_count: null, gas_usage_count: null,
+  });
+  assert.equal(toQuery({ filter: "to", index: 6, dropped: null }), "filter=to&index=6");
+});
+
+test("the 24h walk stops at the first older item and keeps the newest inbound call", async () => {
+  const now = Date.parse("2026-09-02T12:00:00.000Z");
+  const tx = (iso, method) => ({ timestamp: iso, method, hash: "0xabc", from: { hash: "0xdef" } });
+  const pages = [
+    {
+      items: [
+        tx("2026-09-02T11:00:00.000000Z", "launchToken"),
+        tx("2026-09-02T06:00:00.000000Z", "swap"),
+        tx("2026-09-02T01:00:00.000000Z", "launchToken"),
+      ],
+      next_page_params: { index: 1 },
+    },
+    {
+      items: [
+        tx("2026-09-01T23:00:00.000000Z", "createPair"),
+        // Older than the window: the walk stops here and never asks for page 3.
+        tx("2026-08-30T10:00:00.000000Z", "launchToken"),
+      ],
+      next_page_params: { index: 2 },
+    },
+    { items: [tx("2026-08-01T00:00:00.000000Z", "launchToken")], next_page_params: null },
+  ];
+
+  let asked = 0;
+  const out = await countRecentInbound(
+    async () => pages[asked++],
+    { since: now - 24 * 60 * 60 * 1000, countLaunches: true },
+  );
+  assert.equal(asked, 2);
+  assert.equal(out.txns_24h, 4);
+  assert.equal(out.launches_24h, 3); // launchToken, launchToken, createPair — not swap
+  assert.equal(out.last_tx_at, "2026-09-02T11:00:00.000Z");
+  assert.equal(out.last_method, "launchToken");
+  assert.equal(out.capped, false);
+  assert.deepEqual(out.errors, []);
+});
+
+test("the page cap stops the walk, keeps the partial count and records why", async () => {
+  const recent = { items: [{ timestamp: "2026-09-02T11:00:00.000000Z", method: "launchToken" }], next_page_params: { index: 1 } };
+  let asked = 0;
+  const out = await countRecentInbound(
+    async () => {
+      asked++;
+      return recent;
+    },
+    { since: Date.parse("2026-09-01T12:00:00.000Z"), maxPages: 3, countLaunches: true },
+  );
+  assert.equal(asked, 3);
+  assert.equal(out.txns_24h, 3);
+  assert.equal(out.launches_24h, 3);
+  assert.equal(out.capped, true);
+  assert.equal(out.errors[0].step, "txns_24h capped");
+  assert.match(out.errors[0].message, /3 pages/);
+});
+
+test("launch methods are matched by verb prefix, and only for factories", async () => {
+  for (const yes of ["launchToken", "LaunchToken", "createPair", "deployVault", "mint", "mintTo"]) {
+    assert.equal(isLaunchMethod(yes), true, yes);
+  }
+  for (const no of ["transferCreatorFeeRecipient", "swap", "approve", "setLauncher", null, undefined, 7]) {
+    assert.equal(isLaunchMethod(no), false, String(no));
+  }
+
+  const page = { items: [{ timestamp: "2026-09-02T11:00:00.000000Z", method: "launchToken" }], next_page_params: null };
+  const client = {
+    counters: async () => ({ transactions_count: "12", token_transfers_count: "3", gas_usage_count: "9" }),
+    transactions: async () => page,
+  };
+  const now = Date.parse("2026-09-02T12:00:00.000Z");
+
+  const factory = await readAddressActivity(client, { address: "0xf00", label: "factory", role: "factory" }, { now });
+  assert.equal(factory.txns_24h, 1);
+  assert.equal(factory.launches_24h, 1);
+  assert.equal(factory.transactions_count, 12);
+  assert.equal(factory.last_method, "launchToken");
+
+  // A token contract can be called with launchToken by nobody; the field is null, never 0.
+  const token = await readAddressActivity(client, { address: "0x70c", label: "token", role: "token" }, { now });
+  assert.equal(token.txns_24h, 1);
+  assert.equal(token.launches_24h, null);
+
+  const agg = aggregateActivity([factory, token]);
+  assert.equal(agg.txns_24h, 2);
+  assert.equal(agg.launches_24h, 1);
+  assert.equal(agg.last_activity_at, "2026-09-02T11:00:00.000Z");
+  assert.deepEqual(aggregateActivity([]), { last_activity_at: null, txns_24h: null, launches_24h: null });
+});
+
+test("a blocked counters call still leaves the 24h walk, and vice versa", async () => {
+  const client = {
+    counters: async () => {
+      throw new Error("HTTP 403 returned HTML, not JSON (bot challenge or error page)");
+    },
+    transactions: async () => ({ items: [{ timestamp: "2026-09-02T11:00:00.000000Z", method: "swap" }], next_page_params: null }),
+  };
+  const row = await readAddressActivity(client, { address: "0xf00", label: null, role: "vault" }, { now: Date.parse("2026-09-02T12:00:00.000Z") });
+  assert.equal(row.transactions_count, null);
+  assert.equal(row.txns_24h, 1);
+  assert.equal(row.errors.length, 1);
+  assert.match(row.errors[0].message, /counters/);
+
+  const noWalk = {
+    counters: async () => ({ transactions_count: "5" }),
+    transactions: async () => {
+      throw new Error("HTTP 503");
+    },
+  };
+  const partial = await readAddressActivity(noWalk, { address: "0xf00", label: null, role: "factory" }, { now: Date.now() });
+  assert.equal(partial.transactions_count, 5);
+  assert.equal(partial.txns_24h, null); // nothing was counted, so nothing is claimed
+  assert.equal(partial.launches_24h, null);
+  assert.match(partial.errors[0].message, /transactions\?filter=to page 1/);
+
+  assert.deepEqual(parseTransactionsPage({ items: null }), { items: [], next: null });
+  assert.equal(parseTransactionsPage({ items: [], next_page_params: {} }).next, null);
+});
+
+// --- snapshots ------------------------------------------------------------
+
+test("snapshots append, read back in time order and never rewrite a line", () => {
+  const dir = mkdtempSync(join(tmpdir(), "proofline-history-"));
+  try {
+    // Deliberately appended out of order: the reader sorts, the writer does not reorder the file.
+    appendHistory("pons", { at: "2026-08-15T00:00:00.000Z", holders: 20 }, { dir });
+    appendHistory("pons", { at: "2026-09-01T00:00:00.000Z", holders: 35, liquidity_usd: 1000 }, { dir });
+    appendHistory("pons", { at: "2026-08-01T00:00:00.000Z", holders: 10 }, { dir });
+
+    const history = readHistory("pons", { dir });
+    assert.deepEqual(history.map((r) => r.at), [
+      "2026-08-01T00:00:00.000Z", "2026-08-15T00:00:00.000Z", "2026-09-01T00:00:00.000Z",
+    ]);
+    // Every column exists on every line even when the run had nothing to put in it.
+    assert.equal(history[0].liquidity_usd, null);
+    assert.equal(history[2].liquidity_usd, 1000);
+
+    // A fourth append leaves the first three bytes-for-bytes alone.
+    appendHistory("pons", { at: "2026-09-02T00:00:00.000Z", holders: 40 }, { dir });
+    const grown = readHistory("pons", { dir });
+    assert.equal(grown.length, 4);
+    assert.deepEqual(grown.slice(0, 3), history);
+
+    // 7 days back from 2026-09-02 lands on the 2026-08-15 line, the newest that is old enough.
+    assert.deepEqual(deltaFrom(grown, "holders", 7), {
+      value_now: 40, value_then: 20, delta: 20, then_at: "2026-08-15T00:00:00.000Z",
+    });
+    // Nothing in the series reaches 90 days back, so there is no trend to report yet.
+    assert.equal(deltaFrom(grown, "holders", 90), null);
+    assert.equal(deltaFrom(readHistory("nothing-here", { dir }), "holders", 1), null);
+    assert.equal(deltaFrom([{ at: "2026-09-02T00:00:00.000Z", holders: 1 }], "holders", 1), null);
+    // Both ends come back even when only the later one carries the figure.
+    assert.deepEqual(deltaFrom(grown, "liquidity_usd", 1), {
+      value_now: null, value_then: 1000, delta: null, then_at: "2026-09-01T00:00:00.000Z",
+    });
+    // A half-written line from an interrupted run is skipped, not fatal.
+    assert.equal(parseHistory('{"at":"2026-09-01T00:00:00.000Z"}\n{"at":"2026-09-0').length, 1);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("the snapshot takes the token holder count, the market totals and the TVL metric", () => {
+  const snap = snapshotFrom({
+    pulled_at: "2026-09-02T00:00:00.000Z",
+    addresses: [
+      { role: "vault", holders: null },
+      { role: "token", holders: 62367 },
+    ],
+    metrics: [
+      { kind: "volume_24h", value: 94220826 },
+      { kind: "tvl", value: 9208000 },
+    ],
+    market: { liquidity_usd: 1000, volume_h24: 500, trades_h24: 21, price_usd: 0.42, fdv: 900 },
+    activity: { addresses: [{ transactions_count: 10 }, { transactions_count: 5 }, { transactions_count: null }], launches_24h: 3 },
+  });
+  assert.deepEqual(snap, {
+    at: "2026-09-02T00:00:00.000Z",
+    holders: 62367,
+    liquidity_usd: 1000,
+    volume_h24: 500,
+    trades_h24: 21,
+    price_usd: 0.42,
+    fdv: 900,
+    txns_total: 15,
+    launches_24h: 3,
+    tvl: 9208000,
+  });
+});
+
+// --- schema with the market and activity blocks ---------------------------
+
+test("a document carrying both new blocks validates and keeps its key order", () => {
+  const validate = createValidator();
+  const doc = orderDocument({
+    slug: "pons",
+    pulled_at: "2026-09-02T14:00:03.000Z",
+    chain: "robinhood-chain",
+    addresses: [
+      {
+        address: "0x39dBED3a2bd333467115dE45665cC57F813C4571",
+        label: "PONS token",
+        role: "token",
+        is_contract: true,
+        source_verified: true,
+        contract_name: "PonsLauncherToken",
+        proxy: { type: "none", implementation: null, admin: null },
+        owner: null,
+        owner_type: "none",
+        safe: null,
+        created_block: 8963150,
+        created_at: "2026-07-13T20:42:21.000Z",
+        holders: 62367,
+        errors: [],
+      },
+    ],
+    metrics: [],
+    market: {
+      token_address: "0x39dBED3a2bd333467115dE45665cC57F813C4571",
+      pulled_at: "2026-09-02T14:00:03.000Z",
+      pairs: parsePairs([rawPair(), rawPair({ pairAddress: "0x4be9657ec9002e528f4f17a5c43edc525a07f888f7b180c2afbf75e096c4f38a" })]),
+      liquidity_usd: 200,
+      volume_h24: 20,
+      trades_h24: 14,
+      price_usd: 0.5,
+      price_change_h24: 1.5,
+      fdv: 1000,
+      first_pair_at: new Date(JULY).toISOString(),
+      errors: [{ step: "dexscreener", message: "token-pairs: HTTP 503" }],
+    },
+    activity: {
+      pulled_at: "2026-09-02T14:00:03.000Z",
+      addresses: [
+        {
+          address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB",
+          label: "launch factory",
+          role: "factory",
+          transactions_count: 266144,
+          token_transfers_count: 1065034,
+          last_tx_at: "2026-09-01T18:50:46.000Z",
+          last_method: "launchToken",
+          txns_24h: 2000,
+          launches_24h: 1998,
+          errors: [{ step: "txns_24h capped", message: "stopped after 40 pages; count is a floor" }],
+        },
+      ],
+      last_activity_at: "2026-09-01T18:50:46.000Z",
+      txns_24h: 2000,
+      launches_24h: 1998,
+    },
+    errors: [],
+  });
+
+  assert.deepEqual(validate(doc), []);
+  assert.deepEqual(Object.keys(doc), [
+    "slug", "pulled_at", "chain", "addresses", "metrics", "market", "activity", "errors",
+  ]);
+  assert.deepEqual(Object.keys(doc.market.pairs[0]), [
+    "dex", "pair_address", "quote_symbol", "price_usd", "liquidity_usd", "volume_h24",
+    "volume_h6", "txns_h24", "price_change_h24", "fdv", "created_at",
+  ]);
+  assert.equal(countErrors(doc), 2);
+  assert.match(summaryLine("pons", doc), /2 pairs · 2000 txns\/24h · 2 errors/);
+
+  // The 34 files written before these blocks existed still validate: both are optional.
+  const older = orderDocument({
+    slug: "pons", pulled_at: "2026-09-02T14:00:03.000Z", chain: "robinhood-chain",
+    addresses: [], metrics: [], errors: [],
+  });
+  assert.equal(older.market, null);
+  assert.equal(older.activity, null);
+  assert.deepEqual(validate(older), []);
+  assert.equal(errorKey({ step: "rpc", message: "eth_getCode 0xA5aAb3F0c6EeadF30Ef: boom" }), "rpc: eth_getCode <hex>: boom");
 });
 
 // --- runner ---------------------------------------------------------------

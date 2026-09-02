@@ -1,5 +1,5 @@
 slug: swaphood
-pulled_at: 2026-09-02T06:54:17.585Z # chain head 52376124 at read time
+pulled_at: 2026-09-02T19:33:26.220Z # chain head 52824007 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 5381228
     created_at: 2026-07-09T17:02:11.000Z
-    holders: 410
+    holders: 408
     errors: []
   - address: "0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7"
     label: V3 factory (explorer contract name PancakeV3Factory)
@@ -89,19 +89,139 @@ addresses:
     errors: []
 metrics:
   - kind: tvl
-    value: 3650
-    as_of: 2026-09-02T05:56:35.000Z
+    value: 3608
+    as_of: 2026-09-02T19:19:11.000Z
     source_url: https://api.llama.fi/protocol/swaphood-v2
   - kind: fees_24h
-    value: 19.88
-    as_of: 2026-09-02T06:54:17.585Z
+    value: 20.96
+    as_of: 2026-09-02T19:33:26.220Z
     source_url: https://api.llama.fi/summary/fees/swaphood-v2?dataType=dailyFees
   - kind: revenue_24h
-    value: 19.88
-    as_of: 2026-09-02T06:54:17.585Z
+    value: 20.96
+    as_of: 2026-09-02T19:33:26.220Z
     source_url: https://api.llama.fi/summary/fees/swaphood-v2?dataType=dailyRevenue
   - kind: volume_24h
-    value: 2183
-    as_of: 2026-09-02T06:54:17.585Z
+    value: 2095
+    as_of: 2026-09-02T19:33:26.220Z
     source_url: https://api.llama.fi/summary/dexs/swaphood-v2?dataType=dailyVolume
+market:
+  token_address: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
+  pulled_at: 2026-09-02T19:33:26.220Z
+  pairs:
+    - dex: swaphood
+      pair_address: "0xeA7ba72BE3baaB20546bFdA880b7E285E5a51168"
+      quote_symbol: WETH
+      price_usd: 0.1259
+      liquidity_usd: 2927.12
+      volume_h24: 2338.26
+      volume_h6: 330.46
+      txns_h24:
+        buys: 36
+        sells: 25
+      price_change_h24: 9.9
+      fdv: 18345
+      created_at: 2026-07-12T20:18:23.000Z
+    - dex: uniswap
+      pair_address: "0xc92a5cf82c06b03e04488ae20b047e2af11fa4451cbd274838b9944b0eee73ee"
+      quote_symbol: ETH
+      price_usd: 0.1368
+      liquidity_usd: 977.14
+      volume_h24: 490.64
+      volume_h6: 54.73
+      txns_h24:
+        buys: 10
+        sells: 13
+      price_change_h24: -14.01
+      fdv: 19934
+      created_at: 2026-07-14T11:16:53.000Z
+    - dex: uniswap
+      pair_address: "0xa3a7494BA9aFF9B7936bD3CB07D120abe2e9eF90"
+      quote_symbol: WETH
+      price_usd: 0.0000487
+      liquidity_usd: 0
+      volume_h24: 264.01
+      volume_h6: 107.56
+      txns_h24:
+        buys: 51
+        sells: 44
+      price_change_h24: -100
+      fdv: 7
+      created_at: 2026-07-15T23:53:01.000Z
+    - dex: swaphood
+      pair_address: "0xA2263fbba5b52aD06Eb5Fd427CeCF59F1Ce27E48"
+      quote_symbol: HOOD
+      price_usd: 1.49
+      liquidity_usd: 737.59
+      volume_h24: 0.23
+      volume_h6: 0
+      txns_h24:
+        buys: 1
+        sells: 0
+      price_change_h24: null
+      fdv: 9152
+      created_at: 2026-07-16T17:06:32.000Z
+  liquidity_usd: 4641.85
+  volume_h24: 3093.14
+  trades_h24: 180
+  price_usd: 0.1259
+  price_change_h24: 9.9
+  fdv: 18345
+  first_pair_at: 2026-07-12T20:18:23.000Z
+  errors: []
+activity:
+  pulled_at: 2026-09-02T19:33:26.220Z
+  addresses:
+    - address: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
+      label: HOOD token (SwapHood Token — not the Robinhood HOOD Stock Token)
+      role: token
+      transactions_count: 2884
+      token_transfers_count: 11
+      last_tx_at: 2026-09-02T18:51:22.000Z
+      last_method: approve
+      txns_24h: 8
+      launches_24h: null
+      errors: []
+    - address: "0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7"
+      label: V3 factory (explorer contract name PancakeV3Factory)
+      role: factory
+      transactions_count: 64
+      token_transfers_count: 1
+      last_tx_at: 2026-08-21T09:56:07.000Z
+      last_method: collectProtocol
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0xA7036C8C28F96e8cE242d0Af45d1B395B69DAF38"
+      label: h33 token (gitbook, candidate)
+      role: token
+      transactions_count: 199
+      token_transfers_count: 415
+      last_tx_at: 2026-09-02T18:52:52.000Z
+      last_method: approve
+      txns_24h: 1
+      launches_24h: null
+      errors: []
+    - address: "0xE7206Ecac3A51afe7e6179182ad4130A26068dD1"
+      label: V2 factory (gitbook, candidate)
+      role: factory
+      transactions_count: 11
+      token_transfers_count: 1
+      last_tx_at: 2026-07-23T16:43:49.000Z
+      last_method: setPoolSwapFee
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0xea7ba72be3baab20546bfda880b7e285e5a51168"
+      label: HOOD pair (official 12 Jul post)
+      role: other
+      transactions_count: 906
+      token_transfers_count: 28482
+      last_tx_at: 2026-09-02T16:06:14.000Z
+      last_method: claimFees
+      txns_24h: 1
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-02T18:52:52.000Z
+  txns_24h: 10
+  launches_24h: 0
 errors: []

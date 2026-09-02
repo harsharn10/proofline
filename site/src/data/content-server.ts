@@ -14,6 +14,7 @@ import type {
   DossierBundle,
   Findings,
   Derived,
+  Kpis,
   LatestFeedItem,
   Link,
   Metric,
@@ -184,6 +185,7 @@ type ServerContent = {
   changelog: ChangelogEntry[];
   treeBySlug: Record<string, TreeRef>;
   generatedAt: string;
+  now: number;
 };
 
 // Resolve "launch/bonding-curve" against the taxonomy: label from the leaf table, section by leaf
@@ -206,6 +208,7 @@ function loadContent(): ServerContent {
   const census = parseYaml<CensusEntry[]>(rawContent.census);
   const derivedFile = parseJson<DerivedFile>(rawContent.derived);
   const taxonomy = parseJson<TaxonomyFile>(rawContent.taxonomy);
+  const buildNow = Date.now();
   const sections: SectionDef[] = taxonomy.sections.map(({ id, label, description }) => ({ id, label, description }));
 
   // tree.primary ("launch/bonding-curve") -> { domain, leaf, label, sectionId }: the home sections,
@@ -242,6 +245,7 @@ function loadContent(): ServerContent {
     );
     const feed = feedFile ? [...feedFile.items].sort((a, b) => b.date.localeCompare(a.date)) : [];
     const pulled = readYamlOrWarn<PulledFile | null>(rawContent.pulled[`${slug}.yaml`], `pulled/${slug}.yaml`, slug, null);
+    const history = parseHistory(rawContent.pulledHistory[`${slug}.jsonl`]);
     const changelog = changelogAll
       .filter((entry) => entry.slug === slug)
       .sort((a, b) => b.date.localeCompare(a.date));
@@ -266,6 +270,7 @@ function loadContent(): ServerContent {
       changelog,
       derived: withPulledMetrics(pickDerived(derivedFile.projects[slug], slug, project.coverage), pulled),
       pulled,
+      kpis: kpisFor({ lifecycle: project.lifecycle, deployments: project.deployments }, pulled, history, buildNow),
     };
   });
 
@@ -277,6 +282,7 @@ function loadContent(): ServerContent {
     changelog: changelogAll,
     treeBySlug,
     generatedAt: derivedFile.generated_at,
+    now: buildNow,
   };
 }
 
@@ -309,6 +315,7 @@ function toDirectoryEntry(d: Dossier, treeBySlug: Record<string, TreeRef>): Dire
     feedCount: d.feed.length,
     tree: treeBySlug[d.slug] ?? null,
     holders: tokenHolders(d.pulled),
+    kpis: d.kpis,
   };
 }
 
@@ -322,6 +329,75 @@ function withPulledMetrics(derived: Derived, pulled: PulledFile | null): Derived
     .filter((m) => !have.has(m.kind) && typeof m.value === "number" && m.value > 0)
     .map((m) => ({ kind: m.kind, value: m.value, currency: m.kind === "holders" ? undefined : "USD", as_of: m.as_of.slice(0, 10), class: "claim", sources: [], source_url: m.source_url }));
   return extra.length ? { ...derived, metrics: [...derived.metrics, ...extra] } : derived;
+}
+
+const DAY = 86_400_000;
+
+type HistoryLine = { at: string; holders?: number | null; liquidity_usd?: number | null; volume_h24?: number | null; trades_h24?: number | null; txns_total?: number | null; launches_24h?: number | null; tvl?: number | null };
+
+function parseHistory(raw: string | undefined): HistoryLine[] {
+  if (!raw) return [];
+  const lines: HistoryLine[] = [];
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    try {
+      const v = JSON.parse(line) as HistoryLine;
+      if (typeof v.at === "string") lines.push(v);
+    } catch {
+      /* a bad line never breaks the page */
+    }
+  }
+  return lines.sort((a, b) => a.at.localeCompare(b.at));
+}
+
+// Change over `days`: the latest snapshot against the newest one at least that many days older.
+function deltaFrom(history: HistoryLine[], key: "holders", days: number): number | null {
+  if (history.length < 2) return null;
+  const latest = history[history.length - 1]!;
+  const latestAt = new Date(latest.at).getTime();
+  const then = [...history].reverse().find((h) => latestAt - new Date(h.at).getTime() >= days * DAY);
+  if (!then) return null;
+  const a = latest[key], b = then[key];
+  return typeof a === "number" && typeof b === "number" ? a - b : null;
+}
+
+// Every tracker number on a card comes from here: DexScreener market read, Blockscout activity read,
+// holder counts and their 7-day change from snapshots, DefiLlama TVL. Status is computed from the
+// reads, never typed by a person.
+function kpisFor(d: { lifecycle: Dossier["lifecycle"]; deployments: Deployment[] }, pulled: PulledFile | null, history: HistoryLine[], now: number): Kpis {
+  const market = pulled?.market ?? null;
+  const activity = pulled?.activity ?? null;
+  const located = d.deployments.some((x) => x.address !== "not-verified");
+  const holders = tokenHolders(pulled);
+  const lastActivityAt = activity?.last_activity_at ?? null;
+  const tvl = pulled?.metrics.find((m) => m.kind === "tvl")?.value ?? null;
+  const trades = market?.trades_h24 ?? null;
+  let status: Kpis["status"];
+  if (d.lifecycle === "testnet-only") status = "testnet";
+  else if (!located && !market?.pairs?.length) status = "announced";
+  else {
+    const age = lastActivityAt ? now - new Date(lastActivityAt).getTime() : null;
+    if ((age !== null && age <= 7 * DAY) || (trades ?? 0) > 0) status = "live";
+    else if (age !== null && age <= 30 * DAY) status = "quiet";
+    else if (age !== null) status = "dormant";
+    else status = located ? "quiet" : "announced";
+  }
+  return {
+    status,
+    lastActivityAt,
+    liquidityUsd: market?.liquidity_usd ?? null,
+    volume24h: market?.volume_h24 ?? null,
+    trades24h: trades,
+    priceChange24h: market?.price_change_h24 ?? null,
+    fdv: market?.fdv ?? null,
+    holders,
+    holdersDelta7d: deltaFrom(history, "holders", 7),
+    launches24h: activity?.launches_24h ?? null,
+    txnsTotal: activity ? activity.addresses.reduce((n, a) => n + (a.transactions_count ?? 0), 0) || null : null,
+    firstPairAt: market?.first_pair_at ?? null,
+    tvl,
+    readAt: pulled?.pulled_at ?? null,
+  };
 }
 
 // The holder count of the project's token contract (role token, else the first address with one).
@@ -387,6 +463,7 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
       .map((c) => ({ id: c.id, name: c.name, kind: c.kind }))
       .sort((a, b) => a.name.localeCompare(b.name)),
     generatedAt: content.generatedAt,
+    now: content.now,
   };
 });
 
@@ -411,6 +488,7 @@ export const getDossier = createServerFn({ method: "GET" })
       peers: dossier && dossier.coverage === "full" ? peersFor(dossier, content.dossiers, content.treeBySlug) : [],
       tree,
       section: tree?.sectionId ? (content.sections.find((s) => s.id === tree.sectionId) ?? null) : null,
+      now: content.now,
     };
   });
 

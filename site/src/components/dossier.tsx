@@ -7,6 +7,7 @@ import { OnChain } from "@/components/on-chain";
 import { PeerCards } from "@/components/peer-cards";
 import { Section } from "@/components/section";
 import { SnapshotStrip } from "@/components/snapshot-strip";
+import { Traction } from "@/components/traction";
 import { cleanLabel, dejargon, hostLabel } from "@/lib/dejargon";
 import {
   coverageWord,
@@ -15,6 +16,9 @@ import {
   LIFECYCLE_LABEL,
   LINK_KIND_LABEL,
   NOT_VERIFIED,
+  STATUS_LABEL,
+  relativeTime,
+  statusTone,
   correctionsLink,
   dexScreenerSearchUrl,
   explorerTokenUrl,
@@ -414,7 +418,7 @@ function StubBody({
       <p className="honestpanel mt-6">
         {dossier.role === "observe" ? (
           <>
-            <b>Watchlist.</b> This name fails at least one of the four qualifying tests (deployed on chain 4663, a native play, citable, a research story), so it is listed for completeness and never scored.{" "}
+            <b>Watchlist.</b> This name fails at least one of the four qualifying tests (deployed on chain 4663, a native play, citable, a research story). It stays on the watchlist without a score.{" "}
           </>
         ) : (
           <>
@@ -468,6 +472,7 @@ export function Dossier({
   tree,
   section,
   tab,
+  now,
 }: {
   dossier: DossierData;
   site: SiteConfig;
@@ -476,8 +481,9 @@ export function Dossier({
   tree: TreeRef | null;
   section: SectionDef | null;
   tab: DossierTab;
+  now: number;
 }) {
-  const { derived } = dossier;
+  const { derived, kpis } = dossier;
   const full = dossier.coverage === "full";
   const correction = correctionsLink(site.corrections.destination);
 
@@ -497,6 +503,10 @@ export function Dossier({
           <h1 className="mt-2">{dossier.symbol ?? dossier.name}</h1>
           {dossier.symbol ? <p className="sub">{dossier.name}</p> : null}
           <div className="mast-badges">
+            <Badge tone={statusTone(kpis.status)}>
+              <span title="Computed from the latest chain read: live inside 7 days, quiet inside 30, dormant after">{STATUS_LABEL[kpis.status]}</span>
+            </Badge>
+            {kpis.lastActivityAt ? <span className="kago">active {relativeTime(kpis.lastActivityAt, now)}</span> : null}
             <Badge tone={lifecycleTone(dossier.lifecycle)}>{LIFECYCLE_LABEL[dossier.lifecycle]}</Badge>
             <span className="covword">{coverageWord(dossier.coverage, dossier.role)}</span>
             {derived.risk ? <Badge tone={riskTone(derived.risk)}>{derived.risk} risk</Badge> : null}
@@ -512,7 +522,7 @@ export function Dossier({
             <div className="scorebig" title={derived.provisional ? "Provisional: awaiting a second reviewer's sign-off" : undefined}>
               <span className={derived.provisional ? "n prov" : "n"}>
                 {derived.score}
-                <span className="of">/100</span>
+                <span className="of">/100 control</span>
               </span>
               {derived.confidence !== null ? (
                 <span className="conf">
@@ -528,6 +538,7 @@ export function Dossier({
 
       <p className="lead mt-5">{dejargon(dossier.summary)}</p>
       <LinkRow dossier={dossier} site={site} full={full} />
+      <Traction kpis={kpis} now={now} />
       <SnapshotStrip metrics={derived.metrics} rank={derived.rank} sources={dossier.sources} />
       {/* Chain facts sit above the tabs: they are the same on every tab and are what a reader about to
           transact wants first — who holds the keys, how many holders, when it was deployed. */}

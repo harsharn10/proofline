@@ -17,6 +17,26 @@ function MethodologyPage() {
       <h1 className="text-2xl font-bold tracking-tight">How to read a profile</h1>
 
       <dl className="glossary mt-5">
+        <dt>Live · Quiet · Dormant · Announced</dt>
+        <dd>
+          Computed from the latest chain read, never typed by a person. Live: on-chain activity or trades
+          inside the last 7 days. Quiet: inside 30 days. Dormant: older than that. Announced: nothing
+          located on chain yet. Testnet: no mainnet deployment.
+        </dd>
+        <dt>Traction numbers</dt>
+        <dd>
+          Liquidity, 24h volume, trades and 24h change come from DexScreener across every pool for the
+          token. Holders and transaction counts come from Blockscout. Launches are transactions to the
+          launchpad's factory in the last 24 hours. TVL is DefiLlama's Robinhood Chain slice. Each number
+          carries its source in the tooltip and the read time on the section. A dash means not read, never
+          zero. Holder change over 7 days appears once a week of snapshots exists.
+        </dd>
+        <dt>Control score</dt>
+        <dd>
+          The score on a full record measures control and security evidence: who can change the system,
+          whether a timelock exists, whether deployed code matches an audit. It is not a traction or
+          quality score. A launchpad can lead the chain on volume and still score low here.
+        </dd>
         <dt>Initial research</dt>
         <dd>
           The name is on file with its links, what has been located on chain so far, its sources, and the
@@ -27,9 +47,9 @@ function MethodologyPage() {
           A complete record: every documented contract reproduced on the explorer, control and security
           read from source where possible, an evidence score with a confidence figure, and a risk level.
         </dd>
-        <dt>Score and confidence</dt>
+        <dt>Confidence</dt>
         <dd>
-          The score is derived by scripts from stored inputs; nobody types it. Confidence says how much of
+          The control score is derived by scripts from stored inputs; nobody types it. Confidence says how much of
           the record rests on primary sources and on-chain reproduction. Below 50% the score is withheld.
           Between 50% and 69% it shows as provisional: a second person has not yet signed it off.
         </dd>
