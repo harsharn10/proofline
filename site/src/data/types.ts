@@ -424,11 +424,12 @@ export type AccountRef = { handle: string; tier: AccountTier; role: AccountRole 
 
 export type SiteConfig = {
   name: string;
+  title: string;
   tagline: string;
   methodology_version: string;
   maintainer: { id: string; display: string };
   corrections: { destination: string; acknowledge_within_days: number };
-  telegram: { enabled: boolean; weekly_heartbeat: boolean };
+  telegram: { enabled: boolean; weekly_heartbeat: boolean; url: string };
   chain: {
     name: string;
     id: number;
