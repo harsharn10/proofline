@@ -1,127 +1,53 @@
-# Methodology
+# How to read this
 
-Version `proofline-v1.0`. This page is generated from PRD.md §6–§7; edit the PRD, then re-run this extraction.
+Version `proofline-v1.0`.
 
-## 6. Rating system
+Icarus tracks what is new on Robinhood Chain and separates facts we can check from statements that still need work. Every figure should take you back to the page or chain read behind it.
 
-Three public outputs on a full profile. Never one number alone.
+## Status
 
-1. **Evidence score** — weighted 0–100 of verified security posture, engineering, transparency, maturity, economic design
-2. **Research confidence** — 0–100% of completeness, quality, independence, freshness
-3. **Risk level** — Low / Moderate / Elevated / High / Critical, with hard overrides
+- **Live** means on-chain activity or trades were seen within 7 days.
+- **Quiet** means the latest activity was more than 7 days but no more than 30 days ago.
+- **Dormant** means the latest activity was more than 30 days ago.
+- **Announced** means an official surface is confirmed but nothing has been located on chain.
+- **Testnet** means activity has been located on a test network, not mainnet.
 
-The evidence score is not P(success) and is never labeled “safe.”
+Status comes from dated chain reads. It is never typed by a person.
 
-### 6.1 Factor weights
+## The share bar
 
-| Factor | Weight |
-|---|---|
-| Security and operational control | 35% |
-| Engineering evidence and authenticity | 20% |
-| Transparency and accountability | 15% |
-| Product maturity and operational resilience | 15% |
-| Economic design and dependency risk | 15% |
+A name can appear in Right now, category leaders, and Telegram only when its official links are confirmed, a contract is located on chain 4663, and it has at least $25,000 of liquidity for tokens and launchpads or $25,000 of TVL for protocols. Announced names use a different bar: confirmed official links, a clear summary, and nothing located on chain yet.
 
-Conduct and disclosure are findings, not a sixth scored factor. Serious deception can hit transparency and/or trip an override.
+## Control and evidence
 
-Factors 2–5 use the coarse rubric until more full records exist:
+The **Control score** runs from 0 to 100 and describes how much power operators retain, how changes are delayed, and whether deployed code matches an independent review. It is not a measure of growth, quality, safety, or the chance of success.
 
-- Strong evidence: 80
-- Mixed / developing: 50
-- Weak or contradictory: 20
-- Not enough evidence: unscored; lowers confidence
+The **evidence percentage** shows how much of the research rests on primary sources, direct chain checks, independent confirmation, recent information, and a second review. Below 50% the Control score stays hidden; from 50% to 69% it is marked as awaiting a second review.
 
-Every factor records positive evidence, negative evidence, and missing evidence.
+## Official, Unclaimed, and commentary
 
-### 6.2 Security / control tests (35 raw points)
+**Official · links confirmed** means the site or documentation matches the identity on file and is not flagged as unconfirmed. **Unclaimed** means that link check is not complete; it does not mean the name is false.
 
-Factor percentage = `raw / 35 × 100`.
+Commentary labels tell you how a statement is supported:
 
-| Test | Pts | Full | Partial | Zero |
-|---|---:|---|---|---|
-| Deployment verifiability | 5 | All material contracts, proxies, implementations verified and mapped | Inventory exists with documented gaps | Material deployment cannot be identified or verified |
-| Privileged-power blast radius | 8 | No privileged actor can unilaterally seize, mint, freeze, redirect, or rewrite user-fund logic | Powers exist but are narrowly scoped or constrained | One actor, opaque path, or weak role can materially affect user funds |
-| Authorization topology | 5 | Sensitive powers use documented multisig/governance with independent signers and a real threshold | Multisig exists but independence, threshold, or scope is weak | EOA, unknown controller, or unverifiable mechanism |
-| Timelock and exit window | 5 | Material changes have an enforced delay; users can reasonably exit first | Delay exists but excludes important actions or the window is thin | Material changes execute with no effective notice |
-| Audit-to-deployment match | 5 | Independent review covers the deployed commit/config; material findings resolved | Audit exists; scope, match, or remediation incomplete | No relevant review, or the badge is misleading |
-| Continuous safeguards | 4 | Bounty, monitoring, pause/response design, published incident process | Some safeguards; coverage or funding limited | None evidenced |
-| Incident handling | 3 | No known material incident, or full disclosure + remediation + postmortem | Response incomplete or delayed | Active issue, concealment, or misleading comms |
+- **Checked on chain** — reproduced from an explorer or direct chain read.
+- **From the project** — stated by the project and not independently confirmed.
+- **From the evidence** — Icarus's conclusion from named sources.
+- **Disputed** — reliable sources do not agree.
+- **Open** — the answer has not been found or settled.
 
-Unknown information gets no assumed credit. It cuts confidence.
+## Numbers and the dash
 
-Researchers record the exact evidence used for every point.
+Liquidity, volume, trades, price change, and pool dates come from DexScreener. Holders, transaction counts, contract activity, and launches come from Blockscout; TVL and available daily series come from DefiLlama. Each number links to its source, and a dash means **not read**, never zero.
 
-### 6.3 Confidence
+Charts use stored snapshots only. With fewer than 14 points, the card says how many snapshots exist and when they begin.
 
-| Input | Weight |
-|---|---|
-| Primary-source coverage | 30% |
-| Direct onchain / deployment verification | 25% |
-| Independent corroboration | 20% |
-| Freshness | 15% |
-| Review completeness and second-person approval | 10% |
+## Refreshes, Telegram, and corrections
 
-Display:
+Chain data refreshes every 6 hours; research updates as it lands. Use the Telegram button in the top bar to receive the same Icarus updates that clear the share bar.
 
-- Confidence < 50% → suppress numeric evidence score. Show `Research pending / insufficient evidence`
-- 50–69% → number is provisional and visually de-emphasized
-- ≥ 70% → number displays normally, always with confidence and risk
+When a corrections destination is available, this page shows a correction link below. Corrections preserve the dated record of what changed.
 
-Headline always shows risk + confidence. The number never appears alone.
+## Research, not advice
 
-### 6.4 Hard risk overrides
-
-Compute the weighted score first. Apply overrides transparently.
-
-- **Critical** — confirmed active exploit, direct loss path, malicious privileged behavior, or equivalent immediate threat. Risk = Critical. Displayed score capped at 29.
-- **High** — unilateral drain / seize / mint / freeze without effective delay; materially unverifiable production contracts; production claim sitting on test/mock infra. Risk = High. Displayed score capped at 59.
-- **Elevated** — new unaudited production system with meaningful fund exposure, major unresolved dependencies, or immature controls. Risk at least Elevated. No numeric cap.
-
-Profile detail shows uncapped weighted score and override reason. Headline uses the capped score. Removing an override requires new evidence and a recorded reviewer decision.
-
----
-
-## 7. Evidence, archive, language
-
-### 7.1 Evidence classes
-
-Every material statement is one of:
-
-- `verified` — reproduced from onchain data or strong primary evidence
-- `claim` — project-stated, not independently verified
-- `inference` — analyst conclusion from named evidence
-- `disputed` — challenged with supporting evidence
-- `unknown` — unavailable or inconclusive
-
-### 7.2 Source ledger
-
-Every material web source stores:
-
-- original URL and publisher
-- accessed_at
-- claim supported
-- short excerpt or screenshot note
-- content hash when a local snapshot is kept
-- archive URL when available
-- researcher id
-
-Archive only what is needed to support the claim. Respect copyright. A disappeared source stays in the ledger, marked unavailable, with last captured evidence. It is not silently deleted.
-
-Deleted or changed claims need a dated before/after record. Absence from a current page is not proof of intentional deletion.
-
-### 7.3 Writing standard
-
-- Write “the admin address can upgrade contracts without an enforced timelock,” not “the team can rug.”
-- Write “an independent audit was not found during this review,” not “the contracts are unaudited,” unless absence is established.
-- Distinguish “could not verify” from “the claim is false.”
-- Do not call a project or person a scam, fraud, criminal, or malicious without an authoritative finding and review.
-- Do not publish “vibe coded” or “slop” as a conclusion. Describe the engineering evidence.
-- Give subjects a reasonable chance to correct the file.
-
----
-
-
-## Disclaimer
-
-
-Proofline publishes research, not advice. Profiles are not audits, safety ratings, or recommendations to buy, sell, or use a protocol. Evidence scores measure documented posture at a point in time. They are not probabilities of success or loss. Contracts, teams, and markets change. Read the sources. Do your own verification onchain.
+Icarus is powered by Project Proofline and publishes automated research, not investment advice. Information can be incomplete, delayed, or inaccurate, so read the linked sources and do your own research before making financial decisions.
