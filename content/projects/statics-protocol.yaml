@@ -60,6 +60,9 @@ findings:
       sources:
         - S8
   risk:
+    - text: "owner() on the Statics token contract returns 0xeb7c…0862, the verified Airlock contract that also owns the EARN, Statics and Artificial Inu tokens; the token's owner-only functions are controlled by shared launch infrastructure, not by a project-held key or multisig."
+      class: verified
+      sources: [S11]
     - text: The official security model says the broader multi-asset and Statics Dollar diamonds remain subject to independent review before production use, and that the repository test suite is not an external audit.
       class: claim
       sources:

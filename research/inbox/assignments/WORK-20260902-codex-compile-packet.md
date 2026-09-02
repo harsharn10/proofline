@@ -1,6 +1,6 @@
 # Codex assignment: the packet compiler
 
-Status: kicked off 2026-09-02 on branch `codex/20260902/WORK-20260902-codex-compile-packet`. Commit packets to this branch; the draft PR is already open.
+Status: assigned. Open a draft PR from the branch named at the end of this file and keep it in draft.
 
 ```yaml
 contract_version: proofline-research-v2

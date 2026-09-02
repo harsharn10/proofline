@@ -29,12 +29,13 @@ export async function validateContent(root = "content", { release = false } = {}
   const x = crossCheck(content);
   errors.push(...x.errors); warnings.push(...x.warnings);
 
-  if (content.site.corrections?.destination === "TODO") warnings.push("site.yaml: corrections.destination is TODO (blocks --release)");
+  if (content.site.corrections?.destination === "TODO") warnings.push("site.yaml: corrections.destination is TODO (no corrections link renders until it is set)");
 
   // Qualifying tests (spec §5.2): a false value is visible as a warning and blocks --release.
   for (const c of content.census)
     for (const [name, t] of Object.entries(c.qualifying ?? {}))
-      if (t?.value === false) (release ? errors : warnings).push(`census: ${c.slug} fails qualifying test ${name}: ${t.note}`);
+      // A failing test keeps the row on the watchlist (census role: observe); it never blocks a release (issue #35).
+      if (t?.value === false) warnings.push(`census: ${c.slug} fails qualifying test ${name}${c.role === "observe" ? "" : " and is not marked role: observe"}: ${t.note}`);
 
   for (const [slug, project] of content.projects) {
     const sourceList = content.sources.get(slug)?.sources ?? [];
@@ -51,6 +52,9 @@ export async function validateContent(root = "content", { release = false } = {}
     // (pipeline audit 2026-09-01 §7) — it doesn't need a duplicate [S#] tag in a finding or the research doc.
     const officialUrls = new Set((project.official_links ?? []).map((l) => normalizeUrl(l.url)));
     for (const source of sourceList) if (officialUrls.has(normalizeUrl(source.url))) referenced.add(source.id);
+    // A DefiLlama protocol page in the ledger is the receipt scripts/pull.mjs reads chain-slice metrics
+    // from (content/pulled/<slug>.yaml cites it back by URL) — the puller is its citer.
+    for (const source of sourceList) if (/defillama\.com\/protocol\//.test(source.url)) referenced.add(source.id);
     for (const id of ledgerIds) if (!referenced.has(id)) warnings.push(`sources/${slug}: ${id} is never cited by projects/${slug}.yaml, research/${slug}.md or feed/${slug}.yaml`);
   }
 

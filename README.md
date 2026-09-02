@@ -41,6 +41,7 @@ If a number on the site is wrong, the fix is in an input or in `score.mjs`, neve
     content/methodology.md          generated from PRD §6–7 (see Task 5 in the plan for the extraction command)
     research/inbox/assignments/     controller-written assignments: packet header + objective, one per work id
     research/inbox/packets/<slug>/  agent handoffs (packet v2, research-system §5); the only path a collector or verifier writes
+    docs/templates/                 research-packet-v2.md — the worked packet every producer copies
     schema/                         JSON Schema for each file type; schema/taxonomy.json is the leaf and section registry
     scripts/                        validate, score, seed, test, migrations
     fixtures/                       worked scoring examples with hand-calculated expected values
@@ -70,8 +71,10 @@ shape of each server function's response.
 ## Adding a project
 
 A name enters the census from a seed packet (`research/inbox/packets/<slug>/<work-id>.md`,
-research-system §5), never from an agent writing `content/census.yaml`. The compiler turns the packet
-into a row. Until `scripts/compile-packet.mjs` lands (Codex assignment C1), the compiler does it by hand:
+research-system §5), never from an agent writing `content/census.yaml`. Copy
+[`docs/templates/research-packet-v2.md`](docs/templates/research-packet-v2.md) to file one; `npm run
+validate` checks it against `schema/packet.schema.json`. The compiler turns the packet into a row.
+Until `scripts/compile-packet.mjs` lands (Codex assignment C1), the compiler does it by hand:
 
 1. Add an entry to `content/census.yaml` from the packet's identity and classification blocks, with all
    four qualifying tests (PRD §2.1). A test may carry `value: false` with a `note` explaining why — the
@@ -79,17 +82,23 @@ into a row. Until `scripts/compile-packet.mjs` lands (Codex assignment C1), the 
    `validate:release` blocks release until it's resolved. `tree.primary` must be a leaf from
    `schema/taxonomy.json`; `category` is derived from the leaf (`scripts/migrations/derive-category-from-leaf.mjs`).
    Packet coverage `seed` becomes `coverage: stub`; a packet lifecycle of `unknown` cannot become a row.
-2. Add its facts to `scripts/seed-data.mjs` (symbol, summary, dependencies, known deployments, missing-evidence list).
-   This coupling goes away when seed reads the packet (Codex assignment C3).
-3. `npm run seed` — creates `projects/`, `sources/`, `research/` files for it and appends an "Initial stub opened"
-   entry to `content/changelog.yaml` (validate requires one per census slug).
-4. `npm run validate`.
+2. `npm run seed` — reads the newest packet for every census slug that has no `projects/`, `sources/` or
+   `research/` file yet and opens all three from it: symbol from `identity.symbols`, summary from the
+   body's "What it is", official links from `links[]`, deployments from `deployments[]` (address
+   `not-verified` until `exists_on_4663` is true), the source ledger from `receipts[]` and the
+   missing-evidence list from `gaps[]`. It also appends an "Initial stub opened" entry to
+   `content/changelog.yaml` (validate requires one per census slug). A slug with no packet gets a
+   `NULL — …` placeholder stub and a warning. Existing files are never overwritten.
+3. `npm run validate`.
 
 ## Researching a project (stub → full)
 
-Start from a reviewed packet. A collector files one
-`research/inbox/packets/<slug>/<work-id>.md`; a verifier files its own packet with `prior_packet` set;
-a single assigned compiler maps them into the canonical files below. Packet acceptance, profile
+Start from a reviewed packet. A collector files one full-tier
+`research/inbox/packets/<slug>/<work-id>.md` from `docs/templates/research-packet-v2.md`; a verifier
+files its own packet with `prior_packet` set; a single assigned compiler maps them into the canonical
+files below. `npm run validate` gates every packet on `schema/packet.schema.json`: packet-local ids
+must resolve, a `verified` claim needs a reproduction, `lifecycle: mainnet` needs evidence beyond the
+project's own post, and a collector or verifier may not resolve a conflict. Packet acceptance, profile
 publication, site-feed placement and Telegram eligibility are separate decisions (research-system §8).
 The compiler's steps:
 
@@ -276,8 +285,8 @@ a `Producer: <id>` trailer. Producers never write `content/`. The compiler maps 
 `content/census.yaml` is the canonical name registry. Every row carries an `identity` taxonomy:
 aliases, symbols, entity kind, chain scope and `verified | provisional | conflicted` status. New names
 never enter it directly from automation. The one-file-per-name dossier under `research/inbox/names/`
-and `docs/templates/name-intake.yaml` are retired as a format; the packet frontmatter replaced them.
-The files remain until the packet schema lands (Codex C3); nobody files a new dossier there.
+and `docs/templates/name-intake.yaml` are gone: the packet frontmatter is the dossier, and
+`schema/packet.schema.json` is the schema that used to validate them.
 
 ## Voice and conduct lint
 
@@ -311,6 +320,8 @@ Intake tooling: `content/` is canonical now — the merge from the 2026-08-30/31
 5), and `scripts/intake/2026-08-31/{import-chain-file,harvest-data,apply-harvest,build-accounts}.mjs`
 that did it are one-shot, quarantined under `scripts/intake/2026-08-31/` (see the README there).
 `apply-harvest.mjs` and `build-accounts.mjs` refuse to run without `--overwrite` because they regenerate
-their target files wholesale — don't re-run them against reviewed content. `node
+their target files wholesale — don't re-run them against reviewed content. Two of them
+(`apply-harvest.mjs`, `harvest-metrics.mjs`) no longer load at all: they import the retired
+`scripts/seed-data.mjs`, and they stay only as the record of that pass. `node
 scripts/build-dependency-cards.mjs` (skeleton cards, never overwrites an existing one) is not one-shot
 and stays at the top level; it's still the right tool for a new dependency card.

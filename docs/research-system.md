@@ -75,8 +75,13 @@ A verifier run always files its packet so the checks have an audit trail.
 ## 5. Packet v2
 
 One file per run: `research/inbox/packets/<slug>/<work-id>.md`. YAML frontmatter is the dossier and
-validates against `schema/packet.schema.json` (Codex C3; the controller checks by hand until it lands).
-The markdown body is the narrative.
+validates against `schema/packet.schema.json`. `npm run validate` runs that check over every packet in
+the directory (`scripts/lib/packet.mjs`), together with the referential rules a schema cannot express:
+packet-local ids resolve, conflicts join claims that exist, a `verified` claim carries a reproduction
+id, the mainnet bar below, the file's own path against `allowed_paths` and `owned_slugs`, the role and
+producer boundaries, a census identity collision that was not recorded, and the body's section set for
+the tier. The markdown body is the narrative. `docs/templates/research-packet-v2.md` is the worked
+example every producer copies.
 
 Header: `contract_version: proofline-research-v2` · `work_id` · `producer` (`grok-heavy | grok-bot |
 supergrok | codex | claude | <github id>`) · `role` (`collector | verifier | compiler`) · `base_sha`
@@ -229,9 +234,10 @@ and the card format live in `docs/channel-publishing.md`.
 
 ## 9. Retired
 
-- `docs/templates/name-intake.yaml`, `schema/name-intake.schema.json` and `research/inbox/names/` as
-  a format. The packet frontmatter is the dossier. The files go when `schema/packet.schema.json`
-  lands (Codex C3); nobody files a new dossier there.
+- `docs/templates/name-intake.yaml`, `schema/name-intake.schema.json`, `scripts/lib/name-intake.mjs`
+  and `research/inbox/names/`. Deleted on 2026-09-02 when `schema/packet.schema.json` landed; the
+  packet frontmatter is the dossier and `npm run validate` enforces it. `docs/templates/research-packet-v1.md`
+  and `scripts/seed-data.mjs` went with them: `npm run seed` reads the packet instead.
 - Direct producer writes to `content/feed/`, `content/sources/`, `content/accounts.yaml` and
   `research/inbox/account-desk.yaml`. Proposals go in the packet; the compiler writes.
 - The aggregate `<date>-census-candidates.yaml` format and the `name-inventory.yaml` shape. Existing

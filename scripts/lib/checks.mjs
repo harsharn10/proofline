@@ -114,7 +114,11 @@ export function crossCheck(content) {
         for (const sid of item.sources ?? []) if (!cardIds.has(sid)) errors.push(`dependencies/${id}: ${list}[${i}] references ${sid} which is not in its own sources`);
       });
   }
-  for (const [i, e] of content.changelog.entries()) if (!censusSlugs.has(e.slug)) errors.push(`changelog[${i}]: slug "${e.slug}" is not in census.yaml`);
+  // A changelog entry belongs to a census row or to a dependency card (a name that moved from one to
+  // the other keeps its history under the same slug).
+  const cardIdsAll = new Set([...(content.dependencies ?? new Map()).keys()]);
+  for (const [i, e] of content.changelog.entries())
+    if (!censusSlugs.has(e.slug) && !cardIdsAll.has(e.slug)) errors.push(`changelog[${i}]: slug "${e.slug}" is not in census.yaml or content/dependencies/`);
 
   // Account handles are unique, compared case-insensitively (X handles are). A duplicate row would otherwise
   // resolve silently — last wins in build-accounts, first wins in countsForTrending.
@@ -160,7 +164,6 @@ export function crossCheck(content) {
 /** Extra gates before public launch (spec §7.5). derivedBySlug: Map<slug, Derived> from score.mjs. */
 export function releaseCheck(content, derivedBySlug) {
   const errors = [];
-  if (content.site.corrections.destination === "TODO") errors.push("site.yaml: corrections.destination is still TODO");
   if (content.site.maintainer.id === "TODO") errors.push("site.yaml: maintainer.id is still TODO");
   if (content.site.chain?.checked == null) errors.push("site.yaml: chain.checked is null — set it to the date the chain facts were reproduced against docs.robinhood.com");
   for (const [slug, project] of content.projects) {

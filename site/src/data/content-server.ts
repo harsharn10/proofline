@@ -18,6 +18,7 @@ import type {
   Link,
   Metric,
   PeerRef,
+  PulledFile,
   Rank,
   Research,
   Review,
@@ -91,7 +92,7 @@ type SourcesFile = { slug: string; sources: SourceEntry[] };
 type FeedFile = { slug: string; items: Dossier["feed"] };
 // The subset of census.yaml the site reads: the official handle and the desk's taxonomy
 // placement per slug (schema/census.schema.json).
-type CensusEntry = { slug: string; handle?: string; tree?: { primary?: string; secondary?: string[] } };
+type CensusEntry = { slug: string; handle?: string; role?: "subject" | "observe"; tree?: { primary?: string; secondary?: string[] } };
 
 type DerivedFile = {
   generated_at: string;
@@ -210,9 +211,11 @@ function loadContent(): ServerContent {
   // tree.primary ("launch/bonding-curve") -> { domain, leaf, label, sectionId }: the home sections,
   // the dossier eyebrow and the peer set all key off this placement.
   const treeBySlug: Record<string, TreeRef> = {};
+  const roleBySlug: Record<string, "subject" | "observe"> = {};
   for (const row of census) {
     const tree = resolveTree(row.tree?.primary, taxonomy);
     if (tree) treeBySlug[row.slug] = tree;
+    roleBySlug[row.slug] = row.role === "observe" ? "observe" : "subject";
   }
 
   const dependencies: Record<string, DependencyCard> = {};
@@ -238,6 +241,7 @@ function loadContent(): ServerContent {
       null,
     );
     const feed = feedFile ? [...feedFile.items].sort((a, b) => b.date.localeCompare(a.date)) : [];
+    const pulled = readYamlOrWarn<PulledFile | null>(rawContent.pulled[`${slug}.yaml`], `pulled/${slug}.yaml`, slug, null);
     const changelog = changelogAll
       .filter((entry) => entry.slug === slug)
       .sort((a, b) => b.date.localeCompare(a.date));
@@ -249,6 +253,7 @@ function loadContent(): ServerContent {
       category: project.category,
       lifecycle: project.lifecycle,
       coverage: project.coverage,
+      role: roleBySlug[slug] ?? "subject",
       summary: project.summary,
       links: project.official_links,
       dependencies: project.dependencies,
@@ -259,7 +264,8 @@ function loadContent(): ServerContent {
       feed,
       sources: sourcesFile.sources,
       changelog,
-      derived: pickDerived(derivedFile.projects[slug], slug, project.coverage),
+      derived: withPulledMetrics(pickDerived(derivedFile.projects[slug], slug, project.coverage), pulled),
+      pulled,
     };
   });
 
@@ -297,11 +303,32 @@ function toDirectoryEntry(d: Dossier, treeBySlug: Record<string, TreeRef>): Dire
     category: d.category,
     lifecycle: d.lifecycle,
     coverage: d.coverage,
+    role: d.role,
     summary: d.summary,
     derived: d.derived,
     feedCount: d.feed.length,
     tree: treeBySlug[d.slug] ?? null,
+    holders: tokenHolders(d.pulled),
   };
+}
+
+// A pulled DefiLlama figure fills in for a metric kind the project file does not carry. Project
+// metrics (ledger-cited claims) always win; pulled figures never change a rank, which npm run score
+// computes from the project file alone.
+function withPulledMetrics(derived: Derived, pulled: PulledFile | null): Derived {
+  if (!pulled || pulled.metrics.length === 0) return derived;
+  const have = new Set(derived.metrics.map((m) => m.kind));
+  const extra: Metric[] = pulled.metrics
+    .filter((m) => !have.has(m.kind) && typeof m.value === "number" && m.value > 0)
+    .map((m) => ({ kind: m.kind, value: m.value, currency: m.kind === "holders" ? undefined : "USD", as_of: m.as_of.slice(0, 10), class: "claim", sources: [], source_url: m.source_url }));
+  return extra.length ? { ...derived, metrics: [...derived.metrics, ...extra] } : derived;
+}
+
+// The holder count of the project's token contract (role token, else the first address with one).
+function tokenHolders(pulled: PulledFile | null): number | null {
+  if (!pulled) return null;
+  const token = pulled.addresses.find((a) => a.role === "token" && a.holders !== null);
+  return token?.holders ?? pulled.addresses.find((a) => a.holders !== null)?.holders ?? null;
 }
 
 const PEER_LIMIT = 6;
@@ -335,6 +362,7 @@ function peersFor(dossier: Dossier, all: Dossier[], treeBySlug: Record<string, T
     summary: truncate(d.summary, PEER_SUMMARY_MAX),
     lifecycle: d.lifecycle,
     coverage: d.coverage,
+    role: d.role,
     direct: treeBySlug[d.slug]!.leaf === tree.leaf,
     leafLabel: treeBySlug[d.slug]!.label,
     metric: headlineMetric(d.derived),

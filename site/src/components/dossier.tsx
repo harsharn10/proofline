@@ -3,12 +3,13 @@ import { Badge } from "@/components/ui/badge";
 import { DeploymentGrid } from "@/components/deployment-grid";
 import { ExportMenu } from "@/components/export-menu";
 import { FeedList } from "@/components/feed-list";
+import { OnChain } from "@/components/on-chain";
 import { PeerCards } from "@/components/peer-cards";
 import { Section } from "@/components/section";
 import { SnapshotStrip } from "@/components/snapshot-strip";
 import { cleanLabel, dejargon, hostLabel } from "@/lib/dejargon";
 import {
-  COVERAGE_LABEL,
+  coverageWord,
   DEPENDENCY_KIND_LABEL,
   EVIDENCE_LABEL,
   LIFECYCLE_LABEL,
@@ -411,7 +412,15 @@ function StubBody({
     <div>
       {/* One honest panel per page (rule 2): what is on file, what is missing, what closes the gap. */}
       <p className="honestpanel mt-6">
-        <b>Initial research.</b> No full record yet, so no score.{" "}
+        {dossier.role === "observe" ? (
+          <>
+            <b>Watchlist.</b> This name fails at least one of the four qualifying tests (deployed on chain 4663, a native play, citable, a research story), so it is listed for completeness and never scored.{" "}
+          </>
+        ) : (
+          <>
+            <b>Initial research.</b> No full record yet, so no score.{" "}
+          </>
+        )}
         {parts.length > 0 ? `On file: ${parts.join(", ")}.` : "Nothing beyond the name is on file yet."}{" "}
         The full record, with every contract reproduced and control read from source, comes with coverage.
       </p>
@@ -489,7 +498,7 @@ export function Dossier({
           {dossier.symbol ? <p className="sub">{dossier.name}</p> : null}
           <div className="mast-badges">
             <Badge tone={lifecycleTone(dossier.lifecycle)}>{LIFECYCLE_LABEL[dossier.lifecycle]}</Badge>
-            <span className="covword">{COVERAGE_LABEL[dossier.coverage]}</span>
+            <span className="covword">{coverageWord(dossier.coverage, dossier.role)}</span>
             {derived.risk ? <Badge tone={riskTone(derived.risk)}>{derived.risk} risk</Badge> : null}
             {derived.trending ? (
               <Badge tone="warn" className="trendbadge">
@@ -520,6 +529,9 @@ export function Dossier({
       <p className="lead mt-5">{dejargon(dossier.summary)}</p>
       <LinkRow dossier={dossier} site={site} full={full} />
       <SnapshotStrip metrics={derived.metrics} rank={derived.rank} sources={dossier.sources} />
+      {/* Chain facts sit above the tabs: they are the same on every tab and are what a reader about to
+          transact wants first — who holds the keys, how many holders, when it was deployed. */}
+      <OnChain pulled={dossier.pulled} explorerBase={site.chain.explorer} />
 
       {full ? (
         <>

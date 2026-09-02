@@ -89,9 +89,9 @@ events:
     observed_at: 2026-09-04T09:00:00Z
     affected_fields: [activity.status, product.mechanism]
     evidence_state: claimed      # verified|claimed|conflicted
-    impact: "Changes the gating assumption in the record."
-    site_recommendation: update  # update|hold|none
-    channel_recommendation: not-evaluated
+    impact: material              # routine|material|urgent
+    site_recommendation: profile  # feed|profile|both|none
+    channel_recommendation: none  # none|review
     receipt_ids: [R-2]
 metrics:
   - { kind: volume_24h, value: 41200000, currency: USD, as_of: 2026-09-07, window: 24h, method: "api.llama.fi/summary/dexs/pons?dataType=dailyVolume total24h", class: claim, receipt_ids: [R-5] }
