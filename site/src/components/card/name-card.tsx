@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { DeploymentGrid } from "@/components/deployment-grid";
+import { PageMeta } from "@/components/page-meta";
 import {
   Badge,
   DataTable,
@@ -584,6 +585,7 @@ export function NameCard(props: NameCardProps) {
   const token = props.section?.id === "tokens";
   return (
     <article className="card-page">
+      <PageMeta title={`${props.dossier.name} · Icarus`} description={props.dossier.summary} />
       <div className="card-back-row">
         <Link to="/" hash={props.section?.id}>← {props.section?.label ?? "All names"}</Link>
       </div>
