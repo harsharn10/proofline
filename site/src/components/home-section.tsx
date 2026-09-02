@@ -33,7 +33,8 @@ function NameChip({ d }: { d: DirectoryEntry }) {
   const metric = headlineMetric(d.derived);
   // Thin is visible, not hidden (rule 4): an initial-research name with nothing reported is dashed
   // and dimmed, so the shape of the coverage shows at a glance.
-  const quiet = d.coverage !== "full" && !metric && d.holders === null;
+  const watch = d.role === "observe";
+  const quiet = watch || (d.coverage !== "full" && !metric && d.holders === null);
   const showSymbol = d.symbol && d.symbol.toLowerCase() !== d.name.toLowerCase();
   return (
     <Link
@@ -44,7 +45,9 @@ function NameChip({ d }: { d: DirectoryEntry }) {
     >
       {d.name}
       {showSymbol ? <span className="ct">{d.symbol}</span> : null}
-      {metric ? (
+      {watch ? (
+        <small title="fails a qualifying test; listed, never scored">watchlist</small>
+      ) : metric ? (
         <small title={reportedTitle(metric.as_of)}>
           {formatMetricValue(metric)} {METRIC_KIND_LABEL[metric.kind]}
         </small>

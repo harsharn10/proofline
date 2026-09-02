@@ -290,7 +290,7 @@ async function makeContent(mutate = () => {}) {
   const checkedNull = await run((c) => { c.site.chain.checked = null; });
   try {
     assert.deepEqual(clean, [], "clean tree passes release gates");
-    assert.ok(todo.some((e) => e.includes("corrections.destination")), "corrections TODO");
+    assert.deepEqual(todo, [], "corrections TODO is a warning, not a release error (issue #35)");
     assert.ok(unverified.some((e) => e.includes("not verified")), "unverified address on a full profile");
     assert.ok(pendingHigh.some((e) => e.includes("approver pending")), "approver pending with uncapped confidence ≥ 70");
     assert.deepEqual(pendingLow, [], "approver pending with uncapped confidence < 70 is not a release error");
@@ -343,7 +343,8 @@ async function makeContent(mutate = () => {}) {
   try {
     assert.deepEqual(baseline.errors, [], "scratch copy validates");
     assert.ok(qualifyingFalse.warnings.some((w) => w.includes("fails qualifying test citable")), "qualifying value false warns");
-    assert.ok(releaseRun.errors.some((e) => e.includes("fails qualifying test citable")), "qualifying value false is a release error");
+    assert.ok(!releaseRun.errors.some((e) => e.includes("fails qualifying test")), "qualifying value false never blocks a release (issue #35: the row is a watchlist row)");
+    assert.ok(releaseRun.warnings.some((w) => w.includes("fails qualifying test citable") && w.includes("not marked role: observe")), "a failing row without role: observe says so");
     assert.deepEqual(feedCited.errors, [], "feed citation of an existing ledger id is not an error");
     assert.ok(!feedCited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited only from a feed item is not 'never cited'");
     assert.ok(feedCited.warnings.some((w) => w.includes("skip-tier account @spam")), "feed item attributed to a skip-tier account warns");
