@@ -3,11 +3,10 @@ import { DOSSIER_TABS, Dossier, type DossierTab } from "@/components/dossier";
 import { getDossier } from "@/data/content-server";
 
 export const Route = createFileRoute("/n/$slug")({
-  // URL-synced tabs on a full record: /n/<slug>?tab=evidence. Overview is the clean default URL;
-  // anything unrecognized falls back to it. An initial-research page has no tabs and ignores it.
+  // URL-synced card tabs. Commentary is the clean default URL; legacy or unknown values fall back.
   validateSearch: (search: Record<string, unknown>): { tab?: DossierTab } => {
     const tab = search.tab;
-    if (typeof tab === "string" && tab !== "overview" && (DOSSIER_TABS as readonly string[]).includes(tab)) {
+    if (typeof tab === "string" && tab !== "commentary" && (DOSSIER_TABS as readonly string[]).includes(tab)) {
       return { tab: tab as DossierTab };
     }
     return {};
@@ -35,7 +34,7 @@ export const Route = createFileRoute("/n/$slug")({
 });
 
 function NamePage() {
-  const { dossier, site, dependencies, peers, tree, section, now } = Route.useLoaderData();
+  const { dossier, site, dependencies, tree, section, now, related } = Route.useLoaderData();
   const { tab } = Route.useSearch();
   return (
     <>
@@ -48,11 +47,11 @@ function NamePage() {
         dossier={dossier}
         site={site}
         dependencies={dependencies}
-        peers={peers}
         tree={tree}
         section={section}
         now={now}
-        tab={dossier.coverage === "full" ? (tab ?? "overview") : "overview"}
+        tab={tab ?? "commentary"}
+        related={related}
       />
     </>
   );
