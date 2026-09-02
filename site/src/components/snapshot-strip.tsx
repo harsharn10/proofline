@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { hostLabel } from "@/lib/dejargon";
 import { formatDate } from "@/lib/utils";
 import {
@@ -14,23 +13,12 @@ import {
 
 const DISPLAY_ORDER: MetricKind[] = ["tvl", "volume_24h", "fees_24h", "revenue_24h", "market_cap", "holders"];
 
-// Always-visible snapshot (Eregion kv grid): one cell per reported figure — value, as-of,
-// `reported` chip, receipt to the figure's source — plus the rank line with its basis
-// spelled out. No figures → one honest line, nothing else.
-export function SnapshotStrip({
-  metrics,
-  rank,
-  category,
-  sources,
-}: {
-  metrics: Metric[];
-  rank: Rank | null;
-  category: string;
-  sources: SourceEntry[];
-}) {
-  if (metrics.length === 0 && !rank) {
-    return <p className="honest mt-5">No reported figures yet.</p>;
-  }
+// Reported figures as a kv grid: value, as-of, receipt to the figure's source, plus the rank line
+// with its cohort and basis spelled out. Every figure here is reported by its source, not verified
+// by Proofline — the caveat is the as-of tooltip and the one legend on /methodology, not a badge
+// per number. No figures: renders nothing (rule 1).
+export function SnapshotStrip({ metrics, rank, sources }: { metrics: Metric[]; rank: Rank | null; sources: SourceEntry[] }) {
+  if (metrics.length === 0 && !rank) return null;
   const srcById = new Map(sources.map((s) => [s.id, s]));
   const ordered = [...metrics].sort((a, b) => DISPLAY_ORDER.indexOf(a.kind) - DISPLAY_ORDER.indexOf(b.kind));
   return (
@@ -43,13 +31,12 @@ export function SnapshotStrip({
               <div className="s" key={m.kind}>
                 <div className="k">
                   {METRIC_KIND_LABEL[m.kind]}
-                  <span className="chainlbl">as of {formatDate(m.as_of)}</span>
+                  <span className="chainlbl">reported · as of {formatDate(m.as_of)}</span>
                 </div>
                 <div className="v">
                   <span className="num" title={reportedTitle(m.as_of)}>
                     {formatMetricValue(m)}
                   </span>
-                  <Badge tone="warn">reported</Badge>
                   {src ? (
                     <a className="receipt" href={src.url} target="_blank" rel="noreferrer">
                       {hostLabel(src.url)}
@@ -61,7 +48,7 @@ export function SnapshotStrip({
           })}
         </div>
       ) : null}
-      {rank ? <p className="rankline">{rankLine(rank, category)}</p> : null}
+      {rank ? <p className="rankline">{rankLine(rank)}</p> : null}
     </div>
   );
 }

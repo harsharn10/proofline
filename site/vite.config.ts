@@ -41,6 +41,7 @@ function prooflineContent(): Plugin {
         census: read("content/census.yaml"),
         methodology: read("content/methodology.md"),
         derived: read("build/derived.json"),
+        taxonomy: read("schema/taxonomy.json"),
         dependencies: directory("content/dependencies", ".yaml"),
         projects: directory("content/projects", ".yaml"),
         sources: directory("content/sources", ".yaml"),

@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { validateContent } from "./lib/validate-content.mjs";
 import { derive, computeRanks } from "./lib/score.mjs";
 import { computeTrending } from "./lib/trending.mjs";
+import { cohortForLeaf } from "./lib/taxonomy.mjs";
 
 const args = process.argv.slice(2);
 const force = args.includes("--force");
@@ -26,8 +27,9 @@ const trendingBySlug = computeTrending(feedItemsBySlug, content.accounts, {
   today,
 });
 
-// Task A — category ranks: one basis per census category, computed over every project's own `metrics[]`.
-const ranksBySlug = computeRanks([...content.projects.values()].map((p) => ({ slug: p.slug, category: p.category, metrics: p.metrics ?? [] })));
+// Ranks: one basis per cohort (the tree leaf's reader-facing section), computed over every project's own `metrics[]`.
+const leafBySlug = new Map(content.census.map((row) => [row.slug, row.tree?.primary]));
+const ranksBySlug = computeRanks([...content.projects.values()].map((p) => ({ slug: p.slug, cohort: cohortForLeaf(leafBySlug.get(p.slug)), metrics: p.metrics ?? [] })));
 
 const projects = {};
 const rows = [];

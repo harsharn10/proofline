@@ -226,7 +226,7 @@ async function makeContent(mutate = () => {}) {
   const s = parse(await readFile(new URL("../fixtures/clean/sources.yaml", import.meta.url), "utf8"));
   const content = {
     site: { maintainer: { id: "fixture" }, corrections: { destination: "https://example.com/corrections" }, chain: { checked: "2026-08-30" } },
-    census: [{ slug: "clean", name: p.name, identity: { aliases: [], symbols: [p.symbol], entity_kind: "protocol", chain_scope: "unknown", status: "provisional" }, category: p.category, lifecycle: p.lifecycle, coverage: p.coverage }],
+    census: [{ slug: "clean", name: p.name, identity: { aliases: [], symbols: [p.symbol], entity_kind: "protocol", chain_scope: "unknown", status: "provisional" }, category: p.category, lifecycle: p.lifecycle, coverage: p.coverage, tree: { primary: "launch/bonding-curve" } }],
     projects: new Map([["clean", p]]), sources: new Map([["clean", s]]), research: new Map([["clean", "stub"]]),
     dependencies: new Map(), changelog: [{ slug: "clean" }],
     feed: new Map(), accounts: [],
@@ -633,7 +633,8 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 // Task 5 — census schema: optional handle (X pattern) and tree { primary, secondary[] }.
 {
   const base = () => ({
-    slug: "denar", name: "Denar", identity: { aliases: [], symbols: ["DENAR"], entity_kind: "protocol", chain_scope: "unknown", status: "provisional" }, category: "Lending", lifecycle: "mainnet", coverage: "stub", official_links: [],
+    slug: "denar", name: "Denar", identity: { aliases: [], symbols: ["DENAR"], entity_kind: "protocol", chain_scope: "unknown", status: "provisional" }, category: "Isolated lending market", lifecycle: "mainnet", coverage: "stub", official_links: [],
+    tree: { primary: "credit/isolated-money-market" },
     discovery_source: "desk", qualifying: Object.fromEntries(["deployed_on_chain", "native_play", "citable", "research_story"].map((k) => [k, { value: true, note: "n", verified: false }])),
   });
   const cases = [
@@ -862,7 +863,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 // Task A — computeRanks: one basis per category (highest-priority kind ≥2 projects share), standard competition
 // ranking (ties share a position, the next distinct value skips: 1,1,3), categories with <2 ranked projects get none.
 {
-  const proj = (slug, category, metrics) => ({ slug, category, metrics });
+  const proj = (slug, category, metrics) => ({ slug, cohort: { id: category, label: category.toLowerCase() }, metrics });
   const threeTvl = computeRanks([
     proj("a", "Lending", [{ kind: "tvl", value: 300 }]),
     proj("b", "Lending", [{ kind: "tvl", value: 200 }]),
@@ -882,16 +883,16 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     proj("r", "Oracle / infra", [{ kind: "tvl", value: 50 }]),
   ]);
   try {
-    assert.deepEqual(threeTvl.get("a"), { basis: "tvl", position: 1, of: 3 }, "highest tvl → position 1 of 3");
-    assert.deepEqual(threeTvl.get("b"), { basis: "tvl", position: 2, of: 3 });
-    assert.deepEqual(threeTvl.get("c"), { basis: "tvl", position: 3, of: 3 });
-    assert.deepEqual(volumeShared.get("y"), { basis: "volume_24h", position: 1, of: 2 }, "tvl shared by only 1 project is skipped for volume_24h");
-    assert.deepEqual(volumeShared.get("x"), { basis: "volume_24h", position: 2, of: 2 });
+    assert.deepEqual(threeTvl.get("a"), { basis: "tvl", position: 1, of: 3, cohort: "lending" }, "highest tvl → position 1 of 3");
+    assert.deepEqual(threeTvl.get("b"), { basis: "tvl", position: 2, of: 3, cohort: "lending" });
+    assert.deepEqual(threeTvl.get("c"), { basis: "tvl", position: 3, of: 3, cohort: "lending" });
+    assert.deepEqual(volumeShared.get("y"), { basis: "volume_24h", position: 1, of: 2, cohort: "yield" }, "tvl shared by only 1 project is skipped for volume_24h");
+    assert.deepEqual(volumeShared.get("x"), { basis: "volume_24h", position: 2, of: 2, cohort: "yield" });
     assert.equal(onlyOneMetricd.has("solo"), false, "category with 1 metric'd project gets no ranks");
     assert.equal(onlyOneMetricd.has("bare"), false);
-    assert.deepEqual(tied.get("p"), { basis: "tvl", position: 1, of: 3 }, "tie shares position 1");
-    assert.deepEqual(tied.get("q"), { basis: "tvl", position: 1, of: 3 }, "tie shares position 1");
-    assert.deepEqual(tied.get("r"), { basis: "tvl", position: 3, of: 3 }, "next distinct value skips to 3 (standard competition ranking)");
+    assert.deepEqual(tied.get("p"), { basis: "tvl", position: 1, of: 3, cohort: "oracle / infra" }, "tie shares position 1");
+    assert.deepEqual(tied.get("q"), { basis: "tvl", position: 1, of: 3, cohort: "oracle / infra" }, "tie shares position 1");
+    assert.deepEqual(tied.get("r"), { basis: "tvl", position: 3, of: 3, cohort: "oracle / infra" }, "next distinct value skips to 3 (standard competition ranking)");
     console.log("ok   computeRanks");
   } catch (err) { failures++; console.error(`FAIL computeRanks: ${err.message}`); }
 }

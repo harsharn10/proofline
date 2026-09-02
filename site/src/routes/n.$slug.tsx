@@ -3,8 +3,8 @@ import { DOSSIER_TABS, Dossier, type DossierTab } from "@/components/dossier";
 import { getDossier } from "@/data/content-server";
 
 export const Route = createFileRoute("/n/$slug")({
-  // URL-synced tabs: /n/<slug>?tab=evidence. Overview is the clean default URL; anything
-  // unrecognized falls back to it. The default tab renders server-side like any other.
+  // URL-synced tabs on a full record: /n/<slug>?tab=evidence. Overview is the clean default URL;
+  // anything unrecognized falls back to it. An initial-research page has no tabs and ignores it.
   validateSearch: (search: Record<string, unknown>): { tab?: DossierTab } => {
     const tab = search.tab;
     if (typeof tab === "string" && tab !== "overview" && (DOSSIER_TABS as readonly string[]).includes(tab)) {
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/n/$slug")({
       <p className="eyebrow">Not on file</p>
       <h1 className="text-2xl font-bold tracking-tight">That name is not in the file yet.</h1>
       <p className="honest mt-3 max-w-prose">
-        Send the ticker and we will research it — overview, links, and a feed of project posts plus
+        Send the ticker and we will research it: overview, links, and a feed of project posts plus
         commentary.
       </p>
       <Link to="/" className="backlink mt-6">
@@ -35,9 +35,7 @@ export const Route = createFileRoute("/n/$slug")({
 });
 
 function NamePage() {
-  // The loader also carries `accounts` (handle/tier/role for the handles this feed cites — never a
-  // note); the dossier reads its trending handles from derived.trendingAccounts and does not need it.
-  const { dossier, site, dependencies, peers, tree } = Route.useLoaderData();
+  const { dossier, site, dependencies, peers, tree, section } = Route.useLoaderData();
   const { tab } = Route.useSearch();
   return (
     <>
@@ -46,7 +44,15 @@ function NamePage() {
           ← all names
         </Link>
       </div>
-      <Dossier dossier={dossier} site={site} dependencies={dependencies} peers={peers} tree={tree} tab={tab ?? "overview"} />
+      <Dossier
+        dossier={dossier}
+        site={site}
+        dependencies={dependencies}
+        peers={peers}
+        tree={tree}
+        section={section}
+        tab={dossier.coverage === "full" ? (tab ?? "overview") : "overview"}
+      />
     </>
   );
 }

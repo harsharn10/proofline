@@ -1,7 +1,7 @@
 slug: pons
 name: Pons
 symbol: PONS
-category: Launchpad
+category: Bonding-curve launchpad
 lifecycle: mainnet
 coverage: full
 summary: "Native launchpad on Robinhood Chain with two documented generations: v1 launches fixed-supply tokens straight into locked Uniswap V3 WETH pools; v2 sells from a bonding curve that graduates into a permanently locked Uniswap v4 pool and can pair against approved assets such as tokenised stocks. Per its docs v2 is deployed, creator-allowlisted and still under audit."
@@ -270,13 +270,6 @@ scoring:
     reason: "PRD §6.4 Elevated applies: v2 is a new production system with meaningful fund exposure that its own docs call unaudited, no audit was found for v1, and the owner Safe's undelayed setters over fee routing and graduation components are not yet bounded by a source read. Not High: every material contract is identifiable and verifiable, the lockers expose no liquidity exit, and no unilateral drain, mint or freeze path is evidenced. The assessed level already meets the §6.4 floor, so no numeric override is recorded."
 findings:
   positive:
-    - text: Pons publishes an official site at https://ponsfamily.com, docs for both protocol generations at https://docs.ponsfamily.com and an X account at https://x.com/ponsdotfamily.
-      class: claim
-      sources:
-        - S1
-        - S13
-        - S16
-        - S2
     - text: All fourteen documented Pons addresses are contracts on chain 4663; twelve of them (the PONS token, the v1 active factory and locker, and all nine v2 contracts) have explorer-verified source and no proxy, with contract names matching the docs' labels; the owner Safe found by reading owner() is a verified SafeProxy.
       class: verified
       sources:

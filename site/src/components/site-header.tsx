@@ -1,12 +1,11 @@
 import { Link, useLoaderData } from "@tanstack/react-router";
-import { ExportMenu } from "@/components/export-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TopbarSearch } from "@/components/topbar-search";
 import { formatDate } from "@/lib/utils";
 
-// Sticky topbar (Eregion top chrome): wide-tracked mono wordmark, crumb nav with a green
-// active underline, the jump-to-name search, theme toggle, faint asof stamp, one export
-// dropdown. Site-wide meta comes from the root route's loader — see __root.tsx.
+// Sticky topbar (eregion top chrome): wide-tracked mono wordmark, crumb nav with a green active
+// underline, the jump-to-name search, theme toggle, faint as-of stamp. Site-wide meta comes from
+// the root route's loader — see __root.tsx. Export lives on each dossier, not here.
 export function SiteHeader() {
   const meta = useLoaderData({ from: "__root__" });
 
@@ -35,7 +34,6 @@ export function SiteHeader() {
           {meta.namesOnFile} names · upd {formatDate(meta.updated.slice(0, 10))}
         </span>
         <ThemeToggle />
-        <ExportMenu />
       </div>
     </header>
   );

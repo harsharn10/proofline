@@ -1,64 +1,90 @@
 import { Link } from "@tanstack/react-router";
-import { Badge } from "@/components/ui/badge";
 import { dejargon } from "@/lib/dejargon";
 import {
   LIFECYCLE_LABEL,
   METRIC_KIND_LABEL,
   formatMetricValue,
   headlineMetric,
-  lifecycleTone,
   reportedTitle,
   type DirectoryEntry,
   type SectionDef,
 } from "@/data/types";
 
-// Ranked names first (best rank up), unranked after (alphabetical) — never a global list
-// (IA brief §Pages 1). Ranks from different flat-category cohorts can tie on position;
-// the name tiebreak keeps the order stable.
-function sectionOrder(a: DirectoryEntry, b: DirectoryEntry): number {
+// Chip order: full records first, then names with a reported figure (best rank first), then the
+// rest alphabetically. Chips do not imply a ranking the way rows do, so alphabetical never reads
+// as a failed leaderboard.
+function chipOrder(a: DirectoryEntry, b: DirectoryEntry): number {
+  const af = a.coverage === "full" ? 0 : 1;
+  const bf = b.coverage === "full" ? 0 : 1;
+  if (af !== bf) return af - bf;
+  const am = headlineMetric(a.derived) ? 0 : 1;
+  const bm = headlineMetric(b.derived) ? 0 : 1;
+  if (am !== bm) return am - bm;
   const ar = a.derived.rank?.position ?? Number.MAX_SAFE_INTEGER;
   const br = b.derived.rank?.position ?? Number.MAX_SAFE_INTEGER;
   if (ar !== br) return ar - br;
   return a.name.localeCompare(b.name);
 }
 
-// One home section: header (visitor label + count + one plain line), then a hairline
-// mini-table — ticker/name/one-liner, headline reported figure, lifecycle badge.
-export function HomeSection({ section, entries }: { section: SectionDef; entries: DirectoryEntry[] }) {
+// Past this many, the tail folds behind a native <details> "+ N more" (eregion cellchips).
+const CHIP_CAP = 12;
+
+function NameChip({ d }: { d: DirectoryEntry }) {
+  const metric = headlineMetric(d.derived);
+  // Thin is visible, not hidden (rule 4): an initial-research name with nothing reported is dashed
+  // and dimmed, so the shape of the coverage shows at a glance.
+  const quiet = d.coverage !== "full" && !metric;
+  const showSymbol = d.symbol && d.symbol.toLowerCase() !== d.name.toLowerCase();
+  return (
+    <Link
+      to="/n/$slug"
+      params={{ slug: d.slug }}
+      className={quiet ? "chip quiet" : "chip"}
+      title={dejargon(d.summary)}
+    >
+      {d.name}
+      {showSymbol ? <span className="ct">{d.symbol}</span> : null}
+      {metric ? (
+        <small title={reportedTitle(metric.as_of)}>
+          {formatMetricValue(metric)} {METRIC_KIND_LABEL[metric.kind]}
+        </small>
+      ) : d.lifecycle !== "mainnet" ? (
+        <small>{LIFECYCLE_LABEL[d.lifecycle].toLowerCase()}</small>
+      ) : null}
+    </Link>
+  );
+}
+
+// One home section: heading with count, one plain line, then chips — name, ticker when it differs,
+// and one small figure (a reported metric, else the lifecycle when it is not mainnet).
+export function ChipSection({ section, entries }: { section: SectionDef; entries: DirectoryEntry[] }) {
   if (entries.length === 0) return null;
-  const rows = [...entries].sort(sectionOrder);
+  const ordered = [...entries].sort(chipOrder);
+  const head = ordered.slice(0, CHIP_CAP);
+  const rest = ordered.slice(CHIP_CAP);
   return (
     <section id={section.id} className="catsec">
       <div className="sechead">
         <h2 className="t">
-          {section.label} <span className="count">{rows.length}</span>
+          {section.label} <span className="count">{ordered.length}</span>
         </h2>
       </div>
       <p className="catdesc">{section.description}</p>
-      <div>
-        {rows.map((d) => {
-          const metric = headlineMetric(d.derived);
-          return (
-            <Link key={d.slug} to="/n/$slug" params={{ slug: d.slug }} className="secrow">
-              <span className="tick">{d.symbol ?? d.name}</span>
-              <span className="emain">
-                <b>{d.name}</b> <span className="esum">— {dejargon(d.summary)}</span>
-              </span>
-              <span className="emeta">
-                {metric ? (
-                  <span className="mcell" title={reportedTitle(metric.as_of)}>
-                    <span className="mval">
-                      {formatMetricValue(metric)} <small>{METRIC_KIND_LABEL[metric.kind]}</small>
-                    </span>
-                    <Badge tone="warn">reported</Badge>
-                  </span>
-                ) : null}
-                <Badge tone={lifecycleTone(d.lifecycle)}>{LIFECYCLE_LABEL[d.lifecycle]}</Badge>
-              </span>
-            </Link>
-          );
-        })}
+      <div className="chiprow">
+        {head.map((d) => (
+          <NameChip key={d.slug} d={d} />
+        ))}
       </div>
+      {rest.length > 0 ? (
+        <details className="morechips">
+          <summary>+ {rest.length} more</summary>
+          <div className="chiprow">
+            {rest.map((d) => (
+              <NameChip key={d.slug} d={d} />
+            ))}
+          </div>
+        </details>
+      ) : null}
     </section>
   );
 }

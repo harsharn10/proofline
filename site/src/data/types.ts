@@ -172,9 +172,10 @@ export type Metric = {
   sources: string[];
 };
 
-// Category rank from derived.json: position within the flat census category, computed on one
-// basis kind (scripts/lib/score.mjs computeRanks). Never renders without its basis in words.
-export type Rank = { basis: MetricKind; position: number; of: number };
+// Cohort rank from derived.json: position within the reader-facing section of the project's tree
+// leaf, computed on one basis kind (scripts/lib/score.mjs computeRanks). `cohort` is the plural
+// section label ("launchpads"). Never renders without its basis in words.
+export type Rank = { basis: MetricKind; position: number; of: number; cohort: string };
 
 // Exactly the fields the site contract permits from build/derived.json. Never add
 // uncappedScore / uncappedConfidence / securityRaw here — see README "Site contract".
@@ -187,13 +188,6 @@ export type Derived = {
   confidence: number | null;
   risk: RiskLevel | null;
   override: { level: OverrideLevel; reason: string } | null;
-  factorPercents: {
-    security: number | null;
-    engineering: number | null;
-    transparency: number | null;
-    maturity: number | null;
-    economic: number | null;
-  };
   trending: boolean;
   // The counting accounts behind `trending` (scripts/lib/trending.mjs), computed by `npm run score` —
   // the site renders this list and never recomputes it from tiers or feed dates.
@@ -204,8 +198,14 @@ export type Derived = {
   rank: Rank | null;
 };
 
-// The desk's taxonomy placement from census.yaml `tree.primary` ("launch/bonding-curve").
-export type TreeRef = { domain: string; leaf: string };
+// Taxonomy placement from census.yaml `tree.primary` ("launch/bonding-curve"), resolved server-side
+// against schema/taxonomy.json: the leaf's plain-English label and the reader-facing section it
+// files under. The site never keeps its own label table.
+export type TreeRef = { domain: string; leaf: string; label: string; sectionId: string | null };
+
+// One reader-facing section (schema/taxonomy.json `sections`). Order is the home-page order; ids
+// are the home anchors (`/#launchpads`).
+export type SectionDef = { id: string; label: string; description: string };
 
 // What the directory (`/`) and the changelog need per name — no findings, research, sources or feed
 // bodies (final review I6: the full bundle was 561 KB at 49 names and grows with every record).
@@ -218,13 +218,13 @@ export type DirectoryEntry = {
   coverage: Coverage;
   summary: string;
   derived: Derived;
-  handle: string | null; // the project's official X handle from census.yaml, when it has one
   feedCount: number;
-  reviewedAt: string; // review.reviewed_at — the stub sort key
-  // census tree.primary placement — the home page's section grouping (null when the census
-  // row carries no tree yet; such a name stays reachable via search and links).
+  // census tree.primary placement — the home page's section grouping and the card's product label.
   tree: TreeRef | null;
 };
+
+// A dependency card as the home page lists it: enough to label and link the chip.
+export type DependencyListing = { id: string; name: string; kind: DependencyCard["kind"] };
 
 // One row of the home page's "latest in the feed" strip: the item plus just enough of its name to link.
 export type LatestFeedItem = {
@@ -330,15 +330,14 @@ export type SiteConfig = {
   disclaimer: string;
 };
 
-// What getContent() ships to the directory: directory entries and the newest feed items, nothing else.
+// What getContent() ships to the directory: the sections in order, one slim entry per name, and
+// the dependency cards as chips. No feed, no ledger counts.
 export type DirectoryBundle = {
   site: SiteConfig;
+  sections: SectionDef[];
   entries: DirectoryEntry[];
-  latestFeed: LatestFeedItem[];
+  dependencies: DependencyListing[];
   generatedAt: string; // build/derived.json generated_at — when scores were last computed
-  // Ledger totals for the home statrow (redesign rule 2: show what exists, no zeros) —
-  // counted server-side because the directory slice carries no source ledgers.
-  counts: { dependencyCards: number; sourcedClaims: number };
 };
 
 // A "competes with" card on a dossier's Overview tab: same tree leaf first (direct), then same
@@ -349,89 +348,26 @@ export type PeerRef = {
   symbol: string | null;
   summary: string;
   lifecycle: Lifecycle;
+  coverage: Coverage;
   direct: boolean;
-  leaf: string;
+  leafLabel: string;
   metric: Metric | null;
 };
 
-// What getDossier(slug) ships: the dossier, the cards it references, its peers and taxonomy
-// placement, and the accounts its feed cites (handle/tier/role only — never `note`).
+// What getDossier(slug) ships: the dossier, the cards it references, its peers (full records only)
+// and its taxonomy placement with the section it files under.
 export type DossierBundle = {
   dossier: Dossier;
   site: SiteConfig;
   dependencies: Record<string, DependencyRef>;
-  accounts: AccountRef[];
   peers: PeerRef[];
   tree: TreeRef | null;
+  section: SectionDef | null;
 };
 
-// --- Visitor-facing taxonomy (IA ruling) --------------------------------------------
-
-export type SectionDef = { id: string; label: string; description: string; domains: string[] };
-
-// Order is the home-page order. Labels are visitor words; ids are the home anchor slugs
-// (`/#launchpads`); domains are census `tree.primary` domains.
-export const SECTIONS: SectionDef[] = [
-  {
-    id: "launchpads",
-    label: "Launchpads",
-    description: "Where new tokens launch — bonding curves and pools that graduate into open trading.",
-    domains: ["launch"],
-  },
-  {
-    id: "rwa-products",
-    label: "RWA products",
-    description: "Plays built on tokenized stocks and other real-world assets — baskets, vaults, paired tokens.",
-    domains: ["rwa-products"],
-  },
-  {
-    id: "trading-venues",
-    label: "Trading venues",
-    description: "Where tokens change hands — native AMMs, aggregators, and the fee layers on top.",
-    domains: ["trading"],
-  },
-  {
-    id: "yield-lp",
-    label: "Yield & LP",
-    description: "Vaults and managers that put deposits and LP positions to work.",
-    domains: ["yield"],
-  },
-  {
-    id: "agents",
-    label: "Agents",
-    description: "AI agents that launch tokens, trade, or transact on the chain.",
-    domains: ["agents"],
-  },
-  {
-    id: "credit",
-    label: "Credit",
-    description: "Borrowing and lending against on-chain collateral.",
-    domains: ["credit"],
-  },
-  {
-    id: "nft-treasuries",
-    label: "NFT treasuries",
-    description: "NFT collections whose holders claim a treasury or fee stream.",
-    domains: ["nft-treasury"],
-  },
-  {
-    id: "markets",
-    label: "Markets",
-    description: "Prediction markets and options.",
-    domains: ["markets"],
-  },
-  {
-    id: "tooling-infra",
-    label: "Tooling & infra",
-    description: "Scanners, lockers, payments and privacy — the plumbing around everything else.",
-    domains: ["tooling", "privacy"],
-  },
-];
-
-export function sectionForDomain(domain: string | null | undefined): SectionDef | null {
-  if (!domain) return null;
-  return SECTIONS.find((s) => s.domains.includes(domain)) ?? null;
-}
+// --- Visitor-facing taxonomy ------------------------------------------------------------
+// Sections and leaf labels come from schema/taxonomy.json via the server (TreeRef, SectionDef).
+// Nothing here duplicates that table.
 
 export const METRIC_KIND_LABEL: Record<MetricKind, string> = {
   tvl: "TVL",
@@ -452,73 +388,10 @@ export const RANK_BASIS_LABEL: Record<MetricKind, string> = {
   holders: "reported holders",
 };
 
-// Plural cohort nouns for rank lines: ranks are computed within the flat census category
-// (scripts/lib/score.mjs), so the cohort is named by category, not by home section.
-const CATEGORY_PLURAL: Record<string, string> = {
-  Launchpad: "launchpads",
-  "Fee-routing protocol": "fee-routing protocols",
-  Aggregator: "aggregators",
-  "Prediction market": "prediction markets",
-  "Stock-paired token": "stock-paired tokens",
-  "RWA distributor": "RWA distributors",
-  "RWA baskets": "RWA baskets",
-  "Index vault": "index vaults",
-  "Oracle / infra": "oracle & infra plays",
-  "NFT / treasury": "NFT-treasury plays",
-  CDP: "CDPs",
-  Lending: "lending protocols",
-  "Agent / execution": "agent plays",
-  "Scanner / tooling": "scanner & tooling plays",
-  Yield: "yield protocols",
-  Options: "options venues",
-};
-
-// "#1 of 2 launchpads by reported 24h fees" — the only way a rank ever renders.
-export function rankLine(rank: Rank, category: string): string {
-  const cohort = CATEGORY_PLURAL[category] ?? `${category.toLowerCase()} projects`;
-  return `#${rank.position} of ${rank.of} ${cohort} by ${RANK_BASIS_LABEL[rank.basis]}`;
-}
-
-// Leaf slugs -> visitor words for the dossier header chip and peer cards.
-const LEAF_LABEL: Record<string, string> = {
-  "bonding-curve": "bonding curve",
-  "stock-paired-factory": "stock-paired factory",
-  "uni-pool-launch": "Uniswap-pool launch",
-  "other-pad": "launchpad",
-  "hook-programmable": "programmable hooks",
-  aggregator: "aggregator",
-  "amm-native": "native AMM",
-  "perps-native": "native perps",
-  "hook-mev": "MEV hooks",
-  "stock-paired-token": "stock-paired token",
-  "tax-distributor": "tax distributor",
-  "redeemable-basket": "redeemable basket",
-  "index-vault": "index vault",
-  "reserve-currency": "reserve currency",
-  "synthetic-asset": "synthetic assets",
-  "ad-space": "ad space",
-  "token-bound-nft": "token-bound NFT",
-  cdp: "CDP",
-  "isolated-money-market": "isolated money market",
-  "credit-overlay": "credit overlay",
-  "agent-execution": "agent execution",
-  "agent-launch-layer": "agent launch layer",
-  "agent-identity": "agent identity",
-  "savings-vault": "savings vault",
-  "lp-manager": "LP manager",
-  "fee-router": "fee router",
-  "private-transfer": "private transfers",
-  scanner: "scanner",
-  "machine-payments": "machine payments",
-  locker: "locker",
-  prediction: "prediction market",
-  options: "options",
-  "nft-fee-claim": "NFT fee claim",
-  names: "name service",
-};
-
-export function leafLabel(leaf: string): string {
-  return LEAF_LABEL[leaf] ?? leaf.replace(/-/g, " ");
+// "#1 of 2 launchpads by reported 24h fees" — the only way a rank ever renders. The cohort noun
+// arrives with the rank from derived.json; the site never recomputes it.
+export function rankLine(rank: Rank): string {
+  return `#${rank.position} of ${rank.of} ${rank.cohort} by ${RANK_BASIS_LABEL[rank.basis]}`;
 }
 
 // "$86.5M" / "$4.7M" / "56,062" (holders take no $). Mono display everywhere it renders.
@@ -555,6 +428,21 @@ export function reportedTitle(asOf: string): string {
 }
 
 // --- Labels -----------------------------------------------------------------
+
+// Coverage states in reader words (docs/taxonomy.md §2 display mapping).
+export const COVERAGE_LABEL: Record<Coverage, string> = {
+  full: "Full research",
+  stub: "Initial research",
+};
+
+// Evidence classes in reader words; defined on /methodology.
+export const EVIDENCE_LABEL: Record<EvidenceClass, string> = {
+  verified: "verified on-chain",
+  claim: "project claim",
+  inference: "inference",
+  disputed: "disputed",
+  unknown: "unknown",
+};
 
 export const LIFECYCLE_LABEL: Record<Lifecycle, string> = {
   mainnet: "Mainnet",
