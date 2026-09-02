@@ -50,11 +50,13 @@ type TaxonomyFile = {
 
 // `vite.config.ts` predates the optional daily backfills. Keeping this glob here confines the
 // compatibility bridge to the card bundle; a missing directory simply produces an empty object.
-const rawCardSeries = import.meta.glob("../../../content/pulled/series/*.json", {
-  eager: true,
-  query: "?raw",
-  import: "default",
-}) as Record<string, string>;
+const rawCardSeries = typeof import.meta.glob === "function"
+  ? import.meta.glob("../../../content/pulled/series/*.json", {
+      eager: true,
+      query: "?raw",
+      import: "default",
+    }) as Record<string, string>
+  : {};
 
 function parseYaml<T>(raw: string): T {
   return YAML.parse(raw) as T;

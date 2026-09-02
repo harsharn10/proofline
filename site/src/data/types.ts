@@ -350,6 +350,7 @@ export type HistoryPoint = {
   trades_h24?: number | null;
   txns_total?: number | null;
   launches_24h?: number | null;
+  revenue_24h?: number | null;
   tvl?: number | null;
 };
 
