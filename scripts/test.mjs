@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { parse, stringify } from "yaml";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, cp, rm, writeFile, appendFile } from "node:fs/promises";
+import { mkdtemp, mkdir, cp, rm, writeFile, appendFile, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -14,6 +14,7 @@ import { loadContent } from "./lib/load.mjs";
 import {
   selectUnsent,
   selectApproved,
+  selectShareBar,
   buildMessages,
   chunkMessage,
   publicationFingerprint,
@@ -26,6 +27,60 @@ import { meetsShareBar as meetsShareBarCore } from "./lib/share-bar.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
+
+const READER_WORDS = [
+  "packet",
+  "census",
+  "stub",
+  "coverage",
+  "cohort",
+  "qualifying",
+  "collector",
+  "dossier",
+  "evidence class",
+  "provisional",
+  "derived",
+  "slug",
+];
+
+function readerWordHits(value) {
+  return READER_WORDS.filter((word) => new RegExp(`\\b${word.replace(" ", "\\s+")}\\b`, "i").test(value));
+}
+
+function jsxVisibleStrings(source) {
+  const clean = source
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/(^|[^:])\/\/.*$/gm, "$1");
+  const found = [];
+  const collect = (re, group = 1) => {
+    for (const match of clean.matchAll(re)) {
+      const text = match[group];
+      if (/[{};=]|=>|\b(?:const|for|if|return)\b|\.\w+\(/.test(text)) continue;
+      found.push({ text, index: match.index + match[0].indexOf(text) });
+    }
+  };
+  collect(/(?:<\/?[A-Za-z][^>]*>|<>)([^<{]+)(?=<)/gs);
+  collect(/\b(?:aria-label|placeholder|alt|title|label)\s*=\s*["']([^"']*)["']/g);
+  for (const expression of clean.matchAll(/>\s*\{([^{}\n]+)\}\s*</g)) {
+    for (const literal of expression[1].matchAll(/["'`]([^"'`]*)["'`]/g)) {
+      found.push({
+        text: literal[1],
+        index: expression.index + expression[0].indexOf(expression[1]) + literal.index + 1,
+      });
+    }
+  }
+  return found;
+}
+
+async function filesUnder(directory, suffix) {
+  const result = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...await filesUnder(path, suffix));
+    else if (entry.name.endsWith(suffix)) result.push(path);
+  }
+  return result;
+}
 
 for (const [name, want] of Object.entries(expected)) {
   const project = parse(await readFile(new URL(`../fixtures/${name}/project.yaml`, import.meta.url), "utf8"));
@@ -537,9 +592,11 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   const paused = selectApproved(entries, { sent_keys: [] }, { channel_enabled: false, decisions: {} });
   const projects = new Map([["pons", { name: "Pons" }]]);
   const derived = new Map([["pons", { score: 41, provisional: true, risk: "Elevated", confidence: 64 }]]);
-  const messages = buildMessages(approved, { siteName: "Proofline", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
+  const aboveBar = selectShareBar(approved, { pons: true });
+  const belowBar = selectShareBar(approved, { pons: false });
+  const messages = buildMessages(aboveBar, { siteName: "Icarus", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
   const roundupEntries = approved.map((entry) => ({ ...entry, channel: { ...entry.channel, delivery: "roundup" } }));
-  const roundupMessages = buildMessages(roundupEntries, { siteName: "Proofline", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
+  const roundupMessages = buildMessages(roundupEntries, { siteName: "Icarus", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
   const chunks = chunkMessage("a".repeat(3000) + "\n\n" + "b".repeat(3000), 4096);
   try {
     assert.equal(unsent.length, 1);
@@ -553,13 +610,17 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.deepEqual(staleApproval, [], "source edits invalidate approval");
     assert.deepEqual(tamperedCopy, [], "copy edits invalidate approval");
     assert.deepEqual(paused, [], "paused channel publishes nothing");
+    assert.equal(aboveBar.length, 1, "name above the generated share bar remains eligible");
+    assert.deepEqual(belowBar, [], "name below the generated share bar is excluded");
     assert.equal(messages.length, 1, "one direct publication produces one card");
-    assert.ok(messages[0].includes("<b>NEW COVERAGE · PONS</b>"), "event kicker");
-    assert.ok(messages[0].includes("41/100 · Elevated risk"), "proofline view");
-    assert.ok(messages[0].includes("64% confidence · Provisional"), "confidence line");
+    assert.ok(messages[0].includes("<b>NEW PROFILE · PONS</b>"), "event kicker");
+    assert.ok(messages[0].includes("<b>Icarus view</b>"), "Icarus view");
+    assert.ok(messages[0].includes("Control 41/100 · evidence 64% · awaiting second review"), "control and evidence line");
     assert.ok(messages[0].includes("https://x.test/n/pons"), "profile link");
+    assert.ok(messages[0].endsWith("Read the full Pons research →</a>"), "event card ends with its link");
     assert.ok(messages[0].includes("A &lt;b&gt;full&lt;/b&gt; research record"), "html escaped");
-    assert.ok(roundupMessages[0].includes("<b>PROOFLINE ROUNDUP · 2026-08-31</b>"), "roundup card");
+    assert.ok(roundupMessages[0].includes("<b>ICARUS ROUNDUP · 2026-08-31</b>"), "roundup card");
+    assert.ok(roundupMessages[0].endsWith("Open research →</a>"), "roundup ends with a card link");
     assert.equal(chunks.length, 2, "chunked");
     assert.deepEqual(readDotEnv("A=1\n# c\nB=\"two words\"\n"), { A: "1", B: "two words" });
     console.log("ok   telegram publications");
@@ -869,7 +930,10 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   );
   const typesMock = dataModule(`
     export const headlineMetric=()=>null;
+    export const DEFAULT_KPIS=["volume24h"];
     export const SECTION_KPIS={launchpads:["volume24h","launches24h","liquidityUsd","holders"],tokens:["liquidityUsd","volume24h","holders","priceChange24h"]};
+    export const dexScreenerSearchUrl=(value)=>"https://dex.test/"+value;
+    export const explorerTokenUrl=(base,address)=>base+"/token/"+address;
   `);
   const hooks = registerHooks({
     resolve(specifier, context, nextResolve) {
@@ -964,6 +1028,37 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   } catch (err) {
     failures++;
     console.error(`FAIL Icarus home and category rules: ${err.message}`);
+  }
+}
+
+// Reader vocabulary: inspect only text and literal values that can render from JSX; identifiers,
+// route parameters and comments remain free to use the content-system's internal terms.
+{
+  const hits = [];
+  for (const file of await filesUnder("site/src", ".tsx")) {
+    const source = await readFile(file, "utf8");
+    for (const fragment of jsxVisibleStrings(source)) {
+      for (const word of readerWordHits(fragment.text)) {
+        const line = source.slice(0, fragment.index).split("\n").length;
+        hits.push(`${file}:${line}: ${word} in ${JSON.stringify(fragment.text.trim())}`);
+      }
+    }
+  }
+  const methodology = await readFile("content/methodology.md", "utf8");
+  for (const word of readerWordHits(methodology)) {
+    const match = methodology.match(new RegExp(`\\b${word.replace(" ", "\\s+")}\\b`, "i"));
+    const line = methodology.slice(0, match?.index ?? 0).split("\n").length;
+    hits.push(`content/methodology.md:${line}: ${word}`);
+  }
+  const fixture = jsxVisibleStrings(`const dossier = "stub"; // coverage\n<div title="packet">Reader copy</div>`)
+    .flatMap((fragment) => readerWordHits(fragment.text));
+  try {
+    assert.deepEqual(fixture, ["packet"], "scanner checks visible literals but allows identifiers, comments and internal strings");
+    assert.deepEqual(hits, [], hits.join("\n"));
+    console.log("ok   reader vocabulary");
+  } catch (err) {
+    failures++;
+    console.error(`FAIL reader vocabulary: ${err.message}`);
   }
 }
 
