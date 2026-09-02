@@ -1119,3 +1119,27 @@
     native_play:       { value: true, note: "Native AMM (a PancakeSwap V3 fork per the explorer contract name) with a HOOD emissions, fee and buyback flywheel into h33", verified: false }
     citable:           { value: true, note: "X account; docs referenced as a gitbook without a URL in the intake", verified: false }
     research_story:    { value: true, note: "Emissions and buyback control; team states it holds no HOOD or LP; ticker collides with the HOOD Stock Token", verified: false }
+- slug: downto
+  name: Down to Finance
+  category: Redeemable RWA basket
+  lifecycle: announced
+  coverage: stub
+  identity:
+    aliases: ["Down To Finance", "DETF"]
+    symbols: ["DTF"]
+    entity_kind: protocol
+    chain_scope: robinhood-native
+    status: provisional
+  official_links:
+    - { kind: site, url: https://downto.finance }
+    - { kind: app, url: https://app.downto.finance/explore }
+    - { kind: docs, url: https://app.downto.finance/learn }
+    - { kind: x, url: https://x.com/downto_finance }
+  discovery_source: grok-bot packet WORK-20260902-grok-bot-downto (PR #46), compiled 2026-09-02
+  handle: "@downto_finance"
+  tree: { primary: rwa-products/redeemable-basket, secondary: [launch/graduation-token] }
+  qualifying:
+    deployed_on_chain: { value: true, note: "DTF token (a PonsV2LauncherToken) and the DETF package factories are verified contracts on chain 4663 per explorer reads on 2026-09-02 (packet REP-1, REP-2); whether any DETF basket has been created is an open question", verified: true }
+    native_play:       { value: true, note: "Claimed permissionless DETF baskets (mint, hold, bond) with chain-4663 package factories named in the app; the fee-accruing token launched on Pons v2", verified: false }
+    citable:           { value: true, note: "Official site, app and learn pages; X handle taken from the verified token constructor, not an opened profile", verified: false }
+    research_story:    { value: true, note: "Basket mechanism, fee routing to DTF and control of the package factories and proxies (deployer is a single key); audits marked pending on the app footer", verified: false }

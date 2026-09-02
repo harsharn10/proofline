@@ -7,8 +7,8 @@ import { readFile, writeFile, mkdir, access } from "node:fs/promises";
 import { parse, stringify } from "yaml";
 import { readLatestPacket, validatePacket, sectionParagraph } from "./lib/packet.mjs";
 import { REQUIRED_HEADINGS, PENDING_LINE } from "./lib/research-md.mjs";
-import { normalizeUrl } from "./lib/checks.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
+import { reviewKeyFor } from "./lib/telegram.mjs";
 
 const RESEARCHER = "harsharn10"; // the compiler of record until a packet names its own producer
 const LINK_KIND_TO_SOURCE_KIND = { site: "official-site", app: "official-site", docs: "docs", whitepaper: "whitepaper", x: "social", github: "repository", telegram: "social", discord: "social", other: "other" };
@@ -41,15 +41,22 @@ function fromPacket(row, packet) {
   const links = (record.links ?? [])
     .filter((link) => link.authenticity === "confirmed" || link.authenticity === "unconfirmed")
     .map((link) => ({ kind: link.kind, url: link.url }));
-  const deployments = (record.deployments ?? []).map((deployment) => ({
-    label: deployment.label,
-    chain: deployment.address.chain,
-    // Only the producer's own explorer or RPC check earns the address a place in the canonical record.
-    address: deployment.address.exists_on_4663 === true ? deployment.address.value : "not-verified",
-    role: deployment.role,
-    verified: false,
-    sources: [],
-  }));
+  const receiptIndex = new Map((record.receipts ?? []).map((receipt, index) => [receipt.id, `S${index + 1}`]));
+  const receiptKind = new Map((record.receipts ?? []).map((receipt) => [receipt.id, receipt.kind]));
+  const deployments = (record.deployments ?? []).map((deployment) => {
+    const cited = (deployment.receipt_ids ?? []).filter((id) => receiptIndex.has(id));
+    const reproduced = deployment.address.exists_on_4663 === true && cited.some((id) => receiptKind.get(id) === "explorer");
+    return {
+      label: deployment.label,
+      chain: deployment.address.chain,
+      // Only the producer's own explorer or RPC check earns the address a place in the canonical record;
+      // `verified` (PRD §7.1: reproduced on chain) needs that check plus an explorer receipt behind it.
+      address: deployment.address.exists_on_4663 === true ? deployment.address.value : "not-verified",
+      role: deployment.role,
+      verified: reproduced,
+      sources: cited.map((id) => receiptIndex.get(id)),
+    };
+  });
   return {
     symbol: record.identity.symbols?.[0] ?? null,
     summary: sectionParagraph(packet.sections, "What it is") || PENDING_SUMMARY,
@@ -59,6 +66,7 @@ function fromPacket(row, packet) {
     missing: (record.gaps ?? []).map((gap) => gap.question),
     sources,
     researcher: record.producer,
+    workId: record.work_id,
   };
 }
 
@@ -106,7 +114,6 @@ for (const c of census) {
   }
 
   const sources = seed.sources;
-  const officialUrls = new Map(sources.map((s) => [normalizeUrl(s.url), s.id]));
   const project = {
     slug: c.slug, name: c.name, symbol: seed.symbol, category: c.category, lifecycle: c.lifecycle,
     coverage: "stub", summary: seed.summary, official_links: seed.official_links,
@@ -114,12 +121,9 @@ for (const c of census) {
     deployments: seed.deployments,
     review: { researcher: seed.researcher, approver: "pending", methodology_version: "proofline-v1.0", reviewed_at: DATE, published_at: null },
     findings: {
-      positive: seed.official_links
-        .filter((link) => officialUrls.has(normalizeUrl(link.url)))
-        .map((link) => ({
-          text: `${c.name} publishes an official ${link.kind === "site" ? "site" : link.kind} at ${link.url}.`,
-          class: "claim", sources: [officialUrls.get(normalizeUrl(link.url))],
-        })),
+      // No generated "publishes an official site at …" lines: the link row is that receipt, and the
+      // 2026-09-01 review removed 81 of them. Findings are written by the compiler from the packet's claims.
+      positive: [],
       risk: [],
       missing: seed.missing.map((text) => ({ text })),
       unresolved: [],
@@ -140,11 +144,14 @@ for (const c of census) {
     written++;
     if (schema === "project") {
       // A new project file gets its opening history entry (spec §5.8); validate requires one per census slug.
-      await appendChangelog({
+      const entry = {
         date: DATE, slug: c.slug, type: "coverage", severity: "Info", title: "Initial stub opened",
-        detail: "Identity, official links and lifecycle recorded from the seed census. No evidence score until research lands.",
+        detail: seed.workId
+          ? `Identity, official links, deployments and open questions compiled from research packet ${seed.workId}. No evidence score until a full record lands.`
+          : "Identity, official links and lifecycle recorded from the census row; no research packet has been filed yet. No evidence score until research lands.",
         prior: null, new: { coverage: "stub", lifecycle: c.lifecycle }, reviewer: RESEARCHER, methodology_version: "proofline-v1.0",
-      });
+      };
+      await appendChangelog({ ...entry, review_key: reviewKeyFor(entry) });
       logged++;
     }
   }
