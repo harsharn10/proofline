@@ -51,6 +51,9 @@ export async function validateContent(root = "content", { release = false } = {}
     // (pipeline audit 2026-09-01 §7) — it doesn't need a duplicate [S#] tag in a finding or the research doc.
     const officialUrls = new Set((project.official_links ?? []).map((l) => normalizeUrl(l.url)));
     for (const source of sourceList) if (officialUrls.has(normalizeUrl(source.url))) referenced.add(source.id);
+    // A DefiLlama protocol page in the ledger is the receipt scripts/pull.mjs reads chain-slice metrics
+    // from (content/pulled/<slug>.yaml cites it back by URL) — the puller is its citer.
+    for (const source of sourceList) if (/defillama\.com\/protocol\//.test(source.url)) referenced.add(source.id);
     for (const id of ledgerIds) if (!referenced.has(id)) warnings.push(`sources/${slug}: ${id} is never cited by projects/${slug}.yaml, research/${slug}.md or feed/${slug}.yaml`);
   }
 

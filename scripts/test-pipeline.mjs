@@ -12,7 +12,7 @@ import { validateContent } from "./lib/validate-content.mjs";
 import { normalizeUrl } from "./lib/checks.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { entryKey, legacyEntryKey, reviewKeyFor, selectUnsent, selectApproved, publicationFingerprint } from "./lib/telegram.mjs";
-import { validateNameIntake, PRODUCER_IDS } from "./lib/name-intake.mjs";
+import { parsePacket, validatePacket, PRODUCER_IDS } from "./lib/packet.mjs";
 
 let failures = 0;
 async function test(name, fn) {
@@ -111,31 +111,38 @@ await test("entryKey prefers review_key", async () => {
   assert.equal(selectUnsent(changelog, state).filter((entry) => sent.has(legacyEntryKey(entry))).length, 0, "no already-sent entry is selected again");
 });
 
-// 4. Producer ids: any producer or a GitHub id may file a dossier; no machine producer may resolve a conflict.
-await test("name-intake accepts producer codex", async () => {
-  const template = parse(await readFile("docs/templates/name-intake.yaml", "utf8"));
-  assert.deepEqual(validateNameIntake(template, { census: [] }), [], "template validates clean");
+// 4. Producer ids: any producer or a GitHub id may file a packet; no machine producer may resolve a conflict.
+await test("packet accepts producer codex", async () => {
+  const seed = parsePacket(await readFile("fixtures/packets/seed-valid.md", "utf8"));
+  const filedBy = (producer, role = "collector") => {
+    const frontmatter = { ...structuredClone(seed.frontmatter), producer, role };
+    return validatePacket({ ...seed, frontmatter }, { census: [], path: `research/inbox/packets/${frontmatter.slug}/${frontmatter.work_id}.md` });
+  };
+  assert.deepEqual(filedBy("grok-heavy"), [], "the fixture validates clean");
   assert.ok(PRODUCER_IDS.includes("codex"));
   for (const id of [...PRODUCER_IDS, "harsharn10", "Some-Human"])
-    assert.deepEqual(validateNameIntake({ ...template, researcher: id }, { census: [] }), [], `researcher ${id}`);
+    assert.deepEqual(filedBy(id, id === "supergrok" ? "verifier" : "collector"), [], `producer ${id}`);
   for (const bad of ["", "not a github id", "a".repeat(40), "bot@example", null])
-    assert.ok(validateNameIntake({ ...template, researcher: bad }, { census: [] }).length > 0, `researcher ${JSON.stringify(bad)} is rejected`);
+    assert.ok(filedBy(bad).length > 0, `producer ${JSON.stringify(bad)} is rejected`);
 
+  const resolution = (await readFile("fixtures/packets/collector-sets-resolution.md", "utf8")).replace("resolver: harsharn10", "resolver: RESOLVER_ID");
   const resolvedBy = (resolver) => {
-    const record = structuredClone(template);
-    record.reproductions.push({ id: "REP-1", method: "document-scope", source_ids: ["SRC-1"], checked_at: "2026-09-01T12:00:00Z", result: "Checked the announcement text." });
-    record.claims[2].class = "verified";
-    record.claims[2].reproduction_ids = ["REP-1"];
-    record.claims.push({ id: "CLM-8", field: "lifecycle", value: "beta", class: "disputed", source_ids: ["SRC-1"], reproduction_ids: [], observed_at: "2026-09-01T12:00:00Z" });
-    record.conflicts.push({
-      id: "CON-lifecycle", field: "lifecycle", claim_ids: ["CLM-3", "CLM-8"], status: "resolved",
-      resolution: { winning_claim_ids: ["CLM-3"], reproduction_ids: ["REP-1"], rationale: "Reproduced from the announcement.", resolver, resolved_at: "2026-09-01T12:00:00Z" },
-    });
-    return validateNameIntake(record, { census: [] });
+    const packet = parsePacket(resolution.replace("RESOLVER_ID", resolver));
+    packet.frontmatter.role = "compiler"; // a collector may not resolve at all; this tests who may
+    packet.frontmatter.producer = "harsharn10";
+    return validatePacket(packet, { census: [], path: `research/inbox/packets/${packet.frontmatter.slug}/${packet.frontmatter.work_id}.md` });
   };
   assert.deepEqual(resolvedBy("harsharn10"), [], "a human controller may resolve");
   for (const bot of PRODUCER_IDS) assert.ok(resolvedBy(bot).length > 0, `${bot} may not resolve (schema)`);
-  assert.ok(resolvedBy("Grok-Bot").some((e) => e.includes("non-bot controller")), "the lib check normalizes case and punctuation");
+  assert.ok(resolvedBy("Grok-Bot").some((e) => e.includes("not a producer")), "the lib check normalizes case and punctuation");
+
+  // A collector or verifier never fills a resolution, whoever it names.
+  const collectorResolves = parsePacket(await readFile("fixtures/packets/collector-sets-resolution.md", "utf8"));
+  assert.ok(
+    validatePacket(collectorResolves, { census: [], path: "research/inbox/packets/resolver-example/WORK-20260902-grok-heavy-resolver.md" })
+      .some((e) => e.includes("collector")),
+    "a collector leaves resolution empty",
+  );
 });
 
 // 5. Official-link sources: a source whose URL matches a project's official link is cited by that link

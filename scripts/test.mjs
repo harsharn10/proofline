@@ -20,7 +20,6 @@ import {
 import { validateContent } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
-import { validateNameIntake } from "./lib/name-intake.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
@@ -650,51 +649,6 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     for (const [data, want, why] of cases) assert.equal(validateAgainst("census", [data]).length > 0 ? 1 : 0, want, why);
     console.log("ok   census schema handle/tree");
   } catch (err) { failures++; console.error(`FAIL census schema handle/tree: ${err.message}`); }
-}
-
-// New-name intake: complete taxonomy, referential integrity, authenticity and conflicts.
-{
-  const template = parse(await readFile("docs/templates/name-intake.yaml", "utf8"));
-  const valid = validateNameIntake(template, { census: [] });
-  const dangling = structuredClone(template);
-  dangling.claims[0].source_ids = ["SRC-99"];
-  const danglingErrors = validateNameIntake(dangling, { census: [] });
-  const ungroundedVerified = structuredClone(template);
-  ungroundedVerified.identity.status = "verified";
-  const verifiedErrors = validateNameIntake(ungroundedVerified, { census: [] });
-  const mainnet = structuredClone(template);
-  mainnet.lifecycle = "mainnet";
-  const mainnetErrors = validateNameIntake(mainnet, { census: [] });
-  const taxonomyDrift = structuredClone(template);
-  taxonomyDrift.taxonomy.primary_domain = "yield";
-  const taxonomyErrors = validateNameIntake(taxonomyDrift, { census: [] });
-  const unrelatedReproduction = structuredClone(template);
-  unrelatedReproduction.sources.push({ ...structuredClone(template.sources[0]), id: "SRC-2", url: "https://example.com/unrelated" });
-  unrelatedReproduction.reproductions.push({ id: "REP-1", method: "other", source_ids: ["SRC-2"], checked_at: "2026-09-01T12:00:00Z", result: "Checked an unrelated source." });
-  unrelatedReproduction.claims[0].class = "verified";
-  unrelatedReproduction.claims[0].reproduction_ids = ["REP-1"];
-  const reproductionErrors = validateNameIntake(unrelatedReproduction, { census: [] });
-  const unresolved = structuredClone(template);
-  unresolved.reproductions.push({ id: "REP-1", method: "document-scope", source_ids: ["SRC-1"], checked_at: "2026-09-01T12:00:00Z", result: "Checked the announcement text." });
-  unresolved.claims[2].class = "verified";
-  unresolved.claims[2].reproduction_ids = ["REP-1"];
-  unresolved.claims.push({ id: "CLM-8", field: "lifecycle", value: "beta", class: "disputed", source_ids: ["SRC-1"], reproduction_ids: [], observed_at: "2026-09-01T12:00:00Z" });
-  unresolved.conflicts.push({ id: "CON-lifecycle", field: "lifecycle", claim_ids: ["CLM-3", "CLM-8"], status: "open", resolution: null });
-  const unresolvedErrors = validateNameIntake(unresolved, { census: [] });
-  const collision = validateNameIntake(template, {
-    census: [{ slug: "example", name: "Example Protocol", identity: { aliases: [] } }],
-  });
-  try {
-    assert.deepEqual(valid, [], "standard name template passes");
-    assert.ok(danglingErrors.some((error) => error.includes("missing source SRC-99")), "dangling source rejected");
-    assert.ok(verifiedErrors.some((error) => error.includes("verified identity requires")), "identity cannot self-verify");
-    assert.ok(mainnetErrors.some((error) => error.includes("mainnet requires")), "mainnet requires reproduction");
-    assert.ok(taxonomyErrors.some((error) => error.includes("matching taxonomy.primary-domain claim")), "taxonomy must agree with its claim");
-    assert.ok(reproductionErrors.some((error) => error.includes("share a source")), "verified claim must be grounded in its reproduction");
-    assert.ok(unresolvedErrors.some((error) => error.includes("open conflict") && error.includes("verified claim")), "open conflict blocks verification");
-    assert.ok(collision.some((error) => error.includes("possible_matches")), "normalized canonical match must be disclosed");
-    console.log("ok   standardized name intake");
-  } catch (err) { failures++; console.error(`FAIL standardized name intake: ${err.message}`); }
 }
 
 // Task 2 — feed schema: kind enum and account handle pattern.

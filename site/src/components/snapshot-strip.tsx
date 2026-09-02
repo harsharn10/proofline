@@ -26,7 +26,7 @@ export function SnapshotStrip({ metrics, rank, sources }: { metrics: Metric[]; r
       {ordered.length > 0 ? (
         <div className="kvgrid snapgrid">
           {ordered.map((m) => {
-            const src = m.sources.map((id) => srcById.get(id)).find(Boolean);
+            const src = m.sources.map((id) => srcById.get(id)).find(Boolean) ?? (m.source_url ? { url: m.source_url } : null);
             return (
               <div className="s" key={m.kind}>
                 <div className="k">

@@ -31,7 +31,9 @@ re-running it against already-harvested content produces duplicates. `--overwrit
 convention as the other scripts, not a "safe to re-run" claim. See `research/inbox/grok-2026-08-30/HARVEST.md` §12
 for what it harvested, what it skipped and why.
 
-`../../seed-data.mjs` still imports `HARVEST` from `harvest-data.mjs` here (`npm run seed` needs the known
-deployments), and `../../build-dependency-cards.mjs` still imports `GH`/`ACCESSED` from it — that reuse is
-intentional and stays even though this directory itself is frozen (final review I9 deferred collapsing
-`seed-data.mjs`'s duplication of `content/` as a separate, larger change).
+**2026-09-02: `../../seed-data.mjs` was deleted.** `npm run seed` now reads a packet
+(`research/inbox/packets/<slug>/`, research-system §5) instead of a frozen literal, and
+`../../build-dependency-cards.mjs` carries its own `GH`/`ACCESSED` constants. `apply-harvest.mjs`,
+`harvest-metrics.mjs` and the `seed-data.mjs` mentions above still import from that deleted file, so
+those three no longer run. They are one-shot importers that were already marked do-not-re-run; the
+files stay as the record of what the 2026-08-31 pass did, not as working tools.

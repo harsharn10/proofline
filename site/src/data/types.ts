@@ -197,6 +197,9 @@ export type Metric = {
   as_of: string;
   class: "claim";
   sources: string[];
+  // Set when the figure came from content/pulled (scripts/pull.mjs) rather than the project file: the
+  // receipt is the URL the puller read, not a ledger id.
+  source_url?: string;
 };
 
 // Cohort rank from derived.json: position within the reader-facing section of the project's tree

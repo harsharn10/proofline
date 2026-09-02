@@ -261,7 +261,7 @@ function loadContent(): ServerContent {
       feed,
       sources: sourcesFile.sources,
       changelog,
-      derived: pickDerived(derivedFile.projects[slug], slug, project.coverage),
+      derived: withPulledMetrics(pickDerived(derivedFile.projects[slug], slug, project.coverage), pulled),
       pulled,
     };
   });
@@ -306,6 +306,18 @@ function toDirectoryEntry(d: Dossier, treeBySlug: Record<string, TreeRef>): Dire
     tree: treeBySlug[d.slug] ?? null,
     holders: tokenHolders(d.pulled),
   };
+}
+
+// A pulled DefiLlama figure fills in for a metric kind the project file does not carry. Project
+// metrics (ledger-cited claims) always win; pulled figures never change a rank, which npm run score
+// computes from the project file alone.
+function withPulledMetrics(derived: Derived, pulled: PulledFile | null): Derived {
+  if (!pulled || pulled.metrics.length === 0) return derived;
+  const have = new Set(derived.metrics.map((m) => m.kind));
+  const extra: Metric[] = pulled.metrics
+    .filter((m) => !have.has(m.kind) && typeof m.value === "number" && m.value > 0)
+    .map((m) => ({ kind: m.kind, value: m.value, currency: m.kind === "holders" ? undefined : "USD", as_of: m.as_of.slice(0, 10), class: "claim", sources: [], source_url: m.source_url }));
+  return extra.length ? { ...derived, metrics: [...derived.metrics, ...extra] } : derived;
 }
 
 // The holder count of the project's token contract (role token, else the first address with one).

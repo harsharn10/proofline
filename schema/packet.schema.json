@@ -1,0 +1,311 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "packet",
+  "$comment": "Packet v2 frontmatter (docs/research-system.md §5). One file per run at research/inbox/packets/<slug>/<work-id>.md. Referential checks a schema cannot express live in scripts/lib/packet.mjs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version","work_id","producer","role","base_sha","slug","name","packet_tier","as_of",
+    "prior_packet","owned_slugs","allowed_paths","identity","classification","qualifying","receipts"
+  ],
+  "$defs": {
+    "nullNote": { "$comment": "A required field the producer attempted and could not establish (§5).", "type": "string", "pattern": "^NULL — .+" },
+    "claimId": { "type": "string", "pattern": "^CLM-[1-9][0-9]*$" },
+    "conflictId": { "type": "string", "pattern": "^CON-[1-9][0-9]*$" },
+    "eventId": { "type": "string", "pattern": "^EVT-[1-9][0-9]*$" },
+    "receiptId": { "type": "string", "pattern": "^R-[1-9][0-9]*$" },
+    "reproductionId": { "type": "string", "pattern": "^REP-[1-9][0-9]*$" },
+    "claimRefs": { "type": "array", "items": { "$ref": "#/$defs/claimId" }, "uniqueItems": true },
+    "receiptRefs": { "type": "array", "items": { "$ref": "#/$defs/receiptId" }, "uniqueItems": true },
+    "reproductionRefs": { "type": "array", "items": { "$ref": "#/$defs/reproductionId" }, "uniqueItems": true },
+    "slugName": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "text": { "type": "string", "minLength": 1 },
+    "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "dateOrDateTime": { "anyOf": [ { "$ref": "#/$defs/date" }, { "type": "string", "format": "date-time" } ] },
+    "url": { "anyOf": [ { "type": "string", "format": "uri" }, { "$ref": "#/$defs/nullNote" } ] },
+    "urlOrNull": { "anyOf": [ { "type": "null" }, { "type": "string", "format": "uri" }, { "$ref": "#/$defs/nullNote" } ] },
+    "handleOrNull": { "anyOf": [ { "type": "null" }, { "type": "string", "pattern": "^@[A-Za-z0-9_]{1,32}$" }, { "$ref": "#/$defs/nullNote" } ] },
+    "claimClass": { "enum": ["verified","claim","inference","disputed","unknown"] },
+    "authenticity": { "enum": ["confirmed","unconfirmed","conflicted"] },
+    "taxonomyLeaf": {
+      "$comment": "Keys of schema/taxonomy.json leaves. scripts/lib/schemas.mjs replaces this enum from that file at load time; the list below is the checked-in mirror and scripts/test-packet.mjs asserts the two agree.",
+      "enum": [
+        "launch/bonding-curve","launch/hook-programmable","launch/stock-paired-factory","launch/uni-pool-launch","launch/nft-gated-launch","launch/other-pad","launch/graduation-token",
+        "trading/amm-native","trading/amm-imported","trading/aggregator","trading/hook-mev","trading/perps-native","trading/perps-imported","trading/prop-amm","trading/exec-frontend",
+        "credit/lending-primitive","credit/morpho-curator","credit/isolated-money-market","credit/cdp","credit/credit-overlay","credit/rwa-lending","credit/uncollateralized",
+        "rwa-products/stock-token-issuer","rwa-products/stock-paired-token","rwa-products/redeemable-basket","rwa-products/tax-distributor","rwa-products/index-vault","rwa-products/synthetic-asset","rwa-products/reserve-currency","rwa-products/ad-space",
+        "agents/agent-launch-layer","agents/agent-execution","agents/agent-identity","agents/agent-product",
+        "nft-treasury/token-bound-nft","nft-treasury/nft-fee-claim","nft-treasury/nft-marketplace",
+        "markets/prediction","markets/options",
+        "yield/savings-vault","yield/lp-manager","yield/allocator","yield/fee-router","yield/gamified-mining",
+        "privacy/private-transfer",
+        "tooling/locker","tooling/scanner","tooling/names","tooling/machine-payments",
+        "chain-infra/l2-sequencer","chain-infra/bridge","chain-infra/oracle","chain-infra/stablecoin","chain-infra/rpc-aa","chain-infra/custody","chain-infra/analytics"
+      ]
+    },
+    "claimField": {
+      "anyOf": [
+        { "enum": [
+          "identity.name","identity.alias","identity.symbol","identity.handle","identity.domain","identity.repository",
+          "taxonomy.primary-leaf","taxonomy.secondary-leaf","taxonomy.entity-kind","taxonomy.chain-scope","taxonomy.mechanism-tag",
+          "lifecycle","product.mechanism","deployment.address","deployment.role",
+          "control.owner","control.threshold","control.timelock","control.proxy","control.privileged-role",
+          "security.audit","security.bounty","team.identity","team.repository",
+          "economics.metric","activity.status","communications.status","relationship","candidate","other"
+        ] },
+        { "$comment": "Account proposals (§5): account.<handle>.<axis>.", "type": "string", "pattern": "^account\\.@?[A-Za-z0-9_]{1,32}\\.[a-z][a-z-]*$" }
+      ]
+    },
+    "possibleMatch": {
+      "type": "object", "additionalProperties": false,
+      "required": ["slug","signals","contrary_signals"],
+      "properties": {
+        "slug": { "$ref": "#/$defs/slugName" },
+        "signals": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["same-normalized-name","shared-domain","shared-handle","shared-address","shared-deployer","shared-repository","ticker-only","other"] } },
+        "contrary_signals": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "qualifyingTest": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status","claim_ids","note"],
+      "properties": {
+        "status": { "enum": ["pass","fail","unknown"] },
+        "claim_ids": { "$ref": "#/$defs/claimRefs" },
+        "note": { "type": "string" }
+      },
+      "allOf": [
+        { "if": { "properties": { "status": { "const": "pass" } }, "required": ["status"] },
+          "then": { "properties": { "claim_ids": { "minItems": 1 } } },
+          "else": { "properties": { "note": { "minLength": 1 } } } }
+      ]
+    },
+    "link": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind","url","authenticity"],
+      "properties": {
+        "kind": { "enum": ["site","app","docs","whitepaper","x","github","telegram","discord","other"] },
+        "url": { "$ref": "#/$defs/url" },
+        "authenticity": { "$ref": "#/$defs/authenticity" }
+      }
+    },
+    "addressRecord": {
+      "$comment": "The six-field address record of §5. exists_on_4663 and explorer_source_verified default to null; only the producer's own check flips them. The two optional proxy fields are set when a verified shell hides an unverified implementation.",
+      "type": "object", "additionalProperties": false,
+      "required": ["value","chain","source","seen","exists_on_4663","explorer_source_verified"],
+      "properties": {
+        "value": { "anyOf": [ { "type": "string", "pattern": "^(0x[0-9a-fA-F]{40}|[1-9A-HJ-NP-Za-km-z]{32,44})$" }, { "$ref": "#/$defs/nullNote" } ] },
+        "chain": { "$ref": "shared#/$defs/chain" },
+        "source": { "enum": ["bio","docs","audit","explorer","third-party"] },
+        "seen": { "$ref": "#/$defs/dateOrDateTime" },
+        "exists_on_4663": { "type": ["boolean","null"] },
+        "explorer_source_verified": { "type": ["boolean","null"] },
+        "explorer_source_verification_scope": { "enum": ["full","proxy-shell-only","implementation-only"] },
+        "implementation_source_verified": { "type": ["boolean","null"] }
+      }
+    },
+    "deployment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["label","role","address","receipt_ids"],
+      "properties": {
+        "label": { "$ref": "#/$defs/text" },
+        "role": { "$ref": "shared#/$defs/role" },
+        "address": { "$ref": "#/$defs/addressRecord" },
+        "receipt_ids": { "$ref": "#/$defs/receiptRefs", "minItems": 1 }
+      }
+    },
+    "metric": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind","value","currency","as_of","window","method","class","receipt_ids"],
+      "properties": {
+        "kind": { "$ref": "shared#/$defs/metricKind" },
+        "value": { "anyOf": [ { "type": "number" }, { "$ref": "#/$defs/nullNote" } ] },
+        "currency": { "anyOf": [ { "type": "null" }, { "$ref": "#/$defs/text" } ] },
+        "as_of": { "$ref": "#/$defs/dateOrDateTime" },
+        "window": { "enum": ["point","24h","7d","30d","90d","all-time"] },
+        "method": { "$ref": "#/$defs/text" },
+        "class": { "$ref": "#/$defs/claimClass" },
+        "receipt_ids": { "$ref": "#/$defs/receiptRefs", "minItems": 1 }
+      }
+    },
+    "reproduction": {
+      "$comment": "Not a §5 block heading, but claims carry reproduction_ids and a verified claim needs one, so the ids are declared here.",
+      "type": "object", "additionalProperties": false,
+      "required": ["id","method","checked_at","receipt_ids","result"],
+      "properties": {
+        "id": { "$ref": "#/$defs/reproductionId" },
+        "method": { "enum": ["explorer-rpc","explorer-ui","official-crosslink","repository-crosslink","document-scope","api","other"] },
+        "chain_id": { "type": "integer", "minimum": 1 },
+        "checked_at": { "type": "string", "format": "date-time" },
+        "receipt_ids": { "$ref": "#/$defs/receiptRefs", "minItems": 1 },
+        "result": { "$ref": "#/$defs/text" }
+      }
+    },
+    "claim": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id","field","value","class","observed_at","receipt_ids","reproduction_ids","supersedes"],
+      "properties": {
+        "id": { "$ref": "#/$defs/claimId" },
+        "field": { "$ref": "#/$defs/claimField" },
+        "value": {},
+        "class": { "$ref": "#/$defs/claimClass" },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "receipt_ids": { "$ref": "#/$defs/receiptRefs" },
+        "reproduction_ids": { "$ref": "#/$defs/reproductionRefs" },
+        "supersedes": { "type": ["string","null"], "minLength": 1 },
+        "prior_claim": { "$comment": "Verifier only: the S-id or prior claim id under test.", "type": ["string","null"], "minLength": 1 },
+        "disposition": { "enum": ["accepted","corrected","disputed","deferred"] },
+        "prior_value": {}
+      },
+      "allOf": [
+        { "if": { "properties": { "class": { "const": "verified" } }, "required": ["class"] },
+          "then": { "properties": { "reproduction_ids": { "minItems": 1 } } } },
+        { "if": { "properties": { "class": { "const": "unknown" } }, "required": ["class"] },
+          "then": { "properties": { "receipt_ids": { "maxItems": 0 }, "reproduction_ids": { "maxItems": 0 } } },
+          "else": { "properties": { "receipt_ids": { "minItems": 1 } } } },
+        { "if": { "properties": { "disposition": { "const": "corrected" } }, "required": ["disposition"] },
+          "then": { "required": ["prior_value"], "properties": { "prior_value": {} } } }
+      ]
+    },
+    "conflict": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id","field","claim_ids","material_effect","status","resolution"],
+      "properties": {
+        "id": { "$ref": "#/$defs/conflictId" },
+        "field": { "$ref": "#/$defs/claimField" },
+        "claim_ids": { "$ref": "#/$defs/claimRefs", "minItems": 2 },
+        "material_effect": { "anyOf": [ { "type": "boolean" }, { "$ref": "#/$defs/text" } ] },
+        "status": { "enum": ["open","resolved"] },
+        "resolution": {
+          "type": ["object","null"], "additionalProperties": false,
+          "required": ["winning_claim_ids","reproduction_ids","rationale","resolver","resolved_at"],
+          "properties": {
+            "winning_claim_ids": { "$ref": "#/$defs/claimRefs", "minItems": 1 },
+            "reproduction_ids": { "$ref": "#/$defs/reproductionRefs", "minItems": 1 },
+            "rationale": { "$ref": "#/$defs/text" },
+            "resolver": { "type": "string", "minLength": 1, "not": { "enum": ["grok-heavy","grok-bot","supergrok","codex","claude"] } },
+            "resolved_at": { "type": "string", "format": "date-time" }
+          }
+        }
+      },
+      "if": { "properties": { "status": { "const": "resolved" } }, "required": ["status"] },
+      "then": { "properties": { "resolution": { "type": "object" } } },
+      "else": { "properties": { "resolution": { "type": "null" } } }
+    },
+    "event": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id","type","occurred_at","observed_at","affected_fields","evidence_state","impact","site_recommendation","channel_recommendation","receipt_ids"],
+      "properties": {
+        "id": { "$ref": "#/$defs/eventId" },
+        "type": { "enum": ["company","ct","onchain","risk"] },
+        "title": { "$ref": "#/$defs/text" },
+        "summary": { "$ref": "#/$defs/text" },
+        "occurred_at": { "type": "string", "format": "date-time" },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "affected_fields": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+        "evidence_state": { "enum": ["verified","claim","disputed","unknown"] },
+        "impact": { "enum": ["routine","material","urgent"] },
+        "site_recommendation": { "enum": ["feed","profile","both","none"] },
+        "channel_recommendation": { "enum": ["none","review"] },
+        "receipt_ids": { "$ref": "#/$defs/receiptRefs", "minItems": 1 }
+      }
+    },
+    "receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id","publisher","title","url","published_at","accessed_at","kind","authority","authenticity","supports","excerpt"],
+      "properties": {
+        "id": { "$ref": "#/$defs/receiptId" },
+        "publisher": { "$ref": "#/$defs/text" },
+        "title": { "$ref": "#/$defs/text" },
+        "url": { "$ref": "#/$defs/url" },
+        "published_at": { "anyOf": [ { "type": "null" }, { "$ref": "#/$defs/dateOrDateTime" }, { "$ref": "#/$defs/nullNote" } ] },
+        "accessed_at": { "type": "string", "format": "date-time" },
+        "kind": { "enum": ["official-site","docs","whitepaper","social","explorer","repository","audit","announcement","third-party-data","news","other"] },
+        "authority": { "enum": ["onchain","primary","independent","aggregator","social","unknown"] },
+        "authenticity": { "$ref": "#/$defs/authenticity" },
+        "supports": { "type": "array", "uniqueItems": true, "items": { "anyOf": [ { "$ref": "#/$defs/claimId" }, { "$ref": "#/$defs/eventId" } ] } },
+        "excerpt": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "gap": {
+      "type": "object", "additionalProperties": false,
+      "required": ["priority","question","checked","next"],
+      "properties": {
+        "priority": { "$comment": "The contract spells these uppercase; the lowercase spelling used in the desk assignments is accepted and the compiler uppercases it.", "enum": ["P0","P1","P2","p0","p1","p2"] },
+        "question": { "$ref": "#/$defs/text" },
+        "checked": { "$ref": "#/$defs/text" },
+        "next": { "$ref": "#/$defs/text" }
+      }
+    }
+  },
+  "properties": {
+    "contract_version": { "const": "proofline-research-v2" },
+    "work_id": { "type": "string", "pattern": "^WORK-[0-9]{8}-[a-z0-9-]+$" },
+    "producer": { "anyOf": [ { "enum": ["grok-heavy","grok-bot","supergrok","codex","claude"] }, { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9-]{0,38}$" } ] },
+    "role": { "enum": ["collector","verifier","compiler"] },
+    "base_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "slug": { "$ref": "#/$defs/slugName" },
+    "name": { "$ref": "#/$defs/text" },
+    "packet_tier": { "enum": ["seed","full","update"] },
+    "as_of": { "type": "string", "format": "date-time" },
+    "prior_packet": { "type": ["string","null"], "minLength": 1 },
+    "supersedes": { "type": ["string","null"], "pattern": "^WORK-[0-9]{8}-[a-z0-9-]+$" },
+    "owned_slugs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/slugName" } },
+    "allowed_paths": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+    "identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["canonical_name","aliases","symbols","entity_kind","chain_scope","official_domain","official_handle","repository","possible_matches"],
+      "properties": {
+        "canonical_name": { "$ref": "#/$defs/text" },
+        "aliases": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+        "symbols": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+        "entity_kind": { "$ref": "shared#/$defs/entityKind" },
+        "chain_scope": { "$ref": "shared#/$defs/chainScope" },
+        "official_domain": { "$ref": "#/$defs/urlOrNull" },
+        "official_handle": { "$ref": "#/$defs/handleOrNull" },
+        "repository": { "$ref": "#/$defs/urlOrNull" },
+        "possible_matches": { "type": "array", "items": { "$ref": "#/$defs/possibleMatch" } }
+      }
+    },
+    "classification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["primary_leaf","secondary_leaves","mechanism_tags","ecosystem_role","lifecycle","coverage_recommendation","evidence_state","rationale"],
+      "properties": {
+        "primary_leaf": { "$ref": "#/$defs/taxonomyLeaf" },
+        "secondary_leaves": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/taxonomyLeaf" } },
+        "mechanism_tags": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "shared#/$defs/mechanismTag" } },
+        "ecosystem_role": { "enum": ["subject","dependency","observe","graduation"] },
+        "lifecycle": { "enum": ["mainnet","beta","testnet-only","announced","inactive","unknown"] },
+        "coverage_recommendation": { "enum": ["candidate","seed","full"] },
+        "evidence_state": { "enum": ["verified","partly-verified","claimed","conflicted","unverified"] },
+        "rationale": { "$ref": "#/$defs/text" }
+      }
+    },
+    "qualifying": {
+      "type": "object", "additionalProperties": false,
+      "required": ["deployed_on_chain","native_play","citable","research_story"],
+      "properties": {
+        "deployed_on_chain": { "$ref": "#/$defs/qualifyingTest" },
+        "native_play": { "$ref": "#/$defs/qualifyingTest" },
+        "citable": { "$ref": "#/$defs/qualifyingTest" },
+        "research_story": { "$ref": "#/$defs/qualifyingTest" }
+      }
+    },
+    "links": { "type": "array", "items": { "$ref": "#/$defs/link" } },
+    "deployments": { "type": "array", "items": { "$ref": "#/$defs/deployment" } },
+    "metrics": { "type": "array", "items": { "$ref": "#/$defs/metric" } },
+    "reproductions": { "type": "array", "items": { "$ref": "#/$defs/reproduction" } },
+    "claims": { "type": "array", "items": { "$ref": "#/$defs/claim" } },
+    "conflicts": { "type": "array", "items": { "$ref": "#/$defs/conflict" } },
+    "events": { "type": "array", "items": { "$ref": "#/$defs/event" } },
+    "receipts": { "type": "array", "items": { "$ref": "#/$defs/receipt" } },
+    "gaps": { "type": "array", "items": { "$ref": "#/$defs/gap" } }
+  },
+  "allOf": [
+    { "$comment": "Tier full adds deployments, claims and gaps; its body is checked in scripts/lib/packet.mjs.",
+      "if": { "properties": { "packet_tier": { "const": "full" } }, "required": ["packet_tier"] },
+      "then": { "required": ["deployments","claims","gaps"], "properties": { "deployments": { "minItems": 1 }, "claims": { "minItems": 1 }, "gaps": {} } } },
+    { "$comment": "An update names the prior work id it supersedes (§5).",
+      "if": { "properties": { "packet_tier": { "const": "update" } }, "required": ["packet_tier"] },
+      "then": { "required": ["supersedes"], "properties": { "supersedes": { "type": "string" } } } }
+  ]
+}

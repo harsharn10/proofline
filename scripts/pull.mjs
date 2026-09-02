@@ -113,11 +113,15 @@ async function main() {
     const project = projects.get(row.slug);
     if (!project) continue;
     const addresses = addressesFor(project);
-    if (addresses.length === 0) continue;
+    // A name with no located address still gets a file when its ledger cites a DefiLlama protocol
+    // page: the chain-slice metrics are worth reading on their own.
+    const ledger = await readYaml(join("content/sources", `${row.slug}.yaml`)).catch(() => null);
+    const hasLlama = Boolean(findLlamaSlug(ledger?.sources ?? []));
+    if (addresses.length === 0 && !hasLlama) continue;
     targets.push({ slug: row.slug, addresses });
   }
   if (args.slug && targets.length === 0) {
-    console.error(`no census slug "${args.slug}" with a ${CHAIN} address`);
+    console.error(`no census slug "${args.slug}" with a ${CHAIN} address or a DefiLlama receipt`);
     process.exit(1);
   }
 

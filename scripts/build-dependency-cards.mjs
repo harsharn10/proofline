@@ -7,7 +7,11 @@
 import { writeFile, access } from "node:fs/promises";
 import { stringify } from "yaml";
 import { validateAgainst } from "./lib/schemas.mjs";
-import { GH, ACCESSED } from "./intake/2026-08-31/harvest-data.mjs";
+
+// Inlined from the one-shot importer scripts/intake/2026-08-31/harvest-data.mjs, which this script no
+// longer loads: the two constants below are the only values it ever used from that 1,239-line file.
+const GH = "https://github.com/harsharn10/proofline/blob/main";
+const ACCESSED = "2026-08-31T00:00:00Z";
 
 const RESEARCHER = "harsharn10";
 const exists = (p) => access(p).then(() => true, () => false);
