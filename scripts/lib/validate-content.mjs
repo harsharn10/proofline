@@ -29,12 +29,13 @@ export async function validateContent(root = "content", { release = false } = {}
   const x = crossCheck(content);
   errors.push(...x.errors); warnings.push(...x.warnings);
 
-  if (content.site.corrections?.destination === "TODO") warnings.push("site.yaml: corrections.destination is TODO (blocks --release)");
+  if (content.site.corrections?.destination === "TODO") warnings.push("site.yaml: corrections.destination is TODO (no corrections link renders until it is set)");
 
   // Qualifying tests (spec §5.2): a false value is visible as a warning and blocks --release.
   for (const c of content.census)
     for (const [name, t] of Object.entries(c.qualifying ?? {}))
-      if (t?.value === false) (release ? errors : warnings).push(`census: ${c.slug} fails qualifying test ${name}: ${t.note}`);
+      // A failing test keeps the row on the watchlist (census role: observe); it never blocks a release (issue #35).
+      if (t?.value === false) warnings.push(`census: ${c.slug} fails qualifying test ${name}${c.role === "observe" ? "" : " and is not marked role: observe"}: ${t.note}`);
 
   for (const [slug, project] of content.projects) {
     const sourceList = content.sources.get(slug)?.sources ?? [];

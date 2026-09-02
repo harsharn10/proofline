@@ -92,7 +92,7 @@ type SourcesFile = { slug: string; sources: SourceEntry[] };
 type FeedFile = { slug: string; items: Dossier["feed"] };
 // The subset of census.yaml the site reads: the official handle and the desk's taxonomy
 // placement per slug (schema/census.schema.json).
-type CensusEntry = { slug: string; handle?: string; tree?: { primary?: string; secondary?: string[] } };
+type CensusEntry = { slug: string; handle?: string; role?: "subject" | "observe"; tree?: { primary?: string; secondary?: string[] } };
 
 type DerivedFile = {
   generated_at: string;
@@ -211,9 +211,11 @@ function loadContent(): ServerContent {
   // tree.primary ("launch/bonding-curve") -> { domain, leaf, label, sectionId }: the home sections,
   // the dossier eyebrow and the peer set all key off this placement.
   const treeBySlug: Record<string, TreeRef> = {};
+  const roleBySlug: Record<string, "subject" | "observe"> = {};
   for (const row of census) {
     const tree = resolveTree(row.tree?.primary, taxonomy);
     if (tree) treeBySlug[row.slug] = tree;
+    roleBySlug[row.slug] = row.role === "observe" ? "observe" : "subject";
   }
 
   const dependencies: Record<string, DependencyCard> = {};
@@ -251,6 +253,7 @@ function loadContent(): ServerContent {
       category: project.category,
       lifecycle: project.lifecycle,
       coverage: project.coverage,
+      role: roleBySlug[slug] ?? "subject",
       summary: project.summary,
       links: project.official_links,
       dependencies: project.dependencies,
@@ -300,6 +303,7 @@ function toDirectoryEntry(d: Dossier, treeBySlug: Record<string, TreeRef>): Dire
     category: d.category,
     lifecycle: d.lifecycle,
     coverage: d.coverage,
+    role: d.role,
     summary: d.summary,
     derived: d.derived,
     feedCount: d.feed.length,
@@ -358,6 +362,7 @@ function peersFor(dossier: Dossier, all: Dossier[], treeBySlug: Record<string, T
     summary: truncate(d.summary, PEER_SUMMARY_MAX),
     lifecycle: d.lifecycle,
     coverage: d.coverage,
+    role: d.role,
     direct: treeBySlug[d.slug]!.leaf === tree.leaf,
     leafLabel: treeBySlug[d.slug]!.label,
     metric: headlineMetric(d.derived),

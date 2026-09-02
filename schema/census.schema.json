@@ -15,6 +15,7 @@
         "properties": { "kind": { "enum": ["site","app","docs","whitepaper","x","github","telegram","discord","other"] }, "url": { "type": "string", "format": "uri" } } } },
       "discovery_source": { "type": "string", "minLength": 1 },
       "handle": { "type": "string", "pattern": "^@[A-Za-z0-9_]{1,15}$" },
+      "role": { "$comment": "subject (default) is researched and may be scored; observe is a watchlist row kept for completeness — listed, never ranked or scored (docs/taxonomy.md §1 ecosystem role).", "enum": ["subject", "observe"] },
       "tree": { "type": "object", "additionalProperties": false, "required": ["primary"],
         "properties": { "primary": { "$ref": "#/$defs/treePath" }, "secondary": { "type": "array", "items": { "$ref": "#/$defs/treePath" }, "uniqueItems": true } } },
       "qualifying": { "type": "object", "additionalProperties": false, "required": ["deployed_on_chain","native_play","citable","research_story"],

@@ -65,6 +65,9 @@ export type Findings = {
 
 export type Lifecycle = "mainnet" | "beta" | "announced" | "inactive" | "testnet-only";
 export type Coverage = "full" | "stub";
+// census.yaml `role`: a subject is researched and may be scored; an observe row is the watchlist —
+// listed for completeness, never ranked or scored (it fails a qualifying test).
+export type CensusRole = "subject" | "observe";
 
 export type Review = {
   researcher: string;
@@ -246,6 +249,7 @@ export type DirectoryEntry = {
   category: string;
   lifecycle: Lifecycle;
   coverage: Coverage;
+  role: CensusRole;
   summary: string;
   derived: Derived;
   feedCount: number;
@@ -271,6 +275,7 @@ export type Dossier = {
   category: string;
   lifecycle: Lifecycle;
   coverage: Coverage;
+  role: CensusRole;
   summary: string;
   links: Link[];
   dependencies: string[]; // ids into the top-level `dependencies` map
@@ -382,6 +387,7 @@ export type PeerRef = {
   summary: string;
   lifecycle: Lifecycle;
   coverage: Coverage;
+  role: CensusRole;
   direct: boolean;
   leafLabel: string;
   metric: Metric | null;
@@ -462,11 +468,15 @@ export function reportedTitle(asOf: string): string {
 
 // --- Labels -----------------------------------------------------------------
 
-// Coverage states in reader words (docs/taxonomy.md §2 display mapping).
+// Coverage states in reader words (docs/taxonomy.md §2 display mapping). A watchlist row shows
+// "Watchlist" in place of its coverage word.
 export const COVERAGE_LABEL: Record<Coverage, string> = {
   full: "Full research",
   stub: "Initial research",
 };
+export function coverageWord(coverage: Coverage, role: CensusRole): string {
+  return role === "observe" ? "Watchlist" : COVERAGE_LABEL[coverage];
+}
 
 // Evidence classes in reader words; defined on /methodology.
 export const EVIDENCE_LABEL: Record<EvidenceClass, string> = {
