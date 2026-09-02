@@ -50,7 +50,7 @@ async function appendChangelog(path, entry) {
   try { text = await readFile(path, "utf8"); }
   catch (error) {
     if (error.code !== "ENOENT") throw error;
-    text = "# One entry per published change. Newest last.\n";
+    text = `# One entry per published change for ${entry.slug}. Newest last.\n`;
   }
   const existing = parse(text) ?? [];
   if (existing.some((row) => row.review_key === entry.review_key)) return false;
@@ -70,7 +70,7 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
   const sourcesPath = join(root, "sources", `${slug}.yaml`);
   const feedPath = join(root, "feed", `${slug}.yaml`);
   const researchPath = join(root, "research", `${slug}.md`);
-  const changelogPath = join(root, "changelog.yaml");
+  const changelogPath = join(root, "changelog", `${slug}.yaml`);
   const census = await yamlOr(censusPath, []);
   const priorProject = await yamlOr(projectPath, null);
   const priorCensusRow = census.find((row) => row.slug === slug) ?? null;
@@ -87,7 +87,7 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
     for (const path of files) console.log(path);
     return { ...result, files, dryRun: true };
   }
-  for (const path of [projectPath, sourcesPath, researchPath, feedPath]) await mkdir(dirname(path), { recursive: true });
+  for (const path of [projectPath, sourcesPath, researchPath, feedPath, changelogPath]) await mkdir(dirname(path), { recursive: true });
   await writeFile(censusPath, stringify(nextCensus, { lineWidth: 0 }));
   await writeFile(projectPath, stringify(result.project, { lineWidth: 0 }));
   await writeFile(sourcesPath, stringify(result.sources, { lineWidth: 0 }));
