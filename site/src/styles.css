@@ -508,6 +508,51 @@
   }
 }
 
+
+/* ── tracker: ranked KPI tables, movers, traction grid ─────────────────────────────── */
+@layer components {
+  .ktable { margin-top: 6px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .krow {
+    display: grid; grid-template-columns: minmax(160px, 1.6fr) minmax(110px, 0.9fr) repeat(4, minmax(72px, 0.7fr)) minmax(64px, 0.5fr);
+    gap: 10px; align-items: center; padding: 9px 12px; border-bottom: 1px solid var(--line);
+    font-size: 13px; color: var(--text); background: var(--panel);
+  }
+  .krow:last-child { border-bottom: none; }
+  a.krow:hover { background: var(--panel2); color: var(--text); }
+  .krow.dim { color: var(--muted); }
+  .krow.dim .kname b { color: var(--muted); }
+  .khead { background: var(--panel2); font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .kname { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .kname b { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kname small { font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kstatus { display: flex; gap: 7px; align-items: baseline; flex-wrap: wrap; }
+  .kago { font-family: var(--mono); font-size: 10.5px; color: var(--faint); white-space: nowrap; }
+  .knum { font-family: var(--mono); font-size: 12.5px; text-align: right; white-space: nowrap; }
+  .knum.pos, .num.pos, .mchg.pos, .mv.pos { color: var(--accent); }
+  .knum.neg, .num.neg, .mchg.neg { color: var(--neg); }
+  .kctl { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .kctl.faint { color: var(--faint); }
+
+  .movers { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 6px; }
+  .mcol { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .mlist { list-style: none; margin: 8px 0 0; padding: 0; }
+  .mlist li a { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .mlist li:last-child a { border-bottom: none; }
+  .mlist b { color: var(--text); }
+  .mrank { font-family: var(--mono); font-size: 10.5px; color: var(--faint); width: 14px; }
+  .mv { font-family: var(--mono); font-size: 12px; color: var(--text); margin-left: auto; white-space: nowrap; }
+  .mchg { font-family: var(--mono); font-size: 11px; }
+
+  .traction .v.num { font-family: var(--mono); font-size: 16px; font-weight: 600; }
+
+  @media (max-width: 760px) {
+    .krow { grid-template-columns: minmax(0, 1fr) auto; row-gap: 4px; }
+    .khead { display: none; }
+    .krow .knum { text-align: left; font-size: 11.5px; }
+    .movers { grid-template-columns: 1fr; }
+  }
+}
+
 /* ── Dual mode (ported from Eregion globals.css §Dual mode): dark stays the terminal;
    light is the professional read. Light accent is a darker Robinhood green — #00C805
    and #00A804 both fail 4.5:1 on #f6f7f9; #008003 measures 4.8:1 (5.1:1 on white

@@ -136,14 +136,87 @@ export type PulledAddress = {
   holders: number | null;
   errors: Array<{ step: string; message: string }>;
 };
+export type PulledPair = {
+  dex: string;
+  pair_address: string;
+  quote_symbol: string | null;
+  price_usd: number | null;
+  liquidity_usd: number | null;
+  volume_h24: number | null;
+  volume_h6: number | null;
+  txns_h24: { buys: number; sells: number };
+  price_change_h24: number | null;
+  fdv: number | null;
+  created_at: string | null;
+};
+// DexScreener read for the project's token (scripts/lib/pull/dexscreener.mjs).
+export type PulledMarket = {
+  token_address: string | null;
+  pulled_at: string;
+  pairs: PulledPair[];
+  liquidity_usd: number | null;
+  volume_h24: number | null;
+  trades_h24: number | null;
+  price_usd: number | null;
+  price_change_h24: number | null;
+  fdv: number | null;
+  first_pair_at: string | null;
+  errors: Array<{ step: string; message: string }>;
+};
+// Blockscout activity read per address (scripts/lib/pull/activity.mjs).
+export type PulledActivity = {
+  pulled_at: string;
+  addresses: Array<{
+    address: string;
+    label: string | null;
+    role: string | null;
+    transactions_count: number | null;
+    token_transfers_count: number | null;
+    last_tx_at: string | null;
+    last_method: string | null;
+    txns_24h: number | null;
+    launches_24h: number | null;
+    errors: Array<{ step: string; message: string }>;
+  }>;
+  last_activity_at: string | null;
+  txns_24h: number | null;
+  launches_24h: number | null;
+};
 export type PulledFile = {
   slug: string;
   pulled_at: string;
   chain: "robinhood-chain";
   addresses: PulledAddress[];
   metrics: Array<{ kind: MetricKind; value: number; as_of: string; source_url: string }>;
+  market?: PulledMarket | null;
+  activity?: PulledActivity | null;
   errors: Array<{ step: string; message: string }>;
 };
+
+// Activity status, computed server-side from the pulled reads (never asserted by a person):
+// live = on-chain activity or trades inside 7 days; quiet = inside 30 days; dormant = older;
+// announced = nothing located on chain; testnet = lifecycle testnet-only.
+export type ActivityStatus = "live" | "quiet" | "dormant" | "announced" | "testnet";
+
+// The tracker numbers a card and a profile show. Every figure is a dated read from a named free
+// source (DexScreener, Blockscout, DefiLlama); null means not read, never zero.
+export type Kpis = {
+  status: ActivityStatus;
+  lastActivityAt: string | null;
+  liquidityUsd: number | null;
+  volume24h: number | null;
+  trades24h: number | null;
+  priceChange24h: number | null;
+  fdv: number | null;
+  holders: number | null;
+  holdersDelta7d: number | null;
+  launches24h: number | null;
+  txnsTotal: number | null;
+  firstPairAt: string | null;
+  tvl: number | null;
+  readAt: string | null;
+};
+export type KpiKey = Exclude<keyof Kpis, "status" | "lastActivityAt" | "firstPairAt" | "readAt">;
 
 export type ChangelogType = "score" | "risk" | "stage" | "finding" | "correction" | "coverage";
 export type ChangelogSeverity = "Info" | "Review" | "Material" | "Risk";
@@ -257,6 +330,7 @@ export type DirectoryEntry = {
   tree: TreeRef | null;
   // Holder count of the project's token contract from content/pulled, when read. Chip figure of last resort.
   holders: number | null;
+  kpis: Kpis;
 };
 
 // A dependency card as the home page lists it: enough to label and link the chip.
@@ -288,6 +362,7 @@ export type Dossier = {
   changelog: ChangelogEntry[];
   derived: Derived;
   pulled: PulledFile | null;
+  kpis: Kpis;
 };
 
 export type DependencyControl = {
@@ -376,6 +451,7 @@ export type DirectoryBundle = {
   entries: DirectoryEntry[];
   dependencies: DependencyListing[];
   generatedAt: string; // build/derived.json generated_at — when scores were last computed
+  now: number; // build time (ms epoch) for relative "2 min ago" wording
 };
 
 // A "competes with" card on a dossier's Overview tab: same tree leaf first (direct), then same
@@ -402,11 +478,114 @@ export type DossierBundle = {
   peers: PeerRef[];
   tree: TreeRef | null;
   section: SectionDef | null;
+  now: number;
 };
 
 // --- Visitor-facing taxonomy ------------------------------------------------------------
 // Sections and leaf labels come from schema/taxonomy.json via the server (TreeRef, SectionDef).
 // Nothing here duplicates that table.
+
+// Which tracker numbers a section ranks and shows, in order (first key ranks). Chosen per section:
+// a launchpad is judged by volume and launches, a token by liquidity, credit by TVL.
+export const SECTION_KPIS: Record<string, KpiKey[]> = {
+  launchpads: ["volume24h", "launches24h", "liquidityUsd", "holders"],
+  tokens: ["liquidityUsd", "volume24h", "holders", "priceChange24h"],
+  trading: ["volume24h", "liquidityUsd", "trades24h", "holders"],
+  credit: ["tvl", "volume24h", "holders", "liquidityUsd"],
+  yield: ["tvl", "volume24h", "holders", "liquidityUsd"],
+  "rwa-products": ["tvl", "liquidityUsd", "volume24h", "holders"],
+  agents: ["trades24h", "volume24h", "holders", "liquidityUsd"],
+  "nft-treasuries": ["holders", "volume24h", "liquidityUsd", "trades24h"],
+  markets: ["volume24h", "tvl", "liquidityUsd", "holders"],
+  tooling: ["txnsTotal", "holders", "volume24h", "liquidityUsd"],
+};
+export const DEFAULT_KPIS: KpiKey[] = ["volume24h", "liquidityUsd", "holders", "trades24h"];
+
+export const KPI_LABEL: Record<KpiKey, string> = {
+  liquidityUsd: "liquidity",
+  volume24h: "vol 24h",
+  trades24h: "trades 24h",
+  priceChange24h: "24h",
+  fdv: "FDV",
+  holders: "holders",
+  holdersDelta7d: "holders 7d",
+  launches24h: "launches 24h",
+  txnsTotal: "txns",
+  tvl: "TVL",
+};
+export const KPI_SOURCE: Record<KpiKey, string> = {
+  liquidityUsd: "DexScreener, all pools",
+  volume24h: "DexScreener, all pools",
+  trades24h: "DexScreener, buys plus sells",
+  priceChange24h: "DexScreener, deepest pool",
+  fdv: "DexScreener, deepest pool",
+  holders: "Blockscout holder count",
+  holdersDelta7d: "Blockscout holder count, change over 7 days of snapshots",
+  launches24h: "Blockscout, launch transactions to the factory in 24h",
+  txnsTotal: "Blockscout transaction count",
+  tvl: "DefiLlama, Robinhood Chain slice",
+};
+
+// "$52.2M" / "$4.9K" / "$310" — mono everywhere it renders.
+export function formatUsd(v: number): string {
+  if (v >= 1e9) return `$${(v / 1e9).toFixed(1)}B`;
+  if (v >= 1e6) return `$${(v / 1e6).toFixed(1)}M`;
+  if (v >= 1e4) return `$${(v / 1e3).toFixed(0)}K`;
+  if (v >= 1e3) return `$${(v / 1e3).toFixed(1)}K`;
+  return `$${Math.round(v).toLocaleString("en-US")}`;
+}
+export function formatCount(v: number): string {
+  if (v >= 1e6) return `${(v / 1e6).toFixed(1)}M`;
+  if (v >= 1e4) return `${(v / 1e3).toFixed(0)}K`;
+  return Math.round(v).toLocaleString("en-US");
+}
+export function formatKpi(key: KpiKey, v: number | null): string {
+  if (v === null || Number.isNaN(v)) return "—";
+  switch (key) {
+    case "liquidityUsd":
+    case "volume24h":
+    case "fdv":
+    case "tvl":
+      return formatUsd(v);
+    case "priceChange24h":
+      return `${v > 0 ? "+" : ""}${v.toFixed(1)}%`;
+    case "holdersDelta7d":
+      return `${v > 0 ? "+" : ""}${formatCount(v)}`;
+    default:
+      return formatCount(v);
+  }
+}
+// "2 min ago" / "3 h ago" / "5 d ago" relative to build time.
+export function relativeTime(iso: string, now: number): string {
+  const ms = now - new Date(iso).getTime();
+  if (!Number.isFinite(ms) || ms < 0) return "just now";
+  const m = Math.floor(ms / 60000);
+  if (m < 60) return `${Math.max(1, m)} min ago`;
+  const h = Math.floor(m / 60);
+  if (h < 48) return `${h} h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 60) return `${d} d ago`;
+  return `${Math.floor(d / 30)} mo ago`;
+}
+export const STATUS_LABEL: Record<ActivityStatus, string> = {
+  live: "Live",
+  quiet: "Quiet",
+  dormant: "Dormant",
+  announced: "Announced",
+  testnet: "Testnet",
+};
+export function statusTone(status: ActivityStatus): Tone {
+  switch (status) {
+    case "live":
+      return "live";
+    case "quiet":
+      return "warn";
+    case "dormant":
+      return "risk";
+    default:
+      return "muted";
+  }
+}
 
 export const METRIC_KIND_LABEL: Record<MetricKind, string> = {
   tvl: "TVL",

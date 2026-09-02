@@ -35,7 +35,7 @@ export const Route = createFileRoute("/n/$slug")({
 });
 
 function NamePage() {
-  const { dossier, site, dependencies, peers, tree, section } = Route.useLoaderData();
+  const { dossier, site, dependencies, peers, tree, section, now } = Route.useLoaderData();
   const { tab } = Route.useSearch();
   return (
     <>
@@ -51,6 +51,7 @@ function NamePage() {
         peers={peers}
         tree={tree}
         section={section}
+        now={now}
         tab={dossier.coverage === "full" ? (tab ?? "overview") : "overview"}
       />
     </>
