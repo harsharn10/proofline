@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { DeploymentGrid } from "@/components/deployment-grid";
 import { ExportMenu } from "@/components/export-menu";
 import { FeedList } from "@/components/feed-list";
+import { OnChain } from "@/components/on-chain";
 import { PeerCards } from "@/components/peer-cards";
 import { Section } from "@/components/section";
 import { SnapshotStrip } from "@/components/snapshot-strip";
@@ -520,6 +521,9 @@ export function Dossier({
       <p className="lead mt-5">{dejargon(dossier.summary)}</p>
       <LinkRow dossier={dossier} site={site} full={full} />
       <SnapshotStrip metrics={derived.metrics} rank={derived.rank} sources={dossier.sources} />
+      {/* Chain facts sit above the tabs: they are the same on every tab and are what a reader about to
+          transact wants first — who holds the keys, how many holders, when it was deployed. */}
+      <OnChain pulled={dossier.pulled} explorerBase={site.chain.explorer} />
 
       {full ? (
         <>

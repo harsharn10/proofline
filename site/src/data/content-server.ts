@@ -18,6 +18,7 @@ import type {
   Link,
   Metric,
   PeerRef,
+  PulledFile,
   Rank,
   Research,
   Review,
@@ -238,6 +239,7 @@ function loadContent(): ServerContent {
       null,
     );
     const feed = feedFile ? [...feedFile.items].sort((a, b) => b.date.localeCompare(a.date)) : [];
+    const pulled = readYamlOrWarn<PulledFile | null>(rawContent.pulled[`${slug}.yaml`], `pulled/${slug}.yaml`, slug, null);
     const changelog = changelogAll
       .filter((entry) => entry.slug === slug)
       .sort((a, b) => b.date.localeCompare(a.date));
@@ -260,6 +262,7 @@ function loadContent(): ServerContent {
       sources: sourcesFile.sources,
       changelog,
       derived: pickDerived(derivedFile.projects[slug], slug, project.coverage),
+      pulled,
     };
   });
 
@@ -301,7 +304,15 @@ function toDirectoryEntry(d: Dossier, treeBySlug: Record<string, TreeRef>): Dire
     derived: d.derived,
     feedCount: d.feed.length,
     tree: treeBySlug[d.slug] ?? null,
+    holders: tokenHolders(d.pulled),
   };
+}
+
+// The holder count of the project's token contract (role token, else the first address with one).
+function tokenHolders(pulled: PulledFile | null): number | null {
+  if (!pulled) return null;
+  const token = pulled.addresses.find((a) => a.role === "token" && a.holders !== null);
+  return token?.holders ?? pulled.addresses.find((a) => a.holders !== null)?.holders ?? null;
 }
 
 const PEER_LIMIT = 6;

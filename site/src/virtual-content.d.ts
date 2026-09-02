@@ -12,6 +12,7 @@ declare module "virtual:proofline-content" {
     sources: Record<string, string>;
     research: Record<string, string>;
     feed: Record<string, string>;
+    pulled: Record<string, string>;
   };
   export default content;
 }

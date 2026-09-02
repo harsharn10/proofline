@@ -115,6 +115,33 @@ export type SourceEntry = {
   available: boolean;
 };
 
+// Machine-read chain facts from content/pulled/<slug>.yaml (scripts/pull.mjs; schema/pulled.schema.json).
+// Dated, never hand-edited. The site renders them as-is and never recomputes ownership from them.
+export type PulledAddress = {
+  address: string;
+  label: string | null;
+  role: DeploymentRole | null;
+  is_contract: boolean | null;
+  source_verified: boolean | null;
+  contract_name: string | null;
+  proxy: { type: "eip1967" | "none" | "unknown"; implementation: string | null; admin: string | null };
+  owner: string | null;
+  owner_type: "eoa" | "contract" | "safe" | "unknown" | "none";
+  safe: { threshold: number | null; signers: string[] | null } | null;
+  created_block: number | null;
+  created_at: string | null;
+  holders: number | null;
+  errors: Array<{ step: string; message: string }>;
+};
+export type PulledFile = {
+  slug: string;
+  pulled_at: string;
+  chain: "robinhood-chain";
+  addresses: PulledAddress[];
+  metrics: Array<{ kind: MetricKind; value: number; as_of: string; source_url: string }>;
+  errors: Array<{ step: string; message: string }>;
+};
+
 export type ChangelogType = "score" | "risk" | "stage" | "finding" | "correction" | "coverage";
 export type ChangelogSeverity = "Info" | "Review" | "Material" | "Risk";
 export type ChannelEvent =
@@ -221,6 +248,8 @@ export type DirectoryEntry = {
   feedCount: number;
   // census tree.primary placement — the home page's section grouping and the card's product label.
   tree: TreeRef | null;
+  // Holder count of the project's token contract from content/pulled, when read. Chip figure of last resort.
+  holders: number | null;
 };
 
 // A dependency card as the home page lists it: enough to label and link the chip.
@@ -250,6 +279,7 @@ export type Dossier = {
   sources: SourceEntry[];
   changelog: ChangelogEntry[];
   derived: Derived;
+  pulled: PulledFile | null;
 };
 
 export type DependencyControl = {

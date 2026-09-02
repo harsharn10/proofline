@@ -48,7 +48,10 @@ findings:
       class: claim
       sources:
         - S5
-  risk: []
+  risk:
+    - text: "owner() on the Artificial Inu token contract returns 0xeb7c…0862, the verified Airlock contract that also owns the EARN, Statics and Artificial Inu tokens; the token's owner-only functions are controlled by shared launch infrastructure, not by a project-held key or multisig."
+      class: verified
+      sources: [S9]
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from PRD Appendix A not yet reproduced on Blockscout
