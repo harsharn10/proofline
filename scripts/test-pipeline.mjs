@@ -68,8 +68,9 @@ await test("changelog lint catches internal vocabulary", async () => {
       "  methodology_version: proofline-v1.0", "",
     ].join("\n"));
     const { errors } = await validateContent(root);
-    assert.ok(errors.includes('changelog.yaml: [85] 2026-09-01 pons finding detail: internal vocabulary "the desk"'), errors.join("\n"));
-    assert.ok(errors.includes('changelog.yaml: [85] 2026-09-01 pons finding detail: internal vocabulary "Grok"'), errors.join("\n"));
+    // The fixture entry is appended last, so its index is whatever the live file's length is — never hard-code it.
+    assert.ok(errors.some((e) => /^changelog\.yaml: \[\d+\] 2026-09-01 pons finding detail: internal vocabulary "the desk"$/.test(e)), errors.join("\n"));
+    assert.ok(errors.some((e) => /^changelog\.yaml: \[\d+\] 2026-09-01 pons finding detail: internal vocabulary "Grok"$/.test(e)), errors.join("\n"));
     assert.equal(errors.length, 2, `only the fixture entry fails — ${errors.join("\n")}`);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
