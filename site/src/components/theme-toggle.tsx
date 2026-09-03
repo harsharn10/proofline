@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 
-const KEY = "proofline.theme";
+const KEY = "icarus.theme";
 
-// Eregion's dual-mode toggle, ported: dark is the default terminal, light the professional
-// read. The saved choice is applied before first paint by the inline snippet in
-// __root.tsx's head; this button only flips and persists it. localStorage failures
-// (private mode) fall through silently — the flip still applies for the session.
 export function ThemeToggle() {
   const [theme, setTheme] = useState<string | null>(null);
   useEffect(() => {
-    setTheme(document.documentElement.getAttribute("data-theme") ?? "dark");
+    const selected = document.documentElement.getAttribute("data-theme");
+    const system = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    setTheme(selected ?? system);
   }, []);
   const flip = () => {
-    const next = (document.documentElement.getAttribute("data-theme") ?? "dark") === "dark" ? "light" : "dark";
+    const selected = document.documentElement.getAttribute("data-theme");
+    const system = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    const next = (selected ?? system) === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
     try {
       localStorage.setItem(KEY, next);
@@ -22,8 +22,8 @@ export function ThemeToggle() {
     setTheme(next);
   };
   return (
-    <button type="button" className="themetoggle" onClick={flip} title="Toggle light / dark">
-      {theme === "light" ? "☾ dark" : "☀ light"}
+    <button type="button" className="themetoggle" onClick={flip} title="Toggle light or dark theme">
+      {theme === "light" ? "dark" : "light"}
     </button>
   );
 }

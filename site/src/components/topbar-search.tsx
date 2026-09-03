@@ -3,8 +3,6 @@ import { useNavigate } from "@tanstack/react-router";
 
 type NameRef = { slug: string; symbol: string | null; name: string };
 
-// Topbar jump-box (IA brief: search lives in the topbar and goes straight to dossiers).
-// Type, click a match or hit Enter, land on /n/<slug> — no filtered list page in between.
 export function TopbarSearch({ names }: { names: NameRef[] }) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
