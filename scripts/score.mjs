@@ -5,7 +5,7 @@ import { validateContent } from "./lib/validate-content.mjs";
 import { derive, computeRanks } from "./lib/score.mjs";
 import { computeTrending } from "./lib/trending.mjs";
 import { cohortForLeaf } from "./lib/taxonomy.mjs";
-import { meetsShareBar } from "./lib/share-bar.mjs";
+import { meetsShareBar, officialSurfaceConfirmed } from "./lib/share-bar.mjs";
 
 const args = process.argv.slice(2);
 const force = args.includes("--force");
@@ -71,7 +71,7 @@ const censusBySlug = new Map(content.census.map((row) => [row.slug, row]));
 const shareBar = Object.fromEntries(
   [...content.projects]
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([slug, project]) => {
+    .map(([slug]) => {
       const census = censusBySlug.get(slug);
       const pulled = pulledBySlug.get(slug);
       const cohort = cohortForLeaf(census?.tree?.primary);
@@ -79,9 +79,7 @@ const shareBar = Object.fromEntries(
       return [
         slug,
         meetsShareBar({
-          officialConfirmed:
-            project.official_links?.some((link) => link.kind === "site" || link.kind === "docs") === true &&
-            census?.identity?.status !== "conflicted",
+          officialConfirmed: officialSurfaceConfirmed(census),
           hasContractOn4663:
             pulled?.addresses?.some((address) => address.is_contract === true) === true,
           shareBarMetric:

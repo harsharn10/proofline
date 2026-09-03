@@ -11,7 +11,7 @@ import {
 } from "./types";
 // Shared with scripts/score.mjs so site and Telegram eligibility cannot drift.
 // @ts-expect-error The repository-level helper is intentionally plain ESM.
-import { meetsShareBar as meetsShareBarCore } from "../../../scripts/lib/share-bar.mjs";
+import { meetsShareBar as meetsShareBarCore, officialSurfaceConfirmed as officialSurfaceConfirmedCore } from "../../../scripts/lib/share-bar.mjs";
 import type {
   ChangelogEntry,
   Deployment,
@@ -117,8 +117,9 @@ type CensusEntry = {
   handle?: string;
   role?: "subject" | "observe";
   identity: { entity_kind: DirectoryEntry["entityKind"]; status: DirectoryEntry["identityStatus"] };
+  official_links?: Link[];
+  qualifying?: { citable?: { value: boolean; note: string; verified: boolean } };
   tree?: { primary?: string; secondary?: string[] };
-  flags?: Array<string | { type?: string }>;
 };
 
 type PulledCardFields = {
@@ -324,7 +325,7 @@ function loadContent(): ServerContent {
       pulled,
       kpis: kpisFor({ lifecycle: project.lifecycle, deployments: project.deployments }, pulled, history, buildNow),
       card: {
-        officialConfirmed: officialSurfaceConfirmed(project.official_links, censusRow),
+        officialConfirmed: officialSurfaceConfirmed(censusRow),
         handle: censusRow?.handle ?? null,
         themes: Array.isArray(project.themes) ? project.themes.filter((tag) => typeof tag === "string").slice(0, 5) : [],
         history: history.map((point) => ({
@@ -386,7 +387,7 @@ function toDirectoryEntry(
 ): DirectoryEntry {
   const tree = treeBySlug[d.slug] ?? null;
   const census = censusBySlug.get(d.slug);
-  const officialConfirmed = officialSurfaceConfirmed(d.links, census);
+  const officialConfirmed = officialSurfaceConfirmed(census);
   const hasContractOn4663 =
     d.pulled?.addresses.some((address) => address.is_contract === true) ?? false;
   const factoryLaunches24h =
@@ -592,10 +593,9 @@ function parseDailySeries(raw: string | undefined): Record<string, Array<{ at: s
   }
 }
 
-function officialSurfaceConfirmed(links: Link[], census: CensusEntry | undefined): boolean {
-  const hasOfficialSurface = links.some((link) => link.kind === "site" || link.kind === "docs");
-  const flags = (census?.flags ?? []).map((flag) => (typeof flag === "string" ? flag : flag.type ?? ""));
-  return hasOfficialSurface && census?.identity.status !== "conflicted" && !flags.includes("unconfirmed-official");
+// One definition, shared with the score emitter (scripts/lib/share-bar.mjs).
+export function officialSurfaceConfirmed(census: CensusEntry | undefined): boolean {
+  return officialSurfaceConfirmedCore(census) as boolean;
 }
 
 // Change over `days`: the latest snapshot against the newest one at least that many days older.

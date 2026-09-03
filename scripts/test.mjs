@@ -23,7 +23,10 @@ import {
 import { validateContent } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
-import { meetsShareBar as meetsShareBarCore } from "./lib/share-bar.mjs";
+import {
+  meetsShareBar as meetsShareBarCore,
+  officialSurfaceConfirmed as officialSurfaceConfirmedCore,
+} from "./lib/share-bar.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
@@ -1028,6 +1031,57 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   } catch (err) {
     failures++;
     console.error(`FAIL Icarus home and category rules: ${err.message}`);
+  }
+
+  // Official surface confirmed: one definition for the site bundle and the score emitter.
+  const censusRow = (overrides = {}) => ({
+    slug: "foxpad",
+    identity: { entity_kind: "protocol", status: "provisional" },
+    official_links: [
+      { kind: "site", url: "https://foxpad.app" },
+      { kind: "x", url: "https://x.com/fox_onrh" },
+    ],
+    // FoxPad's real row: a site link is on file, but the X account belongs to the FOX token and
+    // the pad's own handle is unconfirmed, so the listing test is not verified.
+    qualifying: { citable: { value: true, note: "the pad's own handle is unconfirmed", verified: false } },
+    ...overrides,
+  });
+  const barEntry = (census) => ({
+    officialConfirmed: officialSurfaceConfirmedCore(census),
+    hasContractOn4663: true,
+    shareBarMetric: "liquidity",
+    kpis: { liquidityUsd: 1_000_000, tvl: null },
+  });
+  const foxpad = censusRow();
+  const confirmed = censusRow({ qualifying: { citable: { value: true, note: "docs read", verified: true } } });
+  try {
+    assert.equal(officialSurfaceConfirmedCore(foxpad), false, "an unverified listing test is not a confirmed surface");
+    assert.equal(rules.officialSurfaceConfirmed(foxpad), false, "the site reads the same definition");
+    assert.equal(meetsShareBarCore(barEntry(foxpad)), false, "the emitter keeps FoxPad off the share bar");
+    assert.equal(rules.meetsShareBar(barEntry(foxpad)), false, "the site keeps FoxPad off the share bar");
+
+    assert.equal(officialSurfaceConfirmedCore(confirmed), true, "a verified listing test with a site link confirms");
+    assert.equal(rules.meetsShareBar(barEntry(confirmed)), true, "a confirmed surface still clears the bar");
+    assert.equal(
+      officialSurfaceConfirmedCore(censusRow({ official_links: [{ kind: "x", url: "https://x.com/fox_onrh" }] })),
+      false,
+      "an X account alone is not an official surface",
+    );
+    assert.equal(
+      officialSurfaceConfirmedCore({ ...confirmed, identity: { entity_kind: "protocol", status: "conflicted" } }),
+      false,
+      "a conflicted identity is never confirmed",
+    );
+    assert.equal(
+      officialSurfaceConfirmedCore({ slug: "x", identity: { status: "verified" }, official_links: [{ kind: "docs", url: "https://d.test" }] }),
+      true,
+      "a row without a qualifying block falls back to its links",
+    );
+    assert.equal(officialSurfaceConfirmedCore(undefined), false, "a name with no registry row is never confirmed");
+    console.log("ok   official surface confirmed");
+  } catch (err) {
+    failures++;
+    console.error(`FAIL official surface confirmed: ${err.message}`);
   }
 }
 
