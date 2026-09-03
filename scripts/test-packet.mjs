@@ -7,7 +7,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parse, stringify } from "yaml";
-import { parsePacket, validatePacket, validatePacketDirectory, BODY_SECTIONS } from "./lib/packet.mjs";
+import { parsePacket, validatePacket, validatePacketDirectory, themesFromBody, BODY_SECTIONS } from "./lib/packet.mjs";
 import { validateAgainst, TAXONOMY_LEAVES } from "./lib/schemas.mjs";
 
 let failures = 0;
@@ -203,7 +203,23 @@ await test("Icarus packet fields are required from 2026-09-03", async () => {
   assert.deepEqual(check(legacy), [], "older seed remains backward compatible");
 });
 
-// 9. One work id spans a whole batch of slugs; the clash the directory walk reports is per (work_id, slug).
+// 9. The themes line is a declaration in one place only; anywhere else it is prose.
+await test("themes are read only from the line after the What it is paragraph", async () => {
+  const summary = "Icarus Fields reads public chain state and publishes what changed.";
+  assert.deepEqual(themesFromBody(`## What it is\n\n${summary}\n\nThemes: chain-data, tooling\n`), ["chain-data", "tooling"]);
+  assert.deepEqual(themesFromBody(`## What it is\n\n${summary}\n\nMore prose.\n\nThemes: chain-data\n`), [], "a line further down the section is prose");
+  assert.deepEqual(themesFromBody(`## What it is\n\n${summary}\n\n\`\`\`\nThemes: chain-data\n\`\`\`\n`), [], "a fenced example is not a declaration");
+  assert.deepEqual(themesFromBody(`## Why it matters\n\nx\n\nThemes: chain-data\n`), [], "only the What it is section declares themes");
+  assert.deepEqual(themesFromBody(`## What it is\n\n${summary}\n`), [], "no line, no themes");
+
+  const current = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
+  const misplaced = parsePacket(
+    `---\n${stringify(current.frontmatter, { lineWidth: 0 })}---\n\n## What it is\n\n${summary}\n\nMore prose.\n\nThemes: chain-data, tooling\n`,
+  );
+  assert.ok(check(misplaced, { census: [] }).some((error) => error.includes("Themes:")), "a misplaced themes line is not a themes line");
+});
+
+// 10. One work id spans a whole batch of slugs; the clash the directory walk reports is per (work_id, slug).
 await test("work_id uniqueness is per (work_id, slug)", async () => {
   const root = await mkdtemp(join(tmpdir(), "proofline-packet-dir-"));
   const file = (slug, name, workId) =>

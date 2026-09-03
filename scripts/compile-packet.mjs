@@ -28,6 +28,11 @@ async function yamlOr(path, fallback) {
   catch (error) { if (error.code === "ENOENT") return fallback; throw error; }
 }
 
+async function textOr(path, fallback) {
+  try { return await readFile(path, "utf8"); }
+  catch (error) { if (error.code === "ENOENT") return fallback; throw error; }
+}
+
 function validationErrors(result, census) {
   const checks = [
     ["census.yaml", validateAgainst("census", census)],
@@ -71,28 +76,35 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
   const feedPath = join(root, "feed", `${slug}.yaml`);
   const researchPath = join(root, "research", `${slug}.md`);
   const changelogPath = join(root, "changelog", `${slug}.yaml`);
+  const pulledPath = join(root, "pulled", `${slug}.yaml`);
   const census = await yamlOr(censusPath, []);
   const priorProject = await yamlOr(projectPath, null);
   const priorCensusRow = census.find((row) => row.slug === slug) ?? null;
   const priorSources = await yamlOr(sourcesPath, null);
   const priorFeed = await yamlOr(feedPath, null);
-  const result = compile(packet, priorProject, priorCensusRow, priorSources, priorFeed);
+  const priorResearch = await textOr(researchPath, null);
+  // content/pulled is machine output; a half-written file must not stop a compile.
+  let pulled = null;
+  try { pulled = await yamlOr(pulledPath, null); } catch { pulled = null; }
+  const result = compile(packet, priorProject, priorCensusRow, priorSources, priorFeed, { pulled, priorResearch });
   const nextCensus = priorCensusRow
     ? census.map((row) => row.slug === slug ? result.censusRow : row)
     : [...census, result.censusRow];
   const errors = validationErrors(result, nextCensus);
   if (errors.length) throw new Error(errors.join("\n"));
-  const files = [censusPath, projectPath, sourcesPath, researchPath, feedPath, changelogPath];
+  // A feed file with no items is not a feed; only write one once there is something to read.
+  const writesFeed = result.feed.items.length > 0 || priorFeed !== null;
+  const files = [censusPath, projectPath, sourcesPath, researchPath, ...(writesFeed ? [feedPath] : []), changelogPath];
   if (dryRun) {
     for (const path of files) console.log(path);
     return { ...result, files, dryRun: true };
   }
-  for (const path of [projectPath, sourcesPath, researchPath, feedPath, changelogPath]) await mkdir(dirname(path), { recursive: true });
+  for (const path of files) await mkdir(dirname(path), { recursive: true });
   await writeFile(censusPath, stringify(nextCensus, { lineWidth: 0 }));
   await writeFile(projectPath, stringify(result.project, { lineWidth: 0 }));
   await writeFile(sourcesPath, stringify(result.sources, { lineWidth: 0 }));
   await writeFile(researchPath, result.research);
-  await writeFile(feedPath, stringify(result.feed, { lineWidth: 0 }));
+  if (writesFeed) await writeFile(feedPath, stringify(result.feed, { lineWidth: 0 }));
   await appendChangelog(changelogPath, result.changelog);
   return { ...result, files, dryRun: false };
 }
@@ -100,7 +112,12 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
 if (process.argv[1] && import.meta.url === new URL(`file://${resolve(process.argv[1])}`).href) {
   try {
     const result = await runCompile(argumentsFor(process.argv.slice(2)));
-    console.log(`${result.dryRun ? "would compile" : "compiled"} ${result.project.slug}: ${result.files.length} canonical paths`);
+    for (const message of result.notices) console.log(`note  ${result.project.slug}: ${message}`);
+    const { autoTaggedParagraphs, skippedMetrics, skippedDeployments } = result.degraded;
+    console.log(
+      `${result.dryRun ? "would compile" : "compiled"} ${result.project.slug}: ${result.files.length} canonical paths` +
+      ` · ${autoTaggedParagraphs} auto-tagged paragraph(s) · ${skippedMetrics} skipped metric(s) · ${skippedDeployments} skipped deployment(s)`,
+    );
   } catch (error) {
     console.error(error.message);
     process.exit(1);

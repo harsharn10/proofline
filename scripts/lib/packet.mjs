@@ -8,6 +8,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse } from "yaml";
 import { validateAgainst } from "./schemas.mjs";
+import { mainnetReceiptFromPulled } from "./checks.mjs";
 import { leafLabel } from "./taxonomy.mjs";
 import { conductWarnings } from "./voice.mjs";
 import { REQUIRED_HEADINGS, PENDING_LINE } from "./research-md.mjs";
@@ -279,7 +280,7 @@ export function validatePacket(packet, { census = [], path = "", source = path }
   if (["seed", "full"].includes(record.packet_tier) && String(record.as_of).slice(0, 10) >= ICARUS_FIELDS_SINCE) {
     if (!sectionParagraph(packet.sections, "What it is")) err('packet needs a paragraph under "## What it is"');
     const themes = themesFromBody(packet.body);
-    if (!/^Themes:\s*\S+/mi.test(packet.body)) err('packet needs a "Themes: a, b" line');
+    if (!themes.length) err('packet needs a "Themes: a, b" line directly after the "## What it is" paragraph');
     for (const message of themeErrors(themes)) err(message);
     if (!events.length) err("packet needs at least one dated event with a receipt URL");
     for (const event of events) {
@@ -364,8 +365,20 @@ const PACKET_HEADINGS = [
   "Verification passes", "Operations log",
 ];
 const HASH_ID = (value) => createHash("sha1").update(value, "utf8").digest("hex").slice(0, 16);
-const PROJECT_LINK_KINDS = new Set(["site", "docs", "x", "telegram", "github", "explorer", "dexscreener"]);
-const CENSUS_LINK_KINDS = new Set(["site", "docs", "x", "telegram", "github"]);
+// Every kind the schemas accept, so a compile adds links and never quietly deletes a stored one.
+const PROJECT_LINK_KINDS = new Set(["site", "app", "docs", "whitepaper", "x", "github", "telegram", "discord", "explorer", "dexscreener", "other"]);
+const CENSUS_LINK_KINDS = new Set(["site", "app", "docs", "whitepaper", "x", "github", "telegram", "discord"]);
+/** The card carries five theme tags; schema/project.schema.json enforces the shape of each. */
+const MAX_THEMES = 5;
+const THEME_RE = /^[a-z0-9][a-z0-9:-]*$/;
+/** schema/census.schema.json handle pattern — an unresolved "NULL — …" is not a handle. */
+const CENSUS_HANDLE_RE = /^@[A-Za-z0-9_]{1,15}$/;
+/** schema/shared.schema.json address pattern, plus the literal the canonical files use for "not read yet". */
+const CANONICAL_ADDRESS_RE = /^(0x[0-9a-fA-F]{40}|[1-9A-HJ-NP-Za-km-z]{32,44}|not-verified)$/;
+/** A research-document evidence tag closing a line, in the grammar checkResearch accepts. */
+const RESEARCH_TAG_END_RE = /\[(?:verified|claim|inference|disputed|unknown)(?:\s+S[1-9][0-9]*)*\]\s*$/;
+/** Weakest-wins ordering for a tag derived from several claims: never assert more than the weakest one. */
+const EVIDENCE_RANK = { unknown: 0, disputed: 1, inference: 2, claim: 3, verified: 4 };
 
 export function normalizeUrl(raw) {
   try {
@@ -381,13 +394,37 @@ export function normalizeUrl(raw) {
 
 export const normalizeText = (value) => String(value ?? "").trim().replace(/\s+/g, " ");
 export const sourceIdentity = (source) => HASH_ID(`${normalizeUrl(source.url)}|${normalizeText(source.claim)}`);
-export const feedIdentity = ({ sourceUrl, slug, date, title }) =>
-  HASH_ID(`${normalizeUrl(sourceUrl)}|${slug}|${date}|${normalizeText(title)}`);
+/**
+ * A feed item's identity is the event that produced it: slug, the packet's work id and the packet-local
+ * event id. Hashing the title instead made an edited or over-long title mint a second item for the same
+ * event on the next compile; keyed this way a recompile replaces the item it already wrote.
+ */
+export const feedIdentity = ({ slug, workId, eventId }) => HASH_ID(`${slug}|${workId}|${eventId}`);
+
+/**
+ * The declared themes line: the first line of the paragraph directly after the "## What it is"
+ * summary, which is where §5 puts it. A "Themes:" line further down the narrative is prose, and one
+ * inside a fenced block is an example, so neither is read as a declaration.
+ */
+function themesLine(body) {
+  const section = [];
+  let fenced = false, inSection = false;
+  for (const raw of String(body ?? "").replace(/\r\n/g, "\n").split("\n")) {
+    if (/^\s*(?:```|~~~)/.test(raw)) { fenced = !fenced; continue; }
+    if (fenced) continue;
+    const heading = /^##\s+(.+?)\s*$/.exec(raw);
+    if (heading) { inSection = heading[1].trim().toLowerCase() === "what it is"; continue; }
+    if (inSection) section.push(raw);
+  }
+  const blocks = section.join("\n").split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean);
+  const match = /^Themes:\s*(.+?)\s*$/i.exec(String(blocks[1] ?? "").split("\n")[0]);
+  return match ? match[1] : null;
+}
 
 export function themesFromBody(body) {
-  const match = String(body ?? "").match(/^Themes:\s*(.+?)\s*$/mi);
-  if (!match) return [];
-  return [...new Set(match[1].split(",").map((tag) => normalizeText(tag).toLowerCase()).filter(Boolean))];
+  const line = themesLine(body);
+  if (!line) return [];
+  return [...new Set(line.split(",").map((tag) => normalizeText(tag).toLowerCase()).filter(Boolean))];
 }
 
 function themeErrors(themes) {
@@ -486,7 +523,7 @@ export function checkPacket(frontmatter, body) {
     if (!normalizeText(paragraphs(bodySections(body).get("What it is"))[0]))
       errors.push('packet needs a paragraph under "## What it is"');
     const themes = themesFromBody(body);
-    if (!/^Themes:\s*\S+/mi.test(body ?? "")) errors.push('packet needs a "Themes: a, b" line');
+    if (!themes.length) errors.push('packet needs a "Themes: a, b" line directly after the "## What it is" paragraph');
     errors.push(...themeErrors(themes));
     const receipts = new Map(rows("receipts").map((receipt) => [receipt.id, receipt]));
     if (!rows("events").length) errors.push("packet needs at least one dated event with a receipt URL");
@@ -512,11 +549,17 @@ function mergeUnique(existing, incoming, identity) {
   return out;
 }
 
+/**
+ * Merge stored official links with the packet's. A stored link is kept whatever its kind — a compile
+ * adds surfaces, it never deletes one a controller put there — while an incoming link has to be a kind
+ * the target schema accepts. Two links with the same normalized URL are one link.
+ */
 function officialLinks(existing, incoming, kinds) {
   const out = [], positions = new Map();
-  const rows = [...(existing ?? []), ...(incoming ?? [])]
-    .filter((link) => kinds.has(link.kind) && typeof link.url === "string" && /^https?:\/\//i.test(link.url))
-    .map(({ kind, url }) => ({ kind, url }));
+  const rows = [
+    ...(existing ?? []).filter((link) => link && typeof link.url === "string"),
+    ...(incoming ?? []).filter((link) => kinds.has(link.kind) && typeof link.url === "string" && /^https?:\/\//i.test(link.url)),
+  ].map(({ kind, url }) => ({ kind, url }));
   for (const row of rows) {
     const key = normalizeUrl(row.url);
     if (positions.has(key)) out[positions.get(key)] = row;
@@ -629,7 +672,7 @@ function stripTag(text) {
   };
 }
 
-function findingsFromBody(frontmatter, body, receiptToSource, priorProject) {
+function findingsFromBody(frontmatter, body, receiptToSource, priorProject, extraGaps = []) {
   const sections = bodySections(body);
   const positive = [], risk = [], unresolved = [];
   const addFinding = (bucket, paragraph) => {
@@ -647,7 +690,10 @@ function findingsFromBody(frontmatter, body, receiptToSource, priorProject) {
   for (const paragraph of paragraphs(sections.get("Material risks"))) addFinding(risk, paragraph);
   for (const conflict of frontmatter.conflicts ?? [])
     if (conflict.status !== "resolved") unresolved.push({ text: `${conflict.field} remains unresolved (${conflict.id}).` });
-  const missing = (frontmatter.gaps ?? []).map((gap) => ({ text: [gap.question, gap.next ? `Next: ${gap.next}` : null].filter(Boolean).join(" ") }));
+  const missing = [
+    ...(frontmatter.gaps ?? []).map((gap) => ({ text: [gap.question, gap.next ? `Next: ${gap.next}` : null].filter(Boolean).join(" ") })),
+    ...extraGaps.map((text) => ({ text: normalizeText(text) })),
+  ];
   if (frontmatter.classification.lifecycle === "mainnet" && !mainnetAllowed(frontmatter))
     missing.push({ text: "Mainnet status was not promoted because the packet did not meet the explorer, RPC, docs-address or supported-metric bar." });
   return {
@@ -658,7 +704,68 @@ function findingsFromBody(frontmatter, body, receiptToSource, priorProject) {
   };
 }
 
-function researchDocument(frontmatter, body, receiptToSource, ledger) {
+/** Sections of the research record whose paragraphs must carry an evidence tag (checkResearch rule 3b). */
+const MATERIAL_RESEARCH_SECTIONS = new Set(REQUIRED_HEADINGS.slice(1, 9));
+
+/** The receipt a paragraph falls back to when it cites no claim: the packet's primary official source. */
+function primaryOfficialReceiptId(frontmatter) {
+  const receipts = frontmatter.receipts ?? [];
+  const domain = normalizeDomain(frontmatter.identity?.official_domain);
+  const onDomain = (receipt) => Boolean(domain) && normalizeDomain(receipt.url) === domain;
+  return (
+    receipts.find((receipt) => receipt.authority === "primary" && onDomain(receipt)) ??
+    receipts.find((receipt) => receipt.authority === "primary") ??
+    receipts.find(onDomain) ??
+    receipts[0]
+  )?.id ?? null;
+}
+
+/**
+ * The tag a paragraph gets when the packet body left it untagged. Claim ids named in the paragraph
+ * decide it: the class is the weakest of those claims and the ids are their receipts' ledger ids, so
+ * the record never asserts more than the packet did. A paragraph that names no claim is a `claim`
+ * against the packet's primary official receipt — the lowest class that still carries a source.
+ */
+function derivedTag(frontmatter, text, receiptToSource, fallbackReceiptId) {
+  const referenced = [...new Set([...String(text).matchAll(/\bCLM-[1-9][0-9]*\b/g)].map((match) => match[0]))];
+  const claims = referenced.map((id) => (frontmatter.claims ?? []).find((claim) => claim.id === id)).filter(Boolean);
+  if (claims.length) {
+    const cls = claims
+      .map((claim) => claim.class)
+      .reduce((weakest, next) => ((EVIDENCE_RANK[next] ?? 0) < (EVIDENCE_RANK[weakest] ?? 0) ? next : weakest));
+    const sources = sourceIds(claims.flatMap((claim) => claim.receipt_ids ?? []), receiptToSource);
+    return cls !== "unknown" && sources.length ? `[${cls} ${sources.join(" ")}]` : "[unknown]";
+  }
+  const sources = sourceIds(fallbackReceiptId ? [fallbackReceiptId] : [], receiptToSource);
+  return sources.length ? `[claim ${sources.join(" ")}]` : "[unknown]";
+}
+
+/**
+ * Close every untagged paragraph of a material section with a derived tag. Mirrors the paragraph rule
+ * in checkResearch: paragraphs split on blank lines, a leading `###` line is not a statement, and the
+ * pending line stands alone. `report` sees each paragraph that was tagged.
+ */
+function autoTagged(text, derive, report) {
+  return String(text ?? "")
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => {
+      const lines = block.split("\n");
+      const heading = /^#{3,}\s/.test(lines[0]) ? lines.shift() : null;
+      const statement = lines.join("\n").trim();
+      if (!statement || statement === PENDING_LINE) return block;
+      if (RESEARCH_TAG_END_RE.test(lines[lines.length - 1])) return block;
+      const tag = derive(statement);
+      report(statement, tag);
+      lines[lines.length - 1] = `${lines[lines.length - 1].replace(/\s+$/, "")} ${tag}`;
+      return [heading, ...lines].filter((line) => line !== null).join("\n");
+    })
+    .join("\n\n");
+}
+
+function researchDocument(frontmatter, body, receiptToSource, ledger, options = {}) {
+  const { coverage = "stub", priorResearch = null, notice = () => {}, onAutoTag = () => {} } = options;
   const source = bodySections(body);
   const mapped = (heading) => mappedTag(source.get(heading) ?? "", receiptToSource);
   const identity = [
@@ -683,12 +790,6 @@ function researchDocument(frontmatter, body, receiptToSource, ledger) {
     return `${event.title ?? event.summary ?? "Communication recorded."} ${sources.length ? `[${event.evidence_state === "verified" ? "verified" : "claim"} ${sources.join(" ")}]` : "[unknown]"}`;
   });
   const findings = [mapped("What could go wrong"), mapped("Material risks"), mapped("Verification passes")].filter(Boolean).join("\n\n");
-  const usedIds = new Set();
-  for (const value of [identity, ...deploymentParagraphs, ...control, ...security, product, ...communications, findings])
-    for (const match of String(value).matchAll(/\bS[1-9][0-9]*\b/g)) usedIds.add(match[0]);
-  const byId = new Map(ledger.sources.map((row) => [row.id, row]));
-  const sources = [...usedIds].sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)))
-    .map((id) => `- ${id} — ${byId.get(id)?.title ?? byId.get(id)?.claim ?? byId.get(id)?.url ?? "Source receipt"}.`).join("\n") || "No source receipts were compiled.";
   const sectionBody = new Map([
     ["Identity", identity],
     ["Deployment", deploymentParagraphs.join("\n\n") || PENDING_LINE],
@@ -699,10 +800,38 @@ function researchDocument(frontmatter, body, receiptToSource, ledger) {
     ["Product and economics", product || PENDING_LINE],
     ["Communications", communications.join("\n\n") || PENDING_LINE],
     ["Findings", findings || PENDING_LINE],
-    ["Sources", sources],
-    ["Review metadata", `Compiled from ${frontmatter.work_id} by ${frontmatter.producer} as of ${frontmatter.as_of}; methodology_version: proofline-v1.0.`],
   ]);
-  return `---\nslug: ${frontmatter.slug}\ncoverage: stub\nmethodology_version: proofline-v1.0\n---\n\n# ${frontmatter.name} — research record\n\n${REQUIRED_HEADINGS.map((heading) => `## ${heading}\n\n${sectionBody.get(heading)}`).join("\n\n")}\n`;
+
+  // A record that already reads at full depth is never written back down to "_Research pending._" by a
+  // packet that has nothing for that section; the existing prose stands until something replaces it.
+  const prior = bodySections(priorResearch ?? "");
+  if (coverage === "full")
+    for (const [heading, text] of sectionBody) {
+      if (text && text !== PENDING_LINE) continue;
+      const kept = prior.get(heading);
+      if (!kept || kept === PENDING_LINE) continue;
+      sectionBody.set(heading, kept);
+      notice(`research ${heading}: kept the existing full-profile section; this packet carries nothing for it`);
+    }
+
+  const fallbackReceiptId = primaryOfficialReceiptId(frontmatter);
+  for (const [heading, text] of sectionBody) {
+    if (!MATERIAL_RESEARCH_SECTIONS.has(heading)) continue;
+    sectionBody.set(heading, autoTagged(
+      text,
+      (statement) => derivedTag(frontmatter, statement, receiptToSource, fallbackReceiptId),
+      (statement, tag) => onAutoTag(heading, statement, tag),
+    ));
+  }
+
+  const usedIds = new Set();
+  for (const value of sectionBody.values())
+    for (const match of String(value).matchAll(/\bS[1-9][0-9]*\b/g)) usedIds.add(match[0]);
+  const byId = new Map(ledger.sources.map((row) => [row.id, row]));
+  sectionBody.set("Sources", [...usedIds].sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)))
+    .map((id) => `- ${id} — ${byId.get(id)?.title ?? byId.get(id)?.claim ?? byId.get(id)?.url ?? "Source receipt"}.`).join("\n") || "No source receipts were compiled.");
+  sectionBody.set("Review metadata", `Compiled from ${frontmatter.work_id} by ${frontmatter.producer} as of ${frontmatter.as_of}; methodology_version: proofline-v1.0.`);
+  return `---\nslug: ${frontmatter.slug}\ncoverage: ${coverage}\nmethodology_version: proofline-v1.0\n---\n\n# ${frontmatter.name} — research record\n\n${REQUIRED_HEADINGS.map((heading) => `## ${heading}\n\n${sectionBody.get(heading)}`).join("\n\n")}\n`;
 }
 
 function changedFields(prior, next) {
@@ -717,13 +846,36 @@ function changedFields(prior, next) {
   return { prior: Object.keys(before).length ? before : null, next: Object.keys(after).length ? after : null };
 }
 
-export function compile(packet, priorProject = null, priorCensusRow = null, priorSources = null, priorFeed = null) {
+/**
+ * Map one packet onto the canonical files. Anything the packet got wrong that a controller could not
+ * have prevented — an unparseable metric, an address that is a sentence, six themes — is dropped from
+ * the compiled record and reported in `notices` rather than refusing the whole packet: a batch of
+ * fifty collector packets must land, minus the parts that are not usable, and say what it dropped.
+ */
+export function compile(packet, priorProject = null, priorCensusRow = null, priorSources = null, priorFeed = null, options = {}) {
+  const { pulled = null, priorResearch = null } = options;
   const frontmatter = packet.frontmatter ?? packet;
   const body = packet.body ?? "";
   const errors = checkPacket(frontmatter, body);
   if (errors.length) throw new Error(errors.join("\n"));
+  const notices = [];
+  const notice = (message) => notices.push(message);
+  let autoTaggedParagraphs = 0;
   const { ledger, receiptToSource } = sourceLedger(frontmatter, priorSources);
-  const lifecycle = canonicalLifecycle(frontmatter, priorCensusRow);
+
+  // Coverage only ever rises. A collector packet compiled onto a full profile leaves the profile full
+  // and leaves its scoring block — owned by editorial review — exactly where it was.
+  const priorCoverage = priorProject?.coverage ?? priorCensusRow?.coverage ?? null;
+  const coverage = priorCoverage === "full" ? "full" : "stub";
+  if (coverage === "full") notice("coverage: stays full; a collector packet never lowers coverage and never touches scoring");
+
+  let lifecycle = canonicalLifecycle(frontmatter, priorCensusRow);
+  const priorLifecycle = priorProject?.lifecycle ?? priorCensusRow?.lifecycle ?? null;
+  const pulledReceipt = mainnetReceiptFromPulled(pulled);
+  if (priorLifecycle === "mainnet" && lifecycle !== "mainnet" && pulledReceipt) {
+    notice(`lifecycle: kept mainnet; the packet says ${lifecycle} but the pulled chain read shows contract ${pulledReceipt.address} with a market pair on 4663`);
+    lifecycle = "mainnet";
+  }
   const primaryLeaf = frontmatter.classification.primary_leaf;
   const identityConflicts = (frontmatter.conflicts ?? []).filter((row) => row.status !== "resolved" && String(row.field).startsWith("identity"));
   const identityStatus = identityConflicts.length ? "conflicted" : frontmatter.classification.evidence_state === "verified" ? "verified" : "provisional";
@@ -744,6 +896,10 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     const claims = (test.claim_ids ?? []).map((id) => (frontmatter.claims ?? []).find((claim) => claim.id === id));
     return [key, { value: test.status === "pass", note: test.note || `${key.replaceAll("_", " ")} ${test.status}.`, verified: claims.length > 0 && claims.every((claim) => claim?.class === "verified") }];
   }));
+  const packetHandle = frontmatter.identity.official_handle;
+  const handle = CENSUS_HANDLE_RE.test(String(packetHandle ?? "")) ? packetHandle : priorCensusRow?.handle;
+  if (packetHandle && handle !== packetHandle)
+    notice(`handle: skipped "${normalizeText(packetHandle).slice(0, 60)}"; it is not an @handle the census accepts`);
   const censusRow = {
     ...(priorCensusRow ?? {}),
     slug: frontmatter.slug,
@@ -751,38 +907,65 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     identity,
     category: leafLabel(primaryLeaf),
     lifecycle,
-    coverage: "stub",
+    coverage,
     official_links: censusLinks,
     discovery_source: priorCensusRow?.discovery_source ?? `${frontmatter.producer} packet ${frontmatter.work_id}`,
-    ...(frontmatter.identity.official_handle ? { handle: frontmatter.identity.official_handle } : {}),
+    ...(handle ? { handle } : {}),
     tree: { primary: primaryLeaf, ...((frontmatter.classification.secondary_leaves ?? []).length ? { secondary: frontmatter.classification.secondary_leaves } : {}) },
     qualifying,
   };
 
-  const deployments = (frontmatter.deployments ?? []).map((deployment) => {
+  // A "NULL — <reason>" address is a sentence, not an address. It is never written into the canonical
+  // record (the schema would reject the whole file); the packet still carries the reason.
+  const deployments = (frontmatter.deployments ?? []).flatMap((deployment) => {
     const address = deployment.address?.value ?? "not-verified";
-    const sources = sourceIds(deployment.receipt_ids, receiptToSource);
-    return {
+    if (!CANONICAL_ADDRESS_RE.test(String(address))) {
+      notice(`deployment "${normalizeText(deployment.label)}": skipped; address is not an address — ${normalizeText(address).slice(0, 90)}`);
+      return [];
+    }
+    return [{
       label: deployment.label,
       chain: deployment.address?.chain ?? "other",
       address,
       role: deployment.role,
       verified: Boolean(address !== "not-verified" && deployment.address?.exists_on_4663 === true && claimForAddress(frontmatter, address)),
-      sources,
-    };
+      sources: sourceIds(deployment.receipt_ids, receiptToSource),
+    }];
   });
-  const metrics = (frontmatter.metrics ?? []).map((metric) => ({
-    kind: metric.kind,
-    value: metric.value,
-    ...(metric.kind === "holders" ? {} : { currency: "USD" }),
-    as_of: String(metric.as_of).slice(0, 10),
-    class: "claim",
-    sources: sourceIds(metric.receipt_ids, receiptToSource),
-  })).filter((metric) => metric.sources.length);
+  // A metric is a number a reader can compare. A value the collector could not establish, or one that
+  // came back negative, is not published as a figure — it is filed as an open gap in its own words.
+  const metricGaps = [];
+  const metrics = (frontmatter.metrics ?? []).flatMap((metric) => {
+    const value = metric.value;
+    if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+      const reason = typeof value === "number" ? `the packet reported ${value}` : normalizeText(value).slice(0, 160);
+      notice(`metric ${metric.kind}: skipped and filed as a gap — ${reason}`);
+      metricGaps.push(`${metric.kind} is not published as a figure: ${reason}`);
+      return [];
+    }
+    return [{
+      kind: metric.kind,
+      value,
+      ...(metric.kind === "holders" ? {} : { currency: "USD" }),
+      as_of: String(metric.as_of).slice(0, 10),
+      class: "claim",
+      sources: sourceIds(metric.receipt_ids, receiptToSource),
+    }];
+  }).filter((metric) => metric.sources.length);
   const relationships = (frontmatter.claims ?? []).filter((claim) => claim.field === "relationship" && claim.value?.kind === "depends-on").map((claim) => claim.value.slug);
   const sections = bodySections(body);
   const compiledSummary = normalizeText(paragraphs(sections.get("What it is"))[0] ?? frontmatter.classification.rationale ?? priorProject?.summary);
-  const compiledThemes = themesFromBody(body);
+  // The theme-count and shape rules are date-gated in the packet check, so a backdated packet can still
+  // arrive with six themes or a tag the card cannot render. Clamp rather than throw on the schema.
+  const declaredThemes = themesFromBody(body);
+  const shapedThemes = declaredThemes.filter((theme) => {
+    if (THEME_RE.test(theme)) return true;
+    notice(`theme "${theme}": dropped; a theme tag is lowercase letters, numbers, colon or hyphen`);
+    return false;
+  });
+  if (shapedThemes.length > MAX_THEMES)
+    notice(`themes: kept the first ${MAX_THEMES} of ${shapedThemes.length}; the card carries ${MAX_THEMES} (dropped ${shapedThemes.slice(MAX_THEMES).join(", ")})`);
+  const compiledThemes = shapedThemes.slice(0, MAX_THEMES);
   const controllerEdited = priorProject?.controller_edited === true;
   const summary = controllerEdited ? priorProject.summary : compiledSummary;
   const themes = controllerEdited ? priorProject.themes : (compiledThemes.length ? compiledThemes : priorProject?.themes);
@@ -793,7 +976,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     symbol: frontmatter.identity.symbols?.[0] ?? priorProject?.symbol ?? null,
     category: censusRow.category,
     lifecycle,
-    coverage: "stub",
+    coverage,
     summary,
     ...(themes?.length ? { themes } : {}),
     official_links: projectLinks,
@@ -801,10 +984,13 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     deployments: mergeUnique(priorProject?.deployments, deployments, (row) => `${row.chain}|${String(row.address).toLowerCase()}`),
     ...(metrics.length || priorProject?.metrics ? { metrics: mergeUnique(priorProject?.metrics, metrics, (row) => row.kind) } : {}),
     review: priorProject?.review ?? { researcher: frontmatter.producer, approver: "pending", methodology_version: "proofline-v1.0", reviewed_at: frontmatter.as_of.slice(0, 10), published_at: null },
-    findings: findingsFromBody(frontmatter, body, receiptToSource, priorProject),
+    findings: findingsFromBody(frontmatter, body, receiptToSource, priorProject, metricGaps),
   };
   const receiptsById = new Map((frontmatter.receipts ?? []).map((receipt) => [receipt.id, receipt]));
   const feedItems = (frontmatter.events ?? []).map((event) => {
+    // site_recommendation "none" is the producer saying this event is not for readers. Honour it: the
+    // public feed is not a dump of every URL-backed event in the packet.
+    if (event.site_recommendation === "none") return null;
     const receipt = (event.receipt_ids ?? []).map((id) => receiptsById.get(id))
       .find((row) => typeof row?.url === "string" && /^https?:\/\//i.test(row.url));
     if (!receipt) return null;
@@ -815,7 +1001,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     const account = event.account ?? accountFromUrl(sourceUrl)
       ?? (event.type === "company" ? frontmatter.identity.official_handle : null);
     return {
-      id: feedIdentity({ sourceUrl, slug: frontmatter.slug, date, title }),
+      id: feedIdentity({ slug: frontmatter.slug, workId: frontmatter.work_id, eventId: event.id }),
       date,
       kind: eventFeedKind(event, receipt, frontmatter.identity.official_handle),
       title,
@@ -826,7 +1012,15 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     };
   }).filter((item) => item?.sources.length);
   const feed = { slug: frontmatter.slug, items: mergeUnique(priorFeed?.items, feedItems, (row) => row.id) };
-  const research = researchDocument(frontmatter, body, receiptToSource, ledger);
+  const research = researchDocument(frontmatter, body, receiptToSource, ledger, {
+    coverage,
+    priorResearch,
+    notice,
+    onAutoTag: (heading, statement, tag) => {
+      autoTaggedParagraphs++;
+      notice(`research ${heading}: auto-tagged an untagged paragraph ${tag} — "${statement.replace(/\s+/g, " ").slice(0, 70)}…"`);
+    },
+  });
   const changes = changedFields(priorProject, project);
   const hasCorrection = (frontmatter.claims ?? []).some((claim) => claim.supersedes) || (frontmatter.conflicts ?? []).some((conflict) => conflict.status === "resolved");
   const isNewPacket = !frontmatter.prior_packet;
@@ -847,5 +1041,12 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     methodology_version: "proofline-v1.0",
   };
   changelog.review_key = reviewKeyFor(changelog);
-  return { project, censusRow, sources: ledger, feed, research, changelog, receiptToSource };
+  return {
+    project, censusRow, sources: ledger, feed, research, changelog, receiptToSource, notices,
+    degraded: {
+      autoTaggedParagraphs,
+      skippedMetrics: metricGaps.length,
+      skippedDeployments: (frontmatter.deployments ?? []).length - deployments.length,
+    },
+  };
 }
