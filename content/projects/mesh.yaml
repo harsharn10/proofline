@@ -5,21 +5,60 @@ category: Machine-payment tooling
 lifecycle: mainnet
 lifecycle_source: pulled 0x14641000a501bdc736116abf84e6fcea9b90a713 2026-08-19T16:37:35.000Z
 coverage: stub
-summary: Machine-payments gateway (MPP) on Robinhood Chain with a MESH token; USDG fee epochs are paid to large holders and Pons is listed as a merchant.
+summary: An HTTP 402 machine-payments gateway on Robinhood Chain. An agent pays USDG per API call through a Permit2 witness transfer; Mesh's relayer broadcasts it and the stablecoin lands in the merchant wallet. Holders of MESH above 500,000 receive the day's protocol-fee pool as a tokenized stock. @MeshGateway runs meshgateway.co.
 official_links:
   - kind: x
     url: https://x.com/MeshGateway
+  - kind: site
+    url: https://meshgateway.co
+  - kind: docs
+    url: https://docs.meshgateway.co/whitepaper
+  - kind: app
+    url: https://meshgateway.co/marketplace
+  - kind: github
+    url: https://github.com/meshgateway
+  - kind: telegram
+    url: https://t.me/MeshCommunity
 dependencies:
   - usdg
 deployments:
-  - label: MESH token
+  - label: MESH token (PonsV2LauncherToken)
     chain: robinhood-chain
-    address: "0x14641000a501bdc736116abf84e6fcea9b90a713"
+    address: "0x14641000A501bdc736116aBf84e6fCeA9B90A713"
     role: token
-    verified: false
+    verified: true
     sources:
       - S2
       - S3
+      - S8
+      - S10
+      - S11
+      - S12
+  - label: PonsV2BondingCurve (MESH launch curve)
+    chain: robinhood-chain
+    address: "0x8Bb3EDE48fE9d946aa6B5f953280cd681db22499"
+    role: other
+    verified: true
+    sources:
+      - S10
+      - S12
+  - label: MeshSplitterFactory
+    chain: robinhood-chain
+    address: "0x002565F730BEC9266Ae48D21E7eA0Efe8d597c09"
+    role: factory
+    verified: true
+    sources:
+      - S14
+      - S15
+      - S26
+  - label: x402ExactPermit2Proxy (settlement path)
+    chain: robinhood-chain
+    address: "0x402085c248EeA27D92E8b30b2C58ed07f9E20001"
+    role: router
+    verified: true
+    sources:
+      - S16
+      - S17
 review:
   researcher: harsharn10
   approver: pending
@@ -33,12 +72,55 @@ findings:
       sources:
         - S3
         - S2
-  risk: []
+  risk:
+    - text: "Receipts: meshgateway.co, /mesh, /earn, /status, whitepaper, @MeshGateway profile and posts, GitHub user, Blockscout token/curve/splitter/proxy/create/settle txs, RPC, DexScreener, and CoinGecko were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-6 R-8 R-12] - Numbers: 162179.74 is the MESH/ETH Uniswap v4 24h volume, not a sum of the USDG pairs and not CoinGecko total_volume. Holders 1063 is Blockscout `holders_count`. 480.66 USDG is the site all-time settlement figure, not TVL. [claim R-6 R-9 R-14] - Adversarial: the strongest contrary reading is that Mesh is only a Pons-launched memecoin wrapping a public x402 proxy, with settlement counts from few wallets. Token socials, site CA, GitHub CA, and a pons-labelled USDG settle tx still leave the gateway as a Robinhood-native rail; unique-payer concentration and missing epoch contracts stay open."
+      class: inference
+      sources:
+        - S12
+        - S16
+        - S18
+    - text: Epoch fee pool and stock-swap path were not reproduced on a Mesh contract this pass. [unknown] - Relayer and splitter treasury are externally owned accounts. [verified R-8] - /status unique payers 18 versus 11,323 settlements. [claim R-14] - DexScreener and CoinGecko market-cap figures disagree. [claim R-9 R-21] - Permit2 proxy is shared x402 bytecode from 11 Aug, not shown as a Mesh deploy.
+      class: verified
+      sources:
+        - S17
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token and gateway addresses not reproduced on Blockscout
     - text: Fee custody between epochs
     - text: Who triggers and sizes epoch payouts
     - text: Official site not located
+    - text: "Which contract holds USDG between epochs and which address swaps the pool into the day's tokenized stock? Next: trace an epoch payout tx from a holder ERC-20 transfer of RBLX or GME and read the sender"
+    - text: "What bps is the protocol fee, and can treasury 0x417909…237D or the relayer change it? Next: read MeshSplitterFactory verified source and the facilitator/relayer docs"
+    - text: "What are the ERC-8004 Identity Registry and Reputation Registry addresses on 4663? Next: open /dashboard/identity and /agents and search Blockscout for ERC-8004"
+    - text: "Is x402ExactPermit2Proxy Mesh-controlled, or shared x402 infra (CREATE2 deployer 0x4e59…4956C, verified 2026-08-11 before MESH launched)? Next: compare bytecode to Coinbase x402 and Mesh github.com/meshgateway/x402"
+    - text: "Does t.me/MeshCommunity cross-link meshgateway.co or @MeshGateway? Next: open the Telegram profile"
+    - text: "Is there an audit artifact for mpp-client, MeshSplitterFactory, or the Permit2 proxy? Next: open the zauthinc post and GitHub security tab"
   unresolved:
     - text: Where merchant fees are held between epochs and who triggers a payout is not described in the intake.
+    - text: economics.metric remains unresolved (CON-1).
+themes:
+  - tooling
+  - agent
+  - rwa
+  - memecoin
+metrics:
+  - kind: holders
+    value: 1063
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S10
+  - kind: volume_24h
+    value: 162179.74
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S13
+  - kind: market_cap
+    value: 381954
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S25

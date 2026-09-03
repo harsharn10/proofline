@@ -1,0 +1,112 @@
+slug: letscash
+name: LetsCash
+symbol: null
+category: Uniswap-pool launchpad
+lifecycle: mainnet
+coverage: stub
+summary: A Uniswap v4 launchpad on Robinhood Chain. One transaction mints a fixed-supply token into a locked v4 pool; a custom hook taxes the quote leg in ETH or USDG, pays the creator, and sends a 0.3% platform share into CASHCAT buys. No bonding curve and no migration. letscash.fun and @letscashfun run it. Distinct from the CASHCAT token.
+themes:
+  - launchpad
+  - memecoin
+  - hook
+official_links:
+  - kind: site
+    url: https://letscash.fun
+  - kind: app
+    url: https://www.letscash.fun/launch
+  - kind: docs
+    url: https://www.letscash.fun/docs
+  - kind: x
+    url: https://x.com/letscashfun
+  - kind: github
+    url: https://github.com/letscashfun/sdk
+  - kind: other
+    url: https://www.letscashfun.com/docs
+dependencies: []
+deployments:
+  - label: Factory (UUPS ERC1967 proxy)
+    chain: robinhood-chain
+    address: "0x5bd1Fbe78a78fe8236fa00CF48fbEBA74ae34661"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S8
+      - S12
+  - label: Factory implementation (current ERC1967 slot)
+    chain: robinhood-chain
+    address: "0x40250b4C73FC30f8F6ad077744B0124B3f111C28"
+    role: implementation
+    verified: true
+    sources:
+      - S10
+      - S12
+  - label: Hook (CashCatHookV2)
+    chain: robinhood-chain
+    address: "0x75A54357D9C78a2Db19004a5FDc76c50F9242AEC"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S7
+      - S9
+      - S12
+  - label: Factory and hook owner (SafeProxy)
+    chain: robinhood-chain
+    address: "0xD2DeFbd13aFF22D6989E8C14B4517Ec308079E91"
+    role: multisig
+    verified: true
+    sources:
+      - S11
+      - S12
+metrics:
+  - kind: volume_24h
+    value: 2996602
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S13
+  - kind: fees_24h
+    value: 91049
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: revenue_24h
+    value: 11311
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: site HTML (twitter:site @letscashfun), docs, about, legacy, GitHub README and SECURITY.md, Blockscout API v2 for factory, hook, implementation, owner Safe and two creation txs, RPC eth_getCode/eth_call, Llama dexs/fees/revenue APIs and the dimension adapter, and the X posts cited above were opened on 2026-09-03. [verified R-1 R-4 R-6 R-7 R-12 R-13] - Numbers: 24h and all-time volume, 24h fees and 24h revenue are Llama Robinhood Chain slices, not all-chains totals. Bytecode lengths and launchConfigCount() are eth_getCode/eth_call at block 53080668. [verified R-12 R-13 R-14 R-15] - Adversarial: the strongest contrary reading is that LetsCash is the CASHCAT token, or that it is NOXA, Hookr or pools.trade. CASHCAT is not in the census; the reproduced factory is not the NOXA factory; Hookr is a hook marketplace; pools.trade InstantLaunchStrategy is hookless."
+      class: claim
+      sources:
+        - S3
+        - S7
+        - S23
+  risk:
+    - text: "Factory implementation 0x40250b4C…1C28 is unverified; the owner Safe can upgrade the proxy. [verified R-6 R-10 R-12] - Liquidity is locked by the hook; a launch cannot pull LP. [claim R-2 R-3] - No audit report PDF was located this pass, despite two named SBSecurity posts. [claim R-19 R-21] [unknown] - Name collision with the CASHCAT token: the hook is named CashCatHookV2 and platform fees buy CASHCAT. [claim R-7 R-23] - Llama volume is reconstructed from FeeAccrued and is doublecounted with Uniswap v4."
+      class: claim
+      sources:
+        - S16
+  missing:
+    - text: "What is the verified source of the live factory implementation 0x40250b4C…1C28, and which functions can the Safe call to upgrade or pause launches? Next: read a verified prior implementation (Llama cites 0x3dFd73A6…2c1A) and eth_call upgrade selectors on the current bytecode"
+    - text: "Safe 0xD2DeFb…9E91 threshold, owners and whether the same Safe can change CashCatHookV2 parameters after launch Next: eth_call getOwners/getThreshold on the Safe and read hook setters' modifiers"
+    - text: "Where is the SBSecurity audit artifact, and which bytecode (factory implementation, hook, airdrop vault) does it cover? Next: ask in public or find a report URL from @SBSecurity_ and match commit/address"
+    - text: "OKX Web3 lifetime volume ~$115M was not opened as a copyable page this pass. Llama dexs totalAllTime is 112045029.89 USD. Next: open the OKX Web3 DEX protocol page if one exists and copy the lifetime figure with window and as-of"
+    - text: "Confirm the CASHCAT token address and that it was not created by factory 0x5bd1…4661 Next: Blockscout API v2 for 0x020bfC650A365f8BB26819deAAbF3E21291018b4 creator_address_hash"
+    - text: "Telegram, Discord or other chat besides the in-app lounge? Next: record if @letscashfun pins one"
+    - text: "Are letscash.fun and letscashfun.com the same deployment, or a split docs host? Next: compare TLS certs and whether /docs on letscash.fun is a reverse-proxy of letscashfun.com"
+  unresolved: []

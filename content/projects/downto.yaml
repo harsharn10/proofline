@@ -5,7 +5,7 @@ category: Redeemable RWA basket
 lifecycle: mainnet
 lifecycle_source: pulled 0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01 2026-08-25T01:26:48.000Z
 coverage: stub
-summary: "Down to Finance is a claimed permissionless DETF (Decentralized ETF) product on Robinhood Chain: one token for a basket the creator picks, with mint, hold, and bond as the three user actions. The official fee-accruing token $DTF at `0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01` is a verified Pons v2 launch token, not a separately documented DETF diamond. App JavaScript for chain 4663 names package factories that do exist and have explorer-verified source. The landing page marks `$DTF-DETF` Live."
+summary: "Down to Finance is a permissionless DETF (Decentralized ETF) on Robinhood Chain: a creator deploys one token as a claim on a basket of vault shares and Uniswap v4 pools; the first bond turns that DETF on, then holders mint, hold, or burn. The fee-accruing $DTF token at 0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01 is a verified Pons v2 launch token. App explore lists no live DETF this pass; Protocol DETF staking is unconfigured."
 official_links:
   - kind: site
     url: https://downto.finance
@@ -15,6 +15,10 @@ official_links:
     url: https://app.downto.finance/learn
   - kind: x
     url: https://x.com/downto_finance
+  - kind: telegram
+    url: https://t.me/downtofinance
+  - kind: github
+    url: https://github.com/cyotee/indexedex
 dependencies: []
 deployments:
   - label: DTF token (PonsV2LauncherToken)
@@ -25,6 +29,7 @@ deployments:
     sources:
       - S1
       - S3
+      - S19
   - label: Pons v2 bonding curve for the DTF token
     chain: robinhood-chain
     address: "0x912467fc912f0f88df3b0d221946de78f38d4559"
@@ -33,6 +38,7 @@ deployments:
     sources:
       - S3
       - S6
+      - S32
   - label: DiamondPackageCallBackFactory (app JS chainId 4663 map)
     chain: robinhood-chain
     address: "0x976949aB55830fA4794bF40C88ea7D7567931003"
@@ -41,6 +47,7 @@ deployments:
     sources:
       - S5
       - S8
+      - S33
   - label: UniswapV4SingleStandardExchangeDETDFPkg (app JS chainId 4663 map)
     chain: robinhood-chain
     address: "0x961b4E050492E2744B8D20404Cd43A11D371577c"
@@ -49,6 +56,7 @@ deployments:
     sources:
       - S4
       - S8
+      - S20
   - label: Create3Factory (app JS chainId 4663 map)
     chain: robinhood-chain
     address: "0xD7786b10BC8Bc97dc7651CAb7B97086c8b227882"
@@ -57,6 +65,7 @@ deployments:
     sources:
       - S9
       - S8
+      - S34
   - label: UniswapV4HookDiamondPackageCallBackFactory (app JS chainId 4663 map)
     chain: robinhood-chain
     address: "0x8BB5FCC67e8CCa44DC41dd08A5e2b2B392C22945"
@@ -65,6 +74,7 @@ deployments:
     sources:
       - S10
       - S8
+      - S35
   - label: indexedexManager / vaultRegistry / vaultFeeOracle proxy (app JS chainId 4663 map)
     chain: robinhood-chain
     address: "0x09682b00D873D913ada0bB69B4D4c9631810d0bc"
@@ -73,6 +83,7 @@ deployments:
     sources:
       - S11
       - S8
+      - S36
   - label: feeCollector proxy (app JS chainId 4663 map)
     chain: robinhood-chain
     address: "0x20af9A1e21a59a411cd3b0C40E70AF9084770b2E"
@@ -81,6 +92,7 @@ deployments:
     sources:
       - S12
       - S8
+      - S37
   - label: App JS owner / deployer (EOA)
     chain: robinhood-chain
     address: not-verified
@@ -89,8 +101,51 @@ deployments:
     sources:
       - S13
       - S8
+  - label: App JS owner / deployer (EOA)
+    chain: robinhood-chain
+    address: "0x72BeA6Fa3E68EF18c87D045Aac7C4Aa5249d933B"
+    role: admin
+    verified: false
+    sources:
+      - S13
+      - S8
+  - label: DTF/WETH Uniswap v3 pair (DexScreener lead book)
+    chain: robinhood-chain
+    address: "0x0F2CA1D996224a0c9dd140B865142aAD381A4287"
+    role: other
+    verified: true
+    sources:
+      - S23
+      - S38
 metrics:
-  - { kind: holders, value: 8914, as_of: 2026-09-02, class: claim, sources: [S14] }
+  - kind: holders
+    value: 8785
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S21
+  - kind: volume_24h
+    value: 2375773.21
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S23
+  - kind: tvl
+    value: 250351.54
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S23
+      - S24
+  - kind: market_cap
+    value: 6554824
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S23
 review:
   researcher: grok-bot
   approver: pending
@@ -99,22 +154,51 @@ review:
   published_at: null
 findings:
   positive:
-    - text: "The DETF package factories and the Uniswap v4 exchange package named in the app for chain 4663 exist and have explorer-verified source (DiamondPackageCallBackFactory, UniswapV4SingleStandardExchangeDETDFPkg, Create3Factory, UniswapV4HookDiamondPackageCallBackFactory)."
+    - text: The DETF package factories and the Uniswap v4 exchange package named in the app for chain 4663 exist and have explorer-verified source (DiamondPackageCallBackFactory, UniswapV4SingleStandardExchangeDETDFPkg, Create3Factory, UniswapV4HookDiamondPackageCallBackFactory).
       class: verified
-      sources: [S4, S5, S9, S10, S8]
+      sources:
+        - S4
+        - S5
+        - S9
+        - S10
+        - S8
   risk:
     - text: "The fee-accruing DTF token is a PonsV2LauncherToken whose launchFactory is the canonical Pons v2 factory: it is a Pons launch, not a separately documented DETF contract, and its curve is a Pons v2 bonding curve."
       class: verified
-      sources: [S3, S6]
-    - text: "owner() on Create3Factory and on both diamond proxies (indexedexManager, feeCollector) returns the deployer 0x72Be…933B, a single externally owned account; the DETF package layer is controlled by one key with no multisig or timelock located."
+      sources:
+        - S3
+        - S6
+    - text: owner() on Create3Factory and on both diamond proxies (indexedexManager, feeCollector) returns the deployer 0x72Be…933B, a single externally owned account; the DETF package layer is controlled by one key with no multisig or timelock located.
       class: verified
-      sources: [S17, S13, S8]
-    - text: "The app footer shows audits as pending and no audit report was located; the indexedexManager and feeCollector addresses are proxies whose implementations were not read."
+      sources:
+        - S17
+        - S13
+        - S8
+    - text: The app footer shows audits as pending and no audit report was located; the indexedexManager and feeCollector addresses are proxies whose implementations were not read.
       class: claim
-      sources: [S2, S11, S12]
+      sources:
+        - S2
+        - S11
+        - S12
+    - text: "Receipts: every URL above was opened on 2026-09-02 and its excerpt copied from the page or API body. [verified R-1 R-3 R-17] - Numbers: holders is the Blockscout token count; volume, liquidity and market cap are the Uniswap v3 DTF/WETH pair slice, not an all-pairs or all-chains total; Llama chain TVL was not filed as protocol TVL. [claim R-15 R-17] - Adversarial: the strongest contrary reading is that Down to Finance is only a Pons-launched token with a marketing site, and the DETF machine is unused. The verified UniswapV4SingleStandardExchangeDETDFPkg name, the 4663 app map, and fourteen deployVault calls argue against unused bytecode; the empty explore list, unconfigured staking page, and the 2026-08-30 delay post argue against a user-open basket product. Classification stays announced with CON-1 open."
+      class: inference
+      sources:
+        - S18
+        - S20
+        - S28
+    - text: Explore lists no live DETF and staking has no Protocol DETF configured, while the landing page still marks $DTF-DETF Live. [claim R-1 R-2 R-22] - The DETF package accepted fourteen deployVault calls, then package activity stopped; created DETF addresses and whether any was bonded are not reproduced. [verified R-14] - Diamond owner is one externally owned account with no timelock located; manager and fee collector source is the proxy shell. [verified R-9 R-11 R-12 R-13] - App footer shows audits pending. [claim R-2] - A second DTF ticker exists at 0x2ec89A…10d2.
+      class: verified
+      sources:
+        - S26
   missing:
-    - text: "Whether any DETF basket has been created and bonded on chain 4663, or the verified package contracts are unused until a documented product open."
-    - text: "Implementation contracts behind the indexedexManager and feeCollector proxies, and who can upgrade them."
-    - text: "Fee path from DETF activity to the DTF token, as documented and as deployed."
+    - text: Whether any DETF basket has been created and bonded on chain 4663, or the verified package contracts are unused until a documented product open.
+    - text: Implementation contracts behind the indexedexManager and feeCollector proxies, and who can upgrade them.
+    - text: Fee path from DETF activity to the DTF token, as documented and as deployed.
+    - text: "Which contracts did the fourteen deployVault calls create, and was any of those DETFs bonded (first bond on) versus left unlisted after the Aug 27 archive commit? Next: read internal transactions on 0x814847568c1d5510… and match each created diamond to app.downto.finance/insights"
+    - text: "What is the live fee path from DETF activity to $DTF, and is Protocol DETF wired on 4663? Next: read FeeCollectorManagerFacet and featured-fee-detfs token list in the 4663 app bundle"
+    - text: "Can the EOA owner diamondCut the indexedexManager and feeCollector without a timelock? Next: eth_call diamondCut selectors and read MultiStepOwnableFacet delay if any"
+    - text: "Is cyotee/indexedex the official repository? Next: a site, docs, or X post that names github.com/cyotee/indexedex"
+    - text: "Is there an audit report? Next: a report URL on the site or an auditor announcement that matches the 4663 diamonds"
   unresolved:
     - text: "Lifecycle: the site marks the protocol Live and its chain-4663 package contracts exist with verified source, but no DefiLlama protocol row and no bonded DETF were found; recorded as announced with the conflict open (packet CON-1)."
+    - text: lifecycle remains unresolved (CON-1).

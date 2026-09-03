@@ -25,3 +25,115 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 3ebc9b3fde5303c5
+- date: 2026-09-02
+  slug: long
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    lifecycle: announced
+    summary: Stock-paired launchpad (Factory + Airlock) that made stock-paired tokens possible on Robinhood Chain; $AI launched here.
+    themes: null
+    official_links:
+      - kind: app
+        url: https://app.long.xyz
+      - kind: x
+        url: https://x.com/longdotxyz
+    deployments:
+      - &a1
+        label: Factory (PRD lists 0x9c88…0845, truncated)
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources:
+          - S6
+      - &a2
+        label: Factory (PRD lists 0x22e9…eeED, truncated)
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources:
+          - S6
+      - &a3
+        label: TickerAirlockFactory (named on Dune per the workbook)
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources:
+          - S4
+    metrics: null
+  new:
+    lifecycle: mainnet
+    summary: The chain's stock-paired token factory. A user deploys a new ERC-20 through LongLauncher, which forwards an Airlock create after a 24-hour ticker lock and quotes the token against a Robinhood stock token in a Uniswap v4 pool. The same app lists $AI/NVDA, $BONER/HIMS and $SPACEHOOD/SPCX. @longdotxyz runs it at app.long.xyz.
+    themes:
+      - launchpad
+      - rwa
+      - stock-paired
+    official_links:
+      - kind: app
+        url: https://app.long.xyz
+      - kind: x
+        url: https://x.com/longdotxyz
+      - kind: docs
+        url: https://app.long.xyz/litepaper
+      - kind: other
+        url: https://dune.com/natan_benish2001/long-on-robinhood-chain
+    deployments:
+      - *a1
+      - *a2
+      - *a3
+      - label: LongLauncher (PRD 0x22e9…eeED)
+        chain: robinhood-chain
+        address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+        role: factory
+        verified: true
+        sources:
+          - S11
+          - S12
+          - S13
+      - label: TickerAirlockFactory (PRD 0x9c88…0845)
+        chain: robinhood-chain
+        address: "0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845"
+        role: factory
+        verified: true
+        sources:
+          - S14
+          - S15
+      - label: DopplerERC20V1Factory (trusted token factory)
+        chain: robinhood-chain
+        address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+        role: factory
+        verified: true
+        sources:
+          - S12
+          - S17
+      - label: Airlock (create primitive)
+        chain: robinhood-chain
+        address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+        role: router
+        verified: true
+        sources:
+          - S12
+          - S16
+    metrics:
+      - kind: volume_24h
+        value: 2902781.29
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S27
+      - kind: tvl
+        value: 964796.07
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S27
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 827ec55a3de17acc

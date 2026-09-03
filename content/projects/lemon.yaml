@@ -1,13 +1,23 @@
 slug: lemon
 name: Lemon
-symbol: null
-category: Launchpad · mechanism not classified
-lifecycle: announced
+symbol: LEMON.FUN
+category: Uniswap-pool launchpad
+lifecycle: mainnet
 coverage: stub
-summary: Launch and trading pad on Robinhood Chain whose coins get an X account posting on-chain facts; Hyperliquid tools claimed through a Lemon terminal.
+summary: "A Uniswap V3 Instant launchpad on Robinhood Chain. A creator sends one transaction through LemonLaunchFactory: the factory deploys a 1-billion fixed-supply ERC-20, seeds a TOKEN/WETH 1% full-range pool, and locks the LP NFT in LemonLaunchLocker. Fees split 30/70 platform/creator. Users launch and trade at lemon.fun, operated as @lemondotfun. Optional stock-dividend vaults and per-coin X agents are claimed on the same site."
 official_links:
   - kind: x
     url: https://x.com/lemondotfun
+  - kind: site
+    url: https://lemon.fun
+  - kind: app
+    url: https://lemon.fun/launch
+  - kind: docs
+    url: https://lemon.fun/docs
+  - kind: telegram
+    url: https://t.me/lemondotfun
+  - kind: other
+    url: https://lemon.fun/leverage/BTC
 dependencies:
   - hyperliquid
 deployments:
@@ -17,6 +27,53 @@ deployments:
     role: factory
     verified: false
     sources: []
+  - label: LemonLaunchFactory (Instant V3)
+    chain: robinhood-chain
+    address: "0x2bA793Fd69Bf251Fd1Af90b576bE8B9fA6Be46DB"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S15
+      - S19
+      - S20
+  - label: LemonLaunchLocker
+    chain: robinhood-chain
+    address: "0xC10309Cf03Bc81c121a8270E3A28E159a9296903"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S16
+      - S19
+  - label: Platform fee receiver / owner EOA
+    chain: robinhood-chain
+    address: "0xEF2c099803Fff879443009722AA2B9C46E020aB6"
+    role: admin
+    verified: true
+    sources:
+      - S5
+      - S18
+      - S19
+  - label: $LEMON.FUN (official pad token)
+    chain: robinhood-chain
+    address: "0xf0E17e54239CD945Cd7bEa471a3a2CA6a8C7f7A3"
+    role: token
+    verified: true
+    sources:
+      - S9
+      - S17
+      - S19
+      - S21
+  - label: LEMON/WETH Uniswap V3 pool
+    chain: robinhood-chain
+    address: "0x01fe057d1C5FB09A4ac02860758DDf26Df9336B5"
+    role: other
+    verified: true
+    sources:
+      - S17
+      - S22
+      - S23
 review:
   researcher: harsharn10
   approver: pending
@@ -30,7 +87,19 @@ findings:
       sources:
         - S3
         - S2
-  risk: []
+  risk:
+    - text: "Receipts: lemon.fun, /docs, /launch, /leverage/BTC, the public token and stats APIs, @lemondotfun profile and six posts, DexScreener pairs, Blockscout factory/locker/token/pool/fee-receiver/create txs, and RPC were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-11 R-15] - Numbers: 124714 and 735282 are the DexScreener LEMON/WETH chain pair, not an all-chains launchpad total. Holders 12457 is the Blockscout token counter. Homepage 682 / $134.4K and stats API 56 / 674 are not mixed into one figure. [claim R-13 R-18 R-20] - Adversarial: the strongest contrary reading is that Lemon is only a frontend over Uniswap V3 and Hyperliquid, with no native factory. Verified name LemonLaunchFactory, TokenLaunched logs, and the 2026-07-25 launchToken tx that created 0xf0E1…f7A3 argue the Instant V3 path is native. A second contrary reading is that 0xef07…4Ba3 is the official coin; creator DopplerERC20V1Factory and two holders argue against it."
+      class: inference
+      sources:
+        - S15
+        - S17
+        - S21
+        - S25
+    - text: Factory and locker `owner()` is one EOA, against docs "unowned". [verified R-15] [claim R-1] - Stock-dividend vault factory address was not located. [claim R-1] - Hyperliquid perps are a frontend claim; custody was not reproduced on Hyperliquid. [claim R-10] - No audit report was located this pass. [unknown] - Homepage vs stats API launch counts disagree.
+      class: claim
+      sources:
+        - S6
+        - S24
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Contract addresses not located
@@ -38,4 +107,38 @@ findings:
     - text: Key custody for the Hyperliquid leg
     - text: Official site not located
     - text: An independent audit was not found in this review
-  unresolved: []
+    - text: "What can owner 0xEF2c…0aB6 change on LemonLaunchFactory and LemonLaunchLocker (fee recipient, claim path, pause) and is there a timelock? Next: read verified LemonLaunchFactory and LemonLaunchLocker source on Blockscout; eth_call feeRecipient/paused if present"
+    - text: "Docs §2.1 say a fresh locker per launch and TokenLaunched(token, pool, locker, creator, tokenId); decoded factory logs are TokenLaunched(token, deployer, dexFactory, pairToken, pool, dexId, launchConfigId, positionId, …) with a single shared locker 0xC103…6903. Which ABI is live? Next: read verified factory event definitions and one launchToken internal trace"
+    - text: "Where is the StockDividendVault factory address, and has any Instant V3 launch on 4663 actually nominated a stock token? Next: search Blockscout for StockDividendVault created by 0xEF2c…0aB6; sample lemon.fun API tokens with stockSymbol set"
+    - text: "Does the Hyperliquid BTC-perp UI at /leverage/BTC sign and settle, or is the book still POLLING with no live position? Next: connect a read-only flow or match a Hyperliquid account to a lemon.fun session; do not treat custody as verified from the meta line alone"
+    - text: "Which launch count is live: homepage 682 launched / 78 graduated, or /api/public/launchpad/stats totalLaunched 56 / totalGraduated 674? Next: GET /api/public/launchpad/tokens?limit=1 and count TokenLaunched logs on 0x2bA7…46DB"
+    - text: "Where is the public repository named in docs §9? Next: search Blockscout verified source file paths for a github.com origin"
+    - text: "Is there an audit whose scope matches LemonLaunchFactory 0x2bA7…46DB bytecode? Next: ask the project in public for a report URL and match bytecode"
+  unresolved:
+    - text: control.owner remains unresolved (CON-1).
+themes:
+  - launchpad
+  - memecoin
+  - rwa
+  - agent
+metrics:
+  - kind: volume_24h
+    value: 124714
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S22
+  - kind: market_cap
+    value: 735282
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S22
+  - kind: holders
+    value: 12457
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17

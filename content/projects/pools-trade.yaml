@@ -2,12 +2,22 @@ slug: pools-trade
 name: pools.trade
 symbol: null
 category: Uniswap-pool launchpad
-lifecycle: announced
+lifecycle: mainnet
 coverage: stub
-summary: Uniswap Labs launchpad minting tokens straight into Uniswap pools on Robinhood Chain.
+summary: Uniswap Labs' own launchpad on Robinhood Chain. A user picks Crowd Launch — a four-hour TWAP that refunds below about $10k FDV — or Instant Launch, a bonding curve that is live immediately. Both mint 1 billion tokens and end in a locked Uniswap v4 pool with a 0.25% autocompounding LP fee. Uniswap Labs runs it at pools.trade as @TradePools.
 official_links:
   - kind: x
     url: https://x.com/pools_dot_fun
+  - kind: app
+    url: https://pools.trade
+  - kind: x
+    url: https://x.com/TradePools
+  - kind: github
+    url: https://github.com/Uniswap/liquidity-launcher
+  - kind: other
+    url: https://blog.uniswap.org/pools-trade-a-new-way-to-launch-on-robinhood-chain
+  - kind: docs
+    url: https://docs.bitquery.io/docs/blockchain/robinhood/pools-trade-api/
 dependencies:
   - uniswap
 deployments:
@@ -17,6 +27,38 @@ deployments:
     role: factory
     verified: false
     sources: []
+  - label: Token factory (UERC20Factory)
+    chain: robinhood-chain
+    address: "0x000000e200088D55C39a11F609E5F667729ad49b"
+    role: factory
+    verified: true
+    sources:
+      - S11
+      - S16
+  - label: Launch entry current (LiquidityLauncher v3.2.0)
+    chain: robinhood-chain
+    address: "0x0000FffFBE8efE702c8703aE3477FF5dE3d319C0"
+    role: factory
+    verified: true
+    sources:
+      - S13
+      - S16
+  - label: Launch entry original (LiquidityLauncher v3.0.0)
+    chain: robinhood-chain
+    address: "0x00004c4ccc709Ef590F7C81102C0689F0263D4e9"
+    role: factory
+    verified: true
+    sources:
+      - S14
+      - S16
+  - label: Launchpad current (InstantLaunchStrategy)
+    chain: robinhood-chain
+    address: "0x23f8209572b4a1C2AD88A42749E830791Fb027f1"
+    role: other
+    verified: true
+    sources:
+      - S15
+      - S16
 review:
   researcher: harsharn10
   approver: pending
@@ -34,7 +76,18 @@ findings:
       class: claim
       sources:
         - S3
-  risk: []
+    - text: "Receipts: Uniswap blog, @Uniswap announcement, pools.trade HTML, @TradePools and @pools_dot_fun profiles, Bitquery docs, Blockscout API v2 for four addresses plus the factory creation tx, Uniswap/liquidity-launcher README, DefiLlama Robinhood fees overview, Hookr FAQ, and the 2 Sep GeckoTerminal quote were opened on 2026-09-02; excerpts are copied from those pages. [verified R-1 R-2 R-3 R-4 R-5 R-6 R-8 R-9 R-10 R-11 R-12 R-13 R-14 R-15 R-16 R-17] - Numbers: the 48,955 USD figure is DefiLlama's Robinhood Chain fees slice for module pools-trade, not an all-chains total; Llama lists only Robinhood Chain on that row. Bytecode lengths are eth_getCode at block 52929547. [claim R-16] [verified R-6] - Adversarial: the strongest contrary reading is that this slug is the SushiSwap Pools.fun pad, or that it is Hookr's pool-first model. @pools_dot_fun's own bio names SushiSwap and pools.fun; pools.trade sets twitter:site @TradePools; Hookr's FAQ disclaims affiliation."
+      class: claim
+      sources:
+        - S8
+        - S19
+        - S20
+  risk:
+    - text: Liquidity is described as permanently locked; a creator cannot withdraw the v4 position. [claim R-1 R-11] - Crowd Launch refunds depend on a threshold that Uniswap ($10k FDV) and Bitquery (~$5k raise) do not state the same way. [claim R-1 R-5] - Census handle @pools_dot_fun is a different product (Pools.fun / SushiSwap). [claim R-15] - Audit reports on the launcher repo are v1/v2; Robinhood v3.2.0 scope is unverified in this pass. [claim R-11] - Optional creator fees mean some tokens pay a creator on every trade.
+      class: claim
+      sources:
+        - S6
+        - S7
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Factory address not located
@@ -42,5 +95,22 @@ findings:
     - text: Whether Uniswap Labs retains control of the factory
     - text: Site URL not in the intake
     - text: Relation to the 'Poolsfun' Sushi-V3 launches unresolved
+    - text: "Census handle @pools_dot_fun is Pools.fun (SushiSwap pad at pools.fun). Official pools.trade handle is @TradePools. Compiler should not merge the two products onto this slug. Next: controller decision on census handle and whether Pools.fun gets its own candidate slug"
+    - text: "Do the v1.0 / v2.0.0 OpenZeppelin and Spearbit reports cover the Robinhood v3.2.0 InstantLaunchStrategy and LiquidityLauncher bytecode? Next: read each report's commit/version scope against commit dd8769cd45c0e9450e928513ee129b0af74f7f32"
+    - text: "How does the blog's optional 0.05% creator fee of the 0.25% LP fee map onto the GitHub fees-on FeeSplitter (40% native ETH to UERC20BeneficiaryVault, 60% to compounding)? Next: read InstantLaunchStrategy and FeeSplitter verified source on Blockscout"
+    - text: "Crowd Launch threshold: Uniswap blog ~$10k FDV or refund vs Bitquery ~$5k-equivalent raise. Which figure is the on-chain auction stop? Next: read a live CCA auction contract and the pools.trade cca.listAuctions payload"
+    - text: "Bitquery Instant/curve UI shows $50k FDV graduation progress with no on-chain migration. Confirm it is display-only. Next: compare one token's Trading.Supply.MarketCap with the pools.trade curve.getLaunchByAddress graduation field"
+    - text: "Who can change InstantLaunchStrategy, LiquidityLauncher, or FeeSplitter parameters after deploy? Next: eth_call owner()/authority on the four reproduced contracts and read verified source modifiers"
   unresolved:
     - text: Two X handles (@pools_dot_fun and @TradePools) are in use; Proofline kept both until the canonical one is confirmed. Whether the 'Poolsfun' Sushi-V3 launches noted by GeckoTerminal on 16 Aug are the same product is unresolved.
+themes:
+  - launchpad
+  - memecoin
+metrics:
+  - kind: fees_24h
+    value: 48955
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S21

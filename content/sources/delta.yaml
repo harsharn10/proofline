@@ -90,9 +90,328 @@ sources:
     publisher: DefiLlama
     kind: third-party-data
     accessed_at: 2026-09-02T07:20:00Z
-    claim: "DefiLlama lists Delta (slug delta, category Liquidity Manager) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs"
+    claim: DefiLlama lists Delta (slug delta, category Liquidity Manager) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs
     excerpt: "api.llama.fi/protocols on 2026-09-02: chains include Robinhood Chain; chainTvls[Robinhood Chain] $15,435. Aggregator figure, not reproduced on chain."
     hash: null
     archive_url: null
     researcher: claude
+    available: true
+  - id: S9
+    url: https://deltaliquidity.app/pools
+    publisher: Delta
+    kind: official-site
+    accessed_at: 2026-09-02T22:57:00Z
+    claim: Delta pools app
+    excerpt: "Title Delta. Description: Liquidity stakes and concentrated liquidity pools on Robinhood Chain. Header: Total Positions 8,275; Total Fees $1,210,576; TVL $1,440,933. Nav links X https://x.com/deltaliquidity and Discord https://discord.gg/deltaliquidity. DELTA Market cap $14.89M Vol 24h $4.31M Fees 24h $43.09K. Stakes page: Total staked 8.9 WETH, Stakes 12."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S10
+    url: https://deltaliquidity.app/docs
+    publisher: Delta
+    kind: docs
+    accessed_at: 2026-09-02T22:59:00Z
+    claim: Delta Docs
+    excerpt: "Live on Robinhood Chain, chain id 4663. Stakes collect a share of swap fees. Pools: shaped position from a single coin. 1% of claimed fees, never principal. Deposit/Withdraw/Creating a stake 0. VaultFactory 0x68EDc4948F60D21c4a7Dcbb8Ed4500cE6D0b153c. FAQ: deposits sit in the stake contract; only your wallet withdraws. Owner key can lower the fee and pause new deposits, cannot raise the fee or move a staked position."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S11
+    url: https://x.com/deltaliquidity
+    publisher: Delta (@deltaliquidity)
+    kind: social
+    accessed_at: 2026-09-02T22:55:00Z
+    claim: X profile @deltaliquidity
+    excerpt: "Delta @deltaliquidity. Bio: The liquidity layer of Robinhood. 0xe8ffd7e24187f72afb08d75b1bb13088a989a791. Followers 5598. Joined July 2026. Profile URL deltaliquidity.app."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S12
+    url: https://robinhoodchain.blockscout.com/address/0xe8ffd7e24187F72afB08d75B1bb13088A989a791
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T22:58:00Z
+    claim: Address 0xe8ff…a791
+    excerpt: hash 0xe8ffd7e24187F72afB08d75B1bb13088A989a791, is_contract true, is_verified true, name PonsLauncherToken, proxy_type null, creator_address_hash 0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB, creation_transaction_hash 0x301f5b492bdf3f985f7f0d37d1616b07df53f8325f03407be7805412be598e87. Token Delta / DELTA, holders_count 14292, total_supply 1e27, decimals 18.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S13
+    url: https://robinhoodchain.blockscout.com/token/0xe8ffd7e24187F72afB08d75B1bb13088A989a791
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T22:58:00Z
+    claim: Token page DELTA
+    excerpt: address_hash 0xe8ffd7e24187F72afB08d75B1bb13088A989a791, name Delta, symbol DELTA, decimals 18, holders_count 14292, total_supply 1000000000000000000000000000, type ERC-20.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S14
+    url: https://robinhoodchain.blockscout.com/tx/0x301f5b492bdf3f985f7f0d37d1616b07df53f8325f03407be7805412be598e87
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T22:58:00Z
+    claim: Creation tx 0x301f5b…
+    excerpt: "status ok, timestamp 2026-07-31T22:59:31Z, block 24555353, from EOA 0x1EAFc3E30f9F6DDFC53DC3EaB028A31BA4B8B0f8, to PonsLaunchFactory 0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB, method launchToken. Params: name Delta, symbol DELTA, description Stake, compound & earn from liquidity pools., socials twitter https://x.com/deltaliquidity website https://deltaliquidity.xyz/, launchConfigId 0, dexId 0."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S15
+    url: https://robinhoodchain.blockscout.com/address/0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T22:58:00Z
+    claim: PonsLaunchFactory 0xA5aAb3…
+    excerpt: hash 0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB, is_contract true, is_verified true, name PonsLaunchFactory, proxy_type null, creator_address_hash 0xda4bCee76B29EFEc9697Fcf663601c2042043968.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S16
+    url: https://robinhoodchain.blockscout.com/address/0xD64FbdA67E1015dF43Fa5e49F02cA844729E5F94
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T22:58:00Z
+    claim: UniswapV3Pool 0xD64Fbd…
+    excerpt: hash 0xD64FbdA67E1015dF43Fa5e49F02cA844729E5F94, is_contract true, is_verified true, name UniswapV3Pool, creator_address_hash 0x1f7d7550B1b028f7571E69A784071F0205FD2EfA, creation_transaction_hash 0x301f5b492bdf3f985f7f0d37d1616b07df53f8325f03407be7805412be598e87.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S17
+    url: https://api.dexscreener.com/latest/dex/tokens/0xe8ffd7e24187f72afb08d75b1bb13088a989a791
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-02T22:57:00Z
+    claim: DELTA token pairs on Robinhood
+    excerpt: Uniswap v3 pair 0xD64FbdA67E1015dF43Fa5e49F02cA844729E5F94 DELTA/WETH liquidity.usd 1159947.42 volume.h24 4343372.01 marketCap 14760957. info.websites https://deltaliquidity.app/ socials x.com/deltaliquidity and discord.com/invite/deltaliquidity. Extra Uniswap v4 DELTA/USDG and DELTA/ETH books.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S18
+    url: https://api.geckoterminal.com/api/v2/networks/robinhood/pools/0xd64fbda67e1015df43fa5e49f02ca844729e5f94
+    publisher: GeckoTerminal
+    kind: third-party-data
+    accessed_at: 2026-09-02T22:57:00Z
+    claim: Robinhood DELTA/WETH pool
+    excerpt: name DELTA / WETH 1%, address 0xd64fbda67e1015df43fa5e49f02ca844729e5f94, reserve_in_usd 1138915.1374, volume_usd.h24 4336125.50, fdv_usd 14807365.15. base_token robinhood_0xe8ffd7e24187f72afb08d75b1bb13088a989a791. quote WETH 0x0bd7d308f8e1639fab988df18a8011f41eacad73. dex pons-dot-family. Trending list this window showed the same pool at about $1.13M liq / $4.33M vol.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S19
+    url: https://api.llama.fi/protocol/delta
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-02T22:57:00Z
+    claim: Delta protocol
+    excerpt: name Delta, symbol DELTA, url https://deltaliquidity.app/, twitter deltaliquidity, address robinhood:0xe8ffd7e24187F72afB08d75B1bb13088A989a791, category Liquidity Manager, chains [Robinhood Chain], module delta-liquidity/index.js, audits 0, currentChainTvls['Robinhood Chain'] 13804.2671, last tvl point date 1788382367 (2026-09-02T20:52:47Z).
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S20
+    url: https://raw.githubusercontent.com/DefiLlama/DefiLlama-Adapters/main/projects/delta-liquidity/index.js
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-02T23:00:00Z
+    claim: delta-liquidity adapter
+    excerpt: "VAULT_FACTORY 0x68EDc4948F60D21c4a7Dcbb8Ed4500cE6D0b153c; LADDER_MANAGER 0x64680254BF644BBdDe394b95129895c13317FeD4; LADDER_MANAGER_V2 0xC5941433114BB47a9733CB31a0A3A3dBfF45B418; ROUTER_V3 0x46dFEa430d1F069C129E26445319562e29f39C47; DELTA 0xe8ffd7e24187F72afB08d75B1bb13088A989a791. Methodology: TVL counts assets custodied by Delta contracts. User-custodied positions are not counted."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S21
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Robinhood Chain RPC
+    kind: explorer
+    accessed_at: 2026-09-02T23:02:00Z
+    claim: eth_getCode, owner, ERC-20 views
+    excerpt: eth_chainId 0x1237. Token 0xe8ff… name() Delta symbol() DELTA totalSupply 1e27 owner() revert deployer() 0x1eafc3e30f9f6ddfc53dc3eab028a31ba4b8b0f8. owner() VaultFactory/VaultFarmFactory/ROUTER_V3 = 0xf98c1097bc50692b8f290b8c20a3f3f7dd0e2a1d (empty code). owner() DeltaLadderManager v3 and Llama ladder managers = 0xb1c2bbf86e557ecdc1812f75ae3fe973e5ec9e69 (empty code). Non-empty code on all docs and Llama adapter addresses listed in deployments.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S22
+    url: https://x.com/deltaliquidity/status/2095175740534997144
+    publisher: Delta (@deltaliquidity)
+    kind: social
+    accessed_at: 2026-09-02T22:55:00Z
+    claim: $1,000,000 has been claimed
+    excerpt: $1,000,000 has been claimed by users providing liquidity on Delta.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S23
+    url: https://x.com/deltaliquidity/status/2094806704907337795
+    publisher: Delta (@deltaliquidity)
+    kind: social
+    accessed_at: 2026-09-02T22:55:00Z
+    claim: $750,000 has been claimed
+    excerpt: $750,000 has been claimed by users providing liquidity on Delta.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S24
+    url: https://x.com/deltaliquidity/status/2094567691969540120
+    publisher: Delta (@deltaliquidity)
+    kind: social
+    accessed_at: 2026-09-02T22:55:00Z
+    claim: Website DDoS post
+    excerpt: Today, the Delta website experienced a DDoS attack originating from a malicious third party, which resulted in a brief interruption to website access. Importantly, there was no impact to Delta’s smart contracts or on-chain functionality. As part of our ongoing efforts, we are actively working with a leading security firm to audit Delta’s codebase.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S25
+    url: https://x.com/deltaliquidity/status/2094298233594118367
+    publisher: Delta (@deltaliquidity)
+    kind: social
+    accessed_at: 2026-09-02T22:55:00Z
+    claim: Over 5,000 positions opened
+    excerpt: There are now over 5,000 positions opened on Delta.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S26
+    url: https://x.com/deltaliquidity/status/2093870819642572800
+    publisher: Delta (@deltaliquidity)
+    kind: social
+    accessed_at: 2026-09-02T22:55:00Z
+    claim: TVL surpassed $1,000,000
+    excerpt: Total value locked on Delta has surpassed $1,000,000.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S27
+    url: https://x.com/deltaliquidity/status/2094180618859172173
+    publisher: Delta (@deltaliquidity)
+    kind: social
+    accessed_at: 2026-09-02T22:55:00Z
+    claim: Quote of Aster $DELTA listing
+    excerpt: "Longing liquidity here. Quoted @Aster_DEX: New perp listings: $DELTA (0xe8ffd7e24187F72afB08d75B1bb13088A989a791) with up to 3x leverage."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S28
+    url: https://x.com/Aster_DEX/status/2094121977175040425
+    publisher: Aster (@Aster_DEX)
+    kind: social
+    accessed_at: 2026-09-02T22:55:00Z
+    claim: New perp listings $DELTA 3x
+    excerpt: "New perp listings: $DELTA (0xe8ffd7e24187F72afB08d75B1bb13088A989a791) with up to 3x leverage. $STONKBROKER (0xe934e36A439C94017B64a3FecE66AF12099aBF50) with up to 5x leverage."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S29
+    url: https://robinhoodchain.blockscout.com/address/0xfA1A5d457a9f9659b1f7bdE14576c6bE955b6bD5
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T23:03:00Z
+    claim: Other DELTA token 0xfA1A…
+    excerpt: hash 0xfA1A5d457a9f9659b1f7bdE14576c6bE955b6bD5, is_contract true, is_verified true, name Delta, creator_address_hash 0x25548Ba29a0071F30E4bDCd98Ea72F79341b07a1 (TWCloneFactory), creation_transaction_hash 0x291bdfb8f1bc8f2b56ef9175ff223c9ddb9d73586847b25cd8818fdc434d997b 2026-08-21T17:09:01Z method deployProxyByImplementationV2. Token Delta / DELTA holders_count 15783.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S30
+    url: https://x.com/search?q=deltaliquidity&f=user
+    publisher: X
+    kind: social
+    accessed_at: 2026-09-02T22:55:00Z
+    claim: Handle search deltaliquidity
+    excerpt: Delta @deltaliquidity, 5598 followers, bio The liquidity layer of Robinhood plus CA 0xe8ff…a791. Delta Community @deltaliquidlty, 280 followers, same bio and CA. Delta Support @deltaliquidityS, 71 followers, same bio and CA.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S31
+    url: https://discord.gg/deltaliquidity
+    publisher: Delta
+    kind: other
+    accessed_at: 2026-09-02T23:02:00Z
+    claim: Discord invite
+    excerpt: Invite slug deltaliquidity linked from deltaliquidity.app/pools. HTTP 200 on discord.com/invite/deltaliquidity.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S32
+    url: https://robinhoodchain.blockscout.com/address/0x68EDc4948F60D21c4a7Dcbb8Ed4500cE6D0b153c
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T23:02:00Z
+    claim: VaultFactory 0x68ED…
+    excerpt: hash 0x68EDc4948F60D21c4a7Dcbb8Ed4500cE6D0b153c, is_contract true, is_verified false, name null, proxy_type null, creator_address_hash 0xf98C1097BC50692b8f290B8c20A3F3f7dD0E2a1D, creation_transaction_hash 0x467f725044942b8fa394c3f9b3bce99c33064ea23332fcdbd7decdddac9eab81.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S33
+    url: https://robinhoodchain.blockscout.com/address/0x6235cF6bd8419b34942F4EDDB39C880BD96dD700
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T23:03:00Z
+    claim: DeltaPositionBuilder verified source
+    excerpt: "is_verified true, name DeltaPositionBuilder, compiler v0.8.26, proxy none. Source: mintLadder(address pool, Rung[] rungs, ...) emits LadderMinted(address indexed owner, address indexed pool, ...). Uses Uniswap v3 NonfungiblePositionManager. No owner() in ABI."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S34
+    url: https://api.dexscreener.com/latest/dex/tokens/0xfA1A5d457a9f9659b1f7bdE14576c6bE955b6bD5
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-02T23:03:00Z
+    claim: Other DELTA 0xfA1A… pairs
+    excerpt: Uniswap pair 0x0FaBFe4E5B1C2caF0dc0555091f69A123B802b5c base Delta / DELTA 0xfA1A5d457a9f9659b1f7bdE14576c6bE955b6bD5 liquidity.usd 4520231.44 volume.h24 0.04. info null. Distinct from 0xe8ff…a791.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S35
+    url: https://api.llama.fi/protocols
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-02T23:00:00Z
+    claim: Delta Financial (Ethereum) row
+    excerpt: "Separate row: Delta Financial slug delta-financial symbol DELTA address 0x9ea3b5b4ec044b70375236a281986106457b20ef category Options chain Ethereum twitter Delta_Token. Robinhood Delta is slug delta, url deltaliquidity.app, twitter deltaliquidity."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S36
+    url: https://x.com/TheVsCrypto
+    publisher: TheVs (@TheVsCrypto)
+    kind: social
+    accessed_at: 2026-09-02T22:55:00Z
+    claim: Product @Deltaliquidity bio
+    excerpt: "TheVs @TheVsCrypto. Bio: Product @Deltaliquidity. Founder @Diligencedao. Quoted by @deltaliquidity on 2026-08-23 in a State of Delta recap."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S37
+    url: https://dexscreener.com/robinhood/0xD64FbdA67E1015dF43Fa5e49F02cA844729E5F94
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-02T22:38:55.976Z
+    claim: Contract record for 0xD64FbdA67E1015dF43Fa5e49F02cA844729E5F94 on Robinhood Chain (4663), read into content/pulled/delta.yaml.
+    excerpt: "pulled pair 0xD64FbdA67E1015dF43Fa5e49F02cA844729E5F94 2026-09-02T22:38:55.976Z: market pair for 0xe8ffd7e24187f72afb08d75b1bb13088a989a791 on Robinhood Chain (4663)."
+    hash: null
+    archive_url: null
+    researcher: pull
     available: true

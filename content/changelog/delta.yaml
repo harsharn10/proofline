@@ -12,3 +12,201 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: f82444f7a6372b48
+- date: 2026-09-02
+  slug: delta
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "LP manager that calls itself the liquidity layer of Robinhood: users provide liquidity and claim fees, with a $DELTA token."
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/deltaliquidity
+    deployments:
+      - label: DELTA token (account bio)
+        chain: robinhood-chain
+        address: "0xe8ffd7e24187f72afb08d75b1bb13088a989a791"
+        role: token
+        verified: false
+        sources:
+          - S4
+          - S6
+      - &a1
+        label: LP manager / vault contracts
+        chain: robinhood-chain
+        address: not-verified
+        role: vault
+        verified: false
+        sources: []
+    metrics:
+      - kind: tvl
+        value: 16201
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S7
+  new:
+    summary: "A liquidity manager: users deposit a token or LP into a stake or a shaped Uniswap position and collect a share of that pool's swap fees in ETH. Open or join a pool on deltaliquidity.app, claim streamed fees after a 1% protocol cut, and withdraw with no lockup. @deltaliquidity runs the app. DELTA is a Pons v1 launch token, not the vault."
+    themes:
+      - vault
+      - rwa
+      - memecoin
+    official_links:
+      - kind: x
+        url: https://x.com/deltaliquidity
+      - kind: site
+        url: https://deltaliquidity.app
+      - kind: docs
+        url: https://deltaliquidity.app/docs
+      - kind: app
+        url: https://deltaliquidity.app/pools
+      - kind: discord
+        url: https://discord.gg/deltaliquidity
+    deployments:
+      - label: DELTA token (PonsLauncherToken)
+        chain: robinhood-chain
+        address: "0xe8ffd7e24187F72afB08d75B1bb13088A989a791"
+        role: token
+        verified: true
+        sources:
+          - S4
+          - S6
+          - S12
+          - S13
+          - S14
+          - S21
+      - *a1
+      - label: DELTA/WETH Uniswap v3 pair
+        chain: robinhood-chain
+        address: "0xD64FbdA67E1015dF43Fa5e49F02cA844729E5F94"
+        role: other
+        verified: true
+        sources:
+          - S16
+          - S17
+          - S18
+          - S21
+          - S37
+      - label: PonsLaunchFactory (token creator)
+        chain: robinhood-chain
+        address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+        role: factory
+        verified: false
+        sources:
+          - S14
+          - S15
+      - label: VaultFactory (docs; creates stakes)
+        chain: robinhood-chain
+        address: "0x68EDc4948F60D21c4a7Dcbb8Ed4500cE6D0b153c"
+        role: factory
+        verified: false
+        sources:
+          - S10
+          - S21
+          - S32
+      - label: VaultFarmFactory (docs)
+        chain: robinhood-chain
+        address: "0x2bdA3FeB985d812a5932fe59eD4D8627BA3A10d1"
+        role: factory
+        verified: false
+        sources:
+          - S10
+          - S21
+      - label: DeltaZap (docs)
+        chain: robinhood-chain
+        address: "0xC0b8eC7589ee49c53305517bFd53BEd708392294"
+        role: other
+        verified: false
+        sources:
+          - S10
+          - S21
+      - label: TwapOracle (docs)
+        chain: robinhood-chain
+        address: "0xA26cB1b06AAE9E58D5DBCCE40f7fC38c0aced62C"
+        role: other
+        verified: false
+        sources:
+          - S10
+          - S21
+      - label: DeltaPositionBuilder (docs)
+        chain: robinhood-chain
+        address: "0x6235cF6bd8419b34942F4EDDB39C880BD96dD700"
+        role: other
+        verified: false
+        sources:
+          - S10
+          - S21
+          - S33
+      - label: DeltaLadderManager v3 (docs current)
+        chain: robinhood-chain
+        address: "0x5cA6214227D1195c4b7b4B96847b8966c688295D"
+        role: vault
+        verified: false
+        sources:
+          - S10
+          - S21
+      - label: Llama adapter LADDER_MANAGER
+        chain: robinhood-chain
+        address: "0x64680254BF644BBdDe394b95129895c13317FeD4"
+        role: vault
+        verified: false
+        sources:
+          - S20
+          - S21
+      - label: Llama adapter LADDER_MANAGER_V2
+        chain: robinhood-chain
+        address: "0xC5941433114BB47a9733CB31a0A3A3dBfF45B418"
+        role: vault
+        verified: false
+        sources:
+          - S20
+          - S21
+      - label: Llama adapter ROUTER_V3
+        chain: robinhood-chain
+        address: "0x46dFEa430d1F069C129E26445319562e29f39C47"
+        role: router
+        verified: false
+        sources:
+          - S20
+          - S21
+    metrics:
+      - kind: tvl
+        value: 13804
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S19
+      - kind: volume_24h
+        value: 4343372.01
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S17
+      - kind: market_cap
+        value: 14760957
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S17
+      - kind: holders
+        value: 14292
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S13
+      - kind: fees_24h
+        value: 43090
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S9
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 163d7decf276c655

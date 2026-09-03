@@ -8,60 +8,104 @@ methodology_version: proofline-v1.0
 
 ## Identity
 
-Mancer describes itself as the DEX aggregator and order layer of Robinhood Chain. Its quoted feature set includes routed swaps, limit orders, stops, OCO brackets and recurring buys; the project's own posts place it in a gated beta for Chain Mancers and StonkBrokers holders. [claim S2 S7 S5]
+Mancer is classified as Trading aggregator.
+
+Mancer is Robinhood Chain's DEX aggregator and non-custodial order layer: a quote races eligible venues, the winning route (or a split) executes in one transaction, and signed limit, stop, OCO and recurring orders stay in the user's wallet until fill. A user connects a wallet at mancer.xyz. Blockhash / @MancerXYZ run the executor; the $MANCER token is a separate Clutch CollectionToken.
+
+Themes: tooling, nft, memecoin
 
 ## Deployment
 
-The reviewed documentation does not publish the router, settlement, executor or token contract addresses, so the production deployment could not be mapped in this pass. [unknown]
+$MANCER token (CollectionToken, Clutch NFT-Token AMM): 0xc72F232a6869e6CF34dC06129AfFD07F8a2a246A on robinhood-chain. [verified S12 S13 S14 S16]
 
-The workbook records a $MANCER token at `0xc72f232a6869e6cf34dc06129affd07f8a2a246a`; the address has not been reproduced on the explorer. [claim S6]
+MancerRouter (live; 1,343 txs this pass): 0xFBA80Ff9C50462661f9D328E033e251251537FA5 on robinhood-chain. [claim S16 S17]
+
+MancerOrders (live; 79 txs this pass): 0x22Db8B8a0D14916f7A84909a0d92DF9024B57f88 on robinhood-chain. [claim S16 S18]
+
+CollectionTokenDeployer (token creator_address_hash): 0x662003BF6049e36b4E887D47b8df8718fFBbc6C2 on robinhood-chain. [claim S12 S15]
+
+MancerRouter (earlier verified copy; 17 txs): 0x67b7ec06828425BdDF02C52789B7939924608f79 on robinhood-chain. [claim S17]
+
+MancerOrders (earlier verified copy; 1 tx): 0xff86B3D4266c9374DA9D8A473E8533965ab6A0C3 on robinhood-chain. [claim S18]
 
 ## Control
 
-Users approve one Mancer contract, which Mancer says may forward trades only to an allowlisted set of venue contracts. The reviewed page does not identify who controls that allowlist or how changes are delayed. [claim S2]
-
-Resting orders are signed messages backed by token allowances. Free cancellation is recorded and honored by Mancer's executor, while onchain cancellation and allowance revocation are the chain-enforced fallback paths. [claim S2]
+_Research pending._
 
 ## Security
 
-Mancer says every execution enforces a user-accepted minimum output onchain and reverts when settlement cannot meet that floor. This behavior has not yet been reproduced against a verified deployment. [claim S2]
-
-The project posted on 2026-08-25 that a formal audit of the router and order contracts was under way with public access to follow; no report, scope or deployment-to-audit match was found in the reviewed official material. [claim S7 S5] [unknown]
+Token source states no owner, no admin, no mint after deployment; `owner()` reverts. Router and Orders were deployed from the same EOA that created the token market. Whitepaper: two small contracts, no upgradeability, venue targets allowlisted. Sherlock collaborative audit 24–27 Aug, report 29 Aug, 0 high / 3 medium / 11 low; "not fixed and not acknowledged" 0. Live Router predates that audit window. AllowanceTarget live instance not identified (four verified copies, 0 txs). [verified S14 S16] [claim S11 S21]
 
 ## Engineering
 
-The documentation describes route splitting across live venues, volatility-based slippage defaults, native ETH wrapping, signed all-or-nothing limit orders, stop triggers, OCO cancellation and scheduled recurring fills. These are design claims pending contract and executor verification. [claim S2]
+_Research pending._
 
 ## Team
 
-The reviewed official pages do not identify the operating entity, named contributors, multisig signers or incident contacts. [unknown]
+Whitepaper author Michael Hirsch — Blockhash. @MichaelHirsch posts as building @MancerXYZ at @BlockhashXYZ. Official handle @MancerXYZ; site swap widget links the token CA. Sherlock names repository blockhash-xyz/mancer-contracts, which is not among the org's public repos this pass. [verified S9 S24] [claim S11 S27]
 
 ## Product and economics
 
-Mancer publishes pair-dependent fees: stable-to-stable swaps at 0%, ETH-to-stable at 0.02%, other swaps at 0.10%, and young-token swaps at 0.50%; order fills add a larger per-fill rate and cap the charge at the rate signed by the user. [claim S2]
+Docs: every quote is a race across eligible routes; the engine may split across pools; ETH wraps inside the swap. Limit orders are free signatures. A stop is a triggered limit. OCO filling either side voids the other in the Orders contract. Recurring buys split one decision across a time grid. [claim S10]
 
-The documentation says Mancer pays gas for executor-submitted order fills, while users pay network gas for swaps and onchain cancellations. Very small scheduled fills may be skipped when execution cost is uneconomic. [claim S2]
+Live execution contracts on 4663 are MancerRouter `0xFBA80Ff9…7FA5` (1,343 txs) and MancerOrders `0x22Db8B8a…7f88` (79 txs), both deployed 2026-08-20T23:35:44Z by `0x0Dc1Dd32…4550`. Earlier verified copies exist with 17 and 1 txs. [verified S17 S18]
 
-The workbook records each Chain Mancer NFT as backed by 500k MANCER, with 1,250 NFTs reserved to back an Anvil LP; the fee-claim mechanics for NFT holders were not verified. [claim S6]
+$MANCER at `0xc72F…246A` is a verified CollectionToken (fixed 2.5B supply, no owner). It was created 2026-08-06 via `createMarket` on a contract Blockscout named AMMFactoryV2. Primary book MANCER/WETH Uniswap v3 `0x543127d6…cF54`. [verified S14 S15 S19]
+
+Blockscout holders_count 9901, total supply 2.5B × 1e18. DexScreener MANCER/WETH v3 liq $561,003.72 vol $1,241,223.49; MANCER/STONKBROKER v3 liq $445,813.78 vol $556,008.76 (2026-09-02T23:13–23:14Z). Status page: quotes, swaps and order execution operational. [verified S13 S19 S20] [claim S22]
 
 ## Communications
 
-The official documentation distinguishes identity verification badges from endorsements and discloses that stock-token trading is restricted in some regions, including the United States. [claim S2]
+Official account quoted a focus on quotes and integrations [claim S23]
 
-The project's 2026-08-14 post announced the beta for NFT holders and its 2026-08-25 post announced the audit; no public-open post was found through 2026-08-31. [claim S7 S8 S5]
+Sherlock posted a completed collaborative audit for Mancer [claim S25]
+
+Official account thanked beta testers after public launch [claim S29]
+
+Official account posted Mancer is open to the public [verified S24]
+
+Official account posted a router-and-order audit in progress [claim S30]
+
+Status page listed quotes, swaps and orders operational [claim S22]
 
 ## Findings
 
-The strongest documented property is the absence of deposited order custody: tokens remain in the user's wallet until a signed fill executes. The largest unresolved questions are the deployed address map, allowlist authority, executor controls and independent audit coverage. [inference S2]
+Signed cancellation is honored by Mancer's executor; a chain-enforced exit needs on-chain cancel or allowance revoke. Venue allowlist control was not reproduced. Four verified AllowanceTarget copies showed zero transactions this pass, so the live approval target is not identified. The Sherlock report exists; bytecode-to-commit matching was not done. [claim S9]
+
+- Signed cancel is executor-honored; chain exits are on-chain cancel or allowance revoke. [claim S10]
+- Venue allowlist owner and the live AllowanceTarget were not reproduced. [unknown]
+- Live Router was deployed 20 Aug; Sherlock audit window is 24–27 Aug — bytecode match to the final commit is open. [claim S21] [verified S17]
+- $MANCER is a Clutch CollectionToken, not a MancerRouter receipt; presenting Clutch NFT backing as aggregator TVL would mix products. [verified S14]
+- Mancer Shield is an announcement, not a deployment this pass. [claim S26]
+
+- Receipts: site, docs, whitepaper, status, Blockscout, RPC, DexScreener, Sherlock report URL, and the cited X posts were opened on 2026-09-02. [verified S9 S16 S17 S24]
+- Numbers: DexScreener figures are aggregator prints for MANCER pairs, not explorer pool inventory. [claim S19]
+- Adversarial: the strongest contrary reading is that Mancer is only a Clutch memecoin with a docs site. The verified Router/Orders, 1,343 router txs, public-open post, and swap widget CA argue the aggregator is a separate live product that happens to share a deployer with the token. [inference S17 S24]
 
 ## Sources
 
-- S2 — [Mancer documentation](https://mancer.xyz/docs), reviewed 2026-08-31.
-- S1, S3, S4 — site, whitepaper and X account (census links).
-- S5–S8 — Research intake artifacts (ecosystem map, workbook, X fills).
-
-See `content/sources/mancer.yaml` for every entry's accessed_at, claim and excerpt.
+- S9 — Official site / app.
+- S10 — Docs.
+- S11 — Whitepaper v1.0.
+- S12 — Address 0xc72F…246A.
+- S13 — Token 0xc72F…246A.
+- S14 — CollectionToken source.
+- S15 — Creation tx 0x9a6d78c1….
+- S16 — eth_getCode / name / symbol / totalSupply.
+- S17 — MancerRouter 0xFBA80Ff9….
+- S18 — MancerOrders 0x22Db8B8a….
+- S19 — tokens/v1 MANCER batch.
+- S20 — token-pairs MANCER.
+- S21 — Mancer collaborative audit report.
+- S22 — Status page.
+- S23 — Better execution, everywhere.
+- S24 — Mancer is now open to the public.
+- S25 — Audit complete post.
+- S26 — Mancer Shield announcement (via prior X index).
+- S27 — blockhash-xyz org.
+- S29 — Thanks to beta testers.
+- S30 — Audit in progress, public access to follow.
 
 ## Review metadata
 
-First documentation pass by harsharn10 on 2026-08-31 (research desk commit 5393021, intaken 2026-08-31). Coverage remains a stub until the contracts, privileged controls and audit status are independently verified.
+Compiled from WORK-20260903-grok-heavy-icarus-research by grok-heavy as of 2026-09-02T23:16:00Z; methodology_version: proofline-v1.0.

@@ -2,12 +2,22 @@ slug: netnet
 name: NetNet Capital
 symbol: NET
 category: Reserve-backed currency
-lifecycle: announced
+lifecycle: mainnet
 coverage: stub
-summary: Reserve token whose treasury the project says holds AAPL, NVDA and SPCX Stock Tokens; DefiLlama has it under Reserve Currency at zero TVL.
+summary: Reserve-backed currency on Robinhood Chain. NET is minted only by the Treasury, staked into rebasing sNET every 8 hours, and sold through bonds against a USDG reserve plus protocol-owned NET/USDG liquidity. Users buy NET/USDG, stake for dividends, or subscribe to bonds and RWA programs at netnet.capital. NetNet Capital Management (@NetNetCap) publishes the contracts; tax-pair adds sit with Safe 0x3Bb7…5f42.
 official_links:
   - kind: x
     url: https://x.com/NetNetCap
+  - kind: site
+    url: https://netnet.capital
+  - kind: app
+    url: https://app.netnet.capital/
+  - kind: docs
+    url: https://docs.netnet.capital/
+  - kind: telegram
+    url: https://t.me/netnetcap
+  - kind: other
+    url: https://win.netnet.capital/
 dependencies:
   - stock-tokens
 deployments:
@@ -23,14 +33,110 @@ deployments:
     role: vault
     verified: false
     sources: []
+  - label: NET token
+    chain: robinhood-chain
+    address: "0xCA9c78Dd337A67F6e0077F65F5E9218719d30eDf"
+    role: token
+    verified: true
+    sources:
+      - S9
+      - S14
+      - S15
+      - S16
+  - label: Treasury
+    chain: robinhood-chain
+    address: "0x04822Ea321A0DEE6F40656172F29312104855d66"
+    role: vault
+    verified: true
+    sources:
+      - S9
+      - S16
+      - S28
+  - label: Staking
+    chain: robinhood-chain
+    address: "0xB078cc304A0B264C5F3680DC0488954ACcd02E87"
+    role: other
+    verified: true
+    sources:
+      - S9
+      - S16
+      - S29
+  - label: sNET (staked NET)
+    chain: robinhood-chain
+    address: "0xb773ec2C326B7f98a5a83fc098825492F020a4c7"
+    role: token
+    verified: true
+    sources:
+      - S9
+      - S16
+  - label: TaxCollector
+    chain: robinhood-chain
+    address: "0x086C58400b8708Ef993f256E12e752dcF0AC918e"
+    role: other
+    verified: false
+    sources:
+      - S9
+      - S16
+  - label: GenesisBond
+    chain: robinhood-chain
+    address: "0x575b7B7c97Ef3E21C82DAeB427899d583e1E913f"
+    role: other
+    verified: false
+    sources:
+      - S9
+      - S16
+  - label: BondDepository
+    chain: robinhood-chain
+    address: "0xff32a969A0c567129eECD926D04657728E1980C1"
+    role: other
+    verified: false
+    sources:
+      - S9
+  - label: NET/USDG canonical Uniswap v2 pair
+    chain: robinhood-chain
+    address: "0x59F95461E68e0c77605299791E1449f175165B54"
+    role: other
+    verified: true
+    sources:
+      - S9
+      - S16
+      - S17
+  - label: Team Safe (NET.guardian)
+    chain: robinhood-chain
+    address: "0x3Bb7A23316f82C0e984fA2E784846d8928a35f42"
+    role: multisig
+    verified: false
+    sources:
+      - S9
+      - S16
 metrics:
   - kind: tvl
     value: 0
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-03
     class: claim
     sources:
-      - S6
+      - S13
+  - kind: holders
+    value: 6992
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: volume_24h
+    value: 7142067.66328455
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S30
+  - kind: market_cap
+    value: 6108502.05189367
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S30
 review:
   researcher: harsharn10
   approver: pending
@@ -48,11 +154,30 @@ findings:
       class: claim
       sources:
         - S3
+    - text: "Receipts: netnet.capital, app, docs official-channels/mechanism/treasury, @NetNetCap profile and posts, t.me/netnetcap, Llama protocol, DexScreener token-pairs, GeckoTerminal pool and both NET tokens, Blockscout NET/Treasury/Staking/create tx, and RPC were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-2 R-6 R-7 R-9 R-11] - Numbers: TVL 0 is the Robinhood chain slice, not the 80630578 staking figure. Treasury USDG 2394555 is `balanceOf`, not RFV. Gecko 24h volume 7142067 is the token aggregator figure, not a single pool. [claim R-6 R-23] [verified R-9] - Adversarial: the strongest contrary reading is that Gecko NET/USDG is Cloudflare stock token 0x116F…01d4. Pool 0x0d662a…deb3 base is robinhood_0xca9c…0edf, DexScreener name is NetNet, and Cloudflare's token is a different address and decimal count."
+      class: inference
+      sources:
+        - S18
+        - S19
+    - text: Liquid Treasury USDG at this block is 2.39M; the $10M post is a different number and the RWA Sleeve is documented as outside RFV. [verified R-9] [claim R-4 R-13] - Guardian Safe threshold is 1. [verified R-9] - 5% tax on mapped-pair transfers. [verified R-9] - Ticker NET also names Cloudflare stock token 0x116F…01d4. [verified R-12] - No audit report located this pass.
+      class: unknown
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: NET token and treasury addresses not located
     - text: Treasury holdings (about $7.5M per the project) not reproduced
     - text: Redemption mechanism, if any
     - text: Official site not located
+    - text: "What is on-chain RFV/NAV at the Treasury versus the $10,000,000 @NetNetCap figure, including Morpho shares and POL? Next: eth_call Treasury RFV/NAV views from verified source; read Morpho vault 0xBeEff033…09dd shares"
+    - text: "What is the NetNet RWA Sleeve address, and do NVDA/AAPL/SPCX balances reproduce the largest-holder posts? Next: read docs/rwa-desk and site JS for sleeve(); reproduce token balances on 4663"
+    - text: "Where is the DefiLlama adapter that sets methodology 'NET staked in the NetNet staking contract' and TVL 0? Next: open the adapter once the path is public and match staking 0xB078…2E87"
+    - text: "Does InverseBond 0x9216…C4C9 fill at NAV-1.5% as documented, and is there an audit matching src/NET.sol? Next: read InverseBond verified source; search auditor indexes named on docs"
+    - text: "Is there a public repository for src/NET.sol? Next: search GitHub for file_path src/NET.sol and constructor guardian wiring"
+    - text: "Does @NetNetCaps link to netnet.capital, or only copy the bio? Next: open the @NetNetCaps website field and compare the domain"
   unresolved:
     - text: The HoodInsider recap's $677K 24h revenue figure is a media claim not reproduced.
+themes:
+  - rwa
+  - vault
+  - lending
+  - nft
+  - stock-paired:nvda

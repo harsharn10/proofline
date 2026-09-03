@@ -4,10 +4,14 @@ symbol: rIDX
 category: RWA index vault
 lifecycle: testnet-only
 coverage: stub
-summary: Experimental ERC-4626 index vault for baskets of Robinhood Stock Tokens; testnet only, mock swap router.
+summary: A testnet ERC-4626 vault that turns ETH into rIDX shares of a five-name stock-token basket. A user deposits ETH on Robinhood Chain testnet (chain id 46630); the vault wraps to WETH and swaps into PLTR, AMD, NFLX, AMZN and TSLA at 20% each through a mock router. nsvoud-dev publishes the contracts and a local Next.js app. Mainnet is listed as a later audit-and-launch phase.
 official_links:
   - kind: github
     url: https://github.com/nsvoud-dev/robinhood-index-vaults
+  - kind: x
+    url: https://x.com/0xNSVOUD
+  - kind: other
+    url: https://robinhood-index-vaults.vercel.app
 dependencies:
   - stock-tokens
 deployments:
@@ -17,6 +21,32 @@ deployments:
     role: vault
     verified: false
     sources: []
+  - label: IndexVault rIDX (Robinhood Chain testnet 46630; largest rIDX by supply this pass)
+    chain: robinhood-chain
+    address: "0x04653bF84918B05a68A7d568233ec1e259338D7E"
+    role: vault
+    verified: false
+    sources:
+      - S15
+      - S18
+  - label: MockSwapRouter (hardcoded in scripts/fundRouter.js and deployVaultOnly.js; testnet 46630)
+    chain: robinhood-chain
+    address: "0x31ecd0d9cEd7AB0744A96acC8e3432576fc8e691"
+    role: router
+    verified: false
+    sources:
+      - S8
+      - S16
+      - S18
+  - label: Testnet WETH constant in IndexVault.sol / hardhat scripts (not a project contract)
+    chain: robinhood-chain
+    address: "0x7943e237c7F95DA44E0301572D358911207852Fa"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S17
+      - S18
 review:
   researcher: harsharn10
   approver: pending
@@ -29,10 +59,36 @@ findings:
       class: claim
       sources:
         - S2
-  risk: []
+    - text: "Receipts: GitHub README, Hardhat, IndexVault.sol, MockSwapRouter.sol, deploy/fund scripts, frontend chain config, repo and user APIs, two commits, Vercel 404, testnet explorer address/tx/search, and Blockscout 4663 address/search pages were opened on 2026-09-03; excerpts are copied from those responses. [verified R-1 R-2 R-3 R-13 R-16] - Numbers: holders_count 4 is the testnet token 0x04653b… slice, not a 4663 figure and not TVL. [claim R-13] - Adversarial: the strongest contrary reading is that a 4663 IndexVault search hit (INDEXVAULT 0xC6d1…, IndexVault 0xc6ff…, hMAG7 0x43e4…) is this product, or that census testnet-only is stale. Those 4663 contracts use different symbols, files and creators; repo CAs are empty on 4663; Hardhat has no 4663 network. [verified R-16]"
+      class: claim
+      sources:
+        - S20
+        - S21
+        - S22
+  risk:
+    - text: MockSwapRouter is a fixed-rate test harness, not a production DEX. [verified R-4] - Owner can change the basket and force Safe Mode with no timelock. [verified R-3] - Eight unverified rIDX CAs on testnet; frontend vault address is not committed. [claim R-7 R-13] - GitHub homepage Vercel URL returns 404. [claim R-11] - No audit report located.
+      class: claim
+      sources:
+        - S3
   missing:
     - text: Testnet addresses
     - text: Confirm no production deposit path exists
     - text: Audit — roadmap item, none reviewed
     - text: Mainnet plan and controls
+    - text: "Which of the eight testnet rIDX ERC-20s is the intended demo vault, and does any still hold index tokens / WETH? Next: eth_call getIndexTokens/totalAssets/getOwner on 0x04653b… and the other seven rIDX CAs on rpc.testnet.chain.robinhood.com"
+    - text: "Has any IndexVault from this repository been deployed on chain 4663 since this pass? Next: re-run Blockscout q=rIDX and eth_getCode on 0x04653b… / 0x31ecd0… after any later git push"
+    - text: "Does getOwner() on testnet rIDX 0x04653b… equal creator 0xf809…, and is that key the nsvoud-dev deployer? Next: eth_call getOwner() on 46630 and any public link from nsvoud-dev to 0xf809…"
+    - text: "Is there an audit of IndexVault.sol / MockSwapRouter.sol? Next: record any later report whose commit matches 41f10a2 or a tagged release (none exist)"
+    - text: "Will robinhood-index-vaults.vercel.app return, and does @0xNSVOUD post about this repo? Next: re-GET the Vercel host and the X profile after a new push"
   unresolved: []
+themes:
+  - index
+  - rwa
+  - vault
+metrics:
+  - kind: holders
+    value: 4
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15

@@ -2,12 +2,26 @@ slug: website
 name: notawebsite
 symbol: WEBSITE
 category: Tokenized advertising market
-lifecycle: announced
+lifecycle: mainnet
 coverage: stub
-summary: Tokenized ad slots on Robinhood Chain that pay ETH to slot owners; v2 live since 2026-08-11 per the project.
+summary: "Tokenized advertising market: 165 visible elements on notawebsite.fun are separately owned on-chain slots. A user pays ETH to claim or take a slot, then edits its content; a take costs 1.4× and credits the prior owner 1.15×. Each slot is an ERC-721 (TINAW). $WEBSITE is a Pons-launched ERC-20 used to burn for upgrades. The same account is building PageMarkets for any publisher page. Operator: @notawebsite_rh."
 official_links:
   - kind: x
     url: https://x.com/notawebsite_rh
+  - kind: site
+    url: https://notawebsite.fun
+  - kind: docs
+    url: https://notawebsite.fun/docs
+  - kind: app
+    url: https://pagemarkets.com
+  - kind: github
+    url: https://github.com/vibecodermaxi/websitekit
+  - kind: other
+    url: https://linktr.ee/notawebsite
+  - kind: other
+    url: https://websitekit.org
+  - kind: other
+    url: https://www.ponsfamily.com/launchpad/0x0762C1708F0D23F86b29D6B857121FF7DF357506
 dependencies: []
 deployments:
   - label: Slot contract / WEBSITE token
@@ -16,6 +30,48 @@ deployments:
     role: token
     verified: false
     sources: []
+  - label: WEBSITE ERC-20 (PonsLauncherToken)
+    chain: robinhood-chain
+    address: "0x0762C1708F0D23F86b29D6B857121FF7DF357506"
+    role: token
+    verified: true
+    sources:
+      - S9
+      - S10
+      - S14
+  - label: TinawSlots v2 (TINAW ERC-721)
+    chain: robinhood-chain
+    address: "0xa112f87dd43D4265Bdd3918A4bb593C7F83ED50a"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S11
+  - label: TinawSlots v1 (frozen board)
+    chain: robinhood-chain
+    address: "0x28Ddf599f8c16ee36a77D7b420973F7201a8BF3c"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S12
+  - label: Uniswap v3 website/WETH pool
+    chain: robinhood-chain
+    address: "0x6D489e07d7Fe2b4Bc5749f75d56337888B68a34a"
+    role: other
+    verified: false
+    sources:
+      - S10
+      - S14
+  - label: Slot operator / treasury / creator
+    chain: robinhood-chain
+    address: "0x15e1D12Fc8A7bF97eaaB211d6353F585C53905c6"
+    role: admin
+    verified: true
+    sources:
+      - S5
+      - S11
+      - S13
 review:
   researcher: harsharn10
   approver: pending
@@ -29,11 +85,58 @@ findings:
       sources:
         - S3
         - S2
-  risk: []
+  risk:
+    - text: "Receipts: notawebsite.fun/docs and /stats, @notawebsite_rh profile and listed posts, Linktree, pagemarkets.com, websitekit GitHub README, Blockscout API v2 for the token, both slot contracts, the operator, the launch tx and the Doppler clone, DexScreener latest/dex/tokens, and RPC eth_getCode/eth_call were opened on 2026-09-03; excerpts are copied from those responses. [verified R-1 R-5 R-6 R-7 R-10] - Numbers: 547112.4 is the Uniswap v3 website/WETH pair volume.h24, not an all-pairs sum. 2612257 is that pair's marketCap. 956387 is Blockscout circulating_market_cap. 8.5358 ETH is the site indexer, both contracts combined. [claim R-2 R-5 R-10] - Adversarial: the strongest contrary reading is that PageMarkets is a separate product, or that 0x0E97…1E18 is the official token. Constructor socials, DexScreener info, Linktree Pons URL, and 1590 holders on 0x0762…7506 versus 5 holders on the Doppler clone argue against merging or swapping the CA."
+      class: inference
+      sources:
+        - S8
+        - S9
+        - S10
+        - S14
+        - S24
+    - text: Slot owner() is one EOA with no published timelock. [verified R-7 R-9] - PageMarkets has no reproduced mainnet CA and no listings this pass. [claim R-19] - websitekit is labeled unaudited and testnet-only; live TinawSlots source was not matched to it. [claim R-18] - A DopplerERC20V1 clone reuses the name this is not a website / WEBSITE at 0x0E97…1E18. [verified R-20] - DexScreener marketCap and Blockscout circulating_market_cap disagree.
+      class: claim
+      sources:
+        - S9
+        - S14
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Slot contract and token addresses not located
     - text: Payout routing and who controls it
     - text: Official site not located
     - text: An independent audit was not found in this review
-  unresolved: []
+    - text: "Does TinawSlotsV2 verified source match websitekit SlotSite, and can owner() change pricing, pause takes, or upgrade without a timelock? Next: read verified TinawSlotsV2 source on Blockscout for onlyOwner setters and compare bytecode to websitekit packages/websitekit-contracts"
+    - text: "Where is the EIP-6551 registry / TBA implementation for slots, and does the NVDA bounty slot hold tokenized NVDA on 4663? Next: search TinawSlotsV2 logs for ERC-6551 createAccount and the official NVDA token balance of that TBA"
+    - text: "Are PageMarkets publisher contracts deployed on 4663, or is the product still off-chain markup with testnet websitekit clones? Next: watch @notawebsite_rh for a PageMarkets CA and reproduce it on Blockscout"
+    - text: "Why do DexScreener marketCap 2612257 and Blockscout circulating_market_cap 956387 disagree on 0x0762…7506? Next: compare circulating supply assumptions and whether DexScreener uses fdv as marketCap"
+    - text: "Does github.com/vibecodermaxi/websitekit or websitekit.org name @notawebsite_rh? Next: open websitekit.org/docs and the GitHub org profile for a handle or domain cross-link"
+    - text: "Who controls 0xC73C…5094 (Pons launchToken sender) relative to slot operator 0x15e1…05c6? Next: leave unmerged unless a primary post or on-chain role links the keys"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+themes:
+  - rwa
+  - nft
+  - memecoin
+  - tooling
+  - stock-paired:nvda
+metrics:
+  - kind: volume_24h
+    value: 547112.4
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: market_cap
+    value: 956387.595040786
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: holders
+    value: 1590
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9

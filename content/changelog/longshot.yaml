@@ -25,3 +25,137 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 6f99e8ca339163d8
+- date: 2026-09-03
+  slug: longshot
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    category: Stock-paired token factory
+    summary: Launch and fee-routing protocol on Robinhood Chain; fees split into a fixed Hyperliquid perp position, holder rewards and the protocol.
+    themes: null
+    official_links:
+      - kind: site
+        url: https://www.uselongshot.xyz
+      - kind: x
+        url: https://x.com/uselongshot
+    deployments:
+      - label: RH Chain token (PRD Appendix A)
+        chain: robinhood-chain
+        address: "0x8701E2C87ade58325601f4F9bf37ADF46Cb75745"
+        role: token
+        verified: false
+        sources:
+          - S5
+          - S4
+    metrics: null
+  new:
+    category: Bonding-curve launchpad
+    summary: "Fee-routed token factory: trading fees fund one immutable Hyperliquid long or short, holder rewards, and a 20% operations cut. A creator picks underlying, direction and leverage, then deploys; on Robinhood Chain LaunchFactoryV4 uses a bonding curve that graduates to Uniswap v4. The official LONGSHOT token trades versus WETH. @uselongshot runs it at uselongshot.xyz."
+    themes:
+      - launchpad
+      - rwa
+      - memecoin
+    official_links:
+      - kind: docs
+        url: https://www.uselongshot.xyz
+      - kind: x
+        url: https://x.com/uselongshot
+      - kind: telegram
+        url: https://t.me/uselongshot
+      - kind: github
+        url: https://github.com/LongshotRH/Longshot
+    deployments:
+      - label: LONGSHOT token (official CA)
+        chain: robinhood-chain
+        address: "0x8701E2C87ade58325601f4F9bf37ADF46Cb75745"
+        role: token
+        verified: true
+        sources:
+          - S5
+          - S4
+          - S9
+          - S10
+          - S12
+      - label: LaunchFactoryV4 (Robinhood Chain)
+        chain: robinhood-chain
+        address: "0xE1E635c1d952C4136f1fBF816c072EBb5D3E3661"
+        role: factory
+        verified: true
+        sources:
+          - S6
+          - S13
+          - S14
+      - label: LaunchLensV4 (Robinhood Chain)
+        chain: robinhood-chain
+        address: "0xCFd8902c696fb74FA64ea6Fe339e149e5c50b00f"
+        role: other
+        verified: false
+        sources:
+          - S6
+          - S15
+      - label: BondingRouterV4 (Robinhood Chain)
+        chain: robinhood-chain
+        address: "0x1BAfB314515Cedf96Ac8D569304934EefA051bcA"
+        role: router
+        verified: false
+        sources:
+          - S6
+          - S16
+      - label: LONGSHOT / WETH Uniswap v3 pool
+        chain: robinhood-chain
+        address: "0xCA3C6DBF5F875156B146FCa72BCeed53A8414fC7"
+        role: other
+        verified: true
+        sources:
+          - S11
+          - S12
+          - S17
+      - label: Pre-V4 launch contract that created the official token
+        chain: robinhood-chain
+        address: "0xB2F8c34181878E410bbbcEb9A992Ea7c66dc877E"
+        role: factory
+        verified: false
+        sources:
+          - S11
+          - S12
+      - label: PoolAccountRegistry (Robinhood Chain)
+        chain: robinhood-chain
+        address: "0x7A367caCc51227B4bF315eabB6Ee501FD01a4fE9"
+        role: other
+        verified: false
+        sources:
+          - S6
+          - S12
+      - label: LaunchFactoryV4 keeper
+        chain: robinhood-chain
+        address: "0xd9C0B4110bc29391c953d986d3a91E6114D0Ad60"
+        role: other
+        verified: false
+        sources:
+          - S12
+    metrics:
+      - kind: market_cap
+        value: 4439
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S17
+      - kind: volume_24h
+        value: 4.09
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S17
+      - kind: holders
+        value: 60
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S10
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: ef4f463f150ba57e

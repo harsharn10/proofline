@@ -12,3 +12,238 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 47b5df7c4355a694
+- date: 2026-09-02
+  slug: downto
+  type: finding
+  severity: Material
+  title: Research record updated
+  detail: "New packet evidence was mapped into the canonical record; unresolved conflicts and evidence gaps remain explicit. Open conflicts: CON-1."
+  prior:
+    summary: "Down to Finance is a claimed permissionless DETF (Decentralized ETF) product on Robinhood Chain: one token for a basket the creator picks, with mint, hold, and bond as the three user actions. The official fee-accruing token $DTF at `0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01` is a verified Pons v2 launch token, not a separately documented DETF diamond. App JavaScript for chain 4663 names package factories that do exist and have explorer-verified source. The landing page marks `$DTF-DETF` Live."
+    official_links:
+      - kind: site
+        url: https://downto.finance
+      - kind: app
+        url: https://app.downto.finance/explore
+      - kind: docs
+        url: https://app.downto.finance/learn
+      - kind: x
+        url: https://x.com/downto_finance
+    deployments:
+      - label: DTF token (PonsV2LauncherToken)
+        chain: robinhood-chain
+        address: "0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01"
+        role: token
+        verified: true
+        sources:
+          - S1
+          - S3
+      - label: Pons v2 bonding curve for the DTF token
+        chain: robinhood-chain
+        address: "0x912467fc912f0f88df3b0d221946de78f38d4559"
+        role: other
+        verified: true
+        sources:
+          - S3
+          - S6
+      - label: DiamondPackageCallBackFactory (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0x976949aB55830fA4794bF40C88ea7D7567931003"
+        role: factory
+        verified: true
+        sources:
+          - S5
+          - S8
+      - label: UniswapV4SingleStandardExchangeDETDFPkg (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0x961b4E050492E2744B8D20404Cd43A11D371577c"
+        role: other
+        verified: true
+        sources:
+          - S4
+          - S8
+      - label: Create3Factory (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0xD7786b10BC8Bc97dc7651CAb7B97086c8b227882"
+        role: factory
+        verified: true
+        sources:
+          - S9
+          - S8
+      - label: UniswapV4HookDiamondPackageCallBackFactory (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0x8BB5FCC67e8CCa44DC41dd08A5e2b2B392C22945"
+        role: factory
+        verified: true
+        sources:
+          - S10
+          - S8
+      - label: indexedexManager / vaultRegistry / vaultFeeOracle proxy (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0x09682b00D873D913ada0bB69B4D4c9631810d0bc"
+        role: proxy
+        verified: true
+        sources:
+          - S11
+          - S8
+      - label: feeCollector proxy (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0x20af9A1e21a59a411cd3b0C40E70AF9084770b2E"
+        role: other
+        verified: true
+        sources:
+          - S12
+          - S8
+      - &a1
+        label: App JS owner / deployer (EOA)
+        chain: robinhood-chain
+        address: not-verified
+        role: admin
+        verified: false
+        sources:
+          - S13
+          - S8
+    metrics:
+      - kind: holders
+        value: 8914
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S14
+  new:
+    summary: "Down to Finance is a permissionless DETF (Decentralized ETF) on Robinhood Chain: a creator deploys one token as a claim on a basket of vault shares and Uniswap v4 pools; the first bond turns that DETF on, then holders mint, hold, or burn. The fee-accruing $DTF token at 0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01 is a verified Pons v2 launch token. App explore lists no live DETF this pass; Protocol DETF staking is unconfigured."
+    official_links:
+      - kind: site
+        url: https://downto.finance
+      - kind: app
+        url: https://app.downto.finance/explore
+      - kind: docs
+        url: https://app.downto.finance/learn
+      - kind: x
+        url: https://x.com/downto_finance
+      - kind: telegram
+        url: https://t.me/downtofinance
+      - kind: github
+        url: https://github.com/cyotee/indexedex
+    deployments:
+      - label: DTF token (PonsV2LauncherToken)
+        chain: robinhood-chain
+        address: "0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01"
+        role: token
+        verified: true
+        sources:
+          - S1
+          - S3
+          - S19
+      - label: Pons v2 bonding curve for the DTF token
+        chain: robinhood-chain
+        address: "0x912467fc912f0f88df3b0d221946de78f38d4559"
+        role: other
+        verified: true
+        sources:
+          - S3
+          - S6
+          - S32
+      - label: DiamondPackageCallBackFactory (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0x976949aB55830fA4794bF40C88ea7D7567931003"
+        role: factory
+        verified: true
+        sources:
+          - S5
+          - S8
+          - S33
+      - label: UniswapV4SingleStandardExchangeDETDFPkg (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0x961b4E050492E2744B8D20404Cd43A11D371577c"
+        role: other
+        verified: true
+        sources:
+          - S4
+          - S8
+          - S20
+      - label: Create3Factory (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0xD7786b10BC8Bc97dc7651CAb7B97086c8b227882"
+        role: factory
+        verified: true
+        sources:
+          - S9
+          - S8
+          - S34
+      - label: UniswapV4HookDiamondPackageCallBackFactory (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0x8BB5FCC67e8CCa44DC41dd08A5e2b2B392C22945"
+        role: factory
+        verified: true
+        sources:
+          - S10
+          - S8
+          - S35
+      - label: indexedexManager / vaultRegistry / vaultFeeOracle proxy (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0x09682b00D873D913ada0bB69B4D4c9631810d0bc"
+        role: proxy
+        verified: true
+        sources:
+          - S11
+          - S8
+          - S36
+      - label: feeCollector proxy (app JS chainId 4663 map)
+        chain: robinhood-chain
+        address: "0x20af9A1e21a59a411cd3b0C40E70AF9084770b2E"
+        role: other
+        verified: true
+        sources:
+          - S12
+          - S8
+          - S37
+      - *a1
+      - label: App JS owner / deployer (EOA)
+        chain: robinhood-chain
+        address: "0x72BeA6Fa3E68EF18c87D045Aac7C4Aa5249d933B"
+        role: admin
+        verified: false
+        sources:
+          - S13
+          - S8
+      - label: DTF/WETH Uniswap v3 pair (DexScreener lead book)
+        chain: robinhood-chain
+        address: "0x0F2CA1D996224a0c9dd140B865142aAD381A4287"
+        role: other
+        verified: true
+        sources:
+          - S23
+          - S38
+    metrics:
+      - kind: holders
+        value: 8785
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S21
+      - kind: volume_24h
+        value: 2375773.21
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S23
+      - kind: tvl
+        value: 250351.54
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S23
+          - S24
+      - kind: market_cap
+        value: 6554824
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S23
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 4165afb278a609b6

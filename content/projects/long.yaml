@@ -2,14 +2,18 @@ slug: long
 name: LONG
 symbol: null
 category: Stock-paired token factory
-lifecycle: announced
+lifecycle: mainnet
 coverage: stub
-summary: Stock-paired launchpad (Factory + Airlock) that made stock-paired tokens possible on Robinhood Chain; $AI launched here.
+summary: The chain's stock-paired token factory. A user deploys a new ERC-20 through LongLauncher, which forwards an Airlock create after a 24-hour ticker lock and quotes the token against a Robinhood stock token in a Uniswap v4 pool. The same app lists $AI/NVDA, $BONER/HIMS and $SPACEHOOD/SPCX. @longdotxyz runs it at app.long.xyz.
 official_links:
   - kind: app
     url: https://app.long.xyz
   - kind: x
     url: https://x.com/longdotxyz
+  - kind: docs
+    url: https://app.long.xyz/litepaper
+  - kind: other
+    url: https://dune.com/natan_benish2001/long-on-robinhood-chain
 dependencies:
   - stock-tokens
   - uniswap
@@ -35,6 +39,39 @@ deployments:
     verified: false
     sources:
       - S4
+  - label: LongLauncher (PRD 0x22e9…eeED)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S11
+      - S12
+      - S13
+  - label: TickerAirlockFactory (PRD 0x9c88…0845)
+    chain: robinhood-chain
+    address: "0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845"
+    role: factory
+    verified: true
+    sources:
+      - S14
+      - S15
+  - label: DopplerERC20V1Factory (trusted token factory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S12
+      - S17
+  - label: Airlock (create primitive)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: router
+    verified: true
+    sources:
+      - S12
+      - S16
 review:
   researcher: harsharn10
   approver: pending
@@ -52,12 +89,45 @@ findings:
       sources:
         - S5
         - S3
-  risk: []
+    - text: "Receipts: app.long.xyz and /tokens, @longdotxyz profile and five posts, Blockscout API v2 plus RPC for LongLauncher, TickerAirlockFactory, Airlock and DopplerERC20V1Factory, BONER and SPACEHOOD create txs, Dune counters, DexScreener token APIs, and the $AI/$BONER/$SPACEHOOD app pages were opened on 2026-09-02; excerpts are copied from those pages. [verified R-1 R-3 R-4 R-5 R-11 R-12 R-13] - Numbers: Dune 24h volume and stock TVL are the dashboard's LONG slice, not an all-chains total. DexScreener figures are the named Uniswap v4 pair on chain robinhood. The $425M figure is the project's post, not Dune. [claim R-13 R-14] [verified R-19 R-20] - Adversarial: the strongest contrary reading is that LONG is Longshot, Longbow, or a bonding-curve pad, or that census announced is still correct. Handles, domains and the verified LongLauncher.create path on $AI/$BONER/$SPACEHOOD argue against those. [verified R-4 R-11 R-12]"
+      class: claim
+      sources:
+        - S10
+  risk:
+    - text: LongLauncher owner is one EOA with pause and sweep, no timelock in verified source. [verified R-4 R-5] - A second live factory (TickerAirlockFactory) is owned by a different EOA. [verified R-7 R-8] - Official 24h volume and the Dune 24h counter disagree by hundreds of millions of dollars. [disputed R-13 R-14] - No audit report was located this pass. [unknown] - LongX NVDA3x is posted as experimental; mint/redeem and pairing were not reproduced here.
+      class: claim
+      sources:
+        - S23
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Full factory addresses (PRD Appendix A is truncated; the workbook points at a Dune dashboard)
     - text: Airlock controls and who can release
     - text: Launch fee flows
     - text: An independent audit was not found in this review
+    - text: "Who holds LongLauncher owner 0x9B7f…ED47 and TickerAirlockFactory owner 0x8aa7…3F99, and is either behind a Safe or timelock? Next: trace those EOAs on the explorer and any project post that names them"
+    - text: "Why is Dune 24h stock volume $118.05M at 2026-09-02T23:40Z while @longdotxyz posted $425M at 2026-09-02T01:08Z? Next: read Dune query 8032287 window and whether the post includes buyback legs or a different slice"
+    - text: "Is TickerAirlockFactory 0x9c88…0845 still taking create() after LongLauncher 0x22e9…eeED shipped? Next: count recent LaunchCreated logs on each address"
+    - text: "Is there an audit whose scope includes LongLauncher, TickerAirlockFactory, Airlock, or DopplerERC20V1Factory as used on 4663? Next: auditor report index for Doppler / long.xyz and a matching commit"
+    - text: "Is there a public GitHub for src/LongLauncher.sol? Next: ask the project in public and record the URL as identity.repository"
   unresolved:
     - text: Which factory is the factory of record for a given stock pair when both LONG and Bankr mint stock-paired tokens (desk gap).
+    - text: economics.metric remains unresolved (CON-1).
+themes:
+  - launchpad
+  - rwa
+  - stock-paired
+metrics:
+  - kind: volume_24h
+    value: 2902781.29
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S27
+  - kind: tvl
+    value: 964796.07
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S27

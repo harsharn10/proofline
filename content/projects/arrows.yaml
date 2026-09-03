@@ -5,29 +5,124 @@ category: Options market
 lifecycle: mainnet
 lifecycle_source: pulled 0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e 2026-08-15T14:24:54.000Z
 coverage: stub
-summary: Fully collateralized options on tokenized stocks as transferable ERC-1155s with writer vaults earning premiums; live at small size since late August per the project.
+summary: Fully collateralized European calls and puts on Robinhood Stock Tokens and ETH, issued as transferable ERC-1155s. A user buys a long or deposits stock, WETH or USDG into a maturity writer vault that escrows maximum loss. Calls settle in-kind; puts settle in USDG. arrows.finance and @arrowsonhood run the surface. Distinct from Arrow Finance, the CDP.
 official_links:
   - kind: site
     url: https://arrows.finance
   - kind: x
     url: https://x.com/arrowsonhood
+  - kind: site
+    url: https://www.arrows.finance
+  - kind: app
+    url: https://app.arrows.finance
+  - kind: docs
+    url: https://docs.arrows.finance
+  - kind: telegram
+    url: https://t.me/arrowsportal
+  - kind: github
+    url: https://github.com/arrows0/contracts
 dependencies:
   - stock-tokens
 deployments:
-  - label: ARROWS token
+  - label: ARROWS token (PonsV2LauncherToken)
     chain: robinhood-chain
     address: "0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e"
     role: token
-    verified: false
+    verified: true
     sources:
       - S3
       - S4
+      - S10
+      - S12
+      - S13
+      - S14
   - label: Option and writer-vault contracts
     chain: robinhood-chain
     address: not-verified
     role: vault
     verified: false
     sources: []
+  - label: Config
+    chain: robinhood-chain
+    address: "0x410C428d7602EcB5B8C3255030e9852C2791445C"
+    role: other
+    verified: true
+    sources:
+      - S7
+      - S14
+      - S19
+  - label: SeriesFactory
+    chain: robinhood-chain
+    address: "0xD03c98E93DF68BB5ADc9C27B3dD57863542A9D8f"
+    role: factory
+    verified: true
+    sources:
+      - S7
+      - S14
+      - S16
+  - label: OptionToken
+    chain: robinhood-chain
+    address: "0x9Af7485f5B8427C628E5F967aD9AA0f9289d015D"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S14
+      - S15
+  - label: CollateralVault
+    chain: robinhood-chain
+    address: "0xd334f914544b570A5fd03b6956f997107dE9C840"
+    role: vault
+    verified: true
+    sources:
+      - S7
+      - S14
+      - S17
+  - label: VaultRouter
+    chain: robinhood-chain
+    address: "0x09D965dD46Cc65fEbeea720295a18B798B4dF0ba"
+    role: router
+    verified: true
+    sources:
+      - S7
+      - S14
+      - S18
+  - label: FeeSplitter
+    chain: robinhood-chain
+    address: "0xf5B9330931E5941e287d40237aDE0Bd6eacb8edc"
+    role: other
+    verified: false
+    sources:
+      - S7
+      - S14
+      - S30
+  - label: TokenStake
+    chain: robinhood-chain
+    address: "0xFCda38304cF81E03ADeF0cb5BB26C171A93168b6"
+    role: other
+    verified: false
+    sources:
+      - S7
+      - S14
+      - S31
+  - label: ETH MaturityCallVault
+    chain: robinhood-chain
+    address: "0x277Ba3F49d550E031bD10E66E2deD624B20db2B4"
+    role: vault
+    verified: false
+    sources:
+      - S7
+      - S14
+      - S32
+  - label: ETH MaturityPutVault
+    chain: robinhood-chain
+    address: "0x37D30B87050d65c28E67A97AE02e02c8Da2A0C3a"
+    role: vault
+    verified: false
+    sources:
+      - S7
+      - S14
+      - S33
 review:
   researcher: harsharn10
   approver: pending
@@ -51,10 +146,53 @@ findings:
       sources:
         - S4
         - S3
+    - text: "Receipts: each URL above was opened on 2026-09-03 and the excerpt copied from the page, API or RPC result. [verified R-1 R-2 R-7 R-9 R-15] - Numbers: DexScreener volume and market cap are the ARROWS/ETH v4 pair, not an options-vault TVL; holders_count is the ERC-20. [claim R-7 R-15] - Adversarial: the strongest contrary reading is that this slug is Arrow Finance (CDP) or ArrowPad. Domain arrows.finance, handle @arrowsonhood, token 0xD71b…4F0e and OptionToken ERC-1155 are a different product from arrowfinance.io / @ArrowFinanceio / 0xf291…9cD03."
+      class: inference
+      sources:
+        - S6
+        - S10
+        - S12
+        - S15
+    - text: Live cores are owned by one EOA; README describes no timelock on the V2 replacement. [verified R-9] [claim R-6] - ETH maturity vaults have code and unpublished source. [verified R-27 R-28] - Posted writer-vault TVL was not reproduced on chain this pass. [claim R-18] - No audit report URL was located this pass. [unknown] - Name collision with Arrow Finance (CDP) and with ArrowPad on Llama; token, domain and handle do not match.
+      class: verified
+      sources:
+        - S10
+        - S12
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from the workbook and desk not reproduced on Blockscout
     - text: Option and writer-vault contracts not located
     - text: Settlement and collateral controls
     - text: An independent audit was not found in this review
+    - text: "Can owner() 0x9F89de65…5365 change escrow, settlement or vault pricing without a timelock? Next: read access modifiers on Config and VaultRouter setters in the verified source"
+    - text: "What is on-chain writer-vault NAV versus the $15.6K figure posted 1 Sep? Next: eth_call totalAssets or equivalent on each MaturityCallVault/MaturityPutVault"
+    - text: "Is there a third-party audit report whose scope matches the live V2 core? Next: open github.com/arrows0/contracts/tree/main/docs and record any report URL as a claim"
+    - text: "Do SPY and QQQ still have live maturity vaults after docs moved them to legacyTokens? Next: eth_getCode the legacy SPY/QQQ vault addresses from the older addresses table"
   unresolved: []
+themes:
+  - options
+  - rwa
+  - vault
+  - nft
+  - stock-paired:nvda
+metrics:
+  - kind: volume_24h
+    value: 75629.28
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S20
+  - kind: market_cap
+    value: 166632
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S20
+  - kind: holders
+    value: 1048
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S12

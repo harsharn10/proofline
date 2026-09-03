@@ -12,3 +12,175 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 3d00be214686c18f
+- date: 2026-09-03
+  slug: index
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "RWA distributor: a 3% tax on $INDEX trades buys Stock Tokens and distributes them to holders on a short cadence, per the project."
+    themes: null
+    official_links:
+      - kind: site
+        url: https://theindex.finance
+      - kind: x
+        url: https://x.com/TheIndexFi
+    deployments:
+      - label: INDEX token
+        chain: robinhood-chain
+        address: "0x56910d4409f3a0c78c64dd8d0545ff0705389870"
+        role: token
+        verified: false
+        sources:
+          - S6
+          - S5
+      - &a1
+        label: Distributor / hook
+        chain: robinhood-chain
+        address: not-verified
+        role: other
+        verified: false
+        sources: []
+    metrics:
+      - kind: revenue_24h
+        value: 24321
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S9
+  new:
+    summary: A 3% ETH fee on Index/ETH pool trades buys a basket of Robinhood Stock Tokens and sends them to eligible holders. Users hold INDEX above a 10,000-token threshold, or Zap received stocks back into INDEX, to stay in the registry. @TheIndexFi runs theindex.finance, indices.theindex.finance and rwa.wtf. The Index is not a launchpad.
+    themes:
+      - index
+      - rwa
+      - hook
+    official_links:
+      - kind: site
+        url: https://theindex.finance
+      - kind: x
+        url: https://x.com/TheIndexFi
+      - kind: app
+        url: https://indices.theindex.finance
+      - kind: app
+        url: https://rwa.wtf
+      - kind: github
+        url: https://github.com/justintimecompilation
+    deployments:
+      - label: INDEX token (ReflectionToken)
+        chain: robinhood-chain
+        address: "0x56910D4409F3a0C78C64DD8D0545FF0705389870"
+        role: token
+        verified: true
+        sources:
+          - S6
+          - S5
+          - S12
+          - S13
+          - S14
+      - *a1
+      - label: Uniswap v4 PoolManager (constructor poolManager; rewardsExcluded)
+        chain: robinhood-chain
+        address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
+        role: other
+        verified: false
+        sources:
+          - S12
+          - S15
+      - label: INDEX/WETH Uniswap v3 pair (DexScreener lead book)
+        chain: robinhood-chain
+        address: "0xD29893fFac8b29eC4Db2cfE0CDB3FE1377c028Ff"
+        role: other
+        verified: true
+        sources:
+          - S16
+          - S27
+      - label: Llama adapter legacy distributor 0x33B0…
+        chain: robinhood-chain
+        address: "0x33B0095333e64bf375952eF197b6FDC3437dc014"
+        role: other
+        verified: false
+        sources:
+          - S25
+      - label: Llama adapter legacy distributor 0x0224…
+        chain: robinhood-chain
+        address: "0x02241379056fd5c2BDe0bDfc63D2b272C18A49bE"
+        role: other
+        verified: false
+        sources:
+          - S25
+      - label: Llama adapter legacy distributor 0x2459…
+        chain: robinhood-chain
+        address: "0x2459DedB3012d1E929EdD17DF26620120bDF11bf"
+        role: other
+        verified: false
+        sources:
+          - S25
+      - label: Llama adapter legacy distributor 0x39AD…
+        chain: robinhood-chain
+        address: "0x39ADB8acD07427D338b5f1AfAb436A04AbFdB7c4"
+        role: other
+        verified: false
+        sources:
+          - S25
+      - label: Llama adapter Indices treasury factory 0x2950…
+        chain: robinhood-chain
+        address: "0x29502Be73947fFf18343dcd98ccDa101e8E7ec49"
+        role: factory
+        verified: false
+        sources:
+          - S25
+      - label: Llama adapter reward vault V2
+        chain: robinhood-chain
+        address: "0xEe7d053cE44D689455765CE1c3c64c5c28EA4088"
+        role: vault
+        verified: false
+        sources:
+          - S25
+    metrics:
+      - kind: revenue_24h
+        value: 30462
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S18
+      - kind: holders
+        value: 21645
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S14
+      - kind: volume_24h
+        value: 4691680.21
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S16
+      - kind: tvl
+        value: 961107.71
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S16
+          - S17
+      - kind: market_cap
+        value: 39500563
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S16
+      - kind: fees_24h
+        value: 30462
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S18
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 57bcdb7c7a5d1f4c

@@ -4,39 +4,141 @@ symbol: INDEX
 category: Fee-funded RWA distributor
 lifecycle: mainnet
 coverage: stub
-summary: "RWA distributor: a 3% tax on $INDEX trades buys Stock Tokens and distributes them to holders on a short cadence, per the project."
+summary: A 3% ETH fee on Index/ETH pool trades buys a basket of Robinhood Stock Tokens and sends them to eligible holders. Users hold INDEX above a 10,000-token threshold, or Zap received stocks back into INDEX, to stay in the registry. @TheIndexFi runs theindex.finance, indices.theindex.finance and rwa.wtf. The Index is not a launchpad.
 official_links:
   - kind: site
     url: https://theindex.finance
   - kind: x
     url: https://x.com/TheIndexFi
+  - kind: app
+    url: https://indices.theindex.finance
+  - kind: app
+    url: https://rwa.wtf
+  - kind: github
+    url: https://github.com/justintimecompilation
 dependencies:
   - stock-tokens
   - uniswap
   - rialto
 deployments:
-  - label: INDEX token
+  - label: INDEX token (ReflectionToken)
     chain: robinhood-chain
-    address: "0x56910d4409f3a0c78c64dd8d0545ff0705389870"
+    address: "0x56910D4409F3a0C78C64DD8D0545FF0705389870"
     role: token
-    verified: false
+    verified: true
     sources:
       - S6
       - S5
+      - S12
+      - S13
+      - S14
   - label: Distributor / hook
     chain: robinhood-chain
     address: not-verified
     role: other
     verified: false
     sources: []
+  - label: Uniswap v4 PoolManager (constructor poolManager; rewardsExcluded)
+    chain: robinhood-chain
+    address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
+    role: other
+    verified: false
+    sources:
+      - S12
+      - S15
+  - label: INDEX/WETH Uniswap v3 pair (DexScreener lead book)
+    chain: robinhood-chain
+    address: "0xD29893fFac8b29eC4Db2cfE0CDB3FE1377c028Ff"
+    role: other
+    verified: true
+    sources:
+      - S16
+      - S27
+  - label: Llama adapter legacy distributor 0x33B0…
+    chain: robinhood-chain
+    address: "0x33B0095333e64bf375952eF197b6FDC3437dc014"
+    role: other
+    verified: false
+    sources:
+      - S25
+  - label: Llama adapter legacy distributor 0x0224…
+    chain: robinhood-chain
+    address: "0x02241379056fd5c2BDe0bDfc63D2b272C18A49bE"
+    role: other
+    verified: false
+    sources:
+      - S25
+  - label: Llama adapter legacy distributor 0x2459…
+    chain: robinhood-chain
+    address: "0x2459DedB3012d1E929EdD17DF26620120bDF11bf"
+    role: other
+    verified: false
+    sources:
+      - S25
+  - label: Llama adapter legacy distributor 0x39AD…
+    chain: robinhood-chain
+    address: "0x39ADB8acD07427D338b5f1AfAb436A04AbFdB7c4"
+    role: other
+    verified: false
+    sources:
+      - S25
+  - label: Llama adapter Indices treasury factory 0x2950…
+    chain: robinhood-chain
+    address: "0x29502Be73947fFf18343dcd98ccDa101e8E7ec49"
+    role: factory
+    verified: false
+    sources:
+      - S25
+  - label: Llama adapter reward vault V2
+    chain: robinhood-chain
+    address: "0xEe7d053cE44D689455765CE1c3c64c5c28EA4088"
+    role: vault
+    verified: false
+    sources:
+      - S25
 metrics:
   - kind: revenue_24h
-    value: 24321
+    value: 30462
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-03
     class: claim
     sources:
-      - S9
+      - S18
+  - kind: holders
+    value: 21645
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: volume_24h
+    value: 4691680.21
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S16
+  - kind: tvl
+    value: 961107.71
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S16
+      - S17
+  - kind: market_cap
+    value: 39500563
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S16
+  - kind: fees_24h
+    value: 30462
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S18
 review:
   researcher: harsharn10
   approver: pending
@@ -54,15 +156,66 @@ findings:
       class: claim
       sources:
         - S4
+    - text: "Receipts: theindex.finance, indices.theindex.finance, X profile and four posts, two HoodInsider posts, Blockscout address/token/tx/source and PoolManager, DexScreener token API, Llama protocol and fees APIs, and the Llama adapter file were opened on 2026-09-03 and excerpts copied from the responses."
+      class: verified
+      sources:
+        - S10
+        - S11
+        - S12
+        - S13
+        - S16
+        - S18
+    - text: "Numbers: DexScreener liquidity and 24h volume are the Uniswap v3 INDEX/WETH pair 0xD29893…, not all INDEX pairs. Llama fees/revenue are the Robinhood Chain slice. Site $1,524,526.02 and X $1,500,000 / $355,000 remain class claim. Blockscout 21645 holders is all holders; registry holderCount is 3779."
+      class: claim
+      sources:
+        - S14
+        - S16
+        - S18
   risk:
     - text: A distribution funded by a trade tax scales with trading volume, so payouts shrink when volume does; the dossier flags that the hook whitelist and fee routing need a contract read.
       class: inference
       sources:
         - S6
+    - text: "Adversarial: the strongest contrary reading is that INDEX is a generic tax token whose Stock Token story is marketing, or that it is a launchpad / Robindex / Robinhood Index Vaults. Verified source names IndexFeeHook and a StockDistributor registry, the creator is not a pad factory, and Robindex / robinhood-index-vaults do not share CA, domain or handle. The unresolved contrary point is which pool actually pays the 3% fee."
+      class: inference
+      sources:
+        - S12
+        - S13
+        - S16
+    - text: IndexFeeHook address is unpublished in the token source; the 3% each-way ETH tax is described for the Uniswap v4 Index/ETH pool while the lead book is Uniswap v3 INDEX/WETH. [verified R-3]
+      class: claim
+      sources:
+        - S16
+    - text: Token owner is one EOA with no timelock on the holder-registry setters.
+      class: verified
+      sources:
+        - S12
+    - text: Four Llama-listed distributors have code on 4663; which one is live, and whether its logs match the site total, was not opened on the explorer this pass.
+      class: claim
+      sources:
+        - S25
+    - text: No audit report was located.
+      class: unknown
+    - text: Distribution size follows taxed volume.
+      class: inference
+      sources:
+        - S10
+        - S12
   missing:
     - text: Token address from the dossier and workbook not yet reproduced on Blockscout
     - text: Distributor and hook contract addresses unknown
     - text: Who sets the tax and controls the basket
     - text: Distribution totals (about $1M per the project) not reproduced on chain
+    - text: "What is the live IndexFeeHook address, and which INDEX pools (v4 ETH, v3 WETH, USDG) actually take the 3% ETH fee? Next: read IndexFeeHook from verified source search or the v4 pool's hook field and eth_call the fee on each book"
+    - text: "Which of the four Llama LEGACY_DISTRIBUTORS is the current StockDistributor, and do its Distributed events reproduce the site's $1,524,526.02? Next: open each distributor on Blockscout for verified name and sum Distributed amount"
+    - text: "Can the owner change minShareBalance, the excluded set, or the hook fee without a timelock, and who holds 0x02d9e7…? Next: read IndexFeeHook owner/setters once the hook address is known"
+    - text: "Is there an audit whose scope matches ReflectionToken, IndexFeeHook and StockDistributor? Next: ask in public and record any report URL as a claim"
+    - text: "Does the site HTML or docs name the INDEX CA and @TheIndexFi so the official pair is bidirectional without DexScreener? Next: read bundled JS or a footer once the client hydrates"
+    - text: "Is github.com/justintimecompilation or blobsarp/indices an official repository? Next: a site or X link to a repo, or leave NULL"
   unresolved:
     - text: "The project's claim of about $1M in Stock Tokens distributed (workbook: over $1M) has not been reproduced on chain."
+    - text: product.mechanism remains unresolved (CON-1).
+themes:
+  - index
+  - rwa
+  - hook

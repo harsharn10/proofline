@@ -25,3 +25,164 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 6629947587c93ba5
+- date: 2026-09-03
+  slug: denar
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "Isolated money market for tokenized equities on Robinhood Chain, priced by Chainlink: lend USD or borrow against Stock Tokens; live since 2026-08-30 per the project."
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/DenarMarkets
+    deployments:
+      - label: DENAR token (posted by the project 30 Aug)
+        chain: robinhood-chain
+        address: "0x3786728a2c49c4617bf4fe5bd82b90b6b0df5508"
+        role: token
+        verified: false
+        sources:
+          - S2
+          - S3
+          - S4
+      - &a1
+        label: Isolated market contracts
+        chain: robinhood-chain
+        address: not-verified
+        role: vault
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    summary: The chain's isolated money market for tokenized stocks. Lenders deposit USDG into an ERC-4626 vault that allocates behind per-market caps; borrowers post NVDA, AAPL, SPY or other listed tokens and draw USDG without selling. Equity books use Chainlink with market-hours guards; PONS uses a Uniswap TWAP and a separate vault. @DenarMarkets runs denar.markets.
+    themes:
+      - lending
+      - rwa
+      - vault
+      - stock-paired:nvda
+    official_links:
+      - kind: x
+        url: https://x.com/DenarMarkets
+      - kind: site
+        url: https://www.denar.markets
+      - kind: app
+        url: https://www.denar.markets/app
+      - kind: docs
+        url: https://docs.denar.markets
+    deployments:
+      - label: DENAR token (PonsV2LauncherToken)
+        chain: robinhood-chain
+        address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
+        role: token
+        verified: true
+        sources:
+          - S2
+          - S3
+          - S4
+          - S14
+          - S15
+          - S16
+      - *a1
+      - label: Denar Morpho Blue (equity lending core)
+        chain: robinhood-chain
+        address: "0xf0A0a33729270586cDD66010B1cedE649745c3A5"
+        role: other
+        verified: true
+        sources:
+          - S9
+          - S19
+          - S18
+      - label: AdaptiveCurveIrm (Denar instance)
+        chain: robinhood-chain
+        address: "0x9316E7eDAB60eF0f489b1E4D11DDcDaa560aCbfD"
+        role: other
+        verified: false
+        sources:
+          - S9
+          - S18
+      - label: Denar USDG Vault (dnUSDG, MetaMorphoV1_1)
+        chain: robinhood-chain
+        address: "0xF0E6AD006080c48766ddb95b8c568D72bC059050"
+        role: vault
+        verified: true
+        sources:
+          - S9
+          - S20
+          - S21
+          - S18
+      - label: MetaMorphoV1_1Factory
+        chain: robinhood-chain
+        address: "0x99a0bD825beDA579794F3f715ab3984310C7226E"
+        role: factory
+        verified: false
+        sources:
+          - S9
+          - S22
+      - label: DenarLiquidator (equity)
+        chain: robinhood-chain
+        address: "0x4d61E8a7eF442eb077650D349781F2cc3Ebe42d1"
+        role: other
+        verified: false
+        sources:
+          - S9
+          - S23
+      - label: Denar Frontier USDG (dnFRONT)
+        chain: robinhood-chain
+        address: "0x338b2f252dae1deb00Afb700128e592a19F8918c"
+        role: vault
+        verified: true
+        sources:
+          - S9
+          - S18
+          - S25
+      - label: Protocol owner / deployer
+        chain: robinhood-chain
+        address: "0xdCB002787Fb86873051b838582063517FDc47c6F"
+        role: admin
+        verified: true
+        sources:
+          - S9
+          - S10
+          - S24
+          - S18
+      - label: Morpho Blue (canonical; not Denar-owned)
+        chain: robinhood-chain
+        address: "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010"
+        role: other
+        verified: false
+        sources:
+          - S9
+          - S18
+    metrics:
+      - kind: tvl
+        value: 28709.75
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S18
+      - kind: volume_24h
+        value: 606232.57
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S17
+      - kind: holders
+        value: 1374
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S15
+      - kind: market_cap
+        value: 862633.35
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S15
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: a427e99f3a59e63d

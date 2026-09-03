@@ -5,29 +5,64 @@ category: Stock-paired token
 lifecycle: mainnet
 lifecycle_source: pulled 0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18 2026-07-14T17:48:31.000Z
 coverage: stub
-summary: "Flagship LONG launch: $AI paired to tokenized NVDA on Uniswap, with a community vault the project says accumulates NVDA from trading fees."
+summary: "Artificial Inu is a LONG-factory stock-paired memecoin: $AI trades against tokenized NVDA in a Uniswap v4 pool on Robinhood Chain. A user swaps AI for NVDA, or uses the secondary WETH book. The official site and @ArtificiallyInu account describe a community vault that takes NVDA buy fees and burns or locks AI sell fees; those fee paths were not reproduced this pass."
 official_links:
   - kind: site
     url: https://artificialinu.com
   - kind: x
     url: https://x.com/ArtificiallyInu
+  - kind: docs
+    url: https://artificialinu.com/how-it-works
 dependencies:
   - stock-tokens
   - uniswap
 deployments:
-  - label: $AI token (PRD Appendix A)
+  - label: $AI token (EIP-1167 clone)
     chain: robinhood-chain
     address: "0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18"
     role: token
-    verified: false
+    verified: true
     sources:
       - S7
+      - S13
+      - S15
+      - S29
   - label: Community vault
     chain: robinhood-chain
     address: not-verified
     role: vault
     verified: false
     sources: []
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S29
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S18
+  - label: LongLauncher (creation tx `to`; PRD 0x22e9…eeED)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S16
+      - S17
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S15
+      - S19
 review:
   researcher: harsharn10
   approver: pending
@@ -50,14 +85,85 @@ findings:
       sources:
         - S5
   risk:
-    - text: "owner() on the Artificial Inu token contract returns 0xeb7c…0862, the verified Airlock contract that also owns the EARN, Statics and Artificial Inu tokens; the token's owner-only functions are controlled by shared launch infrastructure, not by a project-held key or multisig."
+    - text: owner() on the Artificial Inu token contract returns 0xeb7c…0862, the verified Airlock contract that also owns the EARN, Statics and Artificial Inu tokens; the token's owner-only functions are controlled by shared launch infrastructure, not by a project-held key or multisig.
       class: verified
-      sources: [S9]
+      sources:
+        - S9
+    - text: "Receipts: every URL above was opened on 2026-09-02 and its excerpt copied from the page or JSON body. [verified R-1 R-2 R-4 R-6 R-11 R-13] - Numbers: DexScreener AI/NVDA liquidity and Gecko trending reserve are filed as separate claims and metrics, not averaged; AI/WETH is a second book; holders is the Blockscout token count, not an X recap. [verified R-11 R-13 R-5] - Adversarial: the strongest contrary reading is that Gecko's $26M is the usable figure and DexScreener undercounts Uniswap v4 concentrated liquidity, or the reverse, that Gecko overstates virtual reserves; a second contrary reading is that the pool is a Bankr book rather than Uniswap v4. Creation through LongLauncher and DexScreener's uniswap/v4 labels argue for a LONG/Uniswap v4 venue, but the Gecko dex id is unresolved. Vault and fee-split claims could be frontend copy only."
+      class: inference
+      sources:
+        - S16
+        - S20
+        - S23
+    - text: AI/NVDA liquidity is $6.08M on DexScreener, $26.01M on Gecko trending, and $26.7M in a 2 Sep recap; the figures are not interchangeable.
+      class: verified
+      sources:
+        - S20
+        - S22
+    - text: Community Vault address is unpublished, so NVDA-fee custody cannot be checked as a balance.
+      class: claim
+      sources:
+        - S11
+    - text: Token owner() is the shared Airlock; factory create is onlyAirlock.
+      class: verified
+      sources:
+        - S15
+        - S18
+        - S19
+    - text: No audit report was located this pass.
+      class: unknown
+    - text: Gecko attributes the AI/NVDA pool to bankr-robinhood while DexScreener labels it Uniswap v4.
+      class: verified
+      sources:
+        - S20
+        - S23
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from PRD Appendix A not yet reproduced on Blockscout
     - text: Community vault contract and its controller unknown
     - text: Fee routing and pair mechanics unverified
     - text: Vault NVDA balance (about $1.7M per the project) not reproduced on chain
+    - text: "What is the Community Vault contract address, and who can move NVDA out of it? Next: read DopplerERC20V1 verified source for fee recipient / vault setter and match the live recipient on chain"
+    - text: "Do live swaps actually split 80/20 NVDA on buys and 50/50 AI burn/lock on sells? Next: decode a recent AI/NVDA swap and the token's fee functions in DopplerERC20V1 source"
+    - text: "Why is DexScreener AI/NVDA liquidity $6.08M while Gecko trending prints $26.01M for the same pool id? Next: read Uniswap v4 PoolManager / position inventory for 0xcbdfea…ce27 rather than aggregators"
+    - text: "Is the AI/NVDA pool a Uniswap v4 pool, a Bankr-routed pool, or both? Next: PoolManager / hook address on the explorer for 0xcbdfea…ce27"
+    - text: "Is there an audit whose scope includes DopplerERC20V1, LongLauncher, or Airlock as used by $AI? Next: auditor report index for Doppler / LONG and a matching commit"
+    - text: "Can the site's 932.50 NVDA vault balance be reproduced as an ERC-20 balanceOf on a named address? Next: once the vault address is known, balanceOf(NVDA) at a dated block"
   unresolved:
     - text: Vault balances and burn totals are the project's own figures and have not been reproduced on chain.
+    - text: economics.metric remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).
+themes:
+  - memecoin
+  - ai
+  - stock-paired:nvda
+  - dog
+  - rwa
+metrics:
+  - kind: holders
+    value: 35487
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S14
+  - kind: tvl
+    value: 3715804.1
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S22
+  - kind: volume_24h
+    value: 22890375.6
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S22
+  - kind: market_cap
+    value: 267172264
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S20

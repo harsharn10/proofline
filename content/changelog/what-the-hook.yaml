@@ -12,3 +12,148 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 0b7336adec9bb24a
+- date: 2026-09-03
+  slug: what-the-hook
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: MEV redistribution inside a Uniswap v4 hook that pays traders and LPs, with a WTH token.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/whatthehookv4
+    deployments:
+      - &a1
+        label: WTH token
+        chain: robinhood-chain
+        address: not-verified
+        role: token
+        verified: false
+        sources: []
+      - &a2
+        label: MEV hook
+        chain: robinhood-chain
+        address: not-verified
+        role: other
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    summary: A Uniswap v4 hook that recaptures cross-pool arbitrage and pays it to swappers and LPs. On Robinhood Chain the correction settles in the same swap; realised profit is split among the swapper, LPs, a referral and the WTH treasury. Users swap as usual; projects attach the hook at v4 pool creation. The hook is 0xc52f…54c0 and the WTH token is 0xb8Fa…fF79, created by whatthehook.eth.
+    themes:
+      - hook
+      - rwa
+      - stock-paired:nvda
+    official_links:
+      - kind: x
+        url: https://x.com/whatthehookv4
+      - kind: site
+        url: https://www.whatthehook.io
+      - kind: docs
+        url: https://www.whatthehook.io/docs
+      - kind: app
+        url: https://www.whatthehook.io/dashboard.html
+    deployments:
+      - *a1
+      - *a2
+      - label: WTH token
+        chain: robinhood-chain
+        address: "0xb8Fa8010833463Aac5595b55B9045479239EfF79"
+        role: token
+        verified: true
+        sources:
+          - S7
+          - S15
+          - S21
+      - label: WTH hook
+        chain: robinhood-chain
+        address: "0xc52fc52698479E42F0dA9a8a75296EC3871454c0"
+        role: other
+        verified: true
+        sources:
+          - S7
+          - S16
+          - S21
+      - label: ArbExecutor
+        chain: robinhood-chain
+        address: "0x26a5d02938FBF70AF4c114C2Ff432eD3Be0D3B62"
+        role: other
+        verified: true
+        sources:
+          - S7
+          - S17
+          - S21
+      - label: PositionFeeClaimer
+        chain: robinhood-chain
+        address: "0x82067B7Ef3020cc6503142B80593519BD382B700"
+        role: other
+        verified: true
+        sources:
+          - S7
+          - S18
+          - S21
+      - label: Safe multisig (docs admin)
+        chain: robinhood-chain
+        address: "0x98c8681673D6b9fD85D2F505b7CC54E77Da8cE59"
+        role: multisig
+        verified: true
+        sources:
+          - S7
+          - S19
+          - S21
+      - label: Token and hook factory
+        chain: robinhood-chain
+        address: "0x7F66F29AB9e28Dc7602f0D14a4df0Bbcd2b50399"
+        role: factory
+        verified: true
+        sources:
+          - S20
+          - S21
+          - S26
+    metrics:
+      - kind: tvl
+        value: 210671.39
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S11
+      - kind: fees_24h
+        value: 1790
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S12
+      - kind: revenue_24h
+        value: 0
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S13
+      - kind: volume_24h
+        value: 215448.4
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S14
+      - kind: market_cap
+        value: 3700589
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S14
+      - kind: holders
+        value: 767
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S15
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 0e3e578cd0b776a4

@@ -25,3 +25,125 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 306fb9f91411d28f
+- date: 2026-09-02
+  slug: wire
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Command layer that launches tokens on Pons and executes trades from X, Telegram or web, with a $WIRE token.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/wirebotRH
+    deployments:
+      - label: WIRE token (account bio)
+        chain: robinhood-chain
+        address: "0x8ECEA3d0E648DB646d824AA51EedeB16aC3d6878"
+        role: token
+        verified: false
+        sources:
+          - S2
+          - S3
+    metrics: null
+  new:
+    summary: A command layer that turns an X, Telegram or web mention into an on-chain trade on Robinhood Chain. Users tag @wirebotRH to buy, sell, send, launch on Pons or open a prediction market from a handle-tied wallet. $WIRE is the app token. @wirebotRH runs wirebot.trade.
+    themes:
+      - agent
+      - launchpad
+      - prediction
+      - rwa
+      - index
+    official_links:
+      - kind: x
+        url: https://x.com/wirebotRH
+      - kind: site
+        url: https://wirebot.trade
+      - kind: docs
+        url: https://wirebot.trade/docs
+      - kind: app
+        url: https://app.wirebot.trade
+      - kind: telegram
+        url: https://t.me/rh_wirebot
+    deployments:
+      - label: WIRE token (PonsLauncherToken)
+        chain: robinhood-chain
+        address: "0x8ECEA3d0E648DB646d824AA51EedeB16aC3d6878"
+        role: token
+        verified: true
+        sources:
+          - S2
+          - S3
+          - S8
+          - S9
+          - S10
+          - S11
+      - label: WIRE/WETH Uniswap v3 pool (token liquidityPool())
+        chain: robinhood-chain
+        address: "0xD55246642DD114bc21dB98C6f2261161a6158388"
+        role: other
+        verified: true
+        sources:
+          - S11
+          - S13
+          - S14
+          - S27
+      - label: Pons v1 legacy factory (token launchFactory() / creator_address_hash)
+        chain: robinhood-chain
+        address: "0x0c37a24F5D23A486FA692d1500881d698B1F77a4"
+        role: factory
+        verified: false
+        sources:
+          - S9
+          - S12
+          - S15
+      - label: Token deployer EOA
+        chain: robinhood-chain
+        address: "0xFe4B46C8Dbdf982a4F68C5268de440D1DB790920"
+        role: admin
+        verified: false
+        sources:
+          - S11
+          - S12
+          - S22
+      - label: Prediction-market contract named in the 2026-07-20 post
+        chain: robinhood-chain
+        address: "0x695d6Bd8E647060fbB069E602eB64ac058c206c5"
+        role: other
+        verified: false
+        sources:
+          - S23
+          - S24
+    metrics:
+      - kind: holders
+        value: 3928
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S10
+      - kind: volume_24h
+        value: 401332.48
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S13
+      - kind: tvl
+        value: 158574.12
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S13
+          - S25
+      - kind: market_cap
+        value: 1334343
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S13
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: ebb4edc5f11504a9

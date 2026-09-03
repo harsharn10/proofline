@@ -25,3 +25,155 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 7c0854e531846ce9
+- date: 2026-09-03
+  slug: hookr
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "Uniswap v4 hook launchpad and hook marketplace: launch a token whose pool rules (anti-snipe, surge fee, auto-burn) are the product."
+    themes: null
+    official_links:
+      - kind: site
+        url: https://hookr.fun
+      - kind: x
+        url: https://x.com/Hookrfun
+    deployments:
+      - label: HOOKR token (hookr.fun + GitHub per the desk)
+        chain: robinhood-chain
+        address: "0x18E674231A58c239Dc7DaeDcffE15Ec3A24cff5c"
+        role: token
+        verified: false
+        sources:
+          - S3
+          - S4
+      - label: Hook launchpad
+        chain: robinhood-chain
+        address: "0xaAed6fab06D53311220F35421Dda5cc6D6e9d6C3"
+        role: factory
+        verified: false
+        sources:
+          - S3
+      - label: Hook contract
+        chain: robinhood-chain
+        address: "0xd0005624Da88a688BcaB3DBFB4d1Cb23d32Ca0CC"
+        role: other
+        verified: false
+        sources:
+          - S3
+    metrics: null
+  new:
+    summary: Hookr composes Uniswap v4 hooks on Robinhood Chain. A user stacks up to five on-swap rules, publishes the hook for royalties, and opens a new token pool with those rules fixed at creation. Instant launches open at a platform-wide 2.5 ETH FDV; auctions use Uniswap CCA. $HOOKR trades in a hookless v4 pool. The deployer EOA is labelled nodar.eth.
+    themes:
+      - hook
+      - tooling
+      - memecoin
+      - launchpad
+    official_links:
+      - kind: site
+        url: https://hookr.fun
+      - kind: x
+        url: https://x.com/Hookrfun
+      - kind: docs
+        url: https://hookr.fun/docs
+      - kind: app
+        url: https://hookr.fun/builder
+      - kind: x
+        url: https://x.com/hookrfun
+      - kind: github
+        url: https://github.com/Hookr-fun/hookr-contracts
+    deployments:
+      - label: HOOKR token
+        chain: robinhood-chain
+        address: "0x18E674231A58c239Dc7DaeDcffE15Ec3A24cff5c"
+        role: token
+        verified: true
+        sources:
+          - S3
+          - S4
+          - S7
+          - S9
+          - S23
+      - label: HookrLaunchpad generation 3 (GitHub README live table; retained)
+        chain: robinhood-chain
+        address: "0xaAed6fab06D53311220F35421Dda5cc6D6e9d6C3"
+        role: factory
+        verified: true
+        sources:
+          - S3
+          - S12
+          - S21
+      - label: HookrHook generation 3 (GitHub README live table; retained)
+        chain: robinhood-chain
+        address: "0xd0005624Da88a688BcaB3DBFB4d1Cb23d32Ca0CC"
+        role: other
+        verified: true
+        sources:
+          - S3
+          - S13
+          - S21
+      - label: HookrLaunchpadV5 (docs current live)
+        chain: robinhood-chain
+        address: "0xa043caBE645636899dDe91Cce4693C00a015e660"
+        role: factory
+        verified: true
+        sources:
+          - S8
+          - S10
+      - label: HookrHook generation 5 (docs current live)
+        chain: robinhood-chain
+        address: "0xe7c3461A4c762fF9dB4F91BeE3Cf8deAaFc2E8CC"
+        role: other
+        verified: true
+        sources:
+          - S8
+          - S11
+      - label: Bounded HookrSwapRouter (docs current live)
+        chain: robinhood-chain
+        address: "0x644ac2e784059e1C01F24f99DF7795aE2be06ca0"
+        role: router
+        verified: false
+        sources:
+          - S8
+          - S25
+      - label: HookrFlywheelBurner
+        chain: robinhood-chain
+        address: "0x8Cee20FA000aF3266AC2cD2cBeEFbcD19D98FD89"
+        role: other
+        verified: false
+        sources:
+          - S8
+          - S26
+    metrics:
+      - kind: holders
+        value: 5412
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S9
+      - kind: volume_24h
+        value: 2560204.85
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S20
+      - kind: market_cap
+        value: 9295895
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S20
+      - kind: tvl
+        value: 625860.84
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S20
+          - S24
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 7089ac838aa8ce13

@@ -12,3 +12,115 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: d030c52c0d8d98de
+- date: 2026-09-03
+  slug: l4va
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Vault factory that issues tokens backed by locked RWAs, stocks, NFTs or memes; TGE announced for 2026-08-18 on Robinhood Chain.
+    themes: null
+    official_links:
+      - kind: site
+        url: https://l4va.org
+      - kind: x
+        url: https://x.com/L4VAprotocol
+    deployments:
+      - &a1
+        label: L4VA token
+        chain: robinhood-chain
+        address: not-verified
+        role: token
+        verified: false
+        sources: []
+      - &a2
+        label: Vault factory
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    summary: A vault factory for tokens backed by locked RWAs and stocks. A user deposits eligible assets into a programmable vault and receives fungible vault tokens; $L4VA is the protocol token whose TGE is listed on Robinhood Chain. @L4VAprotocol runs it at l4va.org and l4va.com.
+    themes:
+      - rwa
+    official_links:
+      - kind: site
+        url: https://l4va.org
+      - kind: x
+        url: https://x.com/L4VAprotocol
+      - kind: site
+        url: https://l4va.com
+      - kind: app
+        url: https://app.l4va.org
+      - kind: docs
+        url: https://l4va-team.gitbook.io/l4va-docs
+      - kind: whitepaper
+        url: https://l4va.com/manifesto
+      - kind: github
+        url: https://github.com/L4VA-Technologies-Inc
+      - kind: discord
+        url: https://discord.com/invite/mBbTUfAzuS
+    deployments:
+      - *a1
+      - *a2
+      - label: Ticker-named ERC-20 L4VA (not linked from l4va.org)
+        chain: robinhood-chain
+        address: "0xdb65fdc91405d659B3F0b8b743aFD9974b0b9D63"
+        role: token
+        verified: true
+        sources:
+          - S14
+          - S18
+          - S19
+      - label: L4V4 ERC-20 named L4VA (Pons v2; not linked from l4va.org)
+        chain: robinhood-chain
+        address: "0x2A6DA05E7151687e4A6ca6C059e008f6cf7c1C36"
+        role: token
+        verified: true
+        sources:
+          - S15
+          - S16
+          - S17
+          - S21
+      - label: PonsLauncherToken named L4VAprotocol (not linked from l4va.org)
+        chain: robinhood-chain
+        address: "0x54AdF848173b2f83420E4AF36cB237535139a2E8"
+        role: token
+        verified: true
+        sources:
+          - S20
+    metrics:
+      - kind: market_cap
+        value: 1050000
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S5
+          - S6
+      - kind: tvl
+        value: 4514.01
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S17
+      - kind: volume_24h
+        value: 0.76
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S17
+      - kind: holders
+        value: 11
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S15
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: fb6d4a9694bdcaf9

@@ -12,3 +12,80 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 4973058001643c92
+- date: 2026-09-03
+  slug: hoodfun
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "Announced fair-launch pad: one transaction into a bonding curve that locks into Uniswap v3 at goal, with no presale or team allocation per the project."
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/hoodfunfamily
+    deployments:
+      - &a1
+        label: Curve / launch contract
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources: []
+  new:
+    summary: A bonding-curve launchpad on Robinhood Chain. One transaction deploys a token onto a constant-product curve; at the raise goal liquidity migrates into a locked Uniswap v3 pool. Users launch or buy from the hood.fun interface. The assigned handle is @hoodfunfamily; the live site names @hooddotfun.
+    themes:
+      - launchpad
+      - memecoin
+      - rwa
+    official_links:
+      - kind: x
+        url: https://x.com/hoodfunfamily
+      - kind: site
+        url: https://hood.fun
+      - kind: app
+        url: https://hood.fun/create
+      - kind: whitepaper
+        url: https://hood.fun/whitepaper
+      - kind: x
+        url: https://x.com/hooddotfun
+      - kind: telegram
+        url: https://t.me/hooddotfun
+    deployments:
+      - *a1
+      - label: Launchpad factory (Bitquery current)
+        chain: robinhood-chain
+        address: "0x5fcc1df0dc020cf454e742e9a8ae2554c37a452c"
+        role: factory
+        verified: true
+        sources:
+          - S11
+          - S12
+          - S13
+          - S14
+      - label: Launchpad factory (Bitquery previous generation)
+        chain: robinhood-chain
+        address: "0x6a63d96ef77ae569fcb85934cf1bd1ec7fe9b33d"
+        role: factory
+        verified: true
+        sources:
+          - S11
+          - S13
+      - label: Platform (Mobula table)
+        chain: robinhood-chain
+        address: "0xc6a2941b962fb667786d7f4b97f7f965d6f0a4f8"
+        role: other
+        verified: true
+        sources:
+          - S12
+          - S13
+      - label: owner() of current factory, previous factory, and Mobula platform
+        chain: robinhood-chain
+        address: "0xb3f3b54e11217f4f73e7a766b7caa187390d700d"
+        role: admin
+        verified: true
+        sources:
+          - S13
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 922a1a2134abc2e7

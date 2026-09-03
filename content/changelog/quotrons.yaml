@@ -36,3 +36,198 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: fc574e190280c88c
+- date: 2026-09-03
+  slug: quotrons
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "4,444 ERC-404 terminals: burning the liquid token hardwires an NFT that earns one of ten Stock Tokens from a 3% pool fee."
+    themes: null
+    official_links:
+      - kind: site
+        url: https://quotrons.cash
+      - kind: x
+        url: https://x.com/Quotrons404
+    deployments:
+      - label: QUOTRON token (ERC-404 core)
+        chain: robinhood-chain
+        address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
+        role: token
+        verified: false
+        sources:
+          - S3
+          - S4
+          - S5
+      - label: Router
+        chain: robinhood-chain
+        address: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
+        role: router
+        verified: false
+        sources:
+          - S3
+          - S5
+      - label: Uniswap v4 hook
+        chain: robinhood-chain
+        address: "0x62E200Cc8e4D95cf622f40Dd70f407C883EcB0cc"
+        role: other
+        verified: false
+        sources:
+          - S3
+          - S5
+    metrics: null
+  new:
+    summary: "An ERC-404 collection of 4,444 terminals: one liquid QUOTRON materializes a dark NFT, and burning that token hardwires the NFT so it can claim Stock Token rewards from a 3% Uniswap v4 QUOTRON/WETH fee. Trade on quotrons.cash, hardwire a terminal, and claim NVDA, AAPL, TSLA, GME, SPCX, SPY, PLTR, NFLX, RDDT or MSTR. @Quotrons404 runs the app."
+    themes:
+      - nft
+      - rwa
+      - stock-paired:nvda
+      - hook
+    official_links:
+      - kind: site
+        url: https://quotrons.cash
+      - kind: x
+        url: https://x.com/Quotrons404
+      - kind: docs
+        url: https://quotrons.cash/llms-full.txt
+      - kind: docs
+        url: https://quotrons.cash/integration.md
+      - kind: github
+        url: https://github.com/mavrkofficial/quotrons-brand-kit
+      - kind: other
+        url: https://opensea.io/collection/Quotrons404
+      - kind: other
+        url: https://www.sentry.trading/swap?chain=robinhood&token=0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F
+    deployments:
+      - label: QUOTRON V2 core (Quotron404V2)
+        chain: robinhood-chain
+        address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
+        role: token
+        verified: true
+        sources:
+          - S3
+          - S4
+          - S5
+          - S10
+          - S14
+          - S15
+          - S16
+          - S20
+      - label: Canonical router (QuotronWethRouter)
+        chain: robinhood-chain
+        address: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
+        role: router
+        verified: true
+        sources:
+          - S3
+          - S5
+          - S11
+          - S17
+          - S20
+          - S37
+      - label: Canonical Uniswap v4 hook (QuotronWethHook)
+        chain: robinhood-chain
+        address: "0x62E200Cc8e4D95cf622f40Dd70f407C883EcB0cc"
+        role: other
+        verified: true
+        sources:
+          - S3
+          - S5
+          - S11
+          - S18
+          - S20
+          - S38
+      - label: V2 ERC-721 mirror (QuotronMirrorV2)
+        chain: robinhood-chain
+        address: "0x027ACa2794E44f24950D81227DcD516FfBB49d6e"
+        role: other
+        verified: false
+        sources:
+          - S10
+          - S19
+          - S20
+      - label: V2 reflections (QuotronReflectionsV2)
+        chain: robinhood-chain
+        address: "0xe04fba61FD54Ba78Dd450A30d8Af40167aF5d3Ec"
+        role: other
+        verified: false
+        sources:
+          - S10
+          - S20
+          - S32
+      - label: View quoter (QuotronWethQuoter)
+        chain: robinhood-chain
+        address: "0xb8960fdC8A0Be155d196C2795b75747763562df2"
+        role: other
+        verified: false
+        sources:
+          - S11
+          - S12
+          - S20
+      - label: Epoch converter (QuotronEpochConverter)
+        chain: robinhood-chain
+        address: "0x24e62Dd5C7058CC41ad9c5375C137460ea1Da2FE"
+        role: other
+        verified: false
+        sources:
+          - S10
+          - S33
+      - label: Recovery Safe
+        chain: robinhood-chain
+        address: "0x15277aA1ecC13734d57C519a2DAA1cc4A748bA89"
+        role: multisig
+        verified: false
+        sources:
+          - S10
+          - S20
+          - S31
+      - label: Owner / blacklist guardian (EIP-7702)
+        chain: robinhood-chain
+        address: "0x7171E64E979265aeD6588577D1c6b60A701d7866"
+        role: admin
+        verified: false
+        sources:
+          - S14
+          - S16
+          - S20
+      - label: QUOTRON/USDG Uniswap v3 pair
+        chain: robinhood-chain
+        address: "0xb77e03DF4CAe1752aa1E2b52C46794026b46873E"
+        role: other
+        verified: true
+        sources:
+          - S21
+          - S39
+      - label: V1 QUOTRON core (retired)
+        chain: robinhood-chain
+        address: "0x40686524e56AfF0F1446958725dCF6e6dA5381E6"
+        role: token
+        verified: false
+        sources:
+          - S10
+          - S34
+    metrics:
+      - kind: volume_24h
+        value: 961782
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S21
+      - kind: market_cap
+        value: 9776980
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S21
+      - kind: holders
+        value: 3649
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S15
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: b98c2365511d4608

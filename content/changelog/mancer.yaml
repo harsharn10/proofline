@@ -38,3 +38,135 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: f2dc18536e97e623
+- date: 2026-09-02
+  slug: mancer
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    lifecycle: beta
+    summary: Native DEX aggregator and non-custodial order layer (routed swaps, signed limit and stop orders, OCO brackets, recurring buys), in a gated beta for Chain Mancers and StonkBrokers holders; the project says its router and order contracts are under audit; a Shield product is announced.
+    themes: null
+    official_links:
+      - kind: site
+        url: https://mancer.xyz
+      - kind: docs
+        url: https://mancer.xyz/docs
+      - kind: whitepaper
+        url: https://mancer.xyz/whitepaper.pdf
+      - kind: x
+        url: https://x.com/MancerXYZ
+    deployments:
+      - label: $MANCER token (workbook sheet 02)
+        chain: robinhood-chain
+        address: "0xc72f232a6869e6cf34dc06129affd07f8a2a246a"
+        role: token
+        verified: false
+        sources:
+          - S6
+      - &a1
+        label: Aggregator router
+        chain: robinhood-chain
+        address: not-verified
+        role: router
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    lifecycle: mainnet
+    summary: "Mancer is Robinhood Chain's DEX aggregator and non-custodial order layer: a quote races eligible venues, the winning route (or a split) executes in one transaction, and signed limit, stop, OCO and recurring orders stay in the user's wallet until fill. A user connects a wallet at mancer.xyz. Blockhash / @MancerXYZ run the executor; the $MANCER token is a separate Clutch CollectionToken."
+    themes:
+      - tooling
+      - nft
+      - memecoin
+    official_links:
+      - kind: app
+        url: https://mancer.xyz
+      - kind: docs
+        url: https://mancer.xyz/docs
+      - kind: whitepaper
+        url: https://mancer.xyz/whitepaper.pdf
+      - kind: x
+        url: https://x.com/MancerXYZ
+      - kind: discord
+        url: https://discord.gg/mancer
+      - kind: other
+        url: https://mancer.xyz/status
+      - kind: other
+        url: https://chainmancer.xyz/
+    deployments:
+      - label: $MANCER token (CollectionToken, Clutch NFT-Token AMM)
+        chain: robinhood-chain
+        address: "0xc72F232a6869e6CF34dC06129AfFD07F8a2a246A"
+        role: token
+        verified: true
+        sources:
+          - S6
+          - S12
+          - S13
+          - S14
+          - S16
+      - *a1
+      - label: MancerRouter (live; 1,343 txs this pass)
+        chain: robinhood-chain
+        address: "0xFBA80Ff9C50462661f9D328E033e251251537FA5"
+        role: router
+        verified: false
+        sources:
+          - S16
+          - S17
+      - label: MancerOrders (live; 79 txs this pass)
+        chain: robinhood-chain
+        address: "0x22Db8B8a0D14916f7A84909a0d92DF9024B57f88"
+        role: other
+        verified: false
+        sources:
+          - S16
+          - S18
+      - label: CollectionTokenDeployer (token creator_address_hash)
+        chain: robinhood-chain
+        address: "0x662003BF6049e36b4E887D47b8df8718fFBbc6C2"
+        role: factory
+        verified: false
+        sources:
+          - S12
+          - S15
+      - label: MancerRouter (earlier verified copy; 17 txs)
+        chain: robinhood-chain
+        address: "0x67b7ec06828425BdDF02C52789B7939924608f79"
+        role: router
+        verified: false
+        sources:
+          - S17
+      - label: MancerOrders (earlier verified copy; 1 tx)
+        chain: robinhood-chain
+        address: "0xff86B3D4266c9374DA9D8A473E8533965ab6A0C3"
+        role: other
+        verified: false
+        sources:
+          - S18
+    metrics:
+      - kind: holders
+        value: 9901
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S13
+      - kind: tvl
+        value: 445813.78
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S20
+      - kind: volume_24h
+        value: 556008.76
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S20
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 66b0e8c9b6085448

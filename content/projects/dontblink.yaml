@@ -1,0 +1,155 @@
+slug: dontblink
+name: dontblink
+symbol: BLINK
+category: Uniswap-pool launchpad
+lifecycle: mainnet
+coverage: stub
+summary: A multi-mode token launchpad on Robinhood Chain. Classic mints a 1B-supply token into a locked Uniswap v3 1% pool in the same transaction; Pump Curve, Fair Drop and Celebrity Vault are additional modes, and stock-priced Classic pairs against any of 194 Robinhood stock tokens. Creators keep 50% of the 1% pool fee. Current comms are @dontblink_cto on dontblink.community; the original handle @dontblinkfamily remains a separate signer. $BLINK is the platform token.
+themes:
+  - launchpad
+  - rwa
+  - memecoin
+official_links:
+  - kind: site
+    url: https://dontblink.community
+  - kind: app
+    url: https://dontblink.community/launch
+  - kind: docs
+    url: https://dontblink.community/docs
+  - kind: x
+    url: https://x.com/dontblink_cto
+  - kind: x
+    url: https://x.com/dontblinkfamily
+  - kind: discord
+    url: https://discord.gg/pA9TggyjGN
+  - kind: telegram
+    url: https://t.me/dontblink_cto
+  - kind: site
+    url: https://dontblink.family
+dependencies: []
+deployments:
+  - label: v2 PortalProxy
+    chain: robinhood-chain
+    address: "0x7a4EB7F99833178c6463184bd0D8d17b6FC2d59c"
+    role: factory
+    verified: true
+    sources:
+      - S11
+      - S15
+      - S16
+      - S19
+  - label: DontblinkPortal (EIP-1967 implementation)
+    chain: robinhood-chain
+    address: "0x2CdA8AD7FAB20614C60B5365a5801a190BEa27bD"
+    role: implementation
+    verified: true
+    sources:
+      - S11
+      - S12
+      - S16
+  - label: DontblinkPortal (JS bundle portalImpl)
+    chain: robinhood-chain
+    address: "0xf539aEa1d19689B5349Bb051F5DB18a455351C9c"
+    role: implementation
+    verified: false
+    sources:
+      - S16
+      - S19
+  - label: $BLINK (dont blink)
+    chain: robinhood-chain
+    address: "0x7b630F080807DF83908b4aDE46BA6396EE66b098"
+    role: token
+    verified: true
+    sources:
+      - S13
+      - S14
+      - S16
+      - S17
+      - S19
+  - label: V3LaunchpadGatedMax (v1 factory that created $BLINK)
+    chain: robinhood-chain
+    address: "0xF441cc979fa862f2674b9188A7b529caFd3ce204"
+    role: factory
+    verified: false
+    sources:
+      - S13
+      - S14
+  - label: FairQueue
+    chain: robinhood-chain
+    address: "0x7D6628e666EEA927C3bcFb38f83186523825706e"
+    role: other
+    verified: false
+    sources:
+      - S16
+      - S19
+      - S22
+  - label: SoftQuotaRouter
+    chain: robinhood-chain
+    address: "0x40cDc7da1F54C0cF0411Dc5f74326Df202aD4853"
+    role: router
+    verified: false
+    sources:
+      - S16
+      - S19
+      - S23
+  - label: Portal admin Safe
+    chain: robinhood-chain
+    address: "0xefB0b09c66CB66943c1D5Ce796f5f577070de46e"
+    role: admin
+    verified: false
+    sources:
+      - S16
+      - S19
+      - S25
+metrics:
+  - kind: volume_24h
+    value: 482965.87
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17
+  - kind: tvl
+    value: 311242.91
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17
+  - kind: market_cap
+    value: 2466926
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17
+  - kind: holders
+    value: 3998
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S13
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: dontblink.community, /launch, /changelog, /docs, ours.json, the shipped JS, both X profiles and the cited posts, Blockscout portal/impl/token/create txs/FairQueue/SoftQuotaRouter/Safe, DexScreener, RPC, and family DNS were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-11 R-16 R-17] - Numbers: 482965.87 is the BLINK/WETH Uniswap v3 24h volume, not an all-pads figure. Holders 3998 is the Blockscout token row. ours.json 1102 is the site's own token list. [claim R-17 R-18] - Adversarial: the strongest contrary reading is that $BLINK 0x7b63… is a third-party listing. The shipped JS labels it the platform coin, DexScreener websites include dontblink.community and @dontblink_cto, and Blockscout name/symbol match; the create path is the v1 gated factory, not v2 PortalProxy. LONG remains a different factory."
+      class: inference
+      sources:
+        - S13
+        - S17
+        - S19
+    - text: PortalProxy upgrades sit with a 2-of-3 Safe; no timelock was reproduced this pass. [verified R-16] - Shipped JS portalImpl 0xf539… lags the live EIP-1967 implementation 0x2CdA…. [verified R-11 R-19] - Original @dontblinkfamily and current @dontblink_cto both remain online; dontblink.family does not serve. [claim R-5 R-6] [verified R-20] - Thesis author payouts are not fully contract-enforced yet, per the 2 Sep post. [claim R-10] - No audit report was located this pass.
+      class: unknown
+  missing:
+    - text: "Does the 2-of-3 Safe 0xefB0…e46e hold upgrade rights on PortalProxy without a timelock? Next: read DontblinkPortal verified source for upgrade/pause modifiers and any Delay/Timelock address"
+    - text: "Where is the public repository the JS note says holds provenance and governance status? Next: follow GitHub Pages owner for dontblink.community and any README linked from /docs"
+    - text: "Is Fair Drop still testing-only, and which reproduced txs used Pump Curve vs Celebrity Vault vs stock-priced Classic? Next: eth_getLogs Launched on PortalProxy and match mode enum Instant/Fair Drop/Curve"
+    - text: "Do discord.gg/pA9TggyjGN and t.me/dontblink_cto cross-link dontblink.community? Next: open both profiles and compare the linked domain"
+  unresolved:
+    - text: identity.handle remains unresolved (CON-1).
