@@ -28,7 +28,7 @@ identity:
     - slug: ap
       signals: [shared-address]
       contrary_signals:
-        - "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9 is the Apple • Robinhood Token the pair is quoted in; it is the census AP row, not a contract this name deployed"
+        - "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9 is the Apple • Robinhood Token (AAPL) the pair is quoted in; the census AP row carries it as the quote side of its own Uniswap link, and this name did not deploy it"
         - "Jobscoin is the token launched against that quote asset; the two share no handle or domain"
     - slug: pons
       signals: [shared-deployer]
