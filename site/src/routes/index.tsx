@@ -94,7 +94,7 @@ function Home() {
           trending={trending}
           launches={launches}
           announced={announced}
-          notListed={notListedCount(entries, launches)}
+          notListed={notListedCount(entries, launches, now)}
           now={now}
         />
       </section>

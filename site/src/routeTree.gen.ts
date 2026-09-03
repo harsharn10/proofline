@@ -16,6 +16,7 @@ import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as DIdRouteImport } from './routes/d.$id'
 import { Route as NSlugRouteImport } from './routes/n.$slug'
+import { Route as SIdRouteImport } from './routes/s.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const NSlugRoute = NSlugRouteImport.update({
   path: '/n/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SIdRoute = SIdRouteImport.update({
+  id: '/s/$id',
+  path: '/s/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/review': typeof ReviewRoute
   '/d/$id': typeof DIdRoute
   '/n/$slug': typeof NSlugRoute
+  '/s/$id': typeof SIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/review': typeof ReviewRoute
   '/d/$id': typeof DIdRoute
   '/n/$slug': typeof NSlugRoute
+  '/s/$id': typeof SIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/review': typeof ReviewRoute
   '/d/$id': typeof DIdRoute
   '/n/$slug': typeof NSlugRoute
+  '/s/$id': typeof SIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/d/$id'
     | '/n/$slug'
+    | '/s/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/d/$id'
     | '/n/$slug'
+    | '/s/$id'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/d/$id'
     | '/n/$slug'
+    | '/s/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   ReviewRoute: typeof ReviewRoute
   DIdRoute: typeof DIdRoute
   NSlugRoute: typeof NSlugRoute
+  SIdRoute: typeof SIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/s/$id': {
+      id: '/s/$id'
+      path: '/s/$id'
+      fullPath: '/s/$id'
+      preLoaderRoute: typeof SIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReviewRoute: ReviewRoute,
   DIdRoute: DIdRoute,
   NSlugRoute: NSlugRoute,
+  SIdRoute: SIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

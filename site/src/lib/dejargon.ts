@@ -3,15 +3,15 @@
 // reaches a visitor. Each rule targets a phrase the brief names as internal jargon.
 const REPLACEMENTS: Array<[RegExp, string]> = [
   [/\s*\(workbook sheet \d+\)/gi, ""],
-  [/[Tt]he workbook records/g, "Proofline's intake notes record"],
+  [/[Tt]he workbook records/g, "Icarus's intake notes record"],
   [/[Tt]he workbook's/g, "the intake notes'"],
   [/[Tt]he workbook/g, "the intake notes"],
   [/\(workbook\)/gi, "(intake notes)"],
   [/\bworkbook\b/g, "intake notes"],
-  [/[Tt]he desk map/g, "Proofline's chain map"],
-  [/[Tt]he desk's/g, "Proofline's"],
-  [/[Tt]he desk/g, "Proofline"],
-  [/[Dd]esk auditor/g, "Proofline auditor"],
+  [/[Tt]he desk map/g, "Icarus's chain map"],
+  [/[Tt]he desk's/g, "Icarus's"],
+  [/[Tt]he desk/g, "Icarus"],
+  [/[Dd]esk auditor/g, "Icarus auditor"],
   [/chain-slice/gi, "chain-level"],
   [/\bgraduations\b/g, "graduated launches"],
 ];
@@ -20,6 +20,33 @@ export function dejargon(text: string): string {
   let out = text;
   for (const [re, sub] of REPLACEMENTS) out = out.replace(re, sub);
   return out.replace(/ {2,}/g, " ").replace(/ ([,.;:])/g, "$1");
+}
+
+// The vocabulary map (Icarus spec §3 rule 1): the content system's own words, rewritten for a
+// reader. Order matters — the longer phrase always precedes the word it contains.
+const READER_WORDS: Array<[RegExp, string]> = [
+  [/\bProofline\b/g, "Icarus"],
+  [/\bresearch packets?\b/gi, "research"],
+  [/\bpackets?\b/gi, "research"],
+  [/\bdossiers?\b/gi, "research"],
+  [/\bcensus\b/gi, "registry"],
+  [/\bcoverage\b/gi, "review"],
+  [/\bInitial stub opened\b/g, "First profile opened"],
+  [/\bstub\b/gi, "short profile"],
+  [/\bprovisional\b/gi, "awaiting second review"],
+  [/\bconfidence\b/gi, "evidence"],
+  [/\bderived\b/gi, "calculated"],
+  [/\bcohort\b/gi, "section"],
+  [/\bqualifying\b/gi, "listing"],
+];
+
+// The one reader pass. Every visible string that comes out of a content file goes through this
+// on its way to the page — home, the category table, the card and the feed all call it, so a
+// word can never be de-jargoned on one surface and left raw on another.
+export function readerCopy(text: string): string {
+  let out = dejargon(text);
+  for (const [re, sub] of READER_WORDS) out = out.replace(re, sub);
+  return out;
 }
 
 // Deployment labels carry internal parentheticals ("(workbook sheet 02)", "(posted by

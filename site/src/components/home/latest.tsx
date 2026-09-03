@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
+import { readerCopy } from "@/lib/dejargon";
 import { Icon } from "@/components/ui/icon";
 import type { LatestIcarusItem } from "@/data/types";
-import { dejargon } from "@/lib/dejargon";
 import { formatDate } from "@/lib/utils";
 
 export function Latest({ items, telegramUrl }: { items: LatestIcarusItem[]; telegramUrl: string }) {
@@ -21,9 +21,9 @@ export function Latest({ items, telegramUrl }: { items: LatestIcarusItem[]; tele
                 <Icon name={item.kind === "icarus" ? "feather" : "msg"} />
                 {item.who}
               </span>
-              <b className="text-[12.5px] font-medium">{dejargon(item.title)}</b>
+              <b className="text-[12.5px] font-medium">{readerCopy(item.title)}</b>
               <p className="my-0.5 max-w-[84ch] text-[12.5px] text-[var(--t2)]">
-                {dejargon(item.body)}
+                {readerCopy(item.body)}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 <Link

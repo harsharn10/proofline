@@ -14,6 +14,7 @@ declare module "virtual:proofline-content" {
     feed: Record<string, string>;
     pulled: Record<string, string>;
     pulledHistory: Record<string, string>;
+    pulledSeries: Record<string, string>;
   };
   export default content;
 }

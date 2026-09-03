@@ -13,7 +13,7 @@ import {
   type DirectoryEntry,
   type KpiKey,
 } from "@/data/types";
-import { dejargon } from "@/lib/dejargon";
+import { readerCopy } from "@/lib/dejargon";
 
 type Filter = "all" | "live" | "announced" | "watchlist";
 const FILTERS: Array<{ value: Filter; label: string }> = [
@@ -24,13 +24,21 @@ const FILTERS: Array<{ value: Filter; label: string }> = [
 ];
 const STATUS_ORDER = { live: 0, quiet: 1, dormant: 2, announced: 3, testnet: 4 } as const;
 
-// Vite regenerates routeTree.gen.ts when this route is built; that generated file is deliberately
-// outside this assignment's allowed paths, so keep this source independently type-checkable.
-// @ts-expect-error The generated route typing is intentionally not committed by this scoped PR.
-export const Route: any = createFileRoute("/s/$id")({
+export const Route = createFileRoute("/s/$id")({
   validateSearch: (search: Record<string, unknown>): { f?: Filter } =>
     FILTERS.some(({ value }) => value === search.f) ? { f: search.f as Filter } : {},
   loader: () => getContent(),
+  head: ({ params, loaderData }) => {
+    const section = loaderData?.sections.find((item) => item.id === params.id);
+    return section
+      ? {
+          meta: [
+            { title: `${section.label} · Icarus` },
+            { name: "description", content: section.description },
+          ],
+        }
+      : { meta: [] };
+  },
   component: CategoryPage,
 });
 
@@ -190,7 +198,7 @@ function CategoryPage() {
                       <Link to="/n/$slug" params={{ slug: entry.slug }} className="block">
                         <b className="font-medium text-[var(--t1)]">{entry.name}</b>
                         <span className="block text-[11px] text-[var(--t3)]">
-                          {entry.tree?.label ?? dejargon(entry.summary)}
+                          {entry.tree?.label ?? readerCopy(entry.summary)}
                         </span>
                       </Link>
                     </td>

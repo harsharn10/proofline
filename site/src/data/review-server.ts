@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import * as nodeCrypto from "node:crypto";
 import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
@@ -83,7 +83,7 @@ function isChannelCandidate(entry: ChangelogEntry): boolean {
 }
 
 function publicationFingerprint(publication: ChannelPublication): string {
-  return createHash("sha256").update(JSON.stringify(publication)).digest("hex");
+  return nodeCrypto.createHash("sha256").update(JSON.stringify(publication)).digest("hex");
 }
 
 function decisionIsCurrent(entry: ChangelogEntry, decision: ReviewDecision | undefined): boolean {
