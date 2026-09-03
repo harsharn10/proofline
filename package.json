@@ -17,7 +17,7 @@
     "cloudflare:dry": "site/node_modules/.bin/wrangler deploy --dry-run --config wrangler.jsonc",
     "cloudflare:test": "npm run cloudflare:dry && npm --prefix site run cloudflare:smoke",
     "seed": "node scripts/seed-stubs.mjs",
-    "test": "node scripts/validate.mjs && node scripts/test.mjs && node scripts/test-pipeline.mjs && node scripts/test-packet.mjs && node scripts/test-pull.mjs",
+    "test": "node scripts/validate.mjs && node scripts/test.mjs && node scripts/test-pipeline.mjs && node scripts/test-packet.mjs && node scripts/test-compile.mjs && node scripts/test-pull.mjs",
     "telegram": "node scripts/telegram-digest.mjs",
     "telegram:dry": "node scripts/telegram-digest.mjs --dry-run",
     "telegram:chat-id": "node scripts/telegram-chat-id.mjs",

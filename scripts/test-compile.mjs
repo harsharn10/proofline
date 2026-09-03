@@ -38,10 +38,9 @@ await test("compile a brand-new slug from a seed packet", async () => {
   assert.equal(result.sources.sources.length, 1);
   assert.equal(result.feed.items.length, 1);
   assert.equal(result.feed.items[0].id, feedIdentity({
-    sourceUrl: packet.frontmatter.receipts[0].url,
     slug: "alpha",
-    date: "2026-09-02",
-    title: "Factory reproduced",
+    workId: packet.frontmatter.work_id,
+    eventId: packet.frontmatter.events[0].id,
   }));
   assert.match(result.changelog.review_key, /^[a-f0-9]{16}$/);
   assert.ok(!("scoring" in result.project), "compiler never invents scoring");
@@ -109,7 +108,7 @@ await test("CLI writes only canonical files, is idempotent, and supports dry-run
     const first = await treeSnapshot(root);
     await runCompile({ packetPath: "fixtures/compile-packet/new-seed.md", contentDir: root });
     assert.deepEqual(await treeSnapshot(root), first, "second compile produces no diff");
-    const changelog = parse(await readFile(join(root, "changelog.yaml"), "utf8"));
+    const changelog = parse(await readFile(join(root, "changelog", "alpha.yaml"), "utf8"));
     assert.equal(changelog.length, 1, "same packet does not append changelog twice");
     await runCompile({ packetPath: "fixtures/compile-packet/new-seed.md", contentDir: dryRoot, dryRun: true });
     assert.equal((await readdir(join(dryRoot, "projects"))).length, 0, "dry-run writes nothing");

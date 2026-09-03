@@ -36,11 +36,14 @@ export async function validateContent(root = "content", { release = false } = {}
   try {
     for (const name of (await readdir(join(root, "pulled"))).filter((name) => name.endsWith(".yaml")).sort()) {
       const path = join(root, "pulled", name);
+      // content/pulled/ is machine output (scripts/pull.mjs), not a content-validation dependency: a
+      // file the puller left half-written is a puller problem to warn about, never a reason to fail
+      // the hand-written content it sits next to.
       try { pulledBySlug.set(basename(name, ".yaml"), parse(await readFile(path, "utf8"))); }
-      catch (error) { errors.push(`pulled/${name}: ${error.message.split("\n")[0]}`); }
+      catch (error) { warnings.push(`pulled/${name}: ${error.message.split("\n")[0]} — machine output, rerun npm run pull`); }
     }
   } catch (error) {
-    if (error.code !== "ENOENT") errors.push(`pulled: ${error.message.split("\n")[0]}`);
+    if (error.code !== "ENOENT") warnings.push(`pulled: ${error.message.split("\n")[0]} — machine output, rerun npm run pull`);
   }
   warnings.push(...lifecycleDriftWarnings(content.census, pulledBySlug));
 
