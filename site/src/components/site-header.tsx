@@ -2,14 +2,11 @@ import { Link, useLoaderData } from "@tanstack/react-router";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TopbarSearch } from "@/components/topbar-search";
 import { Icon } from "@/components/ui/icon";
-import { CategoryPageMeta } from "@/components/page-meta";
 
 export function SiteHeader() {
   const meta = useLoaderData({ from: "__root__" });
 
   return (
-    <>
-    <CategoryPageMeta />
     <header className="topbar">
       <Link to="/" className="logo" aria-label="Icarus home">
         <span className="logo-mark">
@@ -38,6 +35,5 @@ export function SiteHeader() {
         <ThemeToggle />
       </div>
     </header>
-    </>
   );
 }

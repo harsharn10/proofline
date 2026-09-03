@@ -1,6 +1,7 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { DOSSIER_TABS, Dossier, type DossierTab } from "@/components/dossier";
 import { getDossier } from "@/data/content-server";
+import { readerCopy } from "@/lib/dejargon";
 
 export const Route = createFileRoute("/n/$slug")({
   // URL-synced card tabs. Commentary is the clean default URL; legacy or unknown values fall back.
@@ -17,6 +18,15 @@ export const Route = createFileRoute("/n/$slug")({
     if (!dossier) throw notFound();
     return { dossier, ...rest };
   },
+  // One title mechanism site-wide: route head(), rendered by <HeadContent /> in __root.tsx.
+  head: ({ loaderData }) => ({
+    meta: loaderData?.dossier
+      ? [
+          { title: `${loaderData.dossier.name} · Icarus` },
+          { name: "description", content: readerCopy(loaderData.dossier.summary) },
+        ]
+      : [],
+  }),
   component: NamePage,
   notFoundComponent: () => (
     <main className="wrap narrow pb-10">

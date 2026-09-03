@@ -28,6 +28,17 @@ export const Route = createFileRoute("/s/$id")({
   validateSearch: (search: Record<string, unknown>): { f?: Filter } =>
     FILTERS.some(({ value }) => value === search.f) ? { f: search.f as Filter } : {},
   loader: () => getContent(),
+  head: ({ params, loaderData }) => {
+    const section = loaderData?.sections.find((item) => item.id === params.id);
+    return section
+      ? {
+          meta: [
+            { title: `${section.label} · Icarus` },
+            { name: "description", content: section.description },
+          ],
+        }
+      : { meta: [] };
+  },
   component: CategoryPage,
 });
 
