@@ -26,7 +26,7 @@ identity:
   repository: "NULL — no GitHub org or repository URL on DexScreener, Gecko, Blockscout, justdih.com, or the @dihpons posts this pass"
   possible_matches:
     - slug: clippy
-      signals: [ticker, other]
+      signals: [ticker-only, other]
       contrary_signals:
         - "CLIPPY is Clippy / CLIPPY at 0x85856F025BF13b8Fd2aaE2F6DA458318744F1E18, EIP-1167 DopplerERC20V1 created by DopplerERC20V1Factory 0x1B37…b69a, site clippyrh.com / @ClippyMSFT"
         - "DIH is PonsV2LauncherToken 0x8A3b…2B63 paired to the same MSFT rail 0xe932…2e74 via PonsV2LaunchFactory 0x7eD5…EC7e"
@@ -51,7 +51,7 @@ identity:
         - "Distinct from Pons v1 Dih 0x0c1e…9C74 (PonsLauncherToken, holders_count 1618621) and from Dog In Hood 0x17bb…E4a4"
         - "No shared domain, handle, or reproduced address with the PONS token"
     - slug: noxa
-      signals: [ticker]
+      signals: [ticker-only]
       contrary_signals:
         - "Census Noxa is a pad; a prior $DIH ticker on Noxa/Pons v1 is token 0x0c1e…9C74 named Dih / PonsLauncherToken"
         - "This seed is Pons v2 token 0x8A3b…2B63 named dih / DIH, created 2026-09-03T03:07:28Z"
@@ -255,7 +255,7 @@ events:
     receipt_ids: [R-12]
   - id: EVT-5
     type: ct
-    title: "X posts circulated CA 0x8A3b…2B63 as DIH/MSFT; CLIPPY named as the other MSFT book"
+    title: "X posts circulated CA 0x8A3b…2B63 as DIH/MSFT; CLIPPY named as other book"
     summary: "@dexpaidpanther posted dih (DIH) / MSFT 0x8A3b…2B63 chain robinhood (ponsv2). @r_xley quoted @dihpons and posted the CA. @BlockCap named Clippy as the MSFT memecoin runner, distinct from this token."
     occurred_at: 2026-09-03T03:10:21Z
     observed_at: 2026-09-03T04:23:00Z

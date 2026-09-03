@@ -103,7 +103,7 @@ deployments:
     address:
       value: "0x63575bCC942aCC51495E492A0498eb4Ac0A4C0de"
       chain: robinhood-chain
-      source: social
+      source: bio
       seen: 2026-09-03
       exists_on_4663: true
       explorer_source_verified: true
@@ -122,9 +122,8 @@ deployments:
     receipt_ids: [R-13, R-14, R-20]
 
 metrics:
-  - { kind: fdv, value: 19984.30, currency: USD, as_of: 2026-09-03T04:32:00Z, window: point, method: "api.geckoterminal.com/api/v2/networks/robinhood/tokens/0x63575bcc…c0de attributes.fdv_usd for $Launch; not pad TVL", class: claim, receipt_ids: [R-21] }
+  - { kind: market_cap, value: 19984.30, currency: USD, as_of: 2026-09-03T04:32:00Z, window: point, method: "api.geckoterminal.com/api/v2/networks/robinhood/tokens/0x63575bcc…c0de attributes.fdv_usd for $Launch; not pad TVL", class: claim, receipt_ids: [R-21] }
   - { kind: volume_24h, value: 9052.96, currency: USD, as_of: 2026-09-03T04:32:00Z, window: 24h, method: "Gecko token attributes.volume_usd.h24 for $Launch 0x63575bCC…C0de", class: claim, receipt_ids: [R-21] }
-  - { kind: other, value: 4151, currency: null, as_of: 2026-09-03T04:35:00Z, window: point, method: "Blockscout api/v2/addresses/0x62B33A03…1Bcf/counters transactions_count; factory nonce 4149", class: claim, receipt_ids: [R-14, R-22] }
 
 reproductions:
   - { id: REP-1, method: explorer-rpc, chain_id: 4663, checked_at: 2026-09-03T04:33:00Z, receipt_ids: [R-13, R-14], result: "rpc.mainnet.chain.robinhood.com eth_chainId 0x1237. eth_blockNumber 0x32ad478 (53138552). LaunchHoodV3Factory 0x62B33A03…1Bcf eth_getCode 15739 bytes prefix 0x608080604052600436; nonce 0x1035 (4149); balance 0. owner() 0x73267feDc2C79a37782C19950b2989B208cfEaA4. launchFee() 0. PROTOCOL_TREASURY() 0x73267feD…EaA4. LOCKER() 0x99B79154…1ee0. TOKEN_IMPL() 0x5FDf73ab…E3bE. ERC1967 implementation slot zero. pendingOwner() revert. Blockscout api/v2 name LaunchHoodV3Factory is_verified true proxy_type null." }

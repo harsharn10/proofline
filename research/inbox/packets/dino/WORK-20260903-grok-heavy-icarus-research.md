@@ -165,7 +165,7 @@ claims:
   - { id: CLM-22, field: deployment.address, value: "0x3cE958ac39b9636539c410d060F28f44F5c0B98B", class: verified, observed_at: 2026-09-03T03:38:00Z, receipt_ids: [R-4, R-5, R-18], reproduction_ids: [REP-1, REP-2], supersedes: null }
   - { id: CLM-23, field: identity.domain, value: "NULL — DexScreener info.websites []; Gecko token has no website field; constructor socials.website empty", class: claim, observed_at: 2026-09-03T03:40:00Z, receipt_ids: [R-7, R-9, R-5], reproduction_ids: [], supersedes: null }
   - { id: CLM-24, field: candidate, value: "dino | DINO | NULL | NULL — discovery token not in census 49", class: claim, observed_at: 2026-09-03T03:41:00Z, receipt_ids: [R-1, R-7], reproduction_ids: [], supersedes: null }
-  - { id: CLM-25, field: identity.address, value: "ca-collision: a second Chrome Dino / DINO at 0x1b0e42AEF0F472a8BDF54534b3adF740C28e3E74 (ERC20Token, 332 holders, Uniswap v4 DINO/WETH). Other DINO tickers on 4663 include 0x78e3…b945 and 0xC9db…5101. This packet is 0x000b…64B8 / DINO/GOOGL 0x5e2c…c93d.", class: verified, observed_at: 2026-09-03T03:39:00Z, receipt_ids: [R-20], reproduction_ids: [REP-5], supersedes: null }
+  - { id: CLM-25, field: other, value: "ca-collision: a second Chrome Dino / DINO at 0x1b0e42AEF0F472a8BDF54534b3adF740C28e3E74 (ERC20Token, 332 holders, Uniswap v4 DINO/WETH). Other DINO tickers on 4663 include 0x78e3…b945 and 0xC9db…5101. This packet is 0x000b…64B8 / DINO/GOOGL 0x5e2c…c93d.", class: verified, observed_at: 2026-09-03T03:39:00Z, receipt_ids: [R-20], reproduction_ids: [REP-5], supersedes: null }
 
 conflicts: []
 

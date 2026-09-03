@@ -155,7 +155,7 @@ claims:
   - { id: CLM-20, field: economics.metric, value: "Gecko token fdv_usd 909432.43 at 2026-09-03T03:47:00Z; DexScreener fdv/marketCap 1011951 at 03:50Z. Gecko market_cap_usd null. Gecko pool fdv_usd tracks SPY as base.", class: verified, observed_at: 2026-09-03T03:50:00Z, receipt_ids: [R-7, R-8, R-9], reproduction_ids: [REP-3], supersedes: null }
   - { id: CLM-21, field: deployment.address, value: "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C", class: verified, observed_at: 2026-09-03T03:47:00Z, receipt_ids: [R-6, R-12, R-16], reproduction_ids: [REP-2, REP-4], supersedes: null }
   - { id: CLM-22, field: deployment.address, value: "0x73f9eb020BF091C8F6b42Eb8c6362D779478c650", class: verified, observed_at: 2026-09-03T03:49:00Z, receipt_ids: [R-4, R-5, R-6], reproduction_ids: [REP-1, REP-5], supersedes: null }
-  - { id: CLM-23, field: identity.domain, value: "https://www.stacksapp.us — title STACKS — Autocompounding Token Launchpad; JS bundle hardcodes token 0xD998…D94C and factory 0x13ae…0a36", class: verified, observed_at: 2026-09-03T03:47:00Z, receipt_ids: [R-14, R-21], reproduction_ids: [], supersedes: null }
+  - { id: CLM-23, field: identity.domain, value: "https://www.stacksapp.us — title STACKS — Autocompounding Token Launchpad; JS bundle hardcodes token 0xD998…D94C and factory 0x13ae…0a36", class: claim, observed_at: 2026-09-03T03:47:00Z, receipt_ids: [R-14, R-21], reproduction_ids: [], supersedes: null }
   - { id: CLM-24, field: candidate, value: "stacks | STACKS | NULL | https://www.stacksapp.us — discovery token/pad not in census 49", class: claim, observed_at: 2026-09-03T03:53:00Z, receipt_ids: [R-1, R-7, R-14], reproduction_ids: [], supersedes: null }
 
 conflicts: []

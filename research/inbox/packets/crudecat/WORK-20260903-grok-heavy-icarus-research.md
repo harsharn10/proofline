@@ -204,7 +204,7 @@ events:
     receipt_ids: [R-5]
   - id: EVT-2
     type: ct
-    title: "@arcus_xyz put USO second on the spot leaderboard; @crudecatcoin replied as a USO memecoin"
+    title: "@arcus_xyz put USO second on the spot leaderboard; @crudecatcoin replied"
     summary: "@arcus_xyz: NVDA $53.3M, USO $28M on Arcus spot. @crudecatcoin quote: tokenized oil USO is second-most-traded RWA; Crude Cat as a USO memecoin."
     occurred_at: 2026-09-02T19:37:32Z
     observed_at: 2026-09-03T03:49:00Z

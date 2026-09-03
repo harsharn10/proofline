@@ -21,7 +21,7 @@ identity:
   symbols: [BOMBA]
   entity_kind: token
   chain_scope: robinhood-native
-  official_domain: "bombardilo.com — DexScreener info.websites lists https://bombardilo.com/; HTML title $BOMBA — Bombardilo Crocodilo · Palantir Drops embeds CA 0x525F…1E18, pair 0xa1bb…1e79, app.long.xyz/tokens/<ca>, and x.com/bombaRH; flag unconfirmed-official"
+  official_domain: "https://bombardilo.com/"
   official_handle: "NULL — DexScreener info.socials lists x.com/bombaRH; bombardilo.com links @bombaRH; @bombaRH bio includes CA 0x525f24bf…1e18; no DexScreener Claim Profile confirmation this pass; flag unconfirmed-official"
   repository: "NULL — no GitHub org or repository URL on DexScreener, Gecko, Blockscout, bombardilo.com, or X search this pass"
   possible_matches:
@@ -68,7 +68,7 @@ qualifying:
 
 links:
   - { kind: x, url: "https://x.com/bombaRH", authenticity: unconfirmed }
-  - { kind: website, url: "https://bombardilo.com/", authenticity: unconfirmed }
+  - { kind: site, url: "https://bombardilo.com/", authenticity: unconfirmed }
   - { kind: app, url: "https://app.long.xyz/tokens/0x525F24BF41F178174788C3297Af9c0Af1bA01E18", authenticity: unconfirmed }
 
 deployments:

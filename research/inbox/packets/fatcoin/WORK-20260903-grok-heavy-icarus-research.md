@@ -44,7 +44,7 @@ identity:
         - "FATCOIN is entity_kind token; createLaunch ran on historical factory 0xe64A…F297; current factory had 0 Launched logs for this token"
         - "No shared domain, handle, or reproduced address"
     - slug: pons
-      signals: [ticker]
+      signals: [ticker-only]
       contrary_signals:
         - "A second FATCOIN 0xb68CF66b…03Ba4 is named PonsV2LauncherToken on Blockscout, holders_count 11, FATCOIN/LLY pair 0x32fdb2c0…1a15 liq 4972.32"
         - "This packet's token is unverified 4657-byte runtime at 0x12D5ee79…8a01, holders_count 3437, factory() 0xe64A…F297"
@@ -167,7 +167,7 @@ claims:
   - { id: CLM-27, field: other, value: "Token source is_verified false on Blockscout; creator_address_hash null on the address page even though createLaunch logs identify the factory", class: verified, observed_at: 2026-09-03T03:47:00Z, receipt_ids: [R-1, R-4], reproduction_ids: [REP-2], supersedes: null }
 
 conflicts:
-  - id: CONF-1
+  - id: CON-1
     field: economics.metric
     claim_ids: [CLM-10, CLM-11]
     material_effect: "Same FATCOIN/LLY Uniswap v4 pool 0x46ba8216…af85: DexScreener liquidity.usd 76140.78 volume.h24 1792589.86 fdv 413306 vs Gecko reserve_in_usd 68705.03 volume_usd.h24 1766901.39 fdv_usd 402213.32. Assignment hint ~$78420 / ~$1817912 was closer to DexScreener than to this Gecko slice."

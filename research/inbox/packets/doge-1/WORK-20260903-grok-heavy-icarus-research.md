@@ -21,7 +21,7 @@ identity:
   symbols: [DOGE-1]
   entity_kind: token
   chain_scope: robinhood-native
-  official_domain: "https://www.doge1coinrh.com/ — HTML contains CA 0x3ec8…4c03; DexScreener info.websites and constructor socials website match this pass"
+  official_domain: "https://www.doge1coinrh.com/"
   official_handle: "NULL — DexScreener info.socials lists https://x.com/Doge1CoinRH; constructor socials twitter is https://x.com/doge1coinrh; site links that URL; @Doge1CoinRH bio has no contract this pass; flag unconfirmed-official"
   repository: "NULL — no GitHub org or repository URL on DexScreener, the site HTML, constructor socials, Blockscout, or X search this pass"
   possible_matches:

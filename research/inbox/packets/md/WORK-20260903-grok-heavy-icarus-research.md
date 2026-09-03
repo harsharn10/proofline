@@ -165,7 +165,7 @@ claims:
   - { id: CLM-22, field: deployment.address, value: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599", class: verified, observed_at: 2026-09-03T04:08:00Z, receipt_ids: [R-2, R-5, R-6], reproduction_ids: [REP-1, REP-2], supersedes: null }
   - { id: CLM-23, field: identity.domain, value: "NULL — DexScreener info.websites is app.long.xyz (LONG pad); Gecko token info websites []", class: claim, observed_at: 2026-09-03T04:05:00Z, receipt_ids: [R-7, R-10], reproduction_ids: [], supersedes: null }
   - { id: CLM-24, field: candidate, value: "md | MD | NULL | NULL — discovery token not in census 49", class: claim, observed_at: 2026-09-03T04:12:00Z, receipt_ids: [R-1, R-7], reproduction_ids: [], supersedes: null }
-  - { id: CLM-25, field: other, value: "Blockscout search A Machine Duck also returns copycat MD tokens 0x9A97…3ba3 (holders 1), 0x5565…f0D3 (holders 1), 0xf388…869E (holders 1), 0x7f4E…1bA3 (holders 0). Canonical book is 0x3abb…1e18 / pool 0x197d…9655.", class: verified, observed_at: 2026-09-03T04:08:00Z, receipt_ids: [R-21], reproduction_ids: [], supersedes: null }
+  - { id: CLM-25, field: other, value: "Blockscout search A Machine Duck also returns copycat MD tokens 0x9A97…3ba3 (holders 1), 0x5565…f0D3 (holders 1), 0xf388…869E (holders 1), 0x7f4E…1bA3 (holders 0). Canonical book is 0x3abb…1e18 / pool 0x197d…9655.", class: claim, observed_at: 2026-09-03T04:08:00Z, receipt_ids: [R-21], reproduction_ids: [], supersedes: null }
 
 conflicts: []
 
