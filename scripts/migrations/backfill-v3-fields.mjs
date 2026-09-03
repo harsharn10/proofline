@@ -41,14 +41,26 @@ export async function backfillV3Fields({
     if (!project || !sources) continue;
     stats.packets++;
 
-    const result = compile(parsePacket(packetText), project, censusBySlug.get(slug), sources, feed, { census });
+    const compileProject = structuredClone(project);
+    // Recompute these fields from this batch rather than treating an earlier partial migration run as
+    // canonical input. A controller-edited project is the exception: compile() preserves its copy.
+    if (compileProject.controller_edited !== true)
+      for (const field of V3_FIELDS) delete compileProject[field];
+    const result = compile(parsePacket(packetText), compileProject, censusBySlug.get(slug), sources, feed, { census });
     stats.notices.push(...result.notices.map((notice) => `${slug}: ${notice}`));
 
     const nextProject = structuredClone(project);
     let projectChanged = false;
     for (const field of V3_FIELDS) {
       const value = result.project[field];
-      if (value === undefined || JSON.stringify(value) === JSON.stringify(project[field])) continue;
+      if (value === undefined) {
+        if (project.controller_edited !== true && field in nextProject) {
+          delete nextProject[field];
+          projectChanged = true;
+        }
+        continue;
+      }
+      if (JSON.stringify(value) === JSON.stringify(project[field])) continue;
       nextProject[field] = value;
       stats[field]++;
       projectChanged = true;

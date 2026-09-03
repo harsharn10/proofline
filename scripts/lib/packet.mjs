@@ -566,7 +566,8 @@ function sectionBullets(body, heading) {
 const CANONICAL_SOURCE_TAG_RE = /\[(?:verified|claim|inference|disputed)\s+S[1-9][0-9]*(?:\s+S[1-9][0-9]*)*\]\s*$/i;
 const PACKET_TAGS_END_RE = /(?:\s*\[(?:verified|claim|inference|disputed|unknown)(?:\s+R-[1-9][0-9]*)*\])+\s*$/i;
 
-function v3FieldsFromBody(body, receiptToSource, notice) {
+function v3FieldsFromBody(frontmatter, body, receiptToSource, notice) {
+  const fallbackReceiptId = primaryOfficialReceiptId(frontmatter);
   const shape = (value, label) => {
     const mapped = normalizeText(mappedTag(value, receiptToSource));
     if (mapped.length <= 160) return mapped;
@@ -600,7 +601,12 @@ function v3FieldsFromBody(body, receiptToSource, notice) {
     });
     if (rawRisks.length) notice(`risks: no bullets found; split the section into sentences and kept the first ${Math.min(3, rawRisks.length)}`);
   }
-  const risks = rawRisks.slice(0, 3).map((item, index) => shape(item, `risks bullet ${index + 1}`)).filter(Boolean);
+  const risks = rawRisks.slice(0, 3).map((item, index) => {
+    let mapped = normalizeText(mappedTag(item, receiptToSource));
+    if (!CANONICAL_SOURCE_TAG_RE.test(mapped))
+      mapped = `${mapped} ${derivedTag(frontmatter, item, receiptToSource, fallbackReceiptId)}`;
+    return shape(mapped, `risks bullet ${index + 1}`);
+  }).filter(Boolean);
   return { tldr, whyPeopleCare, risks: risks.length ? risks : null };
 }
 
@@ -1221,7 +1227,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
   const controllerEdited = priorProject?.controller_edited === true;
   const summary = controllerEdited ? priorProject.summary : compiledSummary;
   const themes = controllerEdited ? priorProject.themes : (compiledThemes.length ? compiledThemes : priorProject?.themes);
-  const compiledV3 = v3FieldsFromBody(body, receiptToSource, notice);
+  const compiledV3 = v3FieldsFromBody(frontmatter, body, receiptToSource, notice);
   const tldr = controllerEdited ? priorProject?.tldr : (compiledV3.tldr ?? priorProject?.tldr);
   const whyPeopleCare = controllerEdited ? priorProject?.why_people_care : (compiledV3.whyPeopleCare ?? priorProject?.why_people_care);
   const risks = controllerEdited ? priorProject?.risks : (compiledV3.risks ?? priorProject?.risks);

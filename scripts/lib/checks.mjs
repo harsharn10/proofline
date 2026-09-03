@@ -28,7 +28,12 @@ export function normalizeUrl(raw) {
 export function referencedSourceIds(project) {
   const ids = new Set();
   const walk = (node, key) => {
-    if (Array.isArray(node)) { if (key === "sources" || key === "evidence") node.forEach((x) => typeof x === "string" && ids.add(x)); node.forEach((x) => walk(x, key)); }
+    if (Array.isArray(node)) {
+      if (key === "sources" || key === "evidence") node.forEach((x) => typeof x === "string" && ids.add(x));
+      if (key === "why_people_care" || key === "risks")
+        node.forEach((text) => { for (const match of String(text).matchAll(/\bS[1-9][0-9]*\b/g)) ids.add(match[0]); });
+      node.forEach((x) => walk(x, key));
+    }
     else if (node && typeof node === "object") for (const [k, v] of Object.entries(node)) walk(v, k);
   };
   walk(project, null);

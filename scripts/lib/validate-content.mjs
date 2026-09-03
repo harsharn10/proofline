@@ -145,6 +145,16 @@ export async function validateContent(root = "content", { release = false } = {}
     voice(project.summary, `projects/${slug}.yaml: summary`, { slug });
     conduct(project.summary, `projects/${slug}.yaml: summary`);
     vocab(project.summary, `projects/${slug}.yaml: summary`);
+    for (const [field, values] of [
+      ["tldr", project.tldr ? [project.tldr] : []],
+      ["why_people_care", project.why_people_care ?? []],
+      ["risks", project.risks ?? []],
+    ]) values.forEach((value, index) => {
+      const where = `projects/${slug}.yaml: ${field}${values.length > 1 ? `[${index}]` : ""}`;
+      voice(value, where, { slug });
+      conduct(value, where);
+      vocab(value, where);
+    });
     for (const kind of ["positive", "risk", "missing", "unresolved"])
       (project.findings?.[kind] ?? []).forEach((f, i) => {
         voice(f.text, `projects/${slug}.yaml: findings.${kind}[${i}]`, { slug });
