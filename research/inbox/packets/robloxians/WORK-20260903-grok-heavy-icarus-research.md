@@ -302,7 +302,7 @@ Assignment lead of Gecko liq ~$147k / vol ~$2.9M is close to this pass: live Gec
 
 ## Operations log
 
-- Base: `git -C /Users/harsharnsingh/proofline-pr59 rev-parse origin/main` → 334ca0619aa62e922da83f46de021f06d12348cf. Census 49 slugs have no robloxians / ROBLOXIANS / 0xB528…c10D. Discovery inventory CLM-40 named this candidate.
+- Base: `git -C /Users/harsharnsingh/proofline-pr59 rev-parse origin/main` → 334ca0619aa62e922da83f46de021f06d12348cf. Census 49 slugs have no robloxians / ROBLOXIANS / 0xB528…c10D. The discovery inventory's claim 40 named this candidate.
 - Explorer: Blockscout api/v2 token, RBLX, factory ABI/source, deployer txs, launchAndBuy 0xf7b5…0f39 and logs. RPC eth_getCode/eth_call at blocks 53097184 and 53104209; rate-limit 429 on a first selector sweep, retried.
 - Aggregators: DexScreener latest/dex/tokens (21 pairs); Gecko pool and token (token/pools page 429 on retry).
 - Registry: GET api.robinhood.com/rhj/assets 194 assets, 1 RBLX hit matching 0xF0C4…1bE8.

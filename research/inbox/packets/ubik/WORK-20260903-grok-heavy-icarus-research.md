@@ -308,7 +308,7 @@ DexScreener same pair: liquidity.usd 265353.47, volume.h24 2538287.72, fdv/marke
 
 ## Operations log
 
-- Base: `git -C /Users/harsharnsingh/proofline-pr59 rev-parse origin/main` → 334ca0619aa62e922da83f46de021f06d12348cf. Census 49 slugs have no ubik / UBIK / 0x8124…68Bd. Discovery inventory CLM-53 named ubik | UBIK with no handle.
+- Base: `git -C /Users/harsharnsingh/proofline-pr59 rev-parse origin/main` → 334ca0619aa62e922da83f46de021f06d12348cf. Census 49 slugs have no ubik / UBIK / 0x8124…68Bd. The discovery inventory's claim 53 named ubik | UBIK with no handle.
 - Explorer: Blockscout api/v2 token, factory, GLD, search UBIK, launchToken 0x6710…52fc, graduation 0x652f…2bef, TokenLaunched and PoolRegistered logs, holders. RPC eth_getCode/eth_call/eth_getLogs with Mozilla UA at block 53106284.
 - Aggregators: DexScreener latest/dex/tokens, pairs, search UBIK and CASHBIRD; Gecko token, token/info, pool UBIK/GLD and UBIK/USDG.
 - Registry: GET api.robinhood.com/rhj/assets 194 assets, 1 GLD row at 0xC9a9…FC4e.

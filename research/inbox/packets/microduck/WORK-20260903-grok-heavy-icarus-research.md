@@ -330,7 +330,7 @@ DexScreener same USDG pair: liquidity.usd 694395.16, volume.h24 10492472.42, fdv
 
 ## Operations log
 
-- Base: `git -C /Users/harsharnsingh/proofline-pr59 rev-parse origin/main` → 334ca0619aa62e922da83f46de021f06d12348cf. Census 49 slugs have no microduck / @MicroDuckNVDA / 0xD5f1…E725. Discovery-inventory CLM-38 named this CA.
+- Base: `git -C /Users/harsharnsingh/proofline-pr59 rev-parse origin/main` → 334ca0619aa62e922da83f46de021f06d12348cf. Census 49 slugs have no microduck / @MicroDuckNVDA / 0xD5f1…E725. The discovery inventory's claim 38 named this CA.
 - Official: microduck.net, /assets/index-CAPU-AON.js, ponsfamily.com/launchpad/0xD5f1…E725.
 - Explorer: Blockscout api/v2 token, smart-contract, factory, curve, NVDA, locker. RPC eth_getCode/eth_call at block 53102116.
 - Aggregators: DexScreener latest/dex/tokens (30 pairs). Gecko API 429; HTML + __NEXT_DATA__ used for the USDG 0.78% pool.

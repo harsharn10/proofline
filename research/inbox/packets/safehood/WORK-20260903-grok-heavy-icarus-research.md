@@ -117,6 +117,8 @@ deployments:
       explorer_source_verified: true
     receipt_ids: [R-6, R-18, R-19]
 
+metrics: []
+
 reproductions:
   - { id: REP-1, method: explorer-rpc, chain_id: 4663, checked_at: 2026-09-03T04:05:00Z, receipt_ids: [R-11], result: "eth_blockNumber 53082629. eth_getCode non-empty: Launchpad 19316 bytes, TokenFactory 6573, FeeDistributor 2135, Treasury 1980, MRD1 3353, 0x262b60… 2268. FEE_TIER 10000, TRADE_FEE_BPS 100, MAX_TX_BPS 200, MAX_WALLET_BPS 200, INITIAL_MCAP_USD 2000e8, graduationCapUsd 40000e8, tokenCount 5, totalLaunches 5, totalTradeVolumeWei 0.018e18, launchesPaused false, priceFeed 0x0. hasRole DEFAULT_ADMIN/LIQUIDITY_MANAGER/OPERATOR for deployer 0x7817…a846 = false; for 0x0315…5b60 = true. 0x0315 code 0x. MRD1 pool 0x8795…e077 feeTier 10000 poolLiquidity 0 positionLiquidity 0." }
   - { id: REP-2, method: explorer-ui, chain_id: 4663, checked_at: 2026-09-03T04:00:00Z, receipt_ids: [R-9, R-10, R-12, R-13, R-14, R-15, R-16, R-17, R-18], result: "Blockscout API v2: 0xe893…4900 name Launchpad is_contract true is_verified true file_path contracts/Launchpad.sol compiler v0.8.26 created 2026-07-14T16:40:35Z tx 0x76e4794f… by EOA 0x7817…a846. TokenFactory verified. FeeDistributor and Treasury is_verified false (bytecode twins). 5 createToken txs 2026-07-14–15; 10 collectFees. grantRole x3 then renounceRole x3 at 2026-07-14T16:40:40Z–16:40:50Z to/from 0x0315…5b60. MRD1 created via createToken; 0x262b60… name Safehood.fun / SAFEHOOD creator 0xeADD…9cD4 via 0x475c…b929." }

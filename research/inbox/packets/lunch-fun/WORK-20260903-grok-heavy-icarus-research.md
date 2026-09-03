@@ -414,7 +414,7 @@ No audit report URL was located on the site, docs, terms, X profile or GitHub or
 
 lunch.fun sets twitter:site to @lunchdotfun and schema.org sameAs to https://x.com/lunchdotfun. The @lunchdotfun bio links lunch.fun. Terms name Ticker Mog LLC, a British Virgin Islands limited liability company, as operator. GitHub org lunchdotfun exists with 0 public repositories and is not linked from the site. [verified R-1 R-6] [claim R-17 R-19]
 
-Not LONG: different domain, handle and launcher stack. Not PAIR: PAIR is pair.fund, not a census row, and is a multipool stock-basket pad. [claim R-14]
+Not LONG: different domain, handle and launcher stack. Not PAIR: PAIR is pair.fund, not a census row, and is a multipool stock-basket pad. [unknown]
 
 ## Economics and activity
 
@@ -438,7 +438,7 @@ api.llama.fi/protocol/lunch, lunch-fun, lunchdotfun and lunch.fun all returned 4
 
 - Receipts: lunch.fun, /docs, /api/launches, /terms, @lunchdotfun profile and the dated posts above, Blockscout API v2, RPC eth_getCode/owner(), DexScreener SWOLE, GitHub org lunchdotfun, and the @RHDaily__ board were opened on 2026-09-03; excerpts are copied from those pages. [verified R-1 R-3 R-4 R-8 R-9 R-10 R-16]
 - Numbers: 2,226 is the launches API total, not TVL. $2.8M is the 1 Sep social board. SWOLE 24h volume and market cap are the DexScreener Robinhood Uniswap pair, not an all-chains figure. [verified R-4] [claim R-16 R-18]
-- Adversarial: the strongest contrary reading is that lunch.fun is LONG or PAIR under another name, or that HoodLighterShare is the official HOOD Stock Token. Domains, handles and launcher bytecode names differ from LONG; PAIR is pair.fund and not in the census; HoodLighterShare's explorer name is not a Robinhood Token suffix. [verified R-9 R-10] [claim R-14]
+- Adversarial: the strongest contrary reading is that lunch.fun is LONG or PAIR under another name, or that HoodLighterShare is the official HOOD Stock Token. Domains, handles and launcher bytecode names differ from LONG; PAIR is pair.fund and not in the census; HoodLighterShare's explorer name is not a Robinhood Token suffix. [verified R-9 R-10]
 
 ## Operations log
 

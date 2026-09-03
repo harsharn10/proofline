@@ -351,7 +351,7 @@ Official account on 2026-09-01 posted 50m burned and $13k LLM credits. On 2026-0
 
 ## Operations log
 
-- Base: `git rev-parse origin/main` → 334ca0619aa62e922da83f46de021f06d12348cf. Census has no orbio / ORBIO / orbio.so / 0xAa07…28A3. Discovery inventory CLM-39 listed this CA with no handle.
+- Base: `git rev-parse origin/main` → 334ca0619aa62e922da83f46de021f06d12348cf. Census has no orbio / ORBIO / orbio.so / 0xAa07…28A3. The discovery inventory's claim 39 listed this CA with no handle.
 - Explorer: Blockscout api/v2 address, token, smart-contract, tx 0xf2b15348…, factory, deployer, curve. RPC eth_blockNumber/eth_getCode/eth_call name, symbol, totalSupply, decimals, owner, launchFactory, curve, deployer, socials, description at blocks 53093984–53102794 with Chrome UA. First python urllib RPC got HTTP 403; curl worked.
 - Aggregators: DexScreener latest/dex/tokens for ORBIO, AI, microduck. Gecko token, ORBIO/NVDA pool; token/pools and trending_pools later 429.
 - Site: GET www.orbio.so; HEAD orbio.so → 308 to www; HTML contains x.com/orbiodotso and the CA.

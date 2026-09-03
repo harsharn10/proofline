@@ -118,6 +118,8 @@ deployments:
       explorer_source_verified: false
     receipt_ids: [R-14, R-16, R-18]
 
+metrics: []
+
 reproductions:
   - { id: REP-1, method: explorer-rpc, chain_id: 4663, checked_at: 2026-09-03T05:05:00Z, receipt_ids: [R-14, R-15, R-25, R-26], result: "rpc.mainnet.chain.robinhood.com eth_chainId 0x1237. eth_blockNumber 0x32b2054 (53158469). V30 0x6e4910ea…87C1 eth_getCode 12528 bytes prefix 0x60806040526004361061013f575f3560e01c8063; nonce 4227; balance 0. owner() 0x996c14b1d85841f789dfe32532ba43b9e97c626c. ERC1967 implementation slot zero. Blockscout api/v2 is_contract true is_verified false name null creator 0x996C14b1…626c creation_tx 0x1a8c182f…cde8 timestamp 2026-07-08T23:59:45Z block 4770166. counters transactions_count 10113 token_transfers_count 383028." }
   - { id: REP-2, method: explorer-rpc, chain_id: 4663, checked_at: 2026-09-03T05:05:00Z, receipt_ids: [R-16, R-17], result: "ApeStoreRouterV3 0x2211C504…F32c eth_getCode 12580 bytes; nonce 2; owner() 0x996c14b1…626c; ERC1967 slot zero. Blockscout name ApeStoreRouterV3 is_verified true file_path remix/contracts/BaseContract/ApeStoreRouterV3.sol. ApeProxy 0x789b3D92…c1f6 eth_getCode 5998 bytes; nonce 1; owner() 0x996c14b1…626c; ERC1967 slot zero; Blockscout is_verified false." }

@@ -138,7 +138,7 @@ claims:
   - { id: CLM-5, field: deployment.address, value: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB", class: verified, observed_at: 2026-09-03T04:33:00Z, receipt_ids: [R-3, R-4, R-5], reproduction_ids: [REP-1, REP-2], supersedes: null }
   - { id: CLM-6, field: lifecycle, value: mainnet, class: verified, observed_at: 2026-09-03T04:35:00Z, receipt_ids: [R-1, R-4, R-5, R-7], reproduction_ids: [REP-1, REP-2, REP-3], supersedes: null }
   - { id: CLM-7, field: taxonomy.primary-leaf, value: launch/graduation-token, class: claim, observed_at: 2026-09-03T04:35:00Z, receipt_ids: [R-2, R-4, R-7], reproduction_ids: [], supersedes: null }
-  - { id: CLM-8, field: identity.handle, value: "@yolorobinhood_ — yolorh.com twitter:site and DexScreener info.socials list it; the account posted CA 0x62c71c…32ea on 2026-09-02T18:36:19Z; constructor socials twitter field is empty; impersonator handles exist (handle-collision)", class: verified, observed_at: 2026-09-03T04:36:00Z, receipt_ids: [R-7, R-13, R-14, R-20], reproduction_ids: [REP-5], supersedes: null }
+  - { id: CLM-8, field: identity.handle, value: "@yolorobinhood_ — yolorh.com twitter:site and DexScreener info.socials list it; the account posted CA 0x62c71c…32ea on 2026-09-02T18:36:19Z; constructor socials twitter field is empty; other handles using the YOLO name exist (handle-collision)", class: verified, observed_at: 2026-09-03T04:36:00Z, receipt_ids: [R-7, R-13, R-14, R-20], reproduction_ids: [REP-5], supersedes: null }
   - { id: CLM-9, field: relationship, value: "Creator is census Pons v1 factory 0xA5aA…1feB, not LONG, hood.fun, or LaunchpadFactory. Distinct from those protocol slugs.", class: verified, observed_at: 2026-09-03T04:35:00Z, receipt_ids: [R-1, R-3, R-4], reproduction_ids: [REP-2], supersedes: null }
   - { id: CLM-10, field: economics.metric, value: "YOLO/WETH Uniswap v3 24h volume 1291554.13 USD and liquidity.usd 496388.58 at 2026-09-03T04:32:00Z (DexScreener top pair, not Gecko token all-pools 1724566.66)", class: verified, observed_at: 2026-09-03T04:32:00Z, receipt_ids: [R-7, R-8, R-9], reproduction_ids: [REP-3, REP-4], supersedes: null }
   - { id: CLM-11, field: economics.metric, value: "Gecko same pool volume_usd.h24 1290205.57 reserve_in_usd 494290.36 fdv_usd 13342440.74 at 2026-09-03T04:32:00Z", class: verified, observed_at: 2026-09-03T04:32:00Z, receipt_ids: [R-8, R-9], reproduction_ids: [REP-4], supersedes: null }
@@ -260,7 +260,7 @@ gaps:
   - { priority: P0, question: "Does t.me/YoloCoinRH pin CA 0x62C71c…32eA or a site that cross-links, and does the X bio t.co expand to that group?", checked: "public preview og:title YOLO, 131 subscribers, no CA in HTML; t.co/iQrS2Fqqwf did not expose a Location this pass, 2026-09-03", next: "expand the bio t.co from a logged-in X client; open first messages if they become public without joining" }
   - { priority: P1, question: "Why does launchBlock() return 25536491 while the launch tx blockNumber is 10204613?", checked: "RPC eth_getTransactionByHash blockNumber 10204613; TokenLaunched restrictionsEndBlock 25536857 equals launchBlock()+366; both observed 2026-09-03", next: "read whether chain 4663 block.number tracks an L1 clock vs explorer sequence" }
   - { priority: P1, question: "Is there an audit whose scope matches PonsLauncherToken 0x62C71c…32eA?", checked: "Blockscout, DexScreener, Gecko, yolorh.com, TG preview, X latest, 2026-09-03", next: "ask in public and record the answer as a claim" }
-  - { priority: P2, question: "Do impersonator handles @yolorobinhoodx / @YOLOROBINHOOD / @Yolo_robinhood post a different CA?", checked: "X user search listed those handles; CA post this pass was from @yolorobinhood_, 2026-09-03", next: "open each profile bio and latest posts for a competing CA" }
+  - { priority: P2, question: "Do the handles @yolorobinhoodx / @YOLOROBINHOOD / @Yolo_robinhood post a different CA?", checked: "X user search listed those handles; CA post this pass was from @yolorobinhood_, 2026-09-03", next: "open each profile bio and latest posts for a competing CA" }
 ---
 
 # YOLO — research packet
@@ -277,7 +277,7 @@ The YOLO/WETH Uniswap v3 book printed about $1.29M of 24h volume on DexScreener 
 
 ## What could go wrong
 
-USD liquidity on the YOLO/WETH book counts both sides. Constructor socials were empty, so the site and handle are later surfaces. Impersonator X handles reuse the YOLO name. Claim-portal and vote posts reuse the CA on netlify hosts.
+USD liquidity on the YOLO/WETH book counts both sides. Constructor socials were empty, so the site and handle are later surfaces. Other X handles reuse the YOLO name. Claim-portal and vote posts reuse the CA on netlify hosts.
 
 ## Product and mechanics
 
@@ -304,7 +304,7 @@ Blockscout holders_count 11488. Pair created 2026-07-15T07:15:15Z. [claim R-1 R-
 ## Material risks
 
 - Constructor socials are empty; site and handle are later surfaces. [verified R-2 R-13]
-- Impersonator X handles share the YOLO / Robinhood naming. [claim R-20]
+- Other X handles share the YOLO / Robinhood naming. [claim R-20]
 - Claim-portal and vote posts reuse the CA on netlify hosts. [claim R-16 R-17]
 - No audit report URL this pass. [unknown]
 - Quote token is WETH; pool USD reserve is YOLO plus WETH. [claim R-7 R-8]

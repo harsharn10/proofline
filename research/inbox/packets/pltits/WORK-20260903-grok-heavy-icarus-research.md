@@ -66,6 +66,8 @@ qualifying:
   citable:           { status: pass, claim_ids: [CLM-2, CLM-3, CLM-4], note: "" }
   research_story:    { status: pass, claim_ids: [CLM-1, CLM-9, CLM-10], note: "" }
 
+links: []
+
 deployments:
   - label: PLTITS token (EIP-1167 DopplerERC20V1 clone)
     role: token
