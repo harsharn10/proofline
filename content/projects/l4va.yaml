@@ -4,12 +4,24 @@ symbol: L4VA
 category: Stock-paired token
 lifecycle: announced
 coverage: stub
-summary: Vault factory that issues tokens backed by locked RWAs, stocks, NFTs or memes; TGE announced for 2026-08-18 on Robinhood Chain.
+summary: A vault factory for tokens backed by locked RWAs and stocks. A user deposits eligible assets into a programmable vault and receives fungible vault tokens; $L4VA is the protocol token whose TGE is listed on Robinhood Chain. @L4VAprotocol runs it at l4va.org and l4va.com.
 official_links:
   - kind: site
     url: https://l4va.org
   - kind: x
     url: https://x.com/L4VAprotocol
+  - kind: site
+    url: https://l4va.com
+  - kind: app
+    url: https://app.l4va.org
+  - kind: docs
+    url: https://l4va-team.gitbook.io/l4va-docs
+  - kind: whitepaper
+    url: https://l4va.com/manifesto
+  - kind: github
+    url: https://github.com/L4VA-Technologies-Inc
+  - kind: discord
+    url: https://discord.com/invite/mBbTUfAzuS
 dependencies:
   - stock-tokens
 deployments:
@@ -25,6 +37,32 @@ deployments:
     role: factory
     verified: false
     sources: []
+  - label: Ticker-named ERC-20 L4VA (not linked from l4va.org)
+    chain: robinhood-chain
+    address: "0xdb65fdc91405d659B3F0b8b743aFD9974b0b9D63"
+    role: token
+    verified: true
+    sources:
+      - S14
+      - S18
+      - S19
+  - label: L4V4 ERC-20 named L4VA (Pons v2; not linked from l4va.org)
+    chain: robinhood-chain
+    address: "0x2A6DA05E7151687e4A6ca6C059e008f6cf7c1C36"
+    role: token
+    verified: true
+    sources:
+      - S15
+      - S16
+      - S17
+      - S21
+  - label: PonsLauncherToken named L4VAprotocol (not linked from l4va.org)
+    chain: robinhood-chain
+    address: "0x54AdF848173b2f83420E4AF36cB237535139a2E8"
+    role: token
+    verified: true
+    sources:
+      - S20
 review:
   researcher: harsharn10
   approver: pending
@@ -38,15 +76,64 @@ findings:
       sources:
         - S3
         - S4
+    - text: "Receipts: l4va.org/tge HTML and JS, l4va.com HTML and JS, app.l4va.org, GitBook markdown, X profile and five posts, GitHub org and user, Discord invite API, GlobeNewswire reprint, Blockscout API v2, RPC, DexScreener were opened on 2026-09-03; excerpts are copied from those pages. [verified R-1 R-2 R-4 R-10 R-12] - Numbers: $1,050,000 is the TGE page stated market cap, not a live chain-slice TVL. DexScreener 4514.01 is L4V4/ETH liquidity.usd on pair 0x531343…b1a0, not an official $L4VA pool. Bytecode lengths are eth_getCode on 4663. [claim R-1] [verified R-12 R-13] - Adversarial: the strongest contrary reading is that one of the 50 L4VA-named ERC-20s is the official token. The TGE FAQ says the presale address is unpublished; those hashes are absent from the TGE JS; two of the reproduced tokens were created by Pons factories."
+      class: verified
+      sources:
+        - S6
+        - S14
+        - S20
   risk:
     - text: The dossier records no vault holding a Stock Token as of 30 Aug; the only public record of the product is the TGE press release.
       class: claim
       sources:
         - S3
+    - text: Official $L4VA and vault-factory addresses are unpublished while Blockscout search L4VA returns 50 ERC-20s on 4663. [verified R-2 R-10] - L4V4 0x2A6D…1C36 was created by PonsV2LaunchDeployer; 0x54Ad…a2E8 is a PonsLauncherToken. [verified R-16 R-17] - TGE 35% versus GitBook 40%. [disputed R-2 R-6] - GitBook vault lifecycle still names ADA; Robinhood TGE is a separate surface. [claim R-24 R-2] - No audit report URL was opened this pass. [unknown] - GitHub twitter_username lava_protocol does not match @L4VAprotocol.
+      class: claim
+      sources:
+        - S11
   missing:
     - text: Lifecycle not verified — no deployment evidence reviewed
     - text: Token and vault factory addresses not located
     - text: Whether any vault holds a Stock Token
     - text: An independent audit was not found in this review
     - text: Vesting for the 20% team allocation
-  unresolved: []
+    - text: "Has an official $L4VA or vault-factory address been published on chain 4663? Next: watch @L4VAprotocol and l4va.org/tge for the presale CA, then eth_getCode on 4663"
+    - text: "Does any L4VA vault on 4663 hold a Robinhood Stock Token? Next: after a factory address is published, read vault asset lists against the stock-token registry"
+    - text: "Which GitHub surface is canonical, and what is twitter_username lava_protocol? Next: open the org profile and @lava_protocol and record whether it redirects or is a second handle"
+    - text: "What is the Gnosis Safe treasury address named on the TGE page? Next: read the TGE sale contract when published and eth_call the proceeds recipient"
+    - text: "Does GitBook TGE 40% or the TGE page 35% apply to the Robinhood sale? Next: ask in public on the official handle and keep both figures until a controller resolves"
+    - text: "Is there an audit whose scope matches a Robinhood Chain deployment? Next: search auditor indexes after a CA is published"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: identity.repository remains unresolved (CON-2).
+themes:
+  - rwa
+metrics:
+  - kind: market_cap
+    value: 1050000
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+      - S6
+  - kind: tvl
+    value: 4514.01
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17
+  - kind: volume_24h
+    value: 0.76
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17
+  - kind: holders
+    value: 11
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15

@@ -1,0 +1,113 @@
+slug: pair
+name: PAIR
+symbol: PAIR
+category: Stock-paired token factory
+lifecycle: mainnet
+coverage: stub
+summary: A multipool stock-paired launchpad on Robinhood Chain. A creator deploys a fixed-supply ERC-20 through PairLaunchpadV5 in one transaction; the factory seeds permanently locked Uniswap v4 pools against one to five Robinhood stock tokens. The protocol token PAIR trades versus SPY. PAIR Labs runs it at pair.fund / @pairdotfund.
+themes:
+  - launchpad
+  - rwa
+  - stock-paired:spy
+official_links:
+  - kind: app
+    url: https://pair.fund
+  - kind: docs
+    url: https://pair.fund/docs
+  - kind: x
+    url: https://x.com/pairdotfund
+  - kind: x
+    url: https://x.com/pairecosystem
+  - kind: github
+    url: https://github.com/pairdotfund
+dependencies: []
+deployments:
+  - label: PAIR token (created by V5 launchpad)
+    chain: robinhood-chain
+    address: "0x6b1d42927B1a84eC28Fa88d4fC6FA7AF404966be"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S9
+      - S10
+      - S13
+  - label: PairLaunchpadV5 EIP-1967 proxy (press V5 launchpad)
+    chain: robinhood-chain
+    address: "0x8660A7F019C7943b0b0A91B8E39AFf3b6DB6Ae62"
+    role: factory
+    verified: true
+    sources:
+      - S1
+      - S11
+      - S12
+      - S15
+  - label: PairLaunchpadV5Upgradeable implementation
+    chain: robinhood-chain
+    address: "0x56CF3AEE42Bc5a1DdAe79e275deaBC97B09484db"
+    role: implementation
+    verified: false
+    sources:
+      - S11
+      - S12
+  - label: Launchpad owner() contract
+    chain: robinhood-chain
+    address: "0x3Da42DBECBEFf476c027f8298bfAd0d6C3Ba5656"
+    role: admin
+    verified: true
+    sources:
+      - S16
+metrics:
+  - kind: volume_24h
+    value: 1291403.98
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: tvl
+    value: 261374.52
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: market_cap
+    value: 4832696
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: holders
+    value: 4300
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S10
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: pair.fund and /docs, @pairdotfund profile and six posts, Blockscout API v2 plus RPC for the token, proxy, implementation and owner, the launchTokenMulti transaction, DexScreener token API, GitHub user API, GlobeNewswire reprint, @paird0tfund and @pairecosystem were opened on 2026-09-03; excerpts are copied from those pages. [verified R-1 R-3 R-9 R-11 R-13 R-14] - Numbers: DexScreener figures are the named PAIR/SPY Uniswap v4 pair on chain robinhood, not an all-chains total. Holders is Blockscout holders_count. The $40M and $26M figures are project posts. [verified R-10 R-14] [claim R-7 R-15] - Adversarial: the strongest contrary reading is that PAIR is LONG, Pons, or an unverified copy at @paird0tfund. Handles, domains and the launchTokenMulti creator on 0x8660…Ae62 argue against LONG and Pons; the site JS links only @pairdotfund. [verified R-1 R-13]"
+      class: claim
+      sources:
+        - S3
+        - S19
+  risk:
+    - text: V5 is a UUPS proxy whose owner() is an unverified contract; the ABI names upgrade and fee-withdraw functions with no timelock. [verified R-12 R-16] - PAIR token source is not verified on Blockscout. [verified R-9] - Press says every contract is verified and that GitHub holds the source; the token is unverified and the GitHub user has 0 public repos. [disputed R-9 R-15 R-18] - All-time volume is an official post, not a reproduced explorer or Llama chain slice. [claim R-7] - No audit report was located this pass.
+      class: unknown
+  missing:
+    - text: "Who controls owner contract 0x3Da42D…5656, and can it call upgradeToAndCall on the V5 proxy without a timelock? Next: read the owner contract bytecode or any verified source; eth_call getOwners/getThreshold if it is a Safe"
+    - text: "Will the PAIR token source be verified, matching the press line that every contract is verified? Next: re-read the token page after the open-source post"
+    - text: "What are the live PairV4Locker, PairV4Hook, PairV5MultiPoolAggregator, PairPriceOracle and stockRegistry addresses? Next: eth_call those views on the proxy and open each address on Blockscout"
+    - text: "Is there an audit whose scope includes PairLaunchpadV5Upgradeable as deployed at 0x56CF…84db? Next: auditor report index named in a later post or repo"
+    - text: "Where is the source the press says is published at github.com/pairdotfund? Next: re-fetch the org/user after the open-source post"
+    - text: "Does @pairecosystem bidirectionally link to pair.fund, or is it only named in the press bio? Next: open the account website field and a post that names pair.fund"
+  unresolved:
+    - text: other remains unresolved (CON-1).
+    - text: identity.repository remains unresolved (CON-2).

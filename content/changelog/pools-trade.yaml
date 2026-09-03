@@ -25,3 +25,89 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 836edb813d2ba6c0
+- date: 2026-09-02
+  slug: pools-trade
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    lifecycle: announced
+    summary: Uniswap Labs launchpad minting tokens straight into Uniswap pools on Robinhood Chain.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/pools_dot_fun
+    deployments:
+      - &a1
+        label: Launch factory
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    lifecycle: mainnet
+    summary: Uniswap Labs' own launchpad on Robinhood Chain. A user picks Crowd Launch — a four-hour TWAP that refunds below about $10k FDV — or Instant Launch, a bonding curve that is live immediately. Both mint 1 billion tokens and end in a locked Uniswap v4 pool with a 0.25% autocompounding LP fee. Uniswap Labs runs it at pools.trade as @TradePools.
+    themes:
+      - launchpad
+      - memecoin
+    official_links:
+      - kind: x
+        url: https://x.com/pools_dot_fun
+      - kind: app
+        url: https://pools.trade
+      - kind: x
+        url: https://x.com/TradePools
+      - kind: github
+        url: https://github.com/Uniswap/liquidity-launcher
+      - kind: other
+        url: https://blog.uniswap.org/pools-trade-a-new-way-to-launch-on-robinhood-chain
+      - kind: docs
+        url: https://docs.bitquery.io/docs/blockchain/robinhood/pools-trade-api/
+    deployments:
+      - *a1
+      - label: Token factory (UERC20Factory)
+        chain: robinhood-chain
+        address: "0x000000e200088D55C39a11F609E5F667729ad49b"
+        role: factory
+        verified: true
+        sources:
+          - S11
+          - S16
+      - label: Launch entry current (LiquidityLauncher v3.2.0)
+        chain: robinhood-chain
+        address: "0x0000FffFBE8efE702c8703aE3477FF5dE3d319C0"
+        role: factory
+        verified: true
+        sources:
+          - S13
+          - S16
+      - label: Launch entry original (LiquidityLauncher v3.0.0)
+        chain: robinhood-chain
+        address: "0x00004c4ccc709Ef590F7C81102C0689F0263D4e9"
+        role: factory
+        verified: true
+        sources:
+          - S14
+          - S16
+      - label: Launchpad current (InstantLaunchStrategy)
+        chain: robinhood-chain
+        address: "0x23f8209572b4a1C2AD88A42749E830791Fb027f1"
+        role: other
+        verified: true
+        sources:
+          - S15
+          - S16
+    metrics:
+      - kind: fees_24h
+        value: 48955
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S21
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: c05c361c81514263

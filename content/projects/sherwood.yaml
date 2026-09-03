@@ -1,13 +1,21 @@
 slug: sherwood
 name: Sherwood
-symbol: null
+symbol: SHERWOOD
 category: Private transfer protocol
 lifecycle: mainnet
 coverage: stub
-summary: Private-transfer tool on Robinhood Chain per Proofline's chain map, with a DefiLlama TVL row; the workbook described it as an agent capital layer with a $WOOD token.
+summary: A shielded mixer and DEX on Robinhood Chain. Users deposit ETH or tokens into one Groth16 vault, then withdraw or swap through Uniswap without linking the output address. $SHERWOOD is the Pons-launched app token. @sherw00d_cash runs sherwood.cash.
 official_links:
   - kind: x
     url: https://x.com/sherw00d_cash
+  - kind: site
+    url: https://sherwood.cash
+  - kind: docs
+    url: https://sherwood.cash/docs
+  - kind: github
+    url: https://github.com/sherwood-cash/contracts
+  - kind: telegram
+    url: https://t.me/sherwood_cash
 dependencies: []
 deployments:
   - label: Privacy pool / WOOD token
@@ -16,14 +24,105 @@ deployments:
     role: other
     verified: false
     sources: []
+  - label: SherwoodVault (immutable mixer + shielded DEX)
+    chain: robinhood-chain
+    address: "0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736"
+    role: vault
+    verified: true
+    sources:
+      - S10
+      - S11
+      - S12
+      - S13
+  - label: SwapLogic (UUPS proxy)
+    chain: robinhood-chain
+    address: "0x52445Ae1B988CfDc668EB15628629ED7d0890C6A"
+    role: proxy
+    verified: false
+    sources:
+      - S12
+      - S25
+  - label: SwapLogic implementation
+    chain: robinhood-chain
+    address: "0x10562a98b0eB2BFF853275da5F34BF498192d45B"
+    role: implementation
+    verified: false
+    sources:
+      - S25
+  - label: Verifier2 (Groth16)
+    chain: robinhood-chain
+    address: "0x3d7bEA6294BC033fAA7e0e06F2D94088106CDb79"
+    role: other
+    verified: false
+    sources:
+      - S12
+      - S30
+  - label: SHERWOOD token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1"
+    role: token
+    verified: true
+    sources:
+      - S14
+      - S15
+      - S16
+  - label: Vault admin EOA
+    chain: robinhood-chain
+    address: "0x93080bdF26050307d410d372640D4398397E0A6E"
+    role: admin
+    verified: false
+    sources:
+      - S12
+      - S13
+  - label: protocolFeeRecipient EOA
+    chain: robinhood-chain
+    address: "0x6cEE2DC8A42A5AA3f28799ea8Ebd23Ea5e07cc08"
+    role: other
+    verified: false
+    sources:
+      - S12
 metrics:
   - kind: tvl
-    value: 80196
+    value: 72357.59239
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-03
     class: claim
     sources:
-      - S5
+      - S9
+  - kind: fees_24h
+    value: 25.87
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S26
+  - kind: revenue_24h
+    value: 25.87
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S27
+  - kind: holders
+    value: 658
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: market_cap
+    value: 319875
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S16
+  - kind: volume_24h
+    value: 60337.16
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S16
 review:
   researcher: harsharn10
   approver: pending
@@ -42,10 +141,30 @@ findings:
       sources:
         - S4
         - S3
+    - text: "Receipts: sherwood.cash and /docs, github.com/sherwood-cash/contracts README and deployRobinhood.js, x.com/sherw00d_cash and named status URLs, t.me/sherwood_cash, Blockscout address/token/tx APIs, DexScreener latest/dex/tokens, DefiLlama protocol/fees/adapter, docs.sherwood.sh (other product), and RPC eth_getCode/eth_call were opened on 2026-09-03; excerpts are copied from those responses. [verified R-1 R-5 R-6 R-10] - Numbers: 72357.59239 USD is Llama `currentChainTvls['Robinhood Chain']`, not an all-chains total; 25.87 USD is the 2026-09-02 dailyFees/revenue bar, not the pulled-file 17.27 from 2026-09-02T21:05; 60337.16 USD is DexScreener Uniswap v4 SHERWOOD/ETH volume.h24, not all SHERWOOD pairs; 658 is Blockscout holders_count. [claim R-3 R-8 R-10 R-20] - Adversarial: the strongest contrary reading is that census Sherwood is the sherwood.sh `$WOOD` agent layer, or a same-ticker meme. Distinct handle, domain, vault address, Llama twitter `sherw00d_cash`, and Pons launch params listing `@sherw00d_cash` argue against a merge."
+      class: inference
+      sources:
+        - S9
+        - S15
+        - S32
+    - text: SwapLogic is a UUPS proxy with an unverified implementation; `CONFIG_TIMELOCK` is 0. [verified R-6 R-19] - Vault admin and fee recipient are EOAs with no on-chain timelock. [verified R-6] - Deposit and withdrawal amounts are public; size/timing matching is a documented usage issue. [claim R-17] - No SherwoodVault audit report was located; Llama `audits` is 0. [unknown] - `$SHERWOOD` launch from `0x2c61c825…` is a different EOA than the vault admin. [verified R-9] - Other "Sherwood" / `$WOOD` / `SWOOD` tickers exist on the chain; this slug is vault `0xf540…0736` and token `0xD4DC…92c1`.
+      class: claim
+      sources:
+        - S16
+        - S32
   missing:
     - text: Contract addresses not located
     - text: Freeze and upgrade powers over the pool
     - text: Product classification unresolved between the two intakes
     - text: Official site not located
+    - text: "What can SwapLogic implementation 0x10562a98… change on upgrade, and does any on-chain call match a 2-step proposeSwapLogic/setSwapLogic after deploy? Next: read SwapLogic.sol in github.com/sherwood-cash/contracts and match bytecode to 0x10562a98…"
+    - text: "Is vault admin 0x93080bdF… a single key, and has transferAdmin/claimAdmin ever been used? Next: scan AdminChanged logs and any proposeRouter/setProtocolFeeRecipient txs"
+    - text: "Is there an audit whose scope is SherwoodVault 0xf540…0736 rather than Privacy-Cash? Next: open any report URL the project posts and match commit/address scope"
+    - text: "How does launch EOA 0x2c61c825… relate to vault admin 0x93080bdF…? Next: read token deployer()/owner if the ABI is reachable and any later admin txs"
+    - text: "Is sherwood.spot the same deployment as sherwood.cash? Next: diff the two bundles for the vault address"
   unresolved:
     - text: Whether the two descriptions refer to one project is unresolved.
+themes:
+  - privacy
+  - rwa
+  - agent

@@ -4,10 +4,20 @@ symbol: null
 category: Liquidity manager
 lifecycle: mainnet
 coverage: stub
-summary: Liquidity position manager on Robinhood Chain listed by DefiLlama with TVL and daily revenue; quiet on X during Proofline's research pass.
+summary: "No-swap concentrated-liquidity manager: a deposit opens a per-user Uniswap v3 NFT that the vault rebalances by minting a new range from existing balances, with no swap. Users deposit at snuggle.fi on Base and Arbitrum, or through maxfi.tech for Robinhood Chain stock and meme pools. The engine is @SnuggleFi; DefiLlama's Robinhood vault is labeled MaxFi."
 official_links:
   - kind: x
     url: https://x.com/SnuggleFi
+  - kind: site
+    url: https://snuggle.fi
+  - kind: app
+    url: https://snuggle.fi/deposit
+  - kind: docs
+    url: https://www.snuggle.fi/security
+  - kind: telegram
+    url: https://t.me/SnuggleFi
+  - kind: discord
+    url: https://discord.gg/tfpsdwEe8e
 dependencies:
   - uniswap
 deployments:
@@ -17,21 +27,72 @@ deployments:
     role: vault
     verified: false
     sources: []
+  - label: MaxFi Robinhood vault (SnuggleVault proxy)
+    chain: robinhood-chain
+    address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
+    role: vault
+    verified: true
+    sources:
+      - S11
+      - S12
+      - S17
+      - S18
+  - label: SnuggleVaultUpgradeable
+    chain: robinhood-chain
+    address: "0x999A74ddFde1575C4db454A0300d5F0351A891dE"
+    role: implementation
+    verified: true
+    sources:
+      - S13
+      - S17
+  - label: ViewHelper
+    chain: robinhood-chain
+    address: "0x71b55E366a0F43260b1138A32c312ba7bb7F30F7"
+    role: other
+    verified: true
+    sources:
+      - S11
+      - S14
+      - S17
+  - label: UniswapV3Adapter
+    chain: robinhood-chain
+    address: "0x76bDb43d2EC3b190087076649224F47A58C44eF2"
+    role: other
+    verified: true
+    sources:
+      - S11
+      - S15
+      - S17
+  - label: ProxyAdmin
+    chain: robinhood-chain
+    address: "0x413Ca90D38D964546c2fE03cB103df57372630F6"
+    role: admin
+    verified: true
+    sources:
+      - S16
+      - S17
 metrics:
   - kind: tvl
-    value: 3077872
+    value: 4431613
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-02
     class: claim
     sources:
-      - S5
+      - S10
   - kind: revenue_24h
-    value: 14749
+    value: 16710
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-02
     class: claim
     sources:
-      - S5
+      - S20
+  - kind: fees_24h
+    value: 121834
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S19
 review:
   researcher: harsharn10
   approver: pending
@@ -45,11 +106,31 @@ findings:
       sources:
         - S3
         - S4
-  risk: []
+  risk:
+    - text: "Receipts: snuggle.fi, /security, @SnuggleFi profile and posts, maxfi.tech, Llama protocol/fees/revenue, the Snuggle adapter, Blockscout vault/impl/helper/adapter/ProxyAdmin/create tx, and RPC were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-6 R-11] - Numbers: TVL 4431613 is the Robinhood chain slice, not the 9110436 all-chains last tvl. Fees 121834 and revenue 16710 are the Robinhood bars for 2026-09-02. [claim R-4 R-13 R-14] - Adversarial: the strongest contrary reading is that Snuggle has no Robinhood product and the Llama row is only MaxFi. Adapter comment, verified name SnuggleVaultUpgradeable, and @SnuggleFi posts that MaxFi is powered by SnuggleFi argue they share the engine; they remain separate slugs."
+      class: inference
+      sources:
+        - S11
+        - S12
+        - S24
+    - text: One EOA owns the vault and the ProxyAdmin. [verified R-11] - Robinhood TVL in the Snuggle Llama module is the MaxFi-labeled vault. [verified R-5] - Security page states V30 used AI analysis tools; Abyss.pdf was not matched to the Robinhood bytecode this pass. [claim R-2] - No-swap rebalance still leaves range and impermanent-loss path risk.
+      class: claim
+      sources:
+        - S7
   missing:
     - text: Contract addresses not located
     - text: Rebalance and withdrawal powers
     - text: An independent audit was not found in this review
     - text: Official site not located
+    - text: "Can owner 0x6aC51A…25FF upgrade SnuggleVaultUpgradeable or move treasury without a timelock on the Robinhood ProxyAdmin? Next: read Ownable2Step and ProxyAdmin verified source modifiers; eth_call pending admin/timelock if present"
+    - text: "Is there a Snuggle-branded vault on 4663 besides MaxFi Robinhood 0x1195…6DCE, or is every Robinhood position MaxFi-fronted? Next: search Blockscout for other SnuggleVaultUpgradeable proxies created by 0x6aC51A…"
+    - text: "Does Abyss.pdf / Valves V30 cover the Robinhood bytecode (impl 0x999A…91dE), or only the Base table on /security? Next: open Abyss.pdf and match compiler settings and file_path src/SnuggleVaultUpgradeable.sol"
+    - text: "Do t.me/SnuggleFi and discord.gg/tfpsdwEe8e cross-link snuggle.fi? Next: open both profiles and compare the linked domain"
+    - text: "Where is the source repository for src/SnuggleVaultUpgradeable.sol used in the verified explorer upload? Next: search GitHub for SnuggleVaultUpgradeable and the Base proxy 0xd3923bec…"
   unresolved:
     - text: Proofline found no recent posts from the account; product details beyond the DefiLlama category are unknown.
+themes:
+  - vault
+  - rwa
+  - memecoin
+  - nft

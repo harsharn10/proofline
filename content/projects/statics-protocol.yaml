@@ -2,9 +2,9 @@ slug: statics-protocol
 name: Statics Protocol
 symbol: STATICS
 category: Redeemable RWA basket
-lifecycle: beta
+lifecycle: mainnet
 coverage: stub
-summary: "Native protocol whose fixed-supply Genesis token and Operator NFT system the project reports live on Robinhood mainnet; the redeemable multi-asset basket, Statics Dollar, lending and general-pool suite follows a separate rollout, with the hooks DEX and credit not yet enabled per the project."
+summary: Statics Protocol's live Genesis layer is a fixed-supply STATICS token created through Doppler Airlock into a Uniswap v4 STATICS/WETH multicurve, plus a 5,555 Operator NFT collection the docs back at 180,000 STATICS each. A user buys STATICS on that book or acquires an Operator from the vault. EqualFi Labs publishes the contracts; the basket, Dollar, hook DEX and credit suite remain a separate unreleased rollout.
 official_links:
   - kind: site
     url: https://staticsprotocol.com
@@ -18,23 +18,86 @@ official_links:
     url: https://github.com/EqualFiLabs/statics
   - kind: x
     url: https://x.com/StaticsProtocol
+  - kind: app
+    url: https://staticsprotocol.com/app
+  - kind: docs
+    url: https://docs.staticsprotocol.com/docs/tokenomics/
+  - kind: telegram
+    url: https://t.me/EqualFi
+  - kind: other
+    url: https://opensea.io/collection/statics-operators
 dependencies:
   - uniswap
 deployments:
-  - label: STATICS token
+  - label: STATICS token (DopplerERC20V1 EIP-1167 clone)
     chain: robinhood-chain
     address: "0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd"
     role: token
-    verified: false
+    verified: true
     sources:
       - S6
       - S7
+      - S15
+      - S16
+      - S19
+      - S25
   - label: Genesis system
     chain: robinhood-chain
     address: not-verified
     role: other
     verified: false
     sources: []
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S17
+      - S19
+  - label: DopplerERC20V1Factory
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S18
+      - S19
+  - label: Airlock (token owner(); launch tx to)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S19
+      - S20
+      - S25
+  - label: StaticsGenesisVault
+    chain: robinhood-chain
+    address: "0x8AAAF9a22f439589987B8f1e69d79ca4f648C297"
+    role: vault
+    verified: false
+    sources:
+      - S21
+      - S25
+      - S19
+  - label: Statics Operators NFT (StaticsGenesis, STATOPS)
+    chain: robinhood-chain
+    address: "0xad5E9F96A91D1A6F550580b157af2068A0e8F0BE"
+    role: other
+    verified: false
+    sources:
+      - S22
+      - S25
+      - S19
+  - label: Doppler pool initializer hook (STATICS/WETH canonical pool hook)
+    chain: robinhood-chain
+    address: "0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544"
+    role: other
+    verified: false
+    sources:
+      - S23
+      - S25
 review:
   researcher: harsharn10
   approver: pending
@@ -60,9 +123,10 @@ findings:
       sources:
         - S8
   risk:
-    - text: "owner() on the Statics token contract returns 0xeb7c…0862, the verified Airlock contract that also owns the EARN, Statics and Artificial Inu tokens; the token's owner-only functions are controlled by shared launch infrastructure, not by a project-held key or multisig."
+    - text: owner() on the Statics token contract returns 0xeb7c…0862, the verified Airlock contract that also owns the EARN, Statics and Artificial Inu tokens; the token's owner-only functions are controlled by shared launch infrastructure, not by a project-held key or multisig.
       class: verified
-      sources: [S11]
+      sources:
+        - S11
     - text: The official security model says the broader multi-asset and Statics Dollar diamonds remain subject to independent review before production use, and that the repository test suite is not an external audit.
       class: claim
       sources:
@@ -81,11 +145,62 @@ findings:
       sources:
         - S8
         - S6
+    - text: "Receipts: site, rollout, tokenomics, operators, timelock, testnet page, GitHub README, SECURITY.md, genesis JSON, Blockscout, RPC, DexScreener, Gecko and the cited X posts were opened on 2026-09-02 and excerpts copied from those pages. [verified R-1 R-2 R-8 R-12 R-14] - Numbers: DexScreener and Gecko figures are aggregator chain-slice prints for the STATICS/WETH pool, not an explorer reproduction of PoolManager inventory. [verified R-12 R-13] - Adversarial: the strongest contrary reading is that Statics is another LONG/Doppler memecoin with docs for an unreleased basket protocol. Airlock.create, the verified Genesis vault/Operators, the mainnet genesis JSON, and empty testnet Diamond code on 4663 keep Genesis live and the Diamond suite separate. Shared Airlock with $AI is recorded as a possible match, not a merge."
+      class: inference
+      sources:
+        - S20
+        - S25
+        - S19
+    - text: Token owner-only functions sit on shared Doppler Airlock, which also owns other RH tokens including $AI. [verified R-8] - Genesis JSON still records governance ownership as unaccepted. [claim R-14] - STATICS/WETH liquidity is not one number across aggregators, and Gecko's reserve print is negative. [verified R-12 R-13] - Hook DEX and credit were still described as not live on 30 Aug; presenting baskets, USDstx or 95% LTV credit as live would overstate the rollout. [claim R-2 R-20] - No independent audit report was located.
+      class: unknown
   missing:
     - text: Mainnet Genesis contract addresses in an official deployment manifest (the docs' manifest is testnet-only, chain 46630); the STATICS token address comes from the workbook and is not reproduced
     - text: Deployed mainnet governance, signer threshold and timelock configuration versus the documented seven-day default
     - text: Independent audit report, scope, covered commit and remediation status — an independent audit was not found in this review
     - text: Onchain confirmation that the public repository matches the deployed Genesis contracts; upgrade authority as deployed
     - text: USDstx is a design, not a deployment
+    - text: "Are StaticsDiamond, StaticsDollarCoreDiamond, USDstx or the swap-fee hook deployed on chain 4663? Next: search Blockscout for StaticsDiamond / USDstx verified names on 4663 and read any mainnet diamond manifest if published"
+    - text: "Has governance Safe 0x603A8A2f…b9Ff accepted ownership of the Genesis contracts? Next: owner() on vault, operators NFT, feeReceiver, launchDistributor versus the Safe"
+    - text: "Why is DexScreener STATICS/WETH liquidity $14.25M while Gecko prints reserve_in_usd negative for the same pool id? Next: read Uniswap v4 PoolManager / Doppler initializer inventory for 0xe79228…e8a rather than aggregators"
+    - text: "Is there an independent audit whose scope includes Genesis vault, Operators, or the Doppler modules used at launch? Next: auditor report index for EqualFi Labs / Doppler and a matching commit"
+    - text: "Is credit or the hook DEX enabled on the live Genesis contracts, or still epoch-gated? Next: read StaticsGenesisVault credit functions and a recent Operator acquire/redeem tx"
+    - text: "How many Operators are circulating versus vault inventory? Next: balanceOf(vault) and ownerOf sample IDs on StaticsGenesis"
+    - text: "tvl is not published as a figure: the packet reported -3408657.19"
   unresolved:
     - text: The workbook warns to separate Genesis mainnet addresses from leftover testnet (chain 46630) addresses in the docs.
+    - text: economics.metric remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).
+themes:
+  - rwa
+  - vault
+  - nft
+  - hook
+  - lending
+metrics:
+  - kind: holders
+    value: 1026
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S16
+  - kind: tvl
+    value: 14246101.38
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S23
+  - kind: volume_24h
+    value: 3415619.05
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S24
+  - kind: market_cap
+    value: 22501108
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S23

@@ -12,3 +12,75 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 53e5a960f26eedd0
+- date: 2026-09-03
+  slug: robinhood-index-vaults
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Experimental ERC-4626 index vault for baskets of Robinhood Stock Tokens; testnet only, mock swap router.
+    themes: null
+    official_links:
+      - kind: github
+        url: https://github.com/nsvoud-dev/robinhood-index-vaults
+    deployments:
+      - &a1
+        label: Vault (testnet)
+        chain: robinhood-chain
+        address: not-verified
+        role: vault
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    summary: A testnet ERC-4626 vault that turns ETH into rIDX shares of a five-name stock-token basket. A user deposits ETH on Robinhood Chain testnet (chain id 46630); the vault wraps to WETH and swaps into PLTR, AMD, NFLX, AMZN and TSLA at 20% each through a mock router. nsvoud-dev publishes the contracts and a local Next.js app. Mainnet is listed as a later audit-and-launch phase.
+    themes:
+      - index
+      - rwa
+      - vault
+    official_links:
+      - kind: github
+        url: https://github.com/nsvoud-dev/robinhood-index-vaults
+      - kind: x
+        url: https://x.com/0xNSVOUD
+      - kind: other
+        url: https://robinhood-index-vaults.vercel.app
+    deployments:
+      - *a1
+      - label: IndexVault rIDX (Robinhood Chain testnet 46630; largest rIDX by supply this pass)
+        chain: robinhood-chain
+        address: "0x04653bF84918B05a68A7d568233ec1e259338D7E"
+        role: vault
+        verified: false
+        sources:
+          - S15
+          - S18
+      - label: MockSwapRouter (hardcoded in scripts/fundRouter.js and deployVaultOnly.js; testnet 46630)
+        chain: robinhood-chain
+        address: "0x31ecd0d9cEd7AB0744A96acC8e3432576fc8e691"
+        role: router
+        verified: false
+        sources:
+          - S8
+          - S16
+          - S18
+      - label: Testnet WETH constant in IndexVault.sol / hardhat scripts (not a project contract)
+        chain: robinhood-chain
+        address: "0x7943e237c7F95DA44E0301572D358911207852Fa"
+        role: other
+        verified: false
+        sources:
+          - S5
+          - S17
+          - S18
+    metrics:
+      - kind: holders
+        value: 4
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S15
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: bc9c56b20e5d985c

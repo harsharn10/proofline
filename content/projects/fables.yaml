@@ -4,43 +4,140 @@ symbol: PROLOGUE
 category: Native AMM
 lifecycle: mainnet
 coverage: stub
-summary: ve(3,3) DEX built on Uniswap v4 hooks for stock-token pairs (NVDA/USDG, SPY/USDG, GLD/USDG) with dynamic fees and a $PROLOGUE token.
+summary: A Uniswap v4 DEX whose hooks set market-specific swap fees. On Robinhood Chain, a user deposits a concentrated range, collects fees, and withdraws through fables.fi. $PROLOGUE is the live claim token, launched via pools.trade; FABLES staking, voting, and emissions remain planned. Alphix Association in Zug operates the interface.
 official_links:
   - kind: x
     url: https://x.com/fablesfi
+  - kind: site
+    url: https://www.fables.fi
+  - kind: docs
+    url: https://www.fables.fi/docs
+  - kind: app
+    url: https://www.fables.fi/markets
+  - kind: telegram
+    url: https://t.me/fablesfi
+  - kind: discord
+    url: https://discord.gg/QgeEq2rSv7
 dependencies:
   - uniswap
   - stock-tokens
   - usdg
 deployments:
-  - label: $PROLOGUE token (account bio, per the desk)
+  - label: PROLOGUE token (UERC20; The Prologue)
     chain: robinhood-chain
     address: "0xb9972CA7188e511174947E3936a5315ac7073277"
     role: token
-    verified: false
+    verified: true
     sources:
       - S7
+      - S15
+      - S18
+      - S19
+      - S25
   - label: Hook / gauge contracts
     chain: robinhood-chain
     address: not-verified
     role: other
     verified: false
     sources: []
+  - label: FablesPoolRegistry (AccessManaged public pool index)
+    chain: robinhood-chain
+    address: "0x159A113E012593D9B3cC63ad45E30F0467e13Ef3"
+    role: other
+    verified: true
+    sources:
+      - S13
+      - S20
+      - S26
+  - label: AccessManager (authority every hook asks)
+    chain: robinhood-chain
+    address: "0xA362D98B33A7bb5B5E2180a05f995A70FB404f30"
+    role: admin
+    verified: true
+    sources:
+      - S13
+      - S21
+  - label: NVDA/USDG hook (FablesRWA fee schedule and ledger)
+    chain: robinhood-chain
+    address: "0x66622f77B797D506e5376F7798b67ab288966080"
+    role: other
+    verified: true
+    sources:
+      - S13
+      - S22
+  - label: SPY/USDG hook (FablesRWA fee schedule and ledger)
+    chain: robinhood-chain
+    address: "0xA0E8fBFf13E24Af2b5e61A72800E08a161bDe080"
+    role: other
+    verified: false
+    sources:
+      - S13
+      - S23
+  - label: ETH/USDG hook (FablesRampETH fee schedule and ledger)
+    chain: robinhood-chain
+    address: "0x06a889870C8f83640D6816319f72e2aA579b6080"
+    role: other
+    verified: false
+    sources:
+      - S13
+      - S24
+  - label: Creator fee distributor (weekly USDG)
+    chain: robinhood-chain
+    address: "0xC9EcC11728a4955B31f77c077B97FEC521D78760"
+    role: other
+    verified: false
+    sources:
+      - S13
+      - S32
+  - label: LiquidityLauncher v3.2.0 (created PROLOGUE; not a Fables contract)
+    chain: robinhood-chain
+    address: "0x0000FffFBE8efE702c8703aE3477FF5dE3d319C0"
+    role: factory
+    verified: false
+    sources:
+      - S25
 metrics:
   - kind: tvl
-    value: 2244192
+    value: 6532113.77218
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-02
     class: claim
     sources:
-      - S9
+      - S26
   - kind: volume_24h
-    value: 11880000
+    value: 18380793
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-02
     class: claim
     sources:
-      - S9
+      - S27
+  - kind: fees_24h
+    value: 19302
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S28
+  - kind: revenue_24h
+    value: 0
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S28
+  - kind: holders
+    value: 7688
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S19
+  - kind: market_cap
+    value: 6497256.797285876
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S19
 review:
   researcher: harsharn10
   approver: pending
@@ -61,12 +158,33 @@ findings:
       class: claim
       sources:
         - S5
-  risk: []
+  risk:
+    - text: "Receipts: official site, docs routes (live features, addresses, security/permissions, legal), X profile and named status URLs, DexScreener token API, DefiLlama protocol/dexs/fees APIs, and Blockscout address/tx APIs plus RPC eth_getCode/eth_call were opened on 2026-09-02; excerpts are copied from those responses. [verified R-1 R-2 R-3 R-8 R-16] - Numbers: TVL 6532113.77 USD is currentChainTvls['Robinhood Chain'], not an all-chains mix (Llama lists only that chain). Volume 18380793 and fees 19302 are the same adapter's 24h totals on that chain. Holders 7688 and circulating_market_cap 6497256.80 are Blockscout token fields. DexScreener 654540.72 USD is the PROLOGUE/ETH pair slice. Official $5M deposits is a project post, not the Llama slice. [verified R-9 R-16 R-17 R-19] - Adversarial: the strongest contrary reading is that Fables is not launched (workbook 30 Aug; TGE cited 5 Oct) or that it is up / SwapHood / Hookr / pools.trade. Docs and live hooks on 4663 argue the DEX is live and FABLES is what remains planned; official 19 Aug copy says no TGE date and names pools.trade only as the PROLOGUE launch path. Handles and domains do not match those other census rows."
+      class: inference
+      sources:
+        - S12
+        - S16
+        - S22
+    - text: AccessManager source is unverified; live roles, delay and queued operations were not eth_called. [verified R-11] - Fast keeper/pause roles can change fees inside bytecode bounds and pause one way; docs say a bad Merkle root can allocate weekly USDG incorrectly within its cap. [claim R-4] - No Fables-specific audit report is linked. [claim R-4] - FABLES, voting, gauges and the PROLOGUE redemption contract are not deployed; official channel says no TGE date is announced. A third-party post names 5 October 2026. [claim R-2 R-6 R-23] - PROLOGUE/ETH is hookless; holder flow on that pair is not a read of hooked-market activity. [claim R-3] - Stock-token issuers and Uniswap's protocol-fee controller can restrict or fee the legs independently of Fables.
+      class: claim
+      sources:
+        - S14
   missing:
     - text: PROLOGUE address from the account bio not reproduced on Blockscout
     - text: Hook and gauge addresses unknown
     - text: ve escrow and emissions controls
     - text: An independent audit was not found in this review
     - text: Official site not located in the intake
+    - text: "What roles, delays and queued operations does AccessManager 0xA362D98B…4f30 currently expose, and which key can call them? Next: eth_call getAccess / hasRole-style readers once source is verified, or decode the unverified bytecode against OpenZeppelin AccessManager"
+    - text: "Are FABLES, voting, gauges or emissions contracts deployed on 4663? Next: watch docs/addresses Deployment status and missing contracts and any TGE post from @fablesfi"
+    - text: "Is there an independent audit artifact whose scope matches the live hooks? Next: record any later report whose commit and addresses match the deployed FablesRWA / FablesRampETH / AccessManager"
+    - text: "Is there an official public repository for the verified FablesRWA / FablesPoolRegistry source? Next: record a GitHub org if the site or an official post links one"
+    - text: "Does the Merkle distributor 0xC9Ec…8760 match the weekly USDG proofs, and who can set the root? Next: verify source and read setMerkleRoot / owner-equivalent"
+    - text: "Do remaining docs-listed hooks (TSLA, AAPL, GLD, META, NVDA/SPY, SPY/GLD) share the same AccessManager? Next: eth_call authority() on each remaining hook"
   unresolved:
     - text: The workbook (30 Aug) described Fables as not launched with a PROLOGUE TGE cited for 5 Oct 2026, while Proofline's chain map and DefiLlama list it live with TVL and volume on 31 Aug. Which product is live has not been resolved.
+    - text: communications.status remains unresolved (CON-1).
+themes:
+  - rwa
+  - stock-paired:nvda
+  - hook

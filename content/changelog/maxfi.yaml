@@ -25,3 +25,129 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: a2a4b8971ec13ead
+- date: 2026-09-03
+  slug: maxfi
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    lifecycle: announced
+    summary: Managed LP positions on Stock Token / USDG pairs with no-swap rebalancing, time-delayed depeg protection and a circuit breaker in progress; no token found.
+    themes: null
+    official_links:
+      - kind: site
+        url: https://maxfi.tech
+      - kind: x
+        url: https://x.com/MAXFILABS
+    deployments:
+      - &a1
+        label: LP manager contracts
+        chain: robinhood-chain
+        address: not-verified
+        role: vault
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    lifecycle: mainnet
+    summary: No-swap concentrated-liquidity manager on Robinhood Chain. A deposit opens a per-user Uniswap v3 NFT; the vault rebalances by minting a new range from existing balances with no swap. Users deposit tokenized-stock and meme pairs at maxfi.tech. @MAXFILABS runs the Robinhood UI; DefiLlama labels the vault a Snuggle whitelabel.
+    themes:
+      - vault
+      - rwa
+      - memecoin
+      - nft
+      - stock-paired:nvda
+    official_links:
+      - kind: site
+        url: https://maxfi.tech
+      - kind: x
+        url: https://x.com/MAXFILABS
+      - kind: app
+        url: https://www.maxfi.tech/deposit
+      - kind: docs
+        url: https://www.maxfi.tech/security
+      - kind: docs
+        url: https://www.maxfi.tech/docs
+      - kind: discord
+        url: https://discord.gg/fjNY8UzYAc
+    deployments:
+      - *a1
+      - label: MaxFi Robinhood vault (SnuggleVault proxy)
+        chain: robinhood-chain
+        address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
+        role: vault
+        verified: true
+        sources:
+          - S10
+          - S11
+          - S16
+          - S17
+      - label: SnuggleVaultUpgradeable
+        chain: robinhood-chain
+        address: "0x999A74ddFde1575C4db454A0300d5F0351A891dE"
+        role: implementation
+        verified: true
+        sources:
+          - S12
+          - S16
+      - label: ViewHelper
+        chain: robinhood-chain
+        address: "0x71b55E366a0F43260b1138A32c312ba7bb7F30F7"
+        role: other
+        verified: true
+        sources:
+          - S10
+          - S13
+          - S16
+      - label: UniswapV3Adapter
+        chain: robinhood-chain
+        address: "0x76bDb43d2EC3b190087076649224F47A58C44eF2"
+        role: other
+        verified: true
+        sources:
+          - S10
+          - S14
+          - S16
+      - label: ProxyAdmin
+        chain: robinhood-chain
+        address: "0x413Ca90D38D964546c2fE03cB103df57372630F6"
+        role: admin
+        verified: true
+        sources:
+          - S15
+          - S16
+      - label: MaxFi Vault (Proxy) on Base
+        chain: base
+        address: "0x7d27cdfbfcc878f7e7349e216d44204bfd2afd55"
+        role: vault
+        verified: false
+        sources:
+          - S7
+          - S10
+          - S16
+    metrics:
+      - kind: tvl
+        value: 4534836
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S9
+      - kind: fees_24h
+        value: 121834
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S18
+      - kind: revenue_24h
+        value: 16710
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S19
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 7e5ec3d3891aac4c

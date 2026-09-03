@@ -2,14 +2,22 @@ slug: maxfi
 name: MaxFi
 symbol: null
 category: Liquidity manager
-lifecycle: announced
+lifecycle: mainnet
 coverage: stub
-summary: Managed LP positions on Stock Token / USDG pairs with no-swap rebalancing, time-delayed depeg protection and a circuit breaker in progress; no token found.
+summary: No-swap concentrated-liquidity manager on Robinhood Chain. A deposit opens a per-user Uniswap v3 NFT; the vault rebalances by minting a new range from existing balances with no swap. Users deposit tokenized-stock and meme pairs at maxfi.tech. @MAXFILABS runs the Robinhood UI; DefiLlama labels the vault a Snuggle whitelabel.
 official_links:
   - kind: site
     url: https://maxfi.tech
   - kind: x
     url: https://x.com/MAXFILABS
+  - kind: app
+    url: https://www.maxfi.tech/deposit
+  - kind: docs
+    url: https://www.maxfi.tech/security
+  - kind: docs
+    url: https://www.maxfi.tech/docs
+  - kind: discord
+    url: https://discord.gg/fjNY8UzYAc
 dependencies:
   - uniswap
   - stock-tokens
@@ -21,6 +29,59 @@ deployments:
     role: vault
     verified: false
     sources: []
+  - label: MaxFi Robinhood vault (SnuggleVault proxy)
+    chain: robinhood-chain
+    address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
+    role: vault
+    verified: true
+    sources:
+      - S10
+      - S11
+      - S16
+      - S17
+  - label: SnuggleVaultUpgradeable
+    chain: robinhood-chain
+    address: "0x999A74ddFde1575C4db454A0300d5F0351A891dE"
+    role: implementation
+    verified: true
+    sources:
+      - S12
+      - S16
+  - label: ViewHelper
+    chain: robinhood-chain
+    address: "0x71b55E366a0F43260b1138A32c312ba7bb7F30F7"
+    role: other
+    verified: true
+    sources:
+      - S10
+      - S13
+      - S16
+  - label: UniswapV3Adapter
+    chain: robinhood-chain
+    address: "0x76bDb43d2EC3b190087076649224F47A58C44eF2"
+    role: other
+    verified: true
+    sources:
+      - S10
+      - S14
+      - S16
+  - label: ProxyAdmin
+    chain: robinhood-chain
+    address: "0x413Ca90D38D964546c2fE03cB103df57372630F6"
+    role: admin
+    verified: true
+    sources:
+      - S15
+      - S16
+  - label: MaxFi Vault (Proxy) on Base
+    chain: base
+    address: "0x7d27cdfbfcc878f7e7349e216d44204bfd2afd55"
+    role: vault
+    verified: false
+    sources:
+      - S7
+      - S10
+      - S16
 review:
   researcher: harsharn10
   approver: pending
@@ -44,10 +105,55 @@ findings:
       class: claim
       sources:
         - S4
+    - text: "Receipts: maxfi.tech, /security, /docs, /risks, @MAXFILABS profile and posts, Llama protocol/fees/revenue, the Snuggle adapter, Blockscout vault/impl/helper/adapter/ProxyAdmin/create tx, and RPC were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-6 R-11] - Numbers: TVL 4534836 is the Robinhood chain slice on protocol/snuggle, not the 9195133 all-chains last tvl and not the $9.14M project post. Fees 121834 and revenue 16710 are the Robinhood bars for 2026-09-02. [claim R-4 R-13 R-14 R-15] - Adversarial: the strongest contrary reading is that MaxFi is only a frontend on Snuggle and has no distinct deployment. Adapter comment MaxFi Robinhood, verified name SnuggleVaultUpgradeable, @MAXFILABS bio Powered By Snuggle, and the separate maxfi.tech / @MAXFILABS surface argue they share the engine; they remain separate slugs."
+      class: inference
+      sources:
+        - S8
+        - S10
+        - S11
+    - text: One EOA owns the vault and the ProxyAdmin. [verified R-11] - Robinhood TVL in the Snuggle Llama module is the MaxFi-labeled vault; there is no protocol/maxfi row. [verified R-4 R-5] - Security page states V30 used AI analysis tools; homepage and an official post name Valves/Valve Security; Abyss.pdf was not matched to the Robinhood bytecode this pass. [claim R-1 R-2 R-17] - No-swap rebalance still leaves range and impermanent-loss path risk; /risks says IL is reduced, not eliminated. [claim R-21] - /docs still describes the protocol as built on Base.
+      class: claim
+      sources:
+        - S25
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Manager contract addresses not located
     - text: Withdrawal and rebalance powers
     - text: TVL ($8M per the bio) and payouts not reproduced
     - text: An independent audit was not found in this review
-  unresolved: []
+    - text: "Can owner 0x6aC51A…25FF upgrade SnuggleVaultUpgradeable or move treasury without a timelock on the Robinhood ProxyAdmin? RPC admin slot was 0x0. Next: read Ownable2Step and ProxyAdmin verified source modifiers; eth_call pending admin/timelock if present"
+    - text: "Does Abyss.pdf / Valves V30 cover the Robinhood bytecode (impl 0x999A…91dE), or only the Base table on /security? Next: open Abyss.pdf and match compiler settings and file_path src/SnuggleVaultUpgradeable.sol"
+    - text: "Homepage and @MAXFILABS name Valves/Valve Security while /security says the V30 reviews used AI tools, not a traditional third-party firm. Which artifact is the named-firm report? Next: open valvessecurity.com and any linked report and match addresses"
+    - text: "Do discord.gg/fjNY8UzYAc (site) and the bio Discord t.co (discord.gg/M3sBNhZVAJ in earlier bios) land on the same server? Next: open both invites and compare the server"
+    - text: "Where is the source repository for src/SnuggleVaultUpgradeable.sol used in the verified explorer upload? Next: search GitHub for SnuggleVaultUpgradeable and the Base proxy 0x7d27cdfb…"
+    - text: "/docs still says the protocol is built on Base; FAQ and Llama put Robinhood stock pools on 4663. Is the docs page stale? Next: diff /docs supported-pool table against live /deposit Robinhood pairs"
+  unresolved:
+    - text: security.audit remains unresolved (CON-1).
+themes:
+  - vault
+  - rwa
+  - memecoin
+  - nft
+  - stock-paired:nvda
+metrics:
+  - kind: tvl
+    value: 4534836
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: fees_24h
+    value: 121834
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S18
+  - kind: revenue_24h
+    value: 16710
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S19

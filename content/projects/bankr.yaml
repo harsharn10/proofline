@@ -1,13 +1,23 @@
 slug: bankr
 name: Bankr
-symbol: null
+symbol: BNKR
 category: Agent execution platform
-lifecycle: announced
+lifecycle: mainnet
 coverage: stub
-summary: Agent execution surface on Robinhood Chain that launches tokens from X and runs its own stock-paired factory; the tokens it launches are graduations, not subjects.
+summary: "X-native agent execution: a mention or console prompt mints a token through Doppler Airlock into a locked Uniswap v4 pool, and 95% of the 0.7% pool swap fee (0.665% of volume) accrues to the fee recipient. Users tag @bankrbot or open bankr.bot; chat and API deploys default to Robinhood Chain. Bankr runs the agent as @bankrbot."
 official_links:
   - kind: x
     url: https://x.com/bankrbot
+  - kind: site
+    url: https://bankr.bot
+  - kind: app
+    url: https://bankr.bot/terminal
+  - kind: docs
+    url: https://docs.bankr.bot
+  - kind: github
+    url: https://github.com/BankrBot
+  - kind: telegram
+    url: https://t.me/bankr_ai_bot
 dependencies:
   - stock-tokens
 deployments:
@@ -18,6 +28,49 @@ deployments:
     verified: false
     sources:
       - S5
+  - label: DopplerERC20V1Factory (shared with LONG)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S11
+      - S21
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S12
+      - S21
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
+    role: other
+    verified: true
+    sources:
+      - S13
+      - S21
+  - label: TAYSOM (Bankr stock-paired graduation, quote TSM)
+    chain: robinhood-chain
+    address: "0x9965de8400b382164e4dbF6dc0E5035cfFE28ba3"
+    role: token
+    verified: true
+    sources:
+      - S14
+      - S15
+      - S21
+      - S23
+  - label: ROBINHOOD GOON (Bankr graduation; not GOONER)
+    chain: robinhood-chain
+    address: "0x4D4aD0e4dfACB73C6cf85F81acbD09a40Fd95bA3"
+    role: token
+    verified: true
+    sources:
+      - S16
+      - S17
+      - S21
 review:
   researcher: harsharn10
   approver: pending
@@ -40,11 +93,39 @@ findings:
       class: claim
       sources:
         - S4
+    - text: "Receipts: docs.bankr.bot, bankr.bot, @bankrbot profile and posts, GitHub org, Blockscout factory/impl/tokens/txs, RPC, Bankr launches API, GeckoTerminal TAYSOM/TSM and GOONER, Llama protocol/bankr, and @RHDaily__ were opened on 2026-09-02 and excerpts copied from the responses. [verified R-1 R-6 R-16 R-14] - Numbers: the $2.0M figure is @RHDaily__'s 24h pad board for 1 Sep, not an all-chains Bankr total and not Llama TVL (empty). Token supplies are 100 billion e18 on TAYSOM and GOON. [claim R-14] [verified R-16] - Adversarial: the strongest contrary reading is that Bankr is only LONG with a chatbot, or that $GOONER is the Bankr GOON ticker. Clone bytecode, factory creator and Airlock `create()` match Doppler, while GOONER's creator is LaunchFactory 0x7186…FC63. Wire remains a Pons command layer."
+      class: inference
+      sources:
+        - S11
+        - S18
+        - S22
+    - text: "Shared Doppler/Airlock stack: Bankr-launched tokens have the same `owner()` as other Doppler clones, including LONG-path tokens. [verified R-16 R-13] - Vesting recipient cannot be moved after launch; fee-recipient transfer does not move the vested allocation. [claim R-1] - $GOON and $GOONER are different contracts and different factories. Flag ca-collision. [verified R-11 R-13] - No audit report for the Robinhood factory was located this pass."
+      class: unknown
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Factory address not located in either intake
     - text: Key custody model for agent execution
     - text: Launch fee flows (a 0.665% creator fee is cited by the dossier)
     - text: Official site not located
+    - text: "Who holds the Airlock owner key 0x21E2…7A66 (Safe threshold and owners), and which owner-only DopplerERC20V1 functions remain callable on Bankr-launched tokens? Next: eth_call getThreshold/getOwners on 0x21E2… and read DopplerERC20V1 verified source modifiers"
+    - text: "Does any audit report cover DopplerERC20V1Factory / Airlock as used on 4663, and does Bankr's hook fee add-on have a separate report? Next: open docs Bug Bounty page and search Doppler/Whetstone audit indexes"
+    - text: "SBC and CQ quote assets: intake listed MSFT and QQQ. Only TAYSOM/TSM was reproduced on GeckoTerminal this pass. Next: GeckoTerminal or Uniswap v4 pool lookup for 0x1965…DbA3 and 0xFE99…5BA3"
+    - text: "Which fee schedule applies to a given Bankr RH token: the 6 Jul 2-year/90-day vest post versus the current docs 1-year/30-day vest? Next: read vesting parameters on TAYSOM and GOON verified clone state"
+    - text: "Is @bankr_ai_bot a live Telegram surface that cross-links bankr.bot? Next: open the Telegram profile and compare the linked domain"
+    - text: "DefiLlama Bankr row is Base-only Interface with empty TVL. Is there a Robinhood chain-slice for Bankr or Doppler fees? Next: watch Llama for a Bankr or Doppler Robinhood fees adapter"
   unresolved:
     - text: No Bankr-specific contract address was found in either intake; whether launches route through its own factory or others is unverified.
+themes:
+  - agent
+  - launchpad
+  - ai
+  - rwa
+  - memecoin
+metrics:
+  - kind: volume_24h
+    value: 2000000
+    currency: USD
+    as_of: 2026-09-01
+    class: claim
+    sources:
+      - S19

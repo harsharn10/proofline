@@ -12,3 +12,105 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 8b05680197c1c66f
+- date: 2026-09-03
+  slug: noxa
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    category: Launchpad · mechanism not classified
+    lifecycle: mainnet
+    summary: Launchpad that launches tokens straight into Uniswap v3 pools; the venue behind the chain's first-week memes, listed on DefiLlama with TVL and fees.
+    themes: null
+    official_links:
+      - kind: site
+        url: https://noxa.fun
+      - kind: x
+        url: https://x.com/Noxa_Fi
+    deployments:
+      - &a1
+        label: Launch factory
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources: []
+    metrics:
+      - kind: tvl
+        value: 5425289
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S7
+      - kind: fees_24h
+        value: 123438
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S7
+      - kind: revenue_24h
+        value: 0
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S7
+  new:
+    category: Uniswap-pool launchpad
+    lifecycle: inactive
+    summary: Week-one Uniswap v3 launchpad on Robinhood Chain, now inactive. A user minted a 1 billion-supply token into a locked 1% Uniswap v3 pool with no bonding curve. @Noxa_Fi disabled new launches in mid-July and named a static ENS snapshot as the remaining interface after the original domains were lost. CASHCAT still trades; leftover pad volume on aggregator boards is that secondary-market flow, not new launches.
+    themes:
+      - launchpad
+      - memecoin
+    official_links:
+      - kind: site
+        url: https://noxa.fun
+      - kind: x
+        url: https://x.com/Noxa_Fi
+      - kind: site
+        url: https://fun.noxa.eth.limo
+      - kind: other
+        url: https://fun.noxa.fi
+      - kind: docs
+        url: https://docs.noxa.fi/launchpad/overview/
+    deployments:
+      - *a1
+      - label: Launch factory
+        chain: robinhood-chain
+        address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
+        role: factory
+        verified: true
+        sources:
+          - S12
+          - S13
+          - S14
+          - S15
+    metrics:
+      - kind: tvl
+        value: 5522002
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S9
+      - kind: fees_24h
+        value: 153498
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S10
+      - kind: revenue_24h
+        value: 0
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S9
+          - S10
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 53ed285d7be095a2

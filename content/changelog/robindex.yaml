@@ -25,3 +25,100 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 14021cfc32386bbf
+- date: 2026-09-03
+  slug: robindex
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Token scanner and Telegram bot for Robinhood Chain (robindex.pro) with a $ROBINDEX token; not a stock index and not Robinhood Index Vaults.
+    themes: null
+    official_links:
+      - kind: site
+        url: https://robindex.pro/about
+      - kind: x
+        url: https://x.com/robindexpro
+    deployments:
+      - label: ROBINDEX token (About page and X bio per the dossier)
+        chain: robinhood-chain
+        address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
+        role: token
+        verified: false
+        sources:
+          - S3
+    metrics: null
+  new:
+    summary: "A live token scanner for Robinhood Chain: paste a 0x address for market stats, holders and a 0–99 safety score, or browse a DexPaprika board that ranks Uniswap pools every three minutes and posts volume spikes to Telegram. Users scan at robindex.pro or via the Telegram bot. The $ROBINDEX token is a Pons-launched ERC-20; this is not The Index and not Robinscan."
+    themes:
+      - tooling
+    official_links:
+      - kind: site
+        url: https://robindex.pro/about
+      - kind: x
+        url: https://x.com/robindexpro
+      - kind: site
+        url: https://robindex.pro
+      - kind: app
+        url: https://robindex.pro/scanner
+      - kind: telegram
+        url: https://t.me/robindextrending
+      - kind: telegram
+        url: https://t.me/robindexchat
+      - kind: telegram
+        url: https://t.me/robindextrendingbot
+      - kind: other
+        url: https://medium.com/@robindex/robindex-didnt-stop-building-0642ab32de72
+    deployments:
+      - label: ROBINDEX token (PonsLauncherToken)
+        chain: robinhood-chain
+        address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
+        role: token
+        verified: true
+        sources:
+          - S3
+          - S7
+          - S16
+          - S17
+          - S21
+      - label: Uniswap v3 ROBINDEX/WETH pool
+        chain: robinhood-chain
+        address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
+        role: other
+        verified: true
+        sources:
+          - S18
+          - S19
+          - S21
+          - S22
+    metrics:
+      - kind: market_cap
+        value: 44344
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S22
+      - kind: volume_24h
+        value: 6983.97
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S22
+      - kind: tvl
+        value: 21045.16
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S22
+      - kind: holders
+        value: 238
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S17
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 1f3b829d6cc519c9

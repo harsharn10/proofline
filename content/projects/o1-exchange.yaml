@@ -1,0 +1,153 @@
+slug: o1-exchange
+name: o1.exchange
+symbol: O
+category: Uniswap-pool launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Uniswap v4 launchpad covering Robinhood stock tokens, also live on Base. Creators pick ETH, USDG, or a registered Robinhood Stock Token, sign one factory transaction, and receive a 1 billion fixed-supply ERC-20 in a permanently locked Uniswap v4 pool. o1.exchange runs it at launch.o1.exchange as @o1_exchange.
+themes:
+  - launchpad
+  - rwa
+  - memecoin
+official_links:
+  - kind: site
+    url: https://o1.exchange
+  - kind: app
+    url: https://launch.o1.exchange
+  - kind: docs
+    url: https://docs.o1.exchange
+  - kind: x
+    url: https://x.com/o1_exchange
+  - kind: discord
+    url: https://discord.gg/o1exchange
+  - kind: github
+    url: https://github.com/o1exchange/o1-api
+dependencies: []
+deployments:
+  - label: Robinhood launch factory (current)
+    chain: robinhood-chain
+    address: "0xcE9C48cFa068947f77738c81Be406B53338E5B0d"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S6
+      - S7
+      - S8
+  - label: Robinhood launch hook
+    chain: robinhood-chain
+    address: "0x0310cFEbE1D7A69f2414f6595bBe9d17c5342aCc"
+    role: other
+    verified: false
+    sources:
+      - S2
+      - S7
+      - S27
+  - label: Robinhood fee escrow
+    chain: robinhood-chain
+    address: "0xc5444b417a04a7E1b9C1E327c7D499803c14E5EF"
+    role: other
+    verified: false
+    sources:
+      - S2
+      - S7
+  - label: Robinhood launch token deployer
+    chain: robinhood-chain
+    address: "0xf86dfDb678D8E5d932100Ef479A59fa65a82a5Eb"
+    role: other
+    verified: false
+    sources:
+      - S2
+      - S7
+  - label: Robinhood historical RWA factory (v4)
+    chain: robinhood-chain
+    address: "0xe64AC4113848BBC1a6dDE1A6D1da96720A36F297"
+    role: factory
+    verified: false
+    sources:
+      - S2
+      - S16
+  - label: Base launch factory (different address; not the RH factory)
+    chain: base
+    address: "0x1176122eb77AD6a2339322Cda7C4D7ea9BfA63dC"
+    role: factory
+    verified: false
+    sources:
+      - S2
+      - S7
+  - label: Quantum White Fiber Rabbit
+    chain: robinhood-chain
+    address: "0xCD1cca2B3d0A11b295c42fe765ea8f895c2D0901"
+    role: token
+    verified: true
+    sources:
+      - S16
+      - S18
+  - label: Send Nudes
+    chain: robinhood-chain
+    address: "0xbe98b75361935b18d688409424a869a4C3dC7401"
+    role: token
+    verified: false
+    sources:
+      - S13
+      - S17
+      - S25
+  - label: Cassowary
+    chain: robinhood-chain
+    address: "0xe5F99b9eEA7B3e3aacc961013582704A76F52052"
+    role: token
+    verified: false
+    sources:
+      - S14
+      - S19
+      - S26
+metrics:
+  - kind: fees_24h
+    value: 411118
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S9
+  - kind: revenue_24h
+    value: 220405
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S22
+  - kind: volume_24h
+    value: 23700000
+    currency: USD
+    as_of: 2026-09-01
+    class: claim
+    sources:
+      - S11
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: docs introduction, production-contracts, socials, security, o1.exchange, @o1_exchange, founder posts, RH Daily, DexScreener, Llama fees/revenue/adapter, Blockscout factory/hook/create txs/tokens, and RPC were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-2 R-6 R-7] - Numbers: 411118 is the Robinhood bar for 2026-09-02, not the 448548 all-chains total24h. 23700000 is the RH Daily ranking figure for 2026-09-01, not Llama. [claim R-9 R-11] - Adversarial: the strongest contrary reading is that o1 is Base-only and the RH factory is an unrelated copy. Docs name both chain IDs, Blockscout verifies RWAERC20LaunchpadFactory at the documented RH address, RPC owner matches the documented governance owner, and the Base factory address is empty on 4663."
+      class: inference
+      sources:
+        - S2
+        - S6
+        - S7
+    - text: One EOA owns the current RH factory; docs say that owner can change future-launch settings. [verified R-7] - Liquidity is permanently locked in the launch hook. [claim R-1] - Llama RH fees may omit current-factory launches. [verified R-10] - XORS reports were not matched to RH bytecode this pass. [claim R-20] - NUDES and Cassowary factory origin was not reproduced.
+      class: claim
+      sources:
+        - S25
+        - S26
+  missing:
+    - text: "Can owner 0x5519a8…044D change fees, quotes, or disable creation on 0xcE9C…5B0d without a timelock? Next: read Ownable2Step modifiers on verified src/RWAERC20LaunchpadFactory.sol; eth_getCode already 0x on the owner"
+    - text: "Which factory created Send Nudes 0xbe98…7401 and Cassowary 0xe5F9…2052? Next: search Launched logs on 0xcE9C…5B0d and historical factories for those token addresses"
+    - text: "Does the XORS 28 Aug 2026 report cover RH bytecode at 0xcE9C…5B0d / src/RWAERC20LaunchpadFactory.sol, or only a Base commit? Next: open the Drive folder and match compiler settings to Blockscout v0.8.26 viaIR Cancun"
+    - text: "Should DefiLlama o1-launchpad ROBINHOOD suites add current factory 0xcE9C…5B0d so chain-slice fees include current-flow launches? Next: diff adapter firstBlock against factory create block 48880266"
+    - text: "Does https://github.com/o1exchange/o1-api hold launchpad contracts, or only the trading API? Next: open the org and search for RWAERC20LaunchpadFactory.sol"
+    - text: "Does discord.gg/o1exchange cross-link o1.exchange? Next: open Discord and retry launch.o1.exchange with a browser"
+  unresolved: []

@@ -12,3 +12,90 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: c5f04514b6fb9fd1
+- date: 2026-09-03
+  slug: sight
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Prediction market announced for Robinhood Chain; the project states it has no token and plans a Genesis NFT mint on 2026-09-02.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/sight_hood
+    deployments: []
+    metrics: null
+  new:
+    summary: "Robinhood Chain memecoin UP/DOWN prediction app: users stake ETH on whether a token's Uniswap price rises or falls over a roughly 15-minute round, then claim from the round contract. Access is invite-gated in docs and, from 14 September 2026, NFT-holder only per @sight_hood. Sight Genesis is a 1,776-supply ERC-721 on chain 4663. sighthood.com and @sight_hood run the product."
+    themes:
+      - prediction
+      - nft
+      - memecoin
+    official_links:
+      - kind: x
+        url: https://x.com/sight_hood
+      - kind: site
+        url: https://sighthood.com
+      - kind: app
+        url: https://app.sighthood.com
+      - kind: docs
+        url: https://docs.sighthood.com
+      - kind: other
+        url: https://quest.sighthood.com
+      - kind: telegram
+        url: https://t.me/sight_hood
+    deployments:
+      - label: Sight Genesis ERC-721
+        chain: robinhood-chain
+        address: "0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D"
+        role: token
+        verified: true
+        sources:
+          - S9
+          - S10
+          - S11
+          - S12
+      - label: ERC721SeaDropCloneable
+        chain: robinhood-chain
+        address: "0x09a26fC8FCEF18192E267D7A6da9dFb4be81Dd6A"
+        role: implementation
+        verified: true
+        sources:
+          - S10
+          - S12
+          - S22
+      - label: ERC721SeaDropCloneFactory
+        chain: robinhood-chain
+        address: "0x008EbCCaE39d001200c3003c3225ce0A00690066"
+        role: factory
+        verified: true
+        sources:
+          - S11
+          - S23
+      - label: Sight Genesis owner
+        chain: robinhood-chain
+        address: "0x4de0D3A415E1109Fb55702Da2989Dd9D5d912584"
+        role: admin
+        verified: false
+        sources:
+          - S10
+          - S11
+          - S12
+    metrics:
+      - kind: holders
+        value: 1175
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S10
+      - kind: volume_24h
+        value: 19.34
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S21
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 5062bdfba95f588d

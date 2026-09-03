@@ -1,15 +1,21 @@
 slug: tickeryard
 name: TickerYard
-symbol: null
+symbol: YARD
 category: Synthetic asset protocol
-lifecycle: announced
+lifecycle: mainnet
 coverage: stub
-summary: Synthetic-asset product shipping yBTC (WBTC routed from Arbitrum) on Robinhood Chain; incubated in the StonkBrokers stack with a $YARD token per the workbook.
+summary: "TickerYard mints yBTC on Robinhood Chain as an 8-decimal receipt of Arbitrum WBTC: a user sends WBTC through tickeryard.com and receives yBTC (site: 0.30% wrap fee, about 18 minutes). YAssetGateway is the only minter. $YARD is the Anvil ERC-20 paired with 3,333 Yardkeeper NFTs. @TickerYardHQ lists tickeryard.com."
 official_links:
-  - kind: site
+  - kind: app
     url: https://tickeryard.com
   - kind: x
     url: https://x.com/TickerYardHQ
+  - kind: whitepaper
+    url: https://tickeryard.com/paper/tickeryard-technical-design-paper-v1.pdf
+  - kind: telegram
+    url: https://t.me/portaltickeryard
+  - kind: other
+    url: https://anvil.clutch.market/market/0xFe0b24A3b4052aD78f10fa75a27118c3e54a00e6
 dependencies: []
 deployments:
   - label: yBTC
@@ -25,6 +31,57 @@ deployments:
     verified: false
     sources:
       - S4
+  - label: YARD (Yardkeeper CollectionToken)
+    chain: robinhood-chain
+    address: "0xE3FA12dA7fa026B21817f16622E8AE48fA785166"
+    role: token
+    verified: true
+    sources:
+      - S8
+      - S15
+      - S16
+  - label: yBTC (TickerYard Bitcoin Receipt)
+    chain: robinhood-chain
+    address: "0x9715e0a0a5f60dCa2A3F69d81Fb7f975De5870Ed"
+    role: token
+    verified: true
+    sources:
+      - S9
+      - S15
+      - S17
+  - label: YAssetGateway (yBTC controller)
+    chain: robinhood-chain
+    address: "0x9fa6a54dbC2D69E232768e4E0970913755571e19"
+    role: other
+    verified: true
+    sources:
+      - S10
+      - S15
+  - label: Yardkeepers ERC-721
+    chain: robinhood-chain
+    address: "0x2756bfFC4ccCB0cBebeB675a8593Ca80c8dB8A97"
+    role: other
+    verified: true
+    sources:
+      - S11
+      - S15
+  - label: Anvil NFTAMMVault (Yardkeepers)
+    chain: robinhood-chain
+    address: "0xFe0b24A3b4052aD78f10fa75a27118c3e54a00e6"
+    role: vault
+    verified: true
+    sources:
+      - S12
+      - S15
+      - S20
+  - label: Origin WBTC (Arbitrum One)
+    chain: arbitrum-one
+    address: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f"
+    role: token
+    verified: false
+    sources:
+      - S10
+      - S15
 review:
   researcher: harsharn10
   approver: pending
@@ -41,12 +98,53 @@ findings:
       class: claim
       sources:
         - S4
-  risk: []
+  risk:
+    - text: "Receipts: tickeryard.com, the paper URL, @TickerYardHQ profile and listed posts, Anvil market UI, StonkBrokers partner line, Blockscout token/gateway/vault/create txs, RPC, DexScreener, and GeckoTerminal were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-5 R-11] - Numbers: YARD holders 5302 and yBTC holders 2254 are Blockscout counts. Volume 124536 is the YARD/WETH up pair 24h bar, not an all-chains total. yBTC supply 1.21238693 is `totalSupply` / 1e8. GeckoTerminal market cap 1855735 is not the DexScreener fdv 2426304. [claim R-12 R-17] [verified R-4 R-5 R-11] - Adversarial: the strongest contrary reading is that TickerYard is only an Anvil NFT mint and that yBTC is a ticker copy. Verified names YAssetReceipt / YAssetGateway, originAsset WBTC on 42161, DexScreener websites tickeryard.com, and matching official posts argue the wrap is the live product; copycat CAs remain listed under ca-collision."
+      class: inference
+      sources:
+        - S9
+        - S10
+        - S16
+    - text: "Gateway owner is one EOA with pause and peer-proposal functions; Arbitrum WBTC lock was not reproduced. [verified R-11] - Yardkeepers NFT source is unverified; collection owner is a second EOA. [verified R-7] - Name collision: other ERC-20s use TickerYard / Yardkeeper / $YARD at different addresses. Flag: ca-collision. [verified R-4 R-12] - No audit report was located this pass. [unknown] - Wrap fee 0.30% is a site figure; it is not a named `wrapFeeBps` on the gateway ABI."
+      class: claim
+      sources:
+        - S5
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: yBTC and YARD addresses not located
     - text: Bridge and custody path for the BTC backing
     - text: Mint and redeem controls
     - text: An independent audit was not found in this review
+    - text: "Where is Arbitrum WBTC locked, and does gateway creditInvariant 1.21238693 yBTC match the remote vault balance? Next: read YAssetBridgeCore peers/vaultAssets for selector 4949039107694359620 and eth_call the Arbitrum vault"
+    - text: "Can gateway owner 0x04D870… pause, change peers, or mint without the 172800-second delay, and who holds NFTAMMVault DEFAULT_ADMIN_ROLE? Next: eth_call hasRole for treasury 0xb668… and getRoleMember if present; read pause modifiers in YAssetBridgeCore"
+    - text: "Is the 0.30% wrap fee in the gateway, the Arbitrum vault, or only the site UI? Next: eth_call quoteBridgeBackFee and read the Arbitrum vault fee constant"
+    - text: "Is there a yXAUT receipt on 4663, or is YXAUT_ID only a gateway constant? Next: receiptOf(YXAUT_ID) and Blockscout search yXAUT"
+    - text: "Does any audit PDF cover YAssetReceipt.sol / YAssetGateway.sol compiler v0.8.36? Next: ask in public and match any named auditor report to the gateway bytecode"
+    - text: "Does t.me/portaltickeryard cross-link tickeryard.com / @TickerYardHQ? Next: open the Telegram profile and compare the linked domain"
   unresolved:
     - text: The bridge and custody path for the BTC backing yBTC has not been described in either intake.
+themes:
+  - rwa
+  - nft
+  - launchpad
+metrics:
+  - kind: holders
+    value: 2254
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: volume_24h
+    value: 124536
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S16
+  - kind: market_cap
+    value: 1855735
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S21

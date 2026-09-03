@@ -4,12 +4,26 @@ symbol: ARROW
 category: Collateralized debt protocol
 lifecycle: mainnet
 coverage: stub
-summary: Native CDP minting aUSD against Stock Tokens, ETFs, WETH and USDG; the official app showed active markets and live protocol balances after its 2026-08-31 mainnet launch. An ArrowPad launchpad shares the brand.
+summary: An overcollateralized CDP on Robinhood Chain. A user deposits one approved asset into a vault, mints aUSD against it, and repays to release the collateral. Docs list WETH, USDG and Stock Tokens as collateral. The same brand also runs ArrowPad, a bonding-curve launchpad. Official site arrowfinance.io and handle @ArrowFinanceio. Distinct from Arrows, the options protocol.
 official_links:
   - kind: docs
     url: https://app.arrowfinance.io/docs
   - kind: x
     url: https://x.com/ArrowFinanceio
+  - kind: site
+    url: https://www.arrowfinance.io
+  - kind: app
+    url: https://app.arrowfinance.io
+  - kind: app
+    url: https://staking.arrowfinance.io
+  - kind: app
+    url: https://cdp.arrowfinance.io
+  - kind: docs
+    url: https://www.arrowfinance.io/docs
+  - kind: telegram
+    url: https://t.me/arrowfinanceio
+  - kind: telegram
+    url: https://t.me/arrowfinanceupdates
 dependencies:
   - stock-tokens
   - usdg
@@ -18,40 +32,62 @@ deployments:
     chain: robinhood-chain
     address: "0xf2915d1e3C1B0c769d0c756Ec43F1c1f6c99cD03"
     role: token
-    verified: false
+    verified: true
     sources:
       - S3
       - S4
       - S7
+      - S22
+      - S27
+      - S28
+      - S44
   - label: aUSD (Arrow USD)
     chain: robinhood-chain
     address: "0x4f11d7603D1B0D0f021Db552D8A6d88d7fa38ecf"
     role: token
-    verified: false
+    verified: true
     sources:
       - S3
       - S4
       - S7
-  - label: ArrowPad launch factory (the launchpad, not the CDP)
+      - S26
+      - S29
+      - S30
+  - label: ArrowPad launch factory (Launchpad)
     chain: robinhood-chain
     address: "0x1Badc838AAe6ac41829180744ea2e1C89b452aAe"
     role: factory
-    verified: false
+    verified: true
     sources:
       - S3
-  - label: aUSD liquidity pool on up v3 (per the project's pre-open post)
+      - S23
+      - S31
+  - label: aUSD liquidity pool on up v3
     chain: robinhood-chain
     address: "0x29e3f3d9891cacf213361bcbcb7728970d53baa8"
     role: other
-    verified: false
+    verified: true
     sources:
       - S5
+      - S26
+      - S33
+      - S37
+      - S47
   - label: CDP core
     chain: robinhood-chain
     address: not-verified
     role: vault
     verified: false
     sources: []
+  - label: ARROW/WETH Uniswap v3 pool
+    chain: robinhood-chain
+    address: "0xd1FAf86966b362626a91DDa50E6913c14c02Ef5f"
+    role: other
+    verified: true
+    sources:
+      - S32
+      - S34
+      - S46
 review:
   researcher: harsharn10
   approver: pending
@@ -90,11 +126,64 @@ findings:
       class: claim
       sources:
         - S4
+    - text: "Receipts: site, both docs pages, buy page, borrow app, X profile and named status URLs, Linktree, Telegram preview, GitHub 404, DexScreener pair and token APIs, DefiLlama protocol and chains APIs, and Blockscout address/token/source APIs were opened on 2026-09-02; excerpts are copied from those responses. [verified R-1 R-2 R-3 R-5 R-8 R-15] - Numbers: holders 7328 is the Blockscout ARROW token field; 24h volume 100896.87 USD and liquidity 3787458.75 USD are the DexScreener ARROW/WETH Uniswap v3 pair slice, not an all-pairs or all-chains total; borrow-app TVL 58257.41 USD is a site readout, not an on-chain sum of vaults; DefiLlama ArrowPad TVL is the pad adapter, not CDP TVL. [claim R-5 R-9 R-15 R-21] - Adversarial: the strongest contrary reading is that Arrow Finance is the launchpad (ArrowPad / ArrowPad.fun / Llama @RobinArrowPad) or that it is Arrows the options protocol. Official copy leads with the CDP; the Launchpad contract name is Launchpad, not a vault manager; token CAs, domain and handle do not match arrows.finance."
+      class: inference
+      sources:
+        - S20
+        - S27
+        - S31
+    - text: CDP core contracts are unlabeled, so liquidation, oracle, pause and cap paths are not reproduced. [claim R-2 R-4] - Launchpad owner is one EOA with no timelock on factory setters. [verified R-12] - Docs, the borrow app and the 8/30 post disagree on live market count and LTV. [disputed R-2 R-5 R-20] - aUSD explorer source is not verified; owner() on aUSD reverts. [verified R-10] - Sherlock is named in posts; no report is linked from official properties. [claim R-2 R-20] - ArrowToken source documents a buy/sell tax; owner is now zero, so the last on-chain tax setting is frozen and was not re-read.
+      class: verified
+      sources:
+        - S44
   missing:
     - text: CDP core and stability-pool addresses not located
     - text: Sherlock report and covered commit not reviewed
     - text: Admin powers over caps, listings and the US-hours collateral switch
     - text: ArrowPad factory controls
+    - text: "What are the vault-manager, stability-pool, liquidator, surplus-buffer and aUSD minter addresses on 4663? Next: read the borrow app's contract config or a mint transaction's to-address and open those contracts on Blockscout"
+    - text: "Does a published Sherlock report cover the deployed CDP bytecode, and at which commit? Next: ask in public for the report URL and match bytecode to the reviewed commit"
+    - text: "Which LTV and live-market set is on chain: docs 24 markets at 75/90/55/40, or the app's 70/80/50 with most equities Coming soon? Next: eth_call the unlabeled market contracts once addresses are known"
+    - text: "Why is aUSD totalSupply 42332.58 while the borrow app showed 30435.19 outstanding? Next: split circulating, stability-pool, and unbacked supply from the minter once labeled"
+    - text: "Is AccessRegistry currently allowing public createLaunchpadToken, or is the pad gated? Next: eth_call accessRegistry and isTokenCreationAllowed for a random caller; read getTokensCount"
+    - text: "Are DefiLlama ArrowPad (@RobinArrowPad) and ArrowPad.fun (@Arrowpadfun) this factory 0x1Badc838… or separate pads? Next: diff Llama adapter addresses against 0x1Badc838…"
+    - text: "Current buyTaxBps / sellTaxBps / taxWallet on ArrowToken after owner() went to zero Next: eth_call buyTaxBps(), sellTaxBps(), taxWallet(), pair(), tradingEnabled()"
   unresolved:
     - text: The app's overview and analytics pages showed different aUSD-outstanding totals during the 2026-08-31 review.
     - text: The live app's market count and LTV values differed from the official documentation reviewed the same day.
+    - text: product.mechanism remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).
+    - text: economics.metric remains unresolved (CON-3).
+    - text: product.mechanism remains unresolved (CON-4).
+themes:
+  - lending
+  - rwa
+  - launchpad
+metrics:
+  - kind: holders
+    value: 7328
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S28
+  - kind: volume_24h
+    value: 100896.87
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S34
+  - kind: market_cap
+    value: 6199196
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S34
+  - kind: tvl
+    value: 58257.41
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S24

@@ -12,3 +12,152 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 160d7c29662262e7
+- date: 2026-09-03
+  slug: sherwood
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Private-transfer tool on Robinhood Chain per Proofline's chain map, with a DefiLlama TVL row; the workbook described it as an agent capital layer with a $WOOD token.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/sherw00d_cash
+    deployments:
+      - &a1
+        label: Privacy pool / WOOD token
+        chain: robinhood-chain
+        address: not-verified
+        role: other
+        verified: false
+        sources: []
+    metrics:
+      - kind: tvl
+        value: 80196
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S5
+  new:
+    summary: A shielded mixer and DEX on Robinhood Chain. Users deposit ETH or tokens into one Groth16 vault, then withdraw or swap through Uniswap without linking the output address. $SHERWOOD is the Pons-launched app token. @sherw00d_cash runs sherwood.cash.
+    themes:
+      - privacy
+      - rwa
+      - agent
+    official_links:
+      - kind: x
+        url: https://x.com/sherw00d_cash
+      - kind: site
+        url: https://sherwood.cash
+      - kind: docs
+        url: https://sherwood.cash/docs
+      - kind: github
+        url: https://github.com/sherwood-cash/contracts
+      - kind: telegram
+        url: https://t.me/sherwood_cash
+    deployments:
+      - *a1
+      - label: SherwoodVault (immutable mixer + shielded DEX)
+        chain: robinhood-chain
+        address: "0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736"
+        role: vault
+        verified: true
+        sources:
+          - S10
+          - S11
+          - S12
+          - S13
+      - label: SwapLogic (UUPS proxy)
+        chain: robinhood-chain
+        address: "0x52445Ae1B988CfDc668EB15628629ED7d0890C6A"
+        role: proxy
+        verified: false
+        sources:
+          - S12
+          - S25
+      - label: SwapLogic implementation
+        chain: robinhood-chain
+        address: "0x10562a98b0eB2BFF853275da5F34BF498192d45B"
+        role: implementation
+        verified: false
+        sources:
+          - S25
+      - label: Verifier2 (Groth16)
+        chain: robinhood-chain
+        address: "0x3d7bEA6294BC033fAA7e0e06F2D94088106CDb79"
+        role: other
+        verified: false
+        sources:
+          - S12
+          - S30
+      - label: SHERWOOD token (PonsV2LauncherToken)
+        chain: robinhood-chain
+        address: "0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1"
+        role: token
+        verified: true
+        sources:
+          - S14
+          - S15
+          - S16
+      - label: Vault admin EOA
+        chain: robinhood-chain
+        address: "0x93080bdF26050307d410d372640D4398397E0A6E"
+        role: admin
+        verified: false
+        sources:
+          - S12
+          - S13
+      - label: protocolFeeRecipient EOA
+        chain: robinhood-chain
+        address: "0x6cEE2DC8A42A5AA3f28799ea8Ebd23Ea5e07cc08"
+        role: other
+        verified: false
+        sources:
+          - S12
+    metrics:
+      - kind: tvl
+        value: 72357.59239
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S9
+      - kind: fees_24h
+        value: 25.87
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S26
+      - kind: revenue_24h
+        value: 25.87
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S27
+      - kind: holders
+        value: 658
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S14
+      - kind: market_cap
+        value: 319875
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S16
+      - kind: volume_24h
+        value: 60337.16
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S16
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: e8740d7412d686e0

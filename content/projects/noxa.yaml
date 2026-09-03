@@ -1,15 +1,21 @@
 slug: noxa
 name: NOXA Fun
 symbol: null
-category: Launchpad · mechanism not classified
-lifecycle: mainnet
+category: Uniswap-pool launchpad
+lifecycle: inactive
 coverage: stub
-summary: Launchpad that launches tokens straight into Uniswap v3 pools; the venue behind the chain's first-week memes, listed on DefiLlama with TVL and fees.
+summary: Week-one Uniswap v3 launchpad on Robinhood Chain, now inactive. A user minted a 1 billion-supply token into a locked 1% Uniswap v3 pool with no bonding curve. @Noxa_Fi disabled new launches in mid-July and named a static ENS snapshot as the remaining interface after the original domains were lost. CASHCAT still trades; leftover pad volume on aggregator boards is that secondary-market flow, not new launches.
 official_links:
   - kind: site
     url: https://noxa.fun
   - kind: x
     url: https://x.com/Noxa_Fi
+  - kind: site
+    url: https://fun.noxa.eth.limo
+  - kind: other
+    url: https://fun.noxa.fi
+  - kind: docs
+    url: https://docs.noxa.fi/launchpad/overview/
 dependencies:
   - uniswap
 deployments:
@@ -19,28 +25,39 @@ deployments:
     role: factory
     verified: false
     sources: []
+  - label: Launch factory
+    chain: robinhood-chain
+    address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
+    role: factory
+    verified: true
+    sources:
+      - S12
+      - S13
+      - S14
+      - S15
 metrics:
   - kind: tvl
-    value: 5425289
+    value: 5522002
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-02
     class: claim
     sources:
-      - S7
+      - S9
   - kind: fees_24h
-    value: 123438
+    value: 153498
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-03
     class: claim
     sources:
-      - S7
+      - S10
   - kind: revenue_24h
     value: 0
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-03
     class: claim
     sources:
-      - S7
+      - S9
+      - S10
 review:
   researcher: harsharn10
   approver: pending
@@ -66,4 +83,12 @@ findings:
     - text: Factory address not located
     - text: Launch fee flows and who controls the factory
     - text: An independent audit was not found in this review
+    - text: "Does factory 0xD9eC…FccB still accept TokenLaunched calls, or is launch gated on-chain? Next: read unverified bytecode or a later TokenLaunched log after 14 Jul 2026"
+    - text: "Where are the Robinhood locked Uni v3 positions if Llama's locker address is not a contract on 4663? Next: find the locker from a CASHCAT position NFT owner() or a TokenLaunched positionId"
+    - text: "Who holds owner/admin on the unverified factory, and did that change when launches were disabled? Next: eth_call owner()/authority and any pause flag once source is verified or decompiled"
+    - text: "Who serves fun.noxa.fi (HTTP 200) after @Noxa_Fi said original domains were no longer controlled? Next: compare fun.noxa.fi launch UI against the ENS snapshot and WHOIS/registrar"
+    - text: "Is there an audit of the Robinhood factory bytecode? Next: search named auditors if the project publishes one"
   unresolved: []
+themes:
+  - launchpad
+  - memecoin

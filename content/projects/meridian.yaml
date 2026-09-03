@@ -1,15 +1,77 @@
 slug: meridian
 name: Meridian
-symbol: null
+symbol: MLP
 category: Native perpetuals exchange
 lifecycle: mainnet
 coverage: stub
-summary: Native perps and a prediction market under one handle; DefiLlama lists Meridian Perps and Meridian Predict TVL on Robinhood Chain.
+summary: USDe deposits mint MLP shares in an Accountable ERC-7540 async-redeem vault that lends into an upgradeable AccountableYield strategy; prediction markets run on the same app. Users open app.meridian.xyz; vault management redirects to yield.accountable.capital. @meridiandotxyz is the official handle. mPerps was posted as launching the week after 28 Aug 2026.
 official_links:
   - kind: x
     url: https://x.com/meridiandotxyz
+  - kind: site
+    url: https://meridian.xyz
+  - kind: app
+    url: https://app.meridian.xyz
+  - kind: docs
+    url: https://docs.meridian.xyz
+  - kind: discord
+    url: https://discord.com/invite/meridianxyz
+  - kind: other
+    url: https://blog.meridian.xyz
+  - kind: other
+    url: https://yield.accountable.capital/vaults/4663/0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC
 dependencies: []
-deployments: []
+deployments:
+  - label: Meridian Liquidity Provider (MLP share vault)
+    chain: robinhood-chain
+    address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
+    role: vault
+    verified: true
+    sources:
+      - S17
+      - S18
+      - S23
+  - label: AccountableYield strategy (ERC1967 proxy; app manageUrl)
+    chain: robinhood-chain
+    address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
+    role: proxy
+    verified: true
+    sources:
+      - S10
+      - S21
+      - S23
+  - label: AccountableYield implementation
+    chain: robinhood-chain
+    address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
+    role: implementation
+    verified: false
+    sources:
+      - S21
+      - S35
+  - label: YieldStrategyFactory (Accountable)
+    chain: robinhood-chain
+    address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
+    role: factory
+    verified: false
+    sources:
+      - S19
+      - S20
+  - label: YieldStrategyFactory owner Safe
+    chain: robinhood-chain
+    address: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
+    role: multisig
+    verified: false
+    sources:
+      - S23
+      - S29
+  - label: ConditionalTokensConditionResolver (app robinhood-mainnet map)
+    chain: robinhood-chain
+    address: "0xE42847eE3feE1B29065F14D39EcF664A04d70475"
+    role: other
+    verified: true
+    sources:
+      - S10
+      - S30
 review:
   researcher: harsharn10
   approver: pending
@@ -27,11 +89,45 @@ findings:
       sources:
         - S4
         - S5
-  risk: []
+  risk:
+    - text: "Receipts: meridian.xyz, app.meridian.xyz and its JS bundle, @meridiandotxyz profile and posts, Blockscout vault/factory/proxy/USDe/Safe/resolver, RPC 4663, Llama perps and predict, GitHub org, yield.accountable.capital, and the two collision tokens were opened on 2026-09-03 and excerpts copied from the responses. docs.meridian.xyz timed out. [verified R-1 R-10 R-16 R-17] - Numbers: Llama figures are Robinhood Chain slices. Idle USDe plus `deployedAssets` is the on-chain counterpart to the perps TVL, not `totalAssets()` alone. [claim R-17] [verified R-16] - Adversarial: the strongest contrary reading is that census mainnet is Llama-only, or that MERD/meridiandotxyz is this protocol, or that Hookr/pools.trade is the pad. MLP name, createYieldStrategy params, and the app manageUrl argue the vault is this slug; MERD is Meridian402; Uniswap's pad remains pools.trade."
+      class: inference
+      sources:
+        - S17
+        - S10
+        - S27
+    - text: AccountableYield is an ERC1967 proxy; implementation can change under the factory/Safe path. [verified R-14 R-16] - Vault `totalAssets()` omits `deployedAssets`; idle USDe is not the Llama TVL. [verified R-16] - mPerps live-trading was not reproduced; the last official line is the 28 Aug launch post. [claim R-5 R-3] - No audit report located this pass. [unknown] - MERD and meridiandotxyz tickers are different contracts from MLP.
+      class: verified
+      sources:
+        - S27
+        - S28
   missing:
     - text: Lifecycle set from the DefiLlama listing — no deployment or official post reviewed
     - text: Official site not located
     - text: Resolution and oracle design
     - text: Collateral custody and settlement asset (the workbook says USDe)
+    - text: "Is mPerps trading live on 4663 as of this pass, or still the 28 Aug 'next week' post? Next: open app.meridian.xyz trade UI and search factory for a perp engine address"
+    - text: "Which contracts hold Meridian Predict collateral matching Llama $266k, beyond the ConditionResolver? Next: decode predictionEscrowAddress from the runtime config object and RPC its USDe balance"
+    - text: "Who holds the AccountableYield borrower 0x2f46…56b2 and investmentManager 0x7f1a…5253 keys, and is the factory Safe Accountable or Meridian? Next: read Safe owners on Accountable docs and compare to Meridian operators"
+    - text: "Is there an audit covering AccountableAsyncRedeemVault / AccountableYield as used on 4663? Next: open docs.meridian.xyz after it loads and search Accountable audit indexes"
+    - text: "Does docs.meridian.xyz or blog.meridian.xyz publish the MLP and resolver addresses? Next: retry docs and open the MLP vault docs path"
   unresolved:
     - text: Lifecycle was moved from announced to mainnet on the DefiLlama listing alone; no official post or contract was reviewed. The workbook's USDe-settlement description is unverified.
+themes:
+  - rwa
+  - prediction
+  - vault
+metrics:
+  - kind: tvl
+    value: 2010892.59
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S23
+  - kind: holders
+    value: 612
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S18

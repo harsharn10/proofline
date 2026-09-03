@@ -38,3 +38,170 @@
   reviewer: codex
   methodology_version: proofline-v1.0
   review_key: 7503c7553ffa9500
+- date: 2026-09-02
+  slug: arrow
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Native CDP minting aUSD against Stock Tokens, ETFs, WETH and USDG; the official app showed active markets and live protocol balances after its 2026-08-31 mainnet launch. An ArrowPad launchpad shares the brand.
+    themes: null
+    official_links:
+      - kind: docs
+        url: https://app.arrowfinance.io/docs
+      - kind: x
+        url: https://x.com/ArrowFinanceio
+    deployments:
+      - label: ARROW token (ArrowToken)
+        chain: robinhood-chain
+        address: "0xf2915d1e3C1B0c769d0c756Ec43F1c1f6c99cD03"
+        role: token
+        verified: false
+        sources:
+          - S3
+          - S4
+          - S7
+      - label: aUSD (Arrow USD)
+        chain: robinhood-chain
+        address: "0x4f11d7603D1B0D0f021Db552D8A6d88d7fa38ecf"
+        role: token
+        verified: false
+        sources:
+          - S3
+          - S4
+          - S7
+      - label: ArrowPad launch factory (the launchpad, not the CDP)
+        chain: robinhood-chain
+        address: "0x1Badc838AAe6ac41829180744ea2e1C89b452aAe"
+        role: factory
+        verified: false
+        sources:
+          - S3
+      - label: aUSD liquidity pool on up v3 (per the project's pre-open post)
+        chain: robinhood-chain
+        address: "0x29e3f3d9891cacf213361bcbcb7728970d53baa8"
+        role: other
+        verified: false
+        sources:
+          - S5
+      - &a1
+        label: CDP core
+        chain: robinhood-chain
+        address: not-verified
+        role: vault
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    summary: An overcollateralized CDP on Robinhood Chain. A user deposits one approved asset into a vault, mints aUSD against it, and repays to release the collateral. Docs list WETH, USDG and Stock Tokens as collateral. The same brand also runs ArrowPad, a bonding-curve launchpad. Official site arrowfinance.io and handle @ArrowFinanceio. Distinct from Arrows, the options protocol.
+    themes:
+      - lending
+      - rwa
+      - launchpad
+    official_links:
+      - kind: docs
+        url: https://app.arrowfinance.io/docs
+      - kind: x
+        url: https://x.com/ArrowFinanceio
+      - kind: site
+        url: https://www.arrowfinance.io
+      - kind: app
+        url: https://app.arrowfinance.io
+      - kind: app
+        url: https://staking.arrowfinance.io
+      - kind: app
+        url: https://cdp.arrowfinance.io
+      - kind: docs
+        url: https://www.arrowfinance.io/docs
+      - kind: telegram
+        url: https://t.me/arrowfinanceio
+      - kind: telegram
+        url: https://t.me/arrowfinanceupdates
+    deployments:
+      - label: ARROW token (ArrowToken)
+        chain: robinhood-chain
+        address: "0xf2915d1e3C1B0c769d0c756Ec43F1c1f6c99cD03"
+        role: token
+        verified: true
+        sources:
+          - S3
+          - S4
+          - S7
+          - S22
+          - S27
+          - S28
+          - S44
+      - label: aUSD (Arrow USD)
+        chain: robinhood-chain
+        address: "0x4f11d7603D1B0D0f021Db552D8A6d88d7fa38ecf"
+        role: token
+        verified: true
+        sources:
+          - S3
+          - S4
+          - S7
+          - S26
+          - S29
+          - S30
+      - label: ArrowPad launch factory (Launchpad)
+        chain: robinhood-chain
+        address: "0x1Badc838AAe6ac41829180744ea2e1C89b452aAe"
+        role: factory
+        verified: true
+        sources:
+          - S3
+          - S23
+          - S31
+      - label: aUSD liquidity pool on up v3
+        chain: robinhood-chain
+        address: "0x29e3f3d9891cacf213361bcbcb7728970d53baa8"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S26
+          - S33
+          - S37
+          - S47
+      - *a1
+      - label: ARROW/WETH Uniswap v3 pool
+        chain: robinhood-chain
+        address: "0xd1FAf86966b362626a91DDa50E6913c14c02Ef5f"
+        role: other
+        verified: true
+        sources:
+          - S32
+          - S34
+          - S46
+    metrics:
+      - kind: holders
+        value: 7328
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S28
+      - kind: volume_24h
+        value: 100896.87
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S34
+      - kind: market_cap
+        value: 6199196
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S34
+      - kind: tvl
+        value: 58257.41
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S24
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: b1f4794c8326e34b

@@ -25,3 +25,147 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 6c2a287876c73751
+- date: 2026-09-02
+  slug: longbow
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "Credit overlay on Morpho Blue: isolated markets to borrow USDG against Stock Tokens, PONS and other collateral, with a $BOW token that shares protocol revenue per the project."
+    themes: null
+    official_links:
+      - kind: site
+        url: https://longbow.cash
+      - kind: x
+        url: https://x.com/longbowlend
+    deployments:
+      - label: BOW token
+        chain: robinhood-chain
+        address: "0x451b42A15100C340CA12F7c66DE06fac5EA2D751"
+        role: token
+        verified: false
+        sources:
+          - S3
+          - S4
+      - &a1
+        label: Morpho market contracts (GLD/USDG, RDDT/USDG, PONS/USDG)
+        chain: robinhood-chain
+        address: not-verified
+        role: vault
+        verified: false
+        sources:
+          - S6
+    metrics: null
+  new:
+    summary: "Isolated Morpho Blue markets on Robinhood Chain: a user posts Stock Tokens, PONS or other collateral and borrows USDG without selling the position. Suppliers deposit USDG into Longbow-curated vaults that allocate across those markets. BOW is the protocol token, launched through Pons v2 and paired to SPY on Uniswap v4. @longbowlend runs longbow.cash."
+    themes:
+      - lending
+      - rwa
+      - vault
+      - nft
+      - stock-paired:spy
+    official_links:
+      - kind: site
+        url: https://longbow.cash
+      - kind: x
+        url: https://x.com/longbowlend
+      - kind: site
+        url: https://www.longbow.cash
+      - kind: docs
+        url: https://docs.longbow.cash
+      - kind: telegram
+        url: https://t.me/longbowlend
+    deployments:
+      - label: BOW token (PonsV2LauncherToken)
+        chain: robinhood-chain
+        address: "0x451b42A15100C340CA12F7c66DE06fac5EA2D751"
+        role: token
+        verified: true
+        sources:
+          - S3
+          - S4
+          - S13
+          - S14
+          - S24
+      - *a1
+      - label: Longbow Core USDG vault (lbcoreUSDG)
+        chain: robinhood-chain
+        address: "0x026df18fbd2A7639089D0a16293383ec687A5Ca1"
+        role: vault
+        verified: true
+        sources:
+          - S16
+          - S18
+          - S20
+      - label: Longbow USDG MetaMorpho V1_1 vault
+        chain: robinhood-chain
+        address: "0x8cb8AA35228c96C1C4E956E69AbAEBCc2aA7Dcfe"
+        role: vault
+        verified: false
+        sources:
+          - S17
+          - S21
+      - label: BOW StakingRewards
+        chain: robinhood-chain
+        address: "0xEba502e1177f5fad9432c2deb273569D8381e01A"
+        role: other
+        verified: false
+        sources:
+          - S19
+          - S22
+      - label: Core vault owner Safe (SafeL2)
+        chain: robinhood-chain
+        address: "0x396ae0BD5623c3750e15fd222770F1e972153ED4"
+        role: multisig
+        verified: true
+        sources:
+          - S25
+          - S26
+      - label: Morpho Blue (settlement primitive; not Longbow-owned)
+        chain: robinhood-chain
+        address: "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010"
+        role: other
+        verified: true
+        sources:
+          - S23
+      - label: BOW/USDG Ramses v3 pool
+        chain: robinhood-chain
+        address: "0x95D1b62891531b9207aD9C79a021bDf6BE452920"
+        role: other
+        verified: true
+        sources:
+          - S15
+          - S27
+          - S40
+    metrics:
+      - kind: tvl
+        value: 588602.3
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S16
+      - kind: volume_24h
+        value: 832979.57
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S15
+      - kind: holders
+        value: 5753
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S14
+      - kind: market_cap
+        value: 4843328.84
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S14
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: c1dcea28696b0fca

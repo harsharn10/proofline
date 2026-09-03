@@ -66,9 +66,218 @@ sources:
     publisher: DefiLlama
     kind: third-party-data
     accessed_at: 2026-09-02T07:20:00Z
-    claim: "DefiLlama lists Snuggle (slug snuggle, category Liquidity Manager) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs"
+    claim: DefiLlama lists Snuggle (slug snuggle, category Liquidity Manager) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs
     excerpt: "api.llama.fi/protocols on 2026-09-02: chains include Robinhood Chain; chainTvls[Robinhood Chain] $4.10M. Aggregator figure, not reproduced on chain."
     hash: null
     archive_url: null
     researcher: claude
+    available: true
+  - id: S7
+    url: https://www.snuggle.fi/
+    publisher: Snuggle
+    kind: official-site
+    accessed_at: 2026-09-03T00:08:00Z
+    claim: Snuggle homepage
+    excerpt: "Automated Crypto Yield on Base & Arbitrum. Deposit your Bitcoin, ETH, or stablecoins. Live on Base & Arbitrum • 5 DEXes • 58+ Pools. Uniswap V3 • Aerodrome • PancakeSwap • SushiSwap V3 • Camelot V3. 15% performance fee on earnings only. Verified on DefiLlama. FAQ: Which blockchains does Snuggle support? Snuggle is live on Base and Arbitrum."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S8
+    url: https://www.snuggle.fi/security
+    publisher: Snuggle
+    kind: docs
+    accessed_at: 2026-09-03T00:08:00Z
+    claim: Security
+    excerpt: "V30 Comprehensive Security Audit Complete. Latest audit: February 16, 2026 — 22 Solidity files, ~6,500 lines reviewed. 0 Critical, 0 High, 0 Medium, 8 Low (Accepted). Transparency Note: These audits were conducted using AI security analysis tools, not a traditional third-party audit firm. Deployed Contracts (Base Mainnet) SnuggleVault (Proxy) 0xd3923bec…d16b7470. 𝕏 Twitter https://twitter.com/SnuggleFi."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S9
+    url: https://x.com/SnuggleFi
+    publisher: "@SnuggleFi"
+    kind: social
+    accessed_at: 2026-09-03T00:08:00Z
+    claim: SnuggleFi profile
+    excerpt: "Display name SnuggleFi, handle @SnuggleFi. Bio: Zero-swap LP rebalancing on Base and Arbitrum. No swap fees. No slippage. Just yield and passive income. Uniswap | Aerodrome | PancakeSwap. Website https://snuggle.fi. Joined 2026-01-18. Followers 463."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S10
+    url: https://api.llama.fi/protocol/snuggle
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T00:05:00Z
+    claim: Snuggle protocol row
+    excerpt: name Snuggle category Liquidity Manager chains [Arbitrum, Base, Robinhood Chain] twitter SnuggleFi url https://snuggle.fi/ methodology TVL is the value of all concentrated liquidity positions managed by Snuggle and MaxFi (Snuggle whitelabel) vaults on Base, Arbitrum, and Robinhood. currentChainTvls Robinhood Chain 4431613.38741 Base 4659653.03444 Arbitrum 19170.17748. tvl last date 1788393479 totalLiquidityUSD 9110436. audits 2 audit_links Abyss.pdf.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S11
+    url: https://github.com/DefiLlama/DefiLlama-Adapters/blob/main/projects/snuggle/index.js
+    publisher: DefiLlama
+    kind: repository
+    accessed_at: 2026-09-03T00:06:00Z
+    claim: snuggle adapter ROBINHOOD_VAULTS
+    excerpt: "ROBINHOOD_VAULTS = [{ vault: '0x1195C074F898b7644bA732407619c9804dFE6DCE', viewHelper: '0x71b55E366a0F43260b1138A32c312ba7bb7F30F7' }, // MaxFi Robinhood]. UNI_NFT_ROBINHOOD = '0x73991a25C818Bf1f1128dEAaB1492D45638DE0D3'. ROBINHOOD_ADAPTER_DEX = { '0x76bdb43d2ec3b190087076649224f47a58c44ef2': 'uniswap' }. methodology: Snuggle and MaxFi (Snuggle whitelabel) vaults on Base, Arbitrum, and Robinhood."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S12
+    url: https://robinhoodchain.blockscout.com/address/0x1195C074F898b7644bA732407619c9804dFE6DCE
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:12:00Z
+    claim: Address 0x1195…6DCE TransparentUpgradeableProxy
+    excerpt: hash 0x1195C074F898b7644bA732407619c9804dFE6DCE name TransparentUpgradeableProxy is_contract true is_verified true proxy_type eip1967 implementation SnuggleVaultUpgradeable 0x999A74ddFde1575C4db454A0300d5F0351A891dE creator 0x6aC51A706539D4F5A326dA2892520180858e25FF tx 0x3ae0854d…. Smart-contract compiler v0.8.33 is_partially_verified true file_path TransparentUpgradeableProxy.sol.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S13
+    url: https://robinhoodchain.blockscout.com/address/0x999A74ddFde1575C4db454A0300d5F0351A891dE
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:12:00Z
+    claim: Address 0x999A…91dE SnuggleVaultUpgradeable
+    excerpt: hash 0x999A74ddFde1575C4db454A0300d5F0351A891dE name SnuggleVaultUpgradeable is_contract true is_verified true creator 0x6aC51A706539D4F5A326dA2892520180858e25FF. Smart-contract compiler v0.8.33+commit.64118f21 is_partially_verified true file_path src/SnuggleVaultUpgradeable.sol.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S14
+    url: https://robinhoodchain.blockscout.com/address/0x71b55E366a0F43260b1138A32c312ba7bb7F30F7
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:12:00Z
+    claim: Address 0x71b5…F30F7 ViewHelper
+    excerpt: hash 0x71b55E366a0F43260b1138A32c312ba7bb7F30F7 name ViewHelper is_contract true is_verified true creator 0x6aC51A706539D4F5A326dA2892520180858e25FF creation_transaction_hash 0x1ac4f7f5210e4ef4841ff7fa0a98087ed6065ae75221f323928795fda69d0593. Smart-contract compiler v0.8.33 file_path src/ViewHelper.sol.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S15
+    url: https://robinhoodchain.blockscout.com/address/0x76bDb43d2EC3b190087076649224F47A58C44eF2
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:12:00Z
+    claim: Address 0x76bD…4eF2 UniswapV3Adapter
+    excerpt: hash 0x76bDb43d2EC3b190087076649224F47A58C44eF2 name UniswapV3Adapter is_contract true is_verified true creator 0x6aC51A706539D4F5A326dA2892520180858e25FF creation_transaction_hash 0x72b5215436ea9932325cc2a07ff135b46ae031de76e069a94e4f6a39a4b8ac05.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S16
+    url: https://robinhoodchain.blockscout.com/address/0x413Ca90D38D964546c2fE03cB103df57372630F6
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:12:00Z
+    claim: Address 0x413C…30F6 ProxyAdmin
+    excerpt: hash 0x413Ca90D38D964546c2fE03cB103df57372630F6 name ProxyAdmin is_contract true is_verified true creator 0x6aC51A706539D4F5A326dA2892520180858e25FF. Smart-contract compiler v0.8.33 file_path lib/openzeppelin-contracts/contracts/proxy/transparent/ProxyAdmin.sol.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S17
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Robinhood Chain RPC
+    kind: explorer
+    accessed_at: 2026-09-03T00:10:00Z
+    claim: eth_getCode, owner, EIP-1967, getActivePositionCount
+    excerpt: eth_blockNumber 0x3299570 (53056880). eth_getCode non-empty on vault, ViewHelper, adapter, impl, ProxyAdmin. owner 0x6aC51A…25FF code 0x. vault owner() 0x6ac51a70…25ff. ProxyAdmin owner() same. EIP-1967 impl 0x999a74dd…91de admin 0x413ca90d…30f6. ViewHelper getActivePositionCount() 9029. NFT name Uniswap V3 Positions NFT-V1.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S18
+    url: https://robinhoodchain.blockscout.com/tx/0x3ae0854d1ac38f02b2a2bed84fcbe722c0b449726c57467d84bdd72473fef0c0
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:12:00Z
+    claim: Vault creation tx 0x3ae0854d…
+    excerpt: timestamp 2026-07-22T23:11:26.000000Z status ok result success from 0x6aC51A706539D4F5A326dA2892520180858e25FF block_number 16810524 created_contract 0x1195C074F898b7644bA732407619c9804dFE6DCE name TransparentUpgradeableProxy implementation SnuggleVaultUpgradeable.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S19
+    url: https://api.llama.fi/summary/fees/snuggle?dataType=dailyFees
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T00:06:00Z
+    claim: Snuggle dailyFees
+    excerpt: "total24h 129993 total7d 814662 total30d 1715064. totalDataChartBreakdown last [1788307200, {Base: {Snuggle: 8118}, Robinhood Chain: {Snuggle: 121834}, Arbitrum: {Snuggle: 40.66}}]. Fees methodology: Trading fees and staking rewards earned by the concentrated liquidity positions the vaults manage, scaled up from the performance fee the vault moved to its treasury."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S20
+    url: https://api.llama.fi/summary/fees/snuggle?dataType=dailyRevenue
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T00:06:00Z
+    claim: Snuggle dailyRevenue
+    excerpt: "total24h 17842 total7d 113555 total30d 241733. totalDataChartBreakdown last [1788307200, {Base: {Snuggle: 1126}, Robinhood Chain: {Snuggle: 16710}, Arbitrum: {Snuggle: 6.04}}]. Revenue methodology: The share of the 15% performance fee that lands in the vault treasury."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S21
+    url: https://x.com/MAXFILABS/status/2095232956168327582
+    publisher: "@MAXFILABS"
+    kind: social
+    accessed_at: 2026-09-03T00:15:00Z
+    claim: MAXFI JUST HIT $9 MILLION TVL
+    excerpt: MAXFI JUST HIT $9 MILLION TVL! $106,071 A DAY average payouts over the last 7 days. $2.34M+ already distributed to LP farmers. $9.14M TVL. No-Swap Rebalancing. Self-Custody, no shared vaults. Crypto + Tokenized Stocks.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S22
+    url: https://x.com/SnuggleFi/status/2084343321355497775
+    publisher: "@SnuggleFi"
+    kind: social
+    accessed_at: 2026-09-03T00:15:00Z
+    claim: HALF A MILLION DOLLARS PAID OUT
+    excerpt: Snuggle and MaxFi have now distributed over $500,000 to liquidity providers! $501,300 paid out to date. $5.07M in total value locked. No swap on rebalance, so no swap fee, no slippage, no price impact. @SnuggleFi @MAXFILABS @YaBonksOfficial.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S23
+    url: https://x.com/SnuggleFi/status/2084023634742378962
+    publisher: "@SnuggleFi"
+    kind: social
+    accessed_at: 2026-09-03T00:15:00Z
+    claim: Snuggle + MaxFi just passed $5,000,000 in TVL
+    excerpt: Snuggle + MaxFi just passed $5,000,000 in TVL. $5.03M locked. $477.5K paid out to LPs. $10,000+ a day in rewards. 10th largest liquidity manager in all of DeFi. 8th largest protocol on all of Robinhood Chain.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S24
+    url: https://x.com/SnuggleFi/status/2081153890934780164
+    publisher: "@SnuggleFi"
+    kind: social
+    accessed_at: 2026-09-03T00:15:00Z
+    claim: MaxFi compact view powered by SnuggleFi
+    excerpt: "46 positions. 34 tokenized stocks, 9 memes, 3 alts. All on one screen. MaxFi's new Compact view: one row per position: value, APR, earnings, range status. @MAXFILABS on @RobinhoodCrypto & @Uniswap powered by @SnuggleFi."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S25
+    url: https://www.maxfi.tech/
+    publisher: MaxFi
+    kind: official-site
+    accessed_at: 2026-09-03T00:09:00Z
+    claim: MaxFi homepage
+    excerpt: "MaxFi · Tokenized stocks & crypto on Robinhood Chain, Base & Arbitrum. FAQ: MaxFi is live on Robinhood Chain, Base and Arbitrum. Robinhood Chain is where the tokenized stocks and ETF pools run. Security contact email snugglefi@gmail.com. Twitter https://x.com/MAXFILABS."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
     available: true

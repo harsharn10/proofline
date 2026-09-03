@@ -5,29 +5,113 @@ category: Savings vault
 lifecycle: mainnet
 lifecycle_source: pulled 0x8cf33e3026604bd85677e7bc6e04d256571b6653 2026-08-27T13:40:19.000Z
 coverage: stub
-summary: Liquid vault shares plus a Morpho Blue NVDA/USDG borrow market (38.5% LTV) using a 30-minute TWAP oracle the project built.
+summary: Vynex turns a Robinhood Chain deposit into a transferable ERC-20 YieldShare that redeems the underlying at any block. A user deposits a stock token or USDG and can sell, transfer, or burn the share. Factory vaults harvest pool fees into the share price; a routed USDG vault forwards deposits into steakUSDG on Morpho Blue. One EOA owns the factory. $VYNEX launched through Pons v2.
 official_links:
   - kind: x
     url: https://x.com/UseVynex
+  - kind: site
+    url: https://www.usevynex.org
+  - kind: docs
+    url: https://www.usevynex.org/docs
+  - kind: app
+    url: https://www.usevynex.org/app
+  - kind: discord
+    url: https://discord.gg/usevynex
 dependencies:
   - morpho
   - stock-tokens
   - usdg
 deployments:
-  - label: VYNEX token (cited by a third-party radar account, not the project)
+  - label: VYNEX token (PonsV2LauncherToken)
     chain: robinhood-chain
-    address: "0x8cf33e3026604bd85677e7bc6e04d256571b6653"
+    address: "0x8cF33E3026604Bd85677e7Bc6E04d256571b6653"
     role: token
-    verified: false
+    verified: true
     sources:
       - S3
       - S2
+      - S6
+      - S10
+      - S11
+      - S12
+      - S13
+      - S20
   - label: Vault / oracle contracts
     chain: robinhood-chain
     address: not-verified
     role: vault
     verified: false
     sources: []
+  - label: VaultFactory (current registry)
+    chain: robinhood-chain
+    address: "0x6d48643d2438EbB75BB80cc6683360C1B9fC4C7b"
+    role: factory
+    verified: true
+    sources:
+      - S6
+      - S14
+      - S15
+      - S35
+  - label: VaultFactory implementation
+    chain: robinhood-chain
+    address: "0xF9e012791490e555Dc6Fe101D556dd5D618A79CE"
+    role: implementation
+    verified: false
+    sources:
+      - S14
+      - S30
+  - label: VaultFactory revision 1 (legacyFactory)
+    chain: robinhood-chain
+    address: "0xee57E1B9B87Ca4318E046FAE2C45923f61d8D199"
+    role: factory
+    verified: false
+    sources:
+      - S6
+      - S31
+  - label: Routed ys-USDG (forwards into steakUSDG)
+    chain: robinhood-chain
+    address: "0x01680B41D61253a61c4C55e897a05D10F280cD2A"
+    role: vault
+    verified: true
+    sources:
+      - S6
+      - S7
+      - S16
+      - S17
+  - label: YieldShares NVDA
+    chain: robinhood-chain
+    address: "0xf8670be5530f383ac7d8cf1b60d1814f0aa827ac"
+    role: vault
+    verified: false
+    sources:
+      - S7
+      - S18
+  - label: NVDA/USDG Morpho oracle (from config.js)
+    chain: robinhood-chain
+    address: "0xcf29960266420A42f12061699ec2daBd7eEa8D6e"
+    role: other
+    verified: false
+    sources:
+      - S6
+      - S19
+  - label: StockZap (USDG in)
+    chain: robinhood-chain
+    address: "0xDCAAA4973180094751D74Ac1B0D8A48EA1e0FacE"
+    role: router
+    verified: false
+    sources:
+      - S6
+      - S32
+  - label: Factory / vault owner EOA
+    chain: robinhood-chain
+    address: "0x9c08276E5FA641DCEBC05d650a1b0Ced671EB208"
+    role: admin
+    verified: false
+    sources:
+      - S14
+      - S15
+      - S17
+      - S18
 review:
   researcher: harsharn10
   approver: pending
@@ -57,4 +141,45 @@ findings:
     - text: Oracle control and Morpho market id
     - text: An independent audit was not found in this review
     - text: Official site not located
-  unresolved: []
+    - text: "Does Morpho 0x9D53d5E3… actually hold market id 0xbe3a5355… with the config.js oracle and 38.5% LLTV? Next: decode Morpho Blue ABI on 4663 and call the live idToMarketParams selector, or open the Morpho market page for chain 4663"
+    - text: "Who owns oracle 0xcf299602… and can the 30-minute TWAP be moved? Next: verify source or eth_call owner()/pools on the oracle"
+    - text: "What can VaultFactory owner() 0x9c08276E… change on unverified factory and vault bytecode? Next: read setFee/harvester/skim modifiers once source is verified or decompiled"
+    - text: "Is there a public repository beyond config.js links.contracts https://github.com? Next: ask the project in public for the org and pin the commit that matches factory 0x6d48643d…"
+    - text: "Why do the docs still print VaultFactory as not deployed after config.js and the explorer show 0x6d48643d…? Next: reload docs after a site deploy and record whether the table catches up"
+    - text: "Is there a third-party audit of the factory or YieldShares bytecode? Next: record any later report with matching addresses"
+  unresolved:
+    - text: deployment.address remains unresolved (CON-1).
+themes:
+  - vault
+  - lending
+  - stock-paired:nvda
+  - rwa
+  - hook
+metrics:
+  - kind: holders
+    value: 2506
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S11
+  - kind: market_cap
+    value: 122221
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: volume_24h
+    value: 111955.79
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: tvl
+    value: 15006.96
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17

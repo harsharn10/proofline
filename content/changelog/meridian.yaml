@@ -25,3 +25,106 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: d79d935d7c5732a8
+- date: 2026-09-03
+  slug: meridian
+  type: finding
+  severity: Material
+  title: Research record updated
+  detail: New packet evidence was mapped into the canonical record; unresolved conflicts and evidence gaps remain explicit.
+  prior:
+    summary: Native perps and a prediction market under one handle; DefiLlama lists Meridian Perps and Meridian Predict TVL on Robinhood Chain.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/meridiandotxyz
+    deployments: []
+    metrics: null
+  new:
+    summary: USDe deposits mint MLP shares in an Accountable ERC-7540 async-redeem vault that lends into an upgradeable AccountableYield strategy; prediction markets run on the same app. Users open app.meridian.xyz; vault management redirects to yield.accountable.capital. @meridiandotxyz is the official handle. mPerps was posted as launching the week after 28 Aug 2026.
+    themes:
+      - rwa
+      - prediction
+      - vault
+    official_links:
+      - kind: x
+        url: https://x.com/meridiandotxyz
+      - kind: site
+        url: https://meridian.xyz
+      - kind: app
+        url: https://app.meridian.xyz
+      - kind: docs
+        url: https://docs.meridian.xyz
+      - kind: discord
+        url: https://discord.com/invite/meridianxyz
+      - kind: other
+        url: https://blog.meridian.xyz
+      - kind: other
+        url: https://yield.accountable.capital/vaults/4663/0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC
+    deployments:
+      - label: Meridian Liquidity Provider (MLP share vault)
+        chain: robinhood-chain
+        address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
+        role: vault
+        verified: true
+        sources:
+          - S17
+          - S18
+          - S23
+      - label: AccountableYield strategy (ERC1967 proxy; app manageUrl)
+        chain: robinhood-chain
+        address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
+        role: proxy
+        verified: true
+        sources:
+          - S10
+          - S21
+          - S23
+      - label: AccountableYield implementation
+        chain: robinhood-chain
+        address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
+        role: implementation
+        verified: false
+        sources:
+          - S21
+          - S35
+      - label: YieldStrategyFactory (Accountable)
+        chain: robinhood-chain
+        address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
+        role: factory
+        verified: false
+        sources:
+          - S19
+          - S20
+      - label: YieldStrategyFactory owner Safe
+        chain: robinhood-chain
+        address: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
+        role: multisig
+        verified: false
+        sources:
+          - S23
+          - S29
+      - label: ConditionalTokensConditionResolver (app robinhood-mainnet map)
+        chain: robinhood-chain
+        address: "0xE42847eE3feE1B29065F14D39EcF664A04d70475"
+        role: other
+        verified: true
+        sources:
+          - S10
+          - S30
+    metrics:
+      - kind: tvl
+        value: 2010892.59
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S23
+      - kind: holders
+        value: 612
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S18
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: deb1957f95d348a4

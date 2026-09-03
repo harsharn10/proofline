@@ -5,24 +5,38 @@ category: Trading aggregator
 lifecycle: mainnet
 lifecycle_source: pulled 0xaA40e79E987517f7462bF79315B8A118799B04E3 2026-08-16T13:00:02.000Z
 coverage: stub
-summary: Non-custodial one-tick limit orders on Uniswap V3 and V4 (the position NFT stays in the user's wallet) with fee revenue split to referrals, buybacks and operations; V2 audited by SpyWolf per the project.
+summary: "SCOPL is a non-custodial Uniswap V3/V4 one-tick limit-order layer: a user sets a target price, the order is minted as a concentrated-liquidity position NFT that stays in that wallet, and fills pay pool fees. The app at scopl.live/trade places those orders on Robinhood Chain. $SCOPL is a Pons V2-launched token; @scopl_live runs the site."
 official_links:
   - kind: site
     url: https://scopl.live
   - kind: x
     url: https://x.com/scopl_live
+  - kind: app
+    url: https://scopl.live/trade
+  - kind: docs
+    url: https://scopl.live/docs
+  - kind: other
+    url: https://scopl.live/guide
+  - kind: telegram
+    url: https://t.me/scopl_live
+  - kind: discord
+    url: https://discord.com/invite/cBBN3WWATU
 dependencies:
   - uniswap
 deployments:
-  - label: SCOPL token (account bio; SpyWolf audit for chain 4663)
+  - label: SCOPL token (PonsV2LauncherToken; name scopl.live)
     chain: robinhood-chain
     address: "0xaA40e79E987517f7462bF79315B8A118799B04E3"
     role: token
-    verified: false
+    verified: true
     sources:
       - S4
       - S5
       - S3
+      - S11
+      - S12
+      - S13
+      - S14
   - label: V2 contracts (OrderPolicy, V3 and V4 managers, Referral, RevenueDistributor, FeeRouter, ZapRouter, BuybackVault, RouterSwapAdapter)
     chain: robinhood-chain
     address: not-verified
@@ -30,6 +44,82 @@ deployments:
     verified: false
     sources:
       - S5
+  - label: ScoplLimitOrderManager V3 (API and guide current live)
+    chain: robinhood-chain
+    address: "0xf4badBc5bea19E94f61084172f7b68383166CDd7"
+    role: other
+    verified: true
+    sources:
+      - S8
+      - S10
+      - S15
+      - S36
+  - label: ScoplV4LimitOrderManager (API and guide current live)
+    chain: robinhood-chain
+    address: "0xcdD1E3BC873e5Ff7cA974b7212D6031fe853Cd42"
+    role: other
+    verified: true
+    sources:
+      - S8
+      - S10
+      - S16
+      - S37
+  - label: ScoplFeeRouter
+    chain: robinhood-chain
+    address: "0x7d3ea31b89804d7Dd755781d56eab7128A8b4D48"
+    role: other
+    verified: false
+    sources:
+      - S8
+      - S17
+  - label: ScoplReferralRewards
+    chain: robinhood-chain
+    address: "0x4eE310BCB577afB4beEcDA9422764B7A8E4e04a3"
+    role: other
+    verified: false
+    sources:
+      - S8
+      - S18
+  - label: ScoplRevenueDistributor
+    chain: robinhood-chain
+    address: "0x0A552810F73892216Ae755A027D4AD3efdE3Ca87"
+    role: other
+    verified: false
+    sources:
+      - S8
+      - S19
+  - label: ScoplBuybackVault
+    chain: robinhood-chain
+    address: "0x885C479cD30d02f7a7a09dC785b577B23ee27a00"
+    role: vault
+    verified: false
+    sources:
+      - S8
+      - S20
+  - label: ScoplRouterSwapAdapter
+    chain: robinhood-chain
+    address: "0x168567e09A4835D80589BCDE3F1dA5c930D5d9e7"
+    role: other
+    verified: false
+    sources:
+      - S8
+      - S21
+  - label: ScoplZapRouter
+    chain: robinhood-chain
+    address: "0x34BE29754d2538B31B556A7d2253a98917468c49"
+    role: router
+    verified: false
+    sources:
+      - S8
+      - S22
+  - label: ScoplOrderPolicy (verified on 4663; omitted from the eight-contract guide)
+    chain: robinhood-chain
+    address: "0xfA7a06b158eCf40232A4e1c976160be592391646"
+    role: other
+    verified: false
+    sources:
+      - S23
+      - S25
 review:
   researcher: harsharn10
   approver: pending
@@ -62,11 +152,62 @@ findings:
         - S6
         - S4
         - S5
+    - text: 'Receipts: every URL above was opened on 2026-09-02 and its excerpt copied from the page or API JSON. [verified R-1 R-2 R-4 R-6 R-18 R-19] - Numbers: holders are the Blockscout token field; volume, market cap and TVL are the DexScreener SCOPL/ETH v4 pair slice, not all-pairs and not the pool-explorer chain total. [claim R-6 R-18 R-33] - Adversarial: the strongest contrary reading is that SCOPL is only a Pons-launched memecoin with a marketing site, or that V2 is still undeployed because X says "almost here". The verified PonsV2LauncherToken, the guide/API manager addresses with thousands of transactions, and the Uniswap v4 SCOPL/ETH pool argue against both. A weaker contrary reading is that the extra manager clones are the live product; the public API and guide name 0xf4badBc5… and 0xcdD1E3BC… only.'
+      class: inference
+      sources:
+        - S8
+        - S10
+        - S14
+        - S15
+        - S16
+        - S24
+    - text: Live owner() of the managers, distributor and buyback vault was not reproduced; constructor ownership is one EOA with no timelock in the source read. [inference R-32 R-34] - Official X still describes V2 as almost here while the named V2 managers already execute on 4663. [disputed R-20 R-30] - ScoplOrderPolicy is verified on chain and named in the audit but omitted from the eight-contract guide. [verified R-2 R-17] - At least three additional ScoplLimitOrderManager and four additional ScoplV4LimitOrderManager contracts exist on 4663 beside the API addresses. [claim R-9] - Third-party posts pointed at crypto.cryptolot.lol with the official token address; that host is not scopl.live. [claim R-26] - Address 0x07f5B682… is not a contract on 4663. [verified R-28] - No official source repository was located.
+      class: unknown
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from the bio not reproduced on Blockscout
     - text: Nine V2 contract addresses not published
     - text: Buyback vault and fee router control
     - text: "Whether V2 is live: the audit text and the official account disagree"
+    - text: "What address does owner() return today on the live V3/V4 managers, distributor and buyback vault — still EOA 0x7F4a8ff9… or a Safe? Next: eth_call owner() and pendingOwner() on each guide contract once RPC or a working explorer proxy is available"
+    - text: "Is ScoplOrderPolicy 0xfA7a06b1… in the live order path, and why does the eight-contract guide omit it? Next: read verified manager constructor immutables for an orderPolicy address"
+    - text: "Which of the extra ScoplLimitOrderManager / ScoplV4LimitOrderManager clones still hold position NFTs? Next: compare nextOrderId and NFT approvals on the extra clones"
+    - text: "Is there a public source repository whose commit matches the verified bytecode? Next: ask the project in public for the repo URL and record the answer as a claim"
+    - text: "Does DefiLlama have a Robinhood Chain slice for SCOPL under another slug? Next: search Llama chain=Robinhood for SCOPL / scopl.live"
   unresolved:
     - text: The audit text describes the protocol as already live while the official account still described V2 as around the corner; no deployed addresses for the nine V2 contracts were published.
+    - text: activity.status remains unresolved (CON-1).
+themes:
+  - nft
+  - hook
+  - rwa
+  - tooling
+metrics:
+  - kind: holders
+    value: 1342
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S12
+  - kind: volume_24h
+    value: 220293.98
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S24
+  - kind: market_cap
+    value: 913350
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S24
+  - kind: tvl
+    value: 144283.84
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S24
+      - S39

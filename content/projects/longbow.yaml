@@ -5,12 +5,18 @@ category: Credit aggregation layer
 lifecycle: mainnet
 lifecycle_source: pulled 0x451b42A15100C340CA12F7c66DE06fac5EA2D751 2026-08-08T18:17:53.000Z
 coverage: stub
-summary: "Credit overlay on Morpho Blue: isolated markets to borrow USDG against Stock Tokens, PONS and other collateral, with a $BOW token that shares protocol revenue per the project."
+summary: "Isolated Morpho Blue markets on Robinhood Chain: a user posts Stock Tokens, PONS or other collateral and borrows USDG without selling the position. Suppliers deposit USDG into Longbow-curated vaults that allocate across those markets. BOW is the protocol token, launched through Pons v2 and paired to SPY on Uniswap v4. @longbowlend runs longbow.cash."
 official_links:
   - kind: site
     url: https://longbow.cash
   - kind: x
     url: https://x.com/longbowlend
+  - kind: site
+    url: https://www.longbow.cash
+  - kind: docs
+    url: https://docs.longbow.cash
+  - kind: telegram
+    url: https://t.me/longbowlend
 dependencies:
   - morpho
   - usdg
@@ -18,14 +24,17 @@ dependencies:
   - chainlink
   - uniswap
 deployments:
-  - label: BOW token
+  - label: BOW token (PonsV2LauncherToken)
     chain: robinhood-chain
     address: "0x451b42A15100C340CA12F7c66DE06fac5EA2D751"
     role: token
-    verified: false
+    verified: true
     sources:
       - S3
       - S4
+      - S13
+      - S14
+      - S24
   - label: Morpho market contracts (GLD/USDG, RDDT/USDG, PONS/USDG)
     chain: robinhood-chain
     address: not-verified
@@ -33,6 +42,55 @@ deployments:
     verified: false
     sources:
       - S6
+  - label: Longbow Core USDG vault (lbcoreUSDG)
+    chain: robinhood-chain
+    address: "0x026df18fbd2A7639089D0a16293383ec687A5Ca1"
+    role: vault
+    verified: true
+    sources:
+      - S16
+      - S18
+      - S20
+  - label: Longbow USDG MetaMorpho V1_1 vault
+    chain: robinhood-chain
+    address: "0x8cb8AA35228c96C1C4E956E69AbAEBCc2aA7Dcfe"
+    role: vault
+    verified: false
+    sources:
+      - S17
+      - S21
+  - label: BOW StakingRewards
+    chain: robinhood-chain
+    address: "0xEba502e1177f5fad9432c2deb273569D8381e01A"
+    role: other
+    verified: false
+    sources:
+      - S19
+      - S22
+  - label: Core vault owner Safe (SafeL2)
+    chain: robinhood-chain
+    address: "0x396ae0BD5623c3750e15fd222770F1e972153ED4"
+    role: multisig
+    verified: true
+    sources:
+      - S25
+      - S26
+  - label: Morpho Blue (settlement primitive; not Longbow-owned)
+    chain: robinhood-chain
+    address: "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010"
+    role: other
+    verified: true
+    sources:
+      - S23
+  - label: BOW/USDG Ramses v3 pool
+    chain: robinhood-chain
+    address: "0x95D1b62891531b9207aD9C79a021bDf6BE452920"
+    role: other
+    verified: true
+    sources:
+      - S15
+      - S27
+      - S40
 review:
   researcher: harsharn10
   approver: pending
@@ -55,6 +113,20 @@ findings:
       sources:
         - S3
         - S7
+    - text: "Receipts: www.longbow.cash HTML and JS, docs.longbow.cash, X profile and named status URLs, t.me/longbowlend, Blockscout address/token/tx APIs, DexScreener token-pairs, Longbow `/api/stats` `/api/markets` `/api/v2/vaults` `/api/stats/rich`, DefiLlama protocol/longbow (400), github.com/LongbowFinance (404), and RPC eth_getCode/eth_call were opened on 2026-09-02; excerpts are copied from those responses."
+      class: verified
+      sources:
+        - S9
+        - S13
+        - S15
+        - S16
+    - text: "Numbers: 588602.3 USD is `/api/stats` tvl on chainId 4663, not a DefiLlama row; 832979.57 USD is DexScreener Uniswap v4 BOW/SPY volume.h24, not an all-pairs or all-chains total; 5753 is Blockscout holders_count; 500000 USD is an official post, not the API print."
+      class: claim
+      sources:
+        - S14
+        - S15
+        - S16
+        - S34
   risk:
     - text: The official account's 2026-08-30 post gave an Ethereum-cashtag address (0x07f5b682…) as the Pons token; Proofline found that address is not a contract on chain 4663. Addresses in the project's posts should not be copied without a check.
       class: claim
@@ -65,6 +137,39 @@ findings:
       sources:
         - S4
         - S3
+    - text: "Adversarial: the strongest contrary reading is that Longbow is LONG, Longshot, bow.fun or the Doppler BOW clone, or that census `announced` still holds because Morpho marketIds were not eth_called. Token name Longbow, PonsV2LauncherToken source, Uniswap v4 BOW/SPY book, and site↔handle cross-link argue against a merge; the pool and token on 4663 meet the mainnet bar even while market-id params stay API claims."
+      class: inference
+      sources:
+        - S11
+        - S13
+        - S15
+        - S28
+    - text: Official `/api/markets` lists GLD/USDG at 38.5% LLTV after the 24 Aug post said 62.5%; Morpho market parameters are immutable, so this may be a different marketId.
+      class: disputed
+      sources:
+        - S17
+        - S31
+    - text: PONS/USDG utilization is 1 on the API (51769.68 USDG borrowed against the same supply).
+      class: claim
+      sources:
+        - S17
+    - text: "Official posts tagged `ethereum:0x07f5b682…` as PONS; that address has no code on 4663. Flag: wrong-chain, ca-collision."
+      class: verified
+      sources:
+        - S29
+        - S32
+    - text: Core USDG vault source is unverified; v1 MetaMorpho and staking are owned by one EOA with no timelock found.
+      class: verified
+      sources:
+        - S20
+        - S21
+        - S22
+    - text: No Longbow overlay audit report was located; Morpho Blue audits named in site copy cover the settlement primitive. [claim R-2]
+      class: unknown
+    - text: "Same-ticker BOW `0xf56D9aDA…` is a different contract. Flag: ticker-only."
+      class: verified
+      sources:
+        - S28
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: BOW address not reproduced on Blockscout
@@ -72,5 +177,46 @@ findings:
     - text: Fee-split enforcement not verified against contracts
     - text: An independent audit was not found in this review
     - text: TVL figures ($100k per the project on 2026-08-30; $58.6k per a third party on 2026-08-29) not reproduced
+    - text: "Do the /api/markets Morpho marketIds (PONS 0xaba3ac50…, SPY 0x50bc39b5…, GLD 0x6c12c025…) match Morpho.idToMarketParams on 0x9D53d5…, and is GLD 38.5% a new market or a relabel of the 62.5% post? Next: eth_call idToMarketParams for those bytes32 keys and compare lltv, oracle, loan and collateral"
+    - text: "What is the verified source and allocator path of Core vault 0x026df18… and adapter 0xDA803813…? Next: read bytecode/selectors or wait for explorer verification; map adapter allocations to Morpho markets"
+    - text: "Is there a Longbow overlay audit, or only the Morpho Blue and NFT-escrow reviews named in site copy? Next: open any report URL the project posts and match commit/address scope"
+    - text: "Is the 35/30/25/10 lending fee split still encoded, and which contract enforces it? Next: read StakingRewards and vault feeRecipient 0xa4c8e4ed… transfers"
+    - text: "Who are the three Safe owners, and is there a timelock in front of market creation or vault allocation? Next: label the three EOAs if they appear in verified source or a project post"
   unresolved:
     - text: "TVL: the project posted $100k on 30 Aug; a third-party post cited $58.6k on 29 Aug; DefiLlama had no usable row for Proofline. None reproduced."
+    - text: Official `/api/markets` lists GLD/USDG at 38.5% LLTV after the 24 Aug post said 62.5%; Morpho market parameters are immutable, so this may be a different marketId.
+    - text: product.mechanism remains unresolved (CON-1).
+themes:
+  - lending
+  - rwa
+  - vault
+  - nft
+  - stock-paired:spy
+metrics:
+  - kind: tvl
+    value: 588602.3
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S16
+  - kind: volume_24h
+    value: 832979.57
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S15
+  - kind: holders
+    value: 5753
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S14
+  - kind: market_cap
+    value: 4843328.84
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S14

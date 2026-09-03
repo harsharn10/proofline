@@ -12,3 +12,183 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: f7a911ac3cb5f5a2
+- date: 2026-09-03
+  slug: swaphood
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Native AMM (a PancakeSwap V3 fork per the explorer contract name) with HOOD emissions to LPs, fees to HOOD buybacks and buybacks into h33 backing.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/SwapHoodFi
+    deployments:
+      - label: HOOD token (SwapHood Token — not the Robinhood HOOD Stock Token)
+        chain: robinhood-chain
+        address: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
+        role: token
+        verified: false
+        sources:
+          - S4
+          - S5
+          - S2
+      - label: V3 factory (explorer contract name PancakeV3Factory)
+        chain: robinhood-chain
+        address: "0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7"
+        role: factory
+        verified: false
+        sources:
+          - S4
+          - S5
+          - S2
+      - label: h33 token (gitbook, candidate)
+        chain: robinhood-chain
+        address: "0xA7036C8C28F96e8cE242d0Af45d1B395B69DAF38"
+        role: token
+        verified: false
+        sources:
+          - S4
+          - S2
+      - label: V2 factory (gitbook, candidate)
+        chain: robinhood-chain
+        address: "0xE7206Ecac3A51afe7e6179182ad4130A26068dD1"
+        role: factory
+        verified: false
+        sources:
+          - S4
+          - S2
+      - label: HOOD pair (official 12 Jul post)
+        chain: robinhood-chain
+        address: "0xea7ba72be3baab20546bfda880b7e285e5a51168"
+        role: other
+        verified: false
+        sources:
+          - S4
+    metrics: null
+  new:
+    summary: A native AMM on Robinhood Chain with a SwapHood V2 constant-product factory and a PancakeV3Factory for concentrated liquidity. A user swaps or deposits into pools, stakes LP for HOOD, and can convert HOOD to xHOOD/h33 for fee buybacks. @SwapHoodFi runs it at swaphood.finance.
+    themes:
+      - vault
+      - rwa
+    official_links:
+      - kind: x
+        url: https://x.com/SwapHoodFi
+      - kind: site
+        url: https://swaphood.finance
+      - kind: app
+        url: https://www.swaphood.finance
+      - kind: docs
+        url: https://swaphood-finance.gitbook.io/swaphood-finance-docs
+      - kind: docs
+        url: https://docs.swaphood.finance
+      - kind: telegram
+        url: https://t.me/SwapHood
+      - kind: discord
+        url: https://discord.gg/vjJcXctWYm
+    deployments:
+      - label: HOOD token (SwapHood Token)
+        chain: robinhood-chain
+        address: "0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
+        role: token
+        verified: true
+        sources:
+          - S4
+          - S5
+          - S2
+          - S10
+          - S20
+          - S27
+      - label: V3 factory (explorer contract name PancakeV3Factory)
+        chain: robinhood-chain
+        address: "0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7"
+        role: factory
+        verified: true
+        sources:
+          - S4
+          - S5
+          - S2
+          - S10
+          - S21
+          - S27
+      - label: h33 token (Hood Liquid Staking Token)
+        chain: robinhood-chain
+        address: "0xA7036C8C28F96e8cE242d0Af45d1B395B69DAF38"
+        role: token
+        verified: true
+        sources:
+          - S4
+          - S2
+          - S10
+          - S23
+          - S27
+      - label: V2 factory (SwapHoodFactory)
+        chain: robinhood-chain
+        address: "0xE7206Ecac3A51afe7e6179182ad4130A26068dD1"
+        role: factory
+        verified: true
+        sources:
+          - S4
+          - S2
+          - S10
+          - S22
+          - S27
+      - label: HOOD/WETH V2 pair (vAMM-WETH/HOOD)
+        chain: robinhood-chain
+        address: "0xeA7ba72BE3baaB20546bFdA880b7E285E5a51168"
+        role: other
+        verified: true
+        sources:
+          - S4
+          - S24
+          - S28
+          - S35
+      - label: xHOOD token
+        chain: robinhood-chain
+        address: "0xd3125799EEcb4c9eB6b9d570d15a782808D9BDC3"
+        role: token
+        verified: true
+        sources:
+          - S10
+          - S26
+          - S27
+      - label: HOOD and V3 factory owner
+        chain: robinhood-chain
+        address: "0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb"
+        role: admin
+        verified: true
+        sources:
+          - S25
+          - S27
+    metrics:
+      - kind: tvl
+        value: 13481.19
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S31
+      - kind: volume_24h
+        value: 61998
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S37
+      - kind: fees_24h
+        value: 65.05
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S32
+      - kind: holders
+        value: 407
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S20
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 0d7c9684d5d5897b

@@ -12,257 +12,541 @@
   name: Pons
   category: Bonding-curve launchpad
   lifecycle: mainnet
-  coverage: full          # first full record, 2026-08-31 (PRD §13, §14 step 4); approver pending → provisional
+  coverage: full # first full record, 2026-08-31 (PRD §13, §14 step 4); approver pending → provisional
   identity:
-    aliases: []
-    symbols: ["PONS"]
+    aliases:
+      - pons
+    symbols:
+      - PONS
     entity_kind: protocol
     chain_scope: robinhood-native
-    status: verified
+    status: provisional
   official_links:
-    - { kind: site, url: https://ponsfamily.com }
-    - { kind: x, url: https://x.com/ponsdotfamily }
+    - kind: site
+      url: https://ponsfamily.com
+    - kind: x
+      url: https://x.com/ponsdotfamily
+    - kind: app
+      url: https://www.ponsfamily.com/launchpad
+    - kind: docs
+      url: https://docs.ponsfamily.com
+    - kind: docs
+      url: https://docs.ponsfamily.com/docs/v2
+    - kind: telegram
+      url: https://t.me/ponsdotfamily
   discovery_source: PRD seed table 2026-08-30; Messari profile pons-launchpad; Bitquery Pons API docs; Grok desk map 2026-08-31
   handle: "@ponsdotfamily"
-  tree: { primary: launch/bonding-curve, secondary: [trading/amm-native] }
+  tree:
+    primary: launch/bonding-curve
+    secondary:
+      - trading/amm-native
   qualifying:
-    deployed_on_chain: { value: true, note: "Fourteen documented v1/v2 contracts reproduced on Blockscout 4663 on 2026-08-31 (twelve with verified source) plus the owner Safe; DefiLlama fee/volume rows", verified: true }
-    native_play:       { value: true, note: "Launchpad built for chain 4663 with two documented generations: v1 (fixed-supply token into a locked Uniswap V3 WETH pool) and v2 (bonding curve graduating into a locked Uniswap v4 pool, pairable against approved assets)", verified: true }
-    citable:           { value: true, note: "Official site listed in PRD Appendix A; v1 and v2 docs read 2026-08-31; X handle from the desk", verified: true }
-    research_story:    { value: true, note: "Owner rights over fee recipients, pairing assets and graduation components held by a 2-of-3 Safe with no timelock; v2 deployed and unaudited behind a creator allowlist; v2 quote assets include tokenised stocks", verified: true }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: mancer
   name: Mancer
   category: Trading aggregator
-  lifecycle: beta
+  lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["MANCER"]
+    aliases:
+      - Chain Mancers
+    symbols:
+      - MANCER
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://mancer.xyz }
-    - { kind: docs, url: https://mancer.xyz/docs }
-    - { kind: whitepaper, url: https://mancer.xyz/whitepaper.pdf }
-    - { kind: x, url: https://x.com/MancerXYZ }
+    - kind: app
+      url: https://mancer.xyz
+    - kind: docs
+      url: https://mancer.xyz/docs
+    - kind: whitepaper
+      url: https://mancer.xyz/whitepaper.pdf
+    - kind: x
+      url: https://x.com/MancerXYZ
+    - kind: discord
+      url: https://discord.gg/mancer
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31
   handle: "@MancerXYZ"
-  tree: { primary: trading/aggregator, secondary: [nft-treasury/nft-fee-claim] }
+  tree:
+    primary: trading/aggregator
+    secondary:
+      - nft-treasury/nft-fee-claim
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: native DEX aggregator with resting orders; desk reads the 2026-08-14 post as a gated beta", verified: false }
-    native_play:       { value: true, note: "Aggregator + order layer; Chain Mancers NFT + $MANCER; Shield announced", verified: false }
-    citable:           { value: true, note: "Site, docs, whitepaper, X account", verified: false }
-    research_story:    { value: true, note: "Non-custodial order claims and NFT fee claim need verification; router audit in progress per the project", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: artificial-inu
   name: Artificial Inu
   category: Stock-paired token
-  lifecycle: mainnet   # pulled: 0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18 2026-07-14T17:48:31.000Z
+  lifecycle: mainnet # pulled: 0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18 2026-07-14T17:48:31.000Z
   coverage: stub
   identity:
     aliases: []
-    symbols: ["AI"]
+    symbols:
+      - AI
     entity_kind: token
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://artificialinu.com }
-    - { kind: x, url: https://x.com/ArtificiallyInu }
+    - kind: site
+      url: https://artificialinu.com
+    - kind: x
+      url: https://x.com/ArtificiallyInu
+    - kind: docs
+      url: https://artificialinu.com/how-it-works
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31
   handle: "@ArtificiallyInu"
-  tree: { primary: rwa-products/stock-paired-token }
+  tree:
+    primary: rwa-products/stock-paired-token
   qualifying:
-    deployed_on_chain: { value: true, note: "Token contract address given in PRD Appendix A", verified: false }
-    native_play:       { value: true, note: "Flagship LONG launch; $AI paired to tokenized NVDA; community vault", verified: false }
-    citable:           { value: true, note: "Official site and contract address; X handle from the desk (fill round 4)", verified: false }
-    research_story:    { value: true, note: "Vault, fee routing and pair design against a Stock Token", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: longshot
   name: Longshot
-  category: Stock-paired token factory
-  lifecycle: mainnet   # pulled: 0x8701E2C87ade58325601f4F9bf37ADF46Cb75745 2026-08-12T22:53:45.000Z
+  category: Bonding-curve launchpad
+  lifecycle: mainnet # pulled: 0x8701E2C87ade58325601f4F9bf37ADF46Cb75745 2026-08-12T22:53:45.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: []
+    aliases:
+      - LONGSHOT
+      - uselongshot
+    symbols:
+      - LONGSHOT
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: multichain
     status: provisional
   official_links:
-    - { kind: site, url: https://www.uselongshot.xyz }
-    - { kind: x, url: https://x.com/uselongshot }
+    - kind: docs
+      url: https://www.uselongshot.xyz
+    - kind: x
+      url: https://x.com/uselongshot
+    - kind: telegram
+      url: https://t.me/uselongshot
+    - kind: github
+      url: https://github.com/LongshotRH/Longshot
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31
   handle: "@uselongshot"
-  tree: { primary: launch/stock-paired-factory, secondary: [trading/perps-imported] }
+  tree:
+    primary: launch/bonding-curve
   qualifying:
-    deployed_on_chain: { value: true, note: "RH Chain token address given in PRD Appendix A", verified: false }
-    native_play:       { value: true, note: "Launch / fee-routing protocol with a fixed Hyperliquid perp leg", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Fee split into a Hyperliquid perp, holder rewards and protocol — cross-venue custody path", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: long
   name: LONG
   category: Stock-paired token factory
-  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  lifecycle: mainnet # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   identity:
-    aliases: []
+    aliases:
+      - long.xyz
+      - LongLauncher
     symbols: []
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: app, url: https://app.long.xyz }
-    - { kind: x, url: https://x.com/longdotxyz }
+    - kind: app
+      url: https://app.long.xyz
+    - kind: x
+      url: https://x.com/longdotxyz
+    - kind: docs
+      url: https://app.long.xyz/litepaper
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31
   handle: "@longdotxyz"
-  tree: { primary: launch/stock-paired-factory }
+  tree:
+    primary: launch/stock-paired-factory
   qualifying:
-    deployed_on_chain: { value: true, note: "Factory contracts referenced (truncated) in PRD Appendix A; workbook cites a Dune dashboard of the factory", verified: false }
-    native_play:       { value: true, note: "Stock-paired launchpad; Factory + Airlock; $AI launched here", verified: false }
-    citable:           { value: true, note: "App and X account", verified: false }
-    research_story:    { value: true, note: "Venue that made stock-paired tokens possible; launch mechanics and airlock controls", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: stonkbroker
   name: StonkBrokers
   category: Token-bound treasury NFT
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["STONKBROKER"]
+    aliases:
+      - StonkBroker
+      - Stonk Brokers
+      - Clutch Markets
+      - Clutch Labs
+    symbols:
+      - STONKBROKER
+      - STONK
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://stonkbrokers.cash }
-    - { kind: x, url: https://x.com/ClutchMarkets }
+    - kind: site
+      url: https://stonkbrokers.cash
+    - kind: x
+      url: https://x.com/ClutchMarkets
+    - kind: site
+      url: https://stonkbrokers.io
+    - kind: docs
+      url: https://www.stonkbrokers.cash/docs
+    - kind: docs
+      url: https://www.stonkbrokers.cash/docs/stonkbroker-token
+    - kind: github
+      url: https://github.com/Clutch-L4bs/stonkbroker-erc20
+    - kind: app
+      url: https://www.stonkbrokers.cash/marketplace
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31 (handle, Llama rows)
   handle: "@ClutchMarkets"
-  tree: { primary: nft-treasury/token-bound-nft, secondary: [launch/nft-gated-launch, markets/options, yield/lp-manager] }
+  tree:
+    primary: nft-treasury/token-bound-nft
+    secondary:
+      - markets/options
+      - launch/bonding-curve
+      - tooling/locker
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: native ERC-6551 NFT on Robinhood Chain; DefiLlama lists StonkBrokers TVL and fees", verified: false }
-    native_play:       { value: true, note: "ERC-6551 NFT that can hold Stock Tokens; STORMM options overlay and Leverage Machine announced", verified: false }
-    citable:           { value: true, note: "Site from the workbook and the Clutch Markets X account from the desk", verified: false }
-    research_story:    { value: true, note: "Token-bound accounts holding Stock Tokens — custody and control questions", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: index
   name: The Index
   category: Fee-funded RWA distributor
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["INDEX"]
+    aliases:
+      - Index
+    symbols:
+      - INDEX
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://theindex.finance }
-    - { kind: x, url: https://x.com/TheIndexFi }
+    - kind: site
+      url: https://theindex.finance
+    - kind: x
+      url: https://x.com/TheIndexFi
+    - kind: app
+      url: https://indices.theindex.finance
+    - kind: app
+      url: https://rwa.wtf
+    - kind: github
+      url: https://github.com/justintimecompilation
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31 (handle, Llama revenue row)
   handle: "@TheIndexFi"
-  tree: { primary: rwa-products/tax-distributor }
+  tree:
+    primary: rwa-products/tax-distributor
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: native RWA distributor; token address given in the dossier and workbook; DefiLlama revenue row", verified: false }
-    native_play:       { value: true, note: "Pool tax buys a basket of Stock Tokens for holders", verified: false }
-    citable:           { value: true, note: "Site from the workbook and X account from the desk", verified: false }
-    research_story:    { value: true, note: "Tax-funded basket accumulation — who controls the basket and the tax", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: arrow
   name: Arrow Finance
   category: Collateralized debt protocol
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["ARROW"]
+    aliases:
+      - Arrow
+      - ArrowPad
+    symbols:
+      - ARROW
+      - aUSD
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: docs, url: https://app.arrowfinance.io/docs }
-    - { kind: x, url: https://x.com/ArrowFinanceio }
+    - kind: docs
+      url: https://app.arrowfinance.io/docs
+    - kind: x
+      url: https://x.com/ArrowFinanceio
+    - kind: site
+      url: https://www.arrowfinance.io
+    - kind: app
+      url: https://app.arrowfinance.io
+    - kind: app
+      url: https://staking.arrowfinance.io
+    - kind: app
+      url: https://cdp.arrowfinance.io
+    - kind: docs
+      url: https://www.arrowfinance.io/docs
+    - kind: telegram
+      url: https://t.me/arrowfinanceio
+    - kind: telegram
+      url: https://t.me/arrowfinanceupdates
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31
   handle: "@ArrowFinanceio"
-  tree: { primary: credit/cdp }
+  tree:
+    primary: credit/cdp
+    secondary:
+      - launch/bonding-curve
   qualifying:
-    deployed_on_chain: { value: true, note: "The official CDP app showed active Robinhood Chain markets and live protocol balances after the 2026-08-31 launch; ARROW and aUSD contracts were also reported on Blockscout 4663. Core CDP addresses remain unidentified", verified: false }
-    native_play:       { value: true, note: "Native CDP / DeFi gateway plus launchpad (ArrowPad)", verified: false }
-    citable:           { value: true, note: "Docs site and X account", verified: false }
-    research_story:    { value: true, note: "CDP collateral and liquidation path; launchpad controls; audit status", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: bankr
   name: Bankr
   category: Agent execution platform
-  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  lifecycle: mainnet # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   identity:
-    aliases: []
-    symbols: []
-    entity_kind: protocol
-    chain_scope: unknown
+    aliases:
+      - bankr.bot
+      - Bankrbot
+    symbols:
+      - BNKR
+    entity_kind: application
+    chain_scope: multichain
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/bankrbot }
+    - kind: x
+      url: https://x.com/bankrbot
+    - kind: site
+      url: https://bankr.bot
+    - kind: app
+      url: https://bankr.bot/terminal
+    - kind: docs
+      url: https://docs.bankr.bot
+    - kind: github
+      url: https://github.com/BankrBot
+    - kind: telegram
+      url: https://t.me/bankr_ai_bot
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31 (handle)
   handle: "@bankrbot"
-  tree: { primary: agents/agent-execution, secondary: [launch/stock-paired-factory] }
+  tree:
+    primary: agents/agent-execution
+    secondary:
+      - launch/stock-paired-factory
   qualifying:
-    deployed_on_chain: { value: true, note: "PRD: agent trading surface expanded onto RH Chain; desk observed stock-paired deployments from the account on 2026-08-31", verified: false }
-    native_play:       { value: true, note: "Agent / execution surface with its own stock-paired factory", verified: false }
-    citable:           { value: true, note: "X account from the desk; no site located", verified: false }
-    research_story:    { value: true, note: "Agent-driven execution: key custody, permissions, routing", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: meridian
   name: Meridian
   category: Native perpetuals exchange
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: []
+    aliases:
+      - mPerps
+      - Meridian Predict
+      - Meridian Perps
+      - MLP Vault
+      - meridian.xyz
+    symbols:
+      - MLP
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/meridiandotxyz }
+    - kind: x
+      url: https://x.com/meridiandotxyz
+    - kind: site
+      url: https://meridian.xyz
+    - kind: app
+      url: https://app.meridian.xyz
+    - kind: docs
+      url: https://docs.meridian.xyz
+    - kind: discord
+      url: https://discord.com/invite/meridianxyz
   discovery_source: PRD seed table 2026-08-30; Grok desk map 2026-08-31 (handle, Llama TVL rows)
   handle: "@meridiandotxyz"
-  tree: { primary: trading/perps-native, secondary: [markets/prediction] }
+  tree:
+    primary: trading/perps-native
+    secondary:
+      - markets/prediction
+      - yield/savings-vault
   qualifying:
-    deployed_on_chain: { value: true, note: "DefiLlama lists Meridian Perps and Meridian Predict TVL on Robinhood Chain (desk snapshot 2026-08-31); no deployment or official post reviewed", verified: false }
-    native_play:       { value: true, note: "Prediction / RWA market plus native perps under one handle", verified: false }
-    citable:           { value: true, note: "X account from the desk; no site located", verified: false }
-    research_story:    { value: true, note: "Resolution/oracle design and collateral custody", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: statics-protocol
   name: Statics Protocol
   category: Redeemable RWA basket
-  lifecycle: beta
+  lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["STATICS"]
+    aliases:
+      - Statics
+      - EqualFi Labs
+    symbols:
+      - STATICS
+      - STATOPS
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://staticsprotocol.com }
-    - { kind: docs, url: https://docs.staticsprotocol.com/docs/rollout/ }
-    - { kind: docs, url: https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/ }
-    - { kind: docs, url: https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/ }
-    - { kind: x, url: https://x.com/StaticsProtocol }
+    - kind: site
+      url: https://staticsprotocol.com
+    - kind: docs
+      url: https://docs.staticsprotocol.com/docs/rollout/
+    - kind: docs
+      url: https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/
+    - kind: docs
+      url: https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/
+    - kind: x
+      url: https://x.com/StaticsProtocol
+    - kind: app
+      url: https://staticsprotocol.com/app
+    - kind: docs
+      url: https://docs.staticsprotocol.com/docs/tokenomics/
+    - kind: github
+      url: https://github.com/EqualFiLabs/statics
+    - kind: telegram
+      url: https://t.me/EqualFi
   discovery_source: Prototype seed profile 2026-08-30; restored by product owner; Grok desk map 2026-08-31
   handle: "@StaticsProtocol"
-  tree: { primary: rwa-products/redeemable-basket, secondary: [trading/amm-native, chain-infra/stablecoin, credit/cdp] }
+  tree:
+    primary: rwa-products/redeemable-basket
+    secondary:
+      - trading/amm-native
   qualifying:
-    deployed_on_chain: { value: true, note: "Docs report Genesis system live on Robinhood mainnet 2026-08-27; the project's 30–31 Aug posts say the DEX is not live and credit is off", verified: false }
-    native_play:       { value: true, note: "Redeemable multi-asset baskets, connected pools, self-backed credit", verified: false }
-    citable:           { value: true, note: "Rollout, governance and deployment docs; site and X account", verified: false }
-    research_story:    { value: true, note: "Upgrade authority, seven-day timelock target, audit status", verified: false }
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 
 - slug: safehood
   name: Safehood
@@ -284,56 +568,105 @@
   tree: { primary: launch/uni-pool-launch }
   qualifying:
     deployed_on_chain: { value: true, note: "Repository publishes mainnet contract addresses; the desk found the official account quiet since 2026-07-16 and recorded lifecycle as unknown", verified: false }
-    native_play:       { value: true, note: "Launchpad creating Uniswap v3 pools and opening trading on mainnet", verified: false }
-    citable:           { value: true, note: "Source repository, site and X account", verified: false }
-    research_story:    { value: true, note: "Project states all protocol admin roles sit in one platform admin wallet; factory rebuilt the day it launched", verified: false }
-
+    native_play: { value: true, note: "Launchpad creating Uniswap v3 pools and opening trading on mainnet", verified: false }
+    citable: { value: true, note: "Source repository, site and X account", verified: false }
+    research_story: { value: true, note: "Project states all protocol admin roles sit in one platform admin wallet; factory rebuilt the day it launched", verified: false }
 - slug: robinhood-index-vaults
   name: Robinhood Index Vaults
   category: RWA index vault
   lifecycle: testnet-only
   coverage: stub
-  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
+  role: observe # fails a qualifying test; listed, never scored (issue #35)
   identity:
-    aliases: []
-    symbols: ["rIDX"]
+    aliases:
+      - Robinhood Index Vault
+      - Index Vaults
+    symbols:
+      - rIDX
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: github, url: https://github.com/nsvoud-dev/robinhood-index-vaults }
+    - kind: github
+      url: https://github.com/nsvoud-dev/robinhood-index-vaults
+    - kind: x
+      url: https://x.com/0xNSVOUD
   discovery_source: Prototype seed profile 2026-08-30; restored by product owner; Grok desk map 2026-08-31
-  tree: { primary: rwa-products/index-vault }
+  tree:
+    primary: rwa-products/index-vault
   qualifying:
-    deployed_on_chain: { value: false, note: "No mainnet deployment — testnet only (EVAL 2026-08-31 §5, T1); kept as a row so the universe is visible", verified: false }
-    native_play:       { value: true, note: "ERC-4626 index vault for Stock Token baskets", verified: false }
-    citable:           { value: true, note: "Source repository", verified: false }
-    research_story:    { value: true, note: "Mock swap router; audit and mainnet are roadmap items", verified: false }
-
+    deployed_on_chain:
+      value: false
+      note: No contract on chain 4663. Hardhat/frontend only name robinhoodTestnet 46630. Testnet rIDX 0x04653b… and MockSwapRouter 0x31ecd0… are_contract false on Blockscout 4663; search q=rIDX returned 0 tokens.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+  handle: "@0xNSVOUD"
 - slug: vimen
   name: Vimen
   category: Redeemable RWA basket
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: []
+    aliases:
+      - Vimen baskets
+    symbols:
+      - MAG7
+      - AI6
+      - HOOD6
+      - HOOD6V2
+      - VIRTS
+      - VVIRT
+      - VMAG
+      - VCT
+      - VIM
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: github, url: https://github.com/vimenprotocol/vimen }
-    - { kind: site, url: https://vimen.org }
-    - { kind: x, url: https://x.com/vimenprotocol }
+    - kind: github
+      url: https://github.com/vimenprotocol/vimen
+    - kind: site
+      url: https://vimen.org
+    - kind: x
+      url: https://x.com/vimenprotocol
+    - kind: site
+      url: https://www.vimen.org
+    - kind: app
+      url: https://app.vimen.org
+    - kind: docs
+      url: https://docs.vimen.org/docs
   discovery_source: Prototype seed profile 2026-08-30; restored by product owner; Grok desk map 2026-08-31 (handle, Llama TVL)
   handle: "@vimenprotocol"
-  tree: { primary: rwa-products/redeemable-basket }
+  tree:
+    primary: rwa-products/redeemable-basket
   qualifying:
-    deployed_on_chain: { value: true, note: "Prototype profile recorded early mainnet 2026-08-20; DefiLlama lists a small TVL row", verified: false }
-    native_play:       { value: true, note: "Immutable in-kind index baskets for Stock Tokens with deposit caps", verified: false }
-    citable:           { value: true, note: "Source repository, site from the workbook, X account from the desk", verified: false }
-    research_story:    { value: true, note: "Immutability / no-admin-key claims need bytecode reproduction", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 # --- Grok desk subjects added 2026-08-31 ---
 
 - slug: up
@@ -342,300 +675,631 @@
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["UP"]
+    aliases:
+      - up.
+      - up v3
+      - up v2
+    symbols:
+      - UP
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://up33.xyz }
-    - { kind: x, url: https://x.com/uponrh }
+    - kind: app
+      url: https://up33.xyz
+    - kind: x
+      url: https://x.com/uponrh
+    - kind: docs
+      url: https://up33.xyz/docs/overview
+    - kind: telegram
+      url: https://t.me/uponrh
+    - kind: github
+      url: https://github.com/up-exchange
   discovery_source: Grok desk map 2026-08-31 (trading/amm-native; Llama TVL, fees, volume)
   handle: "@uponrh"
-  tree: { primary: trading/amm-native }
+  tree:
+    primary: trading/amm-native
   qualifying:
-    deployed_on_chain: { value: true, note: "DefiLlama lists up v2 and v3 TVL and volume on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
-    native_play:       { value: true, note: "Native AMM with a (3,3) emissions and buyback design; the desk calls it the largest native AMM by TVL after Uniswap", verified: false }
-    citable:           { value: true, note: "Site and X account from the desk", verified: false }
-    research_story:    { value: true, note: "Who controls emissions and the buyback path; whether the AMM is a fork and of what", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: fables
   name: Fables
   category: Native AMM
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["PROLOGUE"]
+    aliases:
+      - Prologue
+      - $PROLOGUE
+    symbols:
+      - PROLOGUE
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/fablesfi }
+    - kind: x
+      url: https://x.com/fablesfi
+    - kind: site
+      url: https://www.fables.fi
+    - kind: docs
+      url: https://www.fables.fi/docs
+    - kind: app
+      url: https://www.fables.fi/markets
+    - kind: telegram
+      url: https://t.me/fablesfi
+    - kind: discord
+      url: https://discord.gg/QgeEq2rSv7
   discovery_source: Grok desk map 2026-08-31 (trading/amm-native; Llama TVL and volume); workbook sheet 06
   handle: "@fablesfi"
-  tree: { primary: trading/amm-native }
+  tree:
+    primary: trading/amm-native
   qualifying:
-    deployed_on_chain: { value: true, note: "DefiLlama lists Fables TVL and volume on Robinhood Chain (desk snapshot 2026-08-31); the workbook had it as upcoming — unresolved", verified: false }
-    native_play:       { value: true, note: "ve(3,3) DEX built on Uniswap v4 hooks for stock-token pairs; $PROLOGUE token", verified: false }
-    citable:           { value: true, note: "X account from the desk; no site URL located in the intake", verified: false }
-    research_story:    { value: true, note: "Hook logic, emissions control and the ve escrow are user-fund paths", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: denar
   name: Denar
   category: Isolated lending market
-  lifecycle: mainnet   # pulled: 0x3786728a2c49c4617bf4fe5bd82b90b6b0df5508 2026-08-30T21:37:55.000Z
+  lifecycle: mainnet # pulled: 0x3786728a2c49c4617bf4fe5bd82b90b6b0df5508 2026-08-30T21:37:55.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["DENAR"]
+    aliases:
+      - Denar Markets
+    symbols:
+      - DENAR
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/DenarMarkets }
+    - kind: x
+      url: https://x.com/DenarMarkets
+    - kind: site
+      url: https://www.denar.markets
+    - kind: app
+      url: https://www.denar.markets/app
+    - kind: docs
+      url: https://docs.denar.markets
   discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (credit/isolated-money-market)
   handle: "@DenarMarkets"
-  tree: { primary: credit/isolated-money-market }
+  tree:
+    primary: credit/isolated-money-market
+    secondary:
+      - credit/lending-primitive
+      - credit/rwa-lending
+      - credit/morpho-curator
   qualifying:
-    deployed_on_chain: { value: true, note: "Project posted markets live and a contract address on 2026-08-30; address not reproduced on Blockscout in this review", verified: false }
-    native_play:       { value: true, note: "Isolated money market for tokenized equities, Chainlink priced", verified: false }
-    citable:           { value: true, note: "X account; the dossier says the address sits in the site footer but gives no site URL", verified: false }
-    research_story:    { value: true, note: "Day-one lending market: caps, timelock, oracle, who can list markets", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: longbow
   name: Longbow
   category: Credit aggregation layer
-  lifecycle: mainnet   # pulled: 0x451b42A15100C340CA12F7c66DE06fac5EA2D751 2026-08-08T18:17:53.000Z
+  lifecycle: mainnet # pulled: 0x451b42A15100C340CA12F7c66DE06fac5EA2D751 2026-08-08T18:17:53.000Z
   coverage: stub
   identity:
     aliases: []
-    symbols: ["BOW"]
+    symbols:
+      - BOW
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://longbow.cash }
-    - { kind: x, url: https://x.com/longbowlend }
+    - kind: site
+      url: https://longbow.cash
+    - kind: x
+      url: https://x.com/longbowlend
+    - kind: site
+      url: https://www.longbow.cash
+    - kind: docs
+      url: https://docs.longbow.cash
+    - kind: telegram
+      url: https://t.me/longbowlend
   discovery_source: Chain File dossier 2026-08-30; workbook sheet 02; Grok desk map 2026-08-31 (credit/credit-overlay)
   handle: "@longbowlend"
-  tree: { primary: credit/credit-overlay }
+  tree:
+    primary: credit/credit-overlay
+    secondary:
+      - credit/morpho-curator
+      - credit/rwa-lending
   qualifying:
-    deployed_on_chain: { value: true, note: "BOW token address given by the dossier and the workbook; the project posts live markets (GLD, RDDT, PONS)", verified: false }
-    native_play:       { value: true, note: "Credit overlay on Morpho Blue with Pons-token collateral and a protocol token", verified: false }
-    citable:           { value: true, note: "Site from the workbook and X account", verified: false }
-    research_story:    { value: true, note: "Isolated markets, oracle choice (Uniswap TWAP), fee split and who can list collateral", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: noxa
   name: NOXA Fun
-  category: Launchpad · mechanism not classified
-  lifecycle: mainnet
+  category: Uniswap-pool launchpad
+  lifecycle: inactive
   coverage: stub
   identity:
-    aliases: []
+    aliases:
+      - Noxa
+      - fun.noxa
     symbols: []
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: multichain
     status: provisional
   official_links:
-    - { kind: site, url: https://noxa.fun }
-    - { kind: x, url: https://x.com/Noxa_Fi }
+    - kind: site
+      url: https://noxa.fun
+    - kind: x
+      url: https://x.com/Noxa_Fi
+    - kind: site
+      url: https://fun.noxa.eth.limo
+    - kind: docs
+      url: https://docs.noxa.fi/launchpad/overview/
   discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (launch/other-pad; Llama TVL and fees)
   handle: "@Noxa_Fi"
-  tree: { primary: launch/other-pad }
+  tree:
+    primary: launch/uni-pool-launch
   qualifying:
-    deployed_on_chain: { value: true, note: "DefiLlama lists NOXA Fun TVL and fees on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
-    native_play:       { value: true, note: "Launchpad that launches straight into Uniswap v3 pools; origin pad of the chain's first-week memes", verified: false }
-    citable:           { value: true, note: "Site from the dossier and X account from the desk", verified: false }
-    research_story:    { value: true, note: "Launch fee flows and who controls the factory; clone sites use the name", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: netnet
   name: NetNet Capital
   category: Reserve-backed currency
-  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  lifecycle: mainnet # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["NET"]
+    aliases:
+      - NetNet
+      - NetNet Capital Management
+    symbols:
+      - NET
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/NetNetCap }
+    - kind: x
+      url: https://x.com/NetNetCap
+    - kind: site
+      url: https://netnet.capital
+    - kind: app
+      url: https://app.netnet.capital/
+    - kind: docs
+      url: https://docs.netnet.capital/
+    - kind: telegram
+      url: https://t.me/netnetcap
   discovery_source: Grok desk map 2026-08-31 (rwa-products/reserve-currency)
   handle: "@NetNetCap"
-  tree: { primary: rwa-products/reserve-currency }
+  tree:
+    primary: rwa-products/reserve-currency
+    secondary:
+      - yield/savings-vault
   qualifying:
-    deployed_on_chain: { value: true, note: "DefiLlama has a Reserve Currency row at zero TVL; the project posts treasury holdings — no address reviewed", verified: false }
-    native_play:       { value: true, note: "Reserve token backed by a treasury the project says holds Stock Tokens (AAPL, NVDA, SPCX)", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Who holds the treasury, what backs $NET, and whether redemption exists", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: tickeryard
   name: TickerYard
   category: Synthetic asset protocol
-  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  lifecycle: mainnet # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   identity:
-    aliases: []
-    symbols: []
-    entity_kind: infrastructure
-    chain_scope: unknown
+    aliases:
+      - Yardkeeper
+      - TickerYard Bitcoin Receipt
+      - Yardkeepers
+    symbols:
+      - YARD
+      - yBTC
+    entity_kind: protocol
+    chain_scope: cross-chain
     status: provisional
   official_links:
-    - { kind: site, url: https://tickeryard.com }
-    - { kind: x, url: https://x.com/TickerYardHQ }
+    - kind: app
+      url: https://tickeryard.com
+    - kind: x
+      url: https://x.com/TickerYardHQ
+    - kind: whitepaper
+      url: https://tickeryard.com/paper/tickeryard-technical-design-paper-v1.pdf
+    - kind: telegram
+      url: https://t.me/portaltickeryard
   discovery_source: Grok desk map 2026-08-31 (rwa-products/synthetic-asset); workbook sheet 02 ($YARD, StonkBrokers-incubated)
   handle: "@TickerYardHQ"
-  tree: { primary: rwa-products/synthetic-asset }
+  tree:
+    primary: rwa-products/synthetic-asset
+    secondary:
+      - nft-treasury/nft-fee-claim
   qualifying:
-    deployed_on_chain: { value: true, note: "Project posts yBTC shipping on Robinhood Chain; no address reviewed", verified: false }
-    native_play:       { value: true, note: "Synthetic asset product (yBTC from WBTC on Arbitrum) incubated in the StonkBrokers stack per the workbook", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Bridge and custody path for the BTC backing; mint and redeem controls", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: earn-protocol
   name: EARN
   category: Savings vault
-  lifecycle: mainnet   # pulled: 0xa3b6aee90017b72c0812dc1e013de70eb2917ba3 2026-07-23T16:16:15.000Z
+  lifecycle: mainnet # pulled: 0xa3b6aee90017b72c0812dc1e013de70eb2917ba3 2026-07-23T16:16:15.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["EARN"]
+    aliases:
+      - EARN Protocol
+      - earnonhood
+    symbols:
+      - EARN
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://earnonhood.com }
-    - { kind: x, url: https://x.com/EARNONHOOD }
+    - kind: site
+      url: https://earnonhood.com
+    - kind: x
+      url: https://x.com/EARNONHOOD
+    - kind: docs
+      url: https://earnonhood.com/docs
+    - kind: app
+      url: https://earnonhood.com/vault
+    - kind: app
+      url: https://earnonhood.com/omni/pools
+    - kind: app
+      url: https://earnonhood.com/steer
+    - kind: app
+      url: https://earnonhood.com/lend
   discovery_source: Workbook sheet 02; Grok desk map 2026-08-31 (yield/savings-vault)
   handle: "@EARNONHOOD"
-  tree: { primary: yield/savings-vault }
+  tree:
+    primary: yield/savings-vault
+    secondary:
+      - yield/lp-manager
+      - credit/morpho-curator
   qualifying:
-    deployed_on_chain: { value: true, note: "Token address in the account bio and workbook; omnipool zaps posted live 2026-08-30", verified: false }
-    native_play:       { value: true, note: "Uniswap v4 strategy vaults on stock-token pairs plus omnipools; protocol fee and buyback token", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Vault strategy control, fee take and Rialto routing; name collides with Robinhood Earn (Morpho)", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: l4va
   name: L4VA
   category: Stock-paired token
   lifecycle: announced
   coverage: stub
-  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
+  role: observe # fails a qualifying test; listed, never scored (issue #35)
   identity:
-    aliases: []
-    symbols: ["L4VA"]
-    entity_kind: token
-    chain_scope: unknown
-    status: provisional
+    aliases:
+      - L4VA Protocol
+      - L4VA Technologies
+    symbols:
+      - L4VA
+    entity_kind: protocol
+    chain_scope: multichain
+    status: conflicted
+    conflict_ids:
+      - CON-2
   official_links:
-    - { kind: site, url: https://l4va.org }
-    - { kind: x, url: https://x.com/L4VAprotocol }
+    - kind: site
+      url: https://l4va.org
+    - kind: x
+      url: https://x.com/L4VAprotocol
+    - kind: site
+      url: https://l4va.com
+    - kind: app
+      url: https://app.l4va.org
+    - kind: docs
+      url: https://l4va-team.gitbook.io/l4va-docs
+    - kind: whitepaper
+      url: https://l4va.com/manifesto
+    - kind: github
+      url: https://github.com/L4VA-Technologies-Inc
+    - kind: discord
+      url: https://discord.com/invite/mBbTUfAzuS
   discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (lifecycle unknown)
   handle: "@L4VAprotocol"
-  tree: { primary: rwa-products/stock-paired-token }
+  tree:
+    primary: rwa-products/stock-paired-token
   qualifying:
-    deployed_on_chain: { value: false, note: "Lifecycle unknown; no contract, vault or deployment evidence reviewed — press release only (EVAL 2026-08-31 §5, T1)", verified: false }
-    native_play:       { value: true, note: "Vault factory issuing tokens backed by locked RWAs, stocks, NFTs or memes per the project", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: false, note: "No mechanism recorded anywhere beyond the press release (EVAL 2026-08-31 §5, T4)", verified: false }
-
+    deployed_on_chain:
+      value: false
+      note: TGE FAQ says the presale contract address will be published on @l4vaprotocol and l4va.org/tge before the sale opens; no 40-character address in the TGE JS this pass. Blockscout lists many ticker-named ERC-20s that are not linked from the official surface.
+      verified: false
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: delta
   name: Delta
   category: Liquidity manager
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["DELTA"]
+    aliases:
+      - Delta Liquidity
+      - deltaliquidity
+    symbols:
+      - DELTA
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/deltaliquidity }
+    - kind: x
+      url: https://x.com/deltaliquidity
+    - kind: site
+      url: https://deltaliquidity.app
+    - kind: docs
+      url: https://deltaliquidity.app/docs
+    - kind: app
+      url: https://deltaliquidity.app/pools
+    - kind: discord
+      url: https://discord.gg/deltaliquidity
   discovery_source: Grok desk map 2026-08-31 (yield/lp-manager; Llama TVL)
   handle: "@deltaliquidity"
-  tree: { primary: yield/lp-manager }
+  tree:
+    primary: yield/lp-manager
   qualifying:
-    deployed_on_chain: { value: true, note: "Token address in the account bio; DefiLlama lists a small Delta TVL row", verified: false }
-    native_play:       { value: true, note: "LP manager / liquidity layer with its own token and LP reward claims", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Where LP deposits sit and who can move them; TVL claims disagree with DefiLlama", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: snuggle
   name: Snuggle
   category: Liquidity manager
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
+    aliases:
+      - SnuggleFi
     symbols: []
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: multichain
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/SnuggleFi }
+    - kind: x
+      url: https://x.com/SnuggleFi
+    - kind: site
+      url: https://snuggle.fi
+    - kind: app
+      url: https://snuggle.fi/deposit
+    - kind: docs
+      url: https://www.snuggle.fi/security
+    - kind: telegram
+      url: https://t.me/SnuggleFi
+    - kind: discord
+      url: https://discord.gg/tfpsdwEe8e
   discovery_source: Grok desk map 2026-08-31 (yield/lp-manager; Llama TVL and revenue)
   handle: "@SnuggleFi"
-  tree: { primary: yield/lp-manager }
+  tree:
+    primary: yield/lp-manager
   qualifying:
-    deployed_on_chain: { value: true, note: "DefiLlama lists Snuggle TVL and revenue on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
-    native_play:       { value: true, note: "Liquidity position manager listed by DefiLlama; the desk found it quiet on X", verified: false }
-    citable:           { value: true, note: "X account from the desk; no site located", verified: false }
-    research_story:    { value: true, note: "Position manager custody and who can rebalance", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: sherwood
   name: Sherwood
   category: Private transfer protocol
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: []
-    entity_kind: tool
-    chain_scope: unknown
+    aliases:
+      - Sherwood.cash
+      - sherwood.cash
+    symbols:
+      - SHERWOOD
+    entity_kind: protocol
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/sherw00d_cash }
+    - kind: x
+      url: https://x.com/sherw00d_cash
+    - kind: site
+      url: https://sherwood.cash
+    - kind: docs
+      url: https://sherwood.cash/docs
+    - kind: github
+      url: https://github.com/sherwood-cash/contracts
+    - kind: telegram
+      url: https://t.me/sherwood_cash
   discovery_source: Grok desk map 2026-08-31 (privacy/private-transfer; Llama TVL); workbook sheet 02 ($WOOD)
   handle: "@sherw00d_cash"
-  tree: { primary: privacy/private-transfer }
+  tree:
+    primary: privacy/private-transfer
+    secondary:
+      - trading/amm-imported
   qualifying:
-    deployed_on_chain: { value: true, note: "DefiLlama lists a Sherwood TVL row on Robinhood Chain (desk snapshot 2026-08-31)", verified: false }
-    native_play:       { value: true, note: "Private-transfer tooling per the desk; the workbook described an agent capital layer — unresolved", verified: false }
-    citable:           { value: true, note: "X account from the desk; no site located", verified: false }
-    research_story:    { value: true, note: "Custody inside the privacy pool and who can freeze or upgrade it", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: squeeze
   name: Squeeze
   category: Market scanner
   lifecycle: announced
   coverage: stub
-  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
+  role: observe # fails a qualifying test; listed, never scored (issue #35)
   identity:
     aliases: []
     symbols: []
     entity_kind: tool
-    chain_scope: unknown
-    status: provisional
+    chain_scope: robinhood-native
+    status: conflicted
+    conflict_ids:
+      - CON-1
   official_links:
-    - { kind: x, url: https://x.com/UseSqueeze_RH }
+    - kind: x
+      url: https://x.com/UseSqueeze_RH
+    - kind: site
+      url: https://usesqueeze.xyz
+    - kind: app
+      url: https://usesqueeze.xyz/app/
+    - kind: docs
+      url: https://usesqueeze.xyz/docs/
+    - kind: github
+      url: https://github.com/eurotropica01-spec/squeeze
   discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (tooling/scanner)
   handle: "@UseSqueeze_RH"
-  tree: { primary: tooling/scanner }
+  tree:
+    primary: tooling/scanner
+    secondary:
+      - credit/lending-primitive
   qualifying:
-    deployed_on_chain: { value: false, note: "Nothing deployed: the project states the Desk has no contracts and the Tape is off-chain (EVAL 2026-08-31 §5, T1)", verified: false }
-    native_play:       { value: true, note: "Short-interest tape and a planned short desk for Robinhood Chain pools", verified: false }
-    citable:           { value: true, note: "X account", verified: false }
-    research_story:    { value: false, note: "A tape/scanner has no user-fund, routing, launch or control-plane story until the Desk exists (EVAL 2026-08-31 §5, T4)", verified: false }
+    deployed_on_chain:
+      value: false
+      note: Site, docs and README state no Desk contracts; Blockscout Squeeze hits are ticker tokens, not SqueezeCore
+      verified: false
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 
 - slug: agent-name-service
   name: Agent Name Service
   category: Agent identity service
   lifecycle: announced
   coverage: stub
-  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
+  role: observe # fails a qualifying test; listed, never scored (issue #35)
   identity:
     aliases: []
     symbols: []
@@ -646,198 +1310,398 @@
     - { kind: x, url: https://x.com/RHAgentNS }
   discovery_source: Grok desk map 2026-08-31 (agents/agent-identity; lifecycle unknown)
   handle: "@RHAgentNS"
-  tree: { primary: agents/agent-identity, secondary: [tooling/names] }
+  tree: { primary: agents/agent-identity, secondary: [ tooling/names ] }
   qualifying:
     deployed_on_chain: { value: false, note: "No deployment evidence for the registrar — lifecycle unknown (EVAL 2026-08-31 §5, T1)", verified: false }
-    native_play:       { value: true, note: "Name registry for agents with a claimed yearly fee", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Registrar ownership, fee custody and name revocation powers", verified: false }
-
+    native_play: { value: true, note: "Name registry for agents with a claimed yearly fee", verified: false }
+    citable: { value: true, note: "X account; no site located", verified: false }
+    research_story: { value: true, note: "Registrar ownership, fee custody and name revocation powers", verified: false }
 - slug: hookr
   name: Hookr
   category: Programmable-hook launchpad
-  lifecycle: mainnet   # pulled: 0x18E674231A58c239Dc7DaeDcffE15Ec3A24cff5c 2026-08-06T04:20:57.000Z
+  lifecycle: mainnet # pulled: 0x18E674231A58c239Dc7DaeDcffE15Ec3A24cff5c 2026-08-06T04:20:57.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["HOOKR"]
+    aliases:
+      - Hookr.fun
+      - hookr.fun
+    symbols:
+      - HOOKR
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://hookr.fun }
-    - { kind: x, url: https://x.com/Hookrfun }
+    - kind: site
+      url: https://hookr.fun
+    - kind: x
+      url: https://x.com/Hookrfun
+    - kind: docs
+      url: https://hookr.fun/docs
+    - kind: app
+      url: https://hookr.fun/builder
+    - kind: x
+      url: https://x.com/hookrfun
+    - kind: github
+      url: https://github.com/Hookr-fun/hookr-contracts
   discovery_source: Grok desk map 2026-08-31 (launch/hook-programmable; fill rounds 1, 8, 9)
   handle: "@Hookrfun"
-  tree: { primary: launch/hook-programmable }
+  tree:
+    primary: launch/hook-programmable
   qualifying:
-    deployed_on_chain: { value: true, note: "Token, launchpad and hook addresses given on the site and GitHub per the desk; not on the DefiLlama dump", verified: false }
-    native_play:       { value: true, note: "Uniswap v4 hook launchpad and hook marketplace; distinct from HookOS, What The Hook and Pons", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Hook code controls pool rules for every launched token; who can change a deployed hook", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: what-the-hook
   name: What The Hook
   category: MEV-redistribution hook
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["WTH"]
+    aliases:
+      - what the hook?
+      - WTH
+    symbols:
+      - WTH
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/whatthehookv4 }
+    - kind: x
+      url: https://x.com/whatthehookv4
+    - kind: site
+      url: https://www.whatthehook.io
+    - kind: docs
+      url: https://www.whatthehook.io/docs
+    - kind: app
+      url: https://www.whatthehook.io/dashboard.html
   discovery_source: Grok desk map 2026-08-31 (trading/hook-mev; Llama TVL in the observe list)
   handle: "@whatthehookv4"
-  tree: { primary: trading/hook-mev }
+  tree:
+    primary: trading/hook-mev
   qualifying:
-    deployed_on_chain: { value: true, note: "WTH/WETH pair on DexScreener and a DefiLlama TVL row per the desk; no address reviewed", verified: false }
-    native_play:       { value: true, note: "MEV redistribution inside a Uniswap v4 hook that pays traders and LPs", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "The hook sits in the swap path of every pool using it; who can upgrade or redirect it", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: quotrons
   name: Quotrons
   category: Token-bound treasury NFT
-  lifecycle: mainnet   # pulled: 0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F 2026-08-13T15:14:36.000Z
+  lifecycle: mainnet # pulled: 0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F 2026-08-13T15:14:36.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["QUOTRON"]
-    entity_kind: protocol
-    chain_scope: unknown
+    aliases:
+      - QUOTRONS
+      - QUOTRONS V2
+      - Quotrons404
+    symbols:
+      - QUOTRON
+    entity_kind: collection
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://quotrons.cash }
-    - { kind: x, url: https://x.com/Quotrons404 }
+    - kind: site
+      url: https://quotrons.cash
+    - kind: x
+      url: https://x.com/Quotrons404
+    - kind: docs
+      url: https://quotrons.cash/llms-full.txt
+    - kind: docs
+      url: https://quotrons.cash/integration.md
+    - kind: github
+      url: https://github.com/mavrkofficial/quotrons-brand-kit
   discovery_source: Chain File dossier 2026-08-30; workbook sheets 02–03; Grok desk map 2026-08-31 (nft-treasury/token-bound-nft)
   handle: "@Quotrons404"
-  tree: { primary: nft-treasury/token-bound-nft, secondary: [rwa-products/stock-paired-token] }
+  tree:
+    primary: nft-treasury/token-bound-nft
+    secondary:
+      - rwa-products/stock-paired-token
   qualifying:
-    deployed_on_chain: { value: true, note: "Token, router and hook addresses given in project docs per the desk; V2 sales on OpenSea reported", verified: false }
-    native_play:       { value: true, note: "ERC-404 terminals that burn the liquid token and route pool fees into ten Stock Tokens", verified: false }
-    citable:           { value: true, note: "Site from the workbook and X account", verified: false }
-    research_story:    { value: true, note: "V1 retired after an exploit per the project; recovery Safe and blacklist guardian disclosed", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: pools-trade
   name: pools.trade
   category: Uniswap-pool launchpad
-  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  lifecycle: mainnet # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   identity:
-    aliases: []
+    aliases:
+      - TradePools
+      - Pools
     symbols: []
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/pools_dot_fun }
+    - kind: x
+      url: https://x.com/pools_dot_fun
+    - kind: app
+      url: https://pools.trade
+    - kind: x
+      url: https://x.com/TradePools
+    - kind: github
+      url: https://github.com/Uniswap/liquidity-launcher
+    - kind: docs
+      url: https://docs.bitquery.io/docs/blockchain/robinhood/pools-trade-api/
   discovery_source: Grok desk map 2026-08-31 (launch/uni-pool-launch); workbook sheet 04
-  handle: "@pools_dot_fun"
-  tree: { primary: launch/uni-pool-launch }
+  handle: "@TradePools"
+  tree:
+    primary: launch/uni-pool-launch
   qualifying:
-    deployed_on_chain: { value: true, note: "Uniswap Labs pad per its 2026-08-05 blog post as cited by the desk; Dune launch counts in the workbook", verified: false }
-    native_play:       { value: true, note: "Launchpad minting straight into Uniswap pools; agentic launches (Project VEX) sit on it", verified: false }
-    citable:           { value: true, note: "X account (a second handle, @TradePools, is also in use per the desk)", verified: false }
-    research_story:    { value: true, note: "Launch fee flows and whether Uniswap Labs retains control of the factory", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: wire
   name: Wire
   category: Agent execution platform
-  lifecycle: mainnet   # pulled: 0x8ECEA3d0E648DB646d824AA51EedeB16aC3d6878 2026-07-17T19:04:11.000Z
+  lifecycle: mainnet # pulled: 0x8ECEA3d0E648DB646d824AA51EedeB16aC3d6878 2026-07-17T19:04:11.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["WIRE"]
-    entity_kind: protocol
-    chain_scope: unknown
+    aliases:
+      - wire bot
+      - WireBot
+      - WIRE
+    symbols:
+      - WIRE
+    entity_kind: application
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/wirebotRH }
+    - kind: x
+      url: https://x.com/wirebotRH
+    - kind: site
+      url: https://wirebot.trade
+    - kind: docs
+      url: https://wirebot.trade/docs
+    - kind: app
+      url: https://app.wirebot.trade
+    - kind: telegram
+      url: https://t.me/rh_wirebot
   discovery_source: Grok desk map 2026-08-31 (agents/agent-execution; fill rounds 2, 9)
   handle: "@wirebotRH"
-  tree: { primary: agents/agent-execution, secondary: [launch/bonding-curve] }
+  tree:
+    primary: agents/agent-execution
+    secondary:
+      - trading/exec-frontend
+      - launch/bonding-curve
+      - markets/prediction
   qualifying:
-    deployed_on_chain: { value: true, note: "Token address in the account bio; live launch replies on Pons observed by the desk 2026-08-30/31", verified: false }
-    native_play:       { value: true, note: "Command layer executing launches and trades from X, Telegram or web against Pons and other venues", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Key custody for user commands; the protocol fee path; a router-approval patch on post-graduation buys", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: maxfi
   name: MaxFi
   category: Liquidity manager
-  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  lifecycle: mainnet # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   identity:
-    aliases: []
+    aliases:
+      - MAXFI
     symbols: []
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: multichain
     status: provisional
   official_links:
-    - { kind: site, url: https://maxfi.tech }
-    - { kind: x, url: https://x.com/MAXFILABS }
+    - kind: site
+      url: https://maxfi.tech
+    - kind: x
+      url: https://x.com/MAXFILABS
+    - kind: app
+      url: https://www.maxfi.tech/deposit
+    - kind: docs
+      url: https://www.maxfi.tech/security
+    - kind: docs
+      url: https://www.maxfi.tech/docs
+    - kind: discord
+      url: https://discord.gg/fjNY8UzYAc
   discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (yield/lp-manager)
   handle: "@MAXFILABS"
-  tree: { primary: yield/lp-manager }
+  tree:
+    primary: yield/lp-manager
   qualifying:
-    deployed_on_chain: { value: true, note: "Project posts LP payouts on Robinhood Chain; not on the DefiLlama dump; no address reviewed", verified: false }
-    native_play:       { value: true, note: "Managed LP positions on Stock Token / USDG pairs with no-swap rebalancing and a circuit breaker in progress", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Manager contract custody of LP positions; depeg handling; no token found", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: sight
   name: Sight
   category: Prediction market
   lifecycle: announced
   coverage: stub
   identity:
-    aliases: []
-    symbols: []
-    entity_kind: protocol
-    chain_scope: unknown
+    aliases:
+      - Sight Genesis
+      - sighthood
+    symbols:
+      - SIGHT
+    entity_kind: application
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/sight_hood }
+    - kind: x
+      url: https://x.com/sight_hood
+    - kind: site
+      url: https://sighthood.com
+    - kind: app
+      url: https://app.sighthood.com
+    - kind: docs
+      url: https://docs.sighthood.com
+    - kind: telegram
+      url: https://t.me/sight_hood
   discovery_source: Grok desk map 2026-08-31 (markets/prediction; fill rounds 2, 11)
   handle: "@sight_hood"
-  tree: { primary: markets/prediction }
+  tree:
+    primary: markets/prediction
   qualifying:
-    deployed_on_chain: { value: true, note: "Genesis NFT mint announced for 2026-09-02; the project states it has no token; no market contract reviewed", verified: false }
-    native_play:       { value: true, note: "Prediction market announced for Robinhood Chain, distinct from Meridian Predict", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Resolution design and collateral custody once a market ships", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: mesh
   name: Mesh
   category: Machine-payment tooling
-  lifecycle: mainnet   # pulled: 0x14641000a501bdc736116abf84e6fcea9b90a713 2026-08-19T16:37:35.000Z
+  lifecycle: mainnet # pulled: 0x14641000a501bdc736116abf84e6fcea9b90a713 2026-08-19T16:37:35.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["MESH"]
+    aliases:
+      - MeshGateway
+      - MESH Gateway
+    symbols:
+      - MESH
     entity_kind: tool
-    chain_scope: unknown
+    chain_scope: multichain
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/MeshGateway }
+    - kind: x
+      url: https://x.com/MeshGateway
+    - kind: site
+      url: https://meshgateway.co
+    - kind: docs
+      url: https://docs.meshgateway.co/whitepaper
+    - kind: app
+      url: https://meshgateway.co/marketplace
+    - kind: github
+      url: https://github.com/meshgateway
+    - kind: telegram
+      url: https://t.me/MeshCommunity
   discovery_source: Grok desk map 2026-08-31 (tooling/machine-payments; fill round 2)
   handle: "@MeshGateway"
-  tree: { primary: tooling/machine-payments }
+  tree:
+    primary: tooling/machine-payments
+    secondary:
+      - agents/agent-identity
   qualifying:
-    deployed_on_chain: { value: true, note: "Token address and paid-call figures posted by the project; no address reviewed", verified: false }
-    native_play:       { value: true, note: "Machine-payments gateway (MPP) with a token and USDG epochs paid to holders; Pons listed as a merchant", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Fee custody between merchants and holders; who sets epoch payouts", verified: false }
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 
 - slug: foxpad
   name: FoxPad
   category: Launchpad · mechanism not classified
-  lifecycle: mainnet   # pulled: 0x2103faA9D1762e27a716C61718b3aCf3Ec1F9bf1 2026-07-10T22:29:23.000Z
+  lifecycle: mainnet # pulled: 0x2103faA9D1762e27a716C61718b3aCf3Ec1F9bf1 2026-07-10T22:29:23.000Z
   coverage: stub
-  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
+  role: observe # fails a qualifying test; listed, never scored (issue #35)
   identity:
     aliases: []
     symbols: []
@@ -852,221 +1716,455 @@
   tree: { primary: launch/other-pad }
   qualifying:
     deployed_on_chain: { value: true, note: "FOX token address given by the dossier and the map; the pad's own contracts not located", verified: false }
-    native_play:       { value: false, note: "The only evidence that FoxPad exists as a product distinct from the FOX culture token is one dossier line naming foxpad.app; no handle, no address (EVAL 2026-08-31 §5, T2 — the eval places the pad in observe)", verified: false }
-    citable:           { value: true, note: "Pad site from the dossier; X account is the FOX token's account (the pad's own handle is unconfirmed)", verified: false }
-    research_story:    { value: false, note: "The 50/50 fee split and auto-burn are a single dossier claim; no contract or official post describes the pad's mechanism (EVAL 2026-08-31 §5, T4)", verified: false }
-
+    native_play: { value: false, note: "The only evidence that FoxPad exists as a product distinct from the FOX culture token is one dossier line naming foxpad.app; no handle, no address (EVAL 2026-08-31 §5, T2 — the eval places the pad in observe)", verified: false }
+    citable: { value: true, note: "Pad site from the dossier; X account is the FOX token's account (the pad's own handle is unconfirmed)", verified: false }
+    research_story: { value: false, note: "The 50/50 fee split and auto-burn are a single dossier claim; no contract or official post describes the pad's mechanism (EVAL 2026-08-31 §5, T4)", verified: false }
 - slug: scopl
   name: SCOPL
   category: Trading aggregator
-  lifecycle: mainnet   # pulled: 0xaA40e79E987517f7462bF79315B8A118799B04E3 2026-08-16T13:00:02.000Z
+  lifecycle: mainnet # pulled: 0xaA40e79E987517f7462bF79315B8A118799B04E3 2026-08-16T13:00:02.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["SCOPL"]
+    aliases:
+      - scopl.live
+    symbols:
+      - SCOPL
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://scopl.live }
-    - { kind: x, url: https://x.com/scopl_live }
+    - kind: site
+      url: https://scopl.live
+    - kind: x
+      url: https://x.com/scopl_live
+    - kind: app
+      url: https://scopl.live/trade
+    - kind: docs
+      url: https://scopl.live/docs
+    - kind: telegram
+      url: https://t.me/scopl_live
+    - kind: discord
+      url: https://discord.com/invite/cBBN3WWATU
   discovery_source: Grok desk map 2026-08-31 (trading/aggregator; fill rounds 10, 12, 16)
   handle: "@scopl_live"
-  tree: { primary: trading/aggregator }
+  tree:
+    primary: trading/aggregator
+    secondary:
+      - yield/lp-manager
   qualifying:
-    deployed_on_chain: { value: true, note: "Token address in the account bio and in a SpyWolf audit for chain 4663; V2 contract addresses not published", verified: false }
-    native_play:       { value: true, note: "Non-custodial one-tick Uniswap V3/V4 limit orders with fee revenue split", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Order-position custody, revenue router and buyback vault; third-party 'holder portal' links flagged by the desk", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: website
   name: notawebsite
   category: Tokenized advertising market
-  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  lifecycle: mainnet # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["WEBSITE"]
+    aliases:
+      - this is not a website
+      - PageMarkets
+      - TINAW
+    symbols:
+      - WEBSITE
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/notawebsite_rh }
+    - kind: x
+      url: https://x.com/notawebsite_rh
+    - kind: site
+      url: https://notawebsite.fun
+    - kind: docs
+      url: https://notawebsite.fun/docs
+    - kind: app
+      url: https://pagemarkets.com
+    - kind: github
+      url: https://github.com/vibecodermaxi/websitekit
   discovery_source: Grok desk map 2026-08-31 (rwa-products/ad-space; fill round 2)
   handle: "@notawebsite_rh"
-  tree: { primary: rwa-products/ad-space }
+  tree:
+    primary: rwa-products/ad-space
   qualifying:
-    deployed_on_chain: { value: true, note: "Project posts ETH volume and slot payouts since its v2 on 2026-08-11; no address reviewed", verified: false }
-    native_play:       { value: true, note: "Tokenized ad slots that pay ETH to slot owners", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Slot contract ownership and payout routing", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: lemon
   name: Lemon
-  category: Launchpad · mechanism not classified
-  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  category: Uniswap-pool launchpad
+  lifecycle: mainnet # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   identity:
-    aliases: []
-    symbols: []
+    aliases:
+      - Lemon.fun
+      - lemon.fun
+      - LEMON.FUN
+    symbols:
+      - LEMON.FUN
+      - LEMON
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: multichain
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/lemondotfun }
+    - kind: x
+      url: https://x.com/lemondotfun
+    - kind: site
+      url: https://lemon.fun
+    - kind: app
+      url: https://lemon.fun/launch
+    - kind: docs
+      url: https://lemon.fun/docs
+    - kind: telegram
+      url: https://t.me/lemondotfun
   discovery_source: Grok desk map 2026-08-31 (launch/other-pad; fill rounds 3, 4, 6, 10)
   handle: "@lemondotfun"
-  tree: { primary: launch/other-pad }
+  tree:
+    primary: launch/uni-pool-launch
+    secondary:
+      - trading/exec-frontend
+      - trading/perps-imported
   qualifying:
-    deployed_on_chain: { value: true, note: "Project posts a launch/trade terminal built on Robinhood Chain; no address reviewed", verified: false }
-    native_play:       { value: true, note: "Launch and trading pad with agentic X accounts per coin and Hyperliquid tools claimed", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Launch custody and the Hyperliquid leg's key custody", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: robindex
   name: Robindex
   category: Market scanner
-  lifecycle: mainnet   # pulled: 0xd82f70F530AFf45b831d6eE17062B4E85395C6F3 2026-08-04T13:23:42.000Z
+  lifecycle: mainnet # pulled: 0xd82f70F530AFf45b831d6eE17062B4E85395C6F3 2026-08-04T13:23:42.000Z
   coverage: stub
-  role: observe                    # fails a qualifying test; listed, never scored (issue #35)
+  role: observe # fails a qualifying test; listed, never scored (issue #35)
   identity:
-    aliases: []
-    symbols: ["ROBINDEX"]
+    aliases:
+      - RobinDex
+    symbols:
+      - ROBINDEX
     entity_kind: tool
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://robindex.pro/about }
-    - { kind: x, url: https://x.com/robindexpro }
+    - kind: site
+      url: https://robindex.pro/about
+    - kind: x
+      url: https://x.com/robindexpro
+    - kind: site
+      url: https://robindex.pro
+    - kind: app
+      url: https://robindex.pro/scanner
+    - kind: telegram
+      url: https://t.me/robindextrending
+    - kind: telegram
+      url: https://t.me/robindexchat
+    - kind: telegram
+      url: https://t.me/robindextrendingbot
   discovery_source: Chain File dossier 2026-08-30; Grok desk map 2026-08-31 (tooling/scanner)
   handle: "@robindexpro"
-  tree: { primary: tooling/scanner }
+  tree:
+    primary: tooling/scanner
   qualifying:
-    deployed_on_chain: { value: true, note: "Token address on the project's About page and X bio per the dossier", verified: false }
-    native_play:       { value: true, note: "Token scanner and Telegram bot for Robinhood Chain with a project token; not the ERC-4626 Robinhood Index Vaults", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: false, note: "A scanner plus Telegram bot: no user-fund, routing, launch or control-plane story (EVAL 2026-08-31 §5, T4)", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: vynex
   name: Vynex
   category: Savings vault
-  lifecycle: mainnet   # pulled: 0x8cf33e3026604bd85677e7bc6e04d256571b6653 2026-08-27T13:40:19.000Z
+  lifecycle: mainnet # pulled: 0x8cf33e3026604bd85677e7bc6e04d256571b6653 2026-08-27T13:40:19.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["VYNEX"]
+    aliases:
+      - UseVynex
+      - YieldShares
+    symbols:
+      - VYNEX
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/UseVynex }
+    - kind: x
+      url: https://x.com/UseVynex
+    - kind: site
+      url: https://www.usevynex.org
+    - kind: docs
+      url: https://www.usevynex.org/docs
+    - kind: app
+      url: https://www.usevynex.org/app
+    - kind: discord
+      url: https://discord.gg/usevynex
   discovery_source: Grok desk map 2026-08-31 (yield/savings-vault; fill round 5)
   handle: "@UseVynex"
-  tree: { primary: yield/savings-vault, secondary: [credit/isolated-money-market] }
+  tree:
+    primary: yield/savings-vault
+    secondary:
+      - credit/isolated-money-market
   qualifying:
-    deployed_on_chain: { value: true, note: "Project posts an NVDA borrow market on Morpho Blue; token address cited by a third-party account only", verified: false }
-    native_play:       { value: true, note: "Liquid vault shares plus a Morpho NVDA/USDG market with a 30-minute TWAP oracle the project built", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Oracle control, vault custody and whether the Morpho position really sits under the user's address", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: sinjoh
   name: Sinjoh
   category: Fee-routing protocol
-  lifecycle: mainnet   # pulled: 0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D 2026-07-31T00:40:38.000Z
+  lifecycle: mainnet # pulled: 0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D 2026-07-31T00:40:38.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["INJOH"]
+    aliases:
+      - $INJOH
+      - Sinjoh DeFi
+    symbols:
+      - INJOH
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/SinjohDeFi }
+    - kind: x
+      url: https://x.com/SinjohDeFi
+    - kind: site
+      url: https://www.sinjoh.com
+    - kind: app
+      url: https://app.sinjoh.com
+    - kind: github
+      url: https://github.com/Sinjoh-Finance/sinjoh-contracts
   discovery_source: Grok desk map 2026-08-31 (yield/fee-router; fill round 6)
   handle: "@SinjohDeFi"
-  tree: { primary: yield/fee-router, secondary: [launch/other-pad] }
+  tree:
+    primary: yield/fee-router
+    secondary:
+      - launch/other-pad
   qualifying:
-    deployed_on_chain: { value: true, note: "Token address in the account bio; airdrop and burn figures posted by the project", verified: false }
-    native_play:       { value: true, note: "Fee router: launch and creator fees bought back into PONS and NVDA airdrops and burns", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Router custody of collected fees and who sets the split", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: hoodlock
   name: HoodLock
   category: Token and liquidity locker
-  lifecycle: mainnet   # pulled: 0xd5BF43f29BF7Aa5bb42Ae9e217b84B86EB7a4B94 2026-08-01T19:12:01.000Z
+  lifecycle: mainnet # pulled: 0xd5BF43f29BF7Aa5bb42Ae9e217b84B86EB7a4B94 2026-08-01T19:12:01.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["LOCK"]
+    aliases:
+      - $LOCK
+      - Hood Lock
+    symbols:
+      - LOCK
     entity_kind: tool
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://hoodlock.tech }
-    - { kind: x, url: https://x.com/HoodLockRH }
+    - kind: site
+      url: https://hoodlock.tech
+    - kind: x
+      url: https://x.com/HoodLockRH
+    - kind: app
+      url: https://hoodlock.tech/app
+    - kind: docs
+      url: https://hoodlock.tech/docs
+    - kind: discord
+      url: https://discord.gg/hdXKRP9BN
   discovery_source: Grok desk map 2026-08-31 (tooling/locker; fill round 6)
   handle: "@HoodLockRH"
-  tree: { primary: tooling/locker, secondary: [launch/other-pad] }
+  tree:
+    primary: tooling/locker
+    secondary:
+      - launch/other-pad
   qualifying:
-    deployed_on_chain: { value: true, note: "Token address in the account bio; locked-value figure posted by the project", verified: false }
-    native_play:       { value: true, note: "Native liquidity locker with a token and an announced fee-split launchpad", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Locker contract custody and unlock powers; lockers are a user-fund path by construction", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: arrows
   name: Arrows
   category: Options market
-  lifecycle: mainnet   # pulled: 0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e 2026-08-15T14:24:54.000Z
+  lifecycle: mainnet # pulled: 0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e 2026-08-15T14:24:54.000Z
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["ARROWS"]
+    aliases:
+      - Arrows Finance
+    symbols:
+      - ARROWS
     entity_kind: protocol
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://arrows.finance }
-    - { kind: x, url: https://x.com/arrowsonhood }
+    - kind: site
+      url: https://arrows.finance
+    - kind: x
+      url: https://x.com/arrowsonhood
+    - kind: site
+      url: https://www.arrows.finance
+    - kind: app
+      url: https://app.arrows.finance
+    - kind: docs
+      url: https://docs.arrows.finance
+    - kind: telegram
+      url: https://t.me/arrowsportal
+    - kind: github
+      url: https://github.com/arrows0/contracts
   discovery_source: Workbook sheet 02 ($ARROWS); Grok desk map 2026-08-31 (markets/options; fill round 6)
   handle: "@arrowsonhood"
-  tree: { primary: markets/options }
+  tree:
+    primary: markets/options
   qualifying:
-    deployed_on_chain: { value: true, note: "Token address given by the workbook and the desk; week-one trading figures posted by the project", verified: false }
-    native_play:       { value: true, note: "Fully collateralized options on tokenized stocks with writer vaults; not Arrow Finance (CDP) and not ArrowPad", verified: false }
-    citable:           { value: true, note: "Site and X account", verified: false }
-    research_story:    { value: true, note: "Writer vault custody, settlement and collateral rules", verified: false }
-
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: hoodfun
   name: hood.fun
   category: Bonding-curve launchpad
   lifecycle: announced
   coverage: stub
   identity:
-    aliases: []
+    aliases:
+      - hoodfun
+      - HOOD fun
     symbols: []
     entity_kind: protocol
-    chain_scope: unknown
-    status: provisional
+    chain_scope: robinhood-native
+    status: conflicted
+    conflict_ids:
+      - CON-1
   official_links:
-    - { kind: x, url: https://x.com/hoodfunfamily }
+    - kind: x
+      url: https://x.com/hoodfunfamily
+    - kind: site
+      url: https://hood.fun
+    - kind: app
+      url: https://hood.fun/create
+    - kind: whitepaper
+      url: https://hood.fun/whitepaper
+    - kind: x
+      url: https://x.com/hooddotfun
+    - kind: telegram
+      url: https://t.me/hooddotfun
   discovery_source: Grok desk map 2026-08-31 (launch/bonding-curve; fill round 6)
   handle: "@hoodfunfamily"
-  tree: { primary: launch/bonding-curve }
+  tree:
+    primary: launch/bonding-curve
   qualifying:
-    deployed_on_chain: { value: true, note: "Announced fair-launch pad; last official 'coming soon' 2026-07-31; openpump listed it as a chain-4663 pad on 2026-08-29", verified: false }
-    native_play:       { value: true, note: "Bonding curve launching into locked Uniswap v3 with no presale or team allocation per the project", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Curve custody and graduation path if it launches", verified: false }
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 
 - slug: stonks-fun
   name: Stonks.fun
   category: Launchpad · mechanism not classified
-  lifecycle: announced   # ruling C (fix round 1): mainnet rests on the project's own posts
+  lifecycle: announced # ruling C (fix round 1): mainnet rests on the project's own posts
   coverage: stub
   identity:
     aliases: []
-    symbols: ["STONKS"]
+    symbols: [ "STONKS" ]
     entity_kind: protocol
     chain_scope: unknown
     status: provisional
@@ -1077,52 +2175,314 @@
   tree: { primary: launch/other-pad }
   qualifying:
     deployed_on_chain: { value: true, note: "Pad posts launches (a ZEC-paired token) on Robinhood Chain; no address reviewed", verified: false }
-    native_play:       { value: true, note: "DN-404 launchpad on Doppler whose fees burn the platform token; rebrand toward RWA baskets announced", verified: false }
-    citable:           { value: true, note: "X account; no site located", verified: false }
-    research_story:    { value: true, note: "Fee burn path and factory control; not StonkBrokers", verified: false }
-
+    native_play: { value: true, note: "DN-404 launchpad on Doppler whose fees burn the platform token; rebrand toward RWA baskets announced", verified: false }
+    citable: { value: true, note: "X account; no site located", verified: false }
+    research_story: { value: true, note: "Fee burn path and factory control; not StonkBrokers", verified: false }
 - slug: swaphood
   name: SwapHood
   category: Native AMM
   lifecycle: mainnet
   coverage: stub
   identity:
-    aliases: []
-    symbols: ["HOOD"]
-    entity_kind: protocol
-    chain_scope: unknown
-    status: provisional
-  official_links:
-    - { kind: x, url: https://x.com/SwapHoodFi }
-  discovery_source: Grok desk map 2026-08-31 (trading/amm-native; fill rounds 12, 13, 15, 17)
-  handle: "@SwapHoodFi"
-  tree: { primary: trading/amm-native }
-  qualifying:
-    deployed_on_chain: { value: true, note: "HOOD token and V3 factory reported on Blockscout 4663 by the desk (round 17); DefiLlama lists SwapHood V3 volume", verified: false }
-    native_play:       { value: true, note: "Native AMM (a PancakeSwap V3 fork per the explorer contract name) with a HOOD emissions, fee and buyback flywheel into h33", verified: false }
-    citable:           { value: true, note: "X account; docs referenced as a gitbook without a URL in the intake", verified: false }
-    research_story:    { value: true, note: "Emissions and buyback control; team states it holds no HOOD or LP; ticker collides with the HOOD Stock Token", verified: false }
-- slug: downto
-  name: Down to Finance
-  category: Redeemable RWA basket
-  lifecycle: mainnet   # pulled: 0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01 2026-08-25T01:26:48.000Z
-  coverage: stub
-  identity:
-    aliases: ["Down To Finance", "DETF"]
-    symbols: ["DTF"]
+    aliases:
+      - SwapHood V2
+      - SwapHood V3
+      - MetaDEX
+    symbols:
+      - HOOD
+      - h33
+      - xHOOD
     entity_kind: protocol
     chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: site, url: https://downto.finance }
-    - { kind: app, url: https://app.downto.finance/explore }
-    - { kind: docs, url: https://app.downto.finance/learn }
-    - { kind: x, url: https://x.com/downto_finance }
+    - kind: x
+      url: https://x.com/SwapHoodFi
+    - kind: site
+      url: https://swaphood.finance
+    - kind: app
+      url: https://www.swaphood.finance
+    - kind: docs
+      url: https://swaphood-finance.gitbook.io/swaphood-finance-docs
+    - kind: docs
+      url: https://docs.swaphood.finance
+    - kind: telegram
+      url: https://t.me/SwapHood
+    - kind: discord
+      url: https://discord.gg/vjJcXctWYm
+  discovery_source: Grok desk map 2026-08-31 (trading/amm-native; fill rounds 12, 13, 15, 17)
+  handle: "@SwapHoodFi"
+  tree:
+    primary: trading/amm-native
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: downto
+  name: Down to Finance
+  category: Redeemable RWA basket
+  lifecycle: mainnet # pulled: 0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01 2026-08-25T01:26:48.000Z
+  coverage: stub
+  identity:
+    aliases:
+      - Down To Finance
+      - DETF
+      - IndexedEx
+    symbols:
+      - DTF
+    entity_kind: protocol
+    chain_scope: robinhood-native
+    status: provisional
+  official_links:
+    - kind: site
+      url: https://downto.finance
+    - kind: app
+      url: https://app.downto.finance/explore
+    - kind: docs
+      url: https://app.downto.finance/learn
+    - kind: x
+      url: https://x.com/downto_finance
+    - kind: telegram
+      url: https://t.me/downtofinance
+    - kind: github
+      url: https://github.com/cyotee/indexedex
   discovery_source: grok-bot packet WORK-20260902-grok-bot-downto (PR #46), compiled 2026-09-02
   handle: "@downto_finance"
-  tree: { primary: rwa-products/redeemable-basket, secondary: [launch/graduation-token] }
+  tree:
+    primary: rwa-products/redeemable-basket
+    secondary:
+      - launch/graduation-token
   qualifying:
-    deployed_on_chain: { value: true, note: "DTF token (a PonsV2LauncherToken) and the DETF package factories are verified contracts on chain 4663 per explorer reads on 2026-09-02 (packet REP-1, REP-2); whether any DETF basket has been created is an open question", verified: true }
-    native_play:       { value: true, note: "Claimed permissionless DETF baskets (mint, hold, bond) with chain-4663 package factories named in the app; the fee-accruing token launched on Pons v2", verified: false }
-    citable:           { value: true, note: "Official site, app and learn pages; X handle taken from the verified token constructor, not an opened profile", verified: false }
-    research_story:    { value: true, note: "Basket mechanism, fee routing to DTF and control of the package factories and proxies (deployer is a single key); audits marked pending on the app footer", verified: false }
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: dontblink
+  name: dontblink
+  identity:
+    aliases:
+      - Dontblink
+      - don't blink
+    symbols:
+      - BLINK
+    entity_kind: protocol
+    chain_scope: robinhood-native
+    status: conflicted
+    conflict_ids:
+      - CON-1
+  category: Uniswap-pool launchpad
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://dontblink.community
+    - kind: app
+      url: https://dontblink.community/launch
+    - kind: docs
+      url: https://dontblink.community/docs
+    - kind: x
+      url: https://x.com/dontblink_cto
+    - kind: x
+      url: https://x.com/dontblinkfamily
+    - kind: discord
+      url: https://discord.gg/pA9TggyjGN
+    - kind: telegram
+      url: https://t.me/dontblink_cto
+    - kind: site
+      url: https://dontblink.family
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@dontblink_cto"
+  tree:
+    primary: launch/uni-pool-launch
+    secondary:
+      - launch/bonding-curve
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: letscash
+  name: LetsCash
+  identity:
+    aliases:
+      - letscash.fun
+      - letscashfun
+    symbols: []
+    entity_kind: protocol
+    chain_scope: robinhood-native
+    status: provisional
+  category: Uniswap-pool launchpad
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://letscash.fun
+    - kind: app
+      url: https://www.letscash.fun/launch
+    - kind: docs
+      url: https://www.letscash.fun/docs
+    - kind: x
+      url: https://x.com/letscashfun
+    - kind: github
+      url: https://github.com/letscashfun/sdk
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@letscashfun"
+  tree:
+    primary: launch/uni-pool-launch
+    secondary:
+      - launch/hook-programmable
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: o1-exchange
+  name: o1.exchange
+  identity:
+    aliases:
+      - o1 Launchpad
+      - o1 Exchange
+    symbols:
+      - O
+    entity_kind: protocol
+    chain_scope: multichain
+    status: provisional
+  category: Uniswap-pool launchpad
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://o1.exchange
+    - kind: app
+      url: https://launch.o1.exchange
+    - kind: docs
+      url: https://docs.o1.exchange
+    - kind: x
+      url: https://x.com/o1_exchange
+    - kind: discord
+      url: https://discord.gg/o1exchange
+    - kind: github
+      url: https://github.com/o1exchange/o1-api
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@o1_exchange"
+  tree:
+    primary: launch/uni-pool-launch
+    secondary:
+      - launch/stock-paired-factory
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: pair
+  name: PAIR
+  identity:
+    aliases:
+      - pair.fund
+      - PAIR Labs
+      - PairLaunchpadV5
+    symbols:
+      - PAIR
+    entity_kind: protocol
+    chain_scope: robinhood-native
+    status: conflicted
+    conflict_ids:
+      - CON-2
+  category: Stock-paired token factory
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: app
+      url: https://pair.fund
+    - kind: docs
+      url: https://pair.fund/docs
+    - kind: x
+      url: https://x.com/pairdotfund
+    - kind: x
+      url: https://x.com/pairecosystem
+    - kind: github
+      url: https://github.com/pairdotfund
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@pairdotfund"
+  tree:
+    primary: launch/stock-paired-factory
+    secondary:
+      - launch/hook-programmable
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false

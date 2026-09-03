@@ -36,3 +36,210 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 422e1a9e872f0e80
+- date: 2026-09-02
+  slug: earn-protocol
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "Yield layer for tokenized stocks: Uniswap v4 strategy vaults on NVDA/USDG and GME/USDG, permissionless omnipools with zaps routed through Rialto, and a $EARN token that receives buybacks."
+    themes: null
+    official_links:
+      - kind: site
+        url: https://earnonhood.com
+      - kind: x
+        url: https://x.com/EARNONHOOD
+    deployments:
+      - label: EARN token (account bio; workbook sheet 02)
+        chain: robinhood-chain
+        address: "0xa3b6aee90017b72c0812dc1e013de70eb2917ba3"
+        role: token
+        verified: false
+        sources:
+          - S4
+          - S3
+      - &a1
+        label: Strategy vaults / omnipools
+        chain: robinhood-chain
+        address: not-verified
+        role: vault
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    summary: "A yield layer for tokenized stocks on Robinhood Chain: deposits go into Uniswap v4 strategy vaults or into permissionless Omnipools of up to eight tokens, and swap fees accrue to the position. Users deposit a stock token, USDG or ETH on earnonhood.com, receive vault or pool shares, and withdraw by burning those shares. @EARNONHOOD runs the app. $EARN is a Doppler-cloned ERC-20; the lead book is EARN/SPY."
+    themes:
+      - vault
+      - rwa
+      - stock-paired:nvda
+      - lending
+      - memecoin
+    official_links:
+      - kind: site
+        url: https://earnonhood.com
+      - kind: x
+        url: https://x.com/EARNONHOOD
+      - kind: docs
+        url: https://earnonhood.com/docs
+      - kind: app
+        url: https://earnonhood.com/vault
+      - kind: app
+        url: https://earnonhood.com/omni/pools
+      - kind: app
+        url: https://earnonhood.com/steer
+      - kind: app
+        url: https://earnonhood.com/lend
+    deployments:
+      - label: EARN token (DopplerERC20V1 EIP-1167 clone)
+        chain: robinhood-chain
+        address: "0xa3b6aee90017b72c0812dc1e013de70eb2917ba3"
+        role: token
+        verified: true
+        sources:
+          - S4
+          - S3
+          - S11
+          - S12
+          - S13
+          - S15
+          - S27
+      - *a1
+      - label: DopplerERC20V1 implementation
+        chain: robinhood-chain
+        address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+        role: implementation
+        verified: false
+        sources:
+          - S15
+      - label: DopplerERC20V1Factory (token creator)
+        chain: robinhood-chain
+        address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+        role: factory
+        verified: false
+        sources:
+          - S13
+          - S14
+      - label: Airlock (token owner)
+        chain: robinhood-chain
+        address: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
+        role: other
+        verified: false
+        sources:
+          - S16
+          - S27
+      - label: Airlock owner Safe (SafeL2 proxy)
+        chain: robinhood-chain
+        address: "0x21E2ce70511e4FE542a97708e89520471DAa7A66"
+        role: multisig
+        verified: false
+        sources:
+          - S17
+          - S27
+      - label: NVDA/USDG Uniswap v4 vault (NvdaUsdgV4VaultV6)
+        chain: robinhood-chain
+        address: "0x0059F82A76B1Cb261ad71fA117a36CC0BB3Dfd6e"
+        role: vault
+        verified: true
+        sources:
+          - S8
+          - S18
+          - S27
+      - label: NVDA/USDG single-token zap (NvdaUsdgV4ZapV6)
+        chain: robinhood-chain
+        address: "0xD47D1187044B40DB1375ce60682AAC00a5356EFb"
+        role: router
+        verified: false
+        sources:
+          - S8
+          - S19
+      - label: GME/USDG vault (GME-USDG Vault V6)
+        chain: robinhood-chain
+        address: "0x2D26567eE8A4A24eaE17E8385380543E810Dd25a"
+        role: vault
+        verified: true
+        sources:
+          - S8
+          - S20
+          - S27
+      - label: GME/USDG single-token zap
+        chain: robinhood-chain
+        address: "0xb255934707e0796A8da4af7342002F8ef24d9f33"
+        role: router
+        verified: false
+        sources:
+          - S8
+          - S21
+      - label: EARN staking contract
+        chain: robinhood-chain
+        address: "0xeE7abf316E2824FbFB73aa3EA61217Dd600bD051"
+        role: vault
+        verified: false
+        sources:
+          - S22
+          - S37
+      - label: EARN Morpho VaultV2 (EARNVAULT / USDG)
+        chain: robinhood-chain
+        address: "0x8046118a5B0D1BCBcbd4d5f2C9AA9eecC5bf771d"
+        role: vault
+        verified: true
+        sources:
+          - S23
+          - S24
+          - S27
+      - label: Steer SPCX/USDG Uniswap v4 vault (BeaconProxy)
+        chain: robinhood-chain
+        address: "0x57b9b90610a4b9205c57fab92080e9cfbe7229f6"
+        role: vault
+        verified: false
+        sources:
+          - S25
+          - S39
+      - label: STOCK MEMES Omnipool (MEMESTOCKS)
+        chain: robinhood-chain
+        address: "0x00e7B76d0C0F0370C28A07aA9d9fDF92736238A6"
+        role: other
+        verified: true
+        sources:
+          - S26
+          - S30
+          - S27
+      - label: Protocol EOA (vault, stake and Morpho owner)
+        chain: robinhood-chain
+        address: "0x75741D131AbdD3973d6bA00f09948C15D138059d"
+        role: admin
+        verified: false
+        sources:
+          - S18
+          - S27
+    metrics:
+      - kind: holders
+        value: 2030
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S12
+      - kind: market_cap
+        value: 2889181
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S10
+      - kind: volume_24h
+        value: 461012.52
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S10
+      - kind: tvl
+        value: 200000
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S28
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 3ca6c4077b71f0cc

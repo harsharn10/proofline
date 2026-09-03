@@ -25,3 +25,171 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 555e685be8639124
+- date: 2026-09-03
+  slug: netnet
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    lifecycle: announced
+    summary: Reserve token whose treasury the project says holds AAPL, NVDA and SPCX Stock Tokens; DefiLlama has it under Reserve Currency at zero TVL.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/NetNetCap
+    deployments:
+      - &a1
+        label: NET token
+        chain: robinhood-chain
+        address: not-verified
+        role: token
+        verified: false
+        sources: []
+      - &a2
+        label: Treasury
+        chain: robinhood-chain
+        address: not-verified
+        role: vault
+        verified: false
+        sources: []
+    metrics:
+      - kind: tvl
+        value: 0
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S6
+  new:
+    lifecycle: mainnet
+    summary: Reserve-backed currency on Robinhood Chain. NET is minted only by the Treasury, staked into rebasing sNET every 8 hours, and sold through bonds against a USDG reserve plus protocol-owned NET/USDG liquidity. Users buy NET/USDG, stake for dividends, or subscribe to bonds and RWA programs at netnet.capital. NetNet Capital Management (@NetNetCap) publishes the contracts; tax-pair adds sit with Safe 0x3Bb7…5f42.
+    themes:
+      - rwa
+      - vault
+      - lending
+      - nft
+      - stock-paired:nvda
+    official_links:
+      - kind: x
+        url: https://x.com/NetNetCap
+      - kind: site
+        url: https://netnet.capital
+      - kind: app
+        url: https://app.netnet.capital/
+      - kind: docs
+        url: https://docs.netnet.capital/
+      - kind: telegram
+        url: https://t.me/netnetcap
+      - kind: other
+        url: https://win.netnet.capital/
+    deployments:
+      - *a1
+      - *a2
+      - label: NET token
+        chain: robinhood-chain
+        address: "0xCA9c78Dd337A67F6e0077F65F5E9218719d30eDf"
+        role: token
+        verified: true
+        sources:
+          - S9
+          - S14
+          - S15
+          - S16
+      - label: Treasury
+        chain: robinhood-chain
+        address: "0x04822Ea321A0DEE6F40656172F29312104855d66"
+        role: vault
+        verified: true
+        sources:
+          - S9
+          - S16
+          - S28
+      - label: Staking
+        chain: robinhood-chain
+        address: "0xB078cc304A0B264C5F3680DC0488954ACcd02E87"
+        role: other
+        verified: true
+        sources:
+          - S9
+          - S16
+          - S29
+      - label: sNET (staked NET)
+        chain: robinhood-chain
+        address: "0xb773ec2C326B7f98a5a83fc098825492F020a4c7"
+        role: token
+        verified: true
+        sources:
+          - S9
+          - S16
+      - label: TaxCollector
+        chain: robinhood-chain
+        address: "0x086C58400b8708Ef993f256E12e752dcF0AC918e"
+        role: other
+        verified: false
+        sources:
+          - S9
+          - S16
+      - label: GenesisBond
+        chain: robinhood-chain
+        address: "0x575b7B7c97Ef3E21C82DAeB427899d583e1E913f"
+        role: other
+        verified: false
+        sources:
+          - S9
+          - S16
+      - label: BondDepository
+        chain: robinhood-chain
+        address: "0xff32a969A0c567129eECD926D04657728E1980C1"
+        role: other
+        verified: false
+        sources:
+          - S9
+      - label: NET/USDG canonical Uniswap v2 pair
+        chain: robinhood-chain
+        address: "0x59F95461E68e0c77605299791E1449f175165B54"
+        role: other
+        verified: true
+        sources:
+          - S9
+          - S16
+          - S17
+      - label: Team Safe (NET.guardian)
+        chain: robinhood-chain
+        address: "0x3Bb7A23316f82C0e984fA2E784846d8928a35f42"
+        role: multisig
+        verified: false
+        sources:
+          - S9
+          - S16
+    metrics:
+      - kind: tvl
+        value: 0
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S13
+      - kind: holders
+        value: 6992
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S14
+      - kind: volume_24h
+        value: 7142067.66328455
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S30
+      - kind: market_cap
+        value: 6108502.05189367
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S30
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: c81da60992e92aec

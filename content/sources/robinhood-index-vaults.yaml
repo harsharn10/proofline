@@ -24,3 +24,234 @@ sources:
     archive_url: null
     researcher: harsharn10
     available: true
+  - id: S3
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults/blob/41f10a23efb9639bf793d6b37ced009058be0270/README.md
+    publisher: nsvoud-dev
+    kind: repository
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: README.md Robinhood Index Vaults
+    excerpt: "Tokenized index funds on Robinhood L2. Deposit ETH, receive a single vault share (rIDX) representing a diversified basket of stock tokens—PLTR, AMD, NFLX, AMZN, TSLA—with one click. Phase 1 Done: MVP on Robinhood Testnet. Phase 2 Planned: Mainnet launch and security audit. Replace MockSwapRouter with production DEX. Chain ID 46630."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S4
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults/blob/41f10a23efb9639bf793d6b37ced009058be0270/hardhat.config.js
+    publisher: nsvoud-dev
+    kind: repository
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: hardhat.config.js robinhoodTestnet
+    excerpt: networks.robinhoodTestnet url https://rpc.testnet.chain.robinhood.com chainId 46630. etherscan customChains robinhoodTestnet chainId 46630 browserURL https://explorer.testnet.chain.robinhood.com. No mainnet / 4663 network key.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S5
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults/blob/41f10a23efb9639bf793d6b37ced009058be0270/contracts/IndexVault.sol
+    publisher: nsvoud-dev
+    kind: repository
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: contracts/IndexVault.sol
+    excerpt: contract IndexVault is ERC4626, Ownable, ReentrancyGuard. WETH constant 0x7943e237c7F95DA44E0301572D358911207852Fa. STOCK_PER_WETH 100. Constructor deploys ERC20 name/symbol from args; deploy.js uses Robinhood Index Vault / rIDX. setIndex onlyOwner; rebalance owner or keeper; forceTriggerSafeMode onlyOwner. No timelock.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S6
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults/blob/41f10a23efb9639bf793d6b37ced009058be0270/contracts/MockSwapRouter.sol
+    publisher: nsvoud-dev
+    kind: repository
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: contracts/MockSwapRouter.sol
+    excerpt: "Mock DEX router for testing. Fixed rate: 1 WETH = 100 Stock Tokens. exactInputSingle WETH->stock multiplies amountIn by STOCK_PER_WETH; stock->WETH divides. Deployer must fund this contract with stock tokens."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S7
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults/blob/41f10a23efb9639bf793d6b37ced009058be0270/scripts/deploy.js
+    publisher: nsvoud-dev
+    kind: repository
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: scripts/deploy.js
+    excerpt: // Robinhood Chain Testnet. WETH 0x7943e237c7F95DA44E0301572D358911207852Fa. STOCK_TOKENS PLTR 0x1FBE…98d0, AMD 0x7117…778d, NFLX 0x3b82…8C93, AMZN 0x5884…9E02, TSLA 0xC9f9…Bd4E. IndexVault.deploy(WETH, "Robinhood Index Vault", "rIDX", routerAddress).
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S8
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults/blob/41f10a23efb9639bf793d6b37ced009058be0270/scripts/fundRouter.js
+    publisher: nsvoud-dev
+    kind: repository
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: scripts/fundRouter.js MOCK_SWAP_ROUTER
+    excerpt: const MOCK_SWAP_ROUTER = "0x31ecd0d9cEd7AB0744A96acC8e3432576fc8e691". Same address in scripts/deployVaultOnly.js as ROUTER_ADDRESS.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S9
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults/blob/41f10a23efb9639bf793d6b37ced009058be0270/frontend/src/config/chains.ts
+    publisher: nsvoud-dev
+    kind: repository
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: frontend/src/config/chains.ts
+    excerpt: 'export const robinhoodTestnet = defineChain({ id: 46630, name: "Robinhood Chain Testnet", rpcUrls default http https://rpc.testnet.chain.robinhood.com, blockExplorers url https://explorer.testnet.chain.robinhood.com }). wagmi.ts chains: [robinhoodTestnet] only.'
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S10
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults
+    publisher: GitHub
+    kind: repository
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: nsvoud-dev/robinhood-index-vaults repository
+    excerpt: "API: full_name nsvoud-dev/robinhood-index-vaults, homepage https://robinhood-index-vaults.vercel.app, created_at 2026-02-20T15:17:25Z, pushed_at 2026-03-05T18:36:37Z, default_branch main, stargazers_count 0, license MIT, language TypeScript."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S11
+    url: https://github.com/nsvoud-dev
+    publisher: GitHub
+    kind: repository
+    accessed_at: 2026-09-03T18:25:00Z
+    claim: user nsvoud-dev
+    excerpt: "API users/nsvoud-dev: login nsvoud-dev, name nsvoud, twitter_username 0xNSVOUD, blog empty, created_at 2025-10-23T16:50:11Z."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S12
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults/commit/41f10a23efb9639bf793d6b37ced009058be0270
+    publisher: nsvoud-dev
+    kind: repository
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: commit 41f10a2 Institutional UI / Safe Mode UX
+    excerpt: "SHA 41f10a23efb9639bf793d6b37ced009058be0270. Message: Major: Institutional UI with unified local logos and enhanced Safe Mode UX. Author nsvoud instansera@gmail.com 2026-03-05T18:36:33Z. HEAD of main."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S13
+    url: https://robinhood-index-vaults.vercel.app
+    publisher: Vercel
+    kind: other
+    accessed_at: 2026-09-03T18:25:00Z
+    claim: robinhood-index-vaults.vercel.app 404
+    excerpt: "HTTP 404. 404: NOT_FOUND. Code: DEPLOYMENT_NOT_FOUND. This deployment cannot be found."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S14
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults/blob/41f10a23efb9639bf793d6b37ced009058be0270/VIDEO_SCRIPT.md
+    publisher: nsvoud-dev
+    kind: docs
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: VIDEO_SCRIPT.md grant demo
+    excerpt: "Grant Demo Video Script — Robinhood Index Vaults. Conclusion: The MVP is live on Robinhood Testnet and the repo is open. We're ready for a Phase 2 security audit and mainnet launch — and we're applying to the Arbitrum and Robinhood Ecosystem Fund to get there."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S15
+    url: https://explorer.testnet.chain.robinhood.com/address/0x04653bF84918B05a68A7d568233ec1e259338D7E
+    publisher: Robinhood Chain testnet explorer
+    kind: explorer
+    accessed_at: 2026-09-03T18:45:00Z
+    claim: rIDX 0x04653bF84918B05a68A7d568233ec1e259338D7E
+    excerpt: "API v2: hash 0x04653bF84918B05a68A7d568233ec1e259338D7E, is_contract true, is_verified false, name Robinhood Index Vault, creator 0xf809911452fc0F280838001706aFF82591f96070, creation_transaction_hash 0x0a7853578f1580fd0fdb8c8fd47d4f8e91af2829eb6b6b87ddc828897d6c9519. Token name Robinhood Index Vault symbol rIDX holders_count 4 decimals 18. Search q=rIDX returned eight rIDX ERC-20s."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S16
+    url: https://explorer.testnet.chain.robinhood.com/address/0x31ecd0d9cEd7AB0744A96acC8e3432576fc8e691
+    publisher: Robinhood Chain testnet explorer
+    kind: explorer
+    accessed_at: 2026-09-03T18:45:00Z
+    claim: MockSwapRouter 0x31ecd0d9cEd7AB0744A96acC8e3432576fc8e691
+    excerpt: "API v2: hash 0x31ecd0d9cEd7AB0744A96acC8e3432576fc8e691, is_contract true, is_verified false, name null, creator 0xf809911452fc0F280838001706aFF82591f96070, creation_transaction_hash 0x5c7581187066e314a8e7d4be190fe01c4397b7cc5af58369e912f439e05a0b62, has_logs true, has_token_transfers true."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S17
+    url: https://explorer.testnet.chain.robinhood.com/address/0x7943e237c7F95DA44E0301572D358911207852Fa
+    publisher: Robinhood Chain testnet explorer
+    kind: explorer
+    accessed_at: 2026-09-03T18:45:00Z
+    claim: Testnet WETH 0x7943e237c7F95DA44E0301572D358911207852Fa
+    excerpt: "API v2: hash 0x7943e237c7F95DA44E0301572D358911207852Fa, is_contract true, is_verified false, name WETH, proxy_type eip1967, token name WETH symbol WETH holders_count 44173. Creator 0xCe6C30911056a961c5C540367dc670f69240Ee92."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S18
+    url: https://robinhoodchain.blockscout.com/api/v2/search?q=rIDX
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T18:35:00Z
+    claim: 4663 empty check for repo CAs and rIDX search
+    excerpt: "GET /api/v2/search?q=rIDX items []. Address pages 0x31ecd0…691, 0x7943…852Fa, 0x1FBE…98d0, 0x7117…778d, 0x3b82…8C93, 0x5884…9E02, 0xC9f9…Bd4E: is_contract false, is_verified false, creation_tx_hash null."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S19
+    url: https://explorer.testnet.chain.robinhood.com/tx/0x5c7581187066e314a8e7d4be190fe01c4397b7cc5af58369e912f439e05a0b62
+    publisher: Robinhood Chain testnet explorer
+    kind: explorer
+    accessed_at: 2026-09-03T18:45:00Z
+    claim: MockSwapRouter creation tx 0x5c7581…
+    excerpt: timestamp 2026-02-19T23:41:55.000000Z, status ok, result success, block_number 2406186, from 0xf809911452fc0F280838001706aFF82591f96070 is_contract false, to null (contract creation).
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S20
+    url: https://robinhoodchain.blockscout.com/address/0xC6d1cB3A0d1A049af5cC412D8C8c4c32149Fc0Cc
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T18:40:00Z
+    claim: INDEXVAULT token 0xC6d1cB3A0d1A049af5cC412D8C8c4c32149Fc0Cc
+    excerpt: is_contract true, is_verified true, name Index Vault, creator 0x0d6cED728ac12De9133393b128274821B6e7640B, token name Index Vault symbol INDEXVAULT type ERC-20 holders_count 71 total_supply 1e27. Verified file INDEXVAULT.sol pragma 0.8.26, Uniswap v4 PoolKey imports. Not rIDX.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S21
+    url: https://robinhoodchain.blockscout.com/address/0xc6ff4bc6E90a624a20D5c06679965A951a5Ba2F4
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T18:40:00Z
+    claim: IndexVault 0xc6ff4bc6E90a624a20D5c06679965A951a5Ba2F4
+    excerpt: is_contract true, is_verified true, name IndexVault, creator 0xFa382a4009327B8BC868c9fdBCa49d35834E19dF. Verified file contracts/index/IndexVault.sol pragma solidity ^0.8.24. Not the nsvoud-dev 0.8.20 Ownable ERC-4626.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S22
+    url: https://robinhoodchain.blockscout.com/address/0x43e4aa3204A2d3cee2E12532195E9a6b766a3639
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T18:40:00Z
+    claim: Hood MAG7 Index hMAG7 0x43e4aa3204A2d3cee2E12532195E9a6b766a3639
+    excerpt: is_contract true, is_verified true, name Hood MAG7 Index, creator 0x4667E480371A9BeD712f7d03dB1F0863262d9fb4, token symbol hMAG7 holders_count 5. DefiLlama lists Hood Index separately; not rIDX.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S23
+    url: https://github.com/nsvoud-dev/robinhood-index-vaults/commit/7fbe3abd3ccc2cf531d139eef5a77a128a9d4c09
+    publisher: nsvoud-dev
+    kind: repository
+    accessed_at: 2026-09-03T18:20:00Z
+    claim: commit 7fbe3ab initial MVP
+    excerpt: "SHA 7fbe3abd3ccc2cf531d139eef5a77a128a9d4c09. Message: feat: initial MVP for Robinhood Index Vaults. Co-authored-by: Cursor. Author nsvoud instansera@gmail.com 2026-02-20T15:16:05Z."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true

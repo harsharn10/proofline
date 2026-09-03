@@ -4,10 +4,18 @@ symbol: null
 category: Market scanner
 lifecycle: announced
 coverage: stub
-summary: Short-interest tape reading Uniswap v3 TWAPs, live per the project, with a planned short desk that has no deployed contracts.
+summary: An off-chain Uniswap v3 TWAP scanner for Robinhood Chain Pons TOKEN/WETH pools. It publishes a Setup Score from pool depth, holders, oracle cardinality and 5m/30m divergence; short-interest fields stay null until a borrow market exists. The planned Desk would post ETH, borrow a listed token and sell it into that pool. Site, docs and README state no Desk contracts are written or deployed. @UseSqueeze_RH posted usesqueeze.xyz; the indexer is github.com/eurotropica01-spec/squeeze.
 official_links:
   - kind: x
     url: https://x.com/UseSqueeze_RH
+  - kind: site
+    url: https://usesqueeze.xyz
+  - kind: app
+    url: https://usesqueeze.xyz/app/
+  - kind: docs
+    url: https://usesqueeze.xyz/docs/
+  - kind: github
+    url: https://github.com/eurotropica01-spec/squeeze
 dependencies:
   - uniswap
 deployments: []
@@ -34,4 +42,11 @@ findings:
     - text: Tape data source and hosting
     - text: Lender custody design once the Desk exists
     - text: Liquidation on thin books — described by the project as unsolved
-  unresolved: []
+    - text: "Is any Desk contract deployed under a name other than Squeeze? Next: watch github eurotropica01-spec/squeeze for a contracts/ tree or a published address"
+    - text: "Does usesqueeze.xyz or the GitHub org name @UseSqueeze_RH, or the handle name the GitHub user? Next: record a bidirectional link if the site footer or GitHub profile adds the handle"
+    - text: "Which if any SQUEEZE ticker is this product, given docs $SQUEEZE copy and the X $SQUEEZE line? Next: wait for a CA in the GitHub README or a handle post that names one address"
+    - text: "Where is the Tape hosted besides GitHub raw and usesqueeze.xyz? Next: resolve DNS for usesqueeze.xyz to the Netlify account if a Desk ships"
+  unresolved:
+    - text: identity.symbol remains unresolved (CON-1).
+themes:
+  - tooling
