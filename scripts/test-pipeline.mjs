@@ -5,11 +5,11 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, cp, rm, writeFile, appendFile, readFile, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { parse } from "yaml";
+import { parse, stringify } from "yaml";
 import { validateInboxYaml, yamlParseErrors } from "./lib/inbox.mjs";
 import { vocabularyWarnings } from "./lib/voice.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
-import { normalizeUrl, lifecycleDriftWarnings } from "./lib/checks.mjs";
+import { normalizeUrl, lifecycleDriftWarnings, mainnetReceiptFromPulled } from "./lib/checks.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { entryKey, legacyEntryKey, reviewKeyFor, selectUnsent, selectApproved, publicationFingerprint } from "./lib/telegram.mjs";
 import { addSourceKeys, sourceKeyFor } from "./migrations/add-source-keys.mjs";
@@ -340,6 +340,45 @@ await test("lifecycle migration requires a contract and pair and records its rec
     assert.match(await readFile(join(temp, "projects", "alpha.yaml"), "utf8"), new RegExp(`lifecycle_source: pulled ${address} 2026-09-03T10:00:00.000Z`));
     assert.match(await readFile(join(temp, "projects", "activity-only.yaml"), "utf8"), /lifecycle: announced/);
     assert.deepEqual(await migrateLifecycle(temp), [], "migration rerun is idempotent");
+  } finally { await rm(temp, { recursive: true, force: true }); }
+});
+
+// 10. The mainnet receipt names the market's own contract or a pair's, never whichever contract came first.
+await test("mainnet receipt never falls back to an unrelated contract", async () => {
+  const token = "0x1111111111111111111111111111111111111111";
+  const pair = "0x2222222222222222222222222222222222222222";
+  const unrelated = "0x3333333333333333333333333333333333333333";
+  const pulled = (contractAddress) => ({
+    slug: "fixture",
+    chain: "robinhood-chain",
+    addresses: [{ address: contractAddress, is_contract: true, created_at: "2026-09-03T10:00:00.000Z" }],
+    market: { token_address: token, pairs: [{ pair_address: pair, created_at: "2026-09-03T10:05:00.000Z" }] },
+  });
+  assert.deepEqual(mainnetReceiptFromPulled(pulled(token)), { address: token, createdAt: "2026-09-03T10:00:00.000Z" });
+  assert.deepEqual(mainnetReceiptFromPulled(pulled(pair)), { address: pair, createdAt: "2026-09-03T10:00:00.000Z" });
+  assert.equal(mainnetReceiptFromPulled(pulled(unrelated)), null, "an unrelated contract is not a receipt");
+
+  const temp = await mkdtemp(join(tmpdir(), "proofline-receipt-"));
+  try {
+    for (const dir of ["projects", "pulled"]) await mkdir(join(temp, dir), { recursive: true });
+    await writeFile(join(temp, "census.yaml"), "- slug: alpha\n  lifecycle: announced\n");
+    await writeFile(join(temp, "projects", "alpha.yaml"), "slug: alpha\nlifecycle: announced\n");
+    await writeFile(join(temp, "pulled", "alpha.yaml"), stringify(pulled(unrelated)));
+    assert.deepEqual(await migrateLifecycle(temp), [], "no receipt means no flip");
+    assert.match(await readFile(join(temp, "projects", "alpha.yaml"), "utf8"), /lifecycle: announced/);
+  } finally { await rm(temp, { recursive: true, force: true }); }
+});
+
+// 11. content/pulled is machine output: a broken file warns, it does not fail content validation.
+await test("an unparseable pulled file warns instead of failing validation", async () => {
+  const temp = await mkdtemp(join(tmpdir(), "proofline-pulled-"));
+  const content = join(temp, "content");
+  try {
+    await cp("content", content, { recursive: true });
+    await writeFile(join(content, "pulled", "broken.yaml"), "a: 1\n  b: [unclosed\n");
+    const { errors, warnings } = await validateContent(content);
+    assert.deepEqual(errors.filter((error) => error.includes("pulled/broken.yaml")), [], errors.join("\n"));
+    assert.ok(warnings.some((warning) => warning.includes("pulled/broken.yaml")), warnings.join("\n"));
   } finally { await rm(temp, { recursive: true, force: true }); }
 });
 

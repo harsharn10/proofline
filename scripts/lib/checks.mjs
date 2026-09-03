@@ -42,9 +42,17 @@ export function mainnetReceiptFromPulled(pulled) {
   if (!pairs.length) return null;
   const contracts = (pulled.addresses ?? []).filter((row) => row?.is_contract === true && /^0x[0-9a-fA-F]{40}$/.test(row.address ?? ""));
   if (!contracts.length) return null;
+  // The receipt has to be the contract the market is actually about: the market's own token, or the
+  // contract behind one of its pairs. Any other contract in the file (a router, a helper, whatever the
+  // puller happened to see first) proves nothing about this name, so there is no fallback — no match
+  // means no receipt, and the caller leaves the lifecycle where it is.
   const marketAddress = String(pulled.market?.token_address ?? "").toLowerCase();
-  const contract = contracts.find((row) => row.address.toLowerCase() === marketAddress) ?? contracts[0];
-  if (!contract.created_at) return null;
+  const pairAddresses = new Set(pairs.map((pair) => String(pair.pair_address).toLowerCase()));
+  const contract =
+    contracts.find((row) => row.address.toLowerCase() === marketAddress) ??
+    contracts.find((row) => pairAddresses.has(row.address.toLowerCase())) ??
+    null;
+  if (!contract?.created_at) return null;
   return { address: contract.address, createdAt: contract.created_at };
 }
 
