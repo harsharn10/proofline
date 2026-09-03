@@ -45,6 +45,12 @@ export const Route = createRootRoute({
       </head>
       <body>
         <SiteHeader />
+        <aside className="development-note" aria-label="Site status">
+          <div className="wrap">
+            <strong>Public beta.</strong> Icarus is under active development. Some project
+            information and features are still being added, so expect gaps and frequent changes.
+          </div>
+        </aside>
         <Outlet />
         <SiteFooter />
         <Scripts />

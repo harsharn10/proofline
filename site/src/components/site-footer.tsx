@@ -8,10 +8,6 @@ export function SiteFooter() {
   return (
     <footer className="sitefooter">
       <div className="wrap">
-        <p className="beta-note">
-          <strong>Public beta.</strong> Icarus is under active development. Some project information
-          and features are still being added, so expect gaps and frequent changes.
-        </p>
         <p className="footline">
           {meta.disclaimer} <Link to="/disclaimer">Full disclaimer.</Link>
           {correction.href ? <a href={correction.href}>{correction.label}</a> : null}
