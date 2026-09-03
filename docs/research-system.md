@@ -266,6 +266,17 @@ On an approved merge the compiler keeps the older accepted slug unless the offic
 unions aliases and sources, deduplicates sources by normalized URL plus claim, merges feed items by
 stable id, and writes a correction entry when a public name, lifecycle, deployment or conclusion changes.
 
+Disclosure follows the same weighting. A packet whose identity runs into a canonical row must record it
+under `identity.possible_matches` when the two share an **official surface**: the same official handle,
+the same owned domain, or an address one reproduced that the other already carries. Owned means the
+`official_domain` and the `site` and `docs` links — an `app` link is where a product is *used*, so a
+token's page on a launchpad's app is the pad's domain, not a second claim on the pad. Sharing only a
+**name** is not evidence: a launchpad that lists its launches as aliases collides with every one of them
+and is none of them. That is a warning, and the compiler drops the borrowed alias from the newcomer's
+registry row with the notice `alias X is another name's slug (<slug>); dropped` rather than writing two
+names that look like one. A ticker is never an identity: an alias that is one of the record's own symbols
+is a symbol, and two records that agree only on a ticker are two records.
+
 Conduct: never write a verdict about a person, team or account. The only flags are `handle-collision
 | unconfirmed-official | third-party-link | copypasta-pattern | wrong-chain | ca-collision`, each with
 a receipt. Describe what was posted, never intent. `npm run validate` fails on conduct words.

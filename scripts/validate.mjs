@@ -14,6 +14,9 @@ if (root === "content") {
   const census = parse(await readFile("content/census.yaml", "utf8"));
   const packets = await validatePacketDirectory("research/inbox/packets", census);
   errors.push(...packets.errors);
+  // A name that collides with another canonical name but shares no official surface is a warning: the
+  // compiler drops the alias rather than refusing the packet (research-system §7).
+  warnings.push(...packets.warnings);
   // Every research/inbox ledger must at least parse: the directory is on the packet-PR allowlist.
   const inbox = await validateInboxYaml();
   errors.push(...inbox.errors);

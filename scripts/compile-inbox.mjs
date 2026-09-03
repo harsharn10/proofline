@@ -246,7 +246,7 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
   const report = {
     generated_at: new Date().toISOString(),
     dry, base, branches: [], compiled: [], inventory: [], notices: [],
-    gates: {}, shareBar: null, packetPaths: [], preexistingErrors: [],
+    gates: {}, shareBar: null, packetPaths: [], preexistingErrors: [], packetWarnings: [],
   };
 
   // 1. Collect. Every candidate lands in the working tree before anything is validated, so the
@@ -273,7 +273,8 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
   const census = parse(await readFile(join(CONTENT_DIR, "census.yaml"), "utf8")) ?? [];
   let live = candidates;
   for (let pass = 0; pass < VALIDATION_PASSES; pass++) {
-    const { errors } = await validatePacketDirectory(PACKET_ROOT, census);
+    const { errors, warnings } = await validatePacketDirectory(PACKET_ROOT, census);
+    report.packetWarnings = warnings;
     const bad = new Map();
     const orphans = [];
     for (const error of errors) {
@@ -441,6 +442,13 @@ export function renderReport(report) {
     lines.push(`- after: ${report.shareBar.after.length} name(s)`);
     lines.push(`- added: ${report.shareBar.added.join(", ") || "none"}`);
     lines.push(`- removed: ${report.shareBar.removed.join(", ") || "none"}`);
+    lines.push("");
+  }
+  if (report.packetWarnings.length) {
+    lines.push("## Packet warnings (a name collides, no official surface is shared — the alias is dropped)");
+    lines.push("```text");
+    lines.push(...report.packetWarnings);
+    lines.push("```");
     lines.push("");
   }
   if (report.preexistingErrors.length) {

@@ -115,7 +115,8 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
   // content/pulled is machine output; a half-written file must not stop a compile.
   let pulled = null;
   try { pulled = await yamlOr(pulledPath, null); } catch { pulled = null; }
-  const result = compile(packet, priorProject, priorCensusRow, priorSources, priorFeed, { pulled, priorResearch });
+  // The census goes in so the compiler can drop an alias that is only another canonical name (§7).
+  const result = compile(packet, priorProject, priorCensusRow, priorSources, priorFeed, { pulled, priorResearch, census });
   const nextCensus = priorCensusRow
     ? census.map((row) => row.slug === slug ? result.censusRow : row)
     : [...census, result.censusRow];
