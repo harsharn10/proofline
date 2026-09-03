@@ -20,7 +20,7 @@ import {
   publicationFingerprint,
   readDotEnv,
 } from "./lib/telegram.mjs";
-import { validateContent } from "./lib/validate-content.mjs";
+import { validateContent, ownWordSet, filterOwnWords } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
 import {
@@ -1236,6 +1236,22 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   } catch (err) {
     failures++;
     console.error(`FAIL reader vocabulary: ${err.message}`);
+  }
+}
+
+
+// A name's own words are not hype: GIGA may say "giga"; unrelated hype words still fire.
+{
+  try {
+    const own = ownWordSet({ slug: "giga", name: "Giga", identity: { aliases: ["GIGA token"], symbols: ["GIGA"] } }, { name: "Giga", symbol: "GIGA" });
+    assert.ok(own.has("giga") && own.has("token"), "own words carry name, symbol and alias parts");
+    const kept = filterOwnWords(['feed/giga.yaml: x title: banned word "giga"', 'feed/giga.yaml: x body: banned word "moon"'], own);
+    assert.deepEqual(kept, ['feed/giga.yaml: x body: banned word "moon"'], "only the own word is dropped");
+    assert.equal(filterOwnWords(['a: banned word "giga"'], new Set()).length, 1, "no own words, nothing dropped");
+    console.log("ok   own words are not hype");
+  } catch (err) {
+    failures++;
+    console.error(`FAIL own words are not hype: ${err.message}`);
   }
 }
 
