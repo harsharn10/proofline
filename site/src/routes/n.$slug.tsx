@@ -4,10 +4,10 @@ import { getDossier } from "@/data/content-server";
 import { readerCopy } from "@/lib/dejargon";
 
 export const Route = createFileRoute("/n/$slug")({
-  // URL-synced card tabs. Commentary is the clean default URL; legacy or unknown values fall back.
+  // URL-synced detail tabs. Contracts is the clean default URL; legacy or unknown values fall back.
   validateSearch: (search: Record<string, unknown>): { tab?: DossierTab } => {
     const tab = search.tab;
-    if (typeof tab === "string" && tab !== "commentary" && (DOSSIER_TABS as readonly string[]).includes(tab)) {
+    if (typeof tab === "string" && tab !== "contracts" && (DOSSIER_TABS as readonly string[]).includes(tab)) {
       return { tab: tab as DossierTab };
     }
     return {};
@@ -55,7 +55,7 @@ function NamePage() {
         tree={tree}
         section={section}
         now={now}
-        tab={tab ?? "commentary"}
+        tab={tab ?? "contracts"}
         related={related}
       />
     </>

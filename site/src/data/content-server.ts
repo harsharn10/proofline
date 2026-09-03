@@ -326,6 +326,7 @@ function loadContent(): ServerContent {
       review: project.review,
       research,
       feed,
+      wire: [],
       sources: sourcesFile.sources,
       changelog,
       derived: withPulledMetrics(pickDerived(derivedFile.projects[slug], slug, project.coverage), pulled),
@@ -345,6 +346,8 @@ function loadContent(): ServerContent {
         })),
         dailySeries,
         top10Share: pulledCard?.market?.top10_share ?? null,
+        top10ShareExPools: pulled?.market?.top10_share_ex_pools ?? null,
+        burnedShare: pulled?.market?.burned_share ?? null,
         launchpad: pulledCard?.market?.launchpad ?? null,
         mint: pulledCard?.structure?.mint ?? null,
         liquidityLocks: (pulledCard?.structure?.lp ?? []).map((row) => ({
@@ -356,6 +359,18 @@ function loadContent(): ServerContent {
       },
     };
   });
+
+  const compiledWire = wireItems({
+    entries: dossiers.map((dossier) => toDirectoryEntry(dossier, treeBySlug, censusBySlug, site)),
+    feed: dossiers.flatMap((dossier) => dossier.feed.map((item) => ({
+      name: { slug: dossier.slug, symbol: dossier.symbol, name: dossier.name },
+      item,
+    }))),
+    changelog: changelogAll,
+  });
+  for (const dossier of dossiers) {
+    dossier.wire = compiledWire.filter((item) => item.slug === dossier.slug);
+  }
 
   return {
     site,

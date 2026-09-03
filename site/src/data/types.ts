@@ -439,6 +439,7 @@ export type Dossier = {
   review: Review;
   research: Research;
   feed: FeedItem[];
+  wire: WireItem[];
   sources: SourceEntry[];
   changelog: ChangelogEntry[];
   derived: Derived;
@@ -460,6 +461,8 @@ export type Dossier = {
     }>;
     dailySeries: Record<string, Array<{ at: string; value: number }>>;
     top10Share: number | null;
+    top10ShareExPools: number | null;
+    burnedShare: number | null;
     launchpad: { slug: string; via: "factory" | "creator"; address: string } | null;
     mint: "owner-can-mint" | "no-mint-function" | "unknown" | null;
     liquidityLocks: Array<{

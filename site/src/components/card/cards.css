@@ -10,14 +10,15 @@
   .card-title-line { display: flex; min-width: 0; flex-wrap: wrap; gap: 7px; align-items: center; }
   .card-title-line h1 { margin: 0; color: var(--t1); font-size: clamp(21px, 3vw, 27px); font-weight: 720; letter-spacing: -.025em; line-height: 1.12; }
   .card-symbol { color: var(--t3); font-size: 12px; font-weight: 600; }
+  .card-tldr { max-width: 86ch; margin: 7px 0 0; color: var(--t2); font-size: 13px; line-height: 1.45; }
   .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
 
-  .card-summary { margin: 0 20px; padding: 13px 15px; border-radius: 8px; background: var(--s1); }
+  .card-summary { margin: 0; padding: 16px 20px; border-radius: 0; background: var(--s1); }
+  .card-summary h2, .card-block > h2 { margin: 0 0 8px; color: var(--t1); font-size: 12.5px; font-weight: 650; }
   .card-summary p { max-width: 105ch; margin: 0; color: var(--t2); font-size: 13px; line-height: 1.58; }
   .card-summary strong { color: var(--t1); }
   .card-links { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
 
-  .card-columns { display: grid; grid-template-columns: minmax(190px, .72fr) minmax(360px, 1.55fr) minmax(230px, .85fr); gap: 18px; padding: 18px 20px; }
   .card-label, .card-column-title h2 { display: flex; align-items: center; gap: 5px; margin: 0 0 6px; color: var(--t3); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
   .card-label-spaced { margin-top: 14px; }
   .card-fact-group, .card-people { overflow: hidden; border: 0.5px solid var(--line); border-radius: 8px; background: var(--s1); }
@@ -38,13 +39,6 @@
   .card-source-line { display: flex; flex-wrap: wrap; gap: 7px 12px; margin: 7px 2px 0; color: var(--t3); font-size: 10.5px; }
   .card-source-line a { display: inline-flex; align-items: center; gap: 3px; color: var(--acc); }
 
-  .card-column-title { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
-  .card-column-title > a { color: var(--acc); font-size: 11px; }
-  .card-people article { padding: 8px 10px; border-bottom: 0.5px solid var(--line-soft); }
-  .card-people article:last-child { border-bottom: 0; }
-  .card-people p { margin: 0; color: var(--t1); font-size: 11.5px; line-height: 1.45; }
-  .card-people small { display: block; margin-top: 3px; color: var(--t3); font-size: 10px; font-style: italic; }
-  .card-people a { color: var(--acc); }
   .card-empty { margin: 12px 2px; color: var(--t3); font-size: 12px; font-style: italic; }
 
   .card-block { border-top: 0.5px solid var(--line); padding: 16px 20px; }
@@ -52,6 +46,11 @@
   .card-block-head h2 { margin: 0; color: var(--t1); font-size: 12.5px; font-weight: 650; }
   .card-block-head span { color: var(--t3); font-size: 10.5px; }
   .card-block-head a { color: var(--acc); }
+  .card-bullets ul, .card-risks ul { display: grid; gap: 8px; margin: 0; padding-left: 20px; }
+  .card-bullets li, .card-risks li { max-width: 105ch; color: var(--t2); font-size: 12.5px; line-height: 1.5; }
+  .card-bullets sup, .card-risks sup { margin-left: 3px; font-size: 9px; }
+  .card-bullets sup a, .card-risks sup a { color: var(--acc); }
+  .card-risks { background: color-mix(in srgb, var(--bad-bg) 34%, var(--s2)); }
   .card-related-table table { min-width: 720px; }
   .card-related-table tbody tr.is-current td { background: color-mix(in srgb, var(--good-bg) 68%, var(--s2)); }
   .card-related-table td:first-child a { display: inline-flex; align-items: center; gap: 7px; color: var(--t1); font-weight: 550; }
@@ -62,18 +61,13 @@
   .card-legend { display: flex; gap: 14px; margin-top: 7px; color: var(--t3); font-size: 10.5px; }
   .card-legend span { display: inline-flex; align-items: center; gap: 5px; }
 
-  .card-tab-block { padding-top: 0; }
+  .card-tab-block { padding-top: 16px; }
   .card-tabs { display: flex; overflow-x: auto; gap: 18px; border-bottom: 0.5px solid var(--line); }
   .card-tabs a { flex: 0 0 auto; padding: 12px 1px 9px; border-bottom: 2px solid transparent; color: var(--t2); font-size: 12px; }
   .card-tabs a.on { border-bottom-color: var(--rh); color: var(--t1); font-weight: 600; }
   .card-tab-panel { padding-top: 8px; }
-  .card-commentary article { padding: 10px 1px; border-bottom: 0.5px solid var(--line-soft); }
-  .card-commentary article:last-child { border-bottom: 0; }
-  .card-commentary h3 { margin: 0 0 3px; color: var(--t2); font-size: 10px; font-weight: 650; letter-spacing: .055em; text-transform: uppercase; }
-  .card-commentary h3.is-risk { color: var(--bad); }
-  .card-commentary p { max-width: 105ch; margin: 0; color: var(--t2); font-size: 12.5px; line-height: 1.55; }
-  .card-commentary sup { margin-left: 3px; font-size: 9px; }
-  .card-commentary sup a { color: var(--acc); }
+  .card-control { max-width: 760px; }
+  .card-control-note { margin: 12px 0 2px; color: var(--t2); font-size: 11.5px; line-height: 1.5; }
 
   .card-sources { margin: 0; padding: 0; list-style: none; }
   .card-sources li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px; padding: 10px 1px; border-bottom: 0.5px solid var(--line-soft); scroll-margin-top: 70px; }
@@ -88,26 +82,14 @@
   .card-tab-panel .deploygrid { margin-top: 2px; }
   .card-tab-panel .tblwrap { margin-top: 0; border-color: var(--line); border-radius: 8px; background: var(--s1); }
 
-  @media (max-width: 980px) {
-    .card-columns { grid-template-columns: minmax(190px, .7fr) minmax(360px, 1.3fr); }
-    .card-columns > section:last-child { grid-column: 1 / -1; }
-    .card-people { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .card-people article:nth-last-child(-n + 2) { border-bottom: 0; }
-  }
-
   @media (max-width: 680px) {
     .card-title-line .ui-badge-ctl { white-space: normal; }
     .card-page { padding: 8px 10px 34px; }
     .name-card-header { grid-template-columns: auto minmax(0, 1fr); padding: 14px 13px 12px; }
     .name-card-header > .ui-segmented { grid-column: 1 / -1; width: 100%; }
     .name-card-header > .ui-segmented button { flex: 1; }
-    .card-summary { margin: 0 13px; }
-    .card-columns { grid-template-columns: 1fr; padding: 15px 13px; }
-    .card-columns > section:last-child { grid-column: auto; }
+    .card-summary { padding: 14px 13px; }
     .card-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .card-people { grid-template-columns: 1fr; }
-    .card-people article:nth-last-child(-n + 2) { border-bottom: 0.5px solid var(--line-soft); }
-    .card-people article:last-child { border-bottom: 0; }
     .card-block { padding: 14px 13px; }
     .card-block-head { align-items: flex-start; flex-direction: column; gap: 2px; }
   }
