@@ -101,6 +101,30 @@ function parseArgs(argv) {
 
 const readYaml = async (path) => parse(await readFile(path, "utf8"));
 
+/**
+ * Keeps one promise for each client method/argument tuple during a pull. The census can point many
+ * names at the same contracts; sharing those reads makes every name use the same snapshot and keeps
+ * a full run bounded without changing the source clients or their retry behavior.
+ */
+export function memoizeClient(client) {
+  const cache = new Map();
+  return new Proxy(client, {
+    get(target, property, receiver) {
+      const method = Reflect.get(target, property, receiver);
+      if (typeof method !== "function") return method;
+      return (...args) => {
+        const normalized = JSON.stringify(args, (_key, value) =>
+          typeof value === "string" && /^0x[0-9a-fA-F]{40}$/.test(value) ? value.toLowerCase() : value);
+        const key = `${String(property)}:${normalized}`;
+        // Some clients expose synchronous URL builders alongside asynchronous reads. Preserve the
+        // original return type while still sharing in-flight promises from network methods.
+        if (!cache.has(key)) cache.set(key, method.apply(target, args));
+        return cache.get(key);
+      };
+    },
+  });
+}
+
 /** One row per address to pull, deduplicated within a slug, first label and role winning. */
 export function addressesFor(project) {
   const seen = new Map();
@@ -218,11 +242,11 @@ async function main() {
 
   const pace = createPacer(250);
   const deps = { pace };
-  const rpc = createRpcClient({ deps });
-  const blockscout = createBlockscoutClient({ deps });
-  const llama = createLlamaClient({ deps });
-  const dexscreener = createDexscreenerClient({ deps });
-  const activityClient = createActivityClient({ deps });
+  const rpc = memoizeClient(createRpcClient({ deps }));
+  const blockscout = memoizeClient(createBlockscoutClient({ deps }));
+  const llama = memoizeClient(createLlamaClient({ deps }));
+  const dexscreener = memoizeClient(createDexscreenerClient({ deps }));
+  const activityClient = memoizeClient(createActivityClient({ deps }));
   const validate = createValidator();
 
   // Rialto is a chain-wide read: each endpoint is fetched once, cached for the run and paced at one

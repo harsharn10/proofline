@@ -100,7 +100,7 @@ import {
   discoveryCandidates,
   RIALTO_PAGES,
 } from "./lib/pull/rialto.mjs";
-import { addressesFor, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey } from "./pull.mjs";
+import { addressesFor, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey, memoizeClient } from "./pull.mjs";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -887,6 +887,22 @@ test("selects only real Robinhood Chain addresses, deduplicated", () => {
   });
   assert.equal(rows.length, 1);
   assert.equal(rows[0].label, "token");
+});
+
+test("a pull shares duplicate client reads, including mixed-case addresses", async () => {
+  let calls = 0;
+  const client = memoizeClient({
+    lookup: async (tokenAddress) => ({ tokenAddress, call: ++calls }),
+  });
+  const upper = "0xAAA1111111111111111111111111111111111111";
+  const lower = upper.toLowerCase();
+  const [first, same] = await Promise.all([client.lookup(upper), client.lookup(lower)]);
+  assert.equal(first, same, "concurrent duplicates share the same promise result");
+  assert.equal((await client.lookup(upper)).call, 1);
+  assert.equal((await client.lookup("0xBBB2222222222222222222222222222222222222")).call, 2);
+  assert.equal(calls, 2);
+  const urls = memoizeClient({ url: (slug) => `https://example.com/${slug}` });
+  assert.equal(urls.url("pons"), "https://example.com/pons", "synchronous URL builders stay synchronous");
 });
 
 test("a sample document validates against schema/pulled.schema.json", () => {
