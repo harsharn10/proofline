@@ -8,8 +8,8 @@ base_sha: 334ca0619aa62e922da83f46de021f06d12348cf
 slug: meridian
 name: Meridian
 packet_tier: seed
-as_of: 2026-09-03T02:15:35Z
-prior_packet: null
+as_of: 2026-09-03T02:50:00Z
+prior_packet: content/projects/meridian.yaml@334ca0619aa62e922da83f46de021f06d12348cf
 supersedes: null
 owned_slugs: [meridian]
 allowed_paths:
@@ -17,346 +17,336 @@ allowed_paths:
 
 identity:
   canonical_name: Meridian
-  aliases: [Meridian Perps, Meridian Predict, Meridian.xyz, Ethereal]
+  aliases: [mPerps, Meridian Predict, Meridian Perps, MLP Vault, meridian.xyz]
   symbols: [MLP]
   entity_kind: protocol
   chain_scope: robinhood-native
   official_domain: https://meridian.xyz
   official_handle: "@meridiandotxyz"
-  repository: "NULL — no public repository URL on meridian.xyz, app.meridian.xyz, docs.meridian.xyz, or the @meridiandotxyz bio this pass"
+  repository: "NULL — github.com/meridiandotxyz returned 404; GitHub org Meridian-xyz listed zero public repositories this pass"
   possible_matches:
     - slug: sight
       signals: [other]
       contrary_signals:
-        - "Census Sight is a prediction market at @sight_hood; Meridian Predict is USDe RFQ markets at app.meridian.xyz / @meridiandotxyz"
+        - "Census Sight is @sight_hood, a prediction-market announcement with a 2026-09-02 NFT mint"
+        - "Meridian Predict is app.meridian.xyz/predict under @meridiandotxyz with Llama TVL on Robinhood Chain"
         - "No shared domain, handle or reproduced address"
 
 classification:
   primary_leaf: trading/perps-native
-  secondary_leaves: [markets/prediction]
-  mechanism_tags: [derivatives, vault, rwa, oracle, orderbook]
+  secondary_leaves: [markets/prediction, yield/savings-vault]
+  mechanism_tags: [derivatives, vault, rwa]
   ecosystem_role: subject
   lifecycle: mainnet
   coverage_recommendation: full
   evidence_state: partly-verified
-  rationale: "Predict Vault, PredictionMarketEscrow and SecondaryMarketEscrow have non-empty code and verified source on chain 4663; MLP vault 0x24b84023… is live USDe. Official docs still say perpetual-futures mainnet is not live. DefiLlama lists meridian-perps TVL on Robinhood Chain. [R-2] [R-14] [R-17] [R-18] [R-19]"
+  rationale: "MLP 0x24b8…1BF9d is a verified AccountableAsyncRedeemVault on chain 4663 with 612 holders; the same createYieldStrategy tx deployed AccountableYield proxy 0xF62c…B1eC. Idle USDe 496k plus deployedAssets 2.01M matches Llama meridian-perps ~$2.51M. Official 28 Aug post still has mPerps launching next week. Census mainnet holds on the vault, not on a live perp book. [R-5] [R-10] [R-14] [R-16] [R-17]"
 
 qualifying:
-  deployed_on_chain: { status: pass, claim_ids: [CLM-4, CLM-5, CLM-7, CLM-8], note: "" }
-  native_play:       { status: pass, claim_ids: [CLM-1, CLM-20], note: "" }
+  deployed_on_chain: { status: pass, claim_ids: [CLM-4, CLM-5, CLM-6], note: "" }
+  native_play:       { status: pass, claim_ids: [CLM-1, CLM-9], note: "" }
   citable:           { status: pass, claim_ids: [CLM-2, CLM-3], note: "" }
-  research_story:    { status: pass, claim_ids: [CLM-1, CLM-10, CLM-11, CLM-13], note: "" }
+  research_story:    { status: pass, claim_ids: [CLM-1, CLM-10, CLM-13, CLM-18], note: "" }
 
 links:
   - { kind: site, url: "https://meridian.xyz", authenticity: confirmed }
   - { kind: app, url: "https://app.meridian.xyz", authenticity: confirmed }
-  - { kind: docs, url: "https://docs.meridian.xyz", authenticity: confirmed }
+  - { kind: docs, url: "https://docs.meridian.xyz", authenticity: unconfirmed }
   - { kind: x, url: "https://x.com/meridiandotxyz", authenticity: confirmed }
-  - { kind: discord, url: "https://discord.gg/meridianxyz", authenticity: confirmed }
+  - { kind: discord, url: "https://discord.com/invite/meridianxyz", authenticity: unconfirmed }
+  - { kind: other, url: "https://blog.meridian.xyz", authenticity: unconfirmed }
+  - { kind: other, url: "https://yield.accountable.capital/vaults/4663/0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC", authenticity: confirmed }
 
 deployments:
-  - label: Predict vault (PredictionMarketVault / SRHV)
-    role: vault
-    address:
-      value: "0x79cB914f3F336426E89FaB55A9488AB25770552D"
-      chain: robinhood-chain
-      source: docs
-      seen: 2026-09-03T02:10:00Z
-      exists_on_4663: true
-      explorer_source_verified: true
-    receipt_ids: [R-2, R-14, R-18]
-  - label: Prediction Market Escrow
-    role: other
-    address:
-      value: "0xE4cea507b19796362A5a28Fa7cb705A3F1866213"
-      chain: robinhood-chain
-      source: docs
-      seen: 2026-09-03T02:10:00Z
-      exists_on_4663: true
-      explorer_source_verified: true
-    receipt_ids: [R-2, R-15, R-18]
-  - label: Secondary Market Escrow
-    role: other
-    address:
-      value: "0x7E318ef37c3bC3d0cBA205Af2D1Fc9F9CeFEB5df"
-      chain: robinhood-chain
-      source: docs
-      seen: 2026-09-03T02:10:00Z
-      exists_on_4663: true
-      explorer_source_verified: true
-    receipt_ids: [R-2, R-16, R-18]
-  - label: Meridian Liquidity Provider (AccountableAsyncRedeemVault / MLP)
+  - label: Meridian Liquidity Provider (MLP share vault)
     role: vault
     address:
       value: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
       chain: robinhood-chain
-      source: third-party
-      seen: 2026-09-03T02:10:00Z
+      source: explorer
+      seen: 2026-09-03T02:40:00Z
       exists_on_4663: true
       explorer_source_verified: true
-    receipt_ids: [R-17, R-18, R-21]
-  - label: Earlier Accountable MLP proxy (USDe balance zero this pass)
-    role: vault
+    receipt_ids: [R-10, R-11, R-16]
+  - label: AccountableYield strategy (ERC1967 proxy; app manageUrl)
+    role: proxy
     address:
       value: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
       chain: robinhood-chain
-      source: bio
-      seen: 2026-09-03T02:10:00Z
+      source: explorer
+      seen: 2026-09-03T02:40:00Z
       exists_on_4663: true
       explorer_source_verified: true
-    receipt_ids: [R-18, R-25, R-28]
+      explorer_source_verification_scope: full
+      implementation_source_verified: true
+    receipt_ids: [R-3, R-14, R-16]
+  - label: AccountableYield implementation
+    role: implementation
+    address:
+      value: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
+      chain: robinhood-chain
+      source: explorer
+      seen: 2026-09-03T02:40:00Z
+      exists_on_4663: true
+      explorer_source_verified: true
+    receipt_ids: [R-14, R-28]
+  - label: YieldStrategyFactory (Accountable)
+    role: factory
+    address:
+      value: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
+      chain: robinhood-chain
+      source: explorer
+      seen: 2026-09-03T02:40:00Z
+      exists_on_4663: true
+      explorer_source_verified: true
+    receipt_ids: [R-12, R-13]
+  - label: YieldStrategyFactory owner Safe
+    role: multisig
+    address:
+      value: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
+      chain: robinhood-chain
+      source: explorer
+      seen: 2026-09-03T02:40:00Z
+      exists_on_4663: true
+      explorer_source_verified: true
+    receipt_ids: [R-16, R-22]
+  - label: ConditionalTokensConditionResolver (app robinhood-mainnet map)
+    role: other
+    address:
+      value: "0xE42847eE3feE1B29065F14D39EcF664A04d70475"
+      chain: robinhood-chain
+      source: explorer
+      seen: 2026-09-03T02:40:00Z
+      exists_on_4663: true
+      explorer_source_verified: true
+    receipt_ids: [R-3, R-23]
 
 metrics:
-  - { kind: tvl, value: 2505942.43, currency: USD, as_of: 2026-09-03T02:15:35Z, window: point, method: "api.llama.fi/protocol/meridian-perps currentChainTvls['Robinhood Chain']", class: claim, receipt_ids: [R-19] }
-  - { kind: tvl, value: 265553.60, currency: USD, as_of: 2026-09-03T02:15:35Z, window: point, method: "api.llama.fi/protocol/meridian-predict currentChainTvls['Robinhood Chain']", class: claim, receipt_ids: [R-20] }
-  - { kind: tvl, value: 496348.17, currency: USDe, as_of: 2026-09-03T02:10:00Z, window: point, method: "eth_call totalAssets() and USDe.balanceOf on MLP 0x24b84023… at block 53012515", class: claim, receipt_ids: [R-18] }
-  - { kind: tvl, value: 265680.81, currency: USDe, as_of: 2026-09-03T02:10:00Z, window: point, method: "USDe.balanceOf Predict vault + escrow at block 53012515", class: claim, receipt_ids: [R-18] }
+  - { kind: tvl, value: 2505942.43, currency: USD, as_of: 2026-09-03T01:36:00Z, window: point, method: "api.llama.fi/protocol/meridian-perps currentChainTvls['Robinhood Chain']", class: claim, receipt_ids: [R-17] }
+  - { kind: tvl, value: 265553.60, currency: USD, as_of: 2026-09-03T01:36:00Z, window: point, method: "api.llama.fi/protocol/meridian-predict currentChainTvls['Robinhood Chain']", class: claim, receipt_ids: [R-18] }
+  - { kind: tvl, value: 496348.27, currency: USD, as_of: 2026-09-03T02:40:00Z, window: point, method: "RPC eth_call USDe.balanceOf(MLP) and MLP.totalAssets() at block 53078289", class: claim, receipt_ids: [R-16] }
+  - { kind: tvl, value: 2010892.59, currency: USD, as_of: 2026-09-03T02:40:00Z, window: point, method: "RPC eth_call AccountableYield.deployedAssets() on 0xF62c…B1eC at block 53078289", class: claim, receipt_ids: [R-16] }
+  - { kind: holders, value: 612, currency: null, as_of: 2026-09-03T02:40:00Z, window: point, method: "Blockscout api/v2/tokens/0x24b8…1BF9d holders_count and /counters token_holders_count", class: claim, receipt_ids: [R-11] }
 
 reproductions:
-  - { id: REP-1, method: explorer-rpc, chain_id: 4663, checked_at: 2026-09-03T02:10:00Z, receipt_ids: [R-18], result: "rpc.mainnet.chain.robinhood.com eth_chainId 0x1237 (4663) eth_blockNumber 0x328e823 (53012515). eth_getCode non-empty: Predict vault 16036 bytes, escrow 20951, secondary 4832, MLP 18511, old MLP proxy 130, USDe 11267. meridiantrade.xyz PerpEngine and EquityVault empty. Predict vault name Meridian Robinhood Vault / SRHV asset USDe owner Safe 0x99A8…212C. MLP name Meridian Liquidity Provider / MLP asset USDe totalAssets 496348.1666820296 USDe.balanceOf 496348.2666820296. Predict vault USDe 156880.1315690304 escrow USDe 108800.67836965102. Safe getThreshold 1 getOwners 0x5aa9…0A44 and 0xdb5a…9ba2." }
-  - { id: REP-2, method: explorer-ui, chain_id: 4663, checked_at: 2026-09-03T02:10:00Z, receipt_ids: [R-14, R-15, R-16, R-17, R-23, R-27, R-28], result: "Blockscout api/v2: all four live Meridian contracts is_contract true is_verified true. Names PredictionMarketVault, PredictionMarketEscrow, SecondaryMarketEscrow, AccountableAsyncRedeemVault. Predict trio created 2026-06-25T18:42:08Z–18:42:42Z from 0x6A225f09… by txs 0x1acafda8…, 0x61d50253…, 0x094d7396…. MLP token name Meridian Liquidity Provider symbol MLP holders 612. Owner 0x99A8…212C name SafeProxy." }
-  - { id: REP-3, method: official-crosslink, checked_at: 2026-09-03T02:12:00Z, receipt_ids: [R-4, R-6, R-7], result: "@meridiandotxyz website go.meridian.xyz/app redirects to meridian.xyz. docs.meridian.xyz footer links https://x.com/meridiandotxyz and https://discord.gg/meridianxyz. meridian.xyz og:url https://meridian.xyz title mPerps & Prediction Markets | Meridian." }
-  - { id: REP-4, method: api, checked_at: 2026-09-03T02:15:35Z, receipt_ids: [R-19, R-20, R-21, R-26], result: "api.llama.fi/protocol/meridian-perps currentChainTvls Robinhood Chain 2505942.43 tokens USDE 2507240.75695 methodology Count all assets deposited in the Meridian perps LP vault. meridian-predict currentChainTvls 265553.60 tokens USDE 265680.80994. Parent meridian.xyz 2771495. Curators.js robinhood accountableVaults 0x24b84023c8e4Da635be228C380C09bfE5271BF9d labeled Meridian LP vault." }
-  - { id: REP-5, method: explorer-rpc, chain_id: 4663, checked_at: 2026-09-03T02:10:00Z, receipt_ids: [R-18, R-20], result: "USDe.balanceOf(vault)+balanceOf(escrow) 265680.810000000000000000 matches Llama meridian-predict tokens.USDE 265680.80994. MLP on-chain USDe 496348.27 does not match Llama meridian-perps tokens.USDE 2507240.76." }
+  - { id: REP-1, method: explorer-rpc, chain_id: 4663, checked_at: 2026-09-03T02:40:00Z, receipt_ids: [R-16], result: "rpc.mainnet.chain.robinhood.com block 53078289 (later 53077742–53078289). MLP 0x24b8…1BF9d eth_getCode 18511 bytes; name() Meridian Liquidity Provider; symbol() MLP; decimals 18; totalSupply 2489619058646616952464425 (~2,489,619 e18); asset() USDe 0x5d3a1Ff2…ef34; totalAssets() 496348166682029605878244. USDe.balanceOf(MLP) 496348266682029605878244. AccountableYield proxy 0xF62c…B1eC code 130 bytes; deployedAssets() 2010892590272638000000000 (~2,010,893); asset() same USDe; borrower() 0x2f46c3fc…56b2 EOA; investmentManager() and managerFeeRecipient() 0x7f1a3035…5253 EOA. Factory owner() Safe 0x4B07AaA3…BFB1. Safe getThreshold() 2; getOwners() three EOAs 0x25e170e3…8db7, 0x66415e41…17a9, 0xfcb0cbc1…d7bd; nonce 10. Idle USDe plus deployedAssets ≈ 2,507,241 vs Llama $2,505,942." }
+  - { id: REP-2, method: explorer-ui, chain_id: 4663, checked_at: 2026-09-03T02:20:00Z, receipt_ids: [R-10, R-11, R-12, R-13, R-14, R-15, R-22, R-23, R-28], result: "Blockscout: MLP name AccountableAsyncRedeemVault, verified partial src/vault/AccountableAsyncRedeemVault.sol compiler v0.8.27, token Meridian Liquidity Provider / MLP, 612 holders, 1320 transfers, created 2026-07-29T01:15:03Z tx 0x74034e80…bfb9 method createYieldStrategy from 0x94f7339d…222A to YieldStrategyFactory 0xA4d6a4aD…1F9f; params asset USDe, name MLP / Meridian Liquidity Provider. Same tx created ERC1967Proxy 0xF62c…B1eC implementation AccountableYield 0x2639dA09…1710. Factory verified YieldStrategyFactory.sol. Factory owner SafeProxy 0x4B07AaA3…BFB1 implementation SafeL2. USDe token Ethena USDe / USDE 0x5d3a1Ff2…ef34 verified USDeOFT. Resolver 0xE42847eE…0475 verified ConditionalTokensConditionResolver.sol." }
+  - { id: REP-3, method: official-crosslink, checked_at: 2026-09-03T02:15:00Z, receipt_ids: [R-1, R-2, R-3, R-4], result: "meridian.xyz title mPerps & Prediction Markets | Meridian, canonical https://meridian.xyz, twitter:url meridian.xyz. app.meridian.xyz same title, canonical app.meridian.xyz. App bundle maps MLP Vault depositToken USDe chain Robinhood active true manageUrl yield.accountable.capital/vaults/4663/0xF62c…B1eC; Predict Vault active false. Footer/docs/x: docs.meridian.xyz, x.com/meridiandotxyz, discord.com/invite/meridianxyz. @meridiandotxyz bio Powered by Robinhood Chain." }
+  - { id: REP-4, method: api, checked_at: 2026-09-03T01:36:00Z, receipt_ids: [R-17, R-18], result: "Llama meridian-perps currentChainTvls Robinhood Chain 2505942.42996, url https://app.meridian.xyz/, twitter meridiandotxyz, methodology Count all assets deposited in the Meridian perps LP vault, audits 0, parentProtocolSlug meridian.xyz. meridian-predict currentChainTvls Robinhood Chain 265553.59994, url https://app.meridian.xyz/predict, category Prediction Market. Neither row publishes an adapter address." }
 
 claims:
-  - { id: CLM-1, field: product.mechanism, value: "Meridian Predict is an RFQ prediction market on Robinhood Chain settled in USDe: users broadcast size and pick, makers take the other side, vault and escrow hold collateral, no trading fee.", class: claim, observed_at: 2026-09-03T02:08:00Z, receipt_ids: [R-1, R-3], reproduction_ids: [], supersedes: null }
-  - { id: CLM-2, field: identity.domain, value: "https://meridian.xyz", class: verified, observed_at: 2026-09-03T02:12:00Z, receipt_ids: [R-4, R-6, R-7], reproduction_ids: [REP-3], supersedes: null }
-  - { id: CLM-3, field: identity.handle, value: "@meridiandotxyz", class: verified, observed_at: 2026-09-03T02:12:00Z, receipt_ids: [R-6, R-7], reproduction_ids: [REP-3], supersedes: null }
-  - { id: CLM-4, field: deployment.address, value: "0x79cB914f3F336426E89FaB55A9488AB25770552D", class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-2, R-14, R-18], reproduction_ids: [REP-1, REP-2], supersedes: null }
-  - { id: CLM-5, field: deployment.address, value: "0xE4cea507b19796362A5a28Fa7cb705A3F1866213", class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-2, R-15, R-18], reproduction_ids: [REP-1, REP-2], supersedes: null }
-  - { id: CLM-6, field: deployment.address, value: "0x7E318ef37c3bC3d0cBA205Af2D1Fc9F9CeFEB5df", class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-2, R-16, R-18], reproduction_ids: [REP-1, REP-2], supersedes: null }
-  - { id: CLM-7, field: deployment.address, value: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d", class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-17, R-18, R-21], reproduction_ids: [REP-1, REP-2, REP-4], supersedes: null }
-  - { id: CLM-8, field: lifecycle, value: mainnet, class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-2, R-14, R-17, R-18], reproduction_ids: [REP-1, REP-2], supersedes: null }
-  - { id: CLM-9, field: taxonomy.primary-leaf, value: trading/perps-native, class: claim, observed_at: 2026-09-03T02:08:00Z, receipt_ids: [R-1, R-19], reproduction_ids: [], supersedes: null }
-  - { id: CLM-10, field: product.mechanism, value: "Official contracts page: Perpetual Futures mainnet is not yet live. Perps docs describe an offchain-matched CLOB with onchain settlement and mPerps that freeze the mark when the reference market is closed.", class: claim, observed_at: 2026-09-03T02:08:00Z, receipt_ids: [R-1, R-2], reproduction_ids: [], supersedes: null }
-  - { id: CLM-11, field: economics.metric, value: "DefiLlama meridian-perps currentChainTvls Robinhood Chain 2505942.43 USD / tokens USDE 2507240.75695 at 2026-09-03T02:15:35Z", class: verified, observed_at: 2026-09-03T02:15:35Z, receipt_ids: [R-19], reproduction_ids: [REP-4], supersedes: null }
-  - { id: CLM-12, field: economics.metric, value: "DefiLlama meridian-predict currentChainTvls Robinhood Chain 265553.60 USD / tokens USDE 265680.80994 at 2026-09-03T02:15:35Z", class: verified, observed_at: 2026-09-03T02:15:35Z, receipt_ids: [R-20], reproduction_ids: [REP-4, REP-5], supersedes: null }
-  - { id: CLM-13, field: economics.metric, value: "MLP 0x24b84023… totalAssets() 496348.1666820296 and USDe.balanceOf 496348.2666820296 at block 53012515", class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-18], reproduction_ids: [REP-1, REP-5], supersedes: null }
-  - { id: CLM-14, field: economics.metric, value: "USDe.balanceOf Predict vault 156880.1315690304 plus escrow 108800.67836965102 equals 265680.81, matching Llama meridian-predict tokens.USDE", class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-18, R-20], reproduction_ids: [REP-1, REP-5], supersedes: null }
-  - { id: CLM-15, field: control.owner, value: "Predict vault and PredictionMarketEscrow owner() 0x99A8E932B40eD10DD03ce11e424030efa997212C SafeProxy, 1-of-2", class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-18, R-23], reproduction_ids: [REP-1, REP-2], supersedes: null }
-  - { id: CLM-16, field: control.threshold, value: "Safe 0x99A8…212C getThreshold 1, getOwners 0x5aa9815d01b6ebb8647baf7354e8cf0cd9040a44 and 0xdb5af497a73620d881561edb508012a5f84e9ba2", class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-18, R-23], reproduction_ids: [REP-1], supersedes: null }
-  - { id: CLM-17, field: security.audit, value: "docs.meridian.xyz/protocol-reference/audits lists Guardian and ChainSecurity exchange reports; the contracts page still says perpetual-futures mainnet is not live, so those reports are not matched to a 4663 perps engine this pass", class: claim, observed_at: 2026-09-03T02:08:00Z, receipt_ids: [R-2, R-24], reproduction_ids: [], supersedes: null }
-  - { id: CLM-18, field: "account.@meridiandotxyz.role", value: project, class: claim, observed_at: 2026-09-03T02:12:00Z, receipt_ids: [R-6, R-7], reproduction_ids: [], supersedes: null }
-  - { id: CLM-19, field: "account.@meridiandotxyz.slug", value: meridian, class: claim, observed_at: 2026-09-03T02:12:00Z, receipt_ids: [R-6, R-7], reproduction_ids: [], supersedes: null }
-  - { id: CLM-20, field: taxonomy.chain-scope, value: robinhood-native, class: claim, observed_at: 2026-09-03T02:08:00Z, receipt_ids: [R-1, R-2, R-4], reproduction_ids: [], supersedes: null }
-  - { id: CLM-21, field: identity.alias, value: Ethereal, class: claim, observed_at: 2026-09-03T02:12:00Z, receipt_ids: [R-13], reproduction_ids: [], supersedes: null }
-  - { id: CLM-22, field: other, value: "third-party-link: meridiantrade.xyz publishes USDG PerpEngine 0xBa7e695B1689C5715259BD15e147C9fc5aEd4141 and EquityVault 0xF8AaFab9A64A8E4AE3D4eF11592fD57cF0112148; eth_getCode on both is empty on 4663. Not the meridian.xyz stack.", class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-18, R-22], reproduction_ids: [REP-1], supersedes: null }
-  - { id: CLM-23, field: relationship, value: "Distinct from census Sight (@sight_hood), a separate prediction-market name", class: claim, observed_at: 2026-09-03T02:12:00Z, receipt_ids: [R-4, R-7], reproduction_ids: [], supersedes: null }
-  - { id: CLM-24, field: taxonomy.secondary-leaf, value: markets/prediction, class: claim, observed_at: 2026-09-03T02:08:00Z, receipt_ids: [R-1, R-3], reproduction_ids: [], supersedes: null }
-  - { id: CLM-25, field: deployment.address, value: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC", class: verified, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-18, R-25, R-28], reproduction_ids: [REP-1], supersedes: null }
-  - { id: CLM-26, field: product.mechanism, value: "MLP is an AccountableAsyncRedeemVault named Meridian Liquidity Provider, asset USDe. Official posts described Phase 1 pre-deposits ahead of mPerps, curated with Neutral Trade, Accountable and Kappa Lab.", class: claim, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-9, R-17, R-25], reproduction_ids: [], supersedes: null }
-  - { id: CLM-27, field: identity.domain, value: "https://docs.meridian.xyz", class: verified, observed_at: 2026-09-03T02:12:00Z, receipt_ids: [R-2, R-6], reproduction_ids: [REP-3], supersedes: null }
-  - { id: CLM-28, field: "account.@meridiandotxyz.note", value: "Bio: RWA-focused perps and prediction markets with a full derivatives stack. Powered by Robinhood Chain. Website go.meridian.xyz/app.", class: claim, observed_at: 2026-09-03T02:12:00Z, receipt_ids: [R-7], reproduction_ids: [], supersedes: null }
+  - { id: CLM-1, field: product.mechanism, value: "USDe deposits mint MLP shares in an Accountable ERC-7540 async-redeem vault; the paired AccountableYield strategy borrows those assets (deployedAssets). Prediction markets sit on the same app. mPerps (mutualized perpetuals) was posted as launching the week after 2026-08-28.", class: claim, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-1, R-3, R-5, R-10], reproduction_ids: [REP-2, REP-3], supersedes: null }
+  - { id: CLM-2, field: identity.domain, value: "https://meridian.xyz", class: verified, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-1, R-4], reproduction_ids: [REP-3], supersedes: null }
+  - { id: CLM-3, field: identity.handle, value: "@meridiandotxyz", class: verified, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-1, R-4], reproduction_ids: [REP-3], supersedes: null }
+  - { id: CLM-4, field: deployment.address, value: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d", class: verified, observed_at: 2026-09-03T02:40:00Z, receipt_ids: [R-10, R-11, R-16], reproduction_ids: [REP-1, REP-2], supersedes: null }
+  - { id: CLM-5, field: deployment.address, value: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC", class: verified, observed_at: 2026-09-03T02:40:00Z, receipt_ids: [R-3, R-14, R-16], reproduction_ids: [REP-1, REP-2, REP-3], supersedes: null }
+  - { id: CLM-6, field: lifecycle, value: mainnet, class: verified, observed_at: 2026-09-03T02:40:00Z, receipt_ids: [R-10, R-16], reproduction_ids: [REP-1, REP-2], supersedes: null }
+  - { id: CLM-7, field: identity.symbol, value: "MLP", class: verified, observed_at: 2026-09-03T02:40:00Z, receipt_ids: [R-11, R-16], reproduction_ids: [REP-1, REP-2], supersedes: null }
+  - { id: CLM-8, field: taxonomy.primary-leaf, value: trading/perps-native, class: claim, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-1, R-4], reproduction_ids: [], supersedes: null }
+  - { id: CLM-9, field: taxonomy.chain-scope, value: robinhood-native, class: claim, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-1, R-4], reproduction_ids: [], supersedes: null }
+  - { id: CLM-10, field: product.mechanism, value: "MLP vault totalAssets()/USDe balance ~496,348; AccountableYield.deployedAssets() ~2,010,893; sum ~$2.51M. Llama meridian-perps $2,505,942. Official 28 Aug post: MLP cap filled at $2.5M USDe.", class: verified, observed_at: 2026-09-03T02:40:00Z, receipt_ids: [R-5, R-16, R-17], reproduction_ids: [REP-1, REP-4], supersedes: null }
+  - { id: CLM-11, field: economics.metric, value: "Llama meridian-predict Robinhood Chain TVL 265553.60", class: claim, observed_at: 2026-09-03T01:36:00Z, receipt_ids: [R-18], reproduction_ids: [REP-4], supersedes: null }
+  - { id: CLM-12, field: taxonomy.secondary-leaf, value: markets/prediction, class: claim, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-1, R-8, R-18], reproduction_ids: [], supersedes: null }
+  - { id: CLM-13, field: control.owner, value: "YieldStrategyFactory owner() is SafeProxy 0x4B07AaA3…BFB1, threshold 2 of 3 EOAs 0x25e170e3…8db7 / 0x66415e41…17a9 / 0xfcb0cbc1…d7bd. MLP has no owner() in the verified ABI. AccountableYield borrower() and investmentManager() are EOAs.", class: verified, observed_at: 2026-09-03T02:40:00Z, receipt_ids: [R-16, R-22], reproduction_ids: [REP-1], supersedes: null }
+  - { id: CLM-14, field: control.proxy, value: "AccountableYield 0xF62c…B1eC is an ERC1967 proxy to verified AccountableYield 0x2639dA09…1710, created in the same 2026-07-29 createYieldStrategy tx as MLP.", class: verified, observed_at: 2026-09-03T02:20:00Z, receipt_ids: [R-12, R-14, R-28], reproduction_ids: [REP-2], supersedes: null }
+  - { id: CLM-15, field: security.audit, value: "Llama audits field 0; no Meridian-named audit report on meridian.xyz, the X profile, or the verified vault/factory pages this pass; vault source lists security@accountable.capital", class: unknown, observed_at: 2026-09-03T02:45:00Z, receipt_ids: [], reproduction_ids: [], supersedes: null }
+  - { id: CLM-16, field: identity.repository, value: "NULL — github.com/meridiandotxyz 404; GitHub org Meridian-xyz has zero public repositories", class: claim, observed_at: 2026-09-03T02:10:00Z, receipt_ids: [R-19], reproduction_ids: [], supersedes: null }
+  - { id: CLM-17, field: relationship, value: "Vault primitive is Accountable (YieldStrategyFactory / AccountableAsyncRedeemVault / AccountableYield). App redirects vault management to yield.accountable.capital. Distinct from accountable.capital's DVN marketing site.", class: claim, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-3, R-10, R-27], reproduction_ids: [REP-3], supersedes: null }
+  - { id: CLM-18, field: relationship, value: "Flag ca-collision / ticker-only: Meridian402 MERD 0x12f8Cca1…Ab8d8 (meridian402.xyz agent) and token meridiandotxyz / symbol Meridian 0x2717AAc5…02Da are different contracts from MLP.", class: verified, observed_at: 2026-09-03T02:20:00Z, receipt_ids: [R-20, R-21], reproduction_ids: [REP-2], supersedes: null }
+  - { id: CLM-19, field: "account.@meridiandotxyz.role", value: project, class: claim, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-4], reproduction_ids: [], supersedes: null }
+  - { id: CLM-20, field: "account.@meridiandotxyz.slug", value: meridian, class: claim, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-4], reproduction_ids: [], supersedes: null }
+  - { id: CLM-21, field: activity.status, value: "App bundle: MLP Vault active true; Predict Vault active false. Official 28 Aug post: mPerps launches next week. Predict still posting weekly volume in August.", class: claim, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-3, R-5, R-9], reproduction_ids: [REP-3], supersedes: null }
+  - { id: CLM-22, field: deployment.address, value: "0xE42847eE3feE1B29065F14D39EcF664A04d70475", class: verified, observed_at: 2026-09-03T02:20:00Z, receipt_ids: [R-3, R-23], reproduction_ids: [REP-2, REP-3], supersedes: null }
+  - { id: CLM-23, field: taxonomy.secondary-leaf, value: yield/savings-vault, class: claim, observed_at: 2026-09-03T02:15:00Z, receipt_ids: [R-3, R-10], reproduction_ids: [], supersedes: null }
+  - { id: CLM-24, field: control.timelock, value: "No timelock address was read on the factory, vault, or AccountableYield proxy this pass", class: unknown, observed_at: 2026-09-03T02:45:00Z, receipt_ids: [], reproduction_ids: [], supersedes: null }
 
-conflicts:
-  - id: CON-1
-    field: economics.metric
-    claim_ids: [CLM-11, CLM-13]
-    material_effect: "meridian-perps TVL is 2505942.43 USD on DefiLlama and 496348.17 USDe on MLP totalAssets()/balanceOf at block 53012515; a card that collapses them would misstate the vault"
-    status: open
-    resolution: null
+conflicts: []
 
 events:
   - id: EVT-1
     type: company
-    title: "Official account posted MLP vault filled 2.5M USDe cap"
-    summary: "Official account: The MLP Vault has filled its $2.5M cap. mPerps launches next week."
+    title: "Official account posted MLP vault filled $2.5M cap"
+    summary: "The MLP Vault has filled its $2.5M cap. mPerps launches next week."
     occurred_at: 2026-08-28T16:01:15Z
-    observed_at: 2026-09-03T02:12:00Z
-    affected_fields: [economics.metric, product.mechanism]
+    observed_at: 2026-09-03T02:00:00Z
+    affected_fields: [economics.metric, activity.status, lifecycle]
     evidence_state: claim
     impact: material
     site_recommendation: both
     channel_recommendation: none
-    receipt_ids: [R-8]
+    receipt_ids: [R-5]
   - id: EVT-2
     type: company
-    title: "Official account raised MLP cap to 2.5M USDe"
-    summary: "Official account: MLP cap raised to $2.5M USDe. Deposit ahead of the Meridian Perps launch."
+    title: "Official account posted MLP cap raised to $2.5M USDe"
+    summary: "MLP cap raised to $2.5M USDe. Deposit ahead of Meridian Perps; vault URL app.meridian.xyz/vault."
     occurred_at: 2026-08-27T16:11:59Z
-    observed_at: 2026-09-03T02:12:00Z
-    affected_fields: [economics.metric]
+    observed_at: 2026-09-03T02:00:00Z
+    affected_fields: [economics.metric, product.mechanism]
+    evidence_state: claim
+    impact: material
+    site_recommendation: feed
+    channel_recommendation: none
+    receipt_ids: [R-6]
+  - id: EVT-3
+    type: company
+    title: "Official account posted September Fed combo markets"
+    summary: "Six user-built combos off the September Fed meeting, including hold plus named events."
+    occurred_at: 2026-08-25T18:47:28Z
+    observed_at: 2026-09-03T02:00:00Z
+    affected_fields: [activity.status, product.mechanism]
+    evidence_state: claim
+    impact: routine
+    site_recommendation: feed
+    channel_recommendation: none
+    receipt_ids: [R-7]
+  - id: EVT-4
+    type: company
+    title: "Official account posted August Predict category mix"
+    summary: "August Predict flow: Weather 38%, Tennis 22%, Crypto 9%, Counter-Strike 7%, Soccer 6%."
+    occurred_at: 2026-08-24T15:56:02Z
+    observed_at: 2026-09-03T02:00:00Z
+    affected_fields: [activity.status]
+    evidence_state: claim
+    impact: routine
+    site_recommendation: feed
+    channel_recommendation: none
+    receipt_ids: [R-8]
+  - id: EVT-5
+    type: company
+    title: "Official account posted Predict's biggest week"
+    summary: "Meridian Predict posted its biggest week yet. Record volume in a quiet sports stretch."
+    occurred_at: 2026-08-11T19:30:18Z
+    observed_at: 2026-09-03T02:00:00Z
+    affected_fields: [economics.metric, activity.status]
     evidence_state: claim
     impact: material
     site_recommendation: feed
     channel_recommendation: none
     receipt_ids: [R-9]
-  - id: EVT-3
-    type: company
-    title: "Official account posted second Predict competition ended"
-    summary: "Official account: The second Meridian Predict Competition has ended. A new one starts immediately."
-    occurred_at: 2026-08-12T16:28:23Z
-    observed_at: 2026-09-03T02:12:00Z
-    affected_fields: [activity.status]
-    evidence_state: claim
-    impact: routine
-    site_recommendation: feed
-    channel_recommendation: none
-    receipt_ids: [R-10]
-  - id: EVT-4
-    type: company
-    title: "Official account posted Predict's biggest week yet"
-    summary: "Official account: Meridian Predict just posted its biggest week yet. Powered by @RobinhoodCrypto."
-    occurred_at: 2026-08-11T19:30:18Z
-    observed_at: 2026-09-03T02:12:00Z
-    affected_fields: [activity.status]
-    evidence_state: claim
-    impact: routine
-    site_recommendation: feed
-    channel_recommendation: none
-    receipt_ids: [R-11]
-  - id: EVT-5
+  - id: EVT-6
     type: onchain
-    title: "MLP Accountable vault created on Robinhood Chain"
-    summary: "Tx 0x74034e80… at 2026-07-29T01:15:03Z; Blockscout names 0x24b84023… AccountableAsyncRedeemVault / MLP."
+    title: "createYieldStrategy deploys MLP vault and yield proxy"
+    summary: "Tx 0x74034e80… created MLP 0x24b8… and AccountableYield proxy 0xF62c… on 2026-07-29."
     occurred_at: 2026-07-29T01:15:03Z
-    observed_at: 2026-09-03T02:10:00Z
+    observed_at: 2026-09-03T02:20:00Z
     affected_fields: [deployment.address, lifecycle]
     evidence_state: verified
     impact: material
     site_recommendation: profile
     channel_recommendation: none
-    receipt_ids: [R-17, R-28]
-  - id: EVT-6
-    type: ct
-    title: "Ethena Ecosystem posted USDe prediction markets live"
-    summary: "@Ethena_Eco: USDe-native prediction markets are now live on Robinhood Chain, via @meridiandotxyz (formerly Ethereal)."
-    occurred_at: 2026-07-01T20:25:06Z
-    observed_at: 2026-09-03T02:12:00Z
-    affected_fields: [lifecycle, identity.alias, product.mechanism]
-    evidence_state: claim
-    impact: material
-    site_recommendation: both
-    channel_recommendation: none
-    receipt_ids: [R-13]
+    receipt_ids: [R-12, R-14]
   - id: EVT-7
     type: company
-    title: "Official account posted Meridian live as day-one partner"
-    summary: "Official account: Meridian is live on Robinhood Chain as a day-one launch partner. Predictions first."
-    occurred_at: 2026-07-01T19:50:59Z
-    observed_at: 2026-09-03T02:12:00Z
-    affected_fields: [lifecycle, identity.handle, product.mechanism]
+    title: "Official account posted MLP cap raised to $2 million"
+    summary: "MLP cap raised to $2 million. mPerps update next week."
+    occurred_at: 2026-08-14T15:38:41Z
+    observed_at: 2026-09-03T02:00:00Z
+    affected_fields: [economics.metric]
     evidence_state: claim
-    impact: material
-    site_recommendation: profile
+    impact: routine
+    site_recommendation: feed
     channel_recommendation: none
-    receipt_ids: [R-12]
-  - id: EVT-8
-    type: onchain
-    title: "Predict vault and escrow contracts created on chain 4663"
-    summary: "PredictionMarketEscrow, Vault and SecondaryMarketEscrow created 2026-06-25T18:42Z from 0x6A225f09…."
-    occurred_at: 2026-06-25T18:42:08Z
-    observed_at: 2026-09-03T02:10:00Z
-    affected_fields: [deployment.address, lifecycle]
-    evidence_state: verified
-    impact: material
-    site_recommendation: profile
-    channel_recommendation: none
-    receipt_ids: [R-14, R-15, R-16, R-27]
+    receipt_ids: [R-25]
 
 receipts:
-  - { id: R-1, publisher: Meridian, title: "What is Meridian?", url: "https://docs.meridian.xyz/index", published_at: null, accessed_at: 2026-09-03T02:08:00Z, kind: docs, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-9, CLM-10, CLM-20, CLM-24], excerpt: "Meridian is an onchain trading venue on Robinhood Chain. It has two main products: Perpetual futures for crypto perps and mutualized perps (mPerps). Prediction markets for single-outcome and combined predictions. Meridian Predict is a prediction markets venue built on Robinhood Chain and settled in USDe." }
-  - { id: R-2, publisher: Meridian, title: "Contracts", url: "https://docs.meridian.xyz/protocol-reference/contracts", published_at: null, accessed_at: 2026-09-03T02:08:00Z, kind: docs, authority: primary, authenticity: confirmed, supports: [CLM-4, CLM-5, CLM-6, CLM-8, CLM-10, CLM-17, CLM-20, CLM-27], excerpt: "Mainnet chain id 4663. Predict Vault 0x79cB914f3F336426E89FaB55A9488AB25770552D. Prediction Market Escrow 0xE4cea507b19796362A5a28Fa7cb705A3F1866213. Secondary Market Escrow 0x7E318ef37c3bC3d0cBA205Af2D1Fc9F9CeFEB5df. Perpetual Futures mainnet is not yet live." }
-  - { id: R-3, publisher: Meridian, title: "Predict — Fees & Collateral", url: "https://docs.meridian.xyz/trading/predictions/fees-and-collateral", published_at: null, accessed_at: 2026-09-03T02:08:00Z, kind: docs, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-24], excerpt: "Meridian Predict does not charge trading fees. You stake your collateral, the counterparty stakes theirs, and the winning side redeems the entire pool; the protocol does not take a cut. Meridian Predict positions are collateralized in USDe, Ethena's synthetic dollar." }
-  - { id: R-4, publisher: Meridian, title: "mPerps & Prediction Markets | Meridian", url: "https://www.meridian.xyz/", published_at: null, accessed_at: 2026-09-03T02:12:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-2, CLM-20, CLM-23], excerpt: "canonical https://meridian.xyz. og:title mPerps & Prediction Markets | Meridian. og:description Trade global markets onchain with Mutualized Perpetuals (mPerps) designed for capital-efficient, 24/7 price discovery—and prediction markets. go.meridian.xyz/app 302s here with utm_source=twitter." }
-  - { id: R-5, publisher: Meridian, title: "Meridian app", url: "https://app.meridian.xyz/", published_at: null, accessed_at: 2026-09-03T02:12:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-2], excerpt: "title mPerps & Prediction Markets | Meridian. canonical https://app.meridian.xyz. DefiLlama meridian-perps url field is https://app.meridian.xyz/." }
-  - { id: R-6, publisher: Meridian, title: "Support (docs socials)", url: "https://docs.meridian.xyz/protocol-reference/support", published_at: null, accessed_at: 2026-09-03T02:12:00Z, kind: docs, authority: primary, authenticity: confirmed, supports: [CLM-2, CLM-3, CLM-18, CLM-19, CLM-27], excerpt: "Footer links https://x.com/meridiandotxyz (aria-label X (Twitter)) and https://discord.gg/meridianxyz (aria-label Discord). Canonical host docs.meridian.xyz." }
-  - { id: R-7, publisher: "@meridiandotxyz", title: "Meridian profile", url: "https://x.com/meridiandotxyz", published_at: null, accessed_at: 2026-09-03T02:12:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [CLM-2, CLM-3, CLM-18, CLM-19, CLM-23, CLM-28], excerpt: "Display name Meridian, handle @meridiandotxyz, bio 'RWA-focused perps and prediction markets with a full derivatives stack. Powered by Robinhood Chain', website https://go.meridian.xyz/app." }
-  - { id: R-8, publisher: "@meridiandotxyz", title: "The MLP Vault has filled its $2.5M cap", url: "https://x.com/meridiandotxyz/status/2093368321270059488", published_at: 2026-08-28T16:01:15Z, accessed_at: 2026-09-03T02:12:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [EVT-1], excerpt: "The MLP Vault has filled its $2.5M cap. mPerps launches next week. Quotes the 2026-08-27 cap-raise post." }
-  - { id: R-9, publisher: "@meridiandotxyz", title: "MLP cap raised to $2.5M USDe", url: "https://x.com/meridiandotxyz/status/2093008635043754154", published_at: 2026-08-27T16:11:59Z, accessed_at: 2026-09-03T02:12:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [CLM-26, EVT-2], excerpt: "MLP cap raised to $2.5M USDe. Deposit ahead of the Meridian Perps launch to earn USDe rewards, Ethena Rewards, and 20% of all Meridian Points emitted to perps traders. Thread also posted https://app.meridian.xyz/vault." }
-  - { id: R-10, publisher: "@meridiandotxyz", title: "The second Meridian Predict Competition has ended", url: "https://x.com/meridiandotxyz/status/2087576944514847088", published_at: 2026-08-12T16:28:23Z, accessed_at: 2026-09-03T02:12:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [EVT-3], excerpt: "The second Meridian Predict Competition has ended. A new one starts immediately. Prize pool: $5,000 in USDe bonus predictions. 25,000 $CASHCAT." }
-  - { id: R-11, publisher: "@meridiandotxyz", title: "Meridian Predict just posted its biggest week yet", url: "https://x.com/meridiandotxyz/status/2087260335447409075", published_at: 2026-08-11T19:30:18Z, accessed_at: 2026-09-03T02:12:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [EVT-4], excerpt: "Meridian Predict just posted its biggest week yet. Record volume in one of the quietest stretches of the sports calendar. Predict anything, combo everything. Powered by @RobinhoodCrypto." }
-  - { id: R-12, publisher: "@meridiandotxyz", title: "Meridian is live on Robinhood Chain", url: "https://x.com/meridiandotxyz/status/2072407641545134458", published_at: 2026-07-01T19:50:59Z, accessed_at: 2026-09-03T02:12:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [EVT-7], excerpt: "Excited to announce that Meridian is live on Robinhood Chain as a day-one launch partner. We've spent months in private alpha refining the product with users for this moment. Predictions first. Perps, RWAs, and more coming soon." }
-  - { id: R-13, publisher: "@Ethena_Eco", title: "USDe-native prediction markets are now live", url: "https://x.com/Ethena_Eco/status/2072416223661556093", published_at: 2026-07-01T20:25:06Z, accessed_at: 2026-09-03T02:12:00Z, kind: social, authority: independent, authenticity: confirmed, supports: [CLM-21, EVT-6], excerpt: "USDe-native prediction markets are now live on Robinhood Chain, via @Meridiandotxyz (formerly Ethereal). Meridian Predict opens to everyone from day one, no limits or whitelist, settled entirely in USDe." }
-  - { id: R-14, publisher: Blockscout, title: "Address 0x79cB914f3F336426E89FaB55A9488AB25770552D", url: "https://robinhoodchain.blockscout.com/address/0x79cB914f3F336426E89FaB55A9488AB25770552D", published_at: null, accessed_at: 2026-09-03T02:10:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-4, CLM-8, EVT-8], excerpt: "API v2: hash 0x79cB914f3F336426E89FaB55A9488AB25770552D, name PredictionMarketVault, is_contract true, is_verified true, creator 0x6A225f09E0EbE597F79e86875B3704325d40c84d, creation_transaction_hash 0x61d50253bfaa36af8fe65dcdbb920a34a8bdd9767c8465d19bb0e55e31c4b694. Token name Meridian Robinhood Vault symbol SRHV decimals 18." }
-  - { id: R-15, publisher: Blockscout, title: "Address 0xE4cea507b19796362A5a28Fa7cb705A3F1866213", url: "https://robinhoodchain.blockscout.com/address/0xE4cea507b19796362A5a28Fa7cb705A3F1866213", published_at: null, accessed_at: 2026-09-03T02:10:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-5, EVT-8], excerpt: "API v2: hash 0xE4cea507b19796362A5a28Fa7cb705A3F1866213, name PredictionMarketEscrow, is_contract true, is_verified true, creator 0x6A225f09E0EbE597F79e86875B3704325d40c84d, creation_transaction_hash 0x1acafda85399d5703b49baff6df8b68ba5dc6fc2d82f529dc48a4e6fe92bb766." }
-  - { id: R-16, publisher: Blockscout, title: "Address 0x7E318ef37c3bC3d0cBA205Af2D1Fc9F9CeFEB5df", url: "https://robinhoodchain.blockscout.com/address/0x7E318ef37c3bC3d0cBA205Af2D1Fc9F9CeFEB5df", published_at: null, accessed_at: 2026-09-03T02:10:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-6, EVT-8], excerpt: "API v2: hash 0x7E318ef37c3bC3d0cBA205Af2D1Fc9F9CeFEB5df, name SecondaryMarketEscrow, is_contract true, is_verified true, creator 0x6A225f09E0EbE597F79e86875B3704325d40c84d, creation_transaction_hash 0x094d7396de98c5ee9a123adb292ee0ffb3b56626bfaca34965c55de338115b2e." }
-  - { id: R-17, publisher: Blockscout, title: "Address 0x24b84023c8e4Da635be228C380C09bfE5271BF9d", url: "https://robinhoodchain.blockscout.com/address/0x24b84023c8e4Da635be228C380C09bfE5271BF9d", published_at: null, accessed_at: 2026-09-03T02:10:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-7, CLM-26, EVT-5], excerpt: "API v2: hash 0x24b84023c8e4Da635be228C380C09bfE5271BF9d, name AccountableAsyncRedeemVault, is_contract true, is_verified true, creator 0x581028426657b0A055f51cD17DCe05B989de4e52, creation_transaction_hash 0x74034e80801ffdaf3d783f190eb86f70842b1d9caf467958e86e8e0de4a4bfb9. Token name Meridian Liquidity Provider symbol MLP holders_count 612 total_supply 2489619058646616952464425." }
-  - { id: R-18, publisher: Robinhood Chain RPC, title: "eth_getCode / eth_call Meridian stack", url: "https://rpc.mainnet.chain.robinhood.com", published_at: null, accessed_at: 2026-09-03T02:10:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-4, CLM-5, CLM-6, CLM-7, CLM-8, CLM-13, CLM-14, CLM-15, CLM-16, CLM-22, CLM-25], excerpt: "eth_chainId 0x1237 (4663) eth_blockNumber 0x328e823 (53012515). Non-empty code on Predict vault/escrow/secondary, MLP 0x24b84023…, old MLP 0xF62c201e…, USDe 0x5d3a1Ff2…. Empty code on meridiantrade.xyz PerpEngine 0xBa7e695B… and EquityVault 0xF8AaFab9…. MLP totalAssets 496348.1666820296 USDe. Predict vault+escrow USDe 265680.81. Safe 0x99A8…212C threshold 1." }
-  - { id: R-19, publisher: DefiLlama, title: "Meridian Perps protocol", url: "https://api.llama.fi/protocol/meridian-perps", published_at: null, accessed_at: 2026-09-03T02:15:35Z, kind: third-party-data, authority: aggregator, authenticity: unconfirmed, supports: [CLM-9, CLM-11], excerpt: "name Meridian Perps, module meridian-perps/index.js, category Derivatives, chains [Robinhood Chain], currentChainTvls['Robinhood Chain'] 2505942.42996, tokens USDE 2507240.75695, methodology Count all assets deposited in the Meridian perps LP vault, url https://app.meridian.xyz/, twitter meridiandotxyz, parentProtocol parent#meridiandotxyz, listedAt 1785942441." }
-  - { id: R-20, publisher: DefiLlama, title: "Meridian Predict protocol", url: "https://api.llama.fi/protocol/meridian-predict", published_at: null, accessed_at: 2026-09-03T02:15:35Z, kind: third-party-data, authority: aggregator, authenticity: unconfirmed, supports: [CLM-12, CLM-14], excerpt: "name Meridian Predict, module meridian-predict/index.js, category Prediction Market, chains [Robinhood Chain], currentChainTvls['Robinhood Chain'] 265553.59994, tokens USDE 265680.80994, url https://app.meridian.xyz/predict, twitter meridiandotxyz, parentProtocol parent#meridiandotxyz, listedAt 1783447314." }
-  - { id: R-21, publisher: DefiLlama, title: "Curators registry — meridian-perps", url: "https://github.com/DefiLlama/DefiLlama-Adapters/blob/main/registries/curators.js", published_at: null, accessed_at: 2026-09-03T02:08:00Z, kind: repository, authority: aggregator, authenticity: unconfirmed, supports: [CLM-7], excerpt: "meridian-perps config methodology 'Count all assets deposited in the Meridian perps LP vault.' blockchains.robinhood.accountableVaults ['0x24b84023c8e4Da635be228C380C09bfE5271BF9d'] // Meridian LP vault." }
-  - { id: R-22, publisher: meridiantrade.xyz, title: "Contracts — Meridian Documentation", url: "https://www.meridiantrade.xyz/docs/contracts", published_at: null, accessed_at: 2026-09-03T02:08:00Z, kind: docs, authority: unknown, authenticity: unconfirmed, supports: [CLM-22], excerpt: "Flag third-party-link. Table lists PerpEngine 0xBa7e695B1689C5715259BD15e147C9fc5aEd4141 and EquityVault 0xF8AaFab9A64A8E4AE3D4eF11592fD57cF0112148 on Robinhood Chain, USDG collateral. Those two addresses returned empty eth_getCode on 4663 this pass. Not linked from meridian.xyz or @meridiandotxyz." }
-  - { id: R-23, publisher: Blockscout, title: "Address 0x99A8E932B40eD10DD03ce11e424030efa997212C", url: "https://robinhoodchain.blockscout.com/address/0x99A8E932B40eD10DD03ce11e424030efa997212C", published_at: null, accessed_at: 2026-09-03T02:10:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-15, CLM-16], excerpt: "API v2: hash 0x99A8E932B40eD10DD03ce11e424030efa997212C, name SafeProxy, is_contract true, is_verified true. RPC getThreshold 1; getOwners 0x5aa9815d01b6ebb8647baf7354e8cf0cd9040a44 and 0xdb5af497a73620d881561edb508012a5f84e9ba2." }
-  - { id: R-24, publisher: Meridian, title: "Audits", url: "https://docs.meridian.xyz/protocol-reference/audits", published_at: null, accessed_at: 2026-09-03T02:08:00Z, kind: audit, authority: primary, authenticity: confirmed, supports: [CLM-17], excerpt: "Independent reviewers assessed the perpetual futures exchange contracts. Guardian: Exchange audit. ChainSecurity: Exchange audit. An audit applies to the code and scope stated in its report. Also verify the deployed implementation and proxy address on Contracts." }
-  - { id: R-25, publisher: "@meridiandotxyz", title: "Meridian Perps are coming to Robinhood Chain", url: "https://x.com/meridiandotxyz/status/2082874084933636559", published_at: 2026-07-30T17:00:54Z, accessed_at: 2026-09-03T02:12:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [CLM-25, CLM-26], excerpt: "MLP is a professionally curated multi-venue vault launching in partnership with Neutral Trade, Accountable, and Kappa Lab. Depositors providing USDe to MLP. Linked https://yield.accountable.capital/vaults/4663/0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC." }
-  - { id: R-26, publisher: DefiLlama, title: "Meridian.xyz parent protocol", url: "https://api.llama.fi/protocol/meridian.xyz", published_at: null, accessed_at: 2026-09-03T02:15:35Z, kind: third-party-data, authority: aggregator, authenticity: unconfirmed, supports: [CLM-11, CLM-12], excerpt: "name Meridian.xyz, url https://meridian.xyz, twitter meridiandotxyz, currentChainTvls['Robinhood Chain'] 2771495, otherProtocols ['Meridian.xyz', 'Meridian Perps', 'Meridian Predict'], description RWA-focused perps and prediction markets with a full derivatives stack. Powered by Robinhood Chain." }
-  - { id: R-27, publisher: Blockscout, title: "Predict escrow creation tx 0x1acafda8…", url: "https://robinhoodchain.blockscout.com/tx/0x1acafda85399d5703b49baff6df8b68ba5dc6fc2d82f529dc48a4e6fe92bb766", published_at: 2026-06-25T18:42:08Z, accessed_at: 2026-09-03T02:10:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [EVT-8], excerpt: "timestamp 2026-06-25T18:42:08.000000Z, status ok, result success, block_number 203489, from 0x6A225f09E0EbE597F79e86875B3704325d40c84d, created_contract 0xE4cea507b19796362A5a28Fa7cb705A3F1866213." }
-  - { id: R-28, publisher: Blockscout, title: "YieldStrategyFactory tx 0x74034e80…", url: "https://robinhoodchain.blockscout.com/tx/0x74034e80801ffdaf3d783f190eb86f70842b1d9caf467958e86e8e0de4a4bfb9", published_at: 2026-07-29T01:15:03Z, accessed_at: 2026-09-03T02:10:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-25, EVT-5], excerpt: "timestamp 2026-07-29T01:15:03.000000Z, status ok, result success, block_number 22051004, from 0x94f7339dC083c4995C3A9b870a3f66506AFb222A, to YieldStrategyFactory 0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f. Blockscout also lists this hash on MLP 0x24b84023… and on ERC1967Proxy 0xF62c201e…." }
+  - { id: R-1, publisher: Meridian, title: "mPerps & Prediction Markets | Meridian", url: "https://meridian.xyz", published_at: null, accessed_at: 2026-09-03T02:10:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-2, CLM-3, CLM-8, CLM-9, CLM-12], excerpt: "title mPerps & Prediction Markets | Meridian. meta description Trade global markets onchain with Mutualized Perpetuals (mPerps) designed for capital-efficient, 24/7 price discovery—and prediction markets. link rel canonical href https://meridian.xyz. twitter:url https://meridian.xyz." }
+  - { id: R-2, publisher: Meridian, title: "app.meridian.xyz", url: "https://app.meridian.xyz", published_at: null, accessed_at: 2026-09-03T02:10:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-2], excerpt: "title mPerps & Prediction Markets | Meridian. canonical https://app.meridian.xyz. apple-mobile-web-app-title Meridian. script /assets/index-B7YIsHtK.js." }
+  - { id: R-3, publisher: Meridian, title: "app bundle index-B7YIsHtK.js vault and chain maps", url: "https://app.meridian.xyz/assets/index-B7YIsHtK.js", published_at: null, accessed_at: 2026-09-03T02:15:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-5, CLM-17, CLM-21, CLM-22, CLM-23], excerpt: "MLP Vault depositToken USDe chain Robinhood active true tvlCap 15e7 manageUrl https://yield.accountable.capital/vaults/4663/0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC. Predict Vault active false. You'll be redirected to Accountable to manage your vault. rD robinhood-mainnet 0xE42847eE3feE1B29065F14D39EcF664A04d70475. Footer docs.meridian.xyz, x.com/meridiandotxyz, discord.com/invite/meridianxyz, blog.meridian.xyz." }
+  - { id: R-4, publisher: "@meridiandotxyz", title: "Meridian profile", url: "https://x.com/meridiandotxyz", published_at: null, accessed_at: 2026-09-03T02:00:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [CLM-2, CLM-3, CLM-8, CLM-9, CLM-19, CLM-20], excerpt: "Display name Meridian, handle @meridiandotxyz. Bio: RWA-focused perps and prediction markets with a full derivatives stack. Powered by Robinhood Chain." }
+  - { id: R-5, publisher: "@meridiandotxyz", title: "The MLP Vault has filled its $2.5M cap", url: "https://x.com/meridiandotxyz/status/2093368321270059488", published_at: 2026-08-28T16:01:15Z, accessed_at: 2026-09-03T02:00:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-10, CLM-21, EVT-1], excerpt: "The MLP Vault has filled its $2.5M cap. mPerps launches next week." }
+  - { id: R-6, publisher: "@meridiandotxyz", title: "MLP cap raised to $2.5M USDe", url: "https://x.com/meridiandotxyz/status/2093008635043754154", published_at: 2026-08-27T16:11:59Z, accessed_at: 2026-09-03T02:00:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [EVT-2], excerpt: "MLP cap raised to $2.5M USDe. Deposit ahead of the Meridian Perps launch to earn USDe rewards, Ethena Rewards, and 20% of all Meridian Points emitted to perps traders. Follow-up posted https://app.meridian.xyz/vault." }
+  - { id: R-7, publisher: "@meridiandotxyz", title: "Six real combos users built off the September Fed meeting", url: "https://x.com/meridiandotxyz/status/2092322989845123382", published_at: 2026-08-25T18:47:28Z, accessed_at: 2026-09-03T02:00:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [EVT-3], excerpt: "Six real combos users built off the September Fed meeting: Fed hold + Tesla x SpaceX merger; Fed hold + Strait of Hormuz; Fed hold + Alcaraz US Open; Fed hold + Paxton wins Texas; Fed hold + WTI Crude hit $90; Fed hold + Iran & Israel ceasefire holds." }
+  - { id: R-8, publisher: "@meridiandotxyz", title: "What Meridian Predict users are trading in August", url: "https://x.com/meridiandotxyz/status/2091917457284046982", published_at: 2026-08-24T15:56:02Z, accessed_at: 2026-09-03T02:00:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [CLM-12, EVT-4], excerpt: "What Meridian Predict users are trading in August: Weather: 38% Tennis: 22% Crypto: 9% Counter-Strike: 7% Soccer: 6% League of Legends: 5% Dota 2: 3%. Predict anything, combo everything." }
+  - { id: R-9, publisher: "@meridiandotxyz", title: "Meridian Predict just posted its biggest week yet", url: "https://x.com/meridiandotxyz/status/2087260335447409075", published_at: 2026-08-11T19:30:18Z, accessed_at: 2026-09-03T02:00:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [CLM-21, EVT-5], excerpt: "Meridian Predict just posted its biggest week yet. Record volume in one of the quietest stretches of the sports calendar. Predict anything, combo everything. Powered by @RobinhoodCrypto." }
+  - { id: R-10, publisher: Blockscout, title: "Address 0x24b8…1BF9d AccountableAsyncRedeemVault", url: "https://robinhoodchain.blockscout.com/address/0x24b84023c8e4Da635be228C380C09bfE5271BF9d", published_at: null, accessed_at: 2026-09-03T02:20:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-1, CLM-4, CLM-6, CLM-17, CLM-23], excerpt: "name AccountableAsyncRedeemVault is_contract true is_verified true tx 0x74034e80…bfb9. Token Meridian Liquidity Provider / MLP holders_count 612. File src/vault/AccountableAsyncRedeemVault.sol compiler v0.8.27 is_partially_verified true. Source: security-contact security@accountable.capital; ERC-4626 vault with ERC-7540 async redemptions." }
+  - { id: R-11, publisher: Blockscout, title: "Token MLP 0x24b8…1BF9d", url: "https://robinhoodchain.blockscout.com/token/0x24b84023c8e4Da635be228C380C09bfE5271BF9d", published_at: null, accessed_at: 2026-09-03T02:20:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-4, CLM-7], excerpt: "address_hash 0x24b84023c8e4Da635be228C380C09bfE5271BF9d name Meridian Liquidity Provider symbol MLP decimals 18 holders_count 612 total_supply 2489619058646616952464425 type ERC-20. Counters token_holders_count 612 transfers_count 1320." }
+  - { id: R-12, publisher: Blockscout, title: "createYieldStrategy tx 0x74034e80…", url: "https://robinhoodchain.blockscout.com/tx/0x74034e80801ffdaf3d783f190eb86f70842b1d9caf467958e86e8e0de4a4bfb9", published_at: 2026-07-29T01:15:03Z, accessed_at: 2026-09-03T02:20:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-14, EVT-6], excerpt: "timestamp 2026-07-29T01:15:03.000000Z status ok method createYieldStrategy from 0x94f7339dC083c4995C3A9b870a3f66506AFb222A to 0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f block 22051004. decoded params asset 0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34, 0x94f7339d…222A, 0, true, MLP, Meridian Liquidity Provider." }
+  - { id: R-13, publisher: Blockscout, title: "YieldStrategyFactory 0xA4d6…1F9f", url: "https://robinhoodchain.blockscout.com/address/0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f", published_at: null, accessed_at: 2026-09-03T02:20:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-14], excerpt: "hash 0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f name YieldStrategyFactory is_contract true is_verified true creator 0x4e59b44847b379578588920cA78FbF26c0B4956C. Smart-contract file src/factory/YieldStrategyFactory.sol is_partially_verified true. Factory contract for creating and managing yield strategies." }
+  - { id: R-14, publisher: Blockscout, title: "AccountableYield proxy 0xF62c…B1eC", url: "https://robinhoodchain.blockscout.com/address/0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC", published_at: null, accessed_at: 2026-09-03T02:20:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-5, CLM-14, EVT-6], excerpt: "hash 0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC name ERC1967Proxy is_contract true is_verified true proxy_type eip1967 creator 0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f creation_transaction_hash 0x74034e80801ffdaf3d783f190eb86f70842b1d9caf467958e86e8e0de4a4bfb9. implementations AccountableYield 0x2639dA0923aBFFe46a753b765E0856Cc3E121710." }
+  - { id: R-15, publisher: Blockscout, title: "Ethena USDe 0x5d3a…ef34", url: "https://robinhoodchain.blockscout.com/address/0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", published_at: null, accessed_at: 2026-09-03T02:20:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-10], excerpt: "hash 0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34 name USDeOFT is_contract true is_verified true. Token Ethena USDe / USDE decimals 18 holders_count 5323." }
+  - { id: R-16, publisher: Robinhood Chain RPC, title: "eth_getCode, ERC-20/4626 views, Safe, deployedAssets", url: "https://rpc.mainnet.chain.robinhood.com", published_at: null, accessed_at: 2026-09-03T02:40:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-4, CLM-5, CLM-6, CLM-7, CLM-10, CLM-13], excerpt: "block 53078289. MLP code 18511 bytes name Meridian Liquidity Provider symbol MLP totalSupply 2.489619e24 asset 0x5d3a1Ff2…ef34 totalAssets 4.96348e23. USDe.balanceOf(MLP) 4.96348e23. 0xF62c…B1eC deployedAssets 2.010893e24 asset USDe borrower 0x2f46c3fc…56b2 investmentManager 0x7f1a3035…5253. Factory owner 0x4B07AaA3…BFB1. Safe getThreshold 2 getOwners 0x25e170e3… 0x66415e41… 0xfcb0cbc1… nonce 10. Predict resolver 0xE42847eE… code 6755 bytes owner 0x99a8e932…212c." }
+  - { id: R-17, publisher: DefiLlama, title: "Meridian Perps protocol row", url: "https://api.llama.fi/protocol/meridian-perps", published_at: null, accessed_at: 2026-09-03T01:36:00Z, kind: third-party-data, authority: aggregator, authenticity: unconfirmed, supports: [CLM-10], excerpt: "name Meridian Perps url https://app.meridian.xyz/ twitter meridiandotxyz category Derivatives chains [Robinhood Chain] address None currentChainTvls['Robinhood Chain'] 2505942.42996 methodology Count all assets deposited in the Meridian perps LP vault audits 0 parentProtocolSlug meridian.xyz module meridian-perps/index.js." }
+  - { id: R-18, publisher: DefiLlama, title: "Meridian Predict protocol row", url: "https://api.llama.fi/protocol/meridian-predict", published_at: null, accessed_at: 2026-09-03T01:36:00Z, kind: third-party-data, authority: aggregator, authenticity: unconfirmed, supports: [CLM-11, CLM-12], excerpt: "name Meridian Predict url https://app.meridian.xyz/predict twitter meridiandotxyz category Prediction Market chains [Robinhood Chain] address None currentChainTvls['Robinhood Chain'] 265553.59994 parentProtocolSlug meridian.xyz." }
+  - { id: R-19, publisher: GitHub, title: "meridiandotxyz 404 and Meridian-xyz org", url: "https://github.com/Meridian-xyz", published_at: null, accessed_at: 2026-09-03T02:10:00Z, kind: repository, authority: primary, authenticity: unconfirmed, supports: [CLM-16], excerpt: "GET github.com/meridiandotxyz 404. GET api.github.com/orgs/meridian-xyz login Meridian-xyz name Meridian.xyz html_url https://github.com/Meridian-xyz type Organization. GET /orgs/meridian-xyz/repos returned an empty list." }
+  - { id: R-20, publisher: Blockscout, title: "Meridian MERD 0x12f8…Ab8d8", url: "https://robinhoodchain.blockscout.com/token/0x12f8Cca1875B6CdfaF00f7Efde52A40C275Ab8d8", published_at: null, accessed_at: 2026-09-03T02:20:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-18], excerpt: "address_hash 0x12f8Cca1875B6CdfaF00f7Efde52A40C275Ab8d8 name Meridian symbol MERD holders_count 679. GitHub Meridian402/meridian publishes this CA at meridian402.xyz as an agent market-maker, not MLP." }
+  - { id: R-21, publisher: Blockscout, title: "Token meridiandotxyz 0x2717…02Da", url: "https://robinhoodchain.blockscout.com/address/0x2717AAc5120b5e89208ac6566035756262B402Da", published_at: null, accessed_at: 2026-09-03T02:20:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-18], excerpt: "hash 0x2717AAc5120b5e89208ac6566035756262B402Da name Token is_verified true creator 0xb34Da2AD4cAA3334409324FcBf1368Def96ea108. Token name meridiandotxyz symbol Meridian holders_count 137 total_supply 1e27. Not the MLP vault." }
+  - { id: R-22, publisher: Blockscout, title: "Factory owner SafeProxy 0x4B07…BFB1", url: "https://robinhoodchain.blockscout.com/address/0x4B07AaA370189E5603DF56C84f59c5A59181BFB1", published_at: null, accessed_at: 2026-09-03T02:40:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-13], excerpt: "hash 0x4B07AaA370189E5603DF56C84f59c5A59181BFB1 name SafeProxy is_contract true is_verified true proxy_type master_copy implementations SafeL2 0x29fcB43b46531BcA003ddC8FCB67FFE91900C762." }
+  - { id: R-23, publisher: Blockscout, title: "ConditionalTokensConditionResolver 0xE428…0475", url: "https://robinhoodchain.blockscout.com/address/0xE42847eE3feE1B29065F14D39EcF664A04d70475", published_at: null, accessed_at: 2026-09-03T02:20:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-22], excerpt: "hash 0xE42847eE3feE1B29065F14D39EcF664A04d70475 name ConditionalTokensConditionResolver is_contract true is_verified true creator 0x6A225f09E0EbE597F79e86875B3704325d40c84d creation_transaction_hash 0x30f3bd5c3f98ea6eb9bc2507a2b3ba3ceea7f585ccbd133392beeb6f010fb9dc. File src/resolvers/conditionalTokens/ConditionalTokensConditionResolver.sol. App bundle keys this address to robinhood-mainnet." }
+  - { id: R-24, publisher: Meridian, title: "docs.meridian.xyz (timeout)", url: "https://docs.meridian.xyz", published_at: null, accessed_at: 2026-09-03T02:12:00Z, kind: docs, authority: primary, authenticity: unconfirmed, supports: [], excerpt: "GET https://docs.meridian.xyz timed out after ~20s with a partial HTML response. Linked from the app footer and marketing JS; page body was not copied." }
+  - { id: R-25, publisher: "@meridiandotxyz", title: "MLP cap raised to $2 million", url: "https://x.com/meridiandotxyz/status/2088289214714847535", published_at: 2026-08-14T15:38:41Z, accessed_at: 2026-09-03T02:00:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [EVT-7], excerpt: "MLP cap raised to $2 million. mPerps update next week." }
+  - { id: R-26, publisher: Discord, title: "discord.com/invite/meridianxyz", url: "https://discord.com/invite/meridianxyz", published_at: null, accessed_at: 2026-09-03T02:15:00Z, kind: other, authority: primary, authenticity: unconfirmed, supports: [], excerpt: "Invite URL present in app.meridian.xyz bundle footer. Invite landing page was not opened line by line this pass." }
+  - { id: R-27, publisher: Accountable, title: "YieldApp vault 4663/0xF62c…B1eC", url: "https://yield.accountable.capital/vaults/4663/0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC", published_at: null, accessed_at: 2026-09-03T02:15:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-17], excerpt: "title YieldApp by Accountable | Marketplace for Verifiable Yield. canonical https://yield.accountable.capital/. App bundle uses this path as MLP Vault manageUrl on chain 4663." }
+  - { id: R-28, publisher: Blockscout, title: "AccountableYield implementation 0x2639…1710", url: "https://robinhoodchain.blockscout.com/address/0x2639dA0923aBFFe46a753b765E0856Cc3E121710", published_at: null, accessed_at: 2026-09-03T02:20:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-14], excerpt: "name AccountableYield is_verified true file src/strategies/AccountableYield.sol. ABI includes deployedAssets, borrower, investmentManager, loan, dvnPublisher, initialize." }
 
 gaps:
-  - { priority: P0, question: "Why does DefiLlama meridian-perps report ~2.51M USDe while MLP totalAssets() and USDe.balanceOf are 496348 at block 53012515?", checked: "api.llama.fi/protocol/meridian-perps, curators.js accountableVaults 0x24b84023…, eth_call totalAssets/asset/balanceOf, 2026-09-03", next: "read AccountableAsyncRedeemVault accounting (idle vs deployed NAV) in verified source and any Neutral Trade custody addresses" }
-  - { priority: P0, question: "Is a perpetual-futures engine deployed on 4663 since the 2026-08-28 'mPerps launches next week' post, despite docs still saying mainnet is not live?", checked: "docs.meridian.xyz/protocol-reference/contracts, @meridiandotxyz through 2026-08-28, eth_getCode on meridiantrade.xyz PerpEngine empty, 2026-09-03", next: "GET any production trading API config equivalent of api.meridiantest.net/v1/rpc/config and search Blockscout for a verifyingContract" }
-  - { priority: P1, question: "Do the Guardian and ChainSecurity exchange reports match any bytecode on 4663?", checked: "docs.meridian.xyz/protocol-reference/audits linked Google Drive files named, not opened page-by-page this pass", next: "download both PDFs and match commit/scope to a mainnet address once perps contracts are published" }
-  - { priority: P1, question: "Who can pause Predict markets, change oracles, or sweep the vault besides Safe 0x99A8…212C?", checked: "owner() on vault and escrow; secondary owner() reverted; no pause-role call this pass", next: "read verified PredictionMarketVault/Escrow modifiers and any oracle setter" }
-  - { priority: P2, question: "Is meridiantrade.xyz an unrelated USDG equity-perp product, a clone, or a later Meridian surface?", checked: "meridiantrade.xyz docs, empty eth_getCode on its PerpEngine/EquityVault, no link from meridian.xyz or @meridiandotxyz, 2026-09-03", next: "record it as a discovery candidate only if an official surface cross-links a live 4663 address" }
+  - { priority: P0, question: "Is mPerps trading live on 4663 as of this pass, or still the 28 Aug 'next week' post?", checked: "Official account last original 2026-08-28; app bundle Predict Vault inactive; no mPerps-named contract on Blockscout search; MLP vault is live", next: "open app.meridian.xyz trade UI and search factory for a perp engine address" }
+  - { priority: P0, question: "Which contracts hold Meridian Predict collateral matching Llama $266k, beyond the ConditionResolver?", checked: "App bundle maps 0xE42847eE… to robinhood-mainnet; USDe.balanceOf(resolver) was 0; Llama adapter path 404 in DefiLlama-Adapters/projects", next: "decode predictionEscrowAddress from the runtime config object and RPC its USDe balance" }
+  - { priority: P1, question: "Who holds the AccountableYield borrower 0x2f46…56b2 and investmentManager 0x7f1a…5253 keys, and is the factory Safe Accountable or Meridian?", checked: "RPC borrower/investmentManager eth_getCode empty; factory owner Safe 2-of-3; vault source security@accountable.capital", next: "read Safe owners on Accountable docs and compare to Meridian operators" }
+  - { priority: P1, question: "Is there an audit covering AccountableAsyncRedeemVault / AccountableYield as used on 4663?", checked: "Llama audits 0; meridian.xyz, X, verified source headers 2026-09-03", next: "open docs.meridian.xyz after it loads and search Accountable audit indexes" }
+  - { priority: P2, question: "Does docs.meridian.xyz or blog.meridian.xyz publish the MLP and resolver addresses?", checked: "docs.meridian.xyz timed out; blog URL only from JS footer", next: "retry docs and open the MLP vault docs path" }
 ---
 
 # Meridian — research packet
 
 ## What it is
 
-The chain's USDe prediction market, with a Meridian Liquidity Provider vault that DefiLlama lists as meridian-perps. A user deposits USDe, takes RFQ singles or combos, or deposits MLP. Official docs still list perpetual-futures mainnet as not live. meridian.xyz and @meridiandotxyz run it.
+USDe deposits mint MLP shares in an Accountable ERC-7540 async-redeem vault that lends into an upgradeable AccountableYield strategy; prediction markets run on the same app. Users open app.meridian.xyz; vault management redirects to yield.accountable.capital. @meridiandotxyz is the official handle. mPerps was posted as launching the week after 28 Aug 2026.
 
 Themes: rwa, prediction, vault
 
 ## Why it matters
 
-This is the census native-perps name with a live USDe prediction book and a filled MLP vault on chain 4663. DefiLlama splits it as meridian-perps and meridian-predict under parent meridian.xyz. Sight is a second prediction-market census row and does not share this handle or these addresses.
+This is the census perps-plus-predict name with a reproduced Robinhood Chain vault, not a Llama-only row. Idle USDe plus deployedAssets on the AccountableYield proxy match the ~$2.51M meridian-perps chain slice. Predict still has a Llama slice and August volume posts while the in-app Predict Vault flag is off and mPerps remains a dated launch post.
 
 ## What could go wrong
 
-Official docs still say perpetual-futures mainnet is not live, so a card that treats Llama's meridian-perps TVL as open perps trading would overstate the product. Predict vault and escrow are owned by a 1-of-2 Safe. Llama's ~$2.51M meridian-perps figure does not match the 496k USDe sitting in the MLP vault this pass.
+The yield strategy is an ERC1967 proxy. Factory `owner()` is a 2-of-3 Safe on Accountable's factory, not an `owner()` on MLP. Vault `totalAssets()` is only idle USDe; a card that prints that figure as TVL would miss the ~$2.01M `deployedAssets`. MERD / meridiandotxyz tickers on Blockscout are different contracts.
 
 ## Product and mechanics
 
-Meridian Predict is an RFQ market: a user posts size and a pick, makers compete, and the vault plus escrow hold USDe until settlement. Docs state there is no protocol trading fee. [claim R-1 R-3]
+Official site and app describe Mutualized Perpetuals (mPerps) plus prediction markets. @meridiandotxyz posted the MLP cap fill and "mPerps launches next week" on 28 Aug 2026. [claim R-1 R-5]
 
-Perps docs describe an offchain-matched CLOB with onchain settlement and mPerps that freeze the last accepted oracle mark when the reference market is closed. The contracts page still says perpetual-futures mainnet is not yet live. [claim R-1 R-2]
+MLP is a verified AccountableAsyncRedeemVault (ERC-4626 plus ERC-7540 async redeem). `asset()` is Ethena USDe 0x5d3a…ef34. The same `createYieldStrategy` transaction deployed ERC1967 AccountableYield 0xF62c…B1eC, which the app uses as the MLP manage URL on yield.accountable.capital. [verified R-10 R-12 R-14 R-3]
 
-MLP is an AccountableAsyncRedeemVault (symbol MLP, asset USDe). Official posts described Phase 1 USDe pre-deposits ahead of mPerps with Neutral Trade, Accountable and Kappa Lab. [claim R-9 R-17 R-25]
+App bundle: MLP Vault active, Predict Vault inactive. Predict still has August volume posts and a Llama prediction-market row. ConditionResolver 0xE42847eE… is the robinhood-mainnet address in that bundle. [claim R-3 R-8 R-18]
 
 ## Control and security
 
-Predict vault and PredictionMarketEscrow owner() is SafeProxy 0x99A8E932B40eD10DD03ce11e424030efa997212C. getThreshold is 1 with two owners. SecondaryMarketEscrow owner() reverted. MLP owner() reverted. [verified R-18 R-23]
+MLP verified ABI has no `owner()`. YieldStrategyFactory `owner()` is SafeProxy 0x4B07AaA3…BFB1, threshold 2, three EOA owners, nonce 10. AccountableYield `borrower()` and `investmentManager()` return EOAs. The yield contract is an upgradeable ERC1967 proxy. No timelock was read. [verified R-16 R-22 R-14]
 
-docs.meridian.xyz lists Guardian and ChainSecurity exchange audit PDFs. Those reports are not matched to a 4663 perps engine this pass because the contracts page still says perps mainnet is not live. [claim R-2 R-24]
+Llama `audits` is 0. Vault source lists security@accountable.capital. No Meridian-named audit report was located on the site, X profile, or verified pages this pass. [unknown]
 
 ## Team and provenance
 
-@meridiandotxyz website go.meridian.xyz/app redirects to meridian.xyz. docs.meridian.xyz footer links that handle and discord.gg/meridianxyz. @Ethena_Eco called the project formerly Ethereal. No public repository URL was on the site, docs or bio this pass. [verified R-4 R-6 R-7]
+@meridiandotxyz bio matches meridian.xyz: RWA perps and prediction markets on Robinhood Chain. github.com/meridiandotxyz returned 404; GitHub org Meridian-xyz listed zero public repositories. Vault and factory source is Accountable's yield stack. [verified R-1 R-4] [claim R-19 R-17]
 
-meridiantrade.xyz publishes a USDG PerpEngine and EquityVault on chain 4663; both addresses have empty code. Flag third-party-link; do not merge. [verified R-18 R-22]
+Sight (@sight_hood) is a separate census prediction-market row. Meridian402 MERD 0x12f8… and token meridiandotxyz 0x2717… are different CAs. Flag ca-collision / ticker-only. [verified R-20 R-21]
 
 ## Economics and activity
 
-DefiLlama meridian-perps Robinhood Chain TVL 2505942.43 USD (tokens USDE 2507240.76) at 2026-09-03T02:15:35Z. MLP totalAssets() 496348.17 and USDe.balanceOf 496348.27 at block 53012515. Those two figures are open as CON-1. [claim R-19] [verified R-18]
-
-DefiLlama meridian-predict Robinhood Chain TVL 265553.60 USD (tokens USDE 265680.81). USDe.balanceOf on the Predict vault plus escrow is 265680.81 at the same block. [verified R-18 R-20]
-
-Official 2026-08-28 post: MLP vault filled its $2.5M cap; mPerps launches next week. [claim R-8]
+Llama meridian-perps Robinhood Chain $2,505,942 (methodology: assets in the perps LP vault). Llama meridian-predict $265,554. RPC: MLP idle USDe ~496,348; AccountableYield `deployedAssets()` ~2,010,893; sum ~$2.51M. MLP holders 612, supply ~2.49M e18. Official 28 Aug post: $2.5M cap filled. [claim R-17 R-18] [verified R-16 R-11]
 
 ## Material risks
 
-- Predict vault and escrow are owned by a 1-of-2 Safe; a single owner key can change that surface. [verified R-18 R-23]
-- Official contracts page still says perpetual-futures mainnet is not live, while Llama lists a $2.51M meridian-perps row. [claim R-2 R-19]
-- MLP on-chain USDe is 496k against Llama's 2.51M USDE token figure. [verified R-18 R-19]
-- meridiantrade.xyz publishes different USDG perps addresses with empty code on 4663. [verified R-18 R-22]
+- AccountableYield is an ERC1967 proxy; implementation can change under the factory/Safe path. [verified R-14 R-16]
+- Vault `totalAssets()` omits `deployedAssets`; idle USDe is not the Llama TVL. [verified R-16]
+- mPerps live-trading was not reproduced; the last official line is the 28 Aug launch post. [claim R-5 R-3]
+- No audit report located this pass. [unknown]
+- MERD and meridiandotxyz tickers are different contracts from MLP. [verified R-20 R-21]
 
 ## Verification passes
 
-- Receipts: every URL above was opened on 2026-09-03 and its excerpt copied from the page or API. [verified R-1 R-2 R-14 R-17 R-19]
-- Numbers: Predict USDe balances match Llama meridian-predict tokens.USDE; meridian-perps does not match MLP totalAssets. [verified R-18 R-20] [claim R-19]
-- Adversarial: the strongest contrary reading is that meridian-perps TVL is live perps open interest, or that meridiantrade.xyz is this protocol. Docs still say perps mainnet is not live, and meridiantrade.xyz PerpEngine has empty code. [inference R-2 R-18 R-22]
+- Receipts: meridian.xyz, app.meridian.xyz and its JS bundle, @meridiandotxyz profile and posts, Blockscout vault/factory/proxy/USDe/Safe/resolver, RPC 4663, Llama perps and predict, GitHub org, yield.accountable.capital, and the two collision tokens were opened on 2026-09-03 and excerpts copied from the responses. docs.meridian.xyz timed out. [verified R-1 R-10 R-16 R-17]
+- Numbers: Llama figures are Robinhood Chain slices. Idle USDe plus `deployedAssets` is the on-chain counterpart to the perps TVL, not `totalAssets()` alone. [claim R-17] [verified R-16]
+- Adversarial: the strongest contrary reading is that census mainnet is Llama-only, or that MERD/meridiandotxyz is this protocol, or that Hookr/pools.trade is the pad. MLP name, createYieldStrategy params, and the app manageUrl argue the vault is this slug; MERD is Meridian402; Uniswap's pad remains pools.trade. [inference R-10 R-3 R-20]
 
 ## Operations log
 
-- Read content/census.yaml, content/projects/meridian.yaml, content/pulled/meridian.yaml, content/sources/meridian.yaml, content/feed/meridian.yaml.
-- Opened docs.meridian.xyz (index, contracts, predict fees, audits, support), meridian.xyz, app.meridian.xyz, go.meridian.xyz/app redirect, meridiantrade.xyz/docs/contracts.
-- RPC https://rpc.mainnet.chain.robinhood.com eth_chainId, eth_blockNumber, eth_getCode, eth_call name/symbol/decimals/owner/asset/totalAssets/balanceOf/getThreshold/getOwners, eth_getStorageAt EIP-1967; User-Agent required (HTTP 403 without it).
-- Blockscout API v2 addresses and transactions; User-Agent required.
-- DefiLlama api.llama.fi/protocol/meridian-perps, meridian-predict, meridian.xyz; GitHub DefiLlama-Adapters registries/curators.js.
-- X: @meridiandotxyz profile and posts 2093368321270059488, 2093008635043754154, 2087576944514847088, 2087260335447409075, 2072407641545134458, 2082874084933636559; @Ethena_Eco 2072416223661556093.
-- Predict adapter path DefiLlama-Adapters/projects/meridian-predict/index.js 404 this pass; dimension-adapters dexs/meredian-predict.ts holds the same escrow addresses.
-- Time: ~90 minutes.
+- Base: `git -C /Users/harsharnsingh/proofline-pr59 rev-parse origin/main` → 334ca0619aa62e922da83f46de021f06d12348cf. Census meridian, content/projects/meridian.yaml, content/sources/meridian.yaml, content/feed/meridian.yaml, content/research/meridian.md, docs/templates/research-packet-v2.md, schema/packet.schema.json, assignment WORK-20260903-grok-heavy-icarus-research.md (SEED order starts at meridian).
+- Official: meridian.xyz, app.meridian.xyz, /predict, /vault, app JS index-B7YIsHtK.js, vault.lazy JS, yield.accountable.capital vault path, accountable.capital (DVN marketing, different product).
+- Explorer: Blockscout api/v2 with Chrome UA. MLP, token counters, createYieldStrategy tx, factory, F62c proxy, AccountableYield impl, USDe, Safe, ConditionResolver, search Meridian/MLP/Predict/Accountable/mPerps, collision tokens MERD and meridiandotxyz.
+- RPC: rpc.mainnet.chain.robinhood.com with Chrome UA (403 without). Blocks 53026479–53078289. eth_getCode, name/symbol/asset/totalAssets/totalSupply, USDe.balanceOf, deployedAssets, borrower, investmentManager, factory owner, Safe getThreshold/getOwners/nonce.
+- Third party: api.llama.fi/protocol/meridian-perps and meridian-predict; protocols search (exclude meridian-amm Movement, meridian-finance Telos/Base). DefiLlama-Adapters/projects/meridian-perps 404.
+- X: @meridiandotxyz Latest since 2026-08-01 (last original 28 Aug). Pad/recap window since last GO-LIVE: @ponsdotfamily @TradePools @Hookrfun @longdotxyz @0xSammy @HoodInsider_ @RHDaily__ @GeckoTerminal.
+- Failed: docs.meridian.xyz timeout. RPC without UA 403. urllib DexScreener tokens/v1/robinhood 404 (used token-pairs/v1 and Gecko trending). github.com/meridiandotxyz 404.
+- Time: collection 2026-09-03T01:36Z–02:50Z.
