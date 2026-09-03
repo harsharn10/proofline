@@ -25,6 +25,11 @@ identity:
   official_handle: "@AAPLCAT_"
   repository: "NULL — no GitHub org or repository URL on applecat.club, the @AAPLCAT_ profile, DexScreener, Gecko, or Blockscout this pass"
   possible_matches:
+    - slug: ap
+      signals: [shared-address]
+      contrary_signals:
+        - "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9 is the Apple • Robinhood Token the pair is quoted in; it is the census AP row, not a contract this name deployed"
+        - "Apple Cat is the token launched against that quote asset; the two share no handle or domain"
     - slug: long
       signals: [shared-deployer]
       contrary_signals:
@@ -109,16 +114,6 @@ deployments:
       exists_on_4663: true
       explorer_source_verified: true
     receipt_ids: [R-5, R-6]
-  - label: Apple • Robinhood Token (pair quote rail)
-    role: token
-    address:
-      value: "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
-      chain: robinhood-chain
-      source: explorer
-      seen: 2026-09-03T03:47:00Z
-      exists_on_4663: true
-      explorer_source_verified: null
-    receipt_ids: [R-1, R-6, R-11, R-12]
   - label: Airlock (token owner)
     role: other
     address:

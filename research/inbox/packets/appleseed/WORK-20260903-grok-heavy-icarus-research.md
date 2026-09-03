@@ -25,6 +25,11 @@ identity:
   official_handle: "NULL — launch socials twitter is a tweet URL not a profile; DexScreener socials is another tweet URL; X user search returned unrelated handles; flag unconfirmed-official | third-party-link"
   repository: "NULL — no GitHub org or repository URL on DexScreener, Gecko, Blockscout, or X search this pass"
   possible_matches:
+    - slug: ap
+      signals: [shared-address]
+      contrary_signals:
+        - "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9 is the Apple • Robinhood Token the pair is quoted in; it is the census AP row, not a contract this name deployed"
+        - "John Appleseed is the token launched against that quote asset; the two share no handle or domain"
     - slug: pons
       signals: [other]
       contrary_signals:
@@ -124,19 +129,6 @@ deployments:
       exists_on_4663: true
       explorer_source_verified: true
     receipt_ids: [R-1]
-  - label: Apple • Robinhood Token (pair quote rail)
-    role: token
-    address:
-      value: "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
-      chain: robinhood-chain
-      source: explorer
-      seen: 2026-09-03T05:12:00Z
-      exists_on_4663: true
-      explorer_source_verified: true
-      explorer_source_verification_scope: proxy-shell-only
-      implementation_source_verified: null
-    receipt_ids: [R-7, R-12, R-17]
-
 metrics:
   - { kind: volume_24h, value: 599435.79, currency: USD, as_of: 2026-09-03T05:08:32Z, window: 24h, method: "api.dexscreener.com/latest/dex/tokens/0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3 pair 0x67bc6687…fc46 Appleseed/AAPL Uniswap v4 volume.h24", class: claim, receipt_ids: [R-7] }
   - { kind: tvl, value: 12038.09, currency: USD, as_of: 2026-09-03T05:08:32Z, window: point, method: "api.dexscreener.com/latest/dex/tokens/0xF8b22322…B0e3 pair 0x67bc6687…fc46 liquidity.usd", class: claim, receipt_ids: [R-7] }
