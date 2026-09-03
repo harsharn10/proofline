@@ -20,7 +20,50 @@ why. It never guesses and never turns an unavailable read into zero.
 | `metrics[]` TVL | `https://api.llama.fi/protocol/<protocol>` Robinhood Chain slice | Every pull (6 h) |
 | `metrics[]` fees, revenue and volume | `https://api.llama.fi/summary/fees/<protocol>?dataType=dailyFees`, `dailyRevenue`, and `/summary/dexs/<protocol>?dataType=dailyVolume`, Robinhood Chain slice | Every pull (6 h) |
 | `series/<slug>.json.revenue_daily` | DefiLlama daily-revenue response above, Robinhood Chain slice, latest 90 daily points | Every pull (6 h), rewritten only when the read is at least as long |
+| `chain.yaml`, `series/chain.json` | `https://analytics.rialto.xyz/api/stats/{tvl,onchain-economics,metrics,tokenization,transfers,mintburn}/…` | Every pull (6 h); series never shorten |
+| `market.rialto`, `market.pair_asset`, `market.volume_disagreement` | `https://analytics.rialto.xyz/api/router/{tickers,tokens}`, `/api/market/robinhood-symbols`, `/api/stats/assets/explorer`, `/api/liquidity/spreads` | Every pull (6 h) |
+| `discovery.yaml` | Rialto router tokens and tickers plus the asset explorer; optional DexScreener liquidity for at most 40 newest candidates | Every pull (6 h) |
 | `history/<slug>.jsonl` | Snapshot of that pull: holders, market figures, transactions, launches, TVL, `revenue_24h`, `top10_share` | One append per successful pull (6 h) |
+
+## Rialto Analytics
+
+Rialto Analytics is the chain-wide cross-check. Its keyless API rejects bare clients, so every call
+sends `Accept: application/json, text/plain, */*`, `Accept-Language`, a desktop Chrome user agent and
+a `Referer` for the matching public tab (`/markets`, `/tvl`, `/onchain-economics`, `/tokenization`,
+`/transfers` or `/liquidity`). `scripts/lib/pull/rialto.mjs` caches by full URL within a run and the
+runner gives the host its own one-request-per-second pacer. A failed endpoint leaves nullable fields
+and a named `errors[]` entry; it does not stop other Rialto blocks or per-name pulls.
+
+The readers cover:
+
+- router tickers and tokens; the paged tokenized-asset explorer; Robinhood symbols;
+- TVL KPIs, current category and protocol slices, and both 3-month daily series;
+- on-chain economics KPIs and daily metrics;
+- chain activity overview, top assets and daily volume by asset;
+- tokenization totals and series, transfer headlines, mint/burn totals and liquidity spreads.
+
+`content/pulled/chain.yaml` keeps the current chain TVL, economics, activity, tokenization, transfer
+and mint/burn blocks. Activity stores the latest day plus the explicit 7-day and 30-day sums.
+`content/pulled/series/chain.json` keeps up to 90 days of TVL by category, volume, active wallets and
+fee revenue. Each series is protected separately: an empty or shorter response keeps the longer
+committed series and records that decision on the related chain block.
+
+For a located token, a Rialto ticker matches only by base or target contract address, ignoring case.
+Ticker volume becomes USD only when the other side is a router token marked `stable`, or ETH/WETH
+with a price returned by Rialto's liquidity endpoint. Other quote assets stay null. When both Rialto
+and DexScreener produce USD 24-hour volume and the larger is more than twice the smaller,
+`market.volume_disagreement` preserves both figures; the site says “sources disagree” and does not
+silently choose one. Stock-paired and RWA names may also receive the tokenized pair asset from the
+official symbol list plus the asset explorer.
+
+`content/pulled/discovery.yaml` joins all router tokens, ticker legs and asset-explorer rows by
+address, then removes census deployments, Robinhood stocks and ETFs, and stablecoins. It preserves
+`first_seen`; the newest candidates come first. Only the newest 40 receive a DexScreener liquidity
+read per run, which bounds the discovery pass.
+
+The puller deliberately does **not** request Rialto's large-transfer firehose or publish wallet-level
+feeds, wallet labels or named-wallet movements. Aggregate active-wallet and transfer counts are the
+only wallet-related figures retained.
 
 ## Concentration: what counts as a holder
 

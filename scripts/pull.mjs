@@ -46,7 +46,15 @@ import {
   aggregateActivity,
   emptyActivity,
 } from "./lib/pull/activity.mjs";
-import { writePulled, createValidator, appendHistory, snapshotFrom } from "./lib/pull/write.mjs";
+import {
+  writePulled,
+  createValidator,
+  appendHistory,
+  snapshotFrom,
+  writeChainPulled,
+  writeChainSeries,
+  writeDiscovery,
+} from "./lib/pull/write.mjs";
 import {
   buildLaunchpadIndex,
   excludedHolderAddresses,
@@ -55,6 +63,15 @@ import {
 } from "./lib/pull/attribution.mjs";
 import { readTop10, readMintAndRenounce, readLpLocks } from "./lib/pull/token.mjs";
 import { writeSeries, seriesReplacement } from "./lib/pull/series.mjs";
+import {
+  createRialtoClient,
+  readRialto,
+  rialtoMarketFor,
+  volumeDisagreement,
+  pairAssetFor,
+  discoveryCandidates,
+  RIALTO_BASE,
+} from "./lib/pull/rialto.mjs";
 
 const CHAIN = "robinhood-chain";
 const CONCURRENCY = 4;
@@ -184,7 +201,7 @@ async function main() {
     const ledger = await readYaml(join("content/sources", `${row.slug}.yaml`)).catch(() => null);
     const hasLlama = Boolean(findLlamaSlug(ledger?.sources ?? []));
     if (addresses.length === 0 && !hasLlama) continue;
-    targets.push({ slug: row.slug, addresses, llamaSlug: hasLlama ? findLlamaSlug(ledger?.sources ?? []) : null });
+    targets.push({ slug: row.slug, addresses, project, census: row, llamaSlug: hasLlama ? findLlamaSlug(ledger?.sources ?? []) : null });
   }
   if (wanted) {
     const found = new Set(targets.map((target) => target.slug));
@@ -208,6 +225,47 @@ async function main() {
   const activityClient = createActivityClient({ deps });
   const validate = createValidator();
 
+  // Rialto is a chain-wide read: each endpoint is fetched once, cached for the run and paced at one
+  // request per second. It is completed before per-name writes so every name sees the same snapshot.
+  let rialto = null;
+  let discoveryCount = 0;
+  let rialtoFailure = null;
+  if (!args.rpcOnly) {
+    try {
+      const rialtoClient = createRialtoClient({ deps: { pace: createPacer(1000), attempts: 1 } });
+      rialto = await readRialto(rialtoClient, { pulledAt });
+      const chainSeries = await writeChainSeries(rialto.series, { dry: args.dry });
+      for (const kept of chainSeries.kept) {
+        rialto.chain[kept.key === "fee_revenue_daily" ? "economics" : kept.key === "tvl_by_category_daily" ? "tvl" : "activity"]
+          .errors.push({ step: kept.key, message: `read returned ${kept.incoming} points; kept ${kept.existing} committed points` });
+      }
+      await writeChainPulled(rialto.chain, { dry: args.dry });
+
+      const existingDiscovery = await readYaml("content/pulled/discovery.yaml").catch(() => ({ candidates: [] }));
+      const candidates = discoveryCandidates({
+        reference: rialto.reference,
+        census,
+        projects,
+        existing: existingDiscovery?.candidates ?? [],
+        pulledAt,
+      });
+      const discoveryErrors = [...rialto.errors];
+      // Newest candidates lead and at most forty receive the optional DexScreener depth check.
+      for (const candidate of candidates.slice(0, 40)) {
+        const result = await readMarket(dexscreener, candidate.address, { pulledAt });
+        candidate.dexscreener_liquidity_usd = result.liquidity_usd;
+        for (const error of result.errors) {
+          discoveryErrors.push({ step: "dexscreener", message: `${candidate.address}: ${error.message}` });
+        }
+      }
+      await writeDiscovery({ pulled_at: pulledAt, candidates, errors: discoveryErrors }, { dry: args.dry });
+      discoveryCount = candidates.length;
+    } catch (error) {
+      rialtoFailure = error instanceof Error ? error.message : String(error);
+      console.error(`Rialto outputs not written: ${rialtoFailure}`);
+    }
+  }
+
   let blockNumber = null;
   const runErrors = [];
   try {
@@ -220,6 +278,7 @@ async function main() {
   console.log(
     `pull ${targets.length} slugs · rpc ${RPC_URL}` +
       `${args.rpcOnly ? " · blockscout and dexscreener skipped (--rpc-only)" : ` · blockscout ${BLOCKSCOUT_BASE} · dexscreener ${DEXSCREENER_BASE}`}` +
+      `${args.rpcOnly ? "" : ` · rialto ${RIALTO_BASE}${rialto ? ` · ${discoveryCount} discovery candidates` : " unavailable"}`}` +
       `${blockNumber ? ` · head ${blockNumber}` : ""}${args.dry ? " · dry run" : ""}`,
   );
 
@@ -227,6 +286,7 @@ async function main() {
     addresses: 0, owners: 0, safes: 0, proxies: 0, holders: 0, metrics: 0,
     pairs: 0, markets: 0, top10: 0, top10ExPools: 0, launchpads: 0, mint: 0, renounced: 0,
     lp: 0, revenue24h: 0, revenueSeries: 0, seriesKept: 0, txns24h: 0, launches24h: 0, capped: 0,
+    rialto: 0, pairAssets: 0, disagreements: 0,
     errors: 0, files: 0, snapshots: 0,
   };
   const failures = [];
@@ -287,6 +347,21 @@ async function main() {
           market.errors.push({ step: "launchpad", message: `creator ${creator} did not match a launchpad factory, curve or known launcher deployer` });
         }
         market = { ...market, ...top10, launchpad, errors: [...market.errors, ...top10.errors] };
+
+        if (rialto) {
+          const rialtoMarket = rialtoMarketFor(tokenAddress, rialto.reference, { asOf: pulledAt });
+          market.rialto = rialtoMarket;
+          market.volume_disagreement = volumeDisagreement(market.volume_h24, rialtoMarket?.volume_24h_usd ?? null);
+          market.pair_asset = pairAssetFor(target.project, target.census, market, rialtoMarket, rialto.reference);
+          for (const error of rialto.errors) {
+            market.errors.push({ step: "rialto", message: `${error.step}: ${error.message}` });
+          }
+        } else {
+          market.rialto = null;
+          market.pair_asset = null;
+          market.volume_disagreement = null;
+          if (rialtoFailure) market.errors.push({ step: "rialto", message: rialtoFailure });
+        }
 
         const tokenRow = addresses.find((row) => row.address.toLowerCase() === tokenAddress.toLowerCase());
         const ownership = await readMintAndRenounce(blockscout, tokenAddress, tokenRow?.owner ?? null);
@@ -367,6 +442,9 @@ async function main() {
       totals.pairs += market.pairs.length;
       if (market.pairs.length > 0) totals.markets++;
       else if (tokenAddress) noPairs.push({ slug: target.slug, address: tokenAddress });
+      if (market.rialto) totals.rialto++;
+      if (market.pair_asset) totals.pairAssets++;
+      if (market.volume_disagreement) totals.disagreements++;
       marketRows.push({
         slug: target.slug,
         pairs: market.pairs.length,
@@ -400,14 +478,16 @@ async function main() {
       `${totals.owners} owners · ${totals.safes} safes · ${totals.proxies} proxies · ` +
       `${totals.holders} holder counts · ${totals.metrics} metrics · ${totals.markets} markets · ` +
       `${totals.pairs} pairs · ${totals.txns24h} txns/24h · ${totals.launches24h} launches/24h · ` +
-      `${totals.errors} errors · ${seconds}s`,
+      `${totals.rialto} Rialto matches · ${totals.pairAssets} pair assets · ${totals.disagreements} volume disagreements · ` +
+      `${discoveryCount} discovery candidates · ${totals.errors} errors · ${seconds}s`,
   );
   console.log(
     `coverage of ${targets.length} located names · top10 ${totals.top10}/${targets.length} · ` +
       `top10 ex pools ${totals.top10ExPools}/${targets.length} · launchpad ${totals.launchpads}/${targets.length} · ` +
       `mint ${totals.mint}/${targets.length} · renounced ${totals.renounced}/${targets.length} · ` +
       `LP reads ${totals.lp} · revenue 24h ${totals.revenue24h}/${targets.length} · ` +
-      `revenue series ${totals.revenueSeries}/${targets.length} · ${totals.seriesKept} series kept`,
+      `revenue series ${totals.revenueSeries}/${targets.length} · ${totals.seriesKept} series kept · ` +
+      `Rialto ${totals.rialto}/${targets.length} · pair asset ${totals.pairAssets}/${targets.length}`,
   );
   for (const f of safeThresholdOne) {
     console.log(`1-of-${f.signers ?? "?"} Safe owns ${f.slug} ${f.address} (owner ${f.owner})`);
