@@ -333,7 +333,7 @@ gaps:
 
 A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 pool quoted against RDDT, the Reddit Robinhood Stock Token at 0x05b37F…F4C. Traders buy and sell WOJAK on that book. It is not the RDDT stock token, not in-flight KARMA (Pons Reddit Founder Cat at 0xb1B800…baC3), and not the older Wojak LaunchToken at 0xaCE55…3c6f.
 
-Themes: memecoin, stock-paired:RDDT, LONG pad
+Themes: memecoin, stock-paired:RDDT
 
 ## Why it matters
 

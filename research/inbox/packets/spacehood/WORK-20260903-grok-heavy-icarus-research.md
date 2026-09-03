@@ -307,7 +307,7 @@ gaps:
 
 A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 pool quoted against SPCX, the SpaceX Robinhood Stock Token at 0x4a0E…5eEa. Traders buy and sell SPACEHOOD on that book. It is not the SPCX stock token and is not DOGE-1, a separate SPCX-quoted token.
 
-Themes: memecoin, stock-paired:SPCX, LONG pad
+Themes: memecoin, stock-paired:SPCX
 
 ## Why it matters
 

@@ -325,7 +325,7 @@ gaps:
 
 A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 pool quoted against TSLA, the Tesla Robinhood Stock Token at 0x322F…3b2d. Traders buy and sell Optimus Hood (OPTIMUS) on that book. TSLA is the rail. This token is not the Tesla stock token, not packed doggie, not DOGECOIN/TSLA, and not LONGDOG/TSLA.
 
-Themes: memecoin, stock-paired:TSLA, LONG pad
+Themes: memecoin, stock-paired:TSLA
 
 ## Why it matters
 

@@ -272,7 +272,7 @@ gaps:
 
 Kipseli is a proprietary AMM. On Robinhood Chain a swap approves the PropAmm router, takes a signed quote, and settles against inventory in a reserve wallet quoted in USDG. There is no public bonding curve and no LP token. Docs also list Base and BNB Chain. The site is kipseli.capital. No official X handle was located.
 
-Themes: proprietary AMM
+Themes: amm, orderbook, prop-amm
 
 ## Why it matters
 

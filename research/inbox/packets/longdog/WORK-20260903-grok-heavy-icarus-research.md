@@ -322,7 +322,7 @@ gaps:
 
 A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 pool quoted against TSLA, the Tesla Robinhood Stock Token at 0x322F…3b2d. Traders buy and sell LONGDOG on that book. TSLA is the rail. This token is not the Tesla stock token, not census LONG, not packed doggie, not packed OPTIMUS, and not in-flight DOGECOIN/TSLA.
 
-Themes: memecoin, stock-paired:TSLA, dog, LONG pad
+Themes: memecoin, stock-paired:TSLA, dog
 
 ## Why it matters
 

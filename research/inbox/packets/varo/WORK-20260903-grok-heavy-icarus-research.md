@@ -222,6 +222,8 @@ gaps:
 
 Varo is a Robinhood Chain token launchpad by Rialto. One transaction mints a fixed-supply ERC-20 into a locked Uniswap v3 1% pool quoted in WETH, USDG or a liquid Robinhood stock token, with no bonding curve and no graduation step. The pool fee is 1%; after 29 Jul 2026 new launches send 20% of that fee to the protocol and 80% to creators.
 
+Themes: launchpad, amm, stock-paired
+
 ## Why it matters
 
 It is a live Uniswap v3 instant pad on chain 4663 with a reproduced factory, a first-party JS constant for that factory, and an OKX Dune lifetime DEX volume of $109.92M. The name is not in the 49-row census. Rialto already sits as a prop-AMM dependency card; Varo is the issuance product on a rialto.xyz subdomain.
