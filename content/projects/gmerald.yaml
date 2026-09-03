@@ -1,0 +1,124 @@
+slug: gmerald
+name: GMERALD
+symbol: GMERALD
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply Pons v2 ERC-20 that graduated into a Uniswap v4 GMERALD/GME pool. Traders buy and sell GMERALD against the GameStop • Robinhood Token on that book. GME is the quote rail, not this profile. No official site or handle was confirmed this pass.
+themes:
+  - memecoin
+  - stock-paired:gme
+  - rwa
+  - launchpad
+official_links:
+  - kind: site
+    url: https://www.gmerald.xyz/
+  - kind: x
+    url: https://x.com/gmeraldexe
+  - kind: telegram
+    url: https://t.me/GMERALDportal
+dependencies: []
+deployments:
+  - label: GMERALD token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0x3E4E7bbee9A7e5fBEdABeEa66313C8f636999458"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: PonsV2LaunchDeployer (token creator)
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S5
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S10
+  - label: PonsV2BondingCurve
+    chain: robinhood-chain
+    address: "0xd08Da39D027a7Cd12E1EAE45F72D15585034DC15"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S12
+      - S14
+  - label: PonsV2LaunchAndBuy (create tx to)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S4
+      - S11
+  - label: GME Stock Token (pair quote / factory pairToken)
+    chain: robinhood-chain
+    address: "0x1b0E319c6A659F002271B69dB8A7df2F911c153E"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S13
+metrics:
+  - kind: volume_24h
+    value: 2297336.16
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 102954.42
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 1106505
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 802
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl-source/factory/curve/GME/KITTY and both launch and CurveCompleted txs, RPC name/symbol/deployer/launchFactory/curve, DexScreener token, and one Gecko pool GET were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8] - Numbers: 2297336.16 is the Gecko GME/GMERALD pool 24h volume. Reserve 102954.42 is that pool. DexScreener 2178463.68 / 85277.92 is the same pair, different aggregator. Gecko pool fdv 1946574.29 is not the DexScreener token fdv 1106505. [claim R-7 R-8] - Adversarial: the strongest contrary reading is that GMERALD is KITTY or the official GME product. KITTY is 0x96F10D7A…9aB4 named Roaring Kitty. GME 0x1b0E…153E is the pair rail named GameStop • Robinhood Token. This token is PonsV2LauncherToken 0x3E4E7bbe…9458."
+      class: inference
+      sources:
+        - S1
+        - S9
+        - S13
+    - text: Quote token GME 0x1b0E…153E is a Robinhood Token rail; workbook and dossier GME addresses differ (0x1b0E…153E vs 0xD1C418…1379). [verified R-13] - Pool USD reserve is GMERALD plus GME, not a USDG or WETH backstop. [claim R-7 R-8] - No official handle or domain confirmed this pass; DexScreener site/socials are unconfirmed-official. [claim R-7] - Same ticker on other robinhood CAs and on Solana. Distinct from KITTY/GME. [claim R-7 R-9] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x3E4E7bbe…9458? Next: open gmerald.xyz and the @gmeraldexe profile for a CA cross-link; re-read DexScreener after a Claim Profile"
+    - text: "Why is live totalSupply 885124129620127602499036807 versus constructor supply_ 1e27? Next: sum Burn logs / Transfer-to-zero on Blockscout and compare to 1e27 minus live totalSupply"
+    - text: "Are the other robinhood Gmerald tickers (0x785Dcc33…, 0x83509E45…, 0xEc5C958e…) related deployers or copy tickers? Next: one Blockscout name/creator pass on those three CAs"
+    - text: "Which window printed the assignment lead of ~$58,206 liq / ~$2,077,175 vol? Next: keep the DexScreener GMERALD/GME pair slice; do not use Gecko pool fdv_usd 1.95M as GMERALD fdv"
+  unresolved: []

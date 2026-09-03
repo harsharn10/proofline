@@ -1,0 +1,131 @@
+slug: clippy
+name: CLIPPY
+symbol: CLIPPY
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against MSFT. LongLauncher deploys Clippy (CLIPPY) in one create call and seeds the CLIPPY/MSFT book. Traders buy and sell CLIPPY on Uniswap v4. Official site clippyrh.com and handle @ClippyMSFT both embed CA 0x85856…1E18 this pass.
+themes:
+  - memecoin
+  - stock-paired:msft
+  - rwa
+official_links:
+  - kind: site
+    url: https://clippyrh.com
+  - kind: x
+    url: https://x.com/ClippyMSFT
+  - kind: app
+    url: https://app.long.xyz/tokens/0x85856F025BF13b8Fd2aaE2F6DA458318744F1E18
+dependencies: []
+deployments:
+  - label: CLIPPY token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x85856F025BF13b8Fd2aaE2F6DA458318744F1E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S3
+      - S5
+  - label: LongLauncher (create target)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S18
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S18
+  - label: DopplerHookInitializer
+    chain: robinhood-chain
+    address: "0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544"
+    role: other
+    verified: false
+    sources:
+      - S18
+      - S21
+  - label: MSFT Microsoft Robinhood Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S17
+metrics:
+  - kind: volume_24h
+    value: 955075.56
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 598073.91
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 1969098.93
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 2260
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/MSFT/Airlock/hook and the create tx plus logs, RPC name/symbol/owner/eth_getCode, DexScreener token and search, Gecko pool/token (HTTP 200 first try), /rhj/assets, clippyrh.com data.js, @ClippyMSFT, @BlockCap, and the netlify claim posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12 R-19] - Numbers: 955075.56 is the Gecko CLIPPY/MSFT pool 24h volume, not the 1436380.83 token all-pools figure. Reserve 598073.91 is that pool. DexScreener 976823.32 / 431378.9 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that CLIPPY is an official Microsoft or Robinhood product, or that MSFT 0xe932…2e74 is this subject. /rhj/assets names Microsoft • Robinhood Token at that address as a Stock Token; LongLauncher minted CLIPPY as a separate asset; clippyrh.com and @ClippyMSFT are community surfaces for the graduation token."
+      class: inference
+      sources:
+        - S12
+        - S17
+        - S19
+    - text: Quote token MSFT 0xe932…2e74 is the Microsoft Robinhood Token rail in GET /rhj/assets; it is not this subject. [verified R-12 R-17] - Pool USD reserve is CLIPPY plus MSFT, not a USDG or WETH backstop. Gecko reserve and DexScreener liquidity already disagree. [claim R-7 R-8] - Ticker collision with other robinhood CLIPPY CAs and Solana CLIPPY. [claim R-15] - Netlify claim URLs embedding this CA are copypasta-pattern. [claim R-20] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is 0xEDeA…eDa8 the LONG protocol fee split (OOF Lock used 0x21E2…7A66 at 5%), and does verified DopplerHookInitializer source leave other privileged paths? Next: read DopplerHookInitializer and LongLauncher fee-split in verified source on Blockscout; compare 5% beneficiary across LONG launches"
+    - text: "Which other robinhood CLIPPY tickers stay live besides 0x85856…1E18, and does any later packet try to merge them? Next: keep CAs separate; re-run search if a second CLIPPY/MSFT book crosses the liquidity bar"
+    - text: "Why does Gecko CLIPPY/MSFT reserve_in_usd 598073.91 diverge from DexScreener liquidity.usd 431378.9 on the same pool? Next: re-read both aggregators on the same pool id and note which side of the MSFT book each counts"
+    - text: "Do the netlify.app/claim URLs that embed CA 0x85856…1E18 persist, and does @ClippyMSFT or clippyrh.com ever link them? Next: flag copypasta-pattern only; do not treat as official"
+  unresolved: []

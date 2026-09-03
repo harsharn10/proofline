@@ -1,0 +1,172 @@
+slug: giga
+name: GIGA
+symbol: GIGA
+category: Native AMM
+lifecycle: mainnet
+coverage: stub
+summary: GIGA DEX is a native AMM on Robinhood Chain. Classic pools are a Uniswap v2 fork. Concentrated pools are a PancakeSwap v3 / Uniswap v3 fork. Liquidity incentives rebalance hourly toward gauged pools by rolling revenue; veGIGA is a six-month lock. The token is GIGA (1B minted at genesis). The handle is @giga_dex; the site is gigadex.fi.
+themes:
+  - amm
+official_links:
+  - kind: app
+    url: https://www.gigadex.fi/
+  - kind: docs
+    url: https://docs.gigadex.fi
+  - kind: x
+    url: https://x.com/giga_dex
+  - kind: other
+    url: https://docs.gigadex.fi/security/contracts
+dependencies: []
+deployments:
+  - label: Concentrated-liquidity factory
+    chain: robinhood-chain
+    address: "0xEce6eCd61177336ea6Fb9b17937AC439D85EE20B"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S13
+      - S14
+  - label: Classic factory
+    chain: robinhood-chain
+    address: "0x6Fdf38f92eAd1adFc04B73aaa947ab254f6c0916"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S15
+      - S16
+  - label: GIGA ERC-20
+    chain: robinhood-chain
+    address: "0x5BaaeC1B70864f01dbdb747358FF59F2E2cCF7D5"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S10
+      - S17
+  - label: Controller proxy
+    chain: robinhood-chain
+    address: "0x4a9cEF841098A0D84E5A8D5882AA1E120e89163D"
+    role: proxy
+    verified: false
+    sources:
+      - S3
+      - S13
+      - S18
+  - label: Controller implementation
+    chain: robinhood-chain
+    address: "0x0D47f2f6DC4D5Bc56b0446Ea678EAc6433944A48"
+    role: implementation
+    verified: false
+    sources:
+      - S13
+      - S18
+  - label: veGIGA ERC-721 proxy
+    chain: robinhood-chain
+    address: "0x307Cb092543dA544f5381f66ac13aA84ca4C26E8"
+    role: token
+    verified: false
+    sources:
+      - S3
+      - S13
+      - S27
+  - label: Emission center
+    chain: robinhood-chain
+    address: "0xbfc240b3eb8C700508447b62fD793Bf4dB364783"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S13
+      - S18
+  - label: Controller ProxyAdmin
+    chain: robinhood-chain
+    address: "0x237e0396f96142e88d9966d25273af041ec181af"
+    role: admin
+    verified: false
+    sources:
+      - S13
+      - S28
+  - label: Upgrade Safe (ProxyAdmin owner)
+    chain: robinhood-chain
+    address: "0x72f4DF3580935c179E2eC61c04122731E7fcd4A6"
+    role: multisig
+    verified: false
+    sources:
+      - S13
+      - S29
+  - label: Factory deployer EOA
+    chain: robinhood-chain
+    address: "0x5F378c7C4D33e43eD3eA573A2b0a6ba8a688AD40"
+    role: other
+    verified: false
+    sources:
+      - S14
+      - S16
+      - S29
+metrics:
+  - kind: tvl
+    value: 315041.13158
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S21
+  - kind: volume_24h
+    value: 37216490
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S20
+  - kind: fees_24h
+    value: 20980
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S22
+  - kind: revenue_24h
+    value: 4194
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S23
+  - kind: holders
+    value: 329
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: gigadex.fi, docs pages, X profile and posts, Llama protocol/fees/dexs/parent, GeckoTerminal first GET, GitHub, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-3 R-13 R-19] - Numbers: TVL, volume, and fees are the Robinhood Chain slice from api.llama.fi, not an all-chains total. Bytecode lengths, owner(), allPairsLength, Safe threshold, and token supply are chain 4663 RPC. Holders_count is Blockscout. [verified R-13 R-17 R-19] - Adversarial: strongest contrary reading is that 0xEce6eCd6…e20B is an unrelated PancakeSwap clone and Llama TVL is Uniswap, or that this is a packed pad. Docs set CL factory and Classic factory to these addresses; RPC owner() on the CL factory is the documented Controller; Blockscout names CLFactory and ClassicFactory. Census AMMs and packed pads do not share the domain, handle, or factory."
+      class: inference
+      sources:
+        - S3
+        - S13
+        - S14
+    - text: Protocol proxies are upgradeable; upgrade admin is a 2-of-3 Safe with no timelock located. [verified R-13 R-29] - Controller implementation source is not verified on Blockscout this pass, against docs that say every contract is verified. [verified R-18] [claim R-3] - No published audit report for the Genesis custom code. [unknown] - Llama giga-v3 description is TIA bonding-curve copypasta and is not this product. [disputed R-19] - Solana GIGA ticker collision in Gecko search. [claim R-25] - Handle 1 Sep TVL (2M) and Llama V3 slice (1.50M) differ in window and scope.
+      class: claim
+      sources:
+        - S12
+        - S19
+  missing:
+    - text: "What is the source name of controller implementation 0x0d47f2f6…4a48, and does it match the docs controller? Next: read verified source if it lands; until then treat the proxy as shell-only for custom logic"
+    - text: "Is there a published audit whose scope matches the Genesis controller, emission center, vault, and veGIGA? Next: record the report URL and exact scope when it appears"
+    - text: "Does the 2-of-3 Safe sit behind a timelock on any chain, and which owner keys are hardware vs EOA? Next: eth_getCode on the other two Safe owners; record any timelock if one is introduced"
+    - text: "Which GitHub org, if any, holds the ApexToken / CLFactory source that Blockscout verified? Next: search Blockscout source files for a repository URL once more contracts verify"
+    - text: "Are Llama giga-v3 adapter pool addresses exactly the docs CL factory, and can the TIA bonding-curve description be corrected? Next: open the adapter file when the path resolves; do not use the TIA sentence as product evidence"
+    - text: "What is circulating supply versus the 1B total, given Gecko market_cap_usd null and FDV ~22.9M? Next: do not file FDV as market cap; reproduce a circulating figure from a primary source"
+  unresolved:
+    - text: product.mechanism remains unresolved (CON-1).
+    - text: other remains unresolved (CON-2).

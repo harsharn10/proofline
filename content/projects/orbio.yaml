@@ -1,0 +1,115 @@
+slug: orbio
+name: Orbio.so
+symbol: ORBIO
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A Pons v2 launcher token on Robinhood Chain, quoted against NVIDIA • Robinhood Token (NVDA). PonsV2LaunchAndBuy created Orbio.so (ORBIO) at 0xAa07…28A3 on 2026-08-31; the live book is Uniswap v4 ORBIO/NVDA. orbio.so says each trade pays a 1.50% fee and half of collected fees becomes OpenRouter credits for wallets holding at least 1,000 ORBIO.
+themes:
+  - memecoin
+  - stock-paired:nvda
+official_links:
+  - kind: site
+    url: https://www.orbio.so
+  - kind: site
+    url: https://orbio.so
+  - kind: x
+    url: https://x.com/orbiodotso
+  - kind: other
+    url: https://www.orbio.so/build
+dependencies: []
+deployments:
+  - label: ORBIO token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0xAa07A0e9209e16aC99708C3EC70159c6eF3128A3"
+    role: token
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: false
+    sources:
+      - S5
+      - S8
+  - label: PonsV2LaunchDeployer (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S7
+  - label: PonsV2LaunchAndBuy (creation tx `to`)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S6
+  - label: PonsV2BondingCurve (token curve)
+    chain: robinhood-chain
+    address: "0x7DF21d1F9C75533E6F724dF5C93Cd6C567DaEC02"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S9
+metrics:
+  - kind: tvl
+    value: 197234.79
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S11
+  - kind: volume_24h
+    value: 3250816.84
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S13
+  - kind: market_cap
+    value: 4836157
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S11
+  - kind: holders
+    value: 2364
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S4
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: www.orbio.so, @orbiodotso profile and three posts, Blockscout token/factory/deployer/curve/source and launchAndBuy tx, RPC views, DexScreener ORBIO/AI/microduck token APIs, and the Gecko pool/token endpoints were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-3 R-6 R-11 R-12] - Numbers: $173,802.26 / $2,177,014.68 is the Gecko ORBIO/NVDA pool, not the $3,250,816.84 token all-pools figure. DexScreener $197,234.79 / $2,196,574.70 is the same pair. Holders 2364 is Blockscout, not an aggregator. [claim R-11 R-12 R-13 R-4] - Adversarial: the strongest contrary reading is that ORBIO is Artificial Inu or a LONG flagship because it quotes NVDA. The CA, PonsV2LaunchAndBuy creation tx, site, and handle are distinct from 0x2E8c…1e18 / LongLauncher / artificialinu.com."
+      class: inference
+      sources:
+        - S6
+        - S18
+    - text: Fee-to-credits path is a site ledger claim, not a function on the verified token. [claim R-1] [verified R-10] - ORBIO/NVDA liquidity is $173.8k on Gecko and $197.2k on DexScreener. [verified R-11 R-12] - Gecko total_supply 1B versus RPC/Blockscout 950M. [verified R-13 R-4 R-5] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does any on-chain hook, escrow, or fee splitter on the ORBIO/NVDA pool execute the site's 1.50% / 50% OpenRouter-credit split, or is the ledger off-chain? Next: read the Uniswap v4 hook on pool 0xa95b1fbd…ddc1 and any escrow address named after connecting a wallet on orbio.so"
+    - text: "Which transaction burned 50M ORBIO, and does it match totalSupply 950M vs the 1e27 mint? Next: Blockscout token transfers filtered for burn/0xdead from 2026-08-31T22:33Z"
+    - text: "Is there an audit whose scope includes PonsV2LauncherToken 0xAa07…28A3 or the live ORBIO/NVDA hook? Next: auditor report index if a later post names one"
+    - text: "Does the Build Week 8M ORBIO prize pool sit in a reproduced treasury or locker? Next: open /build and match a holder of 8M on Blockscout"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).
+    - text: economics.metric remains unresolved (CON-3).

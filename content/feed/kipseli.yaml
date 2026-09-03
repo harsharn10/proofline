@@ -1,0 +1,55 @@
+slug: kipseli
+items:
+  - id: 913bcaa0e692e5af
+    date: 2026-07-14
+    kind: onchain
+    title: "RPC: Robinhood PropAmm router has code and a Safe owner"
+    body: Router 0x4f1ce663…7402 is a 3402-byte unverified contract on chain 4663 created 2026-07-14. owner() is Safe 0x5053872f…1115. Matches docs Robinhood Chain Router (PropAmm).
+    sourceUrl: https://rpc.mainnet.chain.robinhood.com
+    sources:
+      - S4
+      - S5
+  - id: ecd3ed7a35da4e85
+    date: 2026-07-14
+    kind: onchain
+    title: Router transferOwnership to 1-of-3 Safe
+    body: On 2026-07-14 deployer 0xAEE25670…55b8D called 0xf2fde38b on the router with new owner 0x5053872f…1115. That Safe getThreshold() is 1.
+    sourceUrl: https://robinhoodchain.blockscout.com/api/v2/transactions/0x909e22a2ada3ab0476e0c5ebabe6242048b5ea13454b140d737aee77e0b14b1b
+    sources:
+      - S20
+      - S8
+  - id: e964d4f512332de5
+    date: 2026-09-01
+    kind: onchain
+    title: Router still emitting WETH/USDG logs on 2026-09-01
+    body: Latest sampled router log in tx 0x6c016e82…af4a14 at 2026-09-01T16:53:40Z via Multicall3, data includes WETH 0x0Bd7D308…AD73 and USDG 0x5fc5360d…d168.
+    sourceUrl: https://robinhoodchain.blockscout.com/api/v2/addresses/0x4f1ce663bF2E5e3b4A4ba88F6D1BF227e5597402/logs
+    sources:
+      - S21
+  - id: c40afd297568a415
+    date: 2026-04-22
+    kind: risk
+    title: 2026-04-22 Base quoting-path unit mismatch
+    body: Defimon Alerts and follow-up posts describe a Base Kipseli PropAMM path where a small WETH input received a large cbBTC output because a USDC-scale integer was transferred as cbBTC. Funds return and a bounty were reported. Base, not chain 4663.
+    account: "@DefimonAlerts"
+    sourceUrl: https://x.com/DefimonAlerts/status/2046873857571934254
+    sources:
+      - S14
+  - id: ed1423dc02a24e9f
+    date: 2026-08-06
+    kind: risk
+    title: 2026-08-06 Base PropAMMWrapper public-call incident
+    body: A 2026-08-06 post describes a Base incident in which a public PropAMMWrapper could be called to settle across tokens with broken unit accounting. Base wrapper, not the Robinhood router.
+    account: "@clarahacks"
+    sourceUrl: https://x.com/clarahacks/status/2085362681096146981
+    sources:
+      - S15
+  - id: f7b7dd1a6070991c
+    date: 2026-07-20
+    kind: ct
+    title: Exypnos lists kipseli as a Robinhood Chain liquidity source
+    body: On 2026-07-20 @exypnos_xyz posted that kipseli was among twelve new liquidity sources on its Robinhood Chain router.
+    account: "@exypnos_xyz"
+    sourceUrl: https://x.com/exypnos_xyz/status/2079143226385355245
+    sources:
+      - S13

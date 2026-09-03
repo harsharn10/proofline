@@ -1,0 +1,126 @@
+slug: doggie
+name: Doggie Mode
+symbol: DOGGIE
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A 1B-supply memecoin paired to tokenized Tesla on Robinhood Chain. LongLauncher minted DOGGIE as a DopplerERC20V1 clone into a Uniswap v4 DOGGIE/TSLA pool. Holders swap DOGGIE against TSLA. doggiemode.com and @DoggieMode publish the contract.
+themes:
+  - memecoin
+  - stock-paired:tsla
+  - dog
+  - rwa
+official_links:
+  - kind: site
+    url: https://doggiemode.com/
+  - kind: x
+    url: https://x.com/DoggieMode
+  - kind: telegram
+    url: https://t.me/DoggieModePortal
+  - kind: app
+    url: https://app.long.xyz/
+dependencies: []
+deployments:
+  - label: DOGGIE token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xa9eFe2Fc94dE79734C03051515F48f254Ce61e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S4
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S2
+      - S4
+      - S7
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S2
+      - S3
+      - S6
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S4
+      - S8
+  - label: Tesla • Robinhood Token (pair quote)
+    chain: robinhood-chain
+    address: "0x322F0929c4625eD5bAd873c95208D54E1c003b2d"
+    role: token
+    verified: false
+    sources:
+      - S1
+      - S3
+      - S9
+      - S20
+metrics:
+  - kind: volume_24h
+    value: 1043346
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S10
+  - kind: tvl
+    value: 531673.15
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S10
+  - kind: market_cap
+    value: 3302094.98
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S11
+  - kind: holders
+    value: 1405
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: doggiemode.com, Blockscout token/create/LongLauncher/factory/impl/Airlock/TSLA, RPC, DexScreener, Gecko pool/token/info, /rhj/assets, CMC, @DoggieMode profile and three posts, @NovaFox, and Telegram preview were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-2 R-4 R-11] - Numbers: 1039630.54 is the Gecko DOGGIE/TSLA pool 24h volume, not the 1109367.23 token all-pools figure. Reserve 540680.98 is that pool. DexScreener 1043346 / 531673.15 is the same pair, different aggregator. Holders 1405 is Blockscout. [claim R-10 R-11 R-12] - Adversarial: the strongest contrary reading is that DOGGIE is a Bankr factory token or that the TSLA quote is not a Robinhood Stock Token. The create tx is LongLauncher.create; GET /rhj/assets lists TSLA 0x322F…3b2d."
+      class: inference
+      sources:
+        - S3
+        - S20
+    - text: Quote token TSLA is a Robinhood Stock Token; pool USD reserve is DOGGIE plus TSLA. [verified R-9 R-11 R-20] - owner() is Airlock; remaining token privileges were not read in source this pass. [verified R-4 R-8] - Gecko dex label bankr-robinhood does not match the LongLauncher create tx. [verified R-3 R-11] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does Airlock 0xeb7C…0862 hold remaining privileged paths on the DopplerERC20V1 clone (mint, pause, upgrade of the implementation)? Next: read DopplerERC20V1 verified source for mint/burn/pause and Airlock exit liquidity on the TSLA pool"
+    - text: "Why does Gecko label the DOGGIE/TSLA pool dex as bankr-robinhood while the create tx is LongLauncher and DexScreener/CMC say Uniswap v4? Next: compare the pool manager / hook address in the create calldata to Bankr vs LONG Doppler deployments"
+    - text: "Is there an audit whose scope includes DopplerERC20V1 as deployed at 0x3Be8…C599? Next: LONG litepaper / Doppler docs if they name an auditor"
+    - text: "Does the @DoggieMode profile website field list doggiemode.com, or is the reverse link only the 28 Aug post? Next: open the profile website field on x.com/DoggieMode"
+  unresolved: []

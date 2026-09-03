@@ -1,0 +1,108 @@
+slug: op
+name: OP
+symbol: OP
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched on a Pons v2 bonding curve and graduated into a Uniswap v4 pool quoted against SNDK. PonsV2LaunchAndBuy deploys Sandisk Optimus (OP) in one launchAndBuy call, seeds the curve against SNDK, then a later createGraduatedPool locks the OP/SNDK book. Traders buy and sell OP on Uniswap v4. SNDK is a Robinhood Stock Token rail. Distinct from packed CACHE/SNDK and from HDD/SNDK. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:sndk
+  - rwa
+  - graduation
+official_links:
+  - kind: site
+    url: https://www.sandisk.com/en-gb/campaigns/op
+  - kind: x
+    url: https://x.com/sandiskoptimus
+dependencies: []
+deployments:
+  - label: OP token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S20
+  - label: PonsV2LaunchFactory
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S15
+  - label: V2LaunchLocker (locked graduation position)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S19
+  - label: SNDK quote (pairToken / Robinhood Stock Token rail)
+    chain: robinhood-chain
+    address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+    role: token
+    verified: true
+    sources:
+      - S3
+      - S10
+      - S14
+metrics:
+  - kind: volume_24h
+    value: 492866.749174159
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: tvl
+    value: 38151.4449
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 218253
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 477
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/locker/SNDK and both launch/grad txs, RPC name/symbol/deployer/launchFactory/isLocked/getLaunchedToken, DexScreener, Gecko pool/token (first GET 200), /rhj/assets, Sandisk campaign HTML, @sandiskoptimus, @redemptionarcc, and the launch-params tweet were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-3 R-7 R-10] - Numbers: 515331.69 is the DexScreener OP/SNDK 24h volume. Gecko pool 490339.59 is that pool. Gecko token 492866.75 is all-pools. Reserve 38151.44 is the Gecko pool; DexScreener liquidity.usd 43031.71 is the same pair, different aggregator. Gecko pool fdv 1.71M is not OP fdv. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that OP is an official Sandisk product because DexScreener websites sandisk.com and socials @sandiskoptimus. The campaign HTML has no CA, Latest posts have no CA, and the token is a Pons v2 launchAndBuy from EOA 0x7CE3…6aB."
+      class: inference
+      sources:
+        - S5
+        - S12
+        - S13
+    - text: Quote token SNDK 0xB90A…6400 is a Robinhood Stock Token rail in GET /rhj/assets; OP is not that rail. [verified R-10 R-14] - Pool USD reserve is OP plus SNDK, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko pool fdv_usd is SNDK-as-base, not OP fdv. [verified R-8 R-9] - No official handle or domain this pass; Sandisk campaign and @sandiskoptimus are third-party-link / unconfirmed-official. [claim R-7 R-12 R-13] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0xF25C…3214? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle"
+    - text: "Should Gecko pool fdv_usd 1.71M be treated as OP fdv or as SNDK-as-base on a pool named SNDK / OP? Next: keep using DexScreener / Gecko token fdv for OP; do not promote pool fdv as OP market cap"
+    - text: "Does @sandiskoptimus later embed CA 0xF25C…3214 or a Robinhood pair link? Next: re-read the profile and any pinned post"
+    - text: "What is creatorFeeRecipient 0xcF96…2d1E (eip1967_beacon, unverified)? Next: eth_getCode and implementation on that beacon if a follow-up pass is assigned"
+    - text: "Does HDD/SNDK Hard Disk Dog 0xAE9b…1E18 share a Pons or LongLauncher path with OP? Next: Blockscout creator_address_hash on 0xAE9b…1E18 if an HDD packet is assigned"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

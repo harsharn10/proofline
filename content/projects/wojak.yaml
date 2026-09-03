@@ -1,0 +1,130 @@
+slug: wojak
+name: WOJAK
+symbol: WOJAK
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 pool quoted against RDDT, the Reddit Robinhood Stock Token at 0x05b37F…F4C. Traders buy and sell WOJAK on that book. It is not the RDDT stock token, not in-flight KARMA (Pons Reddit Founder Cat at 0xb1B800…baC3), and not the older Wojak LaunchToken at 0xaCE55…3c6f.
+themes:
+  - memecoin
+  - stock-paired:rddt
+official_links:
+  - kind: x
+    url: https://x.com/WojakLong
+  - kind: other
+    url: https://dexscreener.com/robinhood/0x85bbed65b8e20c2ccf52cec4dcd6aa42d904bc74868e85fd0700e34670b8ba70
+dependencies: []
+deployments:
+  - label: WOJAK token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x86d916F551b8E05240c1Eb14E65F733B6d181e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S3
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S3
+      - S10
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S12
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S11
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S3
+      - S13
+  - label: RDDT Stock Token (pair quote / create numeraire; rail, not this subject)
+    chain: robinhood-chain
+    address: "0x05b37Fb53A299a1b874A619e1c4C404D52C36F4C"
+    role: token
+    verified: true
+    sources:
+      - S3
+      - S9
+      - S14
+  - label: WOJAK ticker collision (Wojak / WETH LaunchToken, not this row)
+    chain: robinhood-chain
+    address: "0xaCE55FE98Bab14366dD49aB5AA5dF76aA11A3c6f"
+    role: token
+    verified: false
+    sources:
+      - S16
+      - S17
+metrics:
+  - kind: volume_24h
+    value: 299962.948475396
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 70823.0795
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 99027
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: holders
+    value: 149
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S19
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/Airlock/LongLauncher/RDDT/collision, create tx and logs, RPC name/symbol/owner/getCode, DexScreener tokens/v1 and latest/dex/tokens, Gecko search/pool/token/info (first GET 200), /rhj/assets, @WojakLong, and the netlify vote post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-3 R-6 R-7 R-9] - Numbers: 313168.01 is the DexScreener WOJAK/RDDT pool 24h volume, not Gecko 299962.95. Reserve 69943.17 is DexScreener; 70823.08 is Gecko that pool; 45269.51 is Gecko token all-pools. Holders 158 is Blockscout, not Gecko 149. [claim R-2 R-6 R-7 R-8 R-19] - Adversarial: the strongest contrary reading is that 0xaCE55…3c6f / @wojakrobinhood is the canonical Robinhood Wojak and this RDDT book is a copy, or that this row is in-flight KARMA because both pair to RDDT. Different CAs, pads (LongLauncher vs Pons vs LaunchToken), and quote assets argue against collapse."
+      class: inference
+      sources:
+        - S4
+        - S16
+        - S24
+    - text: Quote token RDDT 0x05b37F…F4C is a Robinhood Stock Token rail, not this subject. [verified R-9 R-14] - Pool USD reserve is WOJAK plus RDDT, not a USDG or WETH backstop. [claim R-6 R-7] - Same-ticker ca-collision with Wojak 0xaCE55…3c6f (WETH, wojakrobinhood.com) and Wojak in Hood 0xC1Ca…011c. [verified R-16 R-17 R-23] - Distinct from in-flight KARMA 0xb1B800…baC3 on the same RDDT rail. [verified R-24] - @WojakLong is unconfirmed-official; bio has no CA. [claim R-15 R-19] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @WojakLong or a LONG surface bidirectionally pin CA 0x86d916…1e18? Next: re-read DexScreener after a Claim Profile and any @longdotxyz post that tags @WojakLong with the CA"
+    - text: "Should aggregators keep 0xaCE55…3c6f (WETH, wojakrobinhood.com) as a separate Wojak row from this RDDT LongLauncher token? Next: keep ca-collision on this packet; do not merge handles @WojakLong and @wojakrobinhood"
+    - text: "Why does Gecko attribute Uniswap v4 pool 0x85bbed65…ba70 to dex id bankr-robinhood? Next: compare PoolManager hook 0x4e346895…a544 against Bankr launchType doppler rows"
+    - text: "Who can claim the 95% Lock beneficiary 0x0ec9…D9Da versus Airlock owner()? Next: eth_call the fee-claim path on verified DopplerHookInitializer / LongLauncher source"
+    - text: "Is there an audit whose scope includes DopplerERC20V1 as used by LongLauncher on 4663? Next: auditor report index for Doppler / long.xyz and a matching commit"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).
+    - text: economics.metric remains unresolved (CON-3).

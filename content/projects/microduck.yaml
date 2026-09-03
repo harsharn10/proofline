@@ -1,0 +1,119 @@
+slug: microduck
+name: microduck
+symbol: microduck
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A Pons v2 ERC-20 on Robinhood Chain. The launch minted a 1B-supply token onto a bonding curve quoted against tokenized NVDA, then graduated into a Uniswap v4 microduck/NVDA pool. Traders also use later microduck/USDG books. microduck.net and @MicroDuckNVDA publish the contract. The token is not Artificial Inu and is not the Pollen Robotics robot.
+themes:
+  - memecoin
+  - stock-paired:nvda
+official_links:
+  - kind: site
+    url: https://microduck.net
+  - kind: x
+    url: https://x.com/MicroDuckNVDA
+  - kind: app
+    url: https://www.ponsfamily.com/launchpad/0xD5f1afEA47b1A9eab414D2ee740cF1d6d039E725
+  - kind: other
+    url: https://pollen-robotics.com/microduck/
+dependencies: []
+deployments:
+  - label: microduck token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0xD5f1afEA47b1A9eab414D2ee740cF1d6d039E725"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S7
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S7
+      - S10
+      - S11
+  - label: Pons v2 bonding curve
+    chain: robinhood-chain
+    address: "0xAe10D785d2AF17cec895EFfE50685d1B113dc3a6"
+    role: other
+    verified: true
+    sources:
+      - S7
+      - S10
+      - S12
+  - label: NVDA quote (NVIDIA • Robinhood Token)
+    chain: robinhood-chain
+    address: "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    role: token
+    verified: false
+    sources:
+      - S8
+      - S10
+      - S13
+      - S14
+  - label: V2LaunchLocker (Gecko top holder)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S9
+      - S15
+metrics:
+  - kind: volume_24h
+    value: 1876306.79
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 520946.96
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 35791571.94
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: holders
+    value: 18856
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: microduck.net and shipped JS, @MicroDuckNVDA profile and two posts, lookalike profiles, Blockscout token/source/factory/curve/NVDA/locker, RPC, DexScreener, Gecko USDG pool HTML, Pons launchpad page, and GET /rhj/assets were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-9 R-14] - Numbers: 10461564.01 / 1116524.46 is the Gecko microduck/USDG 0.78% pool, not an all-pools figure. DexScreener 10492472.42 / 694395.16 is the same pair, different aggregator. NVDA book is a separate pool. [claim R-8 R-9] - Adversarial: the strongest contrary reading is that this token is Artificial Inu or an official NVIDIA / Hugging Face / Pollen product. Base address, factory, domain, and handle differ from $AI; GET /rhj/assets matches the NVDA quote only; the site states unofficial and not affiliated."
+      class: inference
+      sources:
+        - S2
+        - S8
+        - S14
+    - text: Gecko USDG reserve $1.12M versus DexScreener liquidity $694k on the same pool. [claim R-8 R-9] - X bio affiliation wording and site unofficial disclaimer do not match. [claim R-2 R-3] - Curve source is unverified; create tx was not recovered. [verified R-12] [unknown] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "What is the create/launchAndBuy transaction that deployed 0xD5f1…E725? Next: eth_getLogs TokenCreated / Launch on PonsV2LaunchFactory around 2026-08-27T11:48:43Z and match token 0xD5f1…E725"
+    - text: "Is the NVDA Uniswap v4 position locked in V2LaunchLocker 0x2674…4952, and does that locker hold the USDG 0.78% book? Next: read V2LaunchLocker verified source and match position tokenIds for poolId 0xcde4d35e…c370 and 0xa3318d6f…5aad"
+    - text: "Why do Gecko reserveInUsd 1116524.46 and DexScreener liquidity.usd 694395.16 disagree on the same USDG pool? Next: re-fetch both APIs in one minute and compare reserve vs liquidity methodology"
+    - text: "Is there an audit of PonsV2LauncherToken / this launch? Next: read Pons v2 docs security page and any auditor named there"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: communications.status remains unresolved (CON-2).

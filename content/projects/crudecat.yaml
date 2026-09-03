@@ -1,0 +1,126 @@
+slug: crudecat
+name: CRUDECAT
+symbol: CRUDECAT
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by the Circus stock-quoted launchpad and graduated into a Uniswap v3 CRUDECAT/USO book. Traders buy and sell Crude Cat (CRUDECAT) against the USO Stock Token rail. Site crudecat.xyz and @crudecatcoin publish the same CA. [R-1] [R-3] [R-5] [R-7] [R-8]
+themes:
+  - memecoin
+  - stock-paired:uso
+  - rwa
+  - graduation
+official_links:
+  - kind: site
+    url: https://www.crudecat.xyz/
+  - kind: x
+    url: https://x.com/crudecatcoin
+  - kind: telegram
+    url: https://t.me/crudecat
+  - kind: other
+    url: https://airdrop.crudecat.xyz/
+dependencies: []
+deployments:
+  - label: CRUDECAT token (CircusQuoteTokenV3)
+    chain: robinhood-chain
+    address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S3
+  - label: Circus launchpad (token launchpad())
+    chain: robinhood-chain
+    address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S13
+  - label: USO Stock Token rail (pair quote)
+    chain: robinhood-chain
+    address: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
+    role: token
+    verified: true
+    sources:
+      - S3
+      - S10
+      - S11
+  - label: Uniswap v3 CRUDECAT/USO 1% pool
+    chain: robinhood-chain
+    address: "0xc3a873867C79b234A5179BeC2899846376258BeD"
+    role: other
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S12
+      - S19
+  - label: CtoManager (token ctoManager)
+    chain: robinhood-chain
+    address: "0x7D687dd0e3bf5025FbAc010042a5943300c8463a"
+    role: proxy
+    verified: false
+    sources:
+      - S2
+      - S3
+  - label: MetadataController (token metadataController)
+    chain: robinhood-chain
+    address: "0x74D4b708E6ce0748E4b968403E115dD69E60BE8F"
+    role: proxy
+    verified: false
+    sources:
+      - S2
+      - S3
+metrics:
+  - kind: volume_24h
+    value: 406036.06
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+  - kind: tvl
+    value: 219757.12
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+  - kind: market_cap
+    value: 2992401
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+  - kind: holders
+    value: 7931
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/source/create tx/pair/USO/pad, RPC name/symbol/launchpad/unlocked/pair fee, DexScreener pair and oil-ticker search, crudecat.xyz, @crudecatcoin profile plus pinned CA, Telegram preview, tokenURI JSON, /rhj/assets USO row, Gecko HTML meta, GitHub search were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-3 R-5 R-7 R-10] - Numbers: 406036.06 is the DexScreener CRUDECAT/USO v3 24h volume, not Gecko HTML $344.25K. Liquidity 219757.12 is that pool. Holders 7931 is Blockscout. DexScreener marketCap 2992401 is not fdv 6232232. [claim R-1 R-5 R-6] - Adversarial: the strongest contrary reading is that CRUDECAT is OILCOIN/GASOLINU/MICROWAVE or the USO issuer. Those three have different CAs; USO 0xa30FA3…D344 is the /rhj/assets rail, not the memecoin."
+      class: inference
+      sources:
+        - S10
+        - S16
+    - text: "Pool USD reserve is CRUDECAT plus USO, not a USDG or WETH backstop. [claim R-5] - Gecko HTML and DexScreener 24h volume disagree this pass. [claim R-5 R-6] - Ticker collision: unverified lowercase crudecat 0xD869…Bf01 and Solana CRUDECAT. [verified R-15 R-21] - ctoManager may reassign creator(); pad implementation unverified. [verified R-2 R-13] - No audit report URL this pass."
+      class: unknown
+  missing:
+    - text: "What is method 0x4a221c46 on Circus launchpad 0xb7fA…cb00, and which quote-asset argument selected USO? Next: decode 0x4a221c46 from a verified CircusLaunchpad source if the implementation is later verified"
+    - text: "Does Gecko JSON later return pool volume/reserve that can be cited beside DexScreener 406036.06 / 219757.12? Next: retry api.geckoterminal.com/api/v2/networks/robinhood/pools/0xc3a873…8BeD with Mozilla UA"
+    - text: "Does verified CircusQuoteTokenV3 leave a live privileged path via ctoManager or metadataController after graduation? Next: read CtoManager and MetadataController implementations when verified"
+    - text: "Was the 2026-08-25 USO airdrop to top-100 holders reproduced on 4663? Next: Blockscout token transfers of USO to the published holder set around 2026-08-25T23:13Z"
+  unresolved: []

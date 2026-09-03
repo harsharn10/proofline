@@ -1,0 +1,116 @@
+slug: rizzler
+name: RIZZLER
+symbol: RIZZLER
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched into a Uniswap v4 pool quoted against COST. Current RWAERC20LaunchpadFactory (o1 Launch Factory) deploys RIZZLER in one createLaunchAndBuy call and seeds the RIZZLER/COST book. Traders buy and sell RIZZLER on Uniswap v4. COST is the Robinhood stock-token rail, not the project. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:cost
+  - rwa
+official_links:
+  - kind: other
+    url: https://link.me/itztherealrizzler
+dependencies: []
+deployments:
+  - label: RIZZLER token
+    chain: robinhood-chain
+    address: "0x59ccd2519c57c7d06331Caa984326BD33E36Db01"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S18
+  - label: RWAERC20LaunchpadFactory (token factory(); o1 current)
+    chain: robinhood-chain
+    address: "0xcE9C48cFa068947f77738c81Be406B53338E5B0d"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S5
+      - S21
+  - label: LaunchTokenDeployer (factory.tokenDeployer)
+    chain: robinhood-chain
+    address: "0xf86dfDb678D8E5d932100Ef479A59fa65a82a5Eb"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S14
+  - label: LaunchHook (Uniswap v4 hook on RIZZLER/COST)
+    chain: robinhood-chain
+    address: "0x0310cFEbE1D7A69f2414f6595bBe9d17c5342aCc"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S13
+      - S18
+  - label: COST Costco • Robinhood Token (pair rail)
+    chain: robinhood-chain
+    address: "0x4EA005168D7F09a7A0Ba9D1DEf21a479950E44C2"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S10
+      - S11
+      - S18
+metrics:
+  - kind: volume_24h
+    value: 1216052.39
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 27310.31
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 68049.79
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: holders
+    value: 554
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/COST/hook/deployer/other RIZZLER and the createLaunchAndBuy tx, RPC name/symbol/factory/owner/launchCreationEnabled/quoteConfig, DexScreener token plus search, Gecko pool/token, /rhj/assets, link.me preview, and X CA / vote posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-8 R-11] - Numbers: 1216052.39 is the Gecko RIZZLER/COST pool 24h volume, not the 1258104.54 token all-pools figure. Reserve 27310.31 is that pool. DexScreener 1223200.25 / 29180.52 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this is KIRKLAND, packed HOTDOG, the Doppler RIZZLER clone, or an official Costco / celebrity product. KIRKLAND factory() path is Pons v2 0x7eD5…EC7e. Packed HOTDOG is 0x1C1D…566f. Clone is 0x28eC…1e18 with Airlock owner. COST is the rhj rail. Celebrity Linkme and @Da_Rizzler419 do not publish this CA."
+      class: inference
+      sources:
+        - S11
+        - S12
+        - S16
+        - S17
+        - S19
+    - text: Quote token COST 0x4EA0…44C2 is a Robinhood Stock Token rail in GET /rhj/assets; pool USD reserve is RIZZLER plus COST, not a USDG backstop. [verified R-8 R-11] - Current factory launchCreationEnabled is true; KIRKLAND/COST and packed HOTDOG/COST are different tokens. [verified R-5 R-16 R-17] - DexScreener website is a third-party-link; no official handle or domain this pass. [claim R-7 R-12] - Ticker RIZZLER is reused by Doppler clone 0x28eC…1e18 on a thinner COST book. [verified R-16] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x59ccd251…Db01? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle"
+    - text: "Is token 0x59ccd251…Db01 source later verified on Blockscout, and does creator_address_hash fill in as LaunchTokenDeployer 0xf86d…a5Eb? Next: re-fetch api/v2/addresses and smart-contracts for 0x59ccd251…Db01"
+    - text: "Does createLaunchAndBuy metadata ipfs://bafkreic4v5r252cgfvq3652cmef4cz4vm5gw7qfxc6iyx2k3iniilgaw3e list a site or handle? Next: retry ipfs gateway or Blockscout token metadata"
+    - text: "Does launch.o1.exchange/coin/0x59ccd251…Db01 show the launch page and any socials? Next: open the o1 coin page once"
+    - text: "Can factory owner 0x5519a8…044D change fees or quotes on live RIZZLER/COST while launchCreationEnabled is true? Next: read remaining Ownable modifiers on src/RWAERC20LaunchpadFactory.sol and ERC20LaunchpadFactory.sol"
+  unresolved: []

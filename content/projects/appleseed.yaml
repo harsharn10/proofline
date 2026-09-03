@@ -1,0 +1,117 @@
+slug: appleseed
+name: John Appleseed
+symbol: Appleseed
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched on Pons v2 and graduated into a Uniswap v4 pool quoted against AAPL. PonsV2LaunchAndBuy deploys John Appleseed (Appleseed) in one launchAndBuy call, seeds a bonding curve, then sweeps into the Appleseed/AAPL book. Traders buy and sell Appleseed on Uniswap v4. AAPL is the quote rail, not this token. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:aapl
+  - rwa
+official_links:
+  - kind: other
+    url: https://x.com/Esotericgul/status/2095338962977968219
+dependencies: []
+deployments:
+  - label: Appleseed token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: PonsV2LaunchDeployer (token creator)
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S5
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S15
+  - label: Pons v2 bonding curve (create-tx clone)
+    chain: robinhood-chain
+    address: "0x261ae32F5787983a5fEd1828485cA24f58FB391f"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S16
+  - label: PonsV2LaunchAndBuy (create tx to)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S4
+      - S14
+  - label: V2LaunchLocker (top holder after PoolManager)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S1
+metrics:
+  - kind: volume_24h
+    value: 205246.47
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 12051.11
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 21222.54
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: holders
+    value: 330
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/source/deployer/factory/launchAndBuy/AAPL and both launch and sweep txs, RPC name/symbol/deployer/launchFactory/curve/socials, DexScreener, Gecko pool/token, /rhj/assets, @Esotericgul, @1Nzz_, @JohnnyAppleEra, and @dexpaidpanther were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 599435.79 is the DexScreener Appleseed/AAPL pool 24h volume, not the 207168.53 Gecko token all-pools figure. Reserve 12051.11 is the Gecko pool. DexScreener 12038.09 is the same pair, different aggregator. Gecko pool fdv 4751352.24 is AAPL-as-base. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this is packed ICOIN, AAPLCAT, AAPLDOG, or the @JohnnyAppleEra CA. Those are different addresses and pads; this packet is 0xF8b22322…B0e3 / pair 0x67bc6687…fc46 via Pons v2."
+      class: inference
+      sources:
+        - S4
+        - S7
+        - S20
+    - text: Quote token AAPL 0xaF3D…93f9 is the Robinhood Token rail in GET /rhj/assets; this token is not. [verified R-12 R-17] - Pool USD reserve is Appleseed plus AAPL, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko pool fdv follows the AAPL base and is not this token's market cap. [claim R-8 R-9] - No official handle or domain this pass; DexScreener website and launch socials are third-party-links. [claim R-7 R-13] - Other John Appleseed / APPLESEED CAs exist on 4663. [claim R-19 R-20] - Bonding-curve clone is_verified false this pass. [verified R-16] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0xF8b22322…B0e3? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle"
+    - text: "Does verified PonsV2LaunchFactory / curve source leave any privileged path after LaunchSwept despite token owner() reverting? Next: read createToken/graduation modifiers and verify the curve clone against a verified PonsV2BondingCurve twin"
+    - text: "Which of the other Blockscout John Appleseed / APPLESEED CAs still have live AAPL books, and do any share this deployer? Next: RPC name/symbol on those CAs if a later assignment takes them"
+    - text: "Which window printed assignment lead liq ~$27,665 / vol ~$524,075? Next: archive a DexScreener screenshot if the ~$27k liq print returns"
+  unresolved: []

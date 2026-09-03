@@ -1,0 +1,118 @@
+slug: yolo
+name: YOLO
+symbol: YOLO
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: PonsLaunchFactory launched a fixed-supply ERC-20 into a Uniswap v3 YOLO/WETH pool. Traders buy and sell YOLO on that book. Constructor deployer is EOA 0xE0b5…3e55; yolorh.com embeds the CA and @yolorobinhood_ posted it.
+themes:
+  - memecoin
+  - launchpad
+  - amm
+official_links:
+  - kind: site
+    url: https://yolorh.com/
+  - kind: x
+    url: https://x.com/yolorobinhood_
+  - kind: telegram
+    url: https://t.me/YoloCoinRH
+dependencies: []
+deployments:
+  - label: YOLO token (PonsLauncherToken)
+    chain: robinhood-chain
+    address: "0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: PonsLaunchFactory (token creator / launchFactory())
+    chain: robinhood-chain
+    address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: YOLO/WETH Uniswap v3 pool (canonical liquidityPool)
+    chain: robinhood-chain
+    address: "0x52FcB1D83191E06ef2d2D9f460609CA22a923558"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S7
+      - S10
+  - label: WETH (pairToken / quote)
+    chain: robinhood-chain
+    address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S7
+      - S11
+  - label: PonsLaunchLocker (UNI-V3-POS 129850)
+    chain: robinhood-chain
+    address: "0x736D76699C26D0d966744cAe304C000d471f7F35"
+    role: vault
+    verified: false
+    sources:
+      - S4
+      - S12
+metrics:
+  - kind: volume_24h
+    value: 1291554.13
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 496388.58
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 13474583
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 11488
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/source/factory/pool/WETH/locker and launch tx 0xc276…7644, RPC name/symbol/launchFactory/liquidityPool/socials/owner, DexScreener, Gecko token/pool (first GET 200), yolorh.com, @yolorobinhood_ CA post, Telegram preview, and X latest were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-13] - Numbers: 1291554.13 is the DexScreener YOLO/WETH v3 24h volume, not the 1724566.66 Gecko token all-pools figure. Liquidity 496388.58 is that book. Holders 11488 is Blockscout token holders_count. [claim R-1 R-7 R-9] - Adversarial: the strongest contrary reading is that YOLO is an official Pons or Robinhood product. Factory is PonsLaunchFactory but the token is a separate ERC-20; yolorh.com / @yolorobinhood_ are not ponsfamily.com / @ponsdotfamily."
+      class: inference
+      sources:
+        - S3
+        - S13
+    - text: Constructor socials are empty; site and handle are later surfaces. [verified R-2 R-13] - Other X handles share the YOLO / Robinhood naming. [claim R-20] - Claim-portal and vote posts reuse the CA on netlify hosts. [claim R-16 R-17] - No audit report URL this pass. [unknown] - Quote token is WETH; pool USD reserve is YOLO plus WETH.
+      class: claim
+      sources:
+        - S7
+        - S8
+  missing:
+    - text: "Does t.me/YoloCoinRH pin CA 0x62C71c…32eA or a site that cross-links, and does the X bio t.co expand to that group? Next: expand the bio t.co from a logged-in X client; open first messages if they become public without joining"
+    - text: "Why does launchBlock() return 25536491 while the launch tx blockNumber is 10204613? Next: read whether chain 4663 block.number tracks an L1 clock vs explorer sequence"
+    - text: "Is there an audit whose scope matches PonsLauncherToken 0x62C71c…32eA? Next: ask in public and record the answer as a claim"
+    - text: "Do the handles @yolorobinhoodx / @YOLOROBINHOOD / @Yolo_robinhood post a different CA? Next: open each profile bio and latest posts for a competing CA"
+  unresolved: []

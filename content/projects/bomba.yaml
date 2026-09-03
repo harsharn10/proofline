@@ -1,0 +1,128 @@
+slug: bomba
+name: BOMBA
+symbol: BOMBA
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against Palantir Technologies • Robinhood Token. LongLauncher.create deployed Bombardilo (BOMBA) on 2026-08-31 and seeded the BOMBA/PLTR book. Traders buy and sell BOMBA on Uniswap v4. bombardilo.com and @bombaRH publish the CA this pass and stay unconfirmed-official.
+themes:
+  - memecoin
+  - stock-paired:pltr
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/bombaRH
+  - kind: site
+    url: https://bombardilo.com/
+  - kind: app
+    url: https://app.long.xyz/tokens/0x525F24BF41F178174788C3297Af9c0Af1bA01E18
+dependencies: []
+deployments:
+  - label: BOMBA token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S15
+      - S18
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S17
+  - label: PLTR Palantir Technologies • Robinhood Token (pair quote / numeraire)
+    chain: robinhood-chain
+    address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S7
+      - S12
+      - S16
+metrics:
+  - kind: volume_24h
+    value: 381539.43
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 55966.75
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 67674.48
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 865
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/LongLauncher/PLTR and the create tx, RPC name/symbol/owner/code, DexScreener, Gecko pool/token, /rhj/assets, bombardilo.com, @bombaRH, @Cryptogether_, and @0xCR33P were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 359737.22 is the Gecko BOMBA/PLTR pool 24h volume, not the 360794.22 token all-pools figure. Reserve 80879.44 is that pool. DexScreener 381539.43 / 55966.75 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that BOMBA is GOYBEAM, MONITOR, PALANTARD, or a Bankr launch, or that PLTR is this token. Creation is LongLauncher.create of 0x525F…1E18 against PLTR 0x894E…4F2A; the other names are different CAs; PLTR is the rhj/assets Stock Token rail."
+      class: inference
+      sources:
+        - S4
+        - S12
+        - S19
+    - text: Quote token PLTR 0x894E…4F2A is in GET /rhj/assets, so USD pool figures still mix BOMBA with a Stock Token, not USDG. [verified R-12 R-16] - Gecko reserve $80.9k and DexScreener liquidity $56.0k disagree on the same pool. [claim R-7 R-8] - Ticker collision with other Blockscout BOMBA tokens and a Solana Bombardino mint. [verified R-20 R-22] - @bombaRH / bombardilo.com unconfirmed-official this pass. [claim R-7 R-13 R-21] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is @bombaRH / bombardilo.com later confirmed by a DexScreener Claim Profile or a @longdotxyz post that names CA 0x525F…1E18? Next: keep official_handle NULL / unconfirmed-official until a primary confirmation appears"
+    - text: "Does Blockscout later set creator_address_hash on 0x525F…1E18 to DopplerERC20V1Factory, matching GOYBEAM? Next: re-fetch api/v2/addresses/0x525F…1E18 creator fields"
+    - text: "Who is Lock 95% beneficiary 0x5456…fc87 relative to launcher 0xce3D…9813? Next: read DopplerHookInitializer Lock on the explorer; do not merge the two addresses"
+    - text: "Are Blockscout Bombardilo / BOMBA ticker collisions later confused with this slug? Next: keep CAs separate; do not merge on ticker BOMBA"
+    - text: "Why does Gecko label BOMBA/PLTR dex bankr-robinhood while create is LongLauncher? Next: treat as aggregator labeling unless Bankr docs name this CA"
+    - text: "What is Gecko token info websites / twitter_handle for 0x525F…1E18? Next: single GET later; do not loop 429s"
+  unresolved: []

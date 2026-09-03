@@ -1,0 +1,125 @@
+slug: launchhood
+name: LaunchHood
+symbol: Launch
+category: Uniswap-pool launchpad
+lifecycle: mainnet
+coverage: stub
+summary: "LaunchHood is a memecoin launchpad on Robinhood Chain at launchhood.com. The live create path is LaunchHoodV3Factory: one transaction mints a 1B-supply token into a Uniswap V3 1% pool and sends the LP NFT to LaunchHoodV3Locker. Docs treat 4 ETH of net buys as a site graduation badge, not a pool migration. The handle is @Launchhood; the bio still says First Launchpad built on pools.trade."
+themes:
+  - launchpad
+official_links:
+  - kind: site
+    url: https://launchhood.com
+  - kind: app
+    url: https://launchhood.com/create
+  - kind: docs
+    url: https://launchhood.com/docs
+  - kind: x
+    url: https://x.com/Launchhood
+  - kind: other
+    url: https://t.me/launchhood
+  - kind: explorer
+    url: https://robinhoodchain.blockscout.com/address/0x62B33A039D289CBDa50EbeB72Fe4261449E61Bcf
+dependencies: []
+deployments:
+  - label: LaunchHoodV3Factory (current launchToken entry)
+    chain: robinhood-chain
+    address: "0x62B33A039D289CBDa50EbeB72Fe4261449E61Bcf"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S13
+      - S14
+  - label: LaunchHoodV3Locker
+    chain: robinhood-chain
+    address: "0x99B79154Ff4Fc0e313549B809254B02722631ee0"
+    role: other
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S13
+      - S15
+  - label: LaunchHoodV3Token implementation
+    chain: robinhood-chain
+    address: "0x5FDf73abC7A232d91b03638c2f9a52c16aB0E3bE"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S13
+      - S16
+  - label: LaunchHoodFactory (legacy v4 createToken; created $Launch)
+    chain: robinhood-chain
+    address: "0x2e9fbF18F6492F6651B983c34629d292516DE86e"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S13
+      - S17
+      - S18
+  - label: $Launch protocol token (EIP-1167 LaunchHoodToken clone)
+    chain: robinhood-chain
+    address: "0x63575bCC942aCC51495E492A0498eb4Ac0A4C0de"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S10
+      - S13
+      - S19
+  - label: V3 factory owner() / PROTOCOL_TREASURY
+    chain: robinhood-chain
+    address: "0x73267feDc2C79a37782C19950b2989B208cfEaA4"
+    role: admin
+    verified: true
+    sources:
+      - S13
+      - S14
+      - S20
+metrics:
+  - kind: market_cap
+    value: 19984.3
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S21
+  - kind: volume_24h
+    value: 9052.96
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S21
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: launchhood.com, /docs, /create, /claim, JS address map, X profile and posts, t.co expand to pools.trade, Gecko token+info, DexScreener, Llama 400, GitHub 404, indexer GraphQL, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-2 R-13 R-14] - Numbers: $Launch fdv/volume are Gecko/DexScreener token books, not pad TVL. Bytecode lengths, nonce, owner(), launchFee, LOCKER, TOKEN_IMPL are chain 4663 RPC. Factory tx count is Blockscout counters. [verified R-13 R-21 R-22] - Adversarial: strongest contrary reading is that LaunchHood is just a pools.trade UI and should merge into packed pools-trade. /docs and the create page target LaunchHoodV3Factory 0x62B33A03…1Bcf, a verified contract this pad's EOA deployed on 13 Jul, not Uniswap Labs 0x0000FffF…19C0 / InstantLaunchStrategy 0x23f82095…27f1. Bio naming pools.trade is historical frontend copy."
+      class: inference
+      sources:
+        - S2
+        - S3
+        - S13
+    - text: V3 factory owner is one EOA; ABI includes setLaunchFee and config updates. [verified R-13] - Official indexer is not ready; do not use totalCount 0. [verified R-26] - Handle bio still points at pools.trade; current docs are a different Uniswap V3 factory. [claim R-2 R-7] - $Launch is a legacy v4-factory clone, not a V3-factory launch. [verified R-18] - No audit report URL. [unknown] - Handle has not posted since 2026-08-11 this pass.
+      class: claim
+      sources:
+        - S8
+  missing:
+    - text: "How many tokens has LaunchHoodV3Factory actually created, and is nonce 4149 / transactions_count 4151 a CREATE2 launch count? Next: eth_getLogs TokenCreated/launchToken on 0x62B33A03…1Bcf; do not use the stale indexer total"
+    - text: "Does verified LaunchHoodV3Locker source expose any principal withdraw, NFT transfer, or decreaseLiquidity path despite bytecode missing those selectors? Next: read Blockscout verified source for LaunchHoodV3Locker and record the exact collect-only surface"
+    - text: "What can owner 0x73267feD…EaA4 change after deploy (fee, whitelist, dex config, token impl), and is there a timelock? Next: eth_call remaining admin getters; read verified factory source modifiers"
+    - text: "Is there an audit whose scope matches LaunchHoodV3Factory 0x62B33A03…1Bcf and locker 0x99B79154…1ee0? Next: record any published report as a claim with the exact scope"
+    - text: "Is the pools.trade Instant Mode / Burner path still callable from launchhood.com, or is it only historical handle copy? Next: do not merge those fee tables; reproduce any remaining pools.trade frontend route if it still exists"
+    - text: "Did Arc launches, swaps, or circleswap.app ever land with a factory on a non-4663 chain? Next: do not set chain_scope multichain until an Arc factory is reproduced"
+  unresolved: []

@@ -1,0 +1,68 @@
+slug: varo
+name: Varo
+symbol: null
+category: Uniswap-pool launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Varo is a Robinhood Chain token launchpad by Rialto. One transaction mints a fixed-supply ERC-20 into a locked Uniswap v3 1% pool quoted in WETH, USDG or a liquid Robinhood stock token, with no bonding curve and no graduation step. The pool fee is 1%; after 29 Jul 2026 new launches send 20% of that fee to the protocol and 80% to creators.
+themes:
+  - launchpad
+  - amm
+  - stock-paired
+official_links:
+  - kind: app
+    url: https://varo.rialto.xyz
+  - kind: x
+    url: https://x.com/launchonvaro
+  - kind: x
+    url: https://x.com/rialto_xyz
+  - kind: docs
+    url: https://docs.rialto.xyz
+  - kind: other
+    url: https://app.rialto.xyz/varo
+dependencies: []
+deployments:
+  - label: Launchpad factory (ERC1967 proxy)
+    chain: robinhood-chain
+    address: "0x851153fe84239C2dC55fa191aC2f099e20a6d0b8"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S10
+      - S11
+      - S13
+  - label: Launchpad implementation (ERC1967 slot)
+    chain: robinhood-chain
+    address: "0x95C4AB0Bb4557811d2642cb12ae5eFb7E82f15b7"
+    role: implementation
+    verified: true
+    sources:
+      - S10
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: varo.rialto.xyz HTML and JS bundle, @launchonvaro profile and the six posts above, @rialto_xyz 2082592965990461774, docs.rialto.xyz/llms.txt, Blockscout HTML title, RPC eth_getCode/eth_getStorageAt/eth_call, and the two Dune pages were opened on 2026-09-03. [verified R-1 R-2 R-10] - Numbers: $109.92M is the OKX Dune varo row, not an all-chains total and not a 24h figure. Bytecode lengths are eth_getCode at block 53102341. [claim R-12] [verified R-10] - Adversarial: the strongest contrary reading is that Varo is the Rialto prop-AMM, or that the factory is Dune-only. The pad is a Uniswap v3 issuance product on varo.rialto.xyz; the factory constant is in the official JS. rialto is not a census slug, so possible_matches is empty and the objects stay distinct."
+      class: claim
+      sources:
+        - S2
+        - S10
+        - S14
+  risk:
+    - text: "Factory implementation 0x95C4AB0B…15b7 is unverified; owner() reverted, so the upgrade holder is unnamed. [verified R-10] - Liquidity is a locked Uniswap v3 position; a launch cannot pull LP. [claim R-5] - No audit report was located this pass. [unknown] - Handle is one-sided: X points at the site; the site HTML does not cite @launchonvaro. [claim R-1 R-3] - Name collision with a $VARO launched token and with unrelated varo.fun UI."
+      class: claim
+      sources:
+        - S13
+  missing:
+    - text: "Who holds upgrade and fee-collector rights on factory 0x851153fe…d0b8? Next: decode implementation ABI or wait for verified source; identify fee_collector from the pad API config"
+    - text: "Is there a first-party docs page that publishes the factory, locker and fee collector? Next: open the authenticated /api config the JS fetches and copy launchpad, fee_collector, quotes"
+    - text: "When was the factory created, and is source verified? Next: retry Blockscout API or another explorer for creation tx, is_verified, implementation name"
+    - text: "Is there an audit of the Varo factory and lockers? Next: ask in public and record the answer as a claim"
+    - text: "Does DefiLlama have a Varo chain-slice adapter? Next: search Llama dimension-adapters for varo or rialto-launchpad"
+    - text: "Is varo.fun / varodotfun.vercel.app the same product? Next: treat as a name collision unless a shared CA appears"
+  unresolved: []

@@ -2,9 +2,9 @@ slug: safehood
 name: Safehood
 symbol: null
 category: Uniswap-pool launchpad
-lifecycle: announced
+lifecycle: mainnet
 coverage: stub
-summary: Robinhood Chain launchpad that creates Uniswap v3 pools with no bonding curve; the official account has been quiet since 2026-07-16.
+summary: "Uniswap v3 pool launchpad on Robinhood Chain: one transaction deploys a 1 billion-supply ERC-20, creates a 1% Uniswap v3 pool, and opens trading with 2% max-tx and max-wallet until a $40,000 market cap. @_safehood lists safehood.fun. The GitHub-claimed factory 0xe893… has non-empty code on chain 4663. Distinct from hood.fun's bonding-curve pad and Uniswap Labs' pools.trade."
 official_links:
   - kind: github
     url: https://github.com/opengrid1/Launchpad
@@ -15,20 +15,60 @@ official_links:
 dependencies:
   - uniswap
 deployments:
-  - label: Safehood pad token (candidate — from the safehood.fun token page URL)
+  - label: Safehood.fun (SAFEHOOD) pad token
     chain: robinhood-chain
-    address: "0x262b60af42c46bd09c00069cd0dcb2ae0093034b"
+    address: "0x262b60Af42c46bD09c00069Cd0dCb2Ae0093034B"
     role: token
-    verified: false
+    verified: true
     sources:
       - S5
       - S4
+      - S12
+      - S24
+      - S25
   - label: Launch factory (rebuilt 15 Jul per the project)
     chain: robinhood-chain
     address: not-verified
     role: factory
     verified: false
     sources: []
+  - label: Launchpad
+    chain: robinhood-chain
+    address: "0xe893ca05D3F1235de22630504DcEa9e029294900"
+    role: factory
+    verified: true
+    sources:
+      - S7
+      - S15
+      - S17
+      - S21
+  - label: TokenFactory
+    chain: robinhood-chain
+    address: "0x5Cf777e19a6CD4B10c3Aa317a2B8E8bCC5F46364"
+    role: factory
+    verified: true
+    sources:
+      - S7
+      - S17
+      - S18
+  - label: FeeDistributor
+    chain: robinhood-chain
+    address: "0x8E0b175a36ee0854Cc2dC7AeC4B3f90857A059ca"
+    role: other
+    verified: true
+    sources:
+      - S7
+      - S17
+      - S19
+  - label: Treasury
+    chain: robinhood-chain
+    address: "0xD401Ed3C128eaE756323e7EAE27B40407c7d499B"
+    role: other
+    verified: true
+    sources:
+      - S7
+      - S17
+      - S20
 review:
   researcher: harsharn10
   approver: pending
@@ -51,11 +91,34 @@ findings:
       sources:
         - S6
         - S4
+    - text: "Receipts: GitHub README and ProtocolConfig, @_safehood profile and posts, Blockscout API v2 for Launchpad/TokenFactory/FeeDistributor/Treasury/MRD1/0x262b60/Pons token plus create and grantRole txs, RPC views, Vercel 404, Bitquery hood.fun, Uniswap pools.trade blog were opened on 2026-09-03; excerpts are copied from those responses. [verified R-1 R-3 R-9 R-11] - Numbers: 0.018 ETH is `totalTradeVolumeWei` on 0xe893, not a USD volume and not an all-chains figure. FEE_TIER 10000 is 1%, not the README 0.3% how-a-launch-works line. tokenCount 5 is the factory array, not DexScreener pairs. [verified R-11] - Adversarial: the strongest contrary reading is that this slug is hood.fun, pools.trade, census Meridian, or the Pons $SAFEHOOD token. Different factories, handles and mechanism (curve vs Uniswap v3 vs Uniswap v4 vs Pons) argue they stay separate. A second contrary reading is that 0xe893 is abandoned and the live pad is 0x475c/0xeADD; both were created by 0x7817…a846."
+      class: inference
+      sources:
+        - S15
+        - S24
+        - S26
+        - S29
+        - S30
+    - text: One EOA holds DEFAULT_ADMIN, LIQUIDITY_MANAGER and OPERATOR with no code and no timelock observed. [verified R-11 R-16] - `collectFees` can remove protocol-held Uniswap v3 principal to Treasury; MRD1 liquidity views returned 0. [verified R-10 R-11] - Trade-fee split disagrees across verified 0xe893 source (100% creator) and later GitHub/X copy (80/20). [disputed R-2 R-5 R-10] - safehood.fun is 404; last @_safehood post is 2026-07-16. [claim R-3 R-22] - Pad-branded SAFEHOOD 0x262b60… is not from the GitHub-claimed factory; a Pons token uses the same ticker.
+      class: verified
+      sources:
+        - S24
+        - S26
   missing:
     - text: Lifecycle not verified — no deployment evidence reviewed
     - text: Mainnet addresses from the repository not yet reproduced on Blockscout
     - text: Single platform admin wallet claim — confirm scope of powers
     - text: An independent audit was not found in this review
     - text: Whether the factory rebuilt on 2026-07-15 is the one in the repository
+    - text: "Does the 80/20 fee split in the 15 Jul rebuild post and current GitHub ProtocolConfig apply to 0xe893 (verified 100% creator) or only to the later 0x475c / 0xeADD factory that minted 0x262b60? Next: read verified or bytecode of 0x475c9219… and 0xeADD… for CREATOR_FEE_BPS"
+    - text: "Are remaining Uniswap v3 positions on 0xe893 still held with non-zero liquidity after the 10 collectFees calls, besides MRD1 which returned 0? Next: poolInfo on allTokens 1–4"
+    - text: "Is there a live Safehood web host besides the Vercel 404 at safehood.fun? Next: resolve t.co/zbb5rzhCwO and search for a replacement domain on the GitHub web/ package"
+    - text: "Do opengrid1/Launchpad v4, HoodFactory, and meridian/ folders deploy any other chain-4663 factories that should stay on this slug? Next: grep deployments/*.json for 4663 addresses and reproduce each"
+    - text: "Is 0x0315eCb5…5b60 the README PLATFORM_ADMIN, and is there a timelock? Next: search Blockscout for a Safe/multisig that 0x0315 forwards to; none in this pass"
+    - text: "Is an audit report present anywhere besides the README sentence that the codebase has not been audited? Next: search the repo docs/ tree and X media for a PDF"
   unresolved:
     - text: The official account's last posts are dated 2026-07-16; Proofline recorded lifecycle as unknown and this file records announced pending deployment evidence.
+    - text: product.mechanism remains unresolved (CON-1).
+themes:
+  - launchpad
+  - memecoin

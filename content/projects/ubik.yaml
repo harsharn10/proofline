@@ -1,0 +1,112 @@
+slug: ubik
+name: UBIK
+symbol: UBIK
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched on a Pons v2 bonding curve quoted against GLD, then graduated into a Uniswap v4 UBIK/GLD pool. PonsV2LaunchFactory deploys ubik (UBIK) in one launchToken call with pairToken set to the Robinhood GLD Stock Token. Traders buy and sell UBIK on Uniswap v4. GLD is a rail. No official site or handle was located this pass; ubik.gold and @ubik_gold are unconfirmed-official.
+themes:
+  - memecoin
+  - stock-paired:gld
+  - rwa
+official_links:
+  - kind: site
+    url: https://ubik.gold
+  - kind: x
+    url: https://x.com/ubik_gold
+dependencies: []
+deployments:
+  - label: UBIK token (PonsV2LauncherToken bytecode; explorer name ubik)
+    chain: robinhood-chain
+    address: "0x812486EAea648819853F8E372dc9f1516C7868Bd"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+      - S21
+  - label: Pons v2 bonding curve (token curve / TokenLaunched curve)
+    chain: robinhood-chain
+    address: "0x0a4D44200dD5eFefD065f59045d35b45C7eFed37"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S18
+  - label: GLD Stock Token (launch pairToken / Uniswap v4 quote)
+    chain: robinhood-chain
+    address: "0xC9a981FEE1F9DEc688bb123ccDeCc63D0deBFC4e"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S12
+      - S16
+  - label: V2LaunchLocker (GraduationTokensPermanentlyLocked)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S20
+metrics:
+  - kind: volume_24h
+    value: 2574070.31
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 265353.47
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 8521492.86
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 6144
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/GLD and launch/graduation txs, RPC name/symbol/launchFactory/deployer/curve/owner/pairTokenEconomics, DexScreener, Gecko pool/token/info, /rhj/assets, ubik.gold, @ubik_gold, and the @xDesir_arman post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 2574070.31 is the Gecko UBIK/GLD pool 24h volume, not the 6435628.20 token all-pools figure. DexScreener 2538287.72 / 265353.47 is the same pair, different aggregator. Gecko reserve was not used. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that UBIK is an official SPDR/GLD product or the Pons protocol itself. /rhj/assets lists GLD as a Stock Token rail, Pons is the pad, and no official handle or domain was located. CASHBIRD/GLD and SCHIFFY/GLD are different token addresses."
+      class: inference
+      sources:
+        - S10
+        - S11
+        - S12
+    - text: "Quote token GLD 0xC9a9…FC4e is a Robinhood Stock Token rail; pool USD reserve is UBIK plus GLD, not a USDG backstop. [verified R-12 R-16] - Gecko UBIK/GLD reserve_in_usd was negative this pass; do not treat that field as TVL. [claim R-8] - ca-collision: other UBIK tickers exist on 4663; live GLD book is 0x8124…68Bd. [verified R-22] - No official handle or domain this pass; ubik.gold / @ubik_gold are unconfirmed-official. [claim R-7 R-13 R-14] - No audit report URL this pass."
+      class: unknown
+  missing:
+    - text: "Does @ubik_gold or ubik.gold bidirectionally link to token 0x8124…68Bd? Next: re-read DexScreener token profile after a Claim Profile; wait for a first @ubik_gold post that embeds the CA"
+    - text: "Why is Blockscout is_verified false on 0x8124…68Bd when bytecode matches verified PonsV2LauncherToken except the immutable deployer? Next: compare metadata hash and ask whether Blockscout similar-match verification can attach PonsV2LauncherToken.sol"
+    - text: "Why is Gecko UBIK/GLD reserve_in_usd negative while DexScreener liquidity.usd is $265k? Next: re-fetch the Gecko pool; do not treat the negative reserve as TVL"
+    - text: "Which of the other Blockscout UBIK tickers still have live books, and do any share deployer 0xc08c…c362? Next: DexScreener each CA; do not merge"
+  unresolved: []

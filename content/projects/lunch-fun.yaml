@@ -1,0 +1,169 @@
+slug: lunch-fun
+name: lunch.fun
+symbol: null
+category: Uniswap-pool launchpad
+lifecycle: mainnet
+coverage: stub
+summary: A free one-click memecoin launchpad on Robinhood Chain. A user mints a 1 billion-supply ERC-20 in one transaction into a locked Uniswap V3 or V4 pool, quoted against ETH, USDG, a Robinhood stock token, or lunch's custom HOOD pair. Creators pick V3 1% fees or a V4 tax with holder rewards. Ticker Mog LLC runs it at lunch.fun as @lunchdotfun.
+themes:
+  - launchpad
+  - rwa
+  - memecoin
+  - stock-paired:hood
+  - hook
+official_links:
+  - kind: app
+    url: https://lunch.fun
+  - kind: docs
+    url: https://lunch.fun/docs
+  - kind: x
+    url: https://x.com/lunchdotfun
+  - kind: other
+    url: https://lunch.fun/terms
+dependencies: []
+deployments:
+  - label: Launcher (V3, ETH)
+    chain: robinhood-chain
+    address: "0xf5Ac14e7691EF44b15b59FcC6a756e41A3E5EFd6"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S8
+      - S9
+  - label: V4 launcher (ETH, tax)
+    chain: robinhood-chain
+    address: "0xC783221AB1db0244203458417981B4631E80B988"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S8
+      - S9
+  - label: Stock/USDG-pair launcher (V3)
+    chain: robinhood-chain
+    address: "0x568E12B312751992DCfE387CFc8EC7D63E941103"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S8
+      - S9
+      - S10
+  - label: Stock/USDG-pair launcher (V4, tax + rewards)
+    chain: robinhood-chain
+    address: "0x6Fda94ACEEDC5a97171469a8873d00fB9983Bb8c"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S8
+      - S9
+      - S12
+  - label: V4 pair tax hook (stock/USDG)
+    chain: robinhood-chain
+    address: "0x4Eb1976978756Bd56802d8162f2271844924e0cc"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S8
+      - S9
+  - label: V4 pair LP locker (stock/USDG)
+    chain: robinhood-chain
+    address: "0xeF785Ad4eea3cffA6C66F77eb454a61D544Be4b6"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S8
+      - S9
+  - label: Swole Cat (SWOLE)
+    chain: robinhood-chain
+    address: "0x2f36bA966BF29F702Bb290245406a5b0e3e1a66E"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S10
+      - S14
+  - label: hotdog (HOTDOG)
+    chain: robinhood-chain
+    address: "0x45443A4a7b58ab26A4B4D72616cf36D5aAE7188C"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S10
+  - label: Walnut Furnishings Corporation (WFNT)
+    chain: robinhood-chain
+    address: "0x01d6E058A31C8bFda50E60Cb0d19aE546bAA3A20"
+    role: token
+    verified: false
+    sources:
+      - S4
+      - S12
+  - label: Custom HOOD pair (HoodLighterShare)
+    chain: robinhood-chain
+    address: "0x32aC8C1D7672667D5EbdEa22935F7B06fC8D496f"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S10
+      - S14
+  - label: Launcher owner
+    chain: robinhood-chain
+    address: "0x7B2DaF7F696bB844C7786693062D6619D1858cC9"
+    role: admin
+    verified: true
+    sources:
+      - S8
+      - S9
+      - S13
+metrics:
+  - kind: volume_24h
+    value: 1123483.32
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: market_cap
+    value: 794154
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: holders
+    value: 8378
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S10
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: lunch.fun, /docs, /api/launches, /terms, @lunchdotfun profile and the dated posts above, Blockscout API v2, RPC eth_getCode/owner(), DexScreener SWOLE, GitHub org lunchdotfun, and the @RHDaily__ board were opened on 2026-09-03; excerpts are copied from those pages. [verified R-1 R-3 R-4 R-8 R-9 R-10 R-16] - Numbers: 2,226 is the launches API total, not TVL. $2.8M is the 1 Sep social board. SWOLE 24h volume and market cap are the DexScreener Robinhood Uniswap pair, not an all-chains figure. [verified R-4] [claim R-16 R-18] - Adversarial: the strongest contrary reading is that lunch.fun is LONG or PAIR under another name, or that HoodLighterShare is the official HOOD Stock Token. Domains, handles and launcher bytecode names differ from LONG; PAIR is pair.fund and not in the census; HoodLighterShare's explorer name is not a Robinhood Token suffix."
+      class: verified
+      sources:
+        - S9
+        - S10
+  risk:
+    - text: Four launcher proxies, the V4 pair hook and the V4 pair locker share owner() EOA 0x7B2D…8cC9 with empty code; no timelock was found in the docs table. [verified R-8 R-13] - Custom HOOD quote 0x32aC…496f is HoodLighterShare, not a Robinhood Stock Token. [verified R-10 R-16] - Docs publish four launchers and no contract labeled factory. [claim R-3] - No audit report was located this pass. [unknown] - V4 docs say the creator can change buy/sell tax up to 5% per side after launch.
+      class: claim
+      sources:
+        - S3
+  missing:
+    - text: "Docs publish four launchers and no contract labeled factory. Is there any other unpublished factory besides those four? Next: keep the four published launchers; do not invent a fifth factory address"
+    - text: "Can EOA 0x7B2D…8cC9 upgrade the ERC1967 launcher/hook/locker proxies, and is there a timelock? Next: read verified LunchV3LauncherSingle / LunchV4PairLauncher upgrade functions and any ProxyAdmin"
+    - text: "What is HoodLighterShare 0x32aC…496f backing and redemption versus an official Robinhood HOOD Stock Token? Next: read HoodLighterShare verified source and Lighter vault backing"
+    - text: "Is there an audit whose scope includes the four launchers, V4 hooks, and lockers as deployed on 4663? Next: ask the project in public and record any report URL as a claim"
+    - text: "Does GitHub org lunchdotfun ever publish source, and will lunch.fun link it? Next: re-check the org and the site footer on a later pass"
+  unresolved: []

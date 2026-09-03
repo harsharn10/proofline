@@ -1,0 +1,124 @@
+slug: rufus
+name: RUFUS
+symbol: RUFUS
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against Amazon • Robinhood Token (AMZN). LongLauncher.create on 2026-08-30 minted RUFUS and seeded the RUFUS/AMZN book. Traders buy and sell RUFUS against AMZN. AMZN is the quote rail, not the subject. DexScreener lists @Rufusonrh; that handle posted the contract. Flag unconfirmed-official.
+themes:
+  - memecoin
+  - stock-paired:amzn
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/Rufusonrh
+dependencies: []
+deployments:
+  - label: RUFUS token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S6
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+      - S13
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S6
+      - S13
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S14
+  - label: Amazon • Robinhood Token (pair quote rail)
+    chain: robinhood-chain
+    address: "0x12f190a9F9d7D37a250758b26824B97CE941bF54"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S7
+      - S11
+      - S12
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+metrics:
+  - kind: volume_24h
+    value: 166124.83
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 48481.54
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 59045
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 81
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/AMZN and create tx 0xa88a6b7d…d0a3, RPC name/symbol/owner/getAssetData, DexScreener tokens API, Gecko pool/token (HTTP 200), /rhj/assets, @Rufusonrh, @MPtrading_x, netlify claim/vote posts, Blockscout search, and X user search were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8 R-11] - Numbers: 166124.83 is the DexScreener RUFUS/AMZN pair 24h volume. 164874.61 is the Gecko pool volume_usd.h24. Reserve 49511.37 is that pool. DexScreener liquidity 48481.54 is the same pair, different aggregator. RUFUS fdv is Gecko token 60137.31 / DexScreener 59045, not Gecko pool 1986887.92. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this is packed sender or packed waddles, or the 0x695B…9F7f Rufus the Corgi token. Addresses, create timestamps, and pads differ; AMZN is the shared rail."
+      class: inference
+      sources:
+        - S5
+        - S7
+        - S20
+    - text: Quote token AMZN 0x12f1…bF54 is the Robinhood Stock Token rail; pool USD reserve is RUFUS plus AMZN, not a USDG or WETH backstop. [verified R-11 R-12] - Gecko pool fdv ~$1.99M is AMZN-as-base and disagrees with Gecko token fdv $60.1k and DexScreener $59.0k. [claim R-7 R-8 R-9] - Ticker RUFUS collides with other ERC-20s on 4663, including 0x695B…9F7f. [claim R-20 R-22] - Handle @Rufusonrh is unconfirmed-official; netlify claim/vote URLs are third-party-link / copypasta-pattern. [claim R-7 R-15 R-16] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does Amazon or a bidirectional site confirm @Rufusonrh as the project handle for token 0x218D…1E18? Next: re-read DexScreener token profile; search new posts that embed the CA from a second handle that the first handle follows"
+    - text: "Do Lock beneficiaries 0x5BEA…0338 (95%) and 0x21E2…7A66 (5%) still control AMZN-side fees after reservedUntil 2026-08-31T22:43:53Z? Next: read Doppler lock / fee collector state and any LongFeeVaultFactory deployVault for this token"
+    - text: "What is in ipfs://bafkreifo54tpocybvagmxvmhecjmqmvgcrfhykxrloms5jaxeqt5v3zrte from the create tokenFactory bytes? Next: retry via another gateway or Blockscout token metadata if indexed"
+    - text: "Should any of the other RUFUS tickers (0x695B…9F7f Rufus the Corgi, 0xfcEE…236B, 0x3f5d…1e18) get their own packets? Next: only if an assignment names those addresses"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
