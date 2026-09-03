@@ -17,7 +17,7 @@ allowed_paths:
 
 identity:
   canonical_name: SAYLORMOON
-  aliases: []
+  aliases: ["Saylor Moon"]
   symbols: [SAYLORMOON]
   entity_kind: token
   chain_scope: robinhood-native

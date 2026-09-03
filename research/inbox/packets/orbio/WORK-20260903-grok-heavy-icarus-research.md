@@ -324,7 +324,7 @@ No audit report URL was located this pass. [unknown]
 
 ## Team and provenance
 
-@orbiodotso display name is orbio; bio is Let your bag pay for your llm costs; website field is https://orbio.so/. www.orbio.so HTML links that handle and publishes CA 0xAa07…28A3. Onchain socials() and launch params store the same handle and https://orbio.so. orbio.so HTTP 308 to https://www.orbio.so/. No GitHub URL this pass. [verified R-1 R-2 R-5]
+@orbiodotso display name is orbio; the bio says holdings pay for llm costs; website field is https://orbio.so/. www.orbio.so HTML links that handle and publishes CA 0xAa07…28A3. Onchain socials() and launch params store the same handle and https://orbio.so. orbio.so HTTP 308 to https://www.orbio.so/. No GitHub URL this pass. [verified R-1 R-2 R-5]
 
 Census Pons is the pad, not this token. Census Artificial Inu and LONG share the NVDA-quoted neighborhood only. microduck is a pending discovery name, not a census slug. [claim R-6 R-17 R-18]
 

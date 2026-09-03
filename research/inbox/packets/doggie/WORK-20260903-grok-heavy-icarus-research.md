@@ -322,7 +322,7 @@ No audit report URL was located this pass. CMC isAudited is false. [unknown]
 
 doggiemode.com lists CA 0xa9eF…1e18, TSLA 0x322F…3b2d, @DoggieMode and t.me/DoggieModePortal. @DoggieMode posted https://Doggiemode.com on 2026-08-28. DexScreener and Gecko repeat that site and handle. [verified R-1 R-10 R-13 R-15]
 
-Site copy: Created with Grok. Managed by Grok Bot. Independent meme project. Not affiliated with or endorsed by Tesla, Inc., Robinhood, or xAI. No public repository URL was located. [claim R-1]
+Site copy: created with an AI assistant and managed by a bot. Independent meme project. Not affiliated with or endorsed by Tesla, Inc., Robinhood, or xAI. No public repository URL was located. [claim R-1]
 
 Census LONG is the factory. Artificial Inu is a different LongLauncher token vs NVDA. [claim R-3 R-5]
 

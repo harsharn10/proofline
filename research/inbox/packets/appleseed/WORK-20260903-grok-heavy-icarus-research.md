@@ -292,7 +292,7 @@ The Appleseed/AAPL Uniswap v4 book printed about $599k of 24h volume on DexScree
 
 ## What could go wrong
 
-USD liquidity figures on the Appleseed/AAPL book count both sides, and the quote side is AAPL, not USDG. Gecko names the pool AAPL/Appleseed and prints an inverted fdv that is the AAPL book, not this token. No official handle was located, so comms surfaces stay unconfirmed-official. Other John Appleseed CAs exist on the same explorer.
+USD liquidity figures on the Appleseed/AAPL book count both sides, and the quote side is AAPL, not USDG. Gecko names the pool AAPL/Appleseed and reports an inverted fdv that is the AAPL book, not this token. No official handle was located, so comms surfaces stay unconfirmed-official. Other John Appleseed CAs exist on the same explorer.
 
 ## Product and mechanics
 

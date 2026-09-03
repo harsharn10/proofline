@@ -247,7 +247,7 @@ receipts:
   - { id: R-16, publisher: DexScreener, title: "Search AP AAPL and AAPLCAT clones", url: "https://api.dexscreener.com/latest/dex/search?q=AAPLCAT", published_at: null, accessed_at: 2026-09-03T03:47:00Z, kind: third-party-data, authority: aggregator, authenticity: confirmed, supports: [CLM-7, CLM-25, CLM-26], excerpt: "Assigned pair is AAPLCAT/AAPL 0x719a752f…c5b6 token 0x73A9999f…1e18. Distinct robinhood rows: AP/AAPL ap 0x69c68e4C…1e18; ICOIN/AAPL 0x5d6EF…1e18; AppleCat 0xbD6B2b93…9BA3; AAPLCat/WETH 0xaB2f23c7…7777 socials x.com/AAPLCATRH; AAPLCAT 0x6974508F…9d40." }
 
 gaps:
-  - { priority: P0, question: "Is applecat.club operated by @AAPLCAT_, or only a Grok App Builder page whose x:creator is @ServerInu?", checked: "Site prints CA and Follow @AAPLCAT_; DexScreener websites is applecat.club; HTML grok-app-builder + x:creator @ServerInu; @AAPLCAT_ bio has the CA but X user search did not return a website field this pass, 2026-09-03", next: "re-read the @AAPLCAT_ profile website field and any post that links applecat.club" }
+  - { priority: P0, question: "Is applecat.club operated by @AAPLCAT_, or only an app-builder page whose x:creator is @ServerInu?", checked: "Site prints CA and Follow @AAPLCAT_; DexScreener websites is applecat.club; HTML grok-app-builder + x:creator @ServerInu; @AAPLCAT_ bio has the CA but X user search did not return a website field this pass, 2026-09-03", next: "re-read the @AAPLCAT_ profile website field and any post that links applecat.club" }
   - { priority: P1, question: "Does t.me/applecatlong pin CA 0x73A9999f…1e18 or a site that cross-links?", checked: "public preview og:title Apple Cat Club, 31 subscribers, no CA in HTML; applecat.club has no t.me link, 2026-09-03", next: "open the join page / first messages if they become public without joining" }
   - { priority: P1, question: "Do Lock beneficiaries 0x491E…cFC4 (95%) and 0xEDeA…eDa8 (5%) still control AAPL-side fees after graduation?", checked: "create-tx Lock log on hook 0x4e34…a544; getAssetData LP slots include 0xdead; no later fee-vault tx found this pass, 2026-09-03", next: "read Doppler lock / fee collector state and any LongFeeVaultFactory deployVault for this token" }
   - { priority: P2, question: "Should any of the other robinhood AAPLCAT tickers (0xbD6B…, 0xaB2f…, 0x6974…) get their own packets?", checked: "DexScreener search listed them with far lower liquidity than 0x73A9999f…1e18, 2026-09-03", next: "only if an assignment names those CAs" }
@@ -267,7 +267,7 @@ The AAPLCAT/AAPL Uniswap v4 book printed about $1.19M of 24h volume on Gecko at 
 
 ## What could go wrong
 
-USD liquidity figures on the AAPLCAT/AAPL book count both sides, and the quote side is AAPL, not USDG. Gecko reserve and DexScreener liquidity disagree on the same pool. Same-ticker Apple Cat clones exist on robinhood and other chains. applecat.club is also a Grok App Builder page with x:creator @ServerInu. Telegram is a third-party-link with no CA in the preview.
+USD liquidity figures on the AAPLCAT/AAPL book count both sides, and the quote side is AAPL, not USDG. Gecko reserve and DexScreener liquidity disagree on the same pool. Same-ticker Apple Cat clones exist on robinhood and other chains. applecat.club is also an app-builder page with x:creator @ServerInu. Telegram is a third-party-link with no CA in the preview.
 
 ## Product and mechanics
 
@@ -301,7 +301,7 @@ Gecko dex id is bankr-robinhood; DexScreener dexId is uniswap v4. Creation path 
 - Pool USD reserve is AAPLCAT plus AAPL, not a USDG or WETH backstop. [claim R-1 R-2]
 - Gecko reserve 259866.15 vs DexScreener liquidity 191614.26 on the same pool. [claim R-1 R-2]
 - Same-ticker clones and colliding handles (@AAPLCATRH, BSC AAPLCat). [claim R-16]
-- Telegram is a third-party-link; applecat.club carries Grok App Builder attribution. [claim R-9 R-10]
+- Telegram is a third-party-link; applecat.club carries app-builder attribution. [claim R-9 R-10]
 - No audit report URL this pass. [unknown]
 
 ## Verification passes

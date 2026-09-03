@@ -293,7 +293,7 @@ The RUFUS/AMZN Uniswap v4 book printed about $166.1k of 24h volume on DexScreene
 
 ## What could go wrong
 
-USD liquidity figures on the RUFUS/AMZN book count both sides, and the quote side is AMZN, not USDG. Gecko names the pool AMZN / RUFUS and prints pool fdv ~$1.99M (AMZN as base); the RUFUS cap on DexScreener is $59.0k and on the Gecko token endpoint $60.1k. Several other ERC-20s share the RUFUS ticker. No Amazon bidirectional handle was located, so comms surfaces stay unconfirmed-official. Netlify claim and vote URLs that embed this CA are third-party-link / copypasta-pattern.
+USD liquidity figures on the RUFUS/AMZN book count both sides, and the quote side is AMZN, not USDG. Gecko names the pool AMZN / RUFUS and reports pool fdv ~$1.99M (AMZN as base); the RUFUS cap on DexScreener is $59.0k and on the Gecko token endpoint $60.1k. Several other ERC-20s share the RUFUS ticker. No Amazon bidirectional handle was located, so comms surfaces stay unconfirmed-official. Netlify claim and vote URLs that embed this CA are third-party-link / copypasta-pattern.
 
 ## Product and mechanics
 

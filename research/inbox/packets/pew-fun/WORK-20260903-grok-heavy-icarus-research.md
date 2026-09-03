@@ -293,7 +293,7 @@ Themes: launchpad, stock-paired
 
 ## Why it matters
 
-This is a documented Robinhood Chain pad with a reproduced factory and a bidirectional site/handle, not a census row. Emerson still maps 0xc918…9d8c to Pew.fun, but the 30d labeled board has no Pew.fun row. HARVEST.md OKX lifetime was 555 launched / $11.8M DEX; that dashboard 403'd this pass. Distinct from packed NOXA / hood.fun / Pons and from in-flight Circus, Sentry, Bags, and Klik. [claim R-15 R-16] [verified R-9 R-10]
+This is a documented Robinhood Chain pad with a reproduced factory and a bidirectional site/handle, not a census row. Emerson still maps 0xc918…9d8c to Pew.fun, but the 30d labeled board has no Pew.fun row. HARVEST.md OKX lifetime was 555 launched / $11.8M DEX; that dashboard 403'd this pass. Distinct from packed NOXA / hood.fun / Pons and from in-flight Circus, Sentry and Klik. [claim R-15 R-16] [verified R-9 R-10]
 
 ## What could go wrong
 
@@ -331,7 +331,7 @@ HARVEST.md OKX lifetime since 2026-07-01: 555 launched / $11.8M DEX (dashboard 4
 
 - Receipts: pew.fun HTML/JS/docs, X profile and 17 Jul / 31 Jul / 11 Aug posts, GitHub user/org, Emerson Dune factory map, OKX Dune 403, Llama 400, DexScreener SUSHICAT, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-9 R-10 R-15]
 - Numbers: bytecode lengths, nonces, and owner() are chain 4663 RPC. SUSHICAT holders 5163 is Blockscout. Pair liq/vol are DexScreener. OKX 555 / $11.8M is HARVEST.md, not a live table. Emerson 30d has no Pew.fun row. [verified R-10 R-11 R-17]
-- Adversarial: strongest contrary reading is that Pew is NOXA (the 09:32Z post) or that 0xC918…9D8c is idle leftover code. Same-day factory create + SUSHICAT PewToken + Sushi post, JS sushi.factories, Emerson map, and 31 Aug LpFeesCollected sit on this address. NOXA factory is 0xD9eC…FccB. Circus/Sentry/Bags/Klik factories do not match. [inference R-2 R-5 R-9 R-15]
+- Adversarial: strongest contrary reading is that Pew is NOXA (the 09:32Z post) or that 0xC918…9D8c is idle leftover code. Same-day factory create + SUSHICAT PewToken + Sushi post, JS sushi.factories, Emerson map, and 31 Aug LpFeesCollected sit on this address. NOXA factory is 0xD9eC…FccB. Circus, Sentry and Klik factories do not match. [inference R-2 R-5 R-9 R-15]
 
 ## Operations log
 

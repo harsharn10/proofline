@@ -366,7 +366,7 @@ This is a chain-native liquidity venue with its own CL and Classic factories, no
 
 ## What could go wrong
 
-Controller, vault, fee center, and veGIGA are upgradeable ERC1967 proxies. ProxyAdmin owner() is one 2-of-3 Safe that includes the factory deployer EOA. No timelock was located. The controller implementation that holds custom Genesis logic is not source-verified this pass. Docs still say every deployed contract is verified. [verified R-13 R-18 R-29] [claim R-6]
+Controller, vault, fee center, and veGIGA are upgradeable ERC1967 proxies. ProxyAdmin owner() is one 2-of-3 Safe that includes the factory deployer EOA. No timelock was located. The Controller implementation that holds custom Genesis logic is not source-verified this pass. Docs still say every deployed contract is verified. [verified R-13 R-18 R-29] [claim R-6]
 
 ## Product and mechanics
 

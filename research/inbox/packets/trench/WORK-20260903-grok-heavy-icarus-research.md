@@ -364,7 +364,7 @@ Emerson 30d: 123740 tokens, 251 unique deployers, last_launch 2026-09-03 01:31:1
 
 - Receipts: trench.today, docs (home, introduction, how-it-works, getting-started, contracts, links), X profile and posts, Emerson dashboard, Llama 404, GitHub 404, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-3 R-8 R-13]
 - Numbers: token counts and DEX volume are the Emerson 30d slice, not Llama. Bytecode lengths, nonce, and owner slots are chain 4663 RPC. [verified R-8 R-13]
-- Adversarial: strongest contrary reading is that 0x2ECFb98B…FbAA is an abandoned proxy and live launches use TrenchManager or another factory, or that Emerson's Trench / Trencher label mixes a second product. Docs set BondingCurveFactory to this address; factory nonce 146364 and Emerson last_launch 2026-09-03 argue it is still creating. Circus, Sentry, Bags, Klik, pew.fun, and Pons are different factories. [inference R-3 R-8 R-13]
+- Adversarial: strongest contrary reading is that 0x2ECFb98B…FbAA is an abandoned proxy and live launches use TrenchManager or another factory, or that Emerson's Trench / Trencher label mixes a second product. Docs set BondingCurveFactory to this address; factory nonce 146364 and Emerson last_launch 2026-09-03 argue it is still creating. Circus, Sentry, Klik, pew.fun, and Pons are different factories. [inference R-3 R-8 R-13]
 
 ## Operations log
 

@@ -308,7 +308,7 @@ The STRATTON/SPY Uniswap v4 book printed about $9.58M of 24h volume on DexScreen
 
 ## What could go wrong
 
-USD liquidity figures on the STRATTON/SPY book count both sides, and the quote side is SPY, not USDG. Gecko names the pool SPY/STRATTON and prints pool fdv on the SPY base. Site/docs do not embed this CA, so the handle/domain mapping stays unconfirmed-official for the token.
+USD liquidity figures on the STRATTON/SPY book count both sides, and the quote side is SPY, not USDG. Gecko names the pool SPY/STRATTON and reports pool fdv on the SPY base. Site/docs do not embed this CA, so the handle/domain mapping stays unconfirmed-official for the token.
 
 ## Product and mechanics
 

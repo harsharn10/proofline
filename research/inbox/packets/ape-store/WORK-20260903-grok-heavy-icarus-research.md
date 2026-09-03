@@ -298,7 +298,7 @@ Themes: launchpad, memecoin
 
 ## Why it matters
 
-The pad is live on chain 4663 with a published factory in official config, not a census row. Emerson 30d lists 137 tokens and about 154k USD DEX volume, smaller than packed pads on the same board. Gitbook still documents a Base bonding-curve listing path while the handle describes a Robinhood Uniswap-direct path. Distinct from Pons, hood.fun, Bags, and Coinbarrel. [claim R-2 R-4 R-9 R-22]
+The pad is live on chain 4663 with a published factory in official config, not a census row. Emerson 30d lists 137 tokens and about 154k USD DEX volume, smaller than packed pads on the same board. Gitbook still documents a Base bonding-curve listing path while the handle describes a Robinhood Uniswap-direct path. Distinct from Pons, hood.fun and Coinbarrel. [claim R-2 R-4 R-9 R-22]
 
 ## What could go wrong
 
@@ -334,7 +334,7 @@ Llama currentChainTvls Ethereum 7689.85 USD, Base 16292.77 USD at 2026-09-03T03:
 
 - Receipts: ape.store, /api/config, gitbook markdown pages, X profile and posts, t.co expand, Llama protocol/fees, GitHub users, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. Dune returned Cloudflare 403; Emerson figures are from HARVEST.md via the discovery packet. [verified R-1 R-2 R-14 R-20]
 - Numbers: Llama TVL and fees are Ethereum/Base, not Robinhood Chain. Bytecode lengths, nonces, and owner() are chain 4663 RPC. Token page math is the official tokens API with chain=4663. Emerson 137 is a 30d third-party window. [verified R-14 R-19] [claim R-20 R-22]
-- Adversarial: strongest contrary reading is that 0x6e4910ea…87C1 is a leftover V3.0 router and new launches use a different factory, or that Robinhood already abandoned the bonding curve as the 15 Jul post states. Config still sets ApeV30Routers to this address with Active true; RPC shows 12528-byte code and nonce 4227; tokens API RH rows are protocol 30. Packed pads Pons, hood.fun, Bags, and Coinbarrel are different products. [inference R-2 R-9 R-14]
+- Adversarial: strongest contrary reading is that 0x6e4910ea…87C1 is a leftover V3.0 router and new launches use a different factory, or that Robinhood already abandoned the bonding curve as the 15 Jul post states. Config still sets ApeV30Routers to this address with Active true; RPC shows 12528-byte code and nonce 4227; tokens API RH rows are protocol 30. Packed pads Pons, hood.fun and Coinbarrel are different products. [inference R-2 R-9 R-14]
 
 ## Operations log
 

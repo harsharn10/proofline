@@ -239,7 +239,7 @@ The GMERALD/GME Uniswap v4 book printed about $2.30M of 24h volume on Gecko at c
 
 ## What could go wrong
 
-USD liquidity figures on the GMERALD/GME book count both sides, and the quote side is GME, not USDG. Gecko names the pool GME/GMERALD and prints pool fdv on the GME base. DexScreener lists gmerald.xyz and x.com/gmeraldexe, but the on-chain website field is empty and no bidirectional handle check ran this pass, so comms stay unconfirmed-official. Live totalSupply is below the 1e27 constructor mint.
+USD liquidity figures on the GMERALD/GME book count both sides, and the quote side is GME, not USDG. Gecko names the pool GME/GMERALD and reports pool fdv on the GME base. DexScreener lists gmerald.xyz and x.com/gmeraldexe, but the on-chain website field is empty and no bidirectional handle check ran this pass, so comms stay unconfirmed-official. Live totalSupply is below the 1e27 constructor mint.
 
 ## Product and mechanics
 
