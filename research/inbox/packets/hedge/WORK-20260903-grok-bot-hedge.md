@@ -259,7 +259,7 @@ gaps:
 
 ## What it is
 
-Hedgehogs is a 3,333-seat NFT collection on Robinhood Chain. The official site describes each ERC-721 as a manager seat bound to an ERC-6551 account that also functions as an ERC-4626 vault holding tokenized stocks and listed tokens. The site publishes $HEDGE at 0x8226DDA5F73619DEdC671e09Be738fA308da1944 on chain 4663 and states the mint is sold out. This round's explorer and RPC checks found that ERC-20 and an ERC-721 named Hedgehogs; neither has verified source.
+Hedgehogs is a 3,333-seat NFT collection on Robinhood Chain. The official site describes each ERC-721 as a manager seat bound to an ERC-6551 account that also functions as an ERC-4626 vault holding tokenized stocks and listed tokens. The site publishes $HEDGE at 0x8226DDA5F73619DEdC671e09Be738fA308da1944 on chain 4663 and states the mint is sold out. The token and collection contracts exist on chain 4663; neither has verified source.
 
 Themes: nft-treasury, token-bound-nft, vault, rwa, erc-20
 
