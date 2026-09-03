@@ -57,6 +57,13 @@ next compile picks up the new copy. A packet that supersedes one already compile
 `as_of`, or it is left alone as an older copy of what main already has. A packet naming a possible match
 that is being created in the same batch is skipped that round and compiles on the next one.
 
+One skip has a different fix. A packet filed under a **new** slug that turns out to be a second name for
+a name the registry already has — the same official handle or domain — is skipped as
+`duplicate of <existing slug> on the official handle/domain; write an update packet for <existing slug>
+instead of a new name`. Re-PUTting it will not help: the token and the protocol that issued it are one
+entry. File the evidence as an update packet at `research/inbox/packets/<existing slug>/<work-id>.md`
+instead. The established name always keeps the slug; the newcomer is the one dropped.
+
 A discovery round (`slug: discovery-inventory`) is kept as a record and counted in the compile report as
 `inventory: N candidates`. It is never compiled into a project: those names become assignments first.
 
