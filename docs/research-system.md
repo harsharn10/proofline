@@ -181,6 +181,59 @@ Hard stops:
 - a full packet without its three verification passes;
 - a collector or verifier writing scores, approval, corrections or channel decisions.
 
+### Unattended compile
+
+Steps 5 and 6 run on a schedule, with no human in the loop. `.github/workflows/compile.yml` fires every
+six hours at :47 — thirty minutes after the pull at :17, sharing its `main-bots` concurrency group so
+only one bot writes main at a time — and runs `scripts/compile-inbox.mjs`:
+
+1. **Collect.** Every remote branch under `grok-heavy/`, `supergrok/`, `grok/` or `codex/` that is not
+   merged into main, or the one branch given to `workflow_dispatch`. Packet files under
+   `research/inbox/packets/` that differ from main are written into the working tree. A file main already
+   carries with an `as_of` at least as new is left alone: main's copy is the one that compiled and a
+   controller may have corrected it, so a packet that supersedes it must carry a newer `as_of`.
+2. **Validate.** `validatePacketDirectory` runs over the whole batch at once, so the per-(`work_id`,
+   `slug`) uniqueness check sees every packet. A packet with errors is put back the way main has it and
+   its errors are collected against its branch; the rest of the batch carries on. Reverting one packet
+   can clear an error another was blamed for, so validation repeats until nothing new is reverted.
+3. **Compile.** Oldest `as_of` first, so a later packet supersedes an earlier one in the same batch. Each
+   packet goes through the same `compile()` path as `scripts/compile-packet.mjs`, and every notice —
+   auto-tagged paragraph, skipped metric, skipped deployment, lifecycle kept — is collected per packet.
+4. **Gate.** `npm run validate:release` must report 0 errors and `npm run score` must succeed. When every
+   gate error names a slug this run compiled — a banned word that reached a summary, internal vocabulary
+   in a finding — those packets are dropped, the batch is recompiled from main without them, and the
+   gates run again, up to three times: one packet's prose must not hold up the other thirty. When even
+   one error names a file nobody in the batch touched, dropping cannot fix it: `content/` and
+   `research/inbox/packets/` are reverted, the report says why, and the script exits 2. A red main is
+   never pushed.
+5. **Push.** The workflow commits `content/` plus the packets it compiled as `proofline-bot`, message
+   `compile: <n> packets from <branches>` with the trailer `Producer: compile-bot`, then rebases onto main
+   and pushes, retrying three times. Copying the packets onto main is what makes the next run a no-op: the
+   branch file no longer differs. Render redeploys from main.
+
+The report is `build/compile-report.md`, with `build/compile-report.json` for the workflow. Per branch it
+lists what compiled, what was skipped and why, the notices, the share-bar names before and after, and the
+compiled slugs.
+
+What the schedule does not change:
+
+- **A producer never writes `content/**`.** The compiler is its only writer, and packet files are all
+  this job reads off a branch.
+- **No PR is merged.** Packets are lifted off branches; the branch and its PR stay open for a controller.
+- **A packet compiles only if it validates**, and coverage never lowers and scoring is never touched —
+  both properties of `compile()` itself.
+- **A discovery inventory is not a project.** A packet whose slug is `discovery-inventory`, or whose
+  `identity.entity_kind` is `unknown` with a canonical name containing "inventory", is a list of candidate
+  names. It is validated and kept as a record, reported as `inventory: N candidates`, and never compiled:
+  compiling one mints a registry row, a research document and a source ledger for a list. Those names
+  become assignments (§4) first.
+- A packet naming a possible match that is being created in the same batch is skipped that round and
+  compiles on the next one, once the match is in the census.
+
+Nothing fails silently. Skipped packets are commented once per distinct error set on the producer's open
+PR, a failed gate opens or updates the single issue "Compile gate failed" with the report, and the run
+goes red.
+
 ## 7. Evidence, authenticity and conflicts
 
 Evidence strength is field-specific. A project post proves that the project said something. It does
@@ -212,6 +265,17 @@ repository or docs identify the same product and chain; a migration announcement
 On an approved merge the compiler keeps the older accepted slug unless the official identity changed,
 unions aliases and sources, deduplicates sources by normalized URL plus claim, merges feed items by
 stable id, and writes a correction entry when a public name, lifecycle, deployment or conclusion changes.
+
+Disclosure follows the same weighting. A packet whose identity runs into a canonical row must record it
+under `identity.possible_matches` when the two share an **official surface**: the same official handle,
+the same owned domain, or an address one reproduced that the other already carries. Owned means the
+`official_domain` and the `site` and `docs` links — an `app` link is where a product is *used*, so a
+token's page on a launchpad's app is the pad's domain, not a second claim on the pad. Sharing only a
+**name** is not evidence: a launchpad that lists its launches as aliases collides with every one of them
+and is none of them. That is a warning, and the compiler drops the borrowed alias from the newcomer's
+registry row with the notice `alias X is another name's slug (<slug>); dropped` rather than writing two
+names that look like one. A ticker is never an identity: an alias that is one of the record's own symbols
+is a symbol, and two records that agree only on a ticker are two records.
 
 Conduct: never write a verdict about a person, team or account. The only flags are `handle-collision
 | unconfirmed-official | third-party-link | copypasta-pattern | wrong-chain | ca-collision`, each with

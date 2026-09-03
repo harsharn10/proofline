@@ -30,7 +30,35 @@ Base `https://api.github.com`, repo `harsharn10/proofline`, header `Authorizatio
 4. `POST /repos/harsharn10/proofline/pulls` with `{ "title": "<work-id>", "head": "<branch>", "base": "main", "body": "<packet frontmatter header>" }`.
 
 Corrections for the same run update the same PR; a new assignment gets a new work id, branch and PR.
-Never merge, never enable auto-merge. CI comments; a controller merges.
+Never merge, never enable auto-merge. CI comments; the compile bot lifts the packets off the branch.
+
+## What happens to a packet
+
+A branch is either single-assignment (`<producer>/<YYYYMMDD>/<work-id>`) or long-lived (one standing
+branch and one open PR that stay open across runs, such as `grok-heavy/standing/updates`). The compile
+bot reads both the same way: each run it takes whatever packet files on the branch differ from main.
+
+Two clocks run on a filed packet. Neither needs a human.
+
+- **Within minutes.** Validate runs on the branch, then the packet PR gate comments on the PR: either
+  "waiting for controller" (every file is a packet or an assignment) or "needs controller review"
+  (something renamed, deleted, or outside `research/inbox/packets/` and `research/inbox/assignments/`).
+- **Within six hours.** The compile workflow runs at :47 past, every six hours. It lifts every packet
+  file that differs from main off the branch, validates it, compiles the valid ones into `content/`,
+  runs the content gates and pushes to main; the site redeploys from main. The PR is not merged, and no
+  bot will ever merge it — only the packet files move.
+
+A packet that does not validate is skipped and reported in one comment on the PR, with each skipped
+file's errors in a fenced block. So is a packet that validates but whose compiled prose fails the release
+lint — a banned hype word in the "What it is" paragraph, a producer name in a finding — which is dropped
+after the compile and named the same way. The rest of the batch still compiles: one bad packet never
+blocks the others. To fix one, `PUT` the same path again on the same branch with the corrections — the
+next compile picks up the new copy. A packet that supersedes one already compiled onto main must carry a newer
+`as_of`, or it is left alone as an older copy of what main already has. A packet naming a possible match
+that is being created in the same batch is skipped that round and compiles on the next one.
+
+A discovery round (`slug: discovery-inventory`) is kept as a record and counted in the compile report as
+`inventory: N candidates`. It is never compiled into a project: those names become assignments first.
 
 ## Token scope
 

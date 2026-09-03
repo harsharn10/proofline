@@ -67,6 +67,104 @@ function duplicates(values) {
 }
 
 /**
+ * The link kinds that assert ownership of a domain. An `app` link is where a product is *used*, not a
+ * claim on whoever runs it: every token launched through a pad links its page on the pad's app, and that
+ * page is the pad's, not a second claim on the pad's identity (§7).
+ */
+const OWNED_LINK_KINDS = new Set(["site", "docs"]);
+const ADDRESS_IN_URL_RE = /0x[0-9a-fA-F]{40}/g;
+
+/** Domains an entity claims as its own: its official domain plus the hosts of its site and docs links. */
+function ownedDomains(links, officialDomain) {
+  const out = new Set();
+  const add = (value) => { const host = normalizeDomain(value); if (host) out.add(host); };
+  add(officialDomain);
+  for (const link of links ?? []) if (OWNED_LINK_KINDS.has(link?.kind)) add(link.url);
+  return out;
+}
+
+/**
+ * The names a record answers to, normalized, keyed to the text they came from. Primary names — the
+ * record's name and canonical name — always count. An alias counts unless it is one of the record's own
+ * symbols: a ticker in the alias list is a ticker, and two records that agree only on a ticker are not
+ * the same entity (§7).
+ */
+function identityNames(primary, aliases, symbols) {
+  const symbolKeys = new Set((symbols ?? []).map(normalizeIdentity).filter(Boolean));
+  const names = new Map();
+  for (const value of primary) {
+    const key = normalizeIdentity(value);
+    if (key && !names.has(key)) names.set(key, String(value));
+  }
+  for (const value of aliases ?? []) {
+    const key = normalizeIdentity(value);
+    if (key && !names.has(key) && !symbolKeys.has(key)) names.set(key, String(value));
+  }
+  return names;
+}
+
+/** Addresses the packet says it reproduced on 4663 — the only ones strong enough to join two identities. */
+function reproducedAddresses(record) {
+  const out = new Set();
+  for (const deployment of record.deployments ?? []) {
+    const address = deployment?.address;
+    if (address?.exists_on_4663 === true && typeof address.value === "string") out.add(address.value.toLowerCase());
+  }
+  return out;
+}
+
+/** Addresses a census row carries, including any written into the URLs it links. */
+function censusAddresses(row) {
+  const out = new Set();
+  for (const value of row.addresses ?? []) if (typeof value === "string") out.add(value.toLowerCase());
+  for (const link of row.official_links ?? [])
+    for (const match of String(link?.url ?? "").match(ADDRESS_IN_URL_RE) ?? []) out.add(match.toLowerCase());
+  return out;
+}
+
+/**
+ * Every canonical row this packet's identity runs into, and how hard it runs into it.
+ *
+ * `strong` names the surface the two share — the same official handle, the same owned domain, or an
+ * address one reproduced that the other already carries. Those are the only collisions that have to be
+ * recorded under `identity.possible_matches`: they are evidence the two records may be one entity.
+ * `strong` is null when all the two share is a *name*, which is not evidence of anything on a chain
+ * where a launchpad lists its launches and a hundred tokens borrow a word. A ticker is never an
+ * identity: an alias that is one of the record's own symbols is a ticker, not a second name (§7).
+ */
+export function identityCollisions(record, census = []) {
+  const identity = record?.identity ?? {};
+  const names = identityNames([record?.name, identity.canonical_name], identity.aliases, identity.symbols);
+  const handle = normalizeHandle(identity.official_handle);
+  const domains = ownedDomains(record?.links, identity.official_domain);
+  const addresses = reproducedAddresses(record ?? {});
+
+  const out = [];
+  for (const row of census) {
+    if (row.slug === record?.slug) continue;
+    const rowNames = identityNames([row.name], row.identity?.aliases, row.identity?.symbols);
+    const shared = [...names.keys()].filter((key) => rowNames.has(key));
+    const rowHandle = normalizeHandle(row.handle);
+    const rowDomains = ownedDomains(row.official_links, null);
+    const rowAddresses = censusAddresses(row);
+
+    let strong = null;
+    if (handle && rowHandle && handle === rowHandle) strong = `the official handle ${row.handle}`;
+    if (!strong) {
+      const domain = [...domains].find((value) => rowDomains.has(value));
+      if (domain) strong = `the official domain ${domain}`;
+    }
+    if (!strong) {
+      const address = [...addresses].find((value) => rowAddresses.has(value));
+      if (address) strong = `the reproduced address ${address}`;
+    }
+    if (!strong && !shared.length) continue;
+    out.push({ row, strong, names: shared.map((key) => names.get(key)) });
+  }
+  return out;
+}
+
+/**
  * Split a packet file into its dossier, its narrative and the narrative's `## ` sections.
  * Frontmatter is the YAML between the first two `---` lines. Throws on malformed YAML.
  */
@@ -127,12 +225,14 @@ function everyKey(value, out = []) {
  * (they differ only when a template is checked against the path it would be filed at).
  * Returns [] when the packet is clean, else one message per problem.
  */
-export function validatePacket(packet, { census = [], path = "", source = path } = {}) {
+export function validatePacket(packet, { census = [], path = "", source = path, warnings = [] } = {}) {
   const record = packet?.frontmatter;
   if (!record || typeof record !== "object" || Array.isArray(record)) return ["frontmatter is not a YAML mapping"];
 
   const errors = validateAgainst("packet", record);
   const err = (message) => errors.push(message);
+  // Warnings are collected into the caller's array when it passes one; they never fail a packet.
+  const warn = (message) => warnings.push(message);
   const fromTemplate = String(source).startsWith(TEMPLATE_ROOT);
 
   // A placeholder base SHA is a template's business only; a filed packet names the main commit it read.
@@ -222,24 +322,17 @@ export function validatePacket(packet, { census = [], path = "", source = path }
       err("lifecycle mainnet needs a lifecycle claim receipted by an explorer, repository or docs source, or a metric from an onchain or primary source");
   }
 
-  // 5. Identity collisions with the canonical census are recorded, never silently dropped.
+  // 5. Identity collisions with the canonical census. A shared official surface — handle, owned domain,
+  //    reproduced address — is evidence the two records may be one entity and must be disclosed. A shared
+  //    name alone is not: a launchpad that lists its launches as aliases collides with every one of them
+  //    and is none of them. That is a warning, and the compiler drops the colliding alias (§7).
   const recorded = new Set((record.identity?.possible_matches ?? []).map((match) => match.slug));
-  const packetNames = new Set([record.name, record.identity?.canonical_name, ...(record.identity?.aliases ?? [])].map(normalizeIdentity).filter(Boolean));
-  const packetHandle = normalizeHandle(record.identity?.official_handle);
-  const packetDomain = normalizeDomain(record.identity?.official_domain);
   const censusSlugs = new Set(census.map((row) => row.slug));
   for (const slug of recorded) if (!censusSlugs.has(slug)) err(`possible match ${slug} is not in the canonical census`);
-  for (const row of census) {
-    if (row.slug === record.slug) continue;
-    const names = [row.name, ...(row.identity?.aliases ?? [])].map(normalizeIdentity).filter(Boolean);
-    const handle = normalizeHandle(row.handle);
-    const domains = (row.official_links ?? []).map((link) => normalizeDomain(link.url)).filter(Boolean);
-    const hit =
-      names.some((name) => packetNames.has(name)) ||
-      (packetHandle && handle === packetHandle) ||
-      (packetDomain && domains.includes(packetDomain));
-    if (hit && !recorded.has(row.slug))
-      err(`identity matches canonical slug ${row.slug}; record it under identity.possible_matches`);
+  for (const { row, strong, names } of identityCollisions(record, census)) {
+    if (recorded.has(row.slug)) continue;
+    if (strong) err(`identity matches canonical slug ${row.slug} on ${strong}; record it under identity.possible_matches`);
+    else warn(`name "${names[0]}" also names canonical slug ${row.slug}, and the two share no handle, domain or reproduced address; the alias is dropped when this compiles`);
   }
 
   // 6. The file's own path, the slugs it owns and the paths it declared.
@@ -301,12 +394,13 @@ export function validatePacket(packet, { census = [], path = "", source = path }
 /** Walk research/inbox/packets/<slug>/*.md and validate every packet in it. */
 export async function validatePacketDirectory(root = PACKET_ROOT, census = []) {
   const errors = [];
+  const warnings = [];
   let count = 0;
   let slugs;
   try {
     slugs = (await readdir(root, { withFileTypes: true })).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
   } catch (error) {
-    if (error.code === "ENOENT") return { errors, files: 0 };
+    if (error.code === "ENOENT") return { errors, warnings, files: 0 };
     throw error;
   }
 
@@ -323,7 +417,9 @@ export async function validatePacketDirectory(root = PACKET_ROOT, census = []) {
         errors.push(`${where}: ${error.message.split("\n")[0]}`);
         continue;
       }
-      for (const message of validatePacket(packet, { census, path: where })) errors.push(`${where}: ${message}`);
+      const packetWarnings = [];
+      for (const message of validatePacket(packet, { census, path: where, warnings: packetWarnings })) errors.push(`${where}: ${message}`);
+      for (const message of packetWarnings) warnings.push(`${where}: ${message}`);
       // One assignment (one work id) legitimately covers many slugs — a batch files one packet per slug
       // under the same work id. What is never legitimate is two packets for the *same* slug carrying the
       // same work id, so uniqueness is per (work_id, slug), not per work_id.
@@ -335,7 +431,7 @@ export async function validatePacketDirectory(root = PACKET_ROOT, census = []) {
       }
     }
   }
-  return { errors, files: count };
+  return { errors, warnings, files: count };
 }
 
 /** Newest packet for a slug by work id, parsed. Returns null when the slug has none. */
@@ -877,7 +973,7 @@ function changedFields(prior, next) {
  * fifty collector packets must land, minus the parts that are not usable, and say what it dropped.
  */
 export function compile(packet, priorProject = null, priorCensusRow = null, priorSources = null, priorFeed = null, options = {}) {
-  const { pulled = null, priorResearch = null } = options;
+  const { pulled = null, priorResearch = null, census = [] } = options;
   const frontmatter = packet.frontmatter ?? packet;
   const body = packet.body ?? "";
   const errors = checkPacket(frontmatter, body);
@@ -932,8 +1028,19 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
   const primaryLeaf = frontmatter.classification.primary_leaf;
   const identityConflicts = (frontmatter.conflicts ?? []).filter((row) => row.status !== "resolved" && String(row.field).startsWith("identity"));
   const identityStatus = identityConflicts.length ? "conflicted" : frontmatter.classification.evidence_state === "verified" ? "verified" : "provisional";
+  // An alias that is only another canonical name — the launchpad that lists its launches, the token that
+  // borrows a word — is dropped rather than written into the registry, where it would make two names look
+  // like one. The disclosure rule that produced the warning is validatePacket §5.
+  const weakAliases = new Map();
+  for (const { row, strong, names } of identityCollisions(frontmatter, census))
+    if (!strong) for (const name of names) weakAliases.set(normalizeIdentity(name), row.slug);
   const identity = {
-    aliases: frontmatter.identity.aliases ?? [],
+    aliases: (frontmatter.identity.aliases ?? []).filter((alias) => {
+      const slug = weakAliases.get(normalizeIdentity(alias));
+      if (slug === undefined) return true;
+      notice(`alias ${alias} is another name's slug (${slug}); dropped`);
+      return false;
+    }),
     symbols: frontmatter.identity.symbols ?? [],
     entity_kind: frontmatter.identity.entity_kind,
     chain_scope: frontmatter.identity.chain_scope,

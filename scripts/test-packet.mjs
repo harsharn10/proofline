@@ -7,7 +7,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parse, stringify } from "yaml";
-import { parsePacket, validatePacket, validatePacketDirectory, themesFromBody, BODY_SECTIONS } from "./lib/packet.mjs";
+import { compile, parsePacket, validatePacket, validatePacketDirectory, themesFromBody, BODY_SECTIONS } from "./lib/packet.mjs";
 import { validateAgainst, TAXONOMY_LEAVES } from "./lib/schemas.mjs";
 
 let failures = 0;
@@ -157,16 +157,103 @@ await test("packet referential checks", async () => {
   const duplicate = withFrontmatter(seed, (fm) => { fm.claims.push(structuredClone(fm.claims[0])); });
   assert.ok(check(duplicate).some((error) => error.includes("duplicate claim id")), "a reused claim id is rejected");
 
-  const collision = withFrontmatter(seed, (fm) => { fm.identity.aliases = ["Pons"]; });
-  assert.ok(check(collision).some((error) => error.includes("possible_matches")), "a canonical name collision must be recorded");
+  // A shared name and nothing else is a warning: the compiler drops the alias (§7).
+  const nameOnly = withFrontmatter(seed, (fm) => { fm.identity.aliases = ["Pons"]; });
+  const warnings = [];
+  assert.deepEqual(check(nameOnly, { warnings }), [], "a name that collides with nothing else does not fail the packet");
+  assert.ok(warnings.some((w) => w.includes("also names canonical slug pons")), warnings.join("; "));
+
+  // A shared official surface is evidence the two records may be one entity, and must be disclosed.
+  const pons = census.find((row) => row.slug === "pons");
+  const strong = withFrontmatter(seed, (fm) => { fm.identity.official_handle = pons.handle; });
+  assert.ok(check(strong).some((error) => error.includes("possible_matches")), "a shared official handle must be recorded");
   const disclosed = withFrontmatter(seed, (fm) => {
-    fm.identity.aliases = ["Pons"];
-    fm.identity.possible_matches = [{ slug: "pons", signals: ["same-normalized-name"], contrary_signals: ["different domain and handle"] }];
+    fm.identity.official_handle = pons.handle;
+    fm.identity.possible_matches = [{ slug: "pons", signals: ["shared-handle"], contrary_signals: ["different domain"] }];
   });
   assert.deepEqual(check(disclosed), [], "a recorded collision is not an error");
 
   const grok = withFrontmatter(seed, (fm) => { fm.producer = "supergrok"; });
   assert.ok(check(grok).some((error) => error.includes("verifier")), "supergrok files verifier packets only");
+});
+
+// 6b. The shape that used to stop the whole compile: a launchpad and the tokens launched through it.
+// Every launch links its page on the pad's app and some list the pad's name; none of that makes the pad
+// and the token one entity, and none of it may block the batch.
+await test("a launchpad and its launches collide weakly, and the compiler drops the borrowed alias", async () => {
+  const pad = {
+    slug: "long", name: "LONG", handle: "@longdotxyz",
+    identity: { aliases: ["long.xyz", "LongLauncher"], symbols: [], entity_kind: "protocol" },
+    official_links: [{ kind: "site", url: "https://app.long.xyz" }, { kind: "x", url: "https://x.com/longdotxyz" }],
+  };
+  const seed = await fixture("seed-valid");
+
+  // The launched token: its own site and handle, the pad's app page as an `app` link, the pad's name as
+  // an alias, and its ticker in both the symbol and the alias list.
+  const launch = withFrontmatter(seed, (fm) => {
+    fm.identity.canonical_name = "iCoin";
+    fm.identity.aliases = ["ICOIN", "LONG"];
+    fm.identity.symbols = ["ICOIN"];
+    fm.identity.official_handle = "@iCoinRH";
+    fm.identity.official_domain = "https://icoin.example";
+    fm.links = [
+      { kind: "site", url: "https://icoin.example", authenticity: "confirmed" },
+      { kind: "app", url: "https://app.long.xyz/tokens/0x5d6ef090a1461b11c9427ac319260122d1c61e18", authenticity: "unconfirmed" },
+    ];
+  });
+  const warnings = [];
+  assert.deepEqual(
+    validatePacket(launch, { census: [pad], path: pathFor(launch.frontmatter), warnings }), [],
+    "a launch page on the pad's app is not a claim on the pad's identity",
+  );
+  assert.equal(warnings.length, 1, warnings.join("; "));
+  assert.match(warnings[0], /name "LONG" also names canonical slug long/);
+
+  // The same collision the other way round: the pad names its launches, and is still not one of them.
+  const launchRow = {
+    slug: "icoin", name: "iCoin", handle: "@iCoinRH",
+    identity: { aliases: ["ICOIN"], symbols: ["ICOIN"], entity_kind: "token" },
+    official_links: [{ kind: "app", url: "https://app.long.xyz/tokens/0x5d6ef090a1461b11c9427ac319260122d1c61e18" }],
+  };
+  const padPacket = withFrontmatter(seed, (fm) => {
+    fm.slug = "long";
+    fm.owned_slugs = ["long"];
+    fm.work_id = "WORK-20260902-grok-heavy-long";
+    fm.allowed_paths = ["research/inbox/packets/long/WORK-20260902-grok-heavy-long.md"];
+    fm.name = "LONG";
+    fm.identity.canonical_name = "LONG";
+    fm.identity.aliases = ["long.xyz"];
+    fm.identity.official_handle = "@longdotxyz";
+    fm.identity.official_domain = "https://app.long.xyz";
+    fm.links = [{ kind: "site", url: "https://app.long.xyz", authenticity: "confirmed" }];
+  });
+  assert.deepEqual(
+    validatePacket(padPacket, { census: [launchRow], path: pathFor(padPacket.frontmatter) }), [],
+    "the pad's own domain appearing as a token's app link is not a shared official domain",
+  );
+
+  // A real shared surface still has to be disclosed.
+  const sameHandle = withFrontmatter(launch, (fm) => { fm.identity.official_handle = "@longdotxyz"; });
+  assert.ok(
+    validatePacket(sameHandle, { census: [pad], path: pathFor(sameHandle.frontmatter) })
+      .some((error) => error.includes("the official handle @longdotxyz")),
+    "one handle on two records is evidence, and must be recorded",
+  );
+
+  // And the borrowed alias never reaches the registry. compile() needs a packet with the full field set,
+  // so this half runs on the compiler fixture wearing the same identity.
+  const compilable = withFrontmatter(
+    parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8")),
+    (fm) => {
+      fm.identity.canonical_name = "iCoin";
+      fm.identity.aliases = ["ICOIN", "LONG"];
+      fm.identity.symbols = ["ICOIN"];
+      fm.identity.official_handle = "@iCoinRH";
+    },
+  );
+  const compiled = compile(compilable, null, null, null, null, { census: [pad] });
+  assert.deepEqual(compiled.censusRow.identity.aliases, ["ICOIN"], "the pad's name is dropped from the launch's row");
+  assert.ok(compiled.notices.includes("alias LONG is another name's slug (long); dropped"), compiled.notices.join("; "));
 });
 
 // 7. The taxonomy enum in the schema is the taxonomy registry, not a copy that drifted.
