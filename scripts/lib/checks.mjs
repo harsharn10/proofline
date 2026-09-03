@@ -56,32 +56,53 @@ export function mainnetReceiptFromPulled(pulled) {
   return { address: contract.address, createdAt: contract.created_at };
 }
 
-/** The reader-facing Blockscout record for an address the puller read. */
+/** The reader-facing records behind the two reads the puller makes: the explorer, and DexScreener. */
 const EXPLORER_ADDRESS_PAGE = "https://robinhoodchain.blockscout.com/address/";
+const DEXSCREENER_PAIR_PAGE = "https://dexscreener.com/robinhood/";
 
 /**
  * The receipt a pulled chain read gives one deployment address, or null when the puller has not
  * established it. This is the second thing that turns a machine read into a citable receipt, and it
- * lives beside `mainnetReceiptFromPulled` so there is one place that does it: a contract the puller
- * found on 4663 with verified source is evidence a controller does not have to reproduce by hand,
- * while an address the puller has not read yet stays unverified rather than being taken on trust.
+ * lives beside `mainnetReceiptFromPulled` so there is one place that does it: an address the puller
+ * has reached is evidence a controller does not have to reproduce by hand, while one it has not
+ * reached stays unverified rather than being taken on trust.
+ *
+ * The puller reaches an address two ways. `addresses[]` is its explorer read, which knows whether the
+ * address holds code and whether that code's source is verified. `market.pairs[]` is its DexScreener
+ * read: a pool the market data names is a contract that exists and trades, established by a different
+ * endpoint, so it carries that endpoint's publisher and kind rather than the explorer's.
  */
 export function deploymentReceiptFromPulled(pulled, address) {
-  if (pulled?.chain !== "robinhood-chain" || !pulled?.pulled_at) return null;
+  if (pulled?.chain !== "robinhood-chain") return null;
   const wanted = String(address ?? "").toLowerCase();
   if (!wanted || wanted === "not-verified") return null;
+
   const row = (pulled.addresses ?? []).find((entry) => String(entry?.address ?? "").toLowerCase() === wanted);
-  if (!row || row.is_contract !== true) return null;
   // schema/pulled.schema.json carries source_verified on every address; null means Blockscout never
   // answered, which is not the same as "unverified source" but is equally not an establishment.
-  if ("source_verified" in row && row.source_verified !== true) return null;
-  return {
+  const established = row?.is_contract === true && (!("source_verified" in row) || row.source_verified === true);
+  if (row && established && pulled.pulled_at) return {
     address: row.address,
     pulledAt: pulled.pulled_at,
     receipt: `pulled ${row.address} ${pulled.pulled_at}`,
     url: `${EXPLORER_ADDRESS_PAGE}${row.address}`,
-    contractName: row.contract_name ?? null,
+    publisher: "Robinhood Chain Blockscout",
+    kind: "explorer",
+    detail: `is_contract true, source_verified true${row.contract_name ? `, contract ${row.contract_name}` : ""}`,
   };
+
+  const marketPulledAt = pulled.market?.pulled_at;
+  const pair = (pulled.market?.pairs ?? []).find((entry) => String(entry?.pair_address ?? "").toLowerCase() === wanted);
+  if (pair && marketPulledAt) return {
+    address: pair.pair_address,
+    pulledAt: marketPulledAt,
+    receipt: `pulled pair ${pair.pair_address} ${marketPulledAt}`,
+    url: `${DEXSCREENER_PAIR_PAGE}${pair.pair_address}`,
+    publisher: "DexScreener",
+    kind: "third-party-data",
+    detail: `market pair for ${pulled.market?.token_address ?? "the project token"} on Robinhood Chain (4663)`,
+  };
+  return null;
 }
 
 function pulledContractHasActivity(pulled) {

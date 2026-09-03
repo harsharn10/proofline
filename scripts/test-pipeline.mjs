@@ -578,6 +578,34 @@ await test("a pulled chain read verifies a deployment and is cited as its source
   assert.deepEqual(validateAgainst("sources", result.sources), [], "the ledger still passes its schema");
   assert.deepEqual(validateAgainst("project", result.project), []);
 
+  // A pool DexScreener names is a contract the puller has read, from its other endpoint.
+  const pool = "0x1010101010101010101010101010101010101010";
+  const marketPulledAt = "2026-09-03T09:00:00.000Z";
+  const withMarket = {
+    ...pulled,
+    market: { token_address: router, pulled_at: marketPulledAt, pairs: [{ pair_address: pool }] },
+  };
+  const pairRead = deploymentReceiptFromPulled(withMarket, pool.toUpperCase());
+  assert.equal(pairRead.receipt, `pulled pair ${pool} ${marketPulledAt}`);
+  assert.equal(pairRead.url, `https://dexscreener.com/robinhood/${pool}`);
+  assert.equal(pairRead.kind, "third-party-data");
+  assert.equal(pairRead.publisher, "DexScreener");
+  assert.equal(deploymentReceiptFromPulled({ ...withMarket, market: { ...withMarket.market, pulled_at: undefined } }, pool), null, "a market read with no timestamp is not a receipt");
+
+  const poolPacket = reshaped((frontmatter) => {
+    frontmatter.claims[0].class = "claim";
+    frontmatter.claims[0].reproduction_ids = [];
+    frontmatter.deployments[0].address.value = pool;
+    frontmatter.claims[0].value = pool;
+  });
+  const poolResult = compile(poolPacket, null, null, null, null, { pulled: withMarket });
+  const [poolDeployment] = poolResult.project.deployments;
+  assert.equal(poolDeployment.verified, true, "the pool is verified from the market read");
+  const poolSource = poolResult.sources.sources.find((source) => poolDeployment.sources.includes(source.id) && source.researcher === "pull");
+  assert.equal(poolSource.kind, "third-party-data");
+  assert.equal(poolSource.url, `https://dexscreener.com/robinhood/${pool}`);
+  assert.deepEqual(validateAgainst("sources", poolResult.sources), []);
+
   // Compiling again against the same read reuses the entry; a later pull refreshes what it says it read.
   const again = compile(unreproduced, result.project, result.censusRow, result.sources, result.feed, { pulled });
   assert.equal(again.sources.sources.filter((source) => source.researcher === "pull").length, 1, "one entry per address, not one per compile");
@@ -586,6 +614,36 @@ await test("a pulled chain read verifies a deployment and is cited as its source
   const refreshedEntry = refreshed.sources.sources.find((source) => source.researcher === "pull");
   assert.equal(refreshedEntry.accessed_at, "2026-09-04T10:00:00.000Z", "a newer read updates the entry it already has");
   assert.equal(refreshed.sources.sources.filter((source) => source.researcher === "pull").length, 1);
+});
+
+await test("a re-listed deployment keeps the evidence it already has", async () => {
+  const router = "0x2222222222222222222222222222222222222222";
+  const stored = [{
+    label: "Alpha router (reproduced on the explorer by review)",
+    chain: "robinhood-chain",
+    address: router,
+    role: "router",
+    verified: true,
+    sources: ["S20", "S13"],
+  }];
+  // The packet re-lists the address with no reproduction of its own, and no chain read backs it.
+  const unreproduced = reshaped((frontmatter) => { frontmatter.claims[0].class = "claim"; frontmatter.claims[0].reproduction_ids = []; });
+  const seeded = compile(unreproduced);
+  assert.equal(seeded.project.deployments[0].verified, false, "on its own the packet establishes nothing");
+
+  const result = compile(unreproduced, { ...seeded.project, deployments: stored }, seeded.censusRow, seeded.sources, seeded.feed);
+  const [deployment] = result.project.deployments;
+  assert.equal(deployment.verified, true, "a compile never lowers verified on a row someone reproduced");
+  for (const id of ["S20", "S13"]) assert.ok(deployment.sources.includes(id), `stored source ${id} survives: ${deployment.sources}`);
+  assert.ok(deployment.sources.length > 2, "the packet's own citations are added alongside");
+  assert.equal(deployment.sources.length, new Set(deployment.sources).size, "sources are not duplicated");
+  assert.deepEqual(validateAgainst("project", result.project), []);
+
+  // An address the packet brings that is not stored is added, not merged into someone else's row.
+  const fresh = reshaped((frontmatter) => { frontmatter.deployments[0].address.value = "0x3333333333333333333333333333333333333333"; frontmatter.claims[0].value = "0x3333333333333333333333333333333333333333"; });
+  const added = compile(fresh, { ...seeded.project, deployments: stored }, seeded.censusRow, seeded.sources, seeded.feed);
+  assert.equal(added.project.deployments.length, 2);
+  assert.equal(added.project.deployments[0].verified, true, "the stored row is untouched");
 });
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }

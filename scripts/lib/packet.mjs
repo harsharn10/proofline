@@ -554,6 +554,30 @@ function mergeUnique(existing, incoming, identity) {
  * adds surfaces, it never deletes one a controller put there — while an incoming link has to be a kind
  * the target schema accepts. Two links with the same normalized URL are one link.
  */
+/**
+ * Merge stored deployments with the packet's, keyed by chain and address. A row that is already there
+ * keeps the evidence it has: `verified` is never lowered — someone reproduced that address and wrote
+ * it down — and its source ids stay alongside whatever the packet cites. Everything else the packet
+ * brings updates the row, so a re-listed address gains detail and never loses proof.
+ */
+function mergeDeployments(existing, incoming) {
+  const key = (row) => `${row.chain}|${String(row.address).toLowerCase()}`;
+  const out = [...(existing ?? [])];
+  const positions = new Map(out.map((row, index) => [key(row), index]));
+  for (const row of incoming ?? []) {
+    const at = positions.get(key(row));
+    if (at === undefined) { positions.set(key(row), out.length); out.push(row); continue; }
+    const prior = out[at];
+    out[at] = {
+      ...prior,
+      ...row,
+      verified: prior.verified === true || row.verified === true,
+      sources: [...new Set([...(prior.sources ?? []), ...(row.sources ?? [])])],
+    };
+  }
+  return out;
+}
+
 function officialLinks(existing, incoming, kinds) {
   const out = [], positions = new Map();
   const rows = [
@@ -871,11 +895,11 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
   const recordPulledSource = (chainRead, slug) => {
     const candidate = {
       url: chainRead.url,
-      publisher: "Robinhood Chain Blockscout",
-      kind: "explorer",
+      publisher: chainRead.publisher,
+      kind: chainRead.kind,
       accessed_at: chainRead.pulledAt,
       claim: `Contract record for ${chainRead.address} on Robinhood Chain (4663), read into content/pulled/${slug}.yaml.`,
-      excerpt: `${chainRead.receipt}: is_contract true, source_verified true${chainRead.contractName ? `, contract ${chainRead.contractName}` : ""}.`,
+      excerpt: `${chainRead.receipt}: ${chainRead.detail}.`,
       hash: null,
       archive_url: null,
       researcher: "pull",
@@ -1021,7 +1045,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     ...(themes?.length ? { themes } : {}),
     official_links: projectLinks,
     dependencies: [...new Set([...(priorProject?.dependencies ?? []), ...relationships])],
-    deployments: mergeUnique(priorProject?.deployments, deployments, (row) => `${row.chain}|${String(row.address).toLowerCase()}`),
+    deployments: mergeDeployments(priorProject?.deployments, deployments),
     ...(metrics.length || priorProject?.metrics ? { metrics: mergeUnique(priorProject?.metrics, metrics, (row) => row.kind) } : {}),
     review: priorProject?.review ?? { researcher: frontmatter.producer, approver: "pending", methodology_version: "proofline-v1.0", reviewed_at: frontmatter.as_of.slice(0, 10), published_at: null },
     findings: findingsFromBody(frontmatter, body, receiptToSource, priorProject, metricGaps),
