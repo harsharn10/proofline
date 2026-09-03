@@ -123,13 +123,22 @@ reproduced here.
 
 Themes: savings-vault, yield, erc-4626
 
+TL;DR: A savings vault that pools USDG deposits into one ERC-4626 vault with open withdrawal, live since July, run by a single key [CLM-1 CLM-4].
+
 ## Why it matters
 
-Two or three sentences on what the play changes for the chain and who depends on it.
+Three bullets, one line each, ending with the claim ids that back them: the thesis, the traction hook, the next catalyst.
+
+- Thesis: the first open-withdrawal savings vault on the chain, so idle USDG can earn without a lockup [CLM-1].
+- Traction: $128K deposited in the first month, 40 depositors [CLM-5].
+- Catalyst: the documented yield source goes live in Q4 per the docs; not yet reproduced [CLM-6].
 
 ## What could go wrong
 
-Two or three sentences on the failure the reader should watch, stated as mechanism, not intent.
+Up to three bullets, plain words, mechanism not intent, each with the claim ids that back it.
+
+- A single key owns the vault and can change the yield source with no delay [CLM-4].
+- No audit matched the deployed code [CLM-7].
 
 ## Product and mechanics
 
