@@ -24,10 +24,7 @@ const FILTERS: Array<{ value: Filter; label: string }> = [
 ];
 const STATUS_ORDER = { live: 0, quiet: 1, dormant: 2, announced: 3, testnet: 4 } as const;
 
-// Vite regenerates routeTree.gen.ts when this route is built; that generated file is deliberately
-// outside this assignment's allowed paths, so keep this source independently type-checkable.
-// @ts-expect-error The generated route typing is intentionally not committed by this scoped PR.
-export const Route: any = createFileRoute("/s/$id")({
+export const Route = createFileRoute("/s/$id")({
   validateSearch: (search: Record<string, unknown>): { f?: Filter } =>
     FILTERS.some(({ value }) => value === search.f) ? { f: search.f as Filter } : {},
   loader: () => getContent(),

@@ -1,5 +1,3 @@
-# How to read this
-
 Version `proofline-v1.0`.
 
 Icarus tracks what is new on Robinhood Chain and separates facts we can check from statements that still need work. Every figure should take you back to the page or chain read behind it.

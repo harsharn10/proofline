@@ -38,11 +38,6 @@ function NamePage() {
   const { tab } = Route.useSearch();
   return (
     <>
-      <div className="wrap narrow pt-3">
-        <Link to="/" className="backlink">
-          ← all names
-        </Link>
-      </div>
       <Dossier
         dossier={dossier}
         site={site}
