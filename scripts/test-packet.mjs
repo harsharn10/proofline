@@ -3,9 +3,11 @@
 // `ok <name>` line per group, non-zero exit on any failure. Run from the repo root:
 //   node scripts/test-packet.mjs
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { parse, stringify } from "yaml";
-import { parsePacket, validatePacket, BODY_SECTIONS } from "./lib/packet.mjs";
+import { parsePacket, validatePacket, validatePacketDirectory, BODY_SECTIONS } from "./lib/packet.mjs";
 import { validateAgainst, TAXONOMY_LEAVES } from "./lib/schemas.mjs";
 
 let failures = 0;
@@ -199,6 +201,27 @@ await test("Icarus packet fields are required from 2026-09-03", async () => {
   const legacy = await fixture("seed-valid");
   assert.equal(String(legacy.frontmatter.as_of).slice(0, 10), "2026-09-02");
   assert.deepEqual(check(legacy), [], "older seed remains backward compatible");
+});
+
+// 9. One work id spans a whole batch of slugs; the clash the directory walk reports is per (work_id, slug).
+await test("work_id uniqueness is per (work_id, slug)", async () => {
+  const root = await mkdtemp(join(tmpdir(), "proofline-packet-dir-"));
+  const file = (slug, name, workId) =>
+    writeFile(join(root, slug, `${name}.md`), `---\nwork_id: ${workId}\nslug: ${slug}\n---\n\n## What it is\n\nx\n`);
+  try {
+    for (const slug of ["alpha", "beta"]) await mkdir(join(root, slug), { recursive: true });
+    await file("alpha", "WORK-20260903-grok-heavy-batch", "WORK-20260903-grok-heavy-batch");
+    await file("beta", "WORK-20260903-grok-heavy-batch", "WORK-20260903-grok-heavy-batch");
+    const batch = await validatePacketDirectory(root, []);
+    assert.deepEqual(batch.errors.filter((error) => error.includes("work_id")), [], "one work id may cover many slugs");
+    assert.equal(batch.files, 2);
+
+    await file("alpha", "second-file", "WORK-20260903-grok-heavy-batch");
+    const clash = await validatePacketDirectory(root, []);
+    const reported = clash.errors.filter((error) => error.includes("work_id"));
+    assert.equal(reported.length, 1, `two packets for one slug under one work id is still an error: ${reported.join("; ")}`);
+    assert.ok(reported[0].includes("for slug alpha"), reported[0]);
+  } finally { await rm(root, { recursive: true, force: true }); }
 });
 
 console.log(failures ? `${failures} failure(s)` : "all packet tests passed");

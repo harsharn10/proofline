@@ -323,10 +323,14 @@ export async function validatePacketDirectory(root = PACKET_ROOT, census = []) {
         continue;
       }
       for (const message of validatePacket(packet, { census, path: where })) errors.push(`${where}: ${message}`);
+      // One assignment (one work id) legitimately covers many slugs — a batch files one packet per slug
+      // under the same work id. What is never legitimate is two packets for the *same* slug carrying the
+      // same work id, so uniqueness is per (work_id, slug), not per work_id.
       const workId = packet.frontmatter?.work_id;
       if (typeof workId === "string") {
-        if (seenWorkIds.has(workId)) errors.push(`${where}: work_id ${workId} also appears in ${seenWorkIds.get(workId)}`);
-        else seenWorkIds.set(workId, where);
+        const key = `${slug} ${workId}`;
+        if (seenWorkIds.has(key)) errors.push(`${where}: work_id ${workId} also appears in ${seenWorkIds.get(key)} for slug ${slug}`);
+        else seenWorkIds.set(key, where);
       }
     }
   }
