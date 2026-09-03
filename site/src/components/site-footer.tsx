@@ -1,4 +1,4 @@
-import { useLoaderData } from "@tanstack/react-router";
+import { Link, useLoaderData } from "@tanstack/react-router";
 import { correctionsLink } from "@/data/types";
 
 export function SiteFooter() {
@@ -9,10 +9,15 @@ export function SiteFooter() {
     <footer className="sitefooter">
       <div className="wrap">
         <p className="footline">
-          Every number links to its source on the profile. Status is computed from on-chain data, never typed.
-          Research, not advice.
+          Icarus is independent automated research, not advice or an endorsement. Verify everything.
           {correction.href ? <a href={correction.href}>{correction.label}</a> : null}
         </p>
+        <nav className="footerlinks" aria-label="Legal and methodology">
+          <Link to="/methodology">How to read this</Link>
+          <Link to="/disclaimer">Disclaimer</Link>
+          <Link to="/terms">Terms</Link>
+          <Link to="/privacy">Privacy</Link>
+        </nav>
       </div>
     </footer>
   );
