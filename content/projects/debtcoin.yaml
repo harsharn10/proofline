@@ -1,0 +1,127 @@
+slug: debtcoin
+name: DEBTCOIN
+symbol: DEBTCOIN
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against SGOV. LongLauncher deploys Debtcoin (DEBTCOIN) in one create call and seeds the DEBTCOIN/SGOV book. Traders buy and sell DEBTCOIN on Uniswap v4. SGOV is a Robinhood Stock Token rail, not the subject. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:sgov
+  - rwa
+  - graduation
+official_links:
+  - kind: other
+    url: https://x.com/IceManDrakee/status/2094949272131424692
+dependencies: []
+deployments:
+  - label: DEBTCOIN token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x55D9bC094C032cE0F4c57Cb09e6AB8F225531E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S16
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: LongLauncher (create tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S15
+      - S16
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S5
+      - S14
+      - S16
+  - label: Quote asset SGOV stock token (rail)
+    chain: robinhood-chain
+    address: "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S10
+      - S13
+metrics:
+  - kind: tvl
+    value: 213908.99
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: volume_24h
+    value: 1864872.77741426
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: market_cap
+    value: 575084.1709
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 1101
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/SGOV/Airlock/LongLauncher and create tx plus logs, RPC name/symbol/owner/pool/tokenURI, DexScreener pair/token, Gecko pool/token/info, /rhj/assets, Pinata tokenURI, and the IceManDrakee status were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-10] - Numbers: 1593779.02 is the DexScreener DEBTCOIN/SGOV 24h volume, not the 1864872.78 Gecko token all-pools figure. Reserve on Gecko is negative; DexScreener liquidity 213908.99 is the SGOV book. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that DEBTCOIN is an official SGOV or Bankr product, or the same token as JOHNDOG. /rhj/assets lists SGOV as a Robinhood Token rail, Gecko's bankr-robinhood label is shared Doppler infrastructure, create is LongLauncher, and JOHNDOG is a different CA. No official handle or domain was located."
+      class: inference
+      sources:
+        - S4
+        - S10
+        - S18
+    - text: Quote token SGOV is a stock-token rail; pool USD figures count DEBTCOIN plus SGOV, not a USDG backstop. [verified R-7 R-10] - Gecko reserve_in_usd is negative this pass; do not treat it as TVL. [claim R-8] - No official handle or domain this pass; tokenURI Website is a third-party-link. [claim R-7 R-11] - No audit report URL this pass. [unknown] - Same-rail JOHNDOG/SGOV is a different token.
+      class: verified
+      sources:
+        - S18
+        - S19
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x55D9…1E18? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle that also embeds the CA"
+    - text: "Does @IceManDrakee bidirectionally claim the CA beyond the tokenURI Website field? Next: read the account bio and later posts for the CA; do not file as official without a reverse link"
+    - text: "Why is Gecko reserve_in_usd negative on DEBTCOIN/SGOV while DexScreener liquidity.usd is ~$214k? Next: re-fetch Gecko pool; if still negative keep CON-1 open and prefer DexScreener for USD liquidity"
+    - text: "Who controls Airlock owner Safe 0x21E2…7A66 relative to this launch, and is the 5% Lock split a LONG protocol fee? Next: read Airlock owner() on 4663 this pass if filing a control update"
+    - text: "Which Gecko trending window ranked this SGOV book, and did JOHNDOG/SGOV overtake it? Next: archive both SGOV books if a trending screenshot returns"
+    - text: "tvl is not published as a figure: the packet reported -355304.709249059"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

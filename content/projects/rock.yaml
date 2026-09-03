@@ -1,0 +1,120 @@
+slug: rock
+name: ROCK
+symbol: ROCK
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against GLD. LongLauncher deploys ROCK in one create call and seeds the ROCK/GLD book. Traders buy and sell ROCK on Uniswap v4. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:gld
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/justRock_RH
+dependencies: []
+deployments:
+  - label: ROCK token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xB6b5D146d89cDceD2E304389D08448E327c71E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S15
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S3
+      - S5
+  - label: LongLauncher (create target)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S15
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S15
+  - label: GLD SPDR Gold Trust Robinhood Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0xC9a981FEE1F9DEc688bb123ccDeCc63D0deBFC4e"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S10
+      - S13
+metrics:
+  - kind: volume_24h
+    value: 115262.98
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 113062.69
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 199919
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 774
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/GLD/other ROCK and the create tx plus logs, RPC name/symbol/owner/code, DexScreener tokens and search, /rhj/assets, and X Latest posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-12] - Numbers: 115262.98 is the DexScreener ROCK/GLD pair 24h volume, not an all-pools figure. Liquidity 113062.69 is that pool. Assignment lead of liq ~$107,570 vol ~$124,787 was not reproduced at this as_of. [claim R-7] - Adversarial: the strongest contrary reading is that ROCK is UBIK, CASHBIRD, or SCHIFFY, or that it is the Pons ROCK 0x000AEc…9c5C, or that @justRock_RH is official. UBIK is 0x8124…68Bd. CASHBIRD is 0x38C8…1e18. SCHIFFY is 0x42aF…1E18. The Pons token is a different CA. DexScreener socials are empty."
+      class: inference
+      sources:
+        - S12
+        - S14
+        - S11
+    - text: "Quote token GLD 0xC9a9…FC4e is a rail in GET /rhj/assets; this subject is not that row. [verified R-12 R-16] - Pool USD liquidity is ROCK plus GLD, not a USDG or WETH backstop. [claim R-7] - Ticker collision: PonsLauncherToken ROCK 0x000AEc…9c5C. [claim R-17] - No official handle or domain this pass; netlify vote/claim pages are copypasta-pattern. [claim R-7 R-13 R-20] - No audit report URL this pass."
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0xB6b5…1E18? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle that links back"
+    - text: "Does @justRock_RH or @1xharsh pin the CA in bio, or does a site cross-link? Next: re-fetch both profiles and DexScreener info.socials"
+    - text: "Is PonsLauncherToken ROCK 0x000AEc…9c5C still a live ticker collision on DexScreener? Next: GET DexScreener latest/dex/tokens/0x000AEc…9c5C"
+    - text: "Does verified DopplerERC20V1 source expose a burn path matching the 1e27 mint vs 998376280590820425261189213 supply? Next: read burn/transfer hooks in src/tokens/DopplerERC20V1.sol on the explorer"
+    - text: "Would a later Gecko pool slice confirm DexScreener ROCK/GLD 115262.98 / 113062.69? Next: retry api.geckoterminal.com/api/v2/networks/robinhood/tokens/0xB6b5…1E18 when GET is 200"
+  unresolved: []

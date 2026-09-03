@@ -1,0 +1,106 @@
+slug: ram
+name: RAM
+symbol: RAM
+category: Imported AMM
+lifecycle: mainnet
+coverage: stub
+summary: A LayerZero OFT satellite of RAM on Robinhood Chain. Verified RamsesOftSatellite burns on send and mints on authenticated receive, with no external mint. Traders buy and sell RAM on Ramses v3 and Uniswap v4 books. ramses.xyz and @RamsesExchange run the imported AMM; this packet is the token, not the Llama Ramses DEX.
+themes:
+  - amm
+official_links:
+  - kind: site
+    url: https://www.ramses.xyz/
+  - kind: docs
+    url: https://docs.ramses.xyz/
+  - kind: x
+    url: https://x.com/RamsesExchange
+  - kind: github
+    url: https://github.com/RamsesExchange
+  - kind: telegram
+    url: https://t.me/ExchangeRamses
+  - kind: discord
+    url: https://discord.gg/P3fQPWsuaN
+dependencies: []
+deployments:
+  - label: RAM token (RamsesOftSatellite)
+    chain: robinhood-chain
+    address: "0x5173D45A1191eE33cBB7D8c7e65f21B04eD54802"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: Ramses Team Multisig (token owner)
+    chain: robinhood-chain
+    address: "0x20D630cF1f5628285BfB91DfaC8C89eB9087BE1A"
+    role: admin
+    verified: false
+    sources:
+      - S4
+      - S5
+      - S12
+  - label: LayerZero EndpointV2
+    chain: robinhood-chain
+    address: "0x6F475642a6e85809B1c36Fa62763669b1b48DD5B"
+    role: other
+    verified: true
+    sources:
+      - S2
+      - S5
+metrics:
+  - kind: holders
+    value: 10236
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: volume_24h
+    value: 3782622.16
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 13459707.29
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 424602.64
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/source/create tx/Safe/endpoint, RPC name/symbol/owner/endpoint/token(), DexScreener, Gecko token/pool/info (first GET 200), Llama ramses-cl and ramses-cl-v2, docs contract-addresses/ramses-x/audits, ramses.xyz, @RamsesExchange posts, CT posts, Telegram preview, GitHub org, and Discord invite were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 3782622.16 is the Gecko RAM/USDG pool 24h volume, not the 8133977.08 token all-pools figure. Holders 10236 is Blockscout, not Gecko info 9981. Llama 4947098.94 is ramses-cl-v2 Robinhood Chain TVL, not token TVL. [claim R-1 R-7 R-8 R-11] - Adversarial: the strongest contrary reading is that this row is Llama Ramses DEX and should merge into ramses or ramsesx. Contrary: Arbitrum ramses-cl token/DEX address is 0xaaa6…2418, HyperEVM RAM is 0x5555…5555, this address is the 4663 OFT satellite, and census has no ramses/ramsesx row. Do not merge."
+      class: inference
+      sources:
+        - S10
+        - S11
+        - S12
+    - text: Docs describe OFT as unpublished while this satellite is live on 4663. [disputed R-2 R-13] - Gecko market_cap_usd exceeds fdv_usd on the same token endpoint. [disputed R-7] - Llama ramses-cl (Arbitrum) and ramsesx/RamsesX (multi-chain AMM) share name, ticker, site, and handle with this token. [verified R-10 R-11 R-12] - Same-ticker LongLauncher RAM 0x15D7…1e18 is a ca-collision. [claim R-6] - No OFT-satellite-specific audit URL this pass. [claim R-22] - Handle-collision accounts sit next to @RamsesExchange.
+      class: claim
+      sources:
+        - S23
+  missing:
+    - text: "Should RAM the OFT token stay a separate slug from ramsesx the imported AMM and from Llama ramses-cl? Next: keep ram vs ramsesx vs ramses-cl unmerged until a controller places ramsesx in census"
+    - text: "Which OFT peer eids are set, and does the satellite credit HyperEVM 0x5555…5555 or Arbitrum 0xaaa6…2418? Next: eth_call peers() for HyperEVM/Arbitrum/Polygon eids once RPC 429 clears"
+    - text: "Does Gecko market_cap_usd > fdv_usd because circulating includes other-chain OFT supply? Next: compare CoinGecko ramses circulating vs 4663 totalSupply"
+    - text: "Is there an OFT-satellite-specific audit, vs the V3 CLMM reviews on docs/audits? Next: search github.com/RamsesExchange for oft/RamsesOftSatellite audit PDFs"
+    - text: "Does github.com/RamsesExchange bidirectionally link ramses.xyz and the 4663 token? Next: open the org README and any oft repo for the satellite address"
+  unresolved:
+    - text: product.mechanism remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

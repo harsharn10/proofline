@@ -25,3 +25,140 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 05937ccfeac0b495
+- date: 2026-09-03
+  slug: stonks-fun
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    category: Launchpad · mechanism not classified
+    lifecycle: announced
+    summary: DN-404 launchpad on Doppler whose fees burn the $STONKS platform token; a rebrand toward RWA baskets is announced.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/stonksdotfun
+    deployments:
+      - &a1
+        label: STONKS token / factory
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    category: Redeemable RWA basket
+    lifecycle: mainnet
+    summary: Onchain index baskets of Robinhood stock tokens. A user picks holdings, sets weights, and mints one ERC-20 that is fully backed and redeemable in kind. MAG7, DEGEN and SILICON are live; the builder is open. Fees burn $STONKS. @stonksdotfun runs stonks.fun. $STONKS is a Doppler DN-404 from the earlier Uniswap v3 pad.
+    themes:
+      - launchpad
+      - rwa
+      - index
+    official_links:
+      - kind: x
+        url: https://x.com/stonksdotfun
+      - kind: app
+        url: https://stonks.fun
+    deployments:
+      - *a1
+      - label: STONKS token (DopplerDN404)
+        chain: robinhood-chain
+        address: "0x3F298f2b7306Bf9a9e7177Ca461C58c4c2FDfa4c"
+        role: token
+        verified: true
+        sources:
+          - S8
+          - S14
+          - S15
+          - S16
+      - label: DN404Factory
+        chain: robinhood-chain
+        address: "0x37A9Fa204a4d3A429FDED7e3469ab076C854Bc9d"
+        role: factory
+        verified: true
+        sources:
+          - S16
+          - S17
+      - label: StonksLauncherV3
+        chain: robinhood-chain
+        address: "0x2a71F10b41ff0882C7Be2A5c0644722314976b42"
+        role: factory
+        verified: true
+        sources:
+          - S18
+          - S24
+      - label: Basket factory
+        chain: robinhood-chain
+        address: "0xd21cdd54943cA962Ee6f13F0eB48e6f591870d4a"
+        role: factory
+        verified: true
+        sources:
+          - S20
+          - S25
+      - label: MAG7 basket (stonks MAG7)
+        chain: robinhood-chain
+        address: "0xA5eC9f044671b7EbD186b59272C3ab7cB88Ae891"
+        role: token
+        verified: true
+        sources:
+          - S5
+          - S19
+          - S20
+      - label: DEGEN basket (stonks DEGEN)
+        chain: robinhood-chain
+        address: "0xc7ceC00967266Ef50023904669c375baA4A33308"
+        role: token
+        verified: false
+        sources:
+          - S5
+          - S27
+      - label: SILICON basket (stonks SILICON)
+        chain: robinhood-chain
+        address: "0x68c6775Da99a028432FB2A0753DBeb91479868F4"
+        role: token
+        verified: false
+        sources:
+          - S5
+          - S28
+      - label: Basket cash-redeem router
+        chain: robinhood-chain
+        address: "0x5fF3F0896c587a316B92DA88dd2578b18399a4bC"
+        role: router
+        verified: true
+        sources:
+          - S5
+          - S26
+      - label: STONKS/USDG Uniswap v3 pool
+        chain: robinhood-chain
+        address: "0x37C0Bd9540B76bE0c947a07B4be5173B799C8167"
+        role: other
+        verified: false
+        sources:
+          - S21
+          - S22
+    metrics:
+      - kind: volume_24h
+        value: 6138.39
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S22
+      - kind: market_cap
+        value: 648468
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S22
+      - kind: holders
+        value: 1
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S19
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: b1e05b99a612a40b

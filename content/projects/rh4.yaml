@@ -1,0 +1,145 @@
+slug: rh4
+name: rh4.cpu
+symbol: RH4
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned onto a Pons v2 bonding curve and graduated into a Uniswap v4 pool quoted against native ETH. PonsV2LaunchFactory deploys rh4.cpu (RH4) in one launch call and, after the 4.2 ETH threshold, seeds the RH4/ETH book. Traders buy and sell RH4 on Uniswap v4. The same deployer EOA also published ChipFactory8, an ERC-721 the site treats as on-chain chips.
+themes:
+  - memecoin
+  - graduation
+  - bonding-curve
+  - nft
+official_links:
+  - kind: site
+    url: https://rh4cpu.tech
+  - kind: x
+    url: https://x.com/RH4cpu
+  - kind: telegram
+    url: https://t.me/rh4cpu
+  - kind: github
+    url: https://github.com/giupy997/chipc
+  - kind: other
+    url: https://www.ponsfamily.com/launchpad/0xe76a12bcd2f0E6d3db9F9012321642198E6cBd1B
+dependencies: []
+deployments:
+  - label: RH4 token (PonsV2LauncherToken bytecode)
+    chain: robinhood-chain
+    address: "0xe76a12bcd2f0E6d3db9F9012321642198E6cBd1B"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: PonsV2LaunchDeployer
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S13
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S12
+  - label: Pons v2 bonding curve (create-tx clone)
+    chain: robinhood-chain
+    address: "0x5FCAeEa4731C8E84D5E419c0dB8Ea1986859e18b"
+    role: other
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+  - label: V2LaunchLocker (graduated position)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S8
+      - S20
+  - label: ChipFactory8 (RH Chip ERC-721; site CA)
+    chain: robinhood-chain
+    address: "0x265A4D74DbF6C10f40ecf7d870df7677CB6fF65B"
+    role: factory
+    verified: true
+    sources:
+      - S9
+      - S14
+      - S5
+  - label: ChipFeeVault
+    chain: robinhood-chain
+    address: "0xb5C467bA319a1aCe5baCe0ffd45f6582C3AE491D"
+    role: vault
+    verified: false
+    sources:
+      - S15
+      - S22
+  - label: RH4 ticker collision (Pons v2, not this row)
+    chain: robinhood-chain
+    address: "0x9ECEA68a99AEcd079153dD58B751789f4e54E0a9"
+    role: token
+    verified: false
+    sources:
+      - S16
+metrics:
+  - kind: volume_24h
+    value: 565572.91
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 81529.86
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 809875
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 569
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/deployer/curve/create/graduation/ChipFactory/ChipFeeVault/collision, RPC name/symbol/launchFactory/curve/owner, DexScreener tokens, rh4cpu.tech, @RH4cpu, Telegram preview, GitHub chipc, and the vote/CA posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-9] - Numbers: 565572.91 is the DexScreener RH4/ETH Uniswap v4 pool 24h volume, not an all-pools figure. Liquidity 81529.86 is that pool. Holders 569 is Blockscout holders_count. [claim R-1 R-7] - Adversarial: the strongest contrary reading is that this CA is one of several rh4.cpu launches and the chip contracts are unrelated. The site and @RH4cpu bio both embed 0xe76a…Bd1B; ChipFactory8 is the top holder and was created by the same EOA; DexScreener's deepest RH4/ETH book is this pair."
+      class: inference
+      sources:
+        - S7
+        - S9
+        - S10
+        - S14
+    - text: Several other 4663 ERC-20s reuse rh4.cpu / RH4; 0x9ECE…E0a9 has a live ETH book at ~$4.7k liq. [verified R-16] - Flagship USD liquidity is RH4 plus native ETH, not USDG. [claim R-7 R-8] - ChipFactory8 is Ownable by the launch EOA; motherToken() returned 0x0 while the factory holds ~30% of supply. [verified R-5 R-14] - Telegram is a third-party-link this pass; a netlify.app vote URL was posted. [claim R-11 R-18] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does ChipFactory8.motherToken equal 0xe76a…Bd1B, or is the ~3.00e26 RH4 balance a transfer without the setter? Next: read MotherTokenSet logs on 0x265A…F65B and the first RH4 transfer into the factory"
+    - text: "Does github.com/giupy997/chipc pin CA 0xe76a…Bd1B or ChipFactory8, and is giupy997 linked from @RH4cpu? Next: open README and the latest commit for addresses; search @RH4cpu for a GitHub mention"
+    - text: "Does t.me/rh4cpu pin the CA or rh4cpu.tech? Next: open the join page / first messages if they become public without joining"
+    - text: "Which remaining RH4-ticker ERC-20s besides 0x9ECE…E0a9 still have a live book? Next: DexScreener tokens API on each collision CA if a later round needs a collision table"
+    - text: "Is there an audit report for ChipFactory8 / ChipFeeVault / Pons v2? Next: ask in public if a report URL is published"
+  unresolved: []

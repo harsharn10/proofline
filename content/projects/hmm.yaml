@@ -1,0 +1,119 @@
+slug: hmm
+name: HMM
+symbol: HMM
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 minted through Pons v1 into a Uniswap v3 1% WETH pool. PonsLaunchFactory launchToken deploys Thinking Cat (HMM) and seeds the HMM/WETH book. Traders buy and sell HMM on that pool and later Ramses / Uniswap v4 books. hmmmm.fun and @thinkingcatRH publish the contract.
+themes:
+  - memecoin
+  - cat
+official_links:
+  - kind: site
+    url: https://hmmmm.fun
+  - kind: x
+    url: https://x.com/thinkingcatRH
+  - kind: other
+    url: https://x.com/i/communities/2039350183981699140
+  - kind: app
+    url: https://ponsfamily.com/launchpad/0x7fe995a80075df3dc8ae11a9b82c7fe4202cd87f
+dependencies: []
+deployments:
+  - label: HMM token (PonsLauncherToken)
+    chain: robinhood-chain
+    address: "0x7FE995a80075dF3Dc8Ae11A9b82c7FE4202CD87f"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: PonsLaunchFactory (token launchFactory / creator)
+    chain: robinhood-chain
+    address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S6
+  - label: Uniswap v3 HMM/WETH 1% pool (liquidityPool)
+    chain: robinhood-chain
+    address: "0x2b0D0183d017c58B924401cA8AC362f6E01F0E9e"
+    role: other
+    verified: true
+    sources:
+      - S6
+      - S7
+      - S14
+      - S15
+  - label: PonsLaunchLocker (LP NFT 223724 recipient)
+    chain: robinhood-chain
+    address: "0x736D76699C26D0d966744cAe304C000d471f7F35"
+    role: other
+    verified: true
+    sources:
+      - S6
+      - S14
+  - label: launchToken deployer (TokenLaunched deployer / fee wallet)
+    chain: robinhood-chain
+    address: "0x934e92E1C82020fc4e1Ee55712C6d9fb19C6782a"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S6
+      - S14
+metrics:
+  - kind: volume_24h
+    value: 2314392.69
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 689642.48
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 21381671.07
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 14666
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/pool and launchToken 0xb737bacd…94b3 plus TokenLaunched/PositionLocked logs, RPC name/symbol/launchFactory/liquidityPool/socials, DexScreener, Gecko pool/token/pools, hmmmm.fun, @thinkingcatRH, @gornx0x, lookalike search, and the vote post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8 R-10] - Numbers: 2314392.69 is the Gecko HMM/WETH 1% pool 24h volume, not the 2814703.17 token all-pools figure. Reserve 689642.48 is that pool. DexScreener 2463016.35 / 833648.52 is the same pair, different aggregator. Holders 14666 is live Blockscout (assignment hint was 14667). [claim R-1 R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that HMM is the Pons protocol, a Wire product, or the Squeeze factory. Factory name is PonsLaunchFactory and census Pons is the pad; Wire is the launch command path; Squeeze tape reused that factory address as a scanner input. hmmmm.fun / @thinkingcatRH bidirectionally name this CA."
+      class: inference
+      sources:
+        - S3
+        - S10
+        - S11
+        - S13
+    - text: Quote token is WETH, so pool USD reserve is HMM plus ETH, not USDG. [verified R-7 R-8] - DexScreener liquidity and Gecko reserve on the same pool disagree by ~$144k. [claim R-7 R-8] - Handle-collision on three lookalike X accounts that copy the CA. [claim R-17] - Netlify vote URL is a third-party-link / copypasta-pattern. [claim R-18] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does PonsLaunchFactory owner() still point at the census 2-of-3 Safe, and does that path reach HMM after lock? Next: eth_call owner() on 0xA5aA…1feB and ownerOf(223724) on positionManager 0x7399…e0D3"
+    - text: "Why does launchBlock() return 25565387 while the creation tx is Blockscout block 13676926? Next: compare L2 block.number with Blockscout numbering, as CASHCAT seed noted the same split"
+    - text: "Is deployer 0x934e92…782a a Wirebot / EIP-7702 wallet, and who controls 0x7f876F…7775? Next: retry Blockscout address/0x934e92 and read the EIP-7702 target"
+    - text: "Which aggregator book should the site quote when DexScreener liq is $833k and Gecko reserve is $690k? Next: keep both labeled as pool slices; do not mix Gecko token all-pools volume 2814703.17"
+    - text: "Is there an audit of PonsLauncherToken.sol / PonsLaunchFactory.sol that names this HMM deployment? Next: search named auditors if Pons publishes one that covers v1 launcher tokens"
+  unresolved: []

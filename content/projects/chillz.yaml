@@ -1,0 +1,118 @@
+slug: chillz
+name: CHILLZ
+symbol: CHILLZ
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v2 pool quoted against NFLX. Flap Factory deploys Chilleez (CHILLZ) as a FlapTaxTokenV3 clone and the live book is CHILLZ/NFLX on Uniswap v2. Traders buy and sell CHILLZ there. The quote leg is the Netflix • Robinhood Token rail. Site and @ChilleezOnRh say a trade tax feeds a vault that sends NFLX to holders.
+themes:
+  - memecoin
+  - stock-paired:nflx
+  - rwa
+official_links:
+  - kind: site
+    url: https://www.chilleez.net/
+  - kind: x
+    url: https://x.com/ChilleezOnRh
+  - kind: telegram
+    url: https://t.me/ChilleezCommunity
+  - kind: app
+    url: https://app.uniswap.org/swap/?chain=robinhood&outputCurrency=0x5b6ef408c4ebb166788c0ca4cb644f12ac757777
+dependencies: []
+deployments:
+  - label: CHILLZ token (EIP-1167 FlapTaxTokenV3 clone)
+    chain: robinhood-chain
+    address: "0x5B6Ef408c4eBb166788C0cA4cB644f12AC757777"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: FlapTaxTokenV3 implementation
+    chain: robinhood-chain
+    address: "0x7777C8743C88B3aff3cf262135beF2c8b2e83333"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: Flap Factory (token creator)
+    chain: robinhood-chain
+    address: "0x26605f322f7fF986f381bB9A6e3f5DAb0bEaEb09"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: NFLX Stock Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0xE0444EF8BF4eD74f74FD73686e2ddF4C1c5591E8"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S12
+      - S16
+  - label: Uniswap v2 CHILLZ/NFLX mainPool
+    chain: robinhood-chain
+    address: "0x31a03eB2751456eE01B09546Fbb5be2E3b9e7ba9"
+    role: other
+    verified: false
+    sources:
+      - S7
+      - S8
+      - S17
+metrics:
+  - kind: volume_24h
+    value: 290713.69
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 73668.06
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 541425
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+      - S9
+  - kind: holders
+    value: 365
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/NFLX/pair and both create txs, RPC name/symbol/quoteToken/mainPool/taxes/state, DexScreener tokens API, Gecko token GET 200, /rhj/assets, chilleez.net CONFIG, @ChilleezOnRh bio and posts, Telegram preview, Netflix article, and the listing-vote post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12 R-13] - Numbers: 290713.69 is the DexScreener CHILLZ/NFLX v2 pool 24h volume, not the Gecko token 294165.03. Liquidity 73668.06 is that pool both sides. Gecko 36171.14 is token total_reserve_in_usd. Holders 365 is Blockscout. [claim R-1 R-8 R-9] - Adversarial: the strongest contrary reading is that this is the CHILL/NFLX 0x57ff…1e18 book, or an official Netflix product. RPC name/symbol/address, the Uniswap v2 pair, /rhj/assets (NFLX is the rail), and the site disclaimer argue against both."
+      class: inference
+      sources:
+        - S12
+        - S13
+        - S19
+    - text: Same-ticker CHILL/NFLX 0x57ffde6EAFB5dC2D5d596b6502eDEBE982FF1e18 is a different token (Netflix n Chill). [verified R-19] - Same-name Chilleez/CHILLZ clones exist at other addresses with 1–3 holders. [verified R-21] - Pool USD reserve is CHILLZ plus NFLX, not a USDG or WETH backstop. [claim R-8] - 2% buy and sell tax while TaxEnforcedAntiFarmer; taxExpirationTime is 2126. [verified R-5] - Netflix character article on DexScreener websites is a third-party-link; site says no affiliation. [claim R-13 R-20] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does verified FlapTaxTokenV3 / TaxProcessorUniV2 actually send NFLX to holders, matching the site vault copy and the 41 NFLX X post? Next: read Dividend clone source and sample Transfer of NFLX from the processor to holders"
+    - text: "When did token owner() move from Flap Factory to 0x0, and does the factory proxy implementation still hold a privileged path? Next: scan OwnershipTransferred on 0x5B6E…7777 after the create tx; verify factory implementation source"
+    - text: "Are the other Blockscout Chilleez/CHILLZ clones (0x409e, 0x7E8B, 0x9399, 0xb8F0) abandoned pads or active books? Next: DexScreener/RPC each clone address and record any NFLX book"
+    - text: "Is there a GitHub repository or audit for FlapTaxTokenV3 on this chain? Next: docs.flap.sh/flap and Sourcify metadata on 0x7777C874…3333"
+  unresolved: []

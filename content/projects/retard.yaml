@@ -1,0 +1,113 @@
+slug: retard
+name: RETARD
+symbol: RETARD
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 created into a Uniswap v4 pool quoted against LLY. Historical RWAERC20LaunchpadFactory deploys Retardatide (RETARD) in one createLaunch call and seeds the RETARD/LLY book. Traders buy and sell RETARD on Uniswap v4. LLY is the Robinhood stock-token rail, not the project. No official domain was located this pass; DexScreener lists x.com/buyretardatide without a CA in that profile bio.
+themes:
+  - memecoin
+  - stock-paired:lly
+  - rwa
+  - graduation:o1-exchange
+official_links:
+  - kind: x
+    url: https://x.com/BuyRetardatide
+  - kind: other
+    url: https://dexscreener.com/robinhood/0xffb47e8699525abe568b81a5b151d368a3c2f58656b31d3f9b49bc864b3e219f
+  - kind: other
+    url: https://www.geckoterminal.com/robinhood/pools/0xffb47e8699525abe568b81a5b151d368a3c2f58656b31d3f9b49bc864b3e219f
+dependencies: []
+deployments:
+  - label: RETARD token
+    chain: robinhood-chain
+    address: "0xEF455BEE1E4Fa2974A7111d0DC9a1E53660A4501"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: o1 historical RWAERC20LaunchpadFactory (createLaunch)
+    chain: robinhood-chain
+    address: "0xe64AC4113848BBC1a6dDE1A6D1da96720A36F297"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S5
+      - S6
+  - label: Historical LaunchHook (launch mint recipient)
+    chain: robinhood-chain
+    address: "0x778b0c4EeA7D35D66513B587bA87FC9084b0EaCC"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S16
+  - label: Eli Lilly Robinhood Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0x8005d266423c7ea827372c9c864491e5786600ea"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S12
+      - S13
+metrics:
+  - kind: volume_24h
+    value: 342750.84
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: tvl
+    value: 26045.01
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 57783
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 517
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: Blockscout token/deployer/factory/LaunchHook/LLY and the createLaunch tx plus logs, RPC name/symbol/factory/owner/hook/tokenDeployer/quotes, DexScreener tokens and search, Gecko pool/token/pools, /rhj/assets, and @BuyRetardatide were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 324451.63 is the Gecko RETARD/LLY pool 24h volume, not the 342750.84 token all-pools figure. Reserve 28871.55 is that pool. DexScreener 332037.96 / 26045.01 is the same pair, different aggregator. Gecko pool GET fdv 1206569.37 is LLY-as-base, not RETARD fdv. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this is PEPTIDES or FATCOIN, or the Doppler RETARDATIDE 0x04bD…, or that current o1 factory 0xcE9C…5B0d launched it. Different CAs, factories, and holder counts argue against the first; Launched is on 0xe64A…F297 and current-factory topic1 search returned 0 logs."
+      class: verified
+      sources:
+        - S4
+        - S6
+        - S15
+        - S21
+  risk:
+    - text: Gecko pool GET FDV treats LLY as base and disagrees with DexScreener and the Gecko token endpoint by about 20x. [verified R-7 R-8 R-9] - Pool USD reserve is RETARD plus LLY, not a USDG or WETH backstop. [claim R-7 R-8] - No official handle or domain this pass; X is unconfirmed-official. [claim R-7 R-14] - Token source is_verified false. [verified R-1] - A second RETARD ticker exists at 0x04bDFE41…1E18 against LLY via Doppler. [verified R-21] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally embeds token 0xEF455BEE…4501 in the bio or a homepage? Next: re-read the X profile website field and any pinned post that embeds the CA"
+    - text: "Which aggregator is right for RETARD FDV on the LLY book, Gecko token 62270 or Gecko pool GET 1.21M? Next: treat pool GET fdv as LLY-as-base until Gecko names RETARD as base; re-fetch both endpoints in the same minute"
+    - text: "Does createLaunch metadata ipfs://bafkreih7rkrrjr25itxf7lu6c3llmibjqdmhullwm3khe2acycuipvd6g4 name a domain or handle? Next: resolve the CID on another gateway and parse JSON for website/twitter"
+    - text: "Is RETARD bytecode verified anywhere, and does it match o1 launch-token bytecode at tokenDeployer 0x6544af35…615b? Next: compare bytecode hash to launchTokenBytecodeHash() on 0xe64A…F297"
+    - text: "Does the Doppler RETARDATIDE 0x04bDFE41…1E18 share a team with this o1 launch? Next: read that create tx and any comms that cite 0x04bD…"
+    - text: "Is there an audit whose scope includes historical factory 0xe64A…F297 / LaunchHook 0x778b…EaCC as used on this clone? Next: match XORS reports named in the o1-exchange packet to 0xe64A…F297"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

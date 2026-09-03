@@ -1,0 +1,133 @@
+slug: ordihood
+name: ORDIHOOD
+symbol: ORDIHOOD
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: "A one-billion-supply ERC-20 launched on a Pons v2 ETH bonding curve that graduated into a locked Uniswap v4 ORDIHOOD/WETH pool. Traders buy and sell ORDIHOOD on that book. @_Ordihood_ and ordihood.art present numbered onchain inscriptions starting at #0, with the same contract in the account bio and the site bundle."
+themes:
+  - memecoin
+  - nft
+  - launchpad
+official_links:
+  - kind: site
+    url: https://www.ordihood.art/
+  - kind: x
+    url: https://x.com/_Ordihood_
+  - kind: telegram
+    url: https://t.me/ordihood
+dependencies: []
+deployments:
+  - label: ORDIHOOD token (PonsV2LauncherToken bytecode)
+    chain: robinhood-chain
+    address: "0xb27ac340261a8486b8f39dd23b8a95D434a071Bc"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S5
+  - label: PonsV2LaunchDeployer
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S13
+  - label: PonsV2BondingCurve
+    chain: robinhood-chain
+    address: "0x95750FFa17BBE279b47D2b98440AC1FcfB3455Af"
+    role: other
+    verified: true
+    sources:
+      - S2
+      - S4
+      - S5
+      - S6
+  - label: PonsV2LaunchAndBuy
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S4
+      - S17
+  - label: V2LaunchLocker (graduated position)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S6
+      - S16
+      - S23
+  - label: ORDIHOOD ticker collision (Pons v2, not this row)
+    chain: robinhood-chain
+    address: "0x6E9ce427DC02725b0818BE94E087f62bd28a246F"
+    role: token
+    verified: false
+    sources:
+      - S14
+      - S24
+metrics:
+  - kind: volume_24h
+    value: 1319653.13
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 40752.28
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 187662.89
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 969
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/curve/deployer/factory/LaunchAndBuy/locker, launchAndBuy 0x3d1a…52e1, LaunchSwept 0x195e…49a7, createGraduatedPool 0x96b1…b7fb, transfer-to-dead 0xee72…6814, RPC name/symbol/launchFactory/socials/getLaunchedToken/locker/curve, DexScreener tokens, Gecko search/pool/token, ordihood.art + JS bundle, t.me/ordihood, and @_Ordihood_ posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-11] - Numbers: 1319653.13 is the Gecko ORDIHOOD/WETH pool 24h volume, not the 1378220.15 token all-pools figure. Reserve 40752.28 is that pool. DexScreener 1329028.48 / 40228.73 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that 0x6E9c…246F is the official ORDIHOOD because it launched first and its constructor twitter is https://x.com/_Ordihood_. That clone is unverified, holders_count 1, website empty; 0xb27a…71Bc is the verified token whose CA is in the official bio and site JS."
+      class: inference
+      sources:
+        - S10
+        - S11
+        - S14
+    - text: "Ticker collision: unverified ORDIHOOD 0x6E9c…246F, holders_count 1. [verified R-14] - Pool USD reserve is ORDIHOOD plus ETH, not a USDG backstop. [claim R-7 R-8] - Factory owner is a Pons Safe; token owner() reverts. [verified R-6] - Third-party claim URL on X used this CA (copypasta-pattern, third-party-link). [claim R-27] - No audit report URL this pass."
+      class: unknown
+  missing:
+    - text: "Which site-JS addresses besides 0xb27a…71Bc are the inscription / auction / rhc-20 contracts, and do they share the token deployer? Next: Blockscout-name and eth_call the three non-empty site-JS contracts; map auction of Inscription #0 to a tx"
+    - text: "Does t.me/ordihood pin CA 0xb27a…71Bc, and is @ordihood_bot the holder-gate bot from the ROBINS post? Next: open join-page pins if public; search Blockscout for ordihood_bot related contracts"
+    - text: "Does verified PonsV2LaunchFactory source leave privileged paths on owner 0x263e…19Dd that affect this graduated pool? Next: read createGraduatedPool and locker modifiers on the explorer source"
+    - text: "What remains of collision 0x6E9c…246F (curve 0x7b57ca2c…8d10) after holders_count 1? Next: RPC curve.graduated() and DexScreener tokens API on 0x6E9c…246F"
+    - text: "Which Gecko window printed ORDIHOOD/WETH liq ~$59092 vol ~$1178232? Next: archive a Gecko pool screenshot if the ~$59k reserve reprint returns"
+  unresolved: []

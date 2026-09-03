@@ -1,0 +1,116 @@
+slug: cube-family
+name: Cube Family
+symbol: CUBE
+category: Programmable-hook launchpad
+lifecycle: mainnet
+coverage: stub
+summary: "Cube Family is a token launchpad on Robinhood Chain. A launch is one `deployCoin` transaction: TokenDeployer CREATE2-deploys an ERC-20 and Factory opens a Uniswap v4 pool with CubeHook. There is no bonding curve and no graduation. Swap fees split 80/20 on-chain (CREATOR_SHARE_BPS 8000) to holders or the creator, with the 20% platform share pushed to CubeFeeVault. The handle is @CubeFamilyX; the named site is cube.family."
+themes:
+  - launchpad
+official_links:
+  - kind: app
+    url: https://cube.family
+  - kind: x
+    url: https://x.com/CubeFamilyX
+  - kind: telegram
+    url: https://t.me/CubeFamilyTG
+  - kind: other
+    url: https://cube.family/analytics
+dependencies: []
+deployments:
+  - label: Factory
+    chain: robinhood-chain
+    address: "0x47b495aae1f4E7f233CD50c6f49E83098be8d210"
+    role: factory
+    verified: true
+    sources:
+      - S8
+      - S9
+      - S10
+      - S17
+  - label: TokenDeployer
+    chain: robinhood-chain
+    address: "0x3b1FC108635465bcDdeAD7f19Ba65808f2768B3b"
+    role: other
+    verified: false
+    sources:
+      - S8
+      - S11
+  - label: CubeHook
+    chain: robinhood-chain
+    address: "0x6EB98e97D0efaEb784CA4E8Ee55F7bFb5E5800cC"
+    role: other
+    verified: true
+    sources:
+      - S8
+      - S12
+      - S14
+  - label: CubeFeeVault
+    chain: robinhood-chain
+    address: "0x72362D60d6148A07EF3C27be298394219efd542a"
+    role: vault
+    verified: false
+    sources:
+      - S5
+      - S8
+      - S13
+  - label: ClaimRouter
+    chain: robinhood-chain
+    address: "0xE9C3DC2dfa5AcB1B1e81fB09942A9985Dab6089D"
+    role: router
+    verified: false
+    sources:
+      - S8
+      - S21
+  - label: Cube genesis token
+    chain: robinhood-chain
+    address: "0xBE2fBD6916C5899901eB9319e67C8D1525Ce1000"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S8
+      - S15
+      - S16
+  - label: Factory / CubeHook / CubeFeeVault owner()
+    chain: robinhood-chain
+    address: "0xC8D3AA8358a365E0f6D055d88BeF835bd51d0ddb"
+    role: admin
+    verified: true
+    sources:
+      - S8
+      - S13
+      - S20
+metrics:
+  - kind: holders
+    value: 85
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: X profile and recovered 15 Aug posts, Telegram og tags, Blockscout api/v2 address/token/tx/source, RPC, GitHub 404, and Llama GETs were opened on 2026-09-03; cube.family timed out. Excerpts copied from those responses. [verified R-8 R-9 R-10] - Numbers: tokenCount, CREATOR_SHARE_BPS, bytecode lengths, nonces, and owner() are chain 4663 RPC. holders_count 85 is the Blockscout token endpoint, not a Gecko figure. [verified R-8 R-15] - Adversarial: strongest contrary reading is that 0x47b495aa…d210 is a leftover factory and new launches use a different pad, or that Cube Family is Hook.family / Pons.family. Verified source header names cube.family; RPC cubeHook and feeVault match Blockscout names CubeHook and CubeFeeVault; Factory address is not Coinbarrel 0x4234…e70 or Klik 0x16cF…0dd7."
+      class: inference
+      sources:
+        - S9
+        - S10
+    - text: Factory, CubeHook, and CubeFeeVault share one EOA owner with hook-replace, vault-replace, and vault-withdraw. [verified R-8 R-10] - CubeHook source is only partially verified. [verified R-12] - cube.family did not respond this pass; official UI and analytics were not re-read. [claim R-1] - X Latest from:CubeFamilyX returned no posts this pass. [claim R-1] - No audit report URL. [unknown] - Llama `protocol/cube` is a different Solana DEX.
+      class: claim
+      sources:
+        - S23
+  missing:
+    - text: "Does cube.family currently serve HTML that bidirectional-links @CubeFamilyX, and is the launch console still taking deployCoin quotes including stock tokens? Next: retry the site; if it returns, copy title, canonical, twitter:site, and any factory address in the page or JS bundle"
+    - text: "Why did X Latest from:CubeFamilyX return no posts this pass while indexed copies of 15 Aug posts still exist? Next: open the profile in a later pass; do not treat silence as a lifecycle change while the factory still has code"
+    - text: "Is there a second Factory as CubeFeeVault comments ('Both factories') imply, and what is its address? Next: search Blockscout for a second Cube Family Factory; do not invent a twin"
+    - text: "Is there an audit report whose scope matches Factory 0x47b495aa…d210 and CubeHook 0x6EB98e97…00cC? Next: record any published report as a claim with the exact scope"
+    - text: "Which GitHub commit, if any, matches contracts/factory.sol on Blockscout? Next: record a source mirror if one appears; do not treat Llama protocol/cube as this pad"
+    - text: "Are 15 Aug $CUBE volume/burn/revenue figures (75k volume, 37721 burned, 500 platform revenue) still on-chain, and did later deployCoin calls continue after 21 Aug? Next: eth_call tokenByIndex across 0..61 and decode the named burn/buy txs"
+  unresolved: []

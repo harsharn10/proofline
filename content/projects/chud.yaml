@@ -1,0 +1,155 @@
+slug: chud
+name: chud
+symbol: chud
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply Pons v2 ERC-20 that graduated into a Uniswap v4 chud/RDDT pool. Traders buy and sell chud against the Reddit • Robinhood Token on that book. RDDT is the quote rail, not this profile. Distinct from packed KARMA 0xb1B800…baC3, LongLauncher CHUD 0x52E050…1e18, and in-flight wojak/snoo.
+themes:
+  - memecoin
+  - stock-paired:rddt
+  - rwa
+  - launchpad
+official_links:
+  - kind: x
+    url: https://x.com/RHChud
+dependencies: []
+deployments:
+  - label: chud token (PonsV2LauncherToken bytecode)
+    chain: robinhood-chain
+    address: "0x982965547E3B1f6DA55eE93B515834bD34081feB"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S5
+  - label: PonsV2LaunchDeployer
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: factory
+    verified: false
+    sources:
+      - S15
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S16
+  - label: PonsV2BondingCurve
+    chain: robinhood-chain
+    address: "0x6197E3d1967fF1d952cD1b82a5616Cbe943F277b"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S6
+  - label: PonsV2LaunchAndBuy (create tx to)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S3
+      - S17
+  - label: V2LaunchLocker (isLocked true for this token)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S5
+      - S20
+      - S23
+  - label: RDDT Stock Token (pair quote / launch pairToken; rail, not this subject)
+    chain: robinhood-chain
+    address: "0x05b37Fb53A299a1b874A619e1c4C404D52C36F4C"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S8
+      - S12
+  - label: CHUD ticker collision (LongLauncher CHUD, not this row)
+    chain: robinhood-chain
+    address: "0x52E0502a786D4bf759Ddc2AD4F0b4608EfC61e18"
+    role: token
+    verified: false
+    sources:
+      - S13
+      - S14
+      - S18
+  - label: LongLauncher (collision create tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S14
+  - label: DopplerERC20V1 implementation (collision token)
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S13
+      - S14
+metrics:
+  - kind: volume_24h
+    value: 490751.38
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 34748.51
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 225745
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 390
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/buy/deployer/locker/RDDT/collision and launchAndBuy / LaunchSwept txs, RPC name/symbol/launchFactory/curve/isLocked, DexScreener tokens/v1 + latest/dex/tokens, /rhj/assets, and @RHChud were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8 R-9] - Numbers: 490751.38 is the DexScreener chud/RDDT pool 24h volume. Reserve for TVL is DexScreener 34748.51 on that pair, not an all-pools figure. Collision 65232.22 / 52164.63 is a different CA. Gecko was not mixed in. [claim R-7 R-18 R-19] - Adversarial: the strongest contrary reading is that 0x52E050…1e18 is the canonical CHUD because it has more DexScreener liquidity. @RHChud bio and DexScreener socials pin 0x982965…1feB; 0x52E050…1e18 socials are @chudonlong and it is a LongLauncher Doppler clone. Packed KARMA and in-flight wojak/snoo are other names."
+      class: inference
+      sources:
+        - S7
+        - S9
+        - S13
+        - S18
+    - text: Quote token RDDT 0x05b37F…F4C is a Stock Token rail; pool USD figures count chud plus RDDT. [verified R-8 R-12] - Same-ticker LongLauncher CHUD 0x52E050…1e18 is a ca-collision with deeper displayed liquidity and socials @chudonlong. [verified R-13 R-14 R-18] - Token source is unverified on this CA. No audit report URL this pass. [verified R-1] [unknown] - Netlify claim URLs attached the CA. Flag copypasta-pattern.
+      class: claim
+      sources:
+        - S21
+  missing:
+    - text: "Does verified PonsV2LauncherToken source on a sibling clone apply to this unverified 3248 B CA? Next: compare deployed bytecode to a verified PonsV2LauncherToken"
+    - text: "Is 0x458e8E24…8D20 a contract, and does it keep the creator fee path after transferCreatorFeeRecipient? Next: eth_getCode and Blockscout name on 0x458e…8D20"
+    - text: "Which of the other CHUD CAs (0x03A6…A331 Pons v2 ETH book, Chudjak/Chudjack) later claim @RHChud or this CA? Next: re-read DexScreener token profiles if a Claim Profile moves"
+    - text: "Gecko pool slice for 0x5536f402…476f once the first GET is HTTP 200? Next: retry Gecko token/pool GET; use only if first GET is 200"
+  unresolved: []

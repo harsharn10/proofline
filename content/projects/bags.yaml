@@ -1,0 +1,155 @@
+slug: bags
+name: Bags
+symbol: null
+category: Bonding-curve launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Bags is a bonding-curve token launchpad on Robinhood Chain at bags.fm. `BagsFactory.create` (or `createAndBuy`) deploys a fixed-supply ERC-20, a per-token bonding curve, and a fee-share contract in one transaction; 830M of 1B sells vs native ETH, then the raise plus remaining 170M migrate into a Uniswap v4 token/WETH pool with a Bags hook and locked LP. The RH factory is `0xe8Cc4431…Cb37`. Solana is a separate Bags venue. The handle used on GitHub and Llama is @BagsApp; the site is bags.fm.
+themes:
+  - launchpad
+official_links:
+  - kind: site
+    url: https://bags.fm
+  - kind: app
+    url: https://bags.fm/launch
+  - kind: docs
+    url: https://docs.bags.fm/robinhood/overview
+  - kind: x
+    url: https://x.com/BagsApp
+  - kind: github
+    url: https://github.com/bagsfm
+  - kind: github
+    url: https://github.com/bagsfm/bags-idl
+  - kind: telegram
+    url: https://t.me/bags_dev
+  - kind: other
+    url: https://dune.com/0x_emerson/robinhood-memecoin-launchpads-comparison-30d
+dependencies: []
+deployments:
+  - label: BagsFactory proxy
+    chain: robinhood-chain
+    address: "0xe8Cc4431adF8b5A847C113EF0c6af9043219Cb37"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S13
+      - S14
+  - label: BagsFactory implementation
+    chain: robinhood-chain
+    address: "0x7dfa0131F6c8626F199A2E33E49DfB5660e6Ef1C"
+    role: implementation
+    verified: false
+    sources:
+      - S13
+      - S14
+      - S18
+  - label: BagsLens
+    chain: robinhood-chain
+    address: "0xC82Db941dAf90B754aecb5F7D14c683dc608d595"
+    role: other
+    verified: false
+    sources:
+      - S2
+      - S3
+      - S15
+  - label: BagsV4Hook
+    chain: robinhood-chain
+    address: "0x2380aBf72C17aABAb76480244759AC7E2932EEcC"
+    role: other
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S15
+      - S17
+  - label: BagsVault proxy
+    chain: robinhood-chain
+    address: "0x4861446aa7fFd9e67a83cBbAcb1A4B70540B83Aa"
+    role: vault
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S13
+      - S15
+  - label: BagsVault implementation
+    chain: robinhood-chain
+    address: "0xeC66D9fc56E92408518De9b8a8697245E932e688"
+    role: implementation
+    verified: false
+    sources:
+      - S13
+      - S15
+      - S18
+  - label: BagsBondingCurveBeacon
+    chain: robinhood-chain
+    address: "0x8DCEcaf516C828A493C2C449c1E25F92cF80207E"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S13
+      - S18
+  - label: BagsFeeShareBeacon
+    chain: robinhood-chain
+    address: "0xdFf07d39C5332C602e06FA64f0A97C92fd8537e0"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S13
+      - S18
+  - label: BagsFactory and BagsVault owner()
+    chain: robinhood-chain
+    address: "0xDEf671F11C8a30818eb3D9Cc9476EEEc805f9058"
+    role: admin
+    verified: true
+    sources:
+      - S13
+      - S16
+metrics:
+  - kind: fees_24h
+    value: 7354
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S19
+  - kind: revenue_24h
+    value: 3595
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S20
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: bags.fm, docs overview/contracts/launch/trade/changelog, GitHub org bagsfm, X profile and July 2026 posts, Llama protocol/fees, Emerson Dune, Bitquery docs, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-3 R-13 R-19] - Numbers: RH fees and revenue are the Robinhood Chain slice from api.llama.fi, not all-chains. Bytecode lengths, nonces, owner(), allTokensLength 3943, creationFee 0, and the 5 ETH threshold are chain 4663 RPC. Emerson 1,611 / $1.40M is the 30d dashboard, not lifetime. [verified R-13 R-19 R-22] - Adversarial: strongest contrary reading is that 0xe8Cc4431…Cb37 is leftover V1 and new launches use a different factory, or that Bags is packed Pons / FoxPad / Clanker / Coinbarrel. Docs and Emerson factory map set BagsFactory to this address; RPC implementation slot matches verified BagsFactory 0x7dfa01…Ef1C; hook() and FACTORY() wiring match the docs address book. The packed pads use other factories."
+      class: inference
+      sources:
+        - S2
+        - S3
+        - S13
+        - S22
+    - text: Factory, vault, and both beacons are upgradeable; owner is one EOA with no code. [verified R-13 R-16] - A beacon upgradeTo retargets every live curve or fee-share at once. [claim R-3] - Llama RH fees mix V1 and V2; Bitquery names a 0x0ed8… AMM proxy not in the docs address book. [claim R-19 R-23] - No audit report URL. [unknown] - bags.fm HTML does not name @BagsApp. [claim R-1 R-9] - creationFee() is 0 this pass while docs still describe a 0.02 ETH default. [verified R-13] [claim R-2] - Solana volume and fees dominate Llama all-chain totals; do not use those as a Robinhood Chain slice.
+      class: claim
+      sources:
+        - S19
+        - S21
+  missing:
+    - text: "What is the Robinhood V1 factory or router address Llama mixes into RH fees, and is 0x0ed8d8116f89def7c904d6b9657657a3ccc7d5b7 a live V1 singleton? Next: eth_getCode 0x0ed8… on 4663 and read docs changelog or an older address book if V1 is still callable"
+    - text: "Does owner 0xDEf671…9058 sit behind a Safe, timelock, or other contract on any chain, or is every upgradeable Bags proxy Ownable held by this EOA? Next: do not treat the EOA as a timelock; record any Safe on another chain if one appears"
+    - text: "Is there an audit report whose scope matches factory 0xe8Cc4431…Cb37 and hook 0x2380…EEcC? Next: record any published report as a claim with the exact scope"
+    - text: "Does bags.fm HTML or a docs official-links page name @BagsApp, or does the handle stay GitHub/Llama-only? Next: keep flag unconfirmed-official until the site names the handle"
+    - text: "Which of the 3943 factory registry tokens are still on the curve vs migrated, and what share of Emerson 30d volume is post-graduation Uniswap v4? Next: sample BagsLens.getTokenState on the registry tail"
+    - text: "Are Llama protocol/bags TVL dummy.js empty because RH LP is locked in Uniswap v4 PositionManager rather than a Bags custody vault? Next: do not treat vault ETH as pad TVL; record a Llama adapter if one lands"
+  unresolved: []

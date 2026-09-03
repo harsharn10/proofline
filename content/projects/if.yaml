@@ -1,0 +1,114 @@
+slug: if
+name: IF
+symbol: IF
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v3 pool quoted against WETH. NOXA Launch Factory deploys What If (IF) in one method-0x686399cb call and seeds the IF/WETH 1% book. Traders buy and sell IF on Uniswap v3. whatifonhood.com publishes the contract address.
+themes:
+  - memecoin
+  - launchpad:noxa
+  - weth-paired
+official_links:
+  - kind: site
+    url: https://whatifonhood.com
+  - kind: x
+    url: https://x.com/WhatIFonHOOD
+  - kind: telegram
+    url: https://t.me/WhatIFonHoodChain
+dependencies: []
+deployments:
+  - label: IF token (LaunchToken)
+    chain: robinhood-chain
+    address: "0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: NOXA Launch Factory
+    chain: robinhood-chain
+    address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+  - label: WETH pair token
+    chain: robinhood-chain
+    address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    role: token
+    verified: false
+    sources:
+      - S5
+      - S16
+  - label: IF/WETH Uniswap v3 pool
+    chain: robinhood-chain
+    address: "0x39A200271525E9641e799127bdAB299DAeF21953"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S5
+      - S7
+  - label: LaunchLocker (LP NFT 70641)
+    chain: robinhood-chain
+    address: "0x7F03effbd7ceB22A3f80Dd468f67eF27826acD85"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S17
+      - S18
+metrics:
+  - kind: volume_24h
+    value: 369110.82
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 380142.8
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 6952019
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 6931
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/source/factory/pool/WETH/locker and create tx 0x00889365…287c, RPC name/symbol/factory/pairToken/liquidityPool/owner/protocolFeeShare, DexScreener tokens API, whatifonhood.com HTML+JS, Telegram preview, @WhatIFonHOOD / @0xNaruza / lookalike / claim-portal posts, and the 49-row census were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-12] - Numbers: 369110.82 is the DexScreener IF/WETH v3 pair 24h volume, not Blockscout token volume_24h 595253. Liquidity 380142.8 is that pool. Holders 6931 is Blockscout holders_count. [claim R-1 R-7] - Adversarial: the strongest contrary reading is that IF is packed What The Hook (WTH) or a stock-paired pad token. WTH is 0xb8Fa…fF79 / hook 0xc52f…54c0 at whatthehook.io; IF is 0x232C…30d1 quoting WETH via NOXA factory 0xD9eC…FccB."
+      class: inference
+      sources:
+        - S1
+        - S11
+    - text: "LaunchLocker protocolFeeShare is 100 and owner is an EOA that also owns the unverified factory. [verified R-5 R-17] - @WhatIFonHOOD bio does not embed the CA; constructor twitter is a different handle. [claim R-8 R-14] - handle-collision: @WhatlFonHOOD (lowercase L) presents the CA. [claim R-15] - copypasta-pattern / third-party-link: crypto-keo.netlify.app claim URL posted against this CA. [claim R-20] - No audit report URL this pass."
+      class: unknown
+  missing:
+    - text: "Does @WhatIFonHOOD bio or a post embed CA 0x232C…30d1 for a bidirectional official-handle link? Next: search older from:WhatIFonHOOD posts for the CA; re-read the bio after a pin"
+    - text: "Why does launchBlock() return 25507001 while the creation tx is block 6657668? Next: compare deployed bytecode to LaunchToken.sol or decode whether the node reports a different numbering than Blockscout"
+    - text: "Who controls locker owner 0x7E03…242B and protocolFeeRecipient 0x9efd…0417, and is protocolFeeShare 100 still live after a later setProtocolFeeShare? Next: watch setProtocolFeeShare logs; read remaining collectFees recipient split in LaunchLocker.sol"
+    - text: "Is @WhatlFonHOOD (lowercase L) still presenting the IF CA, and does the site or @WhatIFonHOOD name it? Next: re-read both bios; do not treat the lookalike as official"
+    - text: "Does GeckoTerminal still list this token after the 429 this pass? Next: retry Gecko when the first GET is 200; do not mix Blockscout token volume_24h 595253 with the DexScreener pair slice"
+  unresolved: []
