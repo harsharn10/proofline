@@ -11,7 +11,7 @@ import {
 } from "./types";
 // Shared with scripts/score.mjs so site and Telegram eligibility cannot drift.
 // @ts-expect-error The repository-level helper is intentionally plain ESM.
-import { meetsShareBar as meetsShareBarCore, officialSurfaceConfirmed as officialSurfaceConfirmedCore } from "../../../scripts/lib/share-bar.mjs";
+import { locatedOnChain as locatedOnChainCore, meetsShareBar as meetsShareBarCore, officialSurfaceConfirmed as officialSurfaceConfirmedCore } from "../../../scripts/lib/share-bar.mjs";
 import type {
   ChangelogEntry,
   Deployment,
@@ -323,7 +323,7 @@ function loadContent(): ServerContent {
       changelog,
       derived: withPulledMetrics(pickDerived(derivedFile.projects[slug], slug, project.coverage), pulled),
       pulled,
-      kpis: kpisFor({ lifecycle: project.lifecycle, deployments: project.deployments }, pulled, history, buildNow),
+      kpis: kpisFor({ lifecycle: project.lifecycle }, pulled, history, buildNow),
       card: {
         officialConfirmed: officialSurfaceConfirmed(censusRow),
         handle: censusRow?.handle ?? null,
@@ -388,8 +388,7 @@ function toDirectoryEntry(
   const tree = treeBySlug[d.slug] ?? null;
   const census = censusBySlug.get(d.slug);
   const officialConfirmed = officialSurfaceConfirmed(census);
-  const hasContractOn4663 =
-    d.pulled?.addresses.some((address) => address.is_contract === true) ?? false;
+  const hasContractOn4663 = locatedOnChain(d.pulled);
   const factoryLaunches24h =
     d.pulled?.activity?.addresses
       .filter((address) => address.role === "factory")
@@ -606,6 +605,10 @@ function parseDailySeries(raw: string | undefined): Record<string, Array<{ at: s
 }
 
 // One definition, shared with the score emitter (scripts/lib/share-bar.mjs).
+export function locatedOnChain(pulled: PulledFile | null): boolean {
+  return locatedOnChainCore(pulled) as boolean;
+}
+
 export function officialSurfaceConfirmed(census: CensusEntry | undefined): boolean {
   return officialSurfaceConfirmedCore(census) as boolean;
 }
@@ -624,17 +627,17 @@ function deltaFrom(history: HistoryPoint[], key: "holders", days: number): numbe
 // Every tracker number on a card comes from here: DexScreener market read, Blockscout activity read,
 // holder counts and their 7-day change from snapshots, DefiLlama TVL. Status is computed from the
 // reads, never typed by a person.
-function kpisFor(d: { lifecycle: Dossier["lifecycle"]; deployments: Deployment[] }, pulled: PulledFile | null, history: HistoryPoint[], now: number): Kpis {
+function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | null, history: HistoryPoint[], now: number): Kpis {
   const market = pulled?.market ?? null;
   const activity = pulled?.activity ?? null;
-  const located = d.deployments.some((x) => x.address !== "not-verified");
+  const located = locatedOnChain(pulled);
   const holders = tokenHolders(pulled);
   const lastActivityAt = activity?.last_activity_at ?? null;
   const tvl = pulled?.metrics.find((m) => m.kind === "tvl")?.value ?? null;
   const trades = market?.trades_h24 ?? null;
   let status: Kpis["status"];
   if (d.lifecycle === "testnet-only") status = "testnet";
-  else if (!located && !market?.pairs?.length) status = "announced";
+  else if (!located) status = "announced";
   else {
     const age = lastActivityAt ? now - new Date(lastActivityAt).getTime() : null;
     if ((age !== null && age <= 7 * DAY) || (trades ?? 0) > 0) status = "live";

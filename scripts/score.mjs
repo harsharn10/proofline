@@ -5,7 +5,7 @@ import { validateContent } from "./lib/validate-content.mjs";
 import { derive, computeRanks } from "./lib/score.mjs";
 import { computeTrending } from "./lib/trending.mjs";
 import { cohortForLeaf } from "./lib/taxonomy.mjs";
-import { meetsShareBar, officialSurfaceConfirmed } from "./lib/share-bar.mjs";
+import { locatedOnChain, meetsShareBar, officialSurfaceConfirmed } from "./lib/share-bar.mjs";
 
 const args = process.argv.slice(2);
 const force = args.includes("--force");
@@ -80,8 +80,7 @@ const shareBar = Object.fromEntries(
         slug,
         meetsShareBar({
           officialConfirmed: officialSurfaceConfirmed(census),
-          hasContractOn4663:
-            pulled?.addresses?.some((address) => address.is_contract === true) === true,
+          hasContractOn4663: locatedOnChain(pulled),
           shareBarMetric:
             census?.identity?.entity_kind === "token" || cohort?.id === "launchpads"
               ? "liquidity"

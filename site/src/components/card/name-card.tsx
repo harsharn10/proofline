@@ -272,14 +272,12 @@ function CardHeader({ dossier, site, dependencies, tree, section, now, token, wi
           </Badge>
           {statusSource ? <a href={statusSource} target="_blank" rel="noreferrer">{statusPill}</a> : statusPill}
           {!token && dossier.derived.score !== null ? (
-            <Link from="/n/$slug" search={{}} resetScroll={false}>
-              <Badge tone="ctl">
-                <Icon name="shield" />
-                Control {dossier.derived.score}/100
-                {dossier.derived.confidence !== null ? ` · evidence ${dossier.derived.confidence}%` : ""}
-                {!hasSecondReview ? " · awaiting second review" : ""}
-              </Badge>
-            </Link>
+            <Badge tone="ctl">
+              <Icon name="shield" />
+              Control {dossier.derived.score}/100
+              {dossier.derived.confidence !== null ? ` · evidence ${dossier.derived.confidence}%` : ""}
+              {!hasSecondReview ? " · awaiting second review" : ""}
+            </Badge>
           ) : null}
         </div>
         <HeaderTags dossier={dossier} site={site} dependencies={dependencies} tree={tree} token={token} />
@@ -472,7 +470,7 @@ function RelatedTable({ dossier, section, related }: Pick<NameCardProps, "dossie
     <section className="card-block">
       <div className="card-block-head">
         <h2>Related · {section.label.toLowerCase()} on Robinhood Chain</h2>
-        <span>{related.length} names · sorted by {KPI_LABEL[keys[0]!]} · <Link to="/" hash={section.id}>all →</Link></span>
+        <span>{related.length} names · sorted by {KPI_LABEL[keys[0]!]} · <Link to="/s/$id" params={{ id: section.id }}>all →</Link></span>
       </div>
       <DataTable className="card-related-table">
         <table>
@@ -495,13 +493,18 @@ function RelatedTable({ dossier, section, related }: Pick<NameCardProps, "dossie
   );
 }
 
+// Spec §3 rule 1: how a statement is supported, in the same words on a risk and a positive.
+const EVIDENCE_WORDS: Record<EvidenceClass, string> = {
+  verified: "checked on chain",
+  claim: "from the project",
+  inference: "from the evidence",
+  disputed: "disputed",
+  unknown: "unconfirmed",
+};
+
 function evidenceLabel(kind: EvidenceClass, risk: boolean): string {
-  if (risk) return kind === "verified" ? "Risk · checked on chain" : "Risk · from the evidence";
-  if (kind === "verified") return "Checked on chain";
-  if (kind === "claim") return "From the project";
-  if (kind === "inference") return "From the evidence";
-  if (kind === "disputed") return "Disputed";
-  return "Open";
+  const words = EVIDENCE_WORDS[kind] ?? EVIDENCE_WORDS.unknown;
+  return risk ? `Risk · ${words}` : `${words.charAt(0).toUpperCase()}${words.slice(1)}`;
 }
 
 function SourceRefs({ ids }: { ids?: string[] }) {

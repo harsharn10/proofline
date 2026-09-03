@@ -68,7 +68,10 @@ function FeedPage() {
     (filter === "icarus" && item.kind === "icarus") ||
     (filter === "posts" && item.kind === "post") ||
     (filter === "onchain" && item.kind === "onchain");
-  const filtered = items.filter((item) => matchesKind(item, kind) && (!name || item.name.slug === name));
+  // The pills count what the reader would actually see, so a name filter narrows them too.
+  const matchesName = (item: FeedStreamItem) => !name || item.name.slug === name;
+  const inScope = items.filter(matchesName);
+  const filtered = inScope.filter((item) => matchesKind(item, kind));
   const selectedName = name ? namesBySlug.get(name) : null;
 
   return (
@@ -89,7 +92,7 @@ function FeedPage() {
             search={{ ...(filter.value === "all" ? {} : { kind: filter.value }), ...(name ? { name } : {}) }}
             className={kind === filter.value ? "on" : undefined}
           >
-            {filter.label} · {items.filter((item) => matchesKind(item, filter.value)).length}
+            {filter.label} · {inScope.filter((item) => matchesKind(item, filter.value)).length}
           </Link>
         ))}
       </div>

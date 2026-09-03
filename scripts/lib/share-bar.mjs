@@ -18,6 +18,17 @@ export function officialSurfaceConfirmed(census) {
 }
 
 /**
+ * Located on chain 4663: a pulled address the explorer reads as a contract, or a live market
+ * pair. One definition for the share bar and for the status a card shows — a name trading in a
+ * pool is on chain whether or not its deployments have been verified one by one.
+ */
+export function locatedOnChain(pulled) {
+  const addresses = pulled?.addresses ?? [];
+  const pairs = pulled?.market?.pairs ?? [];
+  return addresses.some((address) => address?.is_contract === true) || pairs.length > 0;
+}
+
+/**
  * The one reader/channel eligibility gate. Callers adapt their content row to this
  * deliberately small shape so the browser bundle and the score emitter cannot drift.
  */

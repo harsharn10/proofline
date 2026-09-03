@@ -90,7 +90,11 @@ function icarusView(derived) {
     return "Not yet reviewed";
   }
   return [
-    `Control ${derived.score}/100 · evidence ${derived.confidence}%${derived.provisional ? " · awaiting second review" : ""}`,
+    [
+      `Control ${derived.score}/100`,
+      derived.confidence === null || derived.confidence === undefined ? "" : ` · evidence ${derived.confidence}%`,
+      derived.provisional ? " · awaiting second review" : "",
+    ].join(""),
     derived.risk ? `${derived.risk} risk` : null,
   ].filter(Boolean).join("\n");
 }

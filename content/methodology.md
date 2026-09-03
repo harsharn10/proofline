@@ -1,5 +1,3 @@
-Version `proofline-v1.0`.
-
 Icarus tracks what is new on Robinhood Chain and separates facts we can check from statements that still need work. Every figure should take you back to the page or chain read behind it.
 
 ## Status
@@ -42,7 +40,7 @@ Charts use stored snapshots only. With fewer than 14 points, the card says how m
 
 ## Refreshes, Telegram, and corrections
 
-Chain data refreshes every 6 hours; research updates as it lands. Use the Telegram button in the top bar to receive the same Icarus updates that clear the share bar.
+Chain data refreshes every 6 hours; research updates as it lands. The Icarus updates that clear the share bar also go out on Telegram; while that channel is live, its link sits in the top bar and at the foot of this page.
 
 When a corrections destination is available, this page shows a correction link below. Corrections preserve the dated record of what changed.
 
