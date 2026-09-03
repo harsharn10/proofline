@@ -120,3 +120,7 @@ findings:
     - text: "Does the site burn/payout copy match a live hook fee path, and why is RPC totalSupply 993.4M against a 1e9 mint? Next: eth_call remaining supply math and read DopplerERC20V1 burn/fee functions on the explorer"
     - text: "Which other robinhood SCHIFFY or SCHIFF tickers stay live besides 0x42aF…1E18? Next: re-run search if a second SCHIFFY book crosses the liquidity bar"
   unresolved: []
+risks:
+  - USD liquidity figures on the SCHIFFY/GLD book count both sides, and the quote side is GLD, not USDG. [claim S12]
+  - Gecko labels the pool Bankr; the create target is LongLauncher. [claim S12]
+  - Other contracts on this chain reuse SCHIFF or quote the same GLD rail. [claim S12]

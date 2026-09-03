@@ -128,3 +128,7 @@ findings:
     - text: "Which of the other DexScreener KIRKLAND tickers share this deployer or factory? Next: eth_call launchFactory() on those CAs if they remain in the search"
     - text: "Does verified PonsV2LaunchFactory source leave any owner path that can reach this live curve or locked LP after graduation? Next: read createGraduatedPool and rescueSweptGraduation modifiers in src/v2/PonsV2LaunchFactory.sol on the explorer"
   unresolved: []
+risks:
+  - USD liquidity figures on the KIRKLAND/COST book count both sides, and the quote side is COST, not USDG. [claim S11]
+  - Gecko's pool fdv prices COST as base (~$1.18M) and is not KIRKLAND fdv (token fdv ~$252k). [claim S11]
+  - DexScreener lists @kirklandcto while on-chain socials are empty. [claim S11]

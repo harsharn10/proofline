@@ -110,3 +110,7 @@ findings:
     - text: "Telegram, Discord or other chat besides the in-app lounge? Next: record if @letscashfun pins one"
     - text: "Are letscash.fun and letscashfun.com the same deployment, or a split docs host? Next: compare TLS certs and whether /docs on letscash.fun is a reverse-proxy of letscashfun.com"
   unresolved: []
+risks:
+  - The factory is a UUPS proxy whose current implementation is unverified, so the upgrade path is held by the owner Safe. [claim S1]
+  - Liquidity removal is rejected by the hook, so a failed launch cannot be unwound by pulling LP. [claim S1]
+  - Platform fees buy CASHCAT; that is not the same object as the CASHCAT token. [claim S1]

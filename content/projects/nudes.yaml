@@ -102,3 +102,7 @@ findings:
     - text: "Is there an official site beyond the IPFS metadata CID in createLaunch? Next: resolve the CID and search for a domain"
     - text: "Is there an audit whose scope includes this LaunchHook 0x778b…EaCC / historical factory bytecode? Next: match XORS reports named in the o1-exchange packet to 0xe64A…F297"
   unresolved: []
+risks:
+  - Token source is unverified and the Blockscout address page still has a null creator, so a reader who only opens that page cannot see the factory. [claim S10]
+  - Gecko NUDES/snap reserve and DexScreener NUDES/SNAP liquidity are different prints for the same pool id. [claim S10]
+  - Secondary USDG and WETH books exist; a card that uses all-pools volume would overstate the SNAP book. [claim S10]

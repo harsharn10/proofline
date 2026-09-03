@@ -124,3 +124,6 @@ findings:
     - text: "Is there an audit of LunchTokenPlain / LunchV3PairLauncherFrozen as deployed on 4663? Next: record any report URL from lunch.fun or the launcher owner as a claim"
     - text: "Which of the extra lunch.fun HOTDOG-ticker rows (0xd8a3…, 0x83fe…, 0x24fa…, 0x8ba0…, 0xb2fd…) still have books, and should they stay as ticker notes only? Next: leave them as ticker notes unless one grows an official CA-linked surface"
   unresolved: []
+risks:
+  - The lunch V3 launcher is an ERC1967 proxy whose owner() is one EOA. [claim S1]
+  - LunchTokenPlain itself has no owner, but tokenURI() reads a base from that launcher. [claim S1]

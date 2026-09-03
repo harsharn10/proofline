@@ -153,3 +153,7 @@ findings:
     - text: "Do discord.gg/pA9TggyjGN and t.me/dontblink_cto cross-link dontblink.community? Next: open both profiles and compare the linked domain"
   unresolved:
     - text: identity.handle remains unresolved (CON-1).
+risks:
+  - PortalProxy is upgradeable. `owner()` and the EIP-1967 admin slot return a 2-of-3 Safe. [claim S1]
+  - The shipped JS still names an older DontblinkPortal implementation than the live slot. [claim S1]
+  - Original and current handles both remain online; they are separate signers. [claim S1]

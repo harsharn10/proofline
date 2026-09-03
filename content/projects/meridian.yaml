@@ -131,3 +131,7 @@ metrics:
     class: claim
     sources:
       - S18
+risks:
+  - The yield strategy is an ERC1967 proxy. [claim S8]
+  - Factory `owner()` is a 2-of-3 Safe on Accountable's factory, not an `owner()` on MLP. [claim S8]
+  - Vault `totalAssets()` is only idle USDe; a card that prints that figure as TVL would miss the ~$2.01M `deployedAssets`. [claim S8]

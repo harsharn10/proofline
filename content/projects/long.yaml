@@ -131,3 +131,7 @@ metrics:
     class: claim
     sources:
       - S27
+risks:
+  - LongLauncher `owner()` is a single EOA that can pause creates and sweep native or ERC-20 balances with no timelock in the verified source. [claim S8]
+  - TickerAirlockFactory is a second live router with a different owner. [claim S8]
+  - Official 24h volume ($425M) and the Dune 24h counter ($118.1M) do not match. [claim S8]

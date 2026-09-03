@@ -117,3 +117,7 @@ findings:
     - text: "Will in-flight robloxians (0xB528…c10D) compile as its own census row, or does any later packet try to merge it with oof because both quote RBLX? Next: keep CAs separate when robloxians is packed; RBLX remains the rail"
     - text: "Which other robinhood OOF tickers stay live besides 0xeA3b…1e18? Next: re-run search if a second OOF book crosses the liquidity bar"
   unresolved: []
+risks:
+  - USD liquidity figures on the OOF/RBLX book count both sides, and the quote side is RBLX, not USDG. [claim S12]
+  - Gecko labels the pool Bankr; the create target is LongLauncher. [claim S12]
+  - Other contracts on this chain reuse the OOF ticker. [claim S12]

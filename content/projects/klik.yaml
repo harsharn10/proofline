@@ -78,3 +78,7 @@ findings:
     - text: "Which GitHub commit, if any, matches Factory_whook.sol on Blockscout? Next: do not treat klikfinance/klik as the live contract source; record a source mirror if one appears"
     - text: "Are Tempo and Hook Labs live on chain 4663, or only on Ethereum / Arc as the docs table states? Next: do not use the Ethereum Hook Labs factory addresses on Robinhood Chain"
   unresolved: []
+risks:
+  - "`platformController()` is one externally owned account with no code. [verified S10 S12] [claim S20]"
+  - Verified source lets that address swap the hook, pause `deployCoin`, and withdraw ETH/WETH fees. [verified S10 S12] [claim S20]
+  - There is no timelock. [verified S10 S12] [claim S20]

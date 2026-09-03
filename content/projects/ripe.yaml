@@ -149,3 +149,7 @@ findings:
     - text: "Do the ChainSecurity and Anatomist PDFs cover the Robinhood RipeHq/RipeToken deploy? Next: open both PDFs and match contract names/addresses to 4663"
     - text: "Is discord.gg/hightop linked from ripe.finance or only aggregators? Next: re-read ripe.finance footer and docs community page"
   unresolved: []
+risks:
+  - Aggregator marketCap (~$4.1M) is not the pool FDV (~$935k) and likely blends Base RIPE 0x2A0a…dDC0 with this RH token. [claim S10]
+  - Pool USD reserve is RIPE plus NVDA, not USDG. [claim S10]
+  - Privileged pause/mint paths exist on RipeToken even though owner() reverts. [claim S10]

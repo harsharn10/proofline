@@ -127,3 +127,7 @@ findings:
     - text: "Why do Gecko reserve ($1.01M) and DexScreener liquidity ($474k) disagree on the same AP/AAPL pool? Next: archive both aggregator payloads if the gap stays this wide"
   unresolved:
     - text: economics.metric remains unresolved (CON-1).
+risks:
+  - USD liquidity on the AP/AAPL book counts both AP and AAPL. [claim S7]
+  - Gecko reserve and DexScreener liquidity for the same pool differ by about $535k this pass. [claim S7]
+  - Token owner() is Airlock. [claim S7]

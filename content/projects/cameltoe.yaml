@@ -112,3 +112,7 @@ findings:
     - text: "Can factory owner 0x5519a8…044D change fees or quotes on 0xe64A…F297 now that launchCreationEnabled is false? Next: read remaining Ownable modifiers on src/RWAERC20LaunchpadFactory.sol"
     - text: "Do the other robinhood CAMELTOE tickers (0x8CDf…F201, 0xBfBf…d35A, 0xE975…Aa23) share a deployer with 0xc32B…F201? Next: eth_getCode and factory() on each address"
   unresolved: []
+risks:
+  - USD liquidity figures on the CAMELTOE/LULU book count both sides, and the quote side is LULU, not USDG. [claim S10]
+  - DexScreener and Gecko disagree on reserve and FDV for the same pool. [claim S10]
+  - The X URL on the site did not show a contract in the profile bio this pass. [claim S10]

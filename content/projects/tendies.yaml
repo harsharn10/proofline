@@ -114,3 +114,7 @@ findings:
     - text: "Does a later Gecko pool GET for 0x2376…C4C5 return reserve_in_usd for the WETH book only? Next: one pool GET after the 429 window; do not loop"
   unresolved:
     - text: economics.metric remains unresolved (CON-1).
+risks:
+  - USD liquidity on the lead book counts TENDIES plus WETH, not a USDG backstop. [claim S1]
+  - Gecko token volume_usd.h24 and Blockscout token.volume_24h are all-pools figures and do not match the WETH pair. [claim S1]
+  - No official handle was located, so comms stay unconfirmed-official. [claim S1]

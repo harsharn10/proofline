@@ -140,3 +140,7 @@ metrics:
     class: claim
     sources:
       - S9
+risks:
+  - Both slot contracts return the same externally owned account from owner(), with no timelock named in the docs. [claim S5]
+  - PageMarkets escrow and EIP-6551 wallets are account posts, not reproduced addresses. [claim S5]
+  - A second WEBSITE ticker exists as a Doppler clone. [claim S5]

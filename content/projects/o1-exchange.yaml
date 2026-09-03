@@ -151,3 +151,7 @@ findings:
     - text: "Does https://github.com/o1exchange/o1-api hold launchpad contracts, or only the trading API? Next: open the org and search for RWAERC20LaunchpadFactory.sol"
     - text: "Does discord.gg/o1exchange cross-link o1.exchange? Next: open Discord and retry launch.o1.exchange with a browser"
   unresolved: []
+risks:
+  - Factory `owner()` is one externally owned account with no pending owner. [claim S4]
+  - Liquidity is permanently locked, so a failed launch cannot be unwound by pulling LP. [claim S4]
+  - DefiLlama's Robinhood adapter still lists only historical factories, so the published chain-slice fee figure may miss current-factory flow. [claim S4]

@@ -122,3 +122,7 @@ findings:
   unresolved:
     - text: economics.metric remains unresolved (CON-1).
     - text: economics.metric remains unresolved (CON-2).
+risks:
+  - USD liquidity figures on the MEOW/AMD book count both sides, and the quote side is AMD, not USDG. [claim S10]
+  - Gecko reserve_in_usd on this pool was negative this pass, so a card that uses that field would invert the book. [claim S10]
+  - Same-ticker MEOW clones exist. [claim S10]

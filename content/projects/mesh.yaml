@@ -124,3 +124,7 @@ metrics:
     class: claim
     sources:
       - S25
+risks:
+  - Merchant transfers go through x402ExactPermit2Proxy and a relayer EOA; the sampled status page shows 11,323 settlements from 18 unique payers. [claim S5]
+  - Epoch USDG custody and the stock-swapper were not found in the splitter ABI. [claim S5]
+  - Treasury on MeshSplitterFactory is one EOA. [claim S5]

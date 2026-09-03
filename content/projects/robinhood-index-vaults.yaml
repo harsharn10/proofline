@@ -92,3 +92,7 @@ metrics:
     class: claim
     sources:
       - S15
+risks:
+  - Swaps go through MockSwapRouter at a fixed 1 WETH = 100 stock tokens, not a live DEX. [verified S5 S6] [claim S15]
+  - The owner can setIndex, rebalance, and force Safe Mode with no timelock. [verified S5 S6] [claim S15]
+  - Eight unverified rIDX ERC-20s sit on testnet; the frontend vault address is an env var, not a committed CA. [verified S5 S6] [claim S15]
