@@ -1,7 +1,6 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteNotice } from "@/components/site-notice";
 import { getContent, getSiteMeta } from "@/data/content-server";
 import appCss from "../styles.css?url";
 
@@ -46,7 +45,6 @@ export const Route = createRootRoute({
       </head>
       <body>
         <SiteHeader />
-        <SiteNotice />
         <Outlet />
         <SiteFooter />
         <Scripts />
