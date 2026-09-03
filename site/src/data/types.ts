@@ -323,7 +323,15 @@ export type DirectoryEntry = {
   lifecycle: Lifecycle;
   coverage: Coverage;
   role: CensusRole;
+  entityKind: "protocol" | "application" | "token" | "infrastructure" | "tool" | "collection" | "unknown";
+  identityStatus: "verified" | "provisional" | "conflicted";
+  officialConfirmed: boolean;
+  hasContractOn4663: boolean;
+  shareBarMetric: "liquidity" | "tvl";
   summary: string;
+  officialLinks: Link[];
+  dependencyIds: string[];
+  reviewedAt: string;
   derived: Derived;
   feedCount: number;
   // census tree.primary placement — the home page's section grouping and the card's product label.
@@ -331,6 +339,30 @@ export type DirectoryEntry = {
   // Holder count of the project's token contract from content/pulled, when read. Chip figure of last resort.
   holders: number | null;
   kpis: Kpis;
+  factoryLaunches24h: number;
+};
+
+export type HistoryPoint = {
+  at: string;
+  holders?: number | null;
+  liquidity_usd?: number | null;
+  volume_h24?: number | null;
+  trades_h24?: number | null;
+  txns_total?: number | null;
+  launches_24h?: number | null;
+  tvl?: number | null;
+};
+
+export type TrendingEntry = { entry: DirectoryEntry; change24h: number | null };
+export type SectionLeader = { entry: DirectoryEntry; announced: boolean };
+export type LatestIcarusItem = {
+  kind: "icarus" | "post";
+  date: string;
+  slug: string;
+  who: string;
+  title: string;
+  body: string;
+  sourceUrl: string | null;
 };
 
 // A dependency card as the home page lists it: enough to label and link the chip.
@@ -450,6 +482,9 @@ export type DirectoryBundle = {
   site: SiteConfig;
   sections: SectionDef[];
   entries: DirectoryEntry[];
+  histories: Record<string, HistoryPoint[]>;
+  changelog: ChangelogEntry[];
+  feed: LatestFeedItem[];
   dependencies: DependencyListing[];
   generatedAt: string; // build/derived.json generated_at — when scores were last computed
   now: number; // build time (ms epoch) for relative "2 min ago" wording

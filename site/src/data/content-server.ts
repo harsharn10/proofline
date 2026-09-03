@@ -2,7 +2,10 @@ import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
-import { headlineMetric } from "./types";
+import { headlineMetric, SECTION_KPIS } from "./types";
+// Shared with scripts/score.mjs so site and Telegram eligibility cannot drift.
+// @ts-expect-error The repository-level helper is intentionally plain ESM.
+import { meetsShareBar as meetsShareBarCore } from "../../../scripts/lib/share-bar.mjs";
 import type {
   ChangelogEntry,
   Deployment,
@@ -14,7 +17,9 @@ import type {
   DossierBundle,
   Findings,
   Derived,
+  HistoryPoint,
   Kpis,
+  LatestIcarusItem,
   LatestFeedItem,
   Link,
   Metric,
@@ -24,9 +29,11 @@ import type {
   Research,
   Review,
   SectionDef,
+  SectionLeader,
   SiteConfig,
   SourceEntry,
   TreeRef,
+  TrendingEntry,
 } from "./types";
 
 // schema/taxonomy.json — the one taxonomy. Sections in home order; leaves keyed by "domain/leaf".
@@ -93,13 +100,20 @@ type SourcesFile = { slug: string; sources: SourceEntry[] };
 type FeedFile = { slug: string; items: Dossier["feed"] };
 // The subset of census.yaml the site reads: the official handle and the desk's taxonomy
 // placement per slug (schema/census.schema.json).
-type CensusEntry = { slug: string; handle?: string; role?: "subject" | "observe"; tree?: { primary?: string; secondary?: string[] } };
+type CensusEntry = {
+  slug: string;
+  handle?: string;
+  role?: "subject" | "observe";
+  identity: { entity_kind: DirectoryEntry["entityKind"]; status: DirectoryEntry["identityStatus"] };
+  tree?: { primary?: string; secondary?: string[] };
+};
 
 type DerivedFile = {
   generated_at: string;
   methodology_version: string;
   projects: Record<string, Record<string, unknown>>;
   trending: string[];
+  shareBar?: Record<string, boolean>;
 };
 
 // derived.json values pass through these narrow gates so a malformed emitter row degrades to
@@ -183,7 +197,9 @@ type ServerContent = {
   dossiers: Dossier[];
   dependencies: Record<string, DependencyCard>;
   changelog: ChangelogEntry[];
+  censusBySlug: Map<string, CensusEntry>;
   treeBySlug: Record<string, TreeRef>;
+  histories: Record<string, HistoryPoint[]>;
   generatedAt: string;
   now: number;
 };
@@ -217,6 +233,7 @@ function loadContent(): ServerContent {
   // the dossier eyebrow and the peer set all key off this placement.
   const treeBySlug: Record<string, TreeRef> = {};
   const roleBySlug: Record<string, "subject" | "observe"> = {};
+  const censusBySlug = new Map(census.map((row) => [row.slug, row]));
   for (const row of census) {
     const tree = resolveTree(row.tree?.primary, taxonomy);
     if (tree) treeBySlug[row.slug] = tree;
@@ -282,7 +299,14 @@ function loadContent(): ServerContent {
     dossiers: directorySortKey(dossiers),
     dependencies,
     changelog: changelogAll,
+    censusBySlug,
     treeBySlug,
+    histories: Object.fromEntries(
+      Object.keys(rawContent.projects).map((file) => {
+        const slug = file.replace(/\.yaml$/, "");
+        return [slug, parseHistory(rawContent.pulledHistory[`${slug}.jsonl`])];
+      }),
+    ),
     generatedAt: derivedFile.generated_at,
     now: buildNow,
   };
@@ -299,11 +323,22 @@ function getCachedContent(): ServerContent {
 
 // --- Slices ------------------------------------------------------------------------
 
-// Home shows only the newest 5 — the full firehose lives on /feed (IA brief: declutter home).
-const LATEST_FEED_COUNT = 5;
-const LATEST_FEED_BODY_MAX = 240;
-
-function toDirectoryEntry(d: Dossier, treeBySlug: Record<string, TreeRef>): DirectoryEntry {
+function toDirectoryEntry(
+  d: Dossier,
+  treeBySlug: Record<string, TreeRef>,
+  censusBySlug: Map<string, CensusEntry>,
+): DirectoryEntry {
+  const tree = treeBySlug[d.slug] ?? null;
+  const census = censusBySlug.get(d.slug);
+  const officialConfirmed =
+    d.links.some((link) => link.kind === "site" || link.kind === "docs") &&
+    census?.identity.status !== "conflicted";
+  const hasContractOn4663 =
+    d.pulled?.addresses.some((address) => address.is_contract === true) ?? false;
+  const factoryLaunches24h =
+    d.pulled?.activity?.addresses
+      .filter((address) => address.role === "factory")
+      .reduce((sum, address) => sum + (address.launches_24h ?? 0), 0) ?? 0;
   return {
     slug: d.slug,
     name: d.name,
@@ -312,12 +347,24 @@ function toDirectoryEntry(d: Dossier, treeBySlug: Record<string, TreeRef>): Dire
     lifecycle: d.lifecycle,
     coverage: d.coverage,
     role: d.role,
+    entityKind: census?.identity.entity_kind ?? "unknown",
+    identityStatus: census?.identity.status ?? "provisional",
+    officialConfirmed,
+    hasContractOn4663,
+    shareBarMetric:
+      census?.identity.entity_kind === "token" || tree?.sectionId === "launchpads"
+        ? "liquidity"
+        : "tvl",
     summary: d.summary,
+    officialLinks: d.links,
+    dependencyIds: d.dependencies,
+    reviewedAt: d.review.reviewed_at,
     derived: d.derived,
     feedCount: d.feed.length,
-    tree: treeBySlug[d.slug] ?? null,
+    tree,
     holders: tokenHolders(d.pulled),
     kpis: d.kpis,
+    factoryLaunches24h,
   };
 }
 
@@ -335,15 +382,13 @@ function withPulledMetrics(derived: Derived, pulled: PulledFile | null): Derived
 
 const DAY = 86_400_000;
 
-type HistoryLine = { at: string; holders?: number | null; liquidity_usd?: number | null; volume_h24?: number | null; trades_h24?: number | null; txns_total?: number | null; launches_24h?: number | null; tvl?: number | null };
-
-function parseHistory(raw: string | undefined): HistoryLine[] {
+function parseHistory(raw: string | undefined): HistoryPoint[] {
   if (!raw) return [];
-  const lines: HistoryLine[] = [];
+  const lines: HistoryPoint[] = [];
   for (const line of raw.split("\n")) {
     if (!line.trim()) continue;
     try {
-      const v = JSON.parse(line) as HistoryLine;
+      const v = JSON.parse(line) as HistoryPoint;
       if (typeof v.at === "string") lines.push(v);
     } catch {
       /* a bad line never breaks the page */
@@ -352,8 +397,130 @@ function parseHistory(raw: string | undefined): HistoryLine[] {
   return lines.sort((a, b) => a.at.localeCompare(b.at));
 }
 
+// --- Home and category rules -------------------------------------------------------
+
+export function meetsShareBar(entry: DirectoryEntry): boolean {
+  return meetsShareBarCore(entry);
+}
+
+export function trendingNow(
+  entries: DirectoryEntry[],
+  histories: Record<string, HistoryPoint[]>,
+): TrendingEntry[] {
+  return entries
+    .filter(
+      (entry) =>
+        entry.kpis.status === "live" && meetsShareBar(entry) && entry.kpis.volume24h !== null,
+    )
+    .sort((a, b) => b.kpis.volume24h! - a.kpis.volume24h! || a.name.localeCompare(b.name))
+    .slice(0, 5)
+    .map((entry) => {
+      const anchor = new Date(
+        entry.kpis.readAt ?? histories[entry.slug]?.at(-1)?.at ?? "",
+      ).getTime();
+      const target = anchor - DAY;
+      const prior = (histories[entry.slug] ?? [])
+        .filter((point) => {
+          const at = new Date(point.at).getTime();
+          return Number.isFinite(at) && at < anchor && typeof point.volume_h24 === "number";
+        })
+        .sort(
+          (a, b) =>
+            Math.abs(new Date(a.at).getTime() - target) -
+            Math.abs(new Date(b.at).getTime() - target),
+        )[0];
+      const priorValue = prior?.volume_h24;
+      const change24h =
+        typeof priorValue === "number" && priorValue > 0
+          ? ((entry.kpis.volume24h! - priorValue) / priorValue) * 100
+          : null;
+      return { entry, change24h };
+    });
+}
+
+export function newLaunches(entries: DirectoryEntry[], now = Date.now()): DirectoryEntry[] {
+  return entries
+    .filter((entry) => {
+      if (!entry.kpis.firstPairAt || !meetsShareBar(entry)) return false;
+      const age = now - new Date(entry.kpis.firstPairAt).getTime();
+      return age >= 0 && age <= 14 * DAY;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.kpis.firstPairAt!).getTime() - new Date(a.kpis.firstPairAt!).getTime() ||
+        a.name.localeCompare(b.name),
+    );
+}
+
+export function notListedCount(entries: DirectoryEntry[], listed: DirectoryEntry[]): number {
+  const factoryLaunches = entries.reduce((sum, entry) => sum + entry.factoryLaunches24h, 0);
+  return Math.max(0, factoryLaunches - listed.length);
+}
+
+export function announcedNow(entries: DirectoryEntry[]): DirectoryEntry[] {
+  return entries
+    .filter(
+      (entry) =>
+        entry.kpis.status === "announced" &&
+        entry.officialConfirmed &&
+        entry.summary.trim().length > 0,
+    )
+    .sort((a, b) => b.reviewedAt.localeCompare(a.reviewedAt) || a.name.localeCompare(b.name));
+}
+
+export function sectionLeaders(section: SectionDef, entries: DirectoryEntry[]): SectionLeader[] {
+  const key = (SECTION_KPIS[section.id] ?? ["volume24h"])[0]!;
+  const ranked = entries
+    .filter(
+      (entry) =>
+        entry.tree?.sectionId === section.id && meetsShareBar(entry) && entry.kpis[key] !== null,
+    )
+    .sort((a, b) => Number(b.kpis[key]) - Number(a.kpis[key]) || a.name.localeCompare(b.name))
+    .slice(0, 5)
+    .map((entry) => ({ entry, announced: false }));
+  if (ranked.length >= 3) return ranked;
+  const announced = announcedNow(entries)
+    .filter((entry) => entry.tree?.sectionId === section.id)
+    .slice(0, 3 - ranked.length)
+    .map((entry) => ({ entry, announced: true }));
+  return [...ranked, ...announced];
+}
+
+export function latestFromIcarus(
+  changelog: ChangelogEntry[],
+  feed: LatestFeedItem[],
+  n = 4,
+): LatestIcarusItem[] {
+  const updates: LatestIcarusItem[] = changelog.map((entry) => ({
+    kind: "icarus",
+    date: entry.date,
+    slug: entry.slug,
+    who: "Icarus",
+    title: entry.title,
+    body: entry.detail,
+    sourceUrl: null,
+  }));
+  const posts: LatestIcarusItem[] = feed.map(({ name, item }) => ({
+    kind: "post",
+    date: item.date,
+    slug: name.slug,
+    who: item.account ?? (item.kind === "onchain" ? "on-chain" : (name.symbol ?? name.name)),
+    title: item.title,
+    body: item.body,
+    sourceUrl: item.sourceUrl ?? null,
+  }));
+  return [...updates, ...posts]
+    .sort(
+      (a, b) =>
+        b.date.localeCompare(a.date) ||
+        a.slug.localeCompare(b.slug) ||
+        a.title.localeCompare(b.title),
+    )
+    .slice(0, Math.max(0, n));
+}
+
 // Change over `days`: the latest snapshot against the newest one at least that many days older.
-function deltaFrom(history: HistoryLine[], key: "holders", days: number): number | null {
+function deltaFrom(history: HistoryPoint[], key: "holders", days: number): number | null {
   if (history.length < 2) return null;
   const latest = history[history.length - 1]!;
   const latestAt = new Date(latest.at).getTime();
@@ -366,7 +533,7 @@ function deltaFrom(history: HistoryLine[], key: "holders", days: number): number
 // Every tracker number on a card comes from here: DexScreener market read, Blockscout activity read,
 // holder counts and their 7-day change from snapshots, DefiLlama TVL. Status is computed from the
 // reads, never typed by a person.
-function kpisFor(d: { lifecycle: Dossier["lifecycle"]; deployments: Deployment[] }, pulled: PulledFile | null, history: HistoryLine[], now: number): Kpis {
+function kpisFor(d: { lifecycle: Dossier["lifecycle"]; deployments: Deployment[] }, pulled: PulledFile | null, history: HistoryPoint[], now: number): Kpis {
   const market = pulled?.market ?? null;
   const activity = pulled?.activity ?? null;
   const located = d.deployments.some((x) => x.address !== "not-verified");
@@ -460,7 +627,14 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
   return {
     site: content.site,
     sections: content.sections,
-    entries: content.dossiers.map((d) => toDirectoryEntry(d, content.treeBySlug)),
+    entries: content.dossiers.map((d) =>
+      toDirectoryEntry(d, content.treeBySlug, content.censusBySlug),
+    ),
+    histories: content.histories,
+    changelog: content.changelog,
+    feed: content.dossiers.flatMap((d) =>
+      d.feed.map((item) => ({ name: { slug: d.slug, symbol: d.symbol, name: d.name }, item })),
+    ),
     dependencies: Object.values(content.dependencies)
       .map((c) => ({ id: c.id, name: c.name, kind: c.kind }))
       .sort((a, b) => a.name.localeCompare(b.name)),
