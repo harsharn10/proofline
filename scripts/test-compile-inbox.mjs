@@ -202,28 +202,54 @@ await test("a second run over the same branch produces no diff", async () => {
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-await test("a failed content gate reverts content/ and the packet root, and exits non-ok", async () => {
-  // "degen" is on the banned-word list (scripts/lib/voice.mjs). It survives packet validation and lands
-  // in the compiled summary, where `validate.mjs --release` turns it into an error.
-  const hype = packetFor({
-    slug: "delta", name: "Delta", symbol: "DEL", address: "0x4444444444444444444444444444444444444444",
-    workId: "WORK-20260903-grok-heavy-delta",
-    summary: "Delta is a degen scanner that reads public Robinhood Chain state and publishes changes.",
-  });
+// "degen" is on the banned-word list (scripts/lib/voice.mjs). It survives packet validation and lands in
+// the compiled summary, where `validate.mjs --release` turns it into an error.
+const HYPE = packetFor({
+  slug: "delta", name: "Delta", symbol: "DEL", address: "0x4444444444444444444444444444444444444444",
+  workId: "WORK-20260903-grok-heavy-delta",
+  summary: "Delta is a degen scanner that reads public Robinhood Chain state and publishes changes.",
+});
+
+await test("a packet whose compiled prose fails the release gate is dropped, and the rest of the batch lands", async () => {
   const { root, work } = await fixtureRepo({
     [packetPath("beta", "WORK-20260903-grok-heavy-beta")]: VALID,
-    [packetPath("delta", "WORK-20260903-grok-heavy-delta")]: hype,
+    [packetPath("delta", "WORK-20260903-grok-heavy-delta")]: HYPE,
   });
   try {
+    const report = await run(work, { branches: [PRODUCER_BRANCH] });
+    assert.equal(report.ok, true, "the batch is recompiled without the offender and passes");
+    assert.deepEqual(report.compiled, ["beta"]);
+    assert.ok(existsSync(join(work, "content/projects/beta.yaml")), "the clean packet still lands");
+    assert.ok(!existsSync(join(work, "content/projects/delta.yaml")));
+    assert.ok(!existsSync(join(work, packetPath("delta", "WORK-20260903-grok-heavy-delta"))), "the dropped packet is not staged for main");
+    const branch = report.branches.find((entry) => entry.branch === PRODUCER_BRANCH);
+    assert.equal(branch.skipped.length, 1);
+    assert.equal(branch.skipped[0].path, packetPath("delta", "WORK-20260903-grok-heavy-delta"));
+    assert.ok(branch.skipped[0].errors.some((error) => /banned word "degen"/.test(error)), branch.skipped[0].errors.join("; "));
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+await test("a gate failure no packet in the batch can fix reverts content/ and the packet root", async () => {
+  const { root, work } = await fixtureRepo({
+    [packetPath("beta", "WORK-20260903-grok-heavy-beta")]: VALID,
+  });
+  try {
+    // main itself goes red: a banned word in a project no producer branch touches. Dropping packets
+    // cannot fix that, so the run reverts everything rather than pushing a red main.
+    const alpha = join(work, "content/projects/alpha.yaml");
+    await writeFile(alpha, (await readFile(alpha, "utf8")).replace(/^summary: .*$/m, "summary: Alpha is a scanner that will moon once the indexer lands."));
+    await git(work, "commit", "-q", "-am", "fixture: main goes red");
+    await git(work, "push", "-q", "origin", "main");
+    await git(work, "fetch", "-q", "origin");
+
     const before = await snapshot(join(work, "content"));
     const report = await run(work, { branches: [PRODUCER_BRANCH] });
     assert.equal(report.ok, false, "the gate fails");
     assert.equal(report.gates.validate.ok, false);
-    assert.match(report.gates.validate.output, /banned word "degen"/);
+    assert.match(report.gates.validate.output, /banned word "moon"/);
     assert.deepEqual(await snapshot(join(work, "content")), before, "content/ is exactly as it was");
     assert.equal((await git(work, "status", "--porcelain")).trim(), "", "no packet is left staged for main");
-    assert.ok(!existsSync(join(work, "content/projects/delta.yaml")));
-    assert.ok(!existsSync(join(work, "content/projects/beta.yaml")), "the whole batch is reverted, not just the offender");
+    assert.ok(!existsSync(join(work, "content/projects/beta.yaml")), "the whole batch is reverted");
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 

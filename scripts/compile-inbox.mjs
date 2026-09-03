@@ -32,6 +32,8 @@ export const PRODUCER_PREFIXES = ["grok-heavy/", "supergrok/", "grok/", "codex/"
 const MAX_BUFFER = 64 * 1024 * 1024;
 /** Reverting one bad packet can clear a uniqueness error another packet was blamed for; revalidate. */
 const VALIDATION_PASSES = 5;
+/** How many times the batch is recompiled after dropping the packets a content gate blamed. */
+const GATE_ATTEMPTS = 3;
 
 async function git(args, { allowFail = false } = {}) {
   try {
@@ -195,6 +197,36 @@ async function runGate(script, args = []) {
 
 const tail = (text, lines = 25) => String(text).trimEnd().split("\n").slice(-lines).join("\n");
 
+/** The canonical file an error line names, mapped back to its slug. Order matters: packets before research. */
+const SLUG_PATTERNS = [
+  /^research\/inbox\/packets\/([a-z0-9][a-z0-9-]*)\//,
+  /^projects\/([a-z0-9][a-z0-9-]*)\.yaml:/,
+  /^sources\/([a-z0-9][a-z0-9-]*)(?:\.yaml)?:/,
+  /^research\/([a-z0-9][a-z0-9-]*)\.md:/,
+  /^feed\/([a-z0-9][a-z0-9-]*)\.yaml:/,
+  /^census: ([a-z0-9][a-z0-9-]*) /,
+  /^changelog\.yaml: \[\d+\] \S+ ([a-z0-9][a-z0-9-]*) /,
+];
+
+/**
+ * Which slugs a gate's output blames, and how many of its errors name no slug at all. A batch whose
+ * every gate error points at a packet this run compiled can be retried without those packets; one
+ * error that names site.yaml, accounts.yaml or a slug nobody touched cannot be fixed by dropping
+ * anything, and the run stops.
+ */
+export function failingSlugs(output) {
+  const slugs = new Set();
+  let unattributed = 0;
+  for (const line of String(output).split("\n")) {
+    if (!line.startsWith("error ")) continue;
+    const message = line.slice("error ".length);
+    const match = SLUG_PATTERNS.reduce((found, pattern) => found ?? message.match(pattern), null);
+    if (match) slugs.add(match[1]);
+    else unattributed++;
+  }
+  return { slugs, unattributed };
+}
+
 export async function compileInbox({ branches = [], dry = false, remote = "origin", fetch = true, base = `${remote}/main`, log = console.log } = {}) {
   const dirty = await git(["status", "--porcelain", "--", CONTENT_DIR, PACKET_ROOT]);
   if (dirty.trim()) throw new Error(`working tree is not clean under ${CONTENT_DIR}/ or ${PACKET_ROOT}/:\n${dirty.trim()}`);
@@ -264,6 +296,7 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
   //    An inventory packet is a list of candidate names, not a project: it is kept as a record and
   //    never turned into a census row.
   const parsed = [];
+  const kept = [];
   for (const candidate of live) {
     const packet = parsePacket(candidate.branchText);
     if (isInventoryPacket(packet.frontmatter)) {
@@ -272,6 +305,7 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
       const entry = { path: candidate.path, branch: candidate.branch, candidates: count, possibleMatches: matches };
       candidate.report.inventory.push(entry);
       report.inventory.push(entry);
+      kept.push(candidate);
       log(`note  ${candidate.path}: inventory: ${count} candidates (${matches} possible match(es)) — kept as a record, never compiled`);
       continue;
     }
@@ -279,33 +313,72 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
   }
   parsed.sort((a, b) => a.asOf - b.asOf || a.path.localeCompare(b.path));
 
+  // The share bar before anything is compiled, so the report can name what the batch added or removed.
   await runGate("score.mjs");
   const shareBarBefore = shareBarSlugs(await readJson("build/derived.json"));
   const namesBefore = await censusNames();
 
-  for (const candidate of parsed) {
-    try {
-      const result = await runCompile({ packetPath: candidate.path, contentDir: CONTENT_DIR });
-      candidate.report.compiled.push(candidate.packet.frontmatter.slug);
-      report.compiled.push(candidate.packet.frontmatter.slug);
-      report.packetPaths.push(candidate.path);
-      const { autoTaggedParagraphs, skippedMetrics, skippedDeployments } = result.degraded;
-      report.notices.push({
-        slug: result.project.slug, path: candidate.path, branch: candidate.branch,
-        messages: result.notices, autoTaggedParagraphs, skippedMetrics, skippedDeployments,
-      });
-    } catch (error) {
-      await revertPacket(candidate);
-      candidate.report.skipped.push({ path: candidate.path, errors: String(error.message).split("\n") });
-      log(`skip  ${candidate.path}: compile refused it`);
+  // 4. Compile and gate. Nothing that fails a gate ever reaches main. When every gate error points at a
+  //    packet this run compiled, those packets are dropped and the batch is rebuilt without them — one
+  //    packet whose prose trips the release lint must not hold up the other thirty. An error naming a
+  //    file nobody in this batch touched cannot be fixed that way, and the run stops.
+  let batch = parsed;
+  let validate, score;
+  for (let attempt = 1; attempt <= GATE_ATTEMPTS; attempt++) {
+    report.compiled = []; report.notices = []; report.packetPaths = [];
+    for (const branch of report.branches) branch.compiled = [];
+    if (attempt > 1) {
+      for (const candidate of [...batch, ...kept]) {
+        await mkdir(dirname(candidate.path), { recursive: true });
+        await writeFile(candidate.path, candidate.branchText);
+      }
     }
-  }
-  log(`compiled ${report.compiled.length} packet(s)`);
+    const compiled = [];
+    for (const candidate of batch) {
+      try {
+        const result = await runCompile({ packetPath: candidate.path, contentDir: CONTENT_DIR });
+        candidate.report.compiled.push(candidate.packet.frontmatter.slug);
+        report.compiled.push(candidate.packet.frontmatter.slug);
+        report.packetPaths.push(candidate.path);
+        const { autoTaggedParagraphs, skippedMetrics, skippedDeployments } = result.degraded;
+        report.notices.push({
+          slug: result.project.slug, path: candidate.path, branch: candidate.branch,
+          messages: result.notices, autoTaggedParagraphs, skippedMetrics, skippedDeployments,
+        });
+        compiled.push(candidate);
+      } catch (error) {
+        await revertPacket(candidate);
+        candidate.report.skipped.push({ path: candidate.path, errors: String(error.message).split("\n") });
+        log(`skip  ${candidate.path}: compile refused it`);
+      }
+    }
+    batch = compiled;
+    log(`compiled ${report.compiled.length} packet(s)`);
 
-  // 4. Gate. Nothing that fails these ever reaches main.
-  const validate = await runGate("validate.mjs", ["--release"]);
+    validate = await runGate("validate.mjs", ["--release"]);
+    score = validate.ok ? await runGate("score.mjs") : { ok: false, output: "not run: validate --release failed" };
+    if (validate.ok && score.ok) break;
+
+    const failed = validate.ok ? score : validate;
+    const { slugs, unattributed } = failingSlugs(failed.output);
+    const offenders = batch.filter((candidate) => slugs.has(candidate.packet.frontmatter.slug));
+    const fixable = slugs.size > 0 && unattributed === 0 && offenders.length === slugs.size;
+    if (!fixable || attempt === GATE_ATTEMPTS) break;
+    log(`gate failed on ${[...slugs].join(", ")} — dropping those packets and recompiling the rest`);
+    await restoreWorkingTree();
+    const byLine = new Map([...slugs].map((slug) => [slug, []]));
+    for (const line of failed.output.split("\n")) {
+      if (!line.startsWith("error ")) continue;
+      for (const slug of slugs) if (line.includes(`/${slug}.`) || line.includes(`/${slug}/`) || line.includes(` ${slug} `)) byLine.get(slug).push(line.slice("error ".length));
+    }
+    for (const candidate of offenders)
+      candidate.report.skipped.push({
+        path: candidate.path,
+        errors: [`the compiled content failed a content gate, so this packet was left out of the batch:`, ...byLine.get(candidate.packet.frontmatter.slug)],
+      });
+    batch = batch.filter((candidate) => !offenders.includes(candidate));
+  }
   report.gates.validate = { ok: validate.ok, output: tail(validate.output) };
-  const score = validate.ok ? await runGate("score.mjs") : { ok: false, output: "not run: validate --release failed" };
   report.gates.score = { ok: score.ok, output: tail(score.output) };
 
   if (validate.ok && score.ok) {

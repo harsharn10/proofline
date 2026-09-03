@@ -49,9 +49,11 @@ Two clocks run on a filed packet. Neither needs a human.
   bot will ever merge it — only the packet files move.
 
 A packet that does not validate is skipped and reported in one comment on the PR, with each skipped
-file's errors in a fenced block. The rest of the batch still compiles: one bad packet never blocks the
-others. To fix one, `PUT` the same path again on the same branch with the corrections — the next compile
-picks up the new copy. A packet that supersedes one already compiled onto main must carry a newer
+file's errors in a fenced block. So is a packet that validates but whose compiled prose fails the release
+lint — a banned hype word in the "What it is" paragraph, a producer name in a finding — which is dropped
+after the compile and named the same way. The rest of the batch still compiles: one bad packet never
+blocks the others. To fix one, `PUT` the same path again on the same branch with the corrections — the
+next compile picks up the new copy. A packet that supersedes one already compiled onto main must carry a newer
 `as_of`, or it is left alone as an older copy of what main already has. A packet naming a possible match
 that is being created in the same batch is skipped that round and compiles on the next one.
 
