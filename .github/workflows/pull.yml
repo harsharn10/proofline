@@ -35,7 +35,7 @@ jobs:
     # The 24h transaction walk is the long pole: Blockscout answers in a second or two, at most two
     # requests are in flight against it, and a busy factory can need forty pages. An hour is slack
     # over the observed run, not the expected one.
-    timeout-minutes: 60
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,6 +68,8 @@ jobs:
           git -c user.name="proofline-bot" -c user.email="bot@proofline.local" \
             commit -m "pull: chain facts $(date -u '+%Y-%m-%dT%H:%M:%SZ')" -m "Producer: pull-bot"
           # main moves while this job runs (merges, the compile bot): rebase onto it and retry.
+          git config user.name "proofline-bot"
+          git config user.email "bot@proofline.local"
           for attempt in 1 2 3; do
             git fetch origin main
             if git rebase origin/main && git push origin HEAD:main; then exit 0; fi

@@ -20,7 +20,7 @@ import {
   publicationFingerprint,
   readDotEnv,
 } from "./lib/telegram.mjs";
-import { validateContent } from "./lib/validate-content.mjs";
+import { validateContent, ownWordSet, filterOwnWords } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
 import {
@@ -474,7 +474,7 @@ async function makeContent(mutate = () => {}) {
   await writeFile(researchPath, research.replace("## Identity\n\n", "## Identity\n\nFixture citation. [claim S98]\n\n")); // pons.md is researched now; insert rather than replace the pending line
   const cited = await validateContent(tmp);
   // A feed item citing S99 counts as a citation; a feed item attributed to a skip-tier account warns.
-  const feedItem = (body) => `slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ct\n    title: T\n    body: ${JSON.stringify(body)}\n    account: "@spam"\n    sources: [S99]\n`;
+  const feedItem = (body, kind = "ct") => `slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ${kind}\n    title: T\n    body: ${JSON.stringify(body)}\n    account: "@spam"\n    sources: [S99]\n`;
   await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n  note: Handle collides with the official account; posts not used as evidence.\n");
   await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("B"));
   const feedCited = await validateContent(tmp);
@@ -485,6 +485,8 @@ async function makeContent(mutate = () => {}) {
   await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n");
   await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("Ape in, this will moon."));
   const hypeFeed = await validateContent(tmp);
+  await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("Ape in, this will moon.", "company"));
+  const hypeCompany = await validateContent(tmp);
   await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("B"));
   const ponsPath = join(tmp, "projects", "pons.yaml");
   const pons = parse(await readFile(ponsPath, "utf8"));
@@ -503,7 +505,8 @@ async function makeContent(mutate = () => {}) {
     assert.ok(!feedCited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited only from a feed item is not 'never cited'");
     assert.ok(feedCited.warnings.some((w) => w.includes("skip-tier account @spam")), "feed item attributed to a skip-tier account warns");
     assert.ok(conductNote.errors.some((e) => e.includes("@spam note: conduct word \"drainer\"")), "conduct word in an account note is an error without --release");
-    assert.ok(hypeFeed.errors.some((e) => e.includes("feed/pons.yaml: t1 body: banned word \"moon\"")), "hype word in a feed body is an error without --release");
+    assert.ok(hypeFeed.warnings.some((e) => e.includes("feed/pons.yaml: t1 body: banned word \"moon\"")) && !hypeFeed.errors.some((e) => e.includes("banned word")), "a hype word in a Talk item (what someone posted) warns, never gates");
+    assert.ok(hypeCompany.errors.some((e) => e.includes("feed/pons.yaml: t1 body: banned word \"moon\"")), "a hype word in an announcement item is an error without --release");
     assert.ok(conductFinding.errors.some((e) => e.includes("projects/pons.yaml: findings.risk") && e.includes("conduct word \"scammer\"")), "conduct word in findings text is an error without --release");
     assert.deepEqual(cited.errors, [], "prose citation validates");
     assert.ok(!cited.warnings.some((w) => w.includes("S98 is never cited")), "an id cited only in research prose is not 'never cited'");
@@ -1236,6 +1239,22 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   } catch (err) {
     failures++;
     console.error(`FAIL reader vocabulary: ${err.message}`);
+  }
+}
+
+
+// A name's own words are not hype: GIGA may say "giga"; unrelated hype words still fire.
+{
+  try {
+    const own = ownWordSet({ slug: "giga", name: "Giga", identity: { aliases: ["GIGA token"], symbols: ["GIGA"] } }, { name: "Giga", symbol: "GIGA" });
+    assert.ok(own.has("giga") && own.has("token"), "own words carry name, symbol and alias parts");
+    const kept = filterOwnWords(['feed/giga.yaml: x title: banned word "giga"', 'feed/giga.yaml: x body: banned word "moon"'], own);
+    assert.deepEqual(kept, ['feed/giga.yaml: x body: banned word "moon"'], "only the own word is dropped");
+    assert.equal(filterOwnWords(['a: banned word "giga"'], new Set()).length, 1, "no own words, nothing dropped");
+    console.log("ok   own words are not hype");
+  } catch (err) {
+    failures++;
+    console.error(`FAIL own words are not hype: ${err.message}`);
   }
 }
 

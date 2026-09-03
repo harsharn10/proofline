@@ -101,6 +101,8 @@ jobs:
           git -c user.name="proofline-bot" -c user.email="bot@proofline.local" \
             commit -m "compile: $COUNT packets from $BRANCHES" -m "Producer: compile-bot"
           # main moves while this job runs (merges, the pull bot): rebase onto it and retry.
+          git config user.name "proofline-bot"
+          git config user.email "bot@proofline.local"
           for attempt in 1 2 3; do
             git fetch origin main
             if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
