@@ -1005,7 +1005,23 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.equal(trending[1].change24h, 100, "change uses the snapshot nearest 24h earlier");
 
     assert.deepEqual(rules.newLaunches([pons, ai, announced], now).map((item) => item.slug), ["artificial-inu", "pons"]);
-    assert.equal(rules.notListedCount([entry("factory", { factoryLaunches24h: 12 })], [pons, ai]), 10);
+    // New launches is a 14-day list; the launch count is a 24-hour figure. Only names whose
+    // first pool is inside that window come off it.
+    const factory = entry("factory", { factoryLaunches24h: 12 });
+    const launchedToday = entry("hookr", {
+      kpis: { ...entry("x").kpis, firstPairAt: "2026-09-02T09:00:00Z" },
+    });
+    assert.equal(rules.notListedCount([factory], [pons, ai], now), 12, "older listed names never subtract");
+    assert.equal(
+      rules.notListedCount([factory], [launchedToday, pons, ai], now),
+      11,
+      "one launch listed today, two older names left alone",
+    );
+    assert.equal(
+      rules.notListedCount([entry("factory", { factoryLaunches24h: 0 })], [launchedToday], now),
+      0,
+      "never negative",
+    );
     assert.deepEqual(rules.announcedNow([olderAnnouncement, announced]).map((item) => item.slug), ["sight", "wire"]);
 
     const leaders = rules.sectionLeaders(

@@ -507,9 +507,21 @@ export function newLaunches(entries: DirectoryEntry[], now = Date.now()): Direct
     );
 }
 
-export function notListedCount(entries: DirectoryEntry[], listed: DirectoryEntry[]): number {
+// "Launches below $25K are not listed: N today". The launch count is a 24-hour figure, so only
+// the listed names whose first pool is also inside that window can be subtracted from it —
+// New launches itself is a 14-day list.
+export function notListedCount(
+  entries: DirectoryEntry[],
+  listed: DirectoryEntry[],
+  now = Date.now(),
+): number {
   const factoryLaunches = entries.reduce((sum, entry) => sum + entry.factoryLaunches24h, 0);
-  return Math.max(0, factoryLaunches - listed.length);
+  const listedToday = listed.filter((entry) => {
+    if (!entry.kpis.firstPairAt) return false;
+    const age = now - new Date(entry.kpis.firstPairAt).getTime();
+    return age >= 0 && age <= DAY;
+  }).length;
+  return Math.max(0, factoryLaunches - listedToday);
 }
 
 export function announcedNow(entries: DirectoryEntry[]): DirectoryEntry[] {
