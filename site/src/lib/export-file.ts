@@ -134,7 +134,7 @@ export function dossierToMarkdown(d: Dossier): string {
 export function dossiersToMarkdown(dossiers: Dossier[]): string {
   const index = dossiers.map((d) => `- ${d.symbol ?? d.name} — ${d.name} (${d.lifecycle})`).join("\n");
   return [
-    "# Proofline",
+    "# Icarus",
     "",
     "Robinhood Chain native plays, researched. Not financial advice.",
     "",

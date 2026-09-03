@@ -44,10 +44,89 @@ const READER_WORDS = [
   "provisional",
   "derived",
   "slug",
+  "Proofline",
 ];
 
+// The two places the old brand is still the right word: the attribution the site carries
+// ("Icarus is powered by Project Proofline") and the methodology_version string itself.
+const ATTRIBUTION = /(?:powered by|Project)\s+Proofline|\bproofline-v[\w.]+/gi;
+
 function readerWordHits(value) {
-  return READER_WORDS.filter((word) => new RegExp(`\\b${word.replace(" ", "\\s+")}\\b`, "i").test(value));
+  const text = value.replace(/\$\{[^}]*\}/g, " ").replace(ATTRIBUTION, "");
+  return READER_WORDS.filter((word) => new RegExp(`\\b${word.replace(" ", "\\s+")}\\b`, "i").test(text));
+}
+
+// Names that introduce reader copy outside JSX: { label: "…" }, KPI_LABEL = { … },
+// reportedTitle() — anything whose key or declaration reads like a label.
+const COPY_NAME = /(?:label|title|subtitle|sub|note|hint|description|placeholder)s?$/i;
+
+// Every string literal in the balanced region that starts at `start` (a quote, or a bracket to
+// walk). Template literals come through whole, `${…}` included, which is enough to spot a word.
+function literalsFrom(source, start) {
+  const found = [];
+  let depth = 0;
+  for (let i = start; i < source.length; i += 1) {
+    const ch = source[i];
+    if (ch === '"' || ch === "'" || ch === "`") {
+      let text = "";
+      let j = i + 1;
+      while (j < source.length && source[j] !== ch) {
+        if (source[j] === "\\") { text += source[j + 1] ?? ""; j += 2; continue; }
+        text += source[j];
+        j += 1;
+      }
+      found.push({ text, index: i + 1 });
+      if (depth === 0) return found;
+      i = j;
+      continue;
+    }
+    if (ch === "{" || ch === "[" || ch === "(") depth += 1;
+    else if (ch === "}" || ch === "]" || ch === ")") {
+      depth -= 1;
+      if (depth <= 0) return found;
+    }
+  }
+  return found;
+}
+
+const OPENS = /["'`{[]/;
+
+// The opening quote or bracket a `name:` or `name =` introduces, or -1 when the declaration
+// carries no literal of its own (`label: string` in a type, an imported binding).
+function copyStart(source, from) {
+  let i = from;
+  while (i < source.length && /\s/.test(source[i])) i += 1;
+  if (OPENS.test(source[i] ?? "")) return i;
+  // A typed declaration — `KPI_LABEL: Record<KpiKey, string> = { … }` — steps over the annotation.
+  for (let j = i; j < source.length && j < i + 160; j += 1) {
+    const ch = source[j];
+    if (ch === "=") {
+      let k = j + 1;
+      while (k < source.length && /\s/.test(source[k])) k += 1;
+      return OPENS.test(source[k] ?? "") ? k : -1;
+    }
+    if (ch === ";" || ch === "{" || ch === "}" || ch === "\n" || ch === '"' || ch === "'" || ch === "`") return -1;
+  }
+  return -1;
+}
+
+// The body of `function reportedTitle(asOf: string): string { … }`, past its parameters and
+// return type, or -1 when there is none.
+function bodyStart(source, openParen) {
+  let depth = 0;
+  let i = openParen;
+  for (; i < source.length; i += 1) {
+    if (source[i] === "(") depth += 1;
+    else if (source[i] === ")") {
+      depth -= 1;
+      if (depth === 0) break;
+    }
+  }
+  for (let j = i + 1; j < source.length && j < i + 160; j += 1) {
+    if (source[j] === "{") return j;
+    if (source[j] === ";" || source[j] === "\n") return -1;
+  }
+  return -1;
 }
 
 function jsxVisibleStrings(source) {
@@ -72,7 +151,21 @@ function jsxVisibleStrings(source) {
       });
     }
   }
-  return found;
+  // Copy that never reaches JSX as text: label-ish object and array literals, and the helpers
+  // that build one. Plain .ts modules carry most of it (data/types.ts labels, lib/dejargon.ts).
+  for (const match of clean.matchAll(/\b([A-Za-z_$][\w$]*)\s*[:=]/g)) {
+    if (!COPY_NAME.test(match[1])) continue;
+    const start = copyStart(clean, match.index + match[0].length);
+    if (start !== -1) found.push(...literalsFrom(clean, start));
+  }
+  for (const match of clean.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g)) {
+    if (!COPY_NAME.test(match[1])) continue;
+    const body = bodyStart(clean, match.index + match[0].length - 1);
+    if (body !== -1) found.push(...literalsFrom(clean, body));
+  }
+  // A JSX label attribute matches both collectors; report each string once.
+  const seen = new Set();
+  return found.filter(({ index }) => !seen.has(index) && seen.add(index));
 }
 
 async function filesUnder(directory, suffix) {
@@ -1105,7 +1198,11 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 // route parameters and comments remain free to use the content-system's internal terms.
 {
   const hits = [];
-  for (const file of await filesUnder("site/src", ".tsx")) {
+  const sources = [
+    ...await filesUnder("site/src", ".tsx"),
+    ...(await filesUnder("site/src", ".ts")).filter((file) => !file.endsWith("routeTree.gen.ts")),
+  ].sort();
+  for (const file of sources) {
     const source = await readFile(file, "utf8");
     for (const fragment of jsxVisibleStrings(source)) {
       for (const word of readerWordHits(fragment.text)) {
@@ -1120,10 +1217,19 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     const line = methodology.slice(0, match?.index ?? 0).split("\n").length;
     hits.push(`content/methodology.md:${line}: ${word}`);
   }
-  const fixture = jsxVisibleStrings(`const dossier = "stub"; // coverage\n<div title="packet">Reader copy</div>`)
-    .flatMap((fragment) => readerWordHits(fragment.text));
+  const fixture = jsxVisibleStrings([
+    'const dossier = "stub"; // coverage',
+    '<div title="packet">Reader copy</div>',
+    'const KPI_LABEL = { one: "cohort share" };',
+    'type Row = { label: string; note: string };',
+    'function reportedTitle(as: string): string { return `not verified by Proofline`; }',
+  ].join("\n")).flatMap((fragment) => readerWordHits(fragment.text));
   try {
-    assert.deepEqual(fixture, ["packet"], "scanner checks visible literals but allows identifiers, comments and internal strings");
+    assert.deepEqual(
+      fixture,
+      ["packet", "cohort", "Proofline"],
+      "scanner reads visible literals, label maps and label helpers, but allows identifiers, comments, types and internal strings",
+    );
     assert.deepEqual(hits, [], hits.join("\n"));
     console.log("ok   reader vocabulary");
   } catch (err) {

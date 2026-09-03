@@ -714,7 +714,7 @@ export function headlineMetric(derived: Pick<Derived, "metrics" | "rank">): Metr
 // Title-attr caveat for a reported figure (hard rule: every reported number carries its
 // as-of); the visible `reported` chip sits next to the value.
 export function reportedTitle(asOf: string): string {
-  return `as of ${asOf} — reported by the source, not verified by Proofline`;
+  return `as of ${asOf} — reported by the source, not verified by Icarus`;
 }
 
 // --- Labels -----------------------------------------------------------------
