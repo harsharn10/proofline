@@ -9,14 +9,16 @@ import { parse } from "yaml";
 import { validateInboxYaml, yamlParseErrors } from "./lib/inbox.mjs";
 import { vocabularyWarnings } from "./lib/voice.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
-import { normalizeUrl } from "./lib/checks.mjs";
+import { normalizeUrl, lifecycleDriftWarnings } from "./lib/checks.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { entryKey, legacyEntryKey, reviewKeyFor, selectUnsent, selectApproved, publicationFingerprint } from "./lib/telegram.mjs";
 import { addSourceKeys, sourceKeyFor } from "./migrations/add-source-keys.mjs";
 import { addFeedHashIds, feedIdFor } from "./migrations/add-feed-hash-ids.mjs";
 import { splitChangelog } from "./migrations/split-changelog.mjs";
 import { addReviewKeys } from "./migrations/add-review-keys.mjs";
-import { parsePacket, validatePacket, PRODUCER_IDS } from "./lib/packet.mjs";
+import { parsePacket, validatePacket, compile, PRODUCER_IDS } from "./lib/packet.mjs";
+import { runCompile } from "./compile-packet.mjs";
+import { migrateLifecycle } from "./migrations/lifecycle-from-pulled.mjs";
 
 let failures = 0;
 async function test(name, fn) {
@@ -250,6 +252,95 @@ await test("changelog filename must match every entry slug", async () => {
     const { errors } = await validateContent(root);
     assert.ok(errors.some((error) => error.includes('changelog/pons.yaml[0]: slug field is "arrow"')), errors.join("\n"));
   } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+// 8. Icarus card fields: one seed packet compiles through validation, and rerunning it changes nothing.
+await test("packet compiles Icarus card fields and feed idempotently", async () => {
+  const packetPath = "fixtures/compile-packet/icarus-fields.md";
+  const packet = parsePacket(await readFile(packetPath, "utf8"));
+  assert.deepEqual(validatePacket(packet, { census: [], path: "research/inbox/packets/icarus-fields/WORK-20260903-codex-icarus-fields.md" }), []);
+  const compiled = compile(packet);
+  assert.equal(compiled.project.summary, "Icarus Fields reads public Robinhood Chain state and publishes changes with links to the underlying receipts.");
+  assert.deepEqual(compiled.project.themes, ["chain-data", "monitoring", "tooling"]);
+  assert.deepEqual(compiled.project.official_links.map((link) => link.kind), ["site", "docs", "github", "explorer", "dexscreener"]);
+  assert.equal(new Set(compiled.project.official_links.map((link) => normalizeUrl(link.url))).size, compiled.project.official_links.length);
+  assert.deepEqual(compiled.feed.items.map((item) => item.kind), ["company", "ct", "onchain", "risk"]);
+  assert.equal(compiled.feed.items[0].account, "@fields");
+  assert.equal(compiled.feed.items[1].account, "@reader");
+  assert.equal(compiled.feed.items[0].body, packet.frontmatter.events[0].summary);
+  for (const item of compiled.feed.items) {
+    assert.match(item.id, /^[0-9a-f]{16}$/);
+    assert.ok(item.sourceUrl);
+    assert.ok(item.title.length <= 80);
+  }
+
+  const controllerProject = { ...compiled.project, summary: "Controller summary stays.", themes: ["controller"], controller_edited: true };
+  const preserved = compile(packet, controllerProject, compiled.censusRow, compiled.sources, compiled.feed);
+  assert.equal(preserved.project.summary, "Controller summary stays.");
+  assert.deepEqual(preserved.project.themes, ["controller"]);
+
+  const temp = await mkdtemp(join(tmpdir(), "proofline-icarus-compile-"));
+  const content = join(temp, "content");
+  try {
+    await cp("content", content, { recursive: true });
+    await runCompile({ packetPath, contentDir: content });
+    const first = new Map();
+    async function snapshot(dir, relative = "") {
+      for (const entry of await readdir(dir, { withFileTypes: true })) {
+        const rel = join(relative, entry.name), path = join(dir, entry.name);
+        if (entry.isDirectory()) await snapshot(path, rel);
+        else first.set(rel, await readFile(path, "utf8"));
+      }
+    }
+    await snapshot(content);
+    const checked = await validateContent(content);
+    assert.deepEqual(checked.errors, [], checked.errors.join("\n"));
+    await runCompile({ packetPath, contentDir: content });
+    const second = new Map();
+    async function snapshotAgain(dir, relative = "") {
+      for (const entry of await readdir(dir, { withFileTypes: true })) {
+        const rel = join(relative, entry.name), path = join(dir, entry.name);
+        if (entry.isDirectory()) await snapshotAgain(path, rel);
+        else second.set(rel, await readFile(path, "utf8"));
+      }
+    }
+    await snapshotAgain(content);
+    assert.deepEqual(second, first, "second compile produces no content diff");
+  } finally { await rm(temp, { recursive: true, force: true }); }
+});
+
+// 9. The lifecycle warning is broader than the migration: activity warns, but only contract+pair flips.
+await test("lifecycle migration requires a contract and pair and records its receipt", async () => {
+  const temp = await mkdtemp(join(tmpdir(), "proofline-lifecycle-"));
+  try {
+    for (const dir of ["projects", "pulled"]) await mkdir(join(temp, dir), { recursive: true });
+    await writeFile(join(temp, "census.yaml"), [
+      "- slug: alpha", "  lifecycle: announced", "- slug: activity-only", "  lifecycle: announced", "",
+    ].join("\n"));
+    for (const slug of ["alpha", "activity-only"])
+      await writeFile(join(temp, "projects", `${slug}.yaml`), `slug: ${slug}\nlifecycle: announced\n`);
+    const address = "0x1111111111111111111111111111111111111111";
+    const pulled = (pairs) => [
+      "slug: fixture", "chain: robinhood-chain", "addresses:", `  - address: "${address}"`, "    is_contract: true",
+      "    created_at: 2026-09-03T10:00:00.000Z", "market:", `  token_address: "${address}"`, "  pairs:",
+      ...(pairs ? ["    - pair_address: \"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"", "      created_at: 2026-09-03T10:05:00.000Z"] : []),
+      "activity:", "  addresses:", `    - address: "${address}"`, "      transactions_count: 2", "      last_tx_at: 2026-09-03T11:00:00.000Z", "",
+    ].join("\n");
+    await writeFile(join(temp, "pulled", "alpha.yaml"), pulled(true));
+    await writeFile(join(temp, "pulled", "activity-only.yaml"), pulled(false));
+    const census = parse(await readFile(join(temp, "census.yaml"), "utf8"));
+    const pulledBySlug = new Map([
+      ["alpha", parse(await readFile(join(temp, "pulled", "alpha.yaml"), "utf8"))],
+      ["activity-only", parse(await readFile(join(temp, "pulled", "activity-only.yaml"), "utf8"))],
+    ]);
+    assert.equal(lifecycleDriftWarnings(census, pulledBySlug).length, 2);
+    assert.deepEqual(await migrateLifecycle(temp, { dryRun: true }), [{ slug: "alpha", address, createdAt: "2026-09-03T10:00:00.000Z" }]);
+    assert.match(await readFile(join(temp, "projects", "alpha.yaml"), "utf8"), /lifecycle: announced/);
+    assert.deepEqual(await migrateLifecycle(temp), [{ slug: "alpha", address, createdAt: "2026-09-03T10:00:00.000Z" }]);
+    assert.match(await readFile(join(temp, "projects", "alpha.yaml"), "utf8"), new RegExp(`lifecycle_source: pulled ${address} 2026-09-03T10:00:00.000Z`));
+    assert.match(await readFile(join(temp, "projects", "activity-only.yaml"), "utf8"), /lifecycle: announced/);
+    assert.deepEqual(await migrateLifecycle(temp), [], "migration rerun is idempotent");
+  } finally { await rm(temp, { recursive: true, force: true }); }
 });
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }

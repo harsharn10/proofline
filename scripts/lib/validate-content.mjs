@@ -1,6 +1,9 @@
+import { readFile, readdir } from "node:fs/promises";
+import { basename, join } from "node:path";
+import { parse } from "yaml";
 import { loadContent } from "./load.mjs";
 import { validateAgainst } from "./schemas.mjs";
-import { crossCheck, releaseCheck, referencedSourceIds, normalizeUrl } from "./checks.mjs";
+import { crossCheck, releaseCheck, referencedSourceIds, normalizeUrl, lifecycleDriftWarnings } from "./checks.mjs";
 import { checkResearch, tagIds } from "./research-md.mjs";
 import { derive } from "./score.mjs";
 import { voiceWarnings, conductWarnings, vocabularyWarnings } from "./voice.mjs";
@@ -28,6 +31,18 @@ export async function validateContent(root = "content", { release = false } = {}
 
   const x = crossCheck(content);
   errors.push(...x.errors); warnings.push(...x.warnings);
+
+  const pulledBySlug = new Map();
+  try {
+    for (const name of (await readdir(join(root, "pulled"))).filter((name) => name.endsWith(".yaml")).sort()) {
+      const path = join(root, "pulled", name);
+      try { pulledBySlug.set(basename(name, ".yaml"), parse(await readFile(path, "utf8"))); }
+      catch (error) { errors.push(`pulled/${name}: ${error.message.split("\n")[0]}`); }
+    }
+  } catch (error) {
+    if (error.code !== "ENOENT") errors.push(`pulled: ${error.message.split("\n")[0]}`);
+  }
+  warnings.push(...lifecycleDriftWarnings(content.census, pulledBySlug));
 
   if (content.site.corrections?.destination === "TODO") warnings.push("site.yaml: corrections.destination is TODO (no corrections link renders until it is set)");
 
@@ -78,6 +93,9 @@ export async function validateContent(root = "content", { release = false } = {}
   // plain reader language the same day, so nothing here is grandfathered behind --release.
   const vocab = (text, where) => vocabularyWarnings(text, where).forEach((w) => errors.push(w));
   for (const [slug, project] of content.projects) {
+    const summaryWords = String(project.summary ?? "").trim().split(/\s+/).filter(Boolean).length;
+    if (summaryWords > 120) errors.push(`projects/${slug}.yaml: summary has ${summaryWords} words; maximum is 120`);
+    else if (summaryWords > 80) warnings.push(`projects/${slug}.yaml: summary has ${summaryWords} words; target is 80 or fewer`);
     voice(project.summary, `projects/${slug}.yaml: summary`);
     conduct(project.summary, `projects/${slug}.yaml: summary`);
     vocab(project.summary, `projects/${slug}.yaml: summary`);

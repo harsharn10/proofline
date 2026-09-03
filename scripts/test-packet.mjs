@@ -185,5 +185,21 @@ await test("packet taxonomy enum matches schema/taxonomy.json", async () => {
   }
 });
 
+// 8. The Icarus additions are date-gated library rules, leaving pre-2026-09-03 packet-v2 valid.
+await test("Icarus packet fields are required from 2026-09-03", async () => {
+  const current = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
+  assert.deepEqual(check(current, { census: [] }), [], "current seed has a summary paragraph, themes and URL-backed events");
+  assert.deepEqual(validateAgainst("packet", current.frontmatter), [], "additive event and link fields pass the schema");
+
+  const noThemes = parsePacket(`---\n${stringify(current.frontmatter, { lineWidth: 0 })}---\n\n## What it is\n\nA reader summary.\n`);
+  assert.ok(check(noThemes, { census: [] }).some((error) => error.includes("Themes:")), "current seed needs themes");
+  const noEvents = withFrontmatter(current, (fm) => { fm.events = []; });
+  assert.ok(check(noEvents, { census: [] }).some((error) => error.includes("event")), "current seed needs a URL-backed event");
+
+  const legacy = await fixture("seed-valid");
+  assert.equal(String(legacy.frontmatter.as_of).slice(0, 10), "2026-09-02");
+  assert.deepEqual(check(legacy), [], "older seed remains backward compatible");
+});
+
 console.log(failures ? `${failures} failure(s)` : "all packet tests passed");
 process.exit(failures ? 1 : 0);

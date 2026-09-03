@@ -137,6 +137,12 @@ Body sections, in this order: What it is · Why it matters · What could go wron
 mechanics · Control and security · Team and provenance · Economics and activity · Material risks ·
 Verification passes · Operations log. Every material sentence cites `[R-n]`.
 
+For seed and full packets collected on or after 2026-09-03, three card inputs are required. The first
+paragraph under `## What it is` is the reader summary (mechanism first; target 80 words, hard maximum
+120). A separate `Themes: tag-a, tag-b` line supplies up to five lowercase tags. Every event carries a
+title, a summary containing what was posted, and at least one receipt whose URL opens the post or chain
+read; `account` records the `@handle` when the event is a post. Older packet-v2 files remain valid.
+
 Tiers: **seed** = frontmatter required, body optional. **full** = both, with all three verification
 passes (receipts, numbers, adversarial) recorded. **update** = frontmatter with `supersedes: <prior
 work_id>`, only new or superseded claims and events, their receipts, and the Operations log. An update
@@ -231,6 +237,11 @@ For every event the compiler makes three independent decisions: does it change d
 does it belong in the site feed, is it eligible for channel review. Routine source additions, wording
 changes, internal metadata and ordinary stubs stay site-only. Channel criteria, the publication object
 and the card format live in `docs/channel-publishing.md`.
+
+The compiler maps a URL-backed packet event into `content/feed/<slug>.yaml`: the event summary becomes
+the body, the cited receipt URL becomes `sourceUrl`, and the stable id uses the formula above. A post by
+the project's official handle is `company`; another account is `ct`; an explorer or DefiLlama receipt
+is `onchain`; and a flagged event is `risk`. Existing items merge by id, so compiling twice is a no-op.
 
 ## 9. Retired
 

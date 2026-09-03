@@ -2,6 +2,7 @@
 # Packet v2 (docs/research-system.md §5). The frontmatter is the machine-validated dossier
 # (schema/packet.schema.json, checked by `npm run validate`); the body below it is the narrative.
 # This file is a worked full-tier example: copy it, replace every value, keep every required key.
+# From 2026-09-03, seed and full packets require a What it is paragraph, a Themes line and URL-backed events.
 # A required field you attempted and could not establish is the string "NULL — <reason>".
 # Ids are packet-local, start at 1 and are never reused.
 contract_version: proofline-research-v2
@@ -12,7 +13,7 @@ base_sha: e0d2d2852dc6da7fd8293d4755109b9a0eef11bc
 slug: example-protocol
 name: Example Protocol
 packet_tier: full                     # seed | full | update
-as_of: 2026-09-02T14:00:00Z           # when collecting stopped, UTC
+as_of: 2026-09-03T14:00:00Z           # when collecting stopped, UTC
 prior_packet: null                    # path@sha of the record this run read, or null
 supersedes: null                      # update tier only: the prior work id
 owned_slugs: [example-protocol]
@@ -47,7 +48,7 @@ qualifying:                           # status: pass|fail|unknown; a pass cites 
   citable:           { status: pass, claim_ids: [CLM-3], note: "" }
   research_story:    { status: pass, claim_ids: [CLM-4], note: "" }
 
-links:                                # kind: site|app|docs|whitepaper|x|github|telegram|discord|other
+links:                                # card kinds: site|docs|x|telegram|github|explorer|dexscreener
   - { kind: site, url: "https://example-protocol.org", authenticity: confirmed }
   - { kind: docs, url: "https://docs.example-protocol.org", authenticity: confirmed }
 
@@ -85,6 +86,7 @@ events:                               # type: company|ct|onchain|risk
     type: onchain
     title: "Vault owner is a single externally owned account"
     summary: "owner() on the savings vault returns an address with no code."
+    account: null                     # @handle for a post; null for an on-chain event
     occurred_at: 2026-09-02T13:40:00Z
     observed_at: 2026-09-02T13:40:00Z
     affected_fields: [control.owner]
@@ -118,6 +120,8 @@ verdicts about a person, team or account.
 Example Protocol is a savings vault on Robinhood Chain: deposits are pooled into one ERC-4626 vault
 and withdrawal is open at any block, with the yield source named in the documentation but not
 reproduced here.
+
+Themes: savings-vault, yield, erc-4626
 
 ## Why it matters
 

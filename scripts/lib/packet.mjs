@@ -35,6 +35,7 @@ export const BODY_SECTIONS = [
 const PACKET_ROOT = "research/inbox/packets";
 const TEMPLATE_ROOT = "docs/templates/";
 const ZERO_SHA = "0".repeat(40);
+const ICARUS_FIELDS_SINCE = "2026-09-03";
 
 export function normalizeIdentity(value) {
   return String(value ?? "")
@@ -273,6 +274,26 @@ export function validatePacket(packet, { census = [], path = "", source = path }
     for (const heading of headings) if (!allowed.has(heading)) err(`an update packet body holds only Verification passes and Operations log, not "${heading}"`);
   }
 
+  // Packets collected for Icarus carry the reader-facing card fields. This is deliberately a
+  // date-gated library check, not a schema requirement, so older packet-v2 files remain valid.
+  if (["seed", "full"].includes(record.packet_tier) && String(record.as_of).slice(0, 10) >= ICARUS_FIELDS_SINCE) {
+    if (!sectionParagraph(packet.sections, "What it is")) err('packet needs a paragraph under "## What it is"');
+    const themes = themesFromBody(packet.body);
+    if (!/^Themes:\s*\S+/mi.test(packet.body)) err('packet needs a "Themes: a, b" line');
+    for (const message of themeErrors(themes)) err(message);
+    if (!events.length) err("packet needs at least one dated event with a receipt URL");
+    for (const event of events) {
+      const hasReceiptUrl = (event.receipt_ids ?? []).some((id) => {
+        const url = receiptById.get(id)?.url;
+        return typeof url === "string" && /^https?:\/\//i.test(url);
+      });
+      if (!hasReceiptUrl) err(`event ${event.id} needs a receipt with a URL`);
+      if (!event.title) err(`event ${event.id} needs a title`);
+      if (!event.summary) err(`event ${event.id} needs a summary containing what was posted`);
+      if (String(event.title ?? "").length > 80) err(`event ${event.id} title must be 80 characters or fewer`);
+    }
+  }
+
   return errors;
 }
 
@@ -339,6 +360,8 @@ const PACKET_HEADINGS = [
   "Verification passes", "Operations log",
 ];
 const HASH_ID = (value) => createHash("sha1").update(value, "utf8").digest("hex").slice(0, 16);
+const PROJECT_LINK_KINDS = new Set(["site", "docs", "x", "telegram", "github", "explorer", "dexscreener"]);
+const CENSUS_LINK_KINDS = new Set(["site", "docs", "x", "telegram", "github"]);
 
 export function normalizeUrl(raw) {
   try {
@@ -356,6 +379,20 @@ export const normalizeText = (value) => String(value ?? "").trim().replace(/\s+/
 export const sourceIdentity = (source) => HASH_ID(`${normalizeUrl(source.url)}|${normalizeText(source.claim)}`);
 export const feedIdentity = ({ sourceUrl, slug, date, title }) =>
   HASH_ID(`${normalizeUrl(sourceUrl)}|${slug}|${date}|${normalizeText(title)}`);
+
+export function themesFromBody(body) {
+  const match = String(body ?? "").match(/^Themes:\s*(.+?)\s*$/mi);
+  if (!match) return [];
+  return [...new Set(match[1].split(",").map((tag) => normalizeText(tag).toLowerCase()).filter(Boolean))];
+}
+
+function themeErrors(themes) {
+  const errors = [];
+  if (themes.length > 5) errors.push("Themes must contain no more than 5 tags");
+  for (const theme of themes)
+    if (!/^[a-z0-9][a-z0-9:-]*$/.test(theme)) errors.push(`invalid theme ${theme}; use lowercase letters, numbers, colon or hyphen`);
+  return errors;
+}
 
 function bodySections(body) {
   const sections = new Map();
@@ -429,7 +466,7 @@ export function checkPacket(frontmatter, body) {
   if (frontmatter.scoring !== undefined) errors.push("scoring is owned by editorial review and is not accepted from packets");
   if (frontmatter.review?.approver && frontmatter.review.approver !== "pending") errors.push("review.approver is owned by the controller");
   for (const event of rows("events"))
-    if (![undefined, "not-evaluated", "pending"].includes(event.channel_recommendation))
+    if (![undefined, "none", "not-evaluated", "pending"].includes(event.channel_recommendation))
       errors.push(`${event.id}: channel_recommendation is outside packet ownership`);
 
   for (const warning of conductWarnings(allText, "packet")) errors.push(warning);
@@ -440,6 +477,22 @@ export function checkPacket(frontmatter, body) {
       for (const paragraph of paragraphs(sections.get(heading)))
         if (!/\[(?:verified|claim|inference|disputed|unknown)(?:\s+R-[1-9][0-9]*)*\]\s*$/.test(paragraph))
           errors.push(`${heading}: paragraph must end with a packet evidence tag`);
+  }
+  if (["seed", "full"].includes(frontmatter.packet_tier) && String(frontmatter.as_of).slice(0, 10) >= ICARUS_FIELDS_SINCE) {
+    if (!normalizeText(paragraphs(bodySections(body).get("What it is"))[0]))
+      errors.push('packet needs a paragraph under "## What it is"');
+    const themes = themesFromBody(body);
+    if (!/^Themes:\s*\S+/mi.test(body ?? "")) errors.push('packet needs a "Themes: a, b" line');
+    errors.push(...themeErrors(themes));
+    const receipts = new Map(rows("receipts").map((receipt) => [receipt.id, receipt]));
+    if (!rows("events").length) errors.push("packet needs at least one dated event with a receipt URL");
+    for (const event of rows("events")) {
+      if (!(event.receipt_ids ?? []).some((id) => typeof receipts.get(id)?.url === "string" && /^https?:\/\//i.test(receipts.get(id).url)))
+        errors.push(`${event.id}: event needs a receipt with a URL`);
+      if (!event.title) errors.push(`${event.id}: event needs a title`);
+      if (!event.summary) errors.push(`${event.id}: event needs a summary containing what was posted`);
+      if (String(event.title ?? "").length > 80) errors.push(`${event.id}: title must be 80 characters or fewer`);
+    }
   }
   return [...new Set(errors)];
 }
@@ -453,6 +506,38 @@ function mergeUnique(existing, incoming, identity) {
     else { positions.set(key, out.length); out.push(row); }
   }
   return out;
+}
+
+function officialLinks(existing, incoming, kinds) {
+  const out = [], positions = new Map();
+  const rows = [...(existing ?? []), ...(incoming ?? [])]
+    .filter((link) => kinds.has(link.kind) && typeof link.url === "string" && /^https?:\/\//i.test(link.url))
+    .map(({ kind, url }) => ({ kind, url }));
+  for (const row of rows) {
+    const key = normalizeUrl(row.url);
+    if (positions.has(key)) out[positions.get(key)] = row;
+    else { positions.set(key, out.length); out.push(row); }
+  }
+  return out;
+}
+
+function accountFromUrl(raw) {
+  try {
+    const url = new URL(raw);
+    if (!["x.com", "twitter.com", "www.x.com", "www.twitter.com"].includes(url.hostname.toLowerCase())) return null;
+    const handle = url.pathname.split("/").filter(Boolean)[0];
+    return /^[A-Za-z0-9_]{1,32}$/.test(handle ?? "") ? `@${handle}` : null;
+  } catch { return null; }
+}
+
+function eventFeedKind(event, receipt, officialHandle) {
+  if (event.flagged === true || event.type === "risk") return "risk";
+  const host = (() => { try { return new URL(receipt.url).hostname.toLowerCase(); } catch { return ""; } })();
+  if (event.type === "onchain" || /(?:blockscout|etherscan|defillama)\./.test(host) || host === "api.llama.fi") return "onchain";
+  const account = event.account ?? accountFromUrl(receipt.url);
+  if (account && normalizeHandle(account) === normalizeHandle(officialHandle)) return "company";
+  if (event.type === "company" && !account) return "company";
+  return "ct";
 }
 
 function sourceLedger(frontmatter, priorSources) {
@@ -619,7 +704,7 @@ function researchDocument(frontmatter, body, receiptToSource, ledger) {
 function changedFields(prior, next) {
   if (!prior) return { prior: null, next: { coverage: next.coverage, lifecycle: next.lifecycle } };
   const before = {}, after = {};
-  for (const key of ["name", "category", "lifecycle", "summary", "deployments", "metrics"]) {
+  for (const key of ["name", "category", "lifecycle", "summary", "themes", "official_links", "deployments", "metrics"]) {
     if (JSON.stringify(prior[key] ?? null) !== JSON.stringify(next[key] ?? null)) {
       before[key] = prior[key] ?? null;
       after[key] = next[key] ?? null;
@@ -646,7 +731,10 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     status: identityStatus,
     ...(identityConflicts.length ? { conflict_ids: identityConflicts.map((row) => row.id) } : {}),
   };
-  const links = (frontmatter.links ?? []).map(({ kind, url }) => ({ kind, url }));
+  const projectLinks = officialLinks(priorProject?.official_links, frontmatter.links, PROJECT_LINK_KINDS);
+  // The census schema intentionally has a smaller link vocabulary; explorer and DexScreener links
+  // live on the project card, while the registry keeps its existing official-surface kinds.
+  const censusLinks = officialLinks(priorCensusRow?.official_links, frontmatter.links, CENSUS_LINK_KINDS);
   const qualifying = Object.fromEntries(QUALIFYING.map((key) => {
     const test = frontmatter.qualifying[key];
     const claims = (test.claim_ids ?? []).map((id) => (frontmatter.claims ?? []).find((claim) => claim.id === id));
@@ -660,7 +748,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     category: leafLabel(primaryLeaf),
     lifecycle,
     coverage: "stub",
-    official_links: mergeUnique(priorCensusRow?.official_links, links, (row) => `${row.kind}|${normalizeUrl(row.url)}`),
+    official_links: censusLinks,
     discovery_source: priorCensusRow?.discovery_source ?? `${frontmatter.producer} packet ${frontmatter.work_id}`,
     ...(frontmatter.identity.official_handle ? { handle: frontmatter.identity.official_handle } : {}),
     tree: { primary: primaryLeaf, ...((frontmatter.classification.secondary_leaves ?? []).length ? { secondary: frontmatter.classification.secondary_leaves } : {}) },
@@ -683,13 +771,17 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     kind: metric.kind,
     value: metric.value,
     ...(metric.kind === "holders" ? {} : { currency: "USD" }),
-    as_of: metric.as_of,
+    as_of: String(metric.as_of).slice(0, 10),
     class: "claim",
     sources: sourceIds(metric.receipt_ids, receiptToSource),
   })).filter((metric) => metric.sources.length);
   const relationships = (frontmatter.claims ?? []).filter((claim) => claim.field === "relationship" && claim.value?.kind === "depends-on").map((claim) => claim.value.slug);
   const sections = bodySections(body);
-  const summary = normalizeText(paragraphs(sections.get("What it is"))[0] ?? frontmatter.classification.rationale ?? priorProject?.summary);
+  const compiledSummary = normalizeText(paragraphs(sections.get("What it is"))[0] ?? frontmatter.classification.rationale ?? priorProject?.summary);
+  const compiledThemes = themesFromBody(body);
+  const controllerEdited = priorProject?.controller_edited === true;
+  const summary = controllerEdited ? priorProject.summary : compiledSummary;
+  const themes = controllerEdited ? priorProject.themes : (compiledThemes.length ? compiledThemes : priorProject?.themes);
   const project = {
     ...(priorProject ?? {}),
     slug: frontmatter.slug,
@@ -699,29 +791,36 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     lifecycle,
     coverage: "stub",
     summary,
-    official_links: mergeUnique(priorProject?.official_links, links, (row) => `${row.kind}|${normalizeUrl(row.url)}`),
+    ...(themes?.length ? { themes } : {}),
+    official_links: projectLinks,
     dependencies: [...new Set([...(priorProject?.dependencies ?? []), ...relationships])],
     deployments: mergeUnique(priorProject?.deployments, deployments, (row) => `${row.chain}|${String(row.address).toLowerCase()}`),
     ...(metrics.length || priorProject?.metrics ? { metrics: mergeUnique(priorProject?.metrics, metrics, (row) => row.kind) } : {}),
     review: priorProject?.review ?? { researcher: frontmatter.producer, approver: "pending", methodology_version: "proofline-v1.0", reviewed_at: frontmatter.as_of.slice(0, 10), published_at: null },
     findings: findingsFromBody(frontmatter, body, receiptToSource, priorProject),
   };
-  const feedItems = (frontmatter.events ?? []).filter((event) => ["feed", "profile", "both"].includes(event.site_recommendation)).map((event) => {
+  const receiptsById = new Map((frontmatter.receipts ?? []).map((receipt) => [receipt.id, receipt]));
+  const feedItems = (frontmatter.events ?? []).map((event) => {
+    const receipt = (event.receipt_ids ?? []).map((id) => receiptsById.get(id))
+      .find((row) => typeof row?.url === "string" && /^https?:\/\//i.test(row.url));
+    if (!receipt) return null;
     const sources = sourceIds(event.receipt_ids, receiptToSource);
-    // Packet events do not currently carry sourceUrl, so the first cited receipt is the canonical fallback.
-    const sourceUrl = event.sourceUrl ?? (frontmatter.receipts ?? []).find((receipt) => event.receipt_ids?.includes(receipt.id))?.url;
+    const sourceUrl = receipt.url;
     const date = String(event.occurred_at ?? event.observed_at ?? frontmatter.as_of).slice(0, 10);
-    const title = event.title ?? `${event.type} update`;
+    const title = normalizeText(event.title ?? receipt.title ?? `${event.type} update`).slice(0, 80).trim();
+    const account = event.account ?? accountFromUrl(sourceUrl)
+      ?? (event.type === "company" ? frontmatter.identity.official_handle : null);
     return {
       id: feedIdentity({ sourceUrl, slug: frontmatter.slug, date, title }),
       date,
-      kind: event.type,
+      kind: eventFeedKind(event, receipt, frontmatter.identity.official_handle),
       title,
-      body: event.summary ?? event.impact ?? "Update recorded from the cited source.",
-      ...(sourceUrl ? { sourceUrl } : {}),
+      body: normalizeText(event.summary ?? receipt.excerpt ?? "Update recorded from the cited source."),
+      ...(account && /^@[A-Za-z0-9_]{1,32}$/.test(account) ? { account } : {}),
+      sourceUrl,
       sources,
     };
-  }).filter((item) => item.sources.length);
+  }).filter((item) => item?.sources.length);
   const feed = { slug: frontmatter.slug, items: mergeUnique(priorFeed?.items, feedItems, (row) => row.id) };
   const research = researchDocument(frontmatter, body, receiptToSource, ledger);
   const changes = changedFields(priorProject, project);

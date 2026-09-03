@@ -83,7 +83,7 @@
       "type": "object", "additionalProperties": false,
       "required": ["kind","url","authenticity"],
       "properties": {
-        "kind": { "enum": ["site","app","docs","whitepaper","x","github","telegram","discord","other"] },
+        "kind": { "enum": ["site","app","docs","whitepaper","x","github","telegram","discord","explorer","dexscreener","other"] },
         "url": { "$ref": "#/$defs/url" },
         "authenticity": { "$ref": "#/$defs/authenticity" }
       }
@@ -199,6 +199,8 @@
         "type": { "enum": ["company","ct","onchain","risk"] },
         "title": { "$ref": "#/$defs/text" },
         "summary": { "$ref": "#/$defs/text" },
+        "account": { "$ref": "#/$defs/handleOrNull" },
+        "flagged": { "type": "boolean" },
         "occurred_at": { "type": "string", "format": "date-time" },
         "observed_at": { "type": "string", "format": "date-time" },
         "affected_fields": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
