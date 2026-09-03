@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CategoryCards } from "@/components/home/category-cards";
-import { Latest } from "@/components/home/latest";
 import { RightNow } from "@/components/home/right-now";
 import { StatBox } from "@/components/home/stat-box";
+import { Wire } from "@/components/wire/wire";
 import {
   announcedNow,
   getContent,
-  latestFromIcarus,
   newLaunches,
   notListedCount,
   sectionLeaders,
   trendingNow,
+  wireItems,
 } from "@/data/content-server";
 import { formatCount, formatUsd } from "@/data/types";
 
@@ -47,7 +47,7 @@ function Home() {
   const leaders = Object.fromEntries(
     sections.map((section) => [section.id, sectionLeaders(section, entries)]),
   );
-  const latest = latestFromIcarus(changelog, feed, 4);
+  const wire = wireItems({ entries, changelog, feed });
 
   return (
     <main className="wrap pb-10 pt-5">
@@ -111,12 +111,12 @@ function Home() {
 
       <section className="mt-[26px]">
         <div className="mb-2 flex flex-wrap items-baseline justify-between gap-3 px-0.5">
-          <h2 className="m-0 text-sm font-semibold">Latest from Icarus</h2>
+          <h2 className="m-0 text-sm font-semibold">The wire</h2>
           <span className="text-[11px] text-[var(--t3)]">
-            every research pull, with its sources
+            announcements, talk, on-chain activity and material Icarus notes
           </span>
         </div>
-        <Latest items={latest} telegramUrl={site.telegram.url} />
+        <Wire items={wire} now={now} variant="compact" telegramUrl={site.telegram.url} />
       </section>
     </main>
   );

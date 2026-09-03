@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Icon } from "@/components/ui/icon";
 import { StatusPill } from "@/components/ui/status-pill";
 import {
+  formatCount,
   formatKpi,
   formatUsd,
   relativeTime,
@@ -10,12 +11,7 @@ import {
 } from "@/data/types";
 import { readerCopy } from "@/lib/dejargon";
 
-function Card({
-  title,
-  subtitle,
-  icon,
-  children,
-}: {
+function Card({ title, subtitle, icon, children }: {
   title: string;
   subtitle: string;
   icon: "trend" | "rocket" | "bell";
@@ -24,8 +20,7 @@ function Card({
   return (
     <section className="rounded-xl border-[0.5px] border-[var(--line)] bg-[var(--s2)] p-3.5">
       <h3 className="m-0 flex items-center gap-1.5 text-[13px] font-semibold">
-        <Icon name={icon} />
-        {title}
+        <Icon name={icon} />{title}
       </h3>
       <p className="mb-1.5 mt-0 text-[11.5px] text-[var(--t3)]">{subtitle}</p>
       {children}
@@ -33,36 +28,25 @@ function Card({
   );
 }
 
-function Row({
-  entry,
-  children,
-  rank,
-}: {
-  entry: DirectoryEntry;
-  children: React.ReactNode;
-  rank?: number;
-}) {
+function NameLink({ entry, children }: { entry: DirectoryEntry; children?: React.ReactNode }) {
   return (
-    <li className="border-t-[0.5px] border-[var(--line-soft)] first:border-0">
-      <Link
-        to="/n/$slug"
-        params={{ slug: entry.slug }}
-        className="flex min-w-0 items-baseline gap-2 py-1.5 text-[12.5px]"
-      >
-        {rank ? <span className="w-3 shrink-0 text-[11px] text-[var(--t3)]">{rank}</span> : null}
-        {children}
-      </Link>
-    </li>
+    <Link to="/n/$slug" params={{ slug: entry.slug }} className="font-medium text-[var(--t1)]">
+      {children ?? entry.symbol ?? entry.name}
+    </Link>
   );
 }
 
-export function RightNow({
-  trending,
-  launches,
-  announced,
-  notListed,
-  now,
-}: {
+function MarketFigure({ entry }: { entry: DirectoryEntry }) {
+  const value = entry.kpis.marketCap ?? entry.kpis.fdv;
+  if (value === null) return <span className="italic text-[var(--t3)]">not checked</span>;
+  return (
+    <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer" title="DexScreener market data">
+      {entry.kpis.marketCap === null ? "FDV " : ""}{formatUsd(value)}
+    </a>
+  );
+}
+
+export function RightNow({ trending, launches, announced, notListed, now }: {
   trending: TrendingEntry[];
   launches: DirectoryEntry[];
   announced: DirectoryEntry[];
@@ -74,85 +58,81 @@ export function RightNow({
       <Card title="Trending" subtitle="most 24h volume, live names" icon="trend">
         <ol className="m-0 list-none p-0">
           {trending.map(({ entry, change24h }, index) => (
-            <Row key={entry.slug} entry={entry} rank={index + 1}>
-              <b className="font-medium">{entry.symbol ?? entry.name}</b>
-              <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] text-[var(--t3)]">
-                {entry.tree?.label}
-              </span>
-              <span
-                className="ml-auto whitespace-nowrap font-medium"
-                title="DexScreener, all pools"
-              >
-                {formatUsd(entry.kpis.volume24h!)}
-              </span>
-              {change24h === null ? null : (
-                <span
-                  className={`w-[52px] shrink-0 text-right text-[11px] ${change24h >= 0 ? "text-[var(--good)]" : "text-[var(--bad)]"}`}
-                >
-                  {formatKpi("priceChange24h", change24h)}
-                </span>
-              )}
-            </Row>
-          ))}
-          {trending.length === 0 ? (
-            <li className="py-2 text-xs italic text-[var(--t3)]">
-              No live names clear the bar yet.
+            <li key={entry.slug} className="border-t-[0.5px] border-[var(--line-soft)] py-2 first:border-0">
+              <div className="flex min-w-0 items-baseline gap-2 text-[12.5px]">
+                <span className="w-3 shrink-0 text-[11px] text-[var(--t3)]">{index + 1}</span>
+                <NameLink entry={entry} />
+                <span className="ml-auto whitespace-nowrap text-[11px]"><MarketFigure entry={entry} /></span>
+              </div>
+              <p className="my-0.5 truncate pl-5 text-[11px] text-[var(--t3)]">
+                {readerCopy(entry.tldr ?? entry.summary)}
+              </p>
+              <div className="flex flex-wrap gap-x-2 pl-5 text-[10.5px] text-[var(--t2)]">
+                <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer">
+                  vol {formatUsd(entry.kpis.volume24h!)}
+                </a>
+                {change24h === null ? null : (
+                  <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer" className={change24h >= 0 ? "text-[var(--good)]" : "text-[var(--bad)]"}>
+                    {formatKpi("priceChange24h", change24h)}
+                  </a>
+                )}
+                {entry.kpis.holders === null || !entry.sourceLinks.holders ? (
+                  <span className="italic text-[var(--t3)]">holders not checked</span>
+                ) : (
+                  <a href={entry.sourceLinks.holders} target="_blank" rel="noreferrer">
+                    {formatCount(entry.kpis.holders)} holders
+                  </a>
+                )}
+              </div>
             </li>
-          ) : null}
+          ))}
+          {trending.length === 0 ? <li className="py-2 text-xs italic text-[var(--t3)]">No live names clear the bar yet.</li> : null}
         </ol>
       </Card>
 
-      <Card
-        title="New launches"
-        subtitle="first pool under 14 days old, above the bar"
-        icon="rocket"
-      >
+      <Card title="New launches" subtitle="first pool under 14 days old, above the bar" icon="rocket">
         <ol className="m-0 list-none p-0">
           {launches.slice(0, 5).map((entry) => (
-            <Row key={entry.slug} entry={entry}>
-              <StatusPill status={entry.kpis.status} />
-              <b className="font-medium">{entry.symbol ?? entry.name}</b>
-              <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] text-[var(--t3)]">
-                {readerCopy(entry.summary)}
-              </span>
-              <span className="ml-auto whitespace-nowrap font-medium">
+            <li key={entry.slug} className="border-t-[0.5px] border-[var(--line-soft)] py-2 first:border-0">
+              <div className="flex min-w-0 items-center gap-1.5 text-[12.5px]">
+                <StatusPill status={entry.kpis.status} />
+                <NameLink entry={entry} />
+                <span className="ml-auto whitespace-nowrap text-[11px]"><MarketFigure entry={entry} /></span>
+              </div>
+              <p className={`my-0.5 truncate text-[11px] ${entry.tldr ? "text-[var(--t2)]" : "italic text-[var(--t3)]"}`}>
+                {entry.tldr ? readerCopy(entry.tldr) : "no summary yet"}
+              </p>
+              <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer" className="text-[10.5px] text-[var(--t3)]">
                 {relativeTime(entry.kpis.firstPairAt!, now)}
-              </span>
-            </Row>
-          ))}
-          {launches.length === 0 ? (
-            <li className="py-2 text-xs italic text-[var(--t3)]">
-              No new launch clears the bar yet.
+              </a>
             </li>
-          ) : null}
+          ))}
+          {launches.length === 0 ? <li className="py-2 text-xs italic text-[var(--t3)]">No new launch clears the bar yet.</li> : null}
           <li className="border-t-[0.5px] border-[var(--line-soft)] py-1.5 text-[11px] italic text-[var(--t3)]">
             Launches below $25K are not listed: {notListed.toLocaleString("en-US")} today
           </li>
         </ol>
       </Card>
 
-      <Card
-        title="Announced"
-        subtitle="official surface confirmed, nothing on chain yet"
-        icon="bell"
-      >
+      <Card title="Announced" subtitle="official surface confirmed, nothing on chain yet" icon="bell">
         <ol className="m-0 list-none p-0">
           {announced.slice(0, 5).map((entry) => (
-            <Row key={entry.slug} entry={entry}>
-              <b className="font-medium">{entry.name}</b>
-              <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] text-[var(--t3)]">
-                {readerCopy(entry.summary)}
-              </span>
-              <span className="ml-auto whitespace-nowrap font-medium">
-                {relativeTime(entry.reviewedAt, now)}
-              </span>
-            </Row>
-          ))}
-          {announced.length === 0 ? (
-            <li className="py-2 text-xs italic text-[var(--t3)]">
-              No confirmed announcements yet.
+            <li key={entry.slug} className={`border-t-[0.5px] border-[var(--line-soft)] py-2 first:border-0 ${entry.tldr ? "" : "text-[var(--t3)]"}`}>
+              <div className="flex items-baseline gap-2 text-[12.5px]">
+                <NameLink entry={entry}>{entry.name}</NameLink>
+                <span className="ml-auto whitespace-nowrap text-[10.5px]">{relativeTime(entry.announcementAt, now)}</span>
+              </div>
+              <p className={`my-0.5 text-[11px] ${entry.tldr ? "text-[var(--t2)]" : "italic text-[var(--t3)]"}`}>
+                {entry.tldr ? readerCopy(entry.tldr) : "no summary yet"}
+              </p>
+              {entry.announcementUrl ? (
+                <a href={entry.announcementUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[10.5px] text-[var(--acc)]">
+                  Source <Icon name="ext" />
+                </a>
+              ) : null}
             </li>
-          ) : null}
+          ))}
+          {announced.length === 0 ? <li className="py-2 text-xs italic text-[var(--t3)]">No confirmed announcements yet.</li> : null}
         </ol>
       </Card>
     </div>

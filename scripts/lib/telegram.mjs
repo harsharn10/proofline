@@ -4,14 +4,16 @@ import { createHash } from "node:crypto";
 export const DISCLAIMER =
   "Icarus is powered by Project Proofline. This automated research may be incomplete, delayed or inaccurate. It is not an audit, guarantee or investment advice. Read the sources and do your own research.";
 
+// Telegram uses the same four reader-facing kinds as the site wire. The review workflow keeps
+// its more detailed event names internally; subscribers see one consistent vocabulary.
 export const EVENT_LABELS = {
-  "new-coverage": "NEW PROFILE",
-  "research-update": "RESEARCH UPDATE",
-  "risk-alert": "RISK ALERT",
-  correction: "CORRECTION",
-  breaking: "DEVELOPING",
-  trending: "TRENDING",
-  roundup: "ROUNDUP",
+  "new-coverage": "ICARUS NOTES",
+  "research-update": "ICARUS NOTES",
+  "risk-alert": "ICARUS NOTES",
+  correction: "ICARUS NOTES",
+  breaking: "ANNOUNCEMENTS",
+  trending: "TALK",
+  roundup: "ICARUS NOTES",
 };
 
 /**
@@ -120,8 +122,6 @@ export function formatPublication(
   const watch = publication.watch_next
     ? `<b>What we’re watching</b>\n${escapeHtml(publication.watch_next)}`
     : null;
-  const trendNote =
-    publication.event === "trending" ? "<i>Trending measures attention — not quality or endorsement.</i>" : null;
   const link = url ? `<a href="${escapeHtml(url)}">Read the full ${escapeHtml(name)} research →</a>` : null;
   return [
     `<b>${escapeHtml(label)} · ${escapeHtml(name.toUpperCase())}</b>`,
@@ -130,7 +130,6 @@ export function formatPublication(
     why,
     `<b>Icarus view</b>\n${escapeHtml(icarusView(derived))}`,
     watch,
-    trendNote,
     `<i>${escapeHtml(disclaimer)}</i>`,
     link,
   ]
@@ -165,8 +164,8 @@ export function buildMessages(
   const roundup = entries.filter((entry) => entry.channel.delivery === "roundup");
   if (!roundup.length) return direct;
   const roundupText = [
-    `<b>${escapeHtml(siteName.toUpperCase())} ROUNDUP · ${escapeHtml(date)}</b>`,
-    `${roundup.length} research update${roundup.length === 1 ? "" : "s"} selected by Icarus.`,
+    `<b>${escapeHtml(siteName.toUpperCase())} WIRE · ${escapeHtml(date)}</b>`,
+    `${roundup.length} update${roundup.length === 1 ? "" : "s"} selected by Icarus.`,
     `<i>${escapeHtml(disclaimer)}</i>`,
     ...roundup.map((entry) => formatRoundupEntry(entry, projects.get(entry.slug), { siteUrl, profilePath })),
   ].join("\n\n");

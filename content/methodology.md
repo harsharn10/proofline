@@ -1,5 +1,9 @@
 Icarus tracks what is new on Robinhood Chain and separates facts we can check from statements that still need work. Every figure should take you back to the page or chain read behind it.
 
+## The wire
+
+The wire has four kinds of update: **Announcements** are posts or releases from a project; **Talk** is what people on X are saying and names the account; **On-chain** covers listings, contracts, owner or fee changes, and launches; **Icarus notes** are material findings or corrections that change the picture. Routine profile, review, and scoring work stays out of the wire.
+
 ## Status
 
 - **Live** means on-chain activity or trades were seen within 7 days.

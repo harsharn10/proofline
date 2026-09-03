@@ -146,6 +146,7 @@ export type PulledPair = {
   volume_h6: number | null;
   txns_h24: { buys: number; sells: number };
   price_change_h24: number | null;
+  market_cap: number | null;
   fdv: number | null;
   created_at: string | null;
 };
@@ -159,6 +160,8 @@ export type PulledMarket = {
   trades_h24: number | null;
   price_usd: number | null;
   price_change_h24: number | null;
+  market_cap_usd: number | null;
+  fdv_usd: number | null;
   fdv: number | null;
   first_pair_at: string | null;
   // Share of circulating supply (total supply less burned) held by the ten largest live holders.
@@ -240,6 +243,7 @@ export type Kpis = {
   volume24h: number | null;
   trades24h: number | null;
   priceChange24h: number | null;
+  marketCap: number | null;
   fdv: number | null;
   holders: number | null;
   holdersDelta7d: number | null;
@@ -362,7 +366,11 @@ export type DirectoryEntry = {
   hasContractOn4663: boolean;
   shareBarMetric: "liquidity" | "tvl";
   summary: string;
+  tldr: string | null;
   officialLinks: Link[];
+  announcementAt: string;
+  announcementUrl: string | null;
+  sourceLinks: { market: string; holders: string | null };
   dependencyIds: string[];
   reviewedAt: string;
   derived: Derived;
@@ -377,6 +385,7 @@ export type DirectoryEntry = {
 
 export type HistoryPoint = {
   at: string;
+  market_cap?: number | null;
   holders?: number | null;
   liquidity_usd?: number | null;
   volume_h24?: number | null;
@@ -389,16 +398,6 @@ export type HistoryPoint = {
 
 export type TrendingEntry = { entry: DirectoryEntry; change24h: number | null };
 export type SectionLeader = { entry: DirectoryEntry; announced: boolean };
-export type LatestIcarusItem = {
-  kind: "icarus" | "post";
-  date: string;
-  slug: string;
-  who: string;
-  title: string;
-  body: string;
-  sourceUrl: string | null;
-};
-
 // A dependency card as the home page lists it: enough to label and link the chip.
 export type DependencyListing = { id: string; name: string; kind: DependencyCard["kind"] };
 
@@ -406,6 +405,19 @@ export type DependencyListing = { id: string; name: string; kind: DependencyCard
 export type LatestFeedItem = {
   name: { slug: string; symbol: string | null; name: string };
   item: FeedItem;
+};
+
+export type WireKind = "announcement" | "talk" | "onchain" | "note";
+export type WireItem = {
+  id: string;
+  kind: WireKind;
+  headline: string;
+  gist: string;
+  url: string;
+  slug: string;
+  name: { slug: string; symbol: string | null; name: string };
+  account?: string;
+  at: string;
 };
 
 export type Dossier = {
@@ -417,6 +429,9 @@ export type Dossier = {
   coverage: Coverage;
   role: CensusRole;
   summary: string;
+  tldr: string | null;
+  whyPeopleCare: string[];
+  risks: string[];
   links: Link[];
   dependencies: string[]; // ids into the top-level `dependencies` map
   deployments: Deployment[];
@@ -611,6 +626,7 @@ export const KPI_LABEL: Record<KpiKey, string> = {
   volume24h: "vol 24h",
   trades24h: "trades 24h",
   priceChange24h: "24h",
+  marketCap: "market cap",
   fdv: "FDV",
   holders: "holders",
   holdersDelta7d: "holders 7d",
@@ -623,6 +639,7 @@ export const KPI_SOURCE: Record<KpiKey, string> = {
   volume24h: "DexScreener, all pools",
   trades24h: "DexScreener, buys plus sells",
   priceChange24h: "DexScreener, deepest pool",
+  marketCap: "DexScreener, all pools",
   fdv: "DexScreener, deepest pool",
   holders: "Blockscout holder count",
   holdersDelta7d: "Blockscout holder count, change over 7 days of snapshots",
@@ -649,6 +666,7 @@ export function formatKpi(key: KpiKey, v: number | null): string {
   switch (key) {
     case "liquidityUsd":
     case "volume24h":
+    case "marketCap":
     case "fdv":
     case "tvl":
       return formatUsd(v);
@@ -817,10 +835,17 @@ export const LINK_KIND_LABEL: Record<LinkKind, string> = {
 };
 
 export const FEED_LABEL: Record<FeedKind, string> = {
-  company: "Project",
-  ct: "Commentary",
+  company: "Announcements",
+  ct: "Talk",
   onchain: "On-chain",
-  risk: "Risk",
+  risk: "Icarus notes",
+};
+
+export const WIRE_LABEL: Record<WireKind, string> = {
+  announcement: "Announcements",
+  talk: "Talk",
+  onchain: "On-chain",
+  note: "Icarus notes",
 };
 
 // --- Tone helpers -------------------------------------------------------------

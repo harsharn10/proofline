@@ -712,13 +712,13 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.equal(aboveBar.length, 1, "name above the generated share bar remains eligible");
     assert.deepEqual(belowBar, [], "name below the generated share bar is excluded");
     assert.equal(messages.length, 1, "one direct publication produces one card");
-    assert.ok(messages[0].includes("<b>NEW PROFILE · PONS</b>"), "event kicker");
+    assert.ok(messages[0].includes("<b>ICARUS NOTES · PONS</b>"), "wire kind kicker");
     assert.ok(messages[0].includes("<b>Icarus view</b>"), "Icarus view");
     assert.ok(messages[0].includes("Control 41/100 · evidence 64% · awaiting second review"), "control and evidence line");
     assert.ok(messages[0].includes("https://x.test/n/pons"), "profile link");
     assert.ok(messages[0].endsWith("Read the full Pons research →</a>"), "event card ends with its link");
     assert.ok(messages[0].includes("A &lt;b&gt;full&lt;/b&gt; research record"), "html escaped");
-    assert.ok(roundupMessages[0].includes("<b>ICARUS ROUNDUP · 2026-08-31</b>"), "roundup card");
+    assert.ok(roundupMessages[0].includes("<b>ICARUS WIRE · 2026-08-31</b>"), "wire roundup card");
     assert.ok(roundupMessages[0].endsWith("Open research →</a>"), "roundup ends with a card link");
     assert.equal(chunks.length, 2, "chunked");
     assert.deepEqual(readDotEnv("A=1\n# c\nB=\"two words\"\n"), { A: "1", B: "two words" });
@@ -1027,6 +1027,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   const markdownMock = dataModule(
     `export const parseResearchMarkdown=()=>({sections:[]});export const renderWholeMarkdown=()=>""`,
   );
+  const dejargonMock = dataModule(`export const readerCopy=(value)=>value`);
   const typesMock = dataModule(`
     export const headlineMetric=()=>null;
     export const DEFAULT_KPIS=["volume24h"];
@@ -1042,6 +1043,8 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
         return { url: markdownMock, shortCircuit: true };
       if (context.parentURL?.startsWith(contentServerUrl) && specifier === "./types")
         return { url: typesMock, shortCircuit: true };
+      if (context.parentURL?.startsWith(contentServerUrl) && specifier === "../lib/dejargon")
+        return { url: dejargonMock, shortCircuit: true };
       return nextResolve(specifier, context);
     },
   });
@@ -1058,6 +1061,11 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     hasContractOn4663: true,
     shareBarMetric: "liquidity",
     summary: `${slug} summary`,
+    tldr: `${slug} in one sentence`,
+    announcementAt: "2026-09-01T00:00:00Z",
+    announcementUrl: "https://official.test/post",
+    officialLinks: [{ kind: "site", url: "https://official.test" }],
+    sourceLinks: { market: "https://dex.test", holders: "https://explorer.test" },
     reviewedAt: "2026-09-01T00:00:00Z",
     tree: { sectionId: "launchpads" },
     factoryLaunches24h: 0,
@@ -1066,6 +1074,9 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
       liquidityUsd: 30_000,
       tvl: null,
       volume24h: 100,
+      marketCap: 1_000_000,
+      fdv: null,
+      holders: 42,
       firstPairAt: "2026-09-01T00:00:00Z",
       readAt: "2026-09-02T21:00:00Z",
     },
@@ -1084,6 +1095,8 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   });
   const olderAnnouncement = entry("wire", {
     hasContractOn4663: false,
+    tldr: null,
+    announcementAt: "2026-08-20T00:00:00Z",
     reviewedAt: "2026-08-20T00:00:00Z",
     kpis: { ...entry("x").kpis, status: "announced", liquidityUsd: null, volume24h: null, firstPairAt: null },
   });
@@ -1119,6 +1132,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
       "never negative",
     );
     assert.deepEqual(rules.announcedNow([olderAnnouncement, announced]).map((item) => item.slug), ["sight", "wire"]);
+    assert.equal(rules.announcedNow([olderAnnouncement, announced]).at(-1).tldr, null, "missing summaries form the muted tail");
 
     const leaders = rules.sectionLeaders(
       { id: "launchpads", label: "Launchpads", description: "" },
@@ -1127,18 +1141,30 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.deepEqual(leaders.map((item) => [item.entry.slug, item.announced]), [
       ["pons", false],
       ["sight", true],
-      ["wire", true],
     ]);
 
-    const latest = rules.latestFromIcarus(
-      [{ date: "2026-09-02", slug: "pons", title: "Read", detail: "Detail" }],
-      [{
-        name: { slug: "artificial-inu", symbol: "AI", name: "Artificial Inu" },
-        item: { date: "2026-09-01", title: "Post", body: "Body", kind: "ct", account: "@ai" },
-      }],
-      2,
-    );
-    assert.deepEqual(latest.map((item) => item.kind), ["icarus", "post"]);
+    const wire = rules.wireItems({
+      entries: [pons, ai],
+      changelog: [
+        { date: "2026-09-04", slug: "pons", type: "coverage", severity: "Material", title: "Profile refreshed", detail: "Bookkeeping" },
+        { date: "2026-09-03", slug: "pons", type: "correction", severity: "Material", title: "Material correction", detail: "The picture changed." },
+        { date: "2026-09-02", slug: "pons", type: "risk", severity: "Info", title: "Low-priority note", detail: "Not material." },
+      ],
+      feed: [
+        {
+          name: { slug: "artificial-inu", symbol: "AI", name: "Artificial Inu" },
+          item: { id: "talk", date: "2026-09-04", title: "A very long talk headline ".repeat(6), body: "Body", kind: "ct", account: "@ai", sourceUrl: "https://x.com/ai/status/1" },
+        },
+        {
+          name: { slug: "pons", symbol: "PONS", name: "Pons" },
+          item: { id: "missing-link", date: "2026-09-05", title: "No receipt", body: "Body", kind: "company" },
+        },
+      ],
+    });
+    assert.deepEqual(wire.map((item) => item.kind), ["talk", "note"], "bookkeeping, low-severity notes and receipt-free posts stay out");
+    assert.equal(wire[0].account, "@ai", "Talk carries the posting handle");
+    assert.ok(wire[0].headline.length <= 80, "wire headlines stay within 80 characters");
+    assert.deepEqual(wire.map((item) => item.at), ["2026-09-04", "2026-09-03"], "wire is newest first");
     console.log("ok   Icarus home and category rules");
   } catch (err) {
     failures++;

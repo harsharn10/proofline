@@ -66,6 +66,11 @@ export function CategoryCards({
                     >
                       {announced ? "announced" : formatKpi(key, entry.kpis[key])}
                     </span>
+                    {!announced && entry.kpis.marketCap !== null ? (
+                      <span className="whitespace-nowrap text-[10.5px] text-[var(--t3)]">
+                        · cap {formatKpi("marketCap", entry.kpis.marketCap)}
+                      </span>
+                    ) : null}
                   </Link>
                 </li>
               ))}
