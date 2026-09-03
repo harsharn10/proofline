@@ -12,3 +12,151 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 9ccc76a4b75c38b1
+- date: 2026-09-03
+  slug: agent-name-service
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    lifecycle: announced
+    summary: Name registry for agents (.agent) on Robinhood Chain with a claimed yearly fee.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/RHAgentNS
+    deployments:
+      - &a1
+        label: Registrar
+        chain: robinhood-chain
+        address: not-verified
+        role: other
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    lifecycle: mainnet
+    summary: A .agent namespace on Robinhood Chain. A name resolves to an agent identity (key, wallet, endpoint, capabilities), not a wallet. A controller wallet pays; only the agent's own key can register, signed offline. Users register or search names on agentsn.xyz. @RHAgentNS runs the site. $ANS is a Pons v2 token.
+    themes:
+      - agent
+      - tooling
+    official_links:
+      - kind: x
+        url: https://x.com/RHAgentNS
+      - kind: site
+        url: https://www.agentsn.xyz
+      - kind: docs
+        url: https://www.agentsn.xyz/docs
+      - kind: app
+        url: https://www.agentsn.xyz/register
+    deployments:
+      - *a1
+      - label: AgentNames (registrar)
+        chain: robinhood-chain
+        address: "0x858D52Db9D8484b4921cd6c39Ab5D706BE2155c9"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S14
+          - S19
+      - label: AgentIdentity
+        chain: robinhood-chain
+        address: "0xb7fC672671868e529dB8D123f21b655F9E819c2A"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S15
+          - S18
+      - label: AgentResolver
+        chain: robinhood-chain
+        address: "0x0713447f8e918A217762412005529E339f005f9f"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S16
+      - label: AgentMarket
+        chain: robinhood-chain
+        address: "0x7FcD3C337B6F9203db4287c46A1a607bE6d5357D"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S17
+      - label: ANS token (PonsV2LauncherToken)
+        chain: robinhood-chain
+        address: "0xdB9Bc67f022d967C3a912Ebe3e6ffe25d5F70C24"
+        role: token
+        verified: true
+        sources:
+          - S7
+          - S8
+          - S9
+          - S10
+      - label: Pons v2 launch factory (token launchFactory)
+        chain: robinhood-chain
+        address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+        role: factory
+        verified: false
+        sources:
+          - S8
+          - S9
+          - S10
+      - label: PonsV2BondingCurve (token curve)
+        chain: robinhood-chain
+        address: "0x09eD966e77c02DDd1FF43948D284A85d8e92a0DE"
+        role: other
+        verified: false
+        sources:
+          - S9
+          - S10
+      - label: Token deployer EOA
+        chain: robinhood-chain
+        address: "0x4B4BCA71E68E80130E477Ba831399A12A088Ed69"
+        role: admin
+        verified: false
+        sources:
+          - S9
+          - S10
+          - S12
+      - label: RobinhoodLocker (ANS lock)
+        chain: robinhood-chain
+        address: "0xD0f7d8c6e9f6D80c297bEbe4F7fD1B9C8125C32F"
+        role: other
+        verified: false
+        sources:
+          - S12
+          - S13
+    metrics:
+      - kind: holders
+        value: 64
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S8
+      - kind: tvl
+        value: 5066.36
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S11
+      - kind: volume_24h
+        value: 1.2
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S11
+      - kind: market_cap
+        value: 3154
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S11
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 43d501b56a009b55

@@ -1,0 +1,116 @@
+slug: tendies
+name: TENDIES
+symbol: TENDIES
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned through the NOXA Fun factory into a Uniswap v3 1% pool quoted against WETH. Traders buy and sell TENDIES on that WETH book and on later ETH and USDG books. DexScreener lists memedepot.com/d/showmetendies and @TendiesRH; neither bidirectionally linked the contract this pass.
+themes:
+  - memecoin
+  - amm
+official_links:
+  - kind: x
+    url: https://x.com/TendiesRH
+  - kind: other
+    url: https://memedepot.com/d/showmetendies
+dependencies: []
+deployments:
+  - label: TENDIES token (LaunchToken)
+    chain: robinhood-chain
+    address: "0x45242320DBB855EeA8Fd36804C6487E10E97FCF9"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: NOXA Fun launch factory (token creator / launchFactory)
+    chain: robinhood-chain
+    address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
+    role: factory
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S4
+      - S5
+  - label: Uniswap v3 TENDIES/WETH 1% pool (liquidityPool)
+    chain: robinhood-chain
+    address: "0x237609918F330ADD285b8bC5f8f2922283D1C4C5"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S5
+      - S6
+      - S10
+  - label: WETH (pairToken)
+    chain: robinhood-chain
+    address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S9
+  - label: LaunchLocker (PositionLocked NFT recipient)
+    chain: robinhood-chain
+    address: "0x7F03effbd7ceB22A3f80Dd468f67eF27826acD85"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S5
+      - S17
+metrics:
+  - kind: volume_24h
+    value: 1436438.41
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: tvl
+    value: 424752.97
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: market_cap
+    value: 31058448
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: holders
+    value: 18177
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/source/factory/create tx/TokenLaunched/WETH/pool/locker, RPC name/symbol/factory/pairToken/poolFee/liquidityPool/deployer/socials, DexScreener tokens API, Gecko token GET 200, memedepot, @TendiesRH, and Latest X posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8] - Numbers: 2527033 is the DexScreener TENDIES/WETH pair 24h volume, not Gecko token all-pools 5619716.26 or Blockscout 9570671.75. Reserve 1086177.41 is that pair. [claim R-1 R-7 R-8] - Adversarial: the strongest contrary reading is that TENDIES is a stock-paired LONG/hood.fun/Pons product or that @TendiesRH is official. pairToken is WETH, the factory is NOXA 0xD9eC…FccB, DexScreener top quotes are WETH/ETH/USDG, and the handle does not embed the CA."
+      class: inference
+      sources:
+        - S5
+        - S6
+        - S12
+    - text: Quote token on the lead book is WETH, not USDG; USDG books are secondary and thinner. [verified R-7 R-10] - 24h volume figures disagree across DexScreener pair, Gecko token, and Blockscout token. [claim R-1 R-7 R-8] - No official handle or domain this pass; memedepot and @TendiesRH are unconfirmed-official / third-party-link. [claim R-7 R-12 R-13] - Latest CA posts were netlify claim/vote URLs. [claim R-17 R-20] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x4524…FCF9? Next: re-read DexScreener token profile after a Claim Profile; search new posts from @TendiesRH that embed the CA"
+    - text: "Why does launchBlock() return 25347753 while the creation tx is block 95557? Next: compare deployed bytecode to LaunchToken.sol or decode constructor args from tx input"
+    - text: "Who holds Uniswap v3 position NFT 143 on 0x7399…e0d3 after PositionLocked? Next: eth_call ownerOf(143) on the position manager and read LaunchLocker unlock conditions"
+    - text: "Does a later Gecko pool GET for 0x2376…C4C5 return reserve_in_usd for the WETH book only? Next: one pool GET after the 429 window; do not loop"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

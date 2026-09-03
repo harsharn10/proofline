@@ -1,5 +1,5 @@
 slug: mesh
-pulled_at: 2026-09-02T21:05:36.588Z # chain head 52877457 at read time
+pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x14641000a501bdc736116abf84e6fcea9b90a713"
@@ -17,51 +17,51 @@ addresses:
     safe: null
     created_block: 40707787
     created_at: 2026-08-19T16:37:35.000Z
-    holders: 1053
+    holders: 1055
     errors: []
 metrics: []
 market:
   token_address: "0x14641000a501bdc736116abf84e6fcea9b90a713"
-  pulled_at: 2026-09-02T21:05:36.588Z
+  pulled_at: 2026-09-02T22:38:55.976Z
   pairs:
     - dex: uniswap
       pair_address: "0xda147dee110ffdc9dabbb9b4882b9593a68b7945dfca0749b1d21819fba8cbf6"
       quote_symbol: ETH
-      price_usd: 0.0003279
-      liquidity_usd: 51849.79
-      volume_h24: 158309.31
-      volume_h6: 27391.93
+      price_usd: 0.0003359
+      liquidity_usd: 52389.76
+      volume_h24: 164321.56
+      volume_h6: 30069.81
       txns_h24:
-        buys: 357
-        sells: 304
-      price_change_h24: -19.61
-      fdv: 304972
+        buys: 354
+        sells: 297
+      price_change_h24: -13.18
+      fdv: 312418
       created_at: 2026-08-20T09:32:40.000Z
     - dex: uniswap
       pair_address: "0x9851a6fc5cdf78b4d31979e5d8f5aa1ccf02d837e70330eecd760b2030f19427"
       quote_symbol: USDG
-      price_usd: 0.0005192
-      liquidity_usd: 45.52
-      volume_h24: 3.58
-      volume_h6: 0
+      price_usd: 0.0004071
+      liquidity_usd: 40.35
+      volume_h24: 6.21
+      volume_h6: 2.63
       txns_h24:
         buys: 0
-        sells: 1
-      price_change_h24: null
-      fdv: 482901
+        sells: 2
+      price_change_h24: -21.58
+      fdv: 378681
       created_at: 2026-08-20T21:18:32.000Z
     - dex: uniswap
       pair_address: "0xaed2b26fa1ff12eedced5d5b263152b1c824698c41cc411682631b70c1c7b2f6"
       quote_symbol: USDG
-      price_usd: 0.0003884
-      liquidity_usd: 19.98
-      volume_h24: 1.57
-      volume_h6: 0
+      price_usd: 0.0003094
+      liquidity_usd: 17.85
+      volume_h24: 2.66
+      volume_h6: 1.08
       txns_h24:
         buys: 0
-        sells: 1
-      price_change_h24: null
-      fdv: 361239
+        sells: 2
+      price_change_h24: -20.33
+      fdv: 287810
       created_at: 2026-08-26T22:50:46.000Z
     - dex: uniswap
       pair_address: "0x6b1a39c00bbcdae2159486b808f17f28e6373c345cd68b947d5226f4c4db68fa"
@@ -76,28 +76,59 @@ market:
       price_change_h24: null
       fdv: 1228247
       created_at: 2026-08-19T16:37:54.000Z
-  liquidity_usd: 51919.34
-  volume_h24: 158314.73
-  trades_h24: 664
-  price_usd: 0.0003279
-  price_change_h24: -19.61
-  fdv: 304972
+  liquidity_usd: 52452.01
+  volume_h24: 164330.7
+  trades_h24: 656
+  price_usd: 0.0003359
+  price_change_h24: -13.18
+  fdv: 312418
   first_pair_at: 2026-08-19T16:37:54.000Z
+  top10_share: 0.3708757747337188
+  top10_share_ex_pools: 0.2892431216724943
+  top10_as_of: 2026-09-02T22:38:55.976Z
+  launchpad:
+    slug: pons
+    via: creator
+    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
   errors: []
+structure:
+  pulled_at: 2026-09-02T22:38:55.976Z
+  mint: no-mint-function
+  renounced: null
+  lp:
+    - pair: "0xda147dee110ffdc9dabbb9b4882b9593a68b7945dfca0749b1d21819fba8cbf6"
+      locked_share: null
+      holder_kind: null
+      reason: v3/v4 position; not checked
+    - pair: "0x9851a6fc5cdf78b4d31979e5d8f5aa1ccf02d837e70330eecd760b2030f19427"
+      locked_share: null
+      holder_kind: null
+      reason: v3/v4 position; not checked
+    - pair: "0xaed2b26fa1ff12eedced5d5b263152b1c824698c41cc411682631b70c1c7b2f6"
+      locked_share: null
+      holder_kind: null
+      reason: v3/v4 position; not checked
+    - pair: "0x6b1a39c00bbcdae2159486b808f17f28e6373c345cd68b947d5226f4c4db68fa"
+      locked_share: null
+      holder_kind: null
+      reason: v3/v4 position; not checked
+  errors:
+    - step: renounced
+      message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-02T21:05:36.588Z
+  pulled_at: 2026-09-02T22:38:55.976Z
   addresses:
     - address: "0x14641000a501bdc736116abf84e6fcea9b90a713"
       label: MESH token
       role: token
       transactions_count: 3266
       token_transfers_count: 13
-      last_tx_at: 2026-09-02T21:17:42.000Z
+      last_tx_at: 2026-09-02T22:47:10.000Z
       last_method: approve
-      txns_24h: 130
+      txns_24h: 132
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T21:17:42.000Z
-  txns_24h: 130
+  last_activity_at: 2026-09-02T22:47:10.000Z
+  txns_24h: 132
   launches_24h: null
 errors: []

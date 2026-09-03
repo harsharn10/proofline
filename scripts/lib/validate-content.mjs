@@ -1,6 +1,9 @@
+import { readFile, readdir } from "node:fs/promises";
+import { basename, join } from "node:path";
+import { parse } from "yaml";
 import { loadContent } from "./load.mjs";
 import { validateAgainst } from "./schemas.mjs";
-import { crossCheck, releaseCheck, referencedSourceIds, normalizeUrl } from "./checks.mjs";
+import { crossCheck, releaseCheck, referencedSourceIds, normalizeUrl, lifecycleDriftWarnings } from "./checks.mjs";
 import { checkResearch, tagIds } from "./research-md.mjs";
 import { derive } from "./score.mjs";
 import { voiceWarnings, conductWarnings, vocabularyWarnings } from "./voice.mjs";
@@ -10,6 +13,25 @@ import { voiceWarnings, conductWarnings, vocabularyWarnings } from "./voice.mjs"
  * Returns { errors, warnings, content }; `content` is null when the tree could not even be loaded
  * (the single error then names the file that failed to parse).
  */
+/** The words a name may use about itself: its name, symbol and aliases, lower-cased, split on spaces. */
+export function ownWordSet(censusRow, project) {
+  const words = new Set();
+  const add = (v) => { for (const part of String(v ?? "").toLowerCase().split(/[\s/·-]+/)) if (part.length > 1) words.add(part); };
+  add(censusRow?.name); add(project?.name); add(project?.symbol);
+  for (const v of censusRow?.identity?.aliases ?? []) add(v);
+  for (const v of censusRow?.identity?.symbols ?? []) add(v);
+  return words;
+}
+
+/** Drop voice warnings whose quoted word is one of the name's own words. */
+export function filterOwnWords(warnings, own) {
+  if (!own || own.size === 0) return warnings;
+  return warnings.filter((w) => {
+    const m = w.match(/banned word "([^"]+)"/);
+    return !(m && own.has(m[1].toLowerCase()));
+  });
+}
+
 export async function validateContent(root = "content", { release = false } = {}) {
   const errors = [], warnings = [];
   let content;
@@ -28,6 +50,21 @@ export async function validateContent(root = "content", { release = false } = {}
 
   const x = crossCheck(content);
   errors.push(...x.errors); warnings.push(...x.warnings);
+
+  const pulledBySlug = new Map();
+  try {
+    for (const name of (await readdir(join(root, "pulled"))).filter((name) => name.endsWith(".yaml")).sort()) {
+      const path = join(root, "pulled", name);
+      // content/pulled/ is machine output (scripts/pull.mjs), not a content-validation dependency: a
+      // file the puller left half-written is a puller problem to warn about, never a reason to fail
+      // the hand-written content it sits next to.
+      try { pulledBySlug.set(basename(name, ".yaml"), parse(await readFile(path, "utf8"))); }
+      catch (error) { warnings.push(`pulled/${name}: ${error.message.split("\n")[0]} — machine output, rerun npm run pull`); }
+    }
+  } catch (error) {
+    if (error.code !== "ENOENT") warnings.push(`pulled: ${error.message.split("\n")[0]} — machine output, rerun npm run pull`);
+  }
+  warnings.push(...lifecycleDriftWarnings(content.census, pulledBySlug));
 
   if (content.site.corrections?.destination === "TODO") warnings.push("site.yaml: corrections.destination is TODO (no corrections link renders until it is set)");
 
@@ -69,7 +106,12 @@ export async function validateContent(root = "content", { release = false } = {}
   // Voice lint (banned hype phrases). Hits in a project's summary, findings and research record are warnings
   // that --release turns into errors; hits in feed titles/bodies and account notes are errors always — those
   // files sit on the auto-merge path and `npm test` is the only gate there (final review C3).
-  const voice = (text, where, { hard = false } = {}) => voiceWarnings(text, where).forEach((w) => (hard || release ? errors : warnings).push(w));
+  // A name's own words are not hype: a token called GIGA may be written as "giga" in its own files. Talk items
+  // (kind ct) quote what someone posted, so a hype word there is a warning, never a gate.
+  const ownWords = new Map();
+  for (const row of content.census) ownWords.set(row.slug, ownWordSet(row, content.projects.get(row.slug)));
+  const voice = (text, where, { hard = false, soft = false, slug = null } = {}) =>
+    filterOwnWords(voiceWarnings(text, where), ownWords.get(slug)).forEach((w) => (soft ? warnings : hard || release ? errors : warnings).push(w));
   // Conduct lint (verdicts about named parties): errors always, wherever the site renders the text.
   const conduct = (text, where, opts) => conductWarnings(text, where, opts).forEach((w) => errors.push(w));
   // Internal-vocabulary lint (desk-speak, producer names, role names): reader-facing text must not name the
@@ -78,25 +120,28 @@ export async function validateContent(root = "content", { release = false } = {}
   // plain reader language the same day, so nothing here is grandfathered behind --release.
   const vocab = (text, where) => vocabularyWarnings(text, where).forEach((w) => errors.push(w));
   for (const [slug, project] of content.projects) {
-    voice(project.summary, `projects/${slug}.yaml: summary`);
+    const summaryWords = String(project.summary ?? "").trim().split(/\s+/).filter(Boolean).length;
+    if (summaryWords > 120) errors.push(`projects/${slug}.yaml: summary has ${summaryWords} words; maximum is 120`);
+    else if (summaryWords > 80) warnings.push(`projects/${slug}.yaml: summary has ${summaryWords} words; target is 80 or fewer`);
+    voice(project.summary, `projects/${slug}.yaml: summary`, { slug });
     conduct(project.summary, `projects/${slug}.yaml: summary`);
     vocab(project.summary, `projects/${slug}.yaml: summary`);
     for (const kind of ["positive", "risk", "missing", "unresolved"])
       (project.findings?.[kind] ?? []).forEach((f, i) => {
-        voice(f.text, `projects/${slug}.yaml: findings.${kind}[${i}]`);
+        voice(f.text, `projects/${slug}.yaml: findings.${kind}[${i}]`, { slug });
         conduct(f.text, `projects/${slug}.yaml: findings.${kind}[${i}]`);
         vocab(f.text, `projects/${slug}.yaml: findings.${kind}[${i}]`);
       });
   }
   for (const [slug, f] of content.feed)
     for (const item of f.items ?? []) {
-      voice(item.title, `feed/${slug}.yaml: ${item.id} title`, { hard: true });
-      voice(item.body, `feed/${slug}.yaml: ${item.id} body`, { hard: true });
+      voice(item.title, `feed/${slug}.yaml: ${item.id} title`, { hard: item.kind !== "ct", soft: item.kind === "ct", slug });
+      voice(item.body, `feed/${slug}.yaml: ${item.id} body`, { hard: item.kind !== "ct", soft: item.kind === "ct", slug });
       conduct(item.title, `feed/${slug}.yaml: ${item.id} title`);
       conduct(item.body, `feed/${slug}.yaml: ${item.id} body`);
     }
   for (const [slug, text] of content.research) {
-    voice(text, `research/${slug}.md`);
+    voice(text, `research/${slug}.md`, { slug });
     vocab(text, `research/${slug}.md`);
   }
   // Changelog title/detail is the most reader-facing text in the repo and becomes Telegram copy verbatim

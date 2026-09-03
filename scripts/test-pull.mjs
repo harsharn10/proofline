@@ -34,7 +34,30 @@ import {
   createBlockscoutClient,
   readAddress as readBlockscout,
 } from "./lib/pull/blockscout.mjs";
-import { findLlamaSlug, latestChainTvl, chainTotal24h } from "./lib/pull/llama.mjs";
+import { findLlamaSlug, latestChainTvl, chainTotal24h, readProtocol } from "./lib/pull/llama.mjs";
+import {
+  buildLaunchpadIndex,
+  excludedHolderAddresses,
+  attributeCreator,
+  launchpadSlugsFrom,
+  KNOWN_LAUNCHER_DEPLOYERS,
+} from "./lib/pull/attribution.mjs";
+import {
+  parseTokenDetails,
+  parseHolderPage,
+  shareOfSupply,
+  clampShare,
+  isBurnHolder,
+  isPoolHolder,
+  readTop10,
+  parseVerifiedAbi,
+  classifyMint,
+  readMintAndRenounce,
+  lockedHolderSummary,
+  readLpLocks,
+  LP_REASON,
+} from "./lib/pull/token.mjs";
+import { revenueDaily, seriesReplacement, writeSeries, readSeries } from "./lib/pull/series.mjs";
 import {
   parsePair,
   parsePairs,
@@ -306,15 +329,19 @@ test("parses Blockscout address, token and transaction bodies", () => {
     is_verified: true,
     name: "PonsLauncherToken",
     creation_transaction_hash: "0x1f54",
+    creator_address_hash: "0x0c37a24f5d23a486fa692d1500881d698b1f77a4",
     token: { holders_count: "62260" },
   });
+  // The creator rides along on this same body, so launchpad attribution never refetches it.
   assert.deepEqual(core, {
     is_contract: true,
     source_verified: true,
     contract_name: "PonsLauncherToken",
     creation_tx: "0x1f54",
+    creator: "0x0c37a24f5d23a486fa692d1500881d698b1f77a4",
     is_token: true,
   });
+  assert.equal(parseAddressResponse({}).creator, null);
   assert.equal(parseTokenResponse({ holders_count: "62260" }), 62260);
   assert.equal(parseTokenResponse({}), null);
   assert.equal(toInt("not a number"), null);
@@ -347,6 +374,334 @@ test("takes the Robinhood Chain slice, never the all-chain total", () => {
   assert.equal(latestChainTvl({ chainTvls: { "Robinhood Chain": { tvl: [] } } }), null);
   assert.equal(chainTotal24h({ total24h: 999, chainBreakdown: { "Robinhood Chain": { total24h: 4557472 } } }), 4557472);
   assert.equal(chainTotal24h({ total24h: 999, chainBreakdown: { Base: { total24h: 1 } } }), null);
+  // No breakdown means no chain slice. total24h is the protocol across every chain it runs on, and
+  // publishing it here would credit Robinhood Chain with Base's and Arbitrum's fees.
+  assert.equal(chainTotal24h({ total24h: 999 }), null);
+});
+
+test("an all-chain total is never published as a Robinhood Chain figure", async () => {
+  const bodies = {
+    "/protocol/x": { chainTvls: {} },
+    "/summary/fees/x?dataType=dailyFees": { total24h: 999 },
+    "/summary/fees/x?dataType=dailyRevenue": { total24h: 999, totalDataChart: [[1788307200, 7]] },
+    "/summary/dexs/x": { total24h: 999, chainBreakdown: { Base: { total24h: 12 } } },
+  };
+  const client = {
+    protocolUrl: () => "/protocol/x",
+    feesUrl: (_slug, dataType) => `/summary/fees/x?dataType=${dataType}`,
+    dexsUrl: () => "/summary/dexs/x",
+    get: async (url) => bodies[url],
+  };
+  const out = await readProtocol(client, "x", { asOf: "2026-09-02T00:00:00.000Z" });
+  assert.deepEqual(out.metrics, []);
+  assert.deepEqual(out.revenueSeries, []);
+  const messages = out.errors.map((e) => e.message);
+  assert.equal(out.errors.every((e) => e.step === "llama"), true);
+  assert.match(messages.join("\n"), /fees_24h x: the response carries no chainBreakdown/);
+  assert.match(messages.join("\n"), /revenue_24h x: the response carries no chainBreakdown/);
+  assert.match(messages.join("\n"), /volume_24h x: Robinhood Chain is not one of the chains/);
+  assert.match(messages.join("\n"), /revenue_daily x: no Robinhood Chain daily series/);
+});
+
+test("takes only the Robinhood Chain revenue series, sorted and capped", () => {
+  const points = revenueDaily({
+    totalDataChartBreakdown: [
+      [1788307200, { Base: { adapter: 999 }, "Robinhood Chain": { v1: 4, v2: 6 } }],
+      [1788220800, { "Robinhood Chain": { v1: 3 } }],
+    ],
+  });
+  assert.deepEqual(points, [["2026-09-01", 3], ["2026-09-02", 10]]);
+  // Same rule as chainTotal24h: an aggregate chart with no per-chain breakdown is every chain's
+  // revenue, so it is not this chain's series.
+  assert.deepEqual(revenueDaily({ totalDataChart: [[1788307200, 7]] }), []);
+  assert.deepEqual(revenueDaily({ totalDataChartBreakdown: [[1788307200, { Base: 7 }]] }), []);
+});
+
+test("a shorter or empty read never replaces a committed revenue series", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "series-"));
+  try {
+    const long = [["2026-08-30", 1], ["2026-08-31", 2], ["2026-09-01", 3]];
+    assert.equal((await seriesReplacement("pons", long, { dir })).write, true);
+    await writeSeries("pons", long, { dir });
+    assert.deepEqual(await readSeries("pons", { dir }), long);
+
+    const shorter = await seriesReplacement("pons", [["2026-09-01", 3]], { dir });
+    assert.equal(shorter.write, false);
+    assert.match(shorter.error.message, /returned 1 daily points but 3 are already committed/);
+    const wroteShorter = await writeSeries("pons", [["2026-09-01", 3]], { dir });
+    assert.equal(wroteShorter.written, false);
+    assert.deepEqual(await readSeries("pons", { dir }), long, "the committed series survives a short read");
+
+    const emptied = await writeSeries("pons", [], { dir });
+    assert.equal(emptied.written, false);
+    assert.match(emptied.error.message, /kept the 3 already committed/);
+    assert.deepEqual(await readSeries("pons", { dir }), long);
+
+    // A protocol with no series at all gets no file, rather than a file that says nothing.
+    const none = await writeSeries("delta", [], { dir });
+    assert.equal(none.written, false);
+    assert.match(none.error.message, /no series file was written/);
+    assert.equal(await readSeries("delta", { dir }), null);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// --- token concentration, attribution and structure ----------------------
+
+test("computes top-10 supply share and excludes pools and lockers", async () => {
+  const pair = "0x1111111111111111111111111111111111111111";
+  const locker = "0x2222222222222222222222222222222222222222";
+  const items = [pair, locker, ...Array.from({ length: 8 }, (_, i) => `0x${String(i + 3).padStart(40, "0")}`)]
+    .map((hash) => ({ address: { hash }, value: "10" }));
+  const client = {
+    token: async () => ({ total_supply: "1000", type: "ERC-20" }),
+    tokenHolders: async () => ({ items }),
+  };
+  const out = await readTop10(client, "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", {
+    pulledAt: "2026-09-02T00:00:00.000Z",
+    excluded: new Set([locker]),
+    pairAddresses: [pair],
+  });
+  assert.equal(out.top10_share, 0.1);
+  assert.equal(out.top10_share_ex_pools, 0.08);
+  assert.equal(out.burned_share, 0);
+  assert.equal(out.top10_as_of, "2026-09-02T00:00:00.000Z");
+  assert.deepEqual(out.errors, []);
+  assert.deepEqual(parseTokenDetails({ total_supply: "10", type: "ERC-20" }), { total_supply: "10", type: "ERC-20" });
+  assert.equal(parseHolderPage({ items }).length, 10);
+  assert.equal(shareOfSupply([{ value: "1" }], "0"), null);
+});
+
+test("burned supply is not concentration: it leaves both sides of the ratio", async () => {
+  // Shaped like PONS: 0x…dEaD holds 30% of supply, then ten live holders of 1% each.
+  const dead = "0x000000000000000000000000000000000000dEaD";
+  const items = [
+    { address: { hash: dead, is_contract: false, metadata: { tags: [{ name: "Null: 0x00...dEaD" }] } }, value: "300" },
+    ...Array.from({ length: 12 }, (_, i) => ({
+      address: { hash: `0x${String(i + 1).padStart(40, "0")}`, is_contract: false },
+      value: "10",
+    })),
+  ];
+  const client = {
+    token: async () => ({ total_supply: "1000", type: "ERC-20" }),
+    tokenHolders: async () => ({ items }),
+  };
+  const out = await readTop10(client, "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", {
+    pulledAt: "2026-09-02T00:00:00.000Z",
+  });
+  assert.equal(out.burned_share, 0.3);
+  // Ten live holders of 10 against 700 of circulating supply, not 400/1000 with the burn on top.
+  assert.equal(Number(out.top10_share.toFixed(6)), 0.142857);
+  assert.equal(Number(out.top10_share_ex_pools.toFixed(6)), 0.142857);
+  assert.deepEqual(out.errors, []);
+  assert.equal(isBurnHolder(parseHolderPage({ items })[0]), true);
+  assert.equal(isBurnHolder(parseHolderPage({ items })[1]), false);
+  assert.equal(isBurnHolder({ address: "0x1", name: "Burn Address" }), true);
+  assert.equal(isBurnHolder({ address: "0x1", name: "TokenBurner" }), false, "a burner calls a burn, it is not one");
+});
+
+test("Uniswap v4 liquidity leaves ex-pools even though it is not a pair address", async () => {
+  // Shaped like Artificial Inu: the v4 singleton holds the pool's tokens under its own address, so
+  // market.pairs — which only ever carries pair addresses and pool ids — cannot exclude it.
+  const poolManager = "0x8366a39CC670B4001A1121B8F6A443A643e40951";
+  const items = [
+    { address: { hash: poolManager, name: "PoolManager", is_contract: true }, value: "30" },
+    ...Array.from({ length: 11 }, (_, i) => ({
+      address: { hash: `0x${String(i + 1).padStart(40, "0")}`, is_contract: false },
+      value: "10",
+    })),
+  ];
+  const client = {
+    token: async () => ({ total_supply: "1000", type: "ERC-20" }),
+    tokenHolders: async () => ({ items }),
+  };
+  const out = await readTop10(client, "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", {
+    pulledAt: "2026-09-02T00:00:00.000Z",
+    pairAddresses: [],
+  });
+  assert.equal(out.top10_share, 0.12);
+  assert.equal(out.top10_share_ex_pools, 0.1, "the ten largest non-pool holders, the manager dropped");
+  assert.equal(isPoolHolder({ address: poolManager.toLowerCase(), name: null, is_contract: true }), true);
+  assert.equal(isPoolHolder({ address: "0x1", name: "UniswapV3Pool", is_contract: true }), true);
+  assert.equal(isPoolHolder({ address: "0x1", name: "PoolManager", is_contract: false }), false);
+  assert.equal(isPoolHolder({ address: "0x1", name: null, is_contract: true }), false);
+});
+
+test("a share outside 0-1 is clamped and reported, never left to sink the document", async () => {
+  assert.deepEqual(clampShare(1.02), { value: 1, clamped: true });
+  assert.deepEqual(clampShare(-0.01), { value: 0, clamped: true });
+  assert.deepEqual(clampShare(0.5), { value: 0.5, clamped: false });
+  assert.deepEqual(clampShare(null), { value: null, clamped: false });
+
+  // A total supply read moments before a burn can be smaller than the balances read after it.
+  const client = {
+    token: async () => ({ total_supply: "100", type: "ERC-20" }),
+    tokenHolders: async () => ({ items: [{ address: { hash: `0x${"1".repeat(40)}` }, value: "150" }] }),
+  };
+  const out = await readTop10(client, "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", { pulledAt: "2026-09-02T00:00:00.000Z" });
+  assert.equal(out.top10_share, 1);
+  assert.match(out.errors.map((e) => e.message).join("\n"), /exceeded the circulating supply read/);
+});
+
+test("only launchpads are attributed, and shared infrastructure says so", () => {
+  const factory = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const locker = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+  const create3 = "0xdddddddddddddddddddddddddddddddddddddddd";
+  const vaultFactory = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+  const docs = [
+    {
+      slug: "pons",
+      addresses: [
+        { address: factory, role: "factory", label: "Pons factory" },
+        { address: create3, role: "factory", label: "Create3Factory (app JS chainId 4663 map)" },
+        { address: locker, role: "vault", label: "Launch locker" },
+      ],
+    },
+    // Downto is a redeemable basket, not a launchpad; its deployment helpers launch nothing.
+    { slug: "downto", addresses: [{ address: vaultFactory, role: "factory", label: "DiamondPackageCallBackFactory" }] },
+  ];
+  const census = [
+    { slug: "pons", tree: { primary: "launch/bonding-curve" } },
+    { slug: "downto", tree: { primary: "rwa-products/redeemable-basket", secondary: ["launch/graduation-token"] } },
+    { slug: "artificial-inu", tree: { primary: "rwa-products/stock-paired-token" } },
+  ];
+  assert.deepEqual([...launchpadSlugsFrom(census)], ["pons"]);
+
+  const index = buildLaunchpadIndex(docs, { known: [], launchpadSlugs: launchpadSlugsFrom(census) });
+  assert.deepEqual(attributeCreator(factory.toUpperCase().replace("0X", "0x"), index), {
+    slug: "pons", via: "factory", address: factory, shared: false,
+  });
+  assert.equal(attributeCreator(create3, index), null, "a CREATE3 helper deploys anything for anyone");
+  assert.equal(attributeCreator(vaultFactory, index), null, "role: factory on a non-launchpad is not a launch");
+  assert.equal(attributeCreator("0xcccccccccccccccccccccccccccccccccccccccc", index), null);
+  // Fail-closed: with no launchpad set, project addresses cannot be attributed at all.
+  assert.equal(attributeCreator(factory, buildLaunchpadIndex(docs, { known: [] })), null);
+
+  // The Doppler factory deploys for everyone on that stack, so LONG is the operator, not the launcher.
+  const doppler = KNOWN_LAUNCHER_DEPLOYERS.find((row) => row.label === "DopplerERC20V1Factory");
+  const withKnown = buildLaunchpadIndex([], { launchpadSlugs: new Set() });
+  assert.deepEqual(attributeCreator(doppler.address, withKnown), {
+    slug: "long", via: "shared-factory", address: doppler.address, shared: true,
+  });
+
+  assert.deepEqual([...excludedHolderAddresses(docs)], [locker]);
+  assert.deepEqual(
+    [...excludedHolderAddresses([{ slug: "pons", addresses: [{ address: factory, role: "other", label: "v2 launch locker (V2LaunchLocker)" }] }])],
+    [factory],
+    "a lock-labelled address counts even when its role is not vault",
+  );
+});
+
+test("classifies mint and renounce only from a verified ABI and an owner read", async () => {
+  const abi = { is_verified: true, abi: [{ type: "function", name: "mint", stateMutability: "nonpayable" }] };
+  assert.equal(parseVerifiedAbi(abi).verified, true);
+  assert.deepEqual(classifyMint(parseVerifiedAbi(abi), "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"), {
+    mint: "owner-can-mint", error: null,
+  });
+  assert.equal(classifyMint(parseVerifiedAbi({ abi: null }), null).mint, "unknown");
+  assert.equal(
+    classifyMint(parseVerifiedAbi({ is_verified: true, abi: [{ type: "function", name: "transfer", stateMutability: "nonpayable" }] }), null).mint,
+    "no-mint-function",
+  );
+
+  // SwapHood's token has all three: only the first one creates supply.
+  const swaphood = parseVerifiedAbi({
+    is_verified: true,
+    abi: [
+      { type: "function", name: "mint", stateMutability: "nonpayable" },
+      { type: "function", name: "minters", stateMutability: "view" },
+      { type: "function", name: "setMinters", stateMutability: "nonpayable" },
+    ],
+  });
+  assert.equal(classifyMint(swaphood, "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").mint, "owner-can-mint");
+
+  // A registry of minters and a "has it minted yet" flag are reads, not mints.
+  const viewsOnly = parseVerifiedAbi({
+    is_verified: true,
+    abi: [
+      { type: "function", name: "minters", stateMutability: "view" },
+      { type: "function", name: "minted", stateMutability: "view" },
+      { type: "function", name: "mintingFinished", stateMutability: "view" },
+      { type: "function", name: "mint", stateMutability: "view" },
+    ],
+  });
+  assert.equal(classifyMint(viewsOnly, "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").mint, "no-mint-function");
+  assert.equal(
+    classifyMint(parseVerifiedAbi({ is_verified: true, abi: [{ type: "function", name: "mintTo", stateMutability: "payable" }] }), "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").mint,
+    "owner-can-mint",
+  );
+
+  const out = await readMintAndRenounce(
+    { smartContract: async () => ({ is_verified: true, abi: [{ type: "function", name: "transfer", stateMutability: "nonpayable" }] }) },
+    "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    ZERO_ADDRESS,
+  );
+  assert.equal(out.mint, "no-mint-function");
+  assert.equal(out.renounced, true);
+  assert.deepEqual(out.errors, []);
+});
+
+test("reads ERC-20 LP locks and gives each unread pair its own reason", async () => {
+  const pair = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const locker = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+  const poolId = `0x${"1".repeat(64)}`;
+  const missing = "0xdddddddddddddddddddddddddddddddddddddddd";
+  const broken = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+  const noSupply = "0xffffffffffffffffffffffffffffffffffffffff";
+  const bodies = {
+    [pair]: { type: "ERC-20", total_supply: "100" },
+    [noSupply]: { type: "ERC-20", total_supply: null },
+  };
+  const client = {
+    token: async (address) => {
+      if (address === missing) throw new Error("tokens: HTTP 404");
+      if (address === broken) throw new Error("tokens: HTTP 503");
+      return bodies[address];
+    },
+    tokenHolders: async () => ({ items: [
+      { address: { hash: ZERO_ADDRESS, is_contract: false }, value: "20" },
+      { address: { hash: locker, is_contract: true }, value: "30" },
+      { address: { hash: "0xcccccccccccccccccccccccccccccccccccccccc", is_contract: false }, value: "50" },
+    ] }),
+  };
+  const out = await readLpLocks(client, [
+    { pair_address: pair },
+    { pair_address: poolId },
+    { pair_address: missing },
+    { pair_address: broken },
+    { pair_address: noSupply },
+  ], { lockers: new Set([locker]) });
+  assert.deepEqual(out.lp[0], { pair, locked_share: 0.5, holder_kind: "burn-and-locker", reason: null });
+  // Each of these used to say "v3/v4 position; not checked", whatever had actually happened.
+  assert.deepEqual(out.lp[1], { pair: poolId, locked_share: null, holder_kind: null, reason: LP_REASON.poolId });
+  assert.deepEqual(out.lp[2], { pair: missing, locked_share: null, holder_kind: null, reason: LP_REASON.notAToken });
+  assert.deepEqual(out.lp[3], { pair: broken, locked_share: null, holder_kind: null, reason: LP_REASON.detailsUnavailable });
+  assert.deepEqual(out.lp[4], { pair: noSupply, locked_share: null, holder_kind: null, reason: LP_REASON.noSupply });
+  assert.equal(new Set(out.lp.map((row) => row.reason)).size, 5, "every reason names a different condition");
+});
+
+test("an unread LP lock is null with a reason, and zero is only written for plain accounts", () => {
+  const eoa = (hash, value) => ({ address: hash, value, is_contract: false, tags: [] });
+  const contract = (hash, value) => ({ address: hash, value, is_contract: true, tags: [] });
+
+  // Every holder is a plain account, so nothing among them could be a locker: zero is a real read.
+  assert.deepEqual(lockedHolderSummary([eoa("0xa", "60"), eoa("0xb", "40")], "100", new Set()), {
+    locked_share: 0, holder_kind: "none", reason: null, clamped: false,
+  });
+  // One unnamed contract among them could be a locker this run has never located; 0 would assert
+  // "nothing is locked" on no evidence, which is what 16 of the LP rows on the branch were doing.
+  assert.deepEqual(lockedHolderSummary([eoa("0xa", "60"), contract("0xb", "40")], "100", new Set()), {
+    locked_share: null, holder_kind: null, reason: LP_REASON.noneFound, clamped: false,
+  });
+  assert.deepEqual(lockedHolderSummary([], "100", new Set()), {
+    locked_share: null, holder_kind: null, reason: LP_REASON.noHolders, clamped: false,
+  });
+  // A pulled vault counts as a locker even though schema/shared.schema.json has no locker role.
+  assert.deepEqual(lockedHolderSummary([contract("0xb", "40"), eoa("0xa", "60")], "100", new Set(["0xb"])), {
+    locked_share: 0.4, holder_kind: "locker", reason: null, clamped: false,
+  });
+  assert.equal(lockedHolderSummary([eoa("0xa", "150")], "100", new Set(["0xa"])).clamped, true);
 });
 
 // --- census selection and schema -----------------------------------------
@@ -396,7 +751,7 @@ test("a sample document validates against schema/pulled.schema.json", () => {
 
   assert.deepEqual(validate(doc), []);
   assert.deepEqual(Object.keys(doc), [
-    "slug", "pulled_at", "chain", "addresses", "metrics", "market", "activity", "errors",
+    "slug", "pulled_at", "chain", "addresses", "metrics", "market", "structure", "activity", "errors",
   ]);
   assert.equal(Object.keys(doc.addresses[0])[0], "address");
 
@@ -404,7 +759,7 @@ test("a sample document validates against schema/pulled.schema.json", () => {
   assert.match(yaml, /pulled_at: .*# chain head 52364777 at read time/);
   assert.match(
     summaryLine("pons", doc),
-    /pons\s+1 addresses · 1 owners · 1 safes · 1 holders · 1 metrics · 0 pairs · — txns\/24h · 1 errors/,
+    /pons\s+1 addresses · 1 owners · 1 safes · 1 holders · 1 metrics · 0 pairs · no top-10 · 0 LP reads · — txns\/24h · 1 errors/,
   );
 });
 
@@ -708,8 +1063,9 @@ test("the snapshot takes the token holder count, the market totals and the TVL m
     metrics: [
       { kind: "volume_24h", value: 94220826 },
       { kind: "tvl", value: 9208000 },
+      { kind: "revenue_24h", value: 909887 },
     ],
-    market: { liquidity_usd: 1000, volume_h24: 500, trades_h24: 21, price_usd: 0.42, fdv: 900 },
+    market: { liquidity_usd: 1000, volume_h24: 500, trades_h24: 21, price_usd: 0.42, fdv: 900, top10_share: 0.41 },
     activity: { addresses: [{ transactions_count: 10 }, { transactions_count: 5 }, { transactions_count: null }], launches_24h: 3 },
   });
   assert.deepEqual(snap, {
@@ -723,6 +1079,8 @@ test("the snapshot takes the token holder count, the market totals and the TVL m
     txns_total: 15,
     launches_24h: 3,
     tvl: 9208000,
+    revenue_24h: 909887,
+    top10_share: 0.41,
   });
 });
 
@@ -764,7 +1122,22 @@ test("a document carrying both new blocks validates and keeps its key order", ()
       price_change_h24: 1.5,
       fdv: 1000,
       first_pair_at: new Date(JULY).toISOString(),
+      top10_share: 0.1,
+      top10_share_ex_pools: 0.08,
+      burned_share: 0.29,
+      top10_as_of: "2026-09-02T14:00:03.000Z",
+      launchpad: { slug: "pons", via: "factory", address: "0x0c37a24f5d23a486fa692d1500881d698b1f77a4", shared: false },
       errors: [{ step: "dexscreener", message: "token-pairs: HTTP 503" }],
+    },
+    structure: {
+      pulled_at: "2026-09-02T14:00:03.000Z",
+      mint: "no-mint-function",
+      renounced: true,
+      lp: [
+        { pair: "0x10CC6BD38112cAc182db90B6a71d8Bb5939526bA", locked_share: 0.5, holder_kind: "burn", reason: null },
+        { pair: "0x51B6Ca77DEaE9f17c1D89EdFb301AE50053C57A5", locked_share: null, holder_kind: null, reason: LP_REASON.noneFound },
+      ],
+      errors: [],
     },
     activity: {
       pulled_at: "2026-09-02T14:00:03.000Z",
@@ -791,14 +1164,19 @@ test("a document carrying both new blocks validates and keeps its key order", ()
 
   assert.deepEqual(validate(doc), []);
   assert.deepEqual(Object.keys(doc), [
-    "slug", "pulled_at", "chain", "addresses", "metrics", "market", "activity", "errors",
+    "slug", "pulled_at", "chain", "addresses", "metrics", "market", "structure", "activity", "errors",
   ]);
   assert.deepEqual(Object.keys(doc.market.pairs[0]), [
     "dex", "pair_address", "quote_symbol", "price_usd", "liquidity_usd", "volume_h24",
     "volume_h6", "txns_h24", "price_change_h24", "fdv", "created_at",
   ]);
+  assert.deepEqual(Object.keys(doc.market), [
+    "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
+    "price_usd", "price_change_h24", "fdv", "first_pair_at", "top10_share",
+    "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad", "errors",
+  ]);
   assert.equal(countErrors(doc), 2);
-  assert.match(summaryLine("pons", doc), /2 pairs · 2000 txns\/24h · 2 errors/);
+  assert.match(summaryLine("pons", doc), /2 pairs · top-10 · 1 LP reads · 2000 txns\/24h · 2 errors/);
 
   // The 34 files written before these blocks existed still validate: both are optional.
   const older = orderDocument({
@@ -806,6 +1184,7 @@ test("a document carrying both new blocks validates and keeps its key order", ()
     addresses: [], metrics: [], errors: [],
   });
   assert.equal(older.market, null);
+  assert.equal(older.structure, null);
   assert.equal(older.activity, null);
   assert.deepEqual(validate(older), []);
   assert.equal(errorKey({ step: "rpc", message: "eth_getCode 0xA5aAb3F0c6EeadF30Ef: boom" }), "rpc: eth_getCode <hex>: boom");

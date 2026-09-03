@@ -1,0 +1,105 @@
+slug: jinqian
+name: JINQIAN
+symbol: JINQIAN
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against FAMI. LaunchpadFactory deploys Money Mushroom (JINQIAN) in one createToken call and seeds the JINQIAN/FAMI book. Traders buy and sell JINQIAN on Uniswap v4. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:fami
+  - rwa
+official_links:
+  - kind: telegram
+    url: https://t.me/JinquanCTO
+dependencies: []
+deployments:
+  - label: JINQIAN token (EIP-1167 LaunchpadToken clone)
+    chain: robinhood-chain
+    address: "0xe81880c1C5054245e036359f5c7be31606E79F56"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: LaunchpadToken implementation
+    chain: robinhood-chain
+    address: "0x4C515fcEeF14Dd08e86D6fa0df0eC7f1Ce2f579e"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+      - S6
+  - label: LaunchpadFactory (token factory())
+    chain: robinhood-chain
+    address: "0x160Ea85a96DF909EAC3f79b14c7A69200ceb4898"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+      - S15
+  - label: FAMI TokenizedStock (factory.stock / pair quote)
+    chain: robinhood-chain
+    address: "0x5D2e81cB3A6FECe856B824Dfd7e1d6D3dbaD8cd9"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S7
+      - S16
+      - S17
+metrics:
+  - kind: volume_24h
+    value: 95888630.13
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 2583146.4
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 3022372.11
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 9006
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/FAMI and both create txs, RPC name/symbol/factory/stock/genesisCreator, DexScreener, Gecko pool/token/pools page, /rhj/assets, The Defiant, @TheDegenBoii, Telegram preview, and the TG claim post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 95888630.13 is the Gecko JINQIAN/FAMI pool 24h volume, not the 153223013.63 token all-pools figure. Reserve 2583146.40 is that pool. DexScreener 97642283.24 / 2527116.39 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that FAMI 0x5D2e…8cd9 is a Robinhood Stock Token and JINQIAN is an official Farmmi product. /rhj/assets has no FAMI, the token name has no Robinhood Token suffix, and no official handle or domain was located."
+      class: inference
+      sources:
+        - S12
+        - S16
+    - text: Quote token FAMI 0x5D2e…8cd9 is not in GET /rhj/assets (194 assets). [verified R-12 R-16] - Pool USD reserve is JINQIAN plus FAMI, not a USDG or WETH backstop. [claim R-7 R-8] - No official handle or domain this pass; Telegram is a third-party-link. [claim R-7 R-13] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0xe818…9F56? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle"
+    - text: "Does Robinhood later list a FAMI Stock Token, and would it share this 0x5D2e…8cd9 address? Next: re-fetch /rhj/assets and docs.robinhood.com/chain/contracts if a FAMI ticker appears"
+    - text: "Does verified LaunchpadFactory source leave any privileged path despite owner() reverting? Next: read createToken and fee-split modifiers in src/LaunchpadFactory.sol on the explorer"
+    - text: "Does t.me/JinquanCTO pin the CA 0xe818…9F56 or a site that cross-links? Next: open the join page / first messages if they become public without joining"
+    - text: "Which Gecko trending window ranked this pool vol #1 at ~$96M / ~$5.1M liq? Next: archive a Gecko trending screenshot if the rank returns"
+  unresolved: []

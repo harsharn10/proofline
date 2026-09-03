@@ -1,123 +1,123 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { KpiSection } from "@/components/kpi-section";
-import { Movers } from "@/components/movers";
-import { ResearchedRows } from "@/components/researched-rows";
-import { getContent } from "@/data/content-server";
-import { DEPENDENCY_KIND_LABEL, type DirectoryEntry } from "@/data/types";
-import { formatDate } from "@/lib/utils";
+import { createFileRoute } from "@tanstack/react-router";
+import { CategoryCards } from "@/components/home/category-cards";
+import { Latest } from "@/components/home/latest";
+import { RightNow } from "@/components/home/right-now";
+import { StatBox } from "@/components/home/stat-box";
+import {
+  announcedNow,
+  getContent,
+  latestFromIcarus,
+  newLaunches,
+  notListedCount,
+  sectionLeaders,
+  trendingNow,
+} from "@/data/content-server";
+import { formatCount, formatUsd } from "@/data/types";
 
 export const Route = createFileRoute("/")({
   loader: () => getContent(),
   component: Home,
 });
 
-// The tracker: a masthead with one stat line, what's moving from the latest chain read, the names a
-// full research record backs, then every section as a ranked KPI table. Every number is a dated read
-// from a named free source; status is computed, never asserted.
-function Home() {
-  const { site, sections, entries, dependencies, generatedAt, now } = Route.useLoaderData();
+function chainReadLabel(iso: string | undefined): string {
+  if (!iso) return "not checked";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+    timeZoneName: "short",
+  }).format(new Date(iso));
+}
 
-  const researched = entries.filter((e) => e.coverage === "full");
-  const live = entries.filter((e) => e.kpis.status === "live").length;
-  const bySection = new Map<string, DirectoryEntry[]>();
-  const unplaced: DirectoryEntry[] = [];
-  for (const entry of entries) {
-    const id = entry.tree?.sectionId;
-    if (!id) {
-      unplaced.push(entry);
-      continue;
-    }
-    const bucket = bySection.get(id);
-    if (bucket) bucket.push(entry);
-    else bySection.set(id, [entry]);
-  }
-  const firstSection = sections.find((s) => (bySection.get(s.id)?.length ?? 0) > 0);
-  const readAt = entries.map((e) => e.kpis.readAt).filter((x): x is string => Boolean(x)).sort().pop();
+function Home() {
+  const { site, sections, entries, histories, changelog, feed, now } = Route.useLoaderData();
+  const live = entries.filter((entry) => entry.kpis.status === "live").length;
+  const launchesToday = entries.reduce((sum, entry) => sum + entry.factoryLaunches24h, 0);
+  const volume24h = entries.reduce((sum, entry) => sum + (entry.kpis.volume24h ?? 0), 0);
+  const readAt = entries
+    .map((entry) => entry.kpis.readAt)
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .at(-1);
+  const trending = trendingNow(entries, histories);
+  const launches = newLaunches(entries, now);
+  const announced = announcedNow(entries);
+  const leaders = Object.fromEntries(
+    sections.map((section) => [section.id, sectionLeaders(section, entries)]),
+  );
+  const latest = latestFromIcarus(changelog, feed, 4);
 
   return (
-    <main className="wrap pb-4">
-      <section className="hero">
-        <p className="eyebrow">Robinhood Chain · {site.chain.id}</p>
-        <h1>{site.tagline}</h1>
-        <p className="desc">
-          {site.name} tracks every native play on {site.chain.name}: what is live, what it moves, who holds
-          the keys, and what is still unverified. {site.chain.stack}. Gas in {site.chain.gas}. Mainnet since{" "}
-          {formatDate(site.chain.mainnet_date)}.
-        </p>
-        <p className="statline">
-          <a href={firstSection ? `#${firstSection.id}` : "#dependencies"}>
-            <b>{entries.length}</b> names on file
-          </a>
-          <span className="sep">·</span>
-          <a href="#moving">
-            <b>{live}</b> live on chain
-          </a>
-          <span className="sep">·</span>
-          {researched.length > 0 ? (
-            <>
-              <a href="#researched">
-                <b>{researched.length}</b> researched
-              </a>
-              <span className="sep">·</span>
-            </>
-          ) : null}
-          <a href="#dependencies">
-            <b>{dependencies.length}</b> dependency cards
-          </a>
-          <span className="sep">·</span>
-          <span>chain read {readAt ? formatDate(readAt.slice(0, 10)) : formatDate(generatedAt.slice(0, 10))}</span>
-        </p>
-        <nav className="catpills" aria-label="Sections">
-          {sections.map((s) => {
-            const n = bySection.get(s.id)?.length ?? 0;
-            if (n === 0) return null;
-            return (
-              <a key={s.id} href={`#${s.id}`}>
-                {s.label} <small>{n}</small>
-              </a>
-            );
-          })}
-        </nav>
+    <main className="wrap pb-10 pt-5">
+      <section className="grid grid-cols-1 items-end gap-6 md:grid-cols-[minmax(0,1fr)_300px]">
+        <div>
+          <p className="eyebrow !m-0">Robinhood Chain · {site.chain.id}</p>
+          <h1 className="mb-2 mt-2.5 text-[28px] font-bold leading-[1.15] tracking-[-0.02em]">
+            Icarus: building the <span className="text-[var(--good)]">Robinhood Registry</span>
+          </h1>
+          <p className="m-0 max-w-[60ch] text-sm text-[var(--t2)]">
+            Icarus researches and tracks what is new on Robinhood Chain and keeps you current here
+            and on Telegram. Touch grass when it&apos;s quiet. Catch up fast when it&apos;s busy.
+          </p>
+        </div>
+        <StatBox
+          stats={[
+            { label: "names on file", value: formatCount(entries.length), href: "#categories" },
+            { label: "live on chain", value: formatCount(live), href: "#right-now" },
+            { label: "launches today", value: formatCount(launchesToday), href: "#right-now" },
+            { label: "volume 24h", value: formatUsd(volume24h), href: "#right-now" },
+          ]}
+          note={<>Chain read {chainReadLabel(readAt)} · refreshes every 6 hours</>}
+        />
       </section>
 
-      <Movers entries={entries} now={now} />
+      <nav className="catpills" aria-label="Categories">
+        {sections.map((section) => (
+          <a key={section.id} href={`/s/${section.id}`}>
+            {section.label}{" "}
+            <small>{entries.filter((entry) => entry.tree?.sectionId === section.id).length}</small>
+          </a>
+        ))}
+      </nav>
 
-      <ResearchedRows entries={researched} />
-
-      {sections.map((section) => (
-        <KpiSection key={section.id} section={section} entries={bySection.get(section.id) ?? []} now={now} />
-      ))}
-
-      {unplaced.length > 0 ? (
-        <KpiSection
-          section={{ id: "unplaced", label: "Not yet placed", description: "On file, no taxonomy placement yet." }}
-          entries={unplaced}
+      <section id="right-now" className="mt-[26px]">
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-3 px-0.5">
+          <h2 className="m-0 text-sm font-semibold">Right now</h2>
+          <span className="text-[11px] text-[var(--t3)]">
+            from on-chain data · only names that clear the bar: a confirmed official surface, a
+            located contract, and at least $25K of liquidity or TVL
+          </span>
+        </div>
+        <RightNow
+          trending={trending}
+          launches={launches}
+          announced={announced}
+          notListed={notListedCount(entries, launches, now)}
           now={now}
         />
-      ) : null}
+      </section>
 
-      {dependencies.length > 0 ? (
-        <section id="dependencies" className="catsec">
-          <div className="sechead">
-            <h2 className="t">
-              Dependencies <span className="count">{dependencies.length}</span>
-            </h2>
-            <span className="h">cited from the profiles; not researched as subjects</span>
-          </div>
-          <p className="catdesc">
-            Stock tokens, stablecoins, DEXs, oracles and bridges the plays above rely on. Each card lists who
-            controls it and how it can fail.
-          </p>
-          <div className="chiprow">
-            {dependencies.map((d) => (
-              <Link key={d.id} to="/d/$id" params={{ id: d.id }} className="chip">
-                {d.name}
-                <small>{DEPENDENCY_KIND_LABEL[d.kind]}</small>
-              </Link>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <section id="categories" className="mt-[26px]">
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-3 px-0.5">
+          <h2 className="m-0 text-sm font-semibold">By category</h2>
+          <span className="text-[11px] text-[var(--t3)]">
+            leaders by the number that matters for each · open a category for the full ranking
+          </span>
+        </div>
+        <CategoryCards sections={sections} entries={entries} leaders={leaders} />
+      </section>
+
+      <section className="mt-[26px]">
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-3 px-0.5">
+          <h2 className="m-0 text-sm font-semibold">Latest from Icarus</h2>
+          <span className="text-[11px] text-[var(--t3)]">
+            every research pull, with its sources
+          </span>
+        </div>
+        <Latest items={latest} telegramUrl={site.telegram.url} />
+      </section>
     </main>
   );
 }

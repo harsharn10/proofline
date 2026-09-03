@@ -1,9 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { parse, stringify } from "yaml";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, cp, rm, writeFile, appendFile } from "node:fs/promises";
+import { mkdtemp, mkdir, cp, rm, writeFile, appendFile, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+import { registerHooks } from "node:module";
 import { derive, SECURITY_MAX, PROVISIONAL_CONFIDENCE, FULL_WEIGHT_CONFIDENCE, computeRanks } from "./lib/score.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { crossCheck, releaseCheck } from "./lib/checks.mjs";
@@ -12,17 +14,169 @@ import { loadContent } from "./lib/load.mjs";
 import {
   selectUnsent,
   selectApproved,
+  selectShareBar,
   buildMessages,
   chunkMessage,
   publicationFingerprint,
   readDotEnv,
 } from "./lib/telegram.mjs";
-import { validateContent } from "./lib/validate-content.mjs";
+import { validateContent, ownWordSet, filterOwnWords } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
+import {
+  meetsShareBar as meetsShareBarCore,
+  officialSurfaceConfirmed as officialSurfaceConfirmedCore,
+} from "./lib/share-bar.mjs";
 
 const expected = JSON.parse(await readFile(new URL("../fixtures/expected.json", import.meta.url), "utf8"));
 let failures = 0;
+
+const READER_WORDS = [
+  "packet",
+  "census",
+  "stub",
+  "coverage",
+  "cohort",
+  "qualifying",
+  "collector",
+  "dossier",
+  "evidence class",
+  "provisional",
+  "derived",
+  "slug",
+  "Proofline",
+];
+
+// The two places the old brand is still the right word: the attribution the site carries
+// ("Icarus is powered by Project Proofline") and the methodology_version string itself.
+const ATTRIBUTION = /(?:powered by|Project)\s+Proofline|\bproofline-v[\w.]+/gi;
+
+function readerWordHits(value) {
+  const text = value.replace(/\$\{[^}]*\}/g, " ").replace(ATTRIBUTION, "");
+  return READER_WORDS.filter((word) => new RegExp(`\\b${word.replace(" ", "\\s+")}\\b`, "i").test(text));
+}
+
+// Names that introduce reader copy outside JSX: { label: "…" }, KPI_LABEL = { … },
+// reportedTitle() — anything whose key or declaration reads like a label.
+const COPY_NAME = /(?:label|title|subtitle|sub|note|hint|description|placeholder)s?$/i;
+
+// Every string literal in the balanced region that starts at `start` (a quote, or a bracket to
+// walk). Template literals come through whole, `${…}` included, which is enough to spot a word.
+function literalsFrom(source, start) {
+  const found = [];
+  let depth = 0;
+  for (let i = start; i < source.length; i += 1) {
+    const ch = source[i];
+    if (ch === '"' || ch === "'" || ch === "`") {
+      let text = "";
+      let j = i + 1;
+      while (j < source.length && source[j] !== ch) {
+        if (source[j] === "\\") { text += source[j + 1] ?? ""; j += 2; continue; }
+        text += source[j];
+        j += 1;
+      }
+      found.push({ text, index: i + 1 });
+      if (depth === 0) return found;
+      i = j;
+      continue;
+    }
+    if (ch === "{" || ch === "[" || ch === "(") depth += 1;
+    else if (ch === "}" || ch === "]" || ch === ")") {
+      depth -= 1;
+      if (depth <= 0) return found;
+    }
+  }
+  return found;
+}
+
+const OPENS = /["'`{[]/;
+
+// The opening quote or bracket a `name:` or `name =` introduces, or -1 when the declaration
+// carries no literal of its own (`label: string` in a type, an imported binding).
+function copyStart(source, from) {
+  let i = from;
+  while (i < source.length && /\s/.test(source[i])) i += 1;
+  if (OPENS.test(source[i] ?? "")) return i;
+  // A typed declaration — `KPI_LABEL: Record<KpiKey, string> = { … }` — steps over the annotation.
+  for (let j = i; j < source.length && j < i + 160; j += 1) {
+    const ch = source[j];
+    if (ch === "=") {
+      let k = j + 1;
+      while (k < source.length && /\s/.test(source[k])) k += 1;
+      return OPENS.test(source[k] ?? "") ? k : -1;
+    }
+    if (ch === ";" || ch === "{" || ch === "}" || ch === "\n" || ch === '"' || ch === "'" || ch === "`") return -1;
+  }
+  return -1;
+}
+
+// The body of `function reportedTitle(asOf: string): string { … }`, past its parameters and
+// return type, or -1 when there is none.
+function bodyStart(source, openParen) {
+  let depth = 0;
+  let i = openParen;
+  for (; i < source.length; i += 1) {
+    if (source[i] === "(") depth += 1;
+    else if (source[i] === ")") {
+      depth -= 1;
+      if (depth === 0) break;
+    }
+  }
+  for (let j = i + 1; j < source.length && j < i + 160; j += 1) {
+    if (source[j] === "{") return j;
+    if (source[j] === ";" || source[j] === "\n") return -1;
+  }
+  return -1;
+}
+
+function jsxVisibleStrings(source) {
+  const clean = source
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/(^|[^:])\/\/.*$/gm, "$1");
+  const found = [];
+  const collect = (re, group = 1) => {
+    for (const match of clean.matchAll(re)) {
+      const text = match[group];
+      if (/[{};=]|=>|\b(?:const|for|if|return)\b|\.\w+\(/.test(text)) continue;
+      found.push({ text, index: match.index + match[0].indexOf(text) });
+    }
+  };
+  collect(/(?:<\/?[A-Za-z][^>]*>|<>)([^<{]+)(?=<)/gs);
+  collect(/\b(?:aria-label|placeholder|alt|title|label)\s*=\s*["']([^"']*)["']/g);
+  for (const expression of clean.matchAll(/>\s*\{([^{}\n]+)\}\s*</g)) {
+    for (const literal of expression[1].matchAll(/["'`]([^"'`]*)["'`]/g)) {
+      found.push({
+        text: literal[1],
+        index: expression.index + expression[0].indexOf(expression[1]) + literal.index + 1,
+      });
+    }
+  }
+  // Copy that never reaches JSX as text: label-ish object and array literals, and the helpers
+  // that build one. Plain .ts modules carry most of it (data/types.ts labels, lib/dejargon.ts).
+  for (const match of clean.matchAll(/\b([A-Za-z_$][\w$]*)\s*[:=]/g)) {
+    if (!COPY_NAME.test(match[1])) continue;
+    const start = copyStart(clean, match.index + match[0].length);
+    if (start !== -1) found.push(...literalsFrom(clean, start));
+  }
+  for (const match of clean.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g)) {
+    if (!COPY_NAME.test(match[1])) continue;
+    const body = bodyStart(clean, match.index + match[0].length - 1);
+    if (body !== -1) found.push(...literalsFrom(clean, body));
+  }
+  // A JSX label attribute matches both collectors; report each string once.
+  const seen = new Set();
+  return found.filter(({ index }) => !seen.has(index) && seen.add(index));
+}
+
+async function filesUnder(directory, suffix) {
+  const result = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...await filesUnder(path, suffix));
+    else if (entry.name.endsWith(suffix)) result.push(path);
+  }
+  return result;
+}
 
 for (const [name, want] of Object.entries(expected)) {
   const project = parse(await readFile(new URL(`../fixtures/${name}/project.yaml`, import.meta.url), "utf8"));
@@ -320,7 +474,7 @@ async function makeContent(mutate = () => {}) {
   await writeFile(researchPath, research.replace("## Identity\n\n", "## Identity\n\nFixture citation. [claim S98]\n\n")); // pons.md is researched now; insert rather than replace the pending line
   const cited = await validateContent(tmp);
   // A feed item citing S99 counts as a citation; a feed item attributed to a skip-tier account warns.
-  const feedItem = (body) => `slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ct\n    title: T\n    body: ${JSON.stringify(body)}\n    account: "@spam"\n    sources: [S99]\n`;
+  const feedItem = (body, kind = "ct") => `slug: pons\nitems:\n  - id: t1\n    date: 2026-08-30\n    kind: ${kind}\n    title: T\n    body: ${JSON.stringify(body)}\n    account: "@spam"\n    sources: [S99]\n`;
   await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n  note: Handle collides with the official account; posts not used as evidence.\n");
   await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("B"));
   const feedCited = await validateContent(tmp);
@@ -331,6 +485,8 @@ async function makeContent(mutate = () => {}) {
   await writeFile(join(tmp, "accounts.yaml"), "- handle: \"@spam\"\n  tier: skip\n  role: kol\n");
   await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("Ape in, this will moon."));
   const hypeFeed = await validateContent(tmp);
+  await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("Ape in, this will moon.", "company"));
+  const hypeCompany = await validateContent(tmp);
   await writeFile(join(tmp, "feed", "pons.yaml"), feedItem("B"));
   const ponsPath = join(tmp, "projects", "pons.yaml");
   const pons = parse(await readFile(ponsPath, "utf8"));
@@ -349,7 +505,8 @@ async function makeContent(mutate = () => {}) {
     assert.ok(!feedCited.warnings.some((w) => w.includes("S99 is never cited")), "an id cited only from a feed item is not 'never cited'");
     assert.ok(feedCited.warnings.some((w) => w.includes("skip-tier account @spam")), "feed item attributed to a skip-tier account warns");
     assert.ok(conductNote.errors.some((e) => e.includes("@spam note: conduct word \"drainer\"")), "conduct word in an account note is an error without --release");
-    assert.ok(hypeFeed.errors.some((e) => e.includes("feed/pons.yaml: t1 body: banned word \"moon\"")), "hype word in a feed body is an error without --release");
+    assert.ok(hypeFeed.warnings.some((e) => e.includes("feed/pons.yaml: t1 body: banned word \"moon\"")) && !hypeFeed.errors.some((e) => e.includes("banned word")), "a hype word in a Talk item (what someone posted) warns, never gates");
+    assert.ok(hypeCompany.errors.some((e) => e.includes("feed/pons.yaml: t1 body: banned word \"moon\"")), "a hype word in an announcement item is an error without --release");
     assert.ok(conductFinding.errors.some((e) => e.includes("projects/pons.yaml: findings.risk") && e.includes("conduct word \"scammer\"")), "conduct word in findings text is an error without --release");
     assert.deepEqual(cited.errors, [], "prose citation validates");
     assert.ok(!cited.warnings.some((w) => w.includes("S98 is never cited")), "an id cited only in research prose is not 'never cited'");
@@ -534,9 +691,11 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   const paused = selectApproved(entries, { sent_keys: [] }, { channel_enabled: false, decisions: {} });
   const projects = new Map([["pons", { name: "Pons" }]]);
   const derived = new Map([["pons", { score: 41, provisional: true, risk: "Elevated", confidence: 64 }]]);
-  const messages = buildMessages(approved, { siteName: "Proofline", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
+  const aboveBar = selectShareBar(approved, { pons: true });
+  const belowBar = selectShareBar(approved, { pons: false });
+  const messages = buildMessages(aboveBar, { siteName: "Icarus", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
   const roundupEntries = approved.map((entry) => ({ ...entry, channel: { ...entry.channel, delivery: "roundup" } }));
-  const roundupMessages = buildMessages(roundupEntries, { siteName: "Proofline", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
+  const roundupMessages = buildMessages(roundupEntries, { siteName: "Icarus", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "https://x.test/", profilePath: "/n/" });
   const chunks = chunkMessage("a".repeat(3000) + "\n\n" + "b".repeat(3000), 4096);
   try {
     assert.equal(unsent.length, 1);
@@ -550,13 +709,17 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.deepEqual(staleApproval, [], "source edits invalidate approval");
     assert.deepEqual(tamperedCopy, [], "copy edits invalidate approval");
     assert.deepEqual(paused, [], "paused channel publishes nothing");
+    assert.equal(aboveBar.length, 1, "name above the generated share bar remains eligible");
+    assert.deepEqual(belowBar, [], "name below the generated share bar is excluded");
     assert.equal(messages.length, 1, "one direct publication produces one card");
-    assert.ok(messages[0].includes("<b>NEW COVERAGE · PONS</b>"), "event kicker");
-    assert.ok(messages[0].includes("41/100 · Elevated risk"), "proofline view");
-    assert.ok(messages[0].includes("64% confidence · Provisional"), "confidence line");
+    assert.ok(messages[0].includes("<b>NEW PROFILE · PONS</b>"), "event kicker");
+    assert.ok(messages[0].includes("<b>Icarus view</b>"), "Icarus view");
+    assert.ok(messages[0].includes("Control 41/100 · evidence 64% · awaiting second review"), "control and evidence line");
     assert.ok(messages[0].includes("https://x.test/n/pons"), "profile link");
+    assert.ok(messages[0].endsWith("Read the full Pons research →</a>"), "event card ends with its link");
     assert.ok(messages[0].includes("A &lt;b&gt;full&lt;/b&gt; research record"), "html escaped");
-    assert.ok(roundupMessages[0].includes("<b>PROOFLINE ROUNDUP · 2026-08-31</b>"), "roundup card");
+    assert.ok(roundupMessages[0].includes("<b>ICARUS ROUNDUP · 2026-08-31</b>"), "roundup card");
+    assert.ok(roundupMessages[0].endsWith("Open research →</a>"), "roundup ends with a card link");
     assert.equal(chunks.length, 2, "chunked");
     assert.deepEqual(readDotEnv("A=1\n# c\nB=\"two words\"\n"), { A: "1", B: "two words" });
     console.log("ok   telegram publications");
@@ -850,6 +1013,249 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.deepEqual(tied.get("r"), { basis: "tvl", position: 3, of: 3, cohort: "oracle / infra" }, "next distinct value skips to 3 (standard competition ranking)");
     console.log("ok   computeRanks");
   } catch (err) { failures++; console.error(`FAIL computeRanks: ${err.message}`); }
+}
+
+// Icarus home/category rules execute from the actual TypeScript module. Lightweight module hooks
+// replace its server-only imports so these fixtures test the exported pure rules without a browser.
+{
+  const dataModule = (source) => `data:text/javascript,${encodeURIComponent(source)}`;
+  const contentServerUrl = pathToFileURL(join(process.cwd(), "site/src/data/content-server.ts")).href;
+  const startMock = dataModule(
+    `export function createServerFn(){const chain={validator(){return chain},handler(fn){return fn}};return chain}`,
+  );
+  const contentMock = dataModule(`export default {}`);
+  const markdownMock = dataModule(
+    `export const parseResearchMarkdown=()=>({sections:[]});export const renderWholeMarkdown=()=>""`,
+  );
+  const typesMock = dataModule(`
+    export const headlineMetric=()=>null;
+    export const DEFAULT_KPIS=["volume24h"];
+    export const SECTION_KPIS={launchpads:["volume24h","launches24h","liquidityUsd","holders"],tokens:["liquidityUsd","volume24h","holders","priceChange24h"]};
+    export const dexScreenerSearchUrl=(value)=>"https://dex.test/"+value;
+    export const explorerTokenUrl=(base,address)=>base+"/token/"+address;
+  `);
+  const hooks = registerHooks({
+    resolve(specifier, context, nextResolve) {
+      if (specifier === "@tanstack/react-start") return { url: startMock, shortCircuit: true };
+      if (specifier === "virtual:proofline-content") return { url: contentMock, shortCircuit: true };
+      if (context.parentURL?.startsWith(contentServerUrl) && specifier === "./markdown")
+        return { url: markdownMock, shortCircuit: true };
+      if (context.parentURL?.startsWith(contentServerUrl) && specifier === "./types")
+        return { url: typesMock, shortCircuit: true };
+      return nextResolve(specifier, context);
+    },
+  });
+  const rules = await import(`${contentServerUrl}?home-rules-test`);
+  hooks.deregister();
+
+  const now = Date.parse("2026-09-02T21:00:00Z");
+  const entry = (slug, overrides = {}) => ({
+    slug,
+    name: slug,
+    symbol: slug.toUpperCase(),
+    role: "subject",
+    officialConfirmed: true,
+    hasContractOn4663: true,
+    shareBarMetric: "liquidity",
+    summary: `${slug} summary`,
+    reviewedAt: "2026-09-01T00:00:00Z",
+    tree: { sectionId: "launchpads" },
+    factoryLaunches24h: 0,
+    kpis: {
+      status: "live",
+      liquidityUsd: 30_000,
+      tvl: null,
+      volume24h: 100,
+      firstPairAt: "2026-09-01T00:00:00Z",
+      readAt: "2026-09-02T21:00:00Z",
+    },
+    ...overrides,
+  });
+  const pons = entry("pons", { kpis: { ...entry("x").kpis, volume24h: 200 } });
+  const ai = entry("artificial-inu", {
+    tree: { sectionId: "tokens" },
+    kpis: { ...entry("x").kpis, volume24h: 300 },
+  });
+  const noxa = entry("noxa", { hasContractOn4663: false });
+  const announced = entry("sight", {
+    hasContractOn4663: false,
+    reviewedAt: "2026-09-02T00:00:00Z",
+    kpis: { ...entry("x").kpis, status: "announced", liquidityUsd: null, volume24h: null, firstPairAt: null },
+  });
+  const olderAnnouncement = entry("wire", {
+    hasContractOn4663: false,
+    reviewedAt: "2026-08-20T00:00:00Z",
+    kpis: { ...entry("x").kpis, status: "announced", liquidityUsd: null, volume24h: null, firstPairAt: null },
+  });
+  try {
+    assert.equal(meetsShareBarCore(pons), true, "Pons clears the shared predicate");
+    assert.equal(rules.meetsShareBar(ai), true, "Artificial Inu clears the site predicate");
+    assert.equal(rules.meetsShareBar(noxa), false, "NOXA without a located contract fails");
+    assert.equal(rules.meetsShareBar(announced), false, "announced names fail the live share bar");
+
+    const trending = rules.trendingNow([pons, ai, noxa, announced], {
+      pons: [{ at: "2026-09-01T21:00:00Z", volume_h24: 100 }],
+    });
+    assert.deepEqual(trending.map((item) => item.entry.slug), ["artificial-inu", "pons"]);
+    assert.equal(trending[0].change24h, null, "change omitted without an earlier snapshot");
+    assert.equal(trending[1].change24h, 100, "change uses the snapshot nearest 24h earlier");
+
+    assert.deepEqual(rules.newLaunches([pons, ai, announced], now).map((item) => item.slug), ["artificial-inu", "pons"]);
+    // New launches is a 14-day list; the launch count is a 24-hour figure. Only names whose
+    // first pool is inside that window come off it.
+    const factory = entry("factory", { factoryLaunches24h: 12 });
+    const launchedToday = entry("hookr", {
+      kpis: { ...entry("x").kpis, firstPairAt: "2026-09-02T09:00:00Z" },
+    });
+    assert.equal(rules.notListedCount([factory], [pons, ai], now), 12, "older listed names never subtract");
+    assert.equal(
+      rules.notListedCount([factory], [launchedToday, pons, ai], now),
+      11,
+      "one launch listed today, two older names left alone",
+    );
+    assert.equal(
+      rules.notListedCount([entry("factory", { factoryLaunches24h: 0 })], [launchedToday], now),
+      0,
+      "never negative",
+    );
+    assert.deepEqual(rules.announcedNow([olderAnnouncement, announced]).map((item) => item.slug), ["sight", "wire"]);
+
+    const leaders = rules.sectionLeaders(
+      { id: "launchpads", label: "Launchpads", description: "" },
+      [pons, announced, olderAnnouncement],
+    );
+    assert.deepEqual(leaders.map((item) => [item.entry.slug, item.announced]), [
+      ["pons", false],
+      ["sight", true],
+      ["wire", true],
+    ]);
+
+    const latest = rules.latestFromIcarus(
+      [{ date: "2026-09-02", slug: "pons", title: "Read", detail: "Detail" }],
+      [{
+        name: { slug: "artificial-inu", symbol: "AI", name: "Artificial Inu" },
+        item: { date: "2026-09-01", title: "Post", body: "Body", kind: "ct", account: "@ai" },
+      }],
+      2,
+    );
+    assert.deepEqual(latest.map((item) => item.kind), ["icarus", "post"]);
+    console.log("ok   Icarus home and category rules");
+  } catch (err) {
+    failures++;
+    console.error(`FAIL Icarus home and category rules: ${err.message}`);
+  }
+
+  // Official surface confirmed: one definition for the site bundle and the score emitter.
+  const censusRow = (overrides = {}) => ({
+    slug: "foxpad",
+    identity: { entity_kind: "protocol", status: "provisional" },
+    official_links: [
+      { kind: "site", url: "https://foxpad.app" },
+      { kind: "x", url: "https://x.com/fox_onrh" },
+    ],
+    // FoxPad's real row: a site link is on file, but the X account belongs to the FOX token and
+    // the pad's own handle is unconfirmed, so the row sits on the watchlist (role observe).
+    qualifying: { citable: { value: true, note: "the pad's own handle is unconfirmed", verified: false } },
+    role: "observe",
+    ...overrides,
+  });
+  const barEntry = (census) => ({
+    officialConfirmed: officialSurfaceConfirmedCore(census),
+    hasContractOn4663: true,
+    shareBarMetric: "liquidity",
+    kpis: { liquidityUsd: 1_000_000, tvl: null },
+  });
+  const foxpad = censusRow();
+  const confirmed = censusRow({ role: "subject" });
+  try {
+    assert.equal(officialSurfaceConfirmedCore(foxpad), false, "a watchlist row is not a confirmed surface");
+    assert.equal(rules.officialSurfaceConfirmed(foxpad), false, "the site reads the same definition");
+    assert.equal(meetsShareBarCore(barEntry(foxpad)), false, "the emitter keeps FoxPad off the share bar");
+    assert.equal(rules.meetsShareBar(barEntry(foxpad)), false, "the site keeps FoxPad off the share bar");
+
+    assert.equal(officialSurfaceConfirmedCore(confirmed), true, "a subject row with a site link confirms even before the second-pass flag");
+    assert.equal(rules.meetsShareBar(barEntry(confirmed)), true, "a confirmed surface still clears the bar");
+    assert.equal(
+      officialSurfaceConfirmedCore(censusRow({ official_links: [{ kind: "x", url: "https://x.com/fox_onrh" }] })),
+      false,
+      "an X account alone is not an official surface",
+    );
+    assert.equal(
+      officialSurfaceConfirmedCore({ ...confirmed, identity: { entity_kind: "protocol", status: "conflicted" } }),
+      false,
+      "a conflicted identity is never confirmed",
+    );
+    assert.equal(
+      officialSurfaceConfirmedCore({ slug: "x", identity: { status: "verified" }, official_links: [{ kind: "docs", url: "https://d.test" }] }),
+      true,
+      "a row without a qualifying block or role reads as a subject with links",
+    );
+    assert.equal(officialSurfaceConfirmedCore(undefined), false, "a name with no registry row is never confirmed");
+    console.log("ok   official surface confirmed");
+  } catch (err) {
+    failures++;
+    console.error(`FAIL official surface confirmed: ${err.message}`);
+  }
+}
+
+// Reader vocabulary: inspect only text and literal values that can render from JSX; identifiers,
+// route parameters and comments remain free to use the content-system's internal terms.
+{
+  const hits = [];
+  const sources = [
+    ...await filesUnder("site/src", ".tsx"),
+    ...(await filesUnder("site/src", ".ts")).filter((file) => !file.endsWith("routeTree.gen.ts")),
+  ].sort();
+  for (const file of sources) {
+    const source = await readFile(file, "utf8");
+    for (const fragment of jsxVisibleStrings(source)) {
+      for (const word of readerWordHits(fragment.text)) {
+        const line = source.slice(0, fragment.index).split("\n").length;
+        hits.push(`${file}:${line}: ${word} in ${JSON.stringify(fragment.text.trim())}`);
+      }
+    }
+  }
+  const methodology = await readFile("content/methodology.md", "utf8");
+  for (const word of readerWordHits(methodology)) {
+    const match = methodology.match(new RegExp(`\\b${word.replace(" ", "\\s+")}\\b`, "i"));
+    const line = methodology.slice(0, match?.index ?? 0).split("\n").length;
+    hits.push(`content/methodology.md:${line}: ${word}`);
+  }
+  const fixture = jsxVisibleStrings([
+    'const dossier = "stub"; // coverage',
+    '<div title="packet">Reader copy</div>',
+    'const KPI_LABEL = { one: "cohort share" };',
+    'type Row = { label: string; note: string };',
+    'function reportedTitle(as: string): string { return `not verified by Proofline`; }',
+  ].join("\n")).flatMap((fragment) => readerWordHits(fragment.text));
+  try {
+    assert.deepEqual(
+      fixture,
+      ["packet", "cohort", "Proofline"],
+      "scanner reads visible literals, label maps and label helpers, but allows identifiers, comments, types and internal strings",
+    );
+    assert.deepEqual(hits, [], hits.join("\n"));
+    console.log("ok   reader vocabulary");
+  } catch (err) {
+    failures++;
+    console.error(`FAIL reader vocabulary: ${err.message}`);
+  }
+}
+
+
+// A name's own words are not hype: GIGA may say "giga"; unrelated hype words still fire.
+{
+  try {
+    const own = ownWordSet({ slug: "giga", name: "Giga", identity: { aliases: ["GIGA token"], symbols: ["GIGA"] } }, { name: "Giga", symbol: "GIGA" });
+    assert.ok(own.has("giga") && own.has("token"), "own words carry name, symbol and alias parts");
+    const kept = filterOwnWords(['feed/giga.yaml: x title: banned word "giga"', 'feed/giga.yaml: x body: banned word "moon"'], own);
+    assert.deepEqual(kept, ['feed/giga.yaml: x body: banned word "moon"'], "only the own word is dropped");
+    assert.equal(filterOwnWords(['a: banned word "giga"'], new Set()).length, 1, "no own words, nothing dropped");
+    console.log("ok   own words are not hype");
+  } catch (err) {
+    failures++;
+    console.error(`FAIL own words are not hype: ${err.message}`);
+  }
 }
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }

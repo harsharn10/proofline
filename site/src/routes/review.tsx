@@ -27,7 +27,7 @@ const FILTERS: Array<ReviewStatus | "all"> = [
 ];
 const STATUSES: ReviewStatus[] = ["pending", "approved", "roundup", "held", "site-only", "sent"];
 const EVENTS: Array<{ value: ChannelEvent; label: string }> = [
-  { value: "new-coverage", label: "New coverage" },
+  { value: "new-coverage", label: "New profile" },
   { value: "research-update", label: "Research update" },
   { value: "risk-alert", label: "Risk alert" },
   { value: "correction", label: "Correction" },
@@ -55,6 +55,12 @@ function copyForRequest(copy: ChannelPublication): ChannelPublication {
     ...(why?.length ? { why_it_matters: why } : {}),
     ...(copy.watch_next?.trim() ? { watch_next: copy.watch_next.trim() } : {}),
   };
+}
+
+function readerView(value: string): string {
+  return value
+    .replace("Research pending / insufficient evidence", "Not yet reviewed")
+    .replace("Provisional", "awaiting second review");
 }
 
 function ReviewPage() {
@@ -447,8 +453,8 @@ function TelegramPreview({ item, draft }: { item: ReviewQueueItem; draft: Channe
         </div>
       ) : null}
       <div>
-        <b>Proofline view</b>
-        <p>{item.prooflineView}</p>
+        <b>Icarus view</b>
+        <p>{readerView(item.prooflineView)}</p>
       </div>
       {draft.watch_next ? (
         <div>
@@ -459,8 +465,8 @@ function TelegramPreview({ item, draft }: { item: ReviewQueueItem; draft: Channe
       {draft.event === "trending" ? (
         <em>Trending measures attention — not quality or endorsement.</em>
       ) : null}
-      <a tabIndex={-1}>Read the full {item.projectName} research →</a>
-      <em>Research opinion only — not an audit, guarantee or investment advice.</em>
+      <em>Icarus is powered by Project Proofline. Automated research may be incomplete or inaccurate. This is not investment advice; read the sources and do your own research.</em>
+      <a href={`/n/${item.entry.slug}`} tabIndex={-1}>Read the full {item.projectName} research →</a>
     </section>
   );
 }

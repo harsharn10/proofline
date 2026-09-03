@@ -1,0 +1,124 @@
+slug: flops
+name: FLOPS
+symbol: FLOPS
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 pool quoted against NVDA, the NVIDIA Robinhood Stock Token at 0xd060…9EEC. Traders buy and sell FLOPS on that book. NVDA is the rail. This token is not the NVIDIA stock token and is not the AI, microduck, ORBIO, or RIPE NVDA books. No official project domain was located this pass.
+themes:
+  - memecoin
+  - stock-paired:nvda
+  - rwa
+official_links:
+  - kind: app
+    url: https://app.long.xyz/tokens/0x9dad613c96bd6e9d0f4fd840d53557dc5ede1e18
+  - kind: x
+    url: https://x.com/Flops_rh
+dependencies: []
+deployments:
+  - label: FLOPS token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x9DAD613c96Bd6E9D0f4fd840D53557Dc5EdE1e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S5
+  - label: DopplerERC20V1Factory (token creator)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S5
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S4
+      - S5
+      - S12
+  - label: NVIDIA • Robinhood Token (pair quote rail)
+    chain: robinhood-chain
+    address: "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S7
+      - S10
+      - S11
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S15
+metrics:
+  - kind: volume_24h
+    value: 516844.27
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 118647.59
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 219198
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 783
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/NVDA/Airlock/launcher and the create tx, RPC name/symbol/owner/getAssetData, DexScreener, Gecko pool/token, /rhj/assets, @Flops_rh, and @_laseasy were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-10] - Numbers: 501817.71 is the Gecko FLOPS/NVDA pool 24h volume, not the 503411.98 token all-pools figure. Reserve 102719.87 is that pool. DexScreener 516844.27 / 118647.59 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this FLOPS is packed AI, microduck, ORBIO, or RIPE, is in-flight KOLI, is the NVDA stock token, or is Flops Network. Different CAs, pair ids, and (for NVDA) /rhj/assets argue against those."
+      class: inference
+      sources:
+        - S7
+        - S10
+        - S16
+    - text: Quote token NVDA 0xd060…9EEC is the Robinhood Token rail in GET /rhj/assets; FLOPS is not in that registry. [verified R-10 R-11] - Pool USD reserve is FLOPS plus NVDA, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko reserve $102720 vs DexScreener liquidity $118648 on the same pool. [claim R-7 R-8] - No official handle or domain this pass; @Flops_rh is a third-party-link. [claim R-7 R-13] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x9DAD…1e18? Next: re-read DexScreener token profile after a Claim Profile; retry app.long.xyz; search new posts that embed the CA and a handle"
+    - text: "Does @longdotxyz or @Natan_benish name this CA as a Long mascot, or is that only third-party lore? Next: open the Farcaster/Zora casts if a public API returns text; watch @longdotxyz for a CA pin"
+    - text: "Does verified DopplerERC20V1 / LongLauncher source leave a privileged path after owner() is Airlock? Next: read create and Airlock getAssetData in verified source on the explorer"
+    - text: "Which aggregator slice should a card use when Gecko reserve is $103k and DexScreener liquidity is $119k? Next: keep both figures labeled by source until a verifier picks one"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

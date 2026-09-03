@@ -6,8 +6,7 @@
 //   node scripts/telegram-digest.mjs --all --limit 5      ignore sent-state, cap entries
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { loadContent } from "./lib/load.mjs";
-import { derive } from "./lib/score.mjs";
-import { selectApproved, buildMessages, readDotEnv, entryKey } from "./lib/telegram.mjs";
+import { selectApproved, selectShareBar, buildMessages, readDotEnv, entryKey } from "./lib/telegram.mjs";
 
 const args = process.argv.slice(2);
 const flag = (n) => args.includes(n);
@@ -43,13 +42,23 @@ if (testOnly) {
   console.log("Test message sent. No digest state changed.");
   process.exit(0);
 }
-let entries = selectApproved(content.changelog, state, review, { since, all })
+let derivedFile;
+try {
+  derivedFile = JSON.parse(await readFile("build/derived.json", "utf8"));
+} catch {
+  console.error("Icarus needs build/derived.json before Telegram can apply the share bar. Run npm run score first.");
+  process.exit(1);
+}
+let entries = selectShareBar(
+  selectApproved(content.changelog, state, review, { since, all }),
+  derivedFile.shareBar,
+)
   .sort((a, b) => a.date.localeCompare(b.date) || a.slug.localeCompare(b.slug));
 if (limit > 0) entries = entries.slice(0, limit);
 if (!entries.length) {
   const reason = review.channel_enabled === true
-    ? "No approved, unsent research changes — nothing sent."
-    : "Channel delivery is paused in ops/telegram-review.json — nothing sent.";
+    ? "Icarus: no approved, unsent updates above the share bar — nothing sent."
+    : "Icarus channel delivery is paused in ops/telegram-review.json — nothing sent.";
   console.log(reason);
   process.exit(0);
 }
@@ -61,7 +70,7 @@ if (markSent) {
   process.exit(0);
 }
 
-const derivedBySlug = new Map([...content.projects].map(([slug, p]) => [slug, derive(p)]));
+const derivedBySlug = new Map(Object.entries(derivedFile.projects ?? {}));
 const messages = buildMessages(entries, {
   siteName: content.site.name, date: entries[entries.length - 1].date,
   projects: content.projects, derivedBySlug, siteUrl, profilePath,

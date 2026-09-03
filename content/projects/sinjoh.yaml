@@ -2,23 +2,96 @@ slug: sinjoh
 name: Sinjoh
 symbol: INJOH
 category: Fee-routing protocol
-lifecycle: announced
+lifecycle: mainnet
+lifecycle_source: pulled 0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D 2026-07-31T00:40:38.000Z
 coverage: stub
-summary: "Fee router: launch and creator fees are bought back into PONS and NVDA airdrops and INJOH burns per the project; Yield Banks and raffle products are announced."
+summary: A fee-routing layer on top of Robinhood Chain launchpads. Creators launch through Sinjoh on Pons, Flap, pools.trade or LetsCash; collected fees hit a per-launch router that splits, swaps, airdrops, burns or adds liquidity on a config locked at deploy. Holders of customer tokens receive those routed assets. INJOH is the protocol token, launched on Pons. sinjoh.com and @SinjohDeFi run the surface.
 official_links:
   - kind: x
     url: https://x.com/SinjohDeFi
+  - kind: site
+    url: https://www.sinjoh.com
+  - kind: app
+    url: https://app.sinjoh.com
+  - kind: github
+    url: https://github.com/Sinjoh-Finance/sinjoh-contracts
 dependencies:
   - stock-tokens
 deployments:
-  - label: INJOH token (account bio)
+  - label: INJOH token (PonsLauncherToken)
     chain: robinhood-chain
     address: "0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D"
     role: token
-    verified: false
+    verified: true
     sources:
       - S2
       - S3
+      - S7
+      - S8
+      - S9
+  - label: INJOH/WETH Uniswap v3 pair
+    chain: robinhood-chain
+    address: "0xB09fa4f04032b9d9e690ac4a1d29523b5f9A72DC"
+    role: other
+    verified: true
+    sources:
+      - S9
+      - S10
+      - S6
+      - S28
+  - label: INJOH SinjohFeeRouter clone
+    chain: robinhood-chain
+    address: "0x7E97EadeA120321c65CC09B6FDECc6Eb15D55b2f"
+    role: router
+    verified: false
+    sources:
+      - S9
+      - S12
+      - S13
+  - label: SinjohFeeRouter implementation
+    chain: robinhood-chain
+    address: "0x17c76Ff58b7Da12E116bb22ebDcc7F31Cadf9B64"
+    role: implementation
+    verified: false
+    sources:
+      - S12
+      - S13
+      - S18
+  - label: SinjohFeeRouterFactory
+    chain: robinhood-chain
+    address: "0xFA51E67f799699A237D558F5FbE7B170F8c5584d"
+    role: factory
+    verified: false
+    sources:
+      - S12
+      - S14
+      - S18
+  - label: PonsLaunchFactory (INJOH creator)
+    chain: robinhood-chain
+    address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+    role: factory
+    verified: false
+    sources:
+      - S7
+      - S9
+      - S11
+  - label: SinjohRevenueCollector
+    chain: robinhood-chain
+    address: "0x5Bb7582557F5be30b62c335Ad3ccf4bA79E138c5"
+    role: other
+    verified: false
+    sources:
+      - S15
+      - S18
+  - label: Revenue-collector owner / GitHub governance key
+    chain: robinhood-chain
+    address: "0x39E2f5eFdFd808F26B98979a06BA11ea82E1C85f"
+    role: admin
+    verified: false
+    sources:
+      - S15
+      - S16
+      - S18
 review:
   researcher: harsharn10
   approver: pending
@@ -32,12 +105,85 @@ findings:
       sources:
         - S3
         - S2
-  risk: []
+    - text: "Receipts: site, app piggy-banks page, X profile and named status URLs, DexScreener token API, DefiLlama protocol/sinjoh (404), GitHub AUDITS.md and mainnet-deployments.json, and Blockscout address/tx/token APIs plus RPC eth_getCode/eth_call were opened on 2026-09-02; excerpts are copied from those responses."
+      class: verified
+      sources:
+        - S4
+        - S7
+        - S9
+        - S6
+    - text: "Numbers: volume 940940.38 and marketCap 2338177 are the Uniswap v3 INJOH/WETH pair slice, not all INJOH pairs and not protocol TVL. holders 2292 and totalSupply 1e27 are Blockscout/RPC token fields. Project $48k airdrop and 4.5% burn figures are posts."
+      class: claim
+      sources:
+        - S6
+        - S8
+        - S20
+  risk:
+    - text: "Adversarial: the strongest contrary reading is that Sinjoh is a Pons clone, the census Safehood pad, or still announced because the 2026-08-31 census row used only project posts. The launch tx is launchPonsToken from a SinjohFeeRouter clone; Pons is the factory, not the router. $SAFEHOOD is a customer CA, not safehood.fun. Token, pair and router exist on 4663 with verified source."
+      class: inference
+      sources:
+        - S9
+        - S12
+        - S25
+    - text: Revenue collector owner is one EOA (0x39E2…) with no timelock reproduced.
+      class: verified
+      sources:
+        - S15
+        - S16
+    - text: INJOH fee-router clone config and post-deploy setters were not read; owner() reverts.
+      class: verified
+      sources:
+        - S12
+    - text: Posted INJOH burns do not reduce totalSupply(), which is still 1e27.
+      class: verified
+      sources:
+        - S8
+    - text: No independent audit report of the deployed Sinjoh set.
+      class: unknown
+    - text: Piggy Banks collection address and mint completion are unpublished after a 2026-09-02 postpone.
+      class: claim
+      sources:
+        - S23
+        - S27
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from the bio not reproduced on Blockscout
     - text: Router contract not located
     - text: Who sets the fee split
     - text: An independent audit was not found in this review
+    - text: "What config is stored on INJOH's fee-router clone 0x7E97…5b2f, and which key can change a split after launch? Next: eth_call the verified SinjohFeeRouter readers (buckets, recipients, paused) on the clone and record setter access"
+    - text: "Which keys can set the revenue-collector processor and pause routing, and is there a timelock? Next: read verified SinjohRevenueCollector source for setProcessor / pause and any delay"
+    - text: "Is github.com/Sinjoh-Finance/sinjoh-contracts linked from an official surface? Next: record a site or @SinjohDeFi link if one appears"
+    - text: "Did the Piggy Banks collection mint, and what is the collection address? Next: watch @SinjohDeFi and app.sinjoh.com/piggy-banks for a collection address and reproduce it on 4663"
+    - text: "How were posted INJOH burns executed if totalSupply is still 1e27? Next: trace Transfer to 0x000…dead or a named sink from the fee-router clone"
+    - text: "Is there a DefiLlama adapter / chain-slice TVL for Sinjoh? Next: re-query after any listing; do not treat DexScreener pair liquidity as protocol TVL"
+    - text: "Is there an official Telegram or Discord? Next: record a handle if the site footer or @SinjohDeFi bio adds one"
   unresolved:
     - text: The router contract that collects and splits fees was not located; airdrop and burn figures are the project's own.
+themes:
+  - launchpad
+  - rwa
+  - stock-paired:nvda
+  - nft
+  - vault
+metrics:
+  - kind: volume_24h
+    value: 940940.38
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S6
+  - kind: market_cap
+    value: 2338177
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S6
+  - kind: holders
+    value: 2292
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S8

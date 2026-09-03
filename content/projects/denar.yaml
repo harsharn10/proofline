@@ -2,32 +2,112 @@ slug: denar
 name: Denar
 symbol: DENAR
 category: Isolated lending market
-lifecycle: announced
+lifecycle: mainnet
+lifecycle_source: pulled 0x3786728a2c49c4617bf4fe5bd82b90b6b0df5508 2026-08-30T21:37:55.000Z
 coverage: stub
-summary: "Isolated money market for tokenized equities on Robinhood Chain, priced by Chainlink: lend USD or borrow against Stock Tokens; live since 2026-08-30 per the project."
+summary: The chain's isolated money market for tokenized stocks. Lenders deposit USDG into an ERC-4626 vault that allocates behind per-market caps; borrowers post NVDA, AAPL, SPY or other listed tokens and draw USDG without selling. Equity books use Chainlink prices; PONS uses a Uniswap TWAP and a separate vault. @DenarMarkets runs denar.markets.
 official_links:
   - kind: x
     url: https://x.com/DenarMarkets
+  - kind: site
+    url: https://www.denar.markets
+  - kind: app
+    url: https://www.denar.markets/app
+  - kind: docs
+    url: https://docs.denar.markets
 dependencies:
   - chainlink
   - stock-tokens
   - usdg
 deployments:
-  - label: DENAR token (posted by the project 30 Aug)
+  - label: DENAR token (PonsV2LauncherToken)
     chain: robinhood-chain
-    address: "0x3786728a2c49c4617bf4fe5bd82b90b6b0df5508"
+    address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
     role: token
-    verified: false
+    verified: true
     sources:
       - S2
       - S3
       - S4
+      - S14
+      - S15
+      - S16
   - label: Isolated market contracts
     chain: robinhood-chain
     address: not-verified
     role: vault
     verified: false
     sources: []
+  - label: Denar Morpho Blue (equity lending core)
+    chain: robinhood-chain
+    address: "0xf0A0a33729270586cDD66010B1cedE649745c3A5"
+    role: other
+    verified: true
+    sources:
+      - S9
+      - S19
+      - S18
+  - label: AdaptiveCurveIrm (Denar instance)
+    chain: robinhood-chain
+    address: "0x9316E7eDAB60eF0f489b1E4D11DDcDaa560aCbfD"
+    role: other
+    verified: false
+    sources:
+      - S9
+      - S18
+  - label: Denar USDG Vault (dnUSDG, MetaMorphoV1_1)
+    chain: robinhood-chain
+    address: "0xF0E6AD006080c48766ddb95b8c568D72bC059050"
+    role: vault
+    verified: true
+    sources:
+      - S9
+      - S20
+      - S21
+      - S18
+  - label: MetaMorphoV1_1Factory
+    chain: robinhood-chain
+    address: "0x99a0bD825beDA579794F3f715ab3984310C7226E"
+    role: factory
+    verified: false
+    sources:
+      - S9
+      - S22
+  - label: DenarLiquidator (equity)
+    chain: robinhood-chain
+    address: "0x4d61E8a7eF442eb077650D349781F2cc3Ebe42d1"
+    role: other
+    verified: false
+    sources:
+      - S9
+      - S23
+  - label: Denar Frontier USDG (dnFRONT)
+    chain: robinhood-chain
+    address: "0x338b2f252dae1deb00Afb700128e592a19F8918c"
+    role: vault
+    verified: true
+    sources:
+      - S9
+      - S18
+      - S25
+  - label: Protocol owner / deployer
+    chain: robinhood-chain
+    address: "0xdCB002787Fb86873051b838582063517FDc47c6F"
+    role: admin
+    verified: true
+    sources:
+      - S9
+      - S10
+      - S24
+      - S18
+  - label: Morpho Blue (canonical; not Denar-owned)
+    chain: robinhood-chain
+    address: "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010"
+    role: other
+    verified: false
+    sources:
+      - S9
+      - S18
 review:
   researcher: harsharn10
   approver: pending
@@ -45,6 +125,18 @@ findings:
       class: claim
       sources:
         - S2
+    - text: "Receipts: www.denar.markets HTML, docs.denar.markets pages (how-it-works, contracts, governance, token, fees, changelog, dUSD), X profile and named status URLs, Blockscout address/token/tx/smart-contract APIs, DexScreener token-pairs, DefiLlama protocol/denar (400), GitHub org 404s, t.me previews, and RPC eth_getCode/eth_call were opened on 2026-09-03; excerpts are copied from those responses."
+      class: verified
+      sources:
+        - S7
+        - S9
+        - S14
+        - S17
+        - S18
+    - text: "Numbers: 28709.75 USDG is `totalAssets()` on dnUSDG, not a DefiLlama row; 606232.57 USD is DexScreener Uniswap v4 DENAR/ETH volume.h24, not an all-pairs or all-chains total; 1374 is Blockscout holders_count; cap figures in events are official posts, not the vault print. [verified R-9 R-11 R-12]"
+      class: claim
+      sources:
+        - S27
   risk:
     - text: An independent audit was not found in this review; the dossier records the protocol as day-one with dUSD not yet live.
       class: claim
@@ -55,6 +147,41 @@ findings:
       sources:
         - S5
         - S3
+    - text: 'Adversarial: the strongest contrary reading is that Denar is Longbow or Arrow, or that census `announced` still holds because Morpho marketIds were not eth_called, or that the Pons token is unrelated to the lending stack. Token name Denar Markets, site footer CA, docs CA, launchToken socials field, vault name Denar USDG Vault, and the site↔handle cross-link argue against a merge; the pool and contracts on 4663 meet the mainnet bar even while market-id params stay docs claims. Docs "no public sale" versus the Pons launch remains an open conflict.'
+      class: inference
+      sources:
+        - S7
+        - S11
+        - S14
+        - S16
+        - S17
+    - text: Protocol owner, vault owner, liquidator owner, fee recipient and Frontier curator are one EOA with no code; equity vault curator and guardian are unset.
+      class: verified
+      sources:
+        - S18
+        - S24
+    - text: Token docs state there has been no public sale and that distribution publishes at generation; the token was created by Pons v2 `launchToken` and has 1374 holders plus a Uniswap v4 book.
+      class: disputed
+      sources:
+        - S11
+        - S16
+        - S17
+    - text: "The 31 Aug listing vote tagged `ethereum:0x07f5b682…`; that address has no code on 4663. Flag: wrong-chain, ca-collision."
+      class: verified
+      sources:
+        - S32
+        - S40
+    - text: No external audit report was located; docs cite an internal review and a planned external audit. [claim R-4 R-6]
+      class: unknown
+    - text: dUSD is documented as not deployed.
+      class: claim
+      sources:
+        - S38
+    - text: Frontier vault and adapter are not indexed as contracts on Blockscout this pass despite non-empty RPC code.
+      class: verified
+      sources:
+        - S18
+        - S25
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from the project's post not reproduced on Blockscout
@@ -63,5 +190,46 @@ findings:
     - text: An independent audit was not found in this review
     - text: dUSD not live
     - text: Site URL not in the intake
+    - text: "What are the Morpho marketIds for NVDA/AAPL/MSFT/TSLA/SPY/QQQ/PONS, and do idToMarketParams on 0xf0A0a337… and 0x9D53d5… match the documented oracles, LLTVs and loan/collateral tokens? Next: read supplyQueue(i) on dnUSDG and Frontier, then idToMarketParams on both Morpho cores"
+    - text: "Who submits and accepts caps while curator() is 0x0 on dnUSDG, and which allocator addresses are set? Next: eth_call isAllocator for the admin and any bot addresses; scan submitCap logs"
+    - text: "Is there an external audit whose scope and commit match the deployed Morpho instance, vault, oracles and liquidator? Next: open any report URL the project posts and match commit/address scope"
+    - text: "Why does Blockscout report Frontier 0x338b2f25… and adapter 0xF2656B32… as is_contract false when RPC returns bytecode, and is Frontier source-verified anywhere? Next: re-query explorer after indexing; verify source if a publish lands"
+    - text: "Is the 10% Morpho protocol fee encoded on 0xf0A0a337… per market, and does 10% of fees buy and burn BACKED as the partnership page states? Next: eth_call Morpho fee(id) / feeRecipient for each market and trace fee transfers"
+    - text: "Are t.me/DenarMarkets or t.me/denarmarkets official, and is there a public repository? Next: record a handle or repo only if the site or X bio links it"
   unresolved:
     - text: Which contract holds lender deposits is unknown.
+    - text: Token docs state there has been no public sale and that distribution publishes at generation; the token was created by Pons v2 `launchToken` and has 1374 holders plus a Uniswap v4 book.
+    - text: other remains unresolved (CON-1).
+themes:
+  - lending
+  - rwa
+  - vault
+  - stock-paired:nvda
+metrics:
+  - kind: tvl
+    value: 28709.75
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S18
+  - kind: volume_24h
+    value: 606232.57
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17
+  - kind: holders
+    value: 1374
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15
+  - kind: market_cap
+    value: 862633.35
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15

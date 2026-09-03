@@ -1,0 +1,151 @@
+slug: ripe
+name: Ripe Protocol
+symbol: RIPE
+category: RWA lending market
+lifecycle: mainnet
+coverage: stub
+summary: A lending protocol that mints GREEN against tokenized stocks. Users deposit NVIDIA • Robinhood Token and other registry assets into Ripe vaults and borrow GREEN. Token 0x4D3f…883b is verified RipeToken on chain 4663; Uniswap v2 RIPE/NVDA 0x9b85…769D is protocol pool2, not a pad graduation. ripe.finance and @ripe_dao operate it.
+themes:
+  - lending
+  - rwa
+  - stock-paired:nvda
+  - stablecoin
+official_links:
+  - kind: site
+    url: https://www.ripe.finance
+  - kind: app
+    url: https://app.ripe.finance/robinhood/leaderboard
+  - kind: docs
+    url: https://docs.ripe.finance
+  - kind: x
+    url: https://x.com/ripe_dao
+  - kind: github
+    url: https://github.com/Ripe-Foundation/ripe-protocol
+  - kind: discord
+    url: https://discord.gg/hightop
+dependencies: []
+deployments:
+  - label: RIPE token (RipeToken.vy)
+    chain: robinhood-chain
+    address: "0x4D3f37a965b21aB4122e92Dd41D2693E742c883b"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S14
+  - label: RipeHq registry
+    chain: robinhood-chain
+    address: "0xD4e82AE1De673bba3B53386A2D2C630AE6630940"
+    role: other
+    verified: true
+    sources:
+      - S2
+      - S6
+      - S14
+  - label: RipeGov (governance vault)
+    chain: robinhood-chain
+    address: "0xFa767a19c0C2B80D5A8d5b88be67de153Df1b2f2"
+    role: vault
+    verified: false
+    sources:
+      - S3
+      - S14
+  - label: RIPE/NVDA Uniswap v2 pair (Llama pool2)
+    chain: robinhood-chain
+    address: "0x9b8537bE0FD5cf9B2AD495C5A85130D5bAe4769D"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S7
+      - S8
+  - label: NVIDIA • Robinhood Token (pair quote / collateral rail)
+    chain: robinhood-chain
+    address: "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S7
+      - S12
+      - S16
+  - label: GREEN token
+    chain: robinhood-chain
+    address: "0x355bB7F0f6c730e4460d620420a300fa08FF82F3"
+    role: token
+    verified: false
+    sources:
+      - S6
+      - S14
+  - label: UniswapV2Factory (pair.factory)
+    chain: robinhood-chain
+    address: "0x8bcEaA40B9AcdfAedF85AdF4FF01F5Ad6517937f"
+    role: factory
+    verified: false
+    sources:
+      - S5
+      - S17
+  - label: CCIP admin Safe (token getCCIPAdmin / constructor)
+    chain: robinhood-chain
+    address: "0xe488a42D33b3Af5d3E5Cd5680938d8369716D1bf"
+    role: multisig
+    verified: false
+    sources:
+      - S5
+      - S18
+metrics:
+  - kind: volume_24h
+    value: 1167264.78
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 304746.4
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S13
+  - kind: market_cap
+    value: 935328.28
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 966
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/hq/gov/pair/factory/Safe and the create tx, RPC name/ripeHq/getAddr/getPair, DexScreener, Gecko pool/token, Llama protocol+adapter, ripe.finance + addresses API, /rhj/assets, CoinGecko platforms, GitHub RipeToken.vy, docs audits page, and @ripe_dao posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12 R-14] - Numbers: 1167264.78 is the Gecko RIPE/NVDA pool 24h volume, not the 1242637.37 token all-pools figure. Reserve 221791.89 is that pool. Llama 304746.40 is protocol TVL. DexScreener 1168258.89 / 221537.34 is the same pair, different aggregator. [claim R-7 R-8 R-9 R-13] - Adversarial: the assignment read this as a pad graduation vs a separate Llama Ripe Protocol. On-chain, CoinGecko, ripe.finance API and the Llama adapter use the same RH CA; this packet stays slug ripe and does not invent a second census row."
+      class: inference
+      sources:
+        - S14
+        - S19
+        - S21
+    - text: Gecko/DexScreener marketCap (~$4.1M) is not pool FDV (~$935k) and may mix Base RIPE. [verified R-7 R-8 R-19] - Pool USD reserve is RIPE plus NVDA, not a USDG backstop. [claim R-7 R-8] - RipeToken pause/mint and Safe CCIP admin were not fully mapped. [verified R-5] - Audit PDF scope vs the 4663 deploy was not opened. [claim R-22] - Discord is aggregator-linked only.
+      class: claim
+      sources:
+        - S7
+  missing:
+    - text: "Why do Gecko/DexScreener marketCap (~$4.1M) exceed pool fdv (~$935k), and is that Base circulating mixed with RH supply? Next: read CoinGecko market_data circulating_supply vs each platform total_supply"
+    - text: "Which addresses hold the RIPE/NVDA UNI-V2 LP, and how much sits in RipeGov vs others? Next: Blockscout token holders for 0x9b85…769D and balanceOf(RipeGov)"
+    - text: "Who controls Safe 0xe488…d1bf (getCCIPAdmin) and can it mint or pause RIPE on 4663? Next: Safe owners/threshold on Blockscout and mint/pause modifiers in RipeToken.vy"
+    - text: "Do the ChainSecurity and Anatomist PDFs cover the Robinhood RipeHq/RipeToken deploy? Next: open both PDFs and match contract names/addresses to 4663"
+    - text: "Is discord.gg/hightop linked from ripe.finance or only aggregators? Next: re-read ripe.finance footer and docs community page"
+  unresolved: []

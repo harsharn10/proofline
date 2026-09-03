@@ -11,11 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChangelogRouteImport } from './routes/changelog'
+import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReviewRouteImport } from './routes/review'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as DIdRouteImport } from './routes/d.$id'
 import { Route as NSlugRouteImport } from './routes/n.$slug'
+import { Route as SIdRouteImport } from './routes/s.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -25,6 +29,11 @@ const IndexRoute = IndexRouteImport.update({
 const ChangelogRoute = ChangelogRouteImport.update({
   id: '/changelog',
   path: '/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DisclaimerRoute = DisclaimerRouteImport.update({
+  id: '/disclaimer',
+  path: '/disclaimer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedRoute = FeedRouteImport.update({
@@ -37,9 +46,19 @@ const MethodologyRoute = MethodologyRouteImport.update({
   path: '/methodology',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReviewRoute = ReviewRouteImport.update({
   id: '/review',
   path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DIdRoute = DIdRouteImport.update({
@@ -52,73 +71,106 @@ const NSlugRoute = NSlugRouteImport.update({
   path: '/n/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SIdRoute = SIdRouteImport.update({
+  id: '/s/$id',
+  path: '/s/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
+  '/disclaimer': typeof DisclaimerRoute
   '/feed': typeof FeedRoute
   '/methodology': typeof MethodologyRoute
+  '/privacy': typeof PrivacyRoute
   '/review': typeof ReviewRoute
+  '/terms': typeof TermsRoute
   '/d/$id': typeof DIdRoute
   '/n/$slug': typeof NSlugRoute
+  '/s/$id': typeof SIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
+  '/disclaimer': typeof DisclaimerRoute
   '/feed': typeof FeedRoute
   '/methodology': typeof MethodologyRoute
+  '/privacy': typeof PrivacyRoute
   '/review': typeof ReviewRoute
+  '/terms': typeof TermsRoute
   '/d/$id': typeof DIdRoute
   '/n/$slug': typeof NSlugRoute
+  '/s/$id': typeof SIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
+  '/disclaimer': typeof DisclaimerRoute
   '/feed': typeof FeedRoute
   '/methodology': typeof MethodologyRoute
+  '/privacy': typeof PrivacyRoute
   '/review': typeof ReviewRoute
+  '/terms': typeof TermsRoute
   '/d/$id': typeof DIdRoute
   '/n/$slug': typeof NSlugRoute
+  '/s/$id': typeof SIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/changelog'
+    | '/disclaimer'
     | '/feed'
     | '/methodology'
+    | '/privacy'
     | '/review'
+    | '/terms'
     | '/d/$id'
     | '/n/$slug'
+    | '/s/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/changelog'
+    | '/disclaimer'
     | '/feed'
     | '/methodology'
+    | '/privacy'
     | '/review'
+    | '/terms'
     | '/d/$id'
     | '/n/$slug'
+    | '/s/$id'
   id:
     | '__root__'
     | '/'
     | '/changelog'
+    | '/disclaimer'
     | '/feed'
     | '/methodology'
+    | '/privacy'
     | '/review'
+    | '/terms'
     | '/d/$id'
     | '/n/$slug'
+    | '/s/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChangelogRoute: typeof ChangelogRoute
+  DisclaimerRoute: typeof DisclaimerRoute
   FeedRoute: typeof FeedRoute
   MethodologyRoute: typeof MethodologyRoute
+  PrivacyRoute: typeof PrivacyRoute
   ReviewRoute: typeof ReviewRoute
+  TermsRoute: typeof TermsRoute
   DIdRoute: typeof DIdRoute
   NSlugRoute: typeof NSlugRoute
+  SIdRoute: typeof SIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -137,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChangelogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/disclaimer': {
+      id: '/disclaimer'
+      path: '/disclaimer'
+      fullPath: '/disclaimer'
+      preLoaderRoute: typeof DisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/feed': {
       id: '/feed'
       path: '/feed'
@@ -151,11 +210,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MethodologyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/review': {
       id: '/review'
       path: '/review'
       fullPath: '/review'
       preLoaderRoute: typeof ReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/d/$id': {
@@ -172,17 +245,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/s/$id': {
+      id: '/s/$id'
+      path: '/s/$id'
+      fullPath: '/s/$id'
+      preLoaderRoute: typeof SIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChangelogRoute: ChangelogRoute,
+  DisclaimerRoute: DisclaimerRoute,
   FeedRoute: FeedRoute,
   MethodologyRoute: MethodologyRoute,
+  PrivacyRoute: PrivacyRoute,
   ReviewRoute: ReviewRoute,
+  TermsRoute: TermsRoute,
   DIdRoute: DIdRoute,
   NSlugRoute: NSlugRoute,
+  SIdRoute: SIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

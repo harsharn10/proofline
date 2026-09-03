@@ -2,43 +2,136 @@ slug: quotrons
 name: Quotrons
 symbol: QUOTRON
 category: Token-bound treasury NFT
-lifecycle: announced
+lifecycle: mainnet
+lifecycle_source: pulled 0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F 2026-08-13T15:14:36.000Z
 coverage: stub
-summary: "4,444 ERC-404 terminals: burning the liquid token hardwires an NFT that earns one of ten Stock Tokens from a 3% pool fee."
+summary: "An ERC-404 collection of 4,444 terminals: one liquid QUOTRON materializes a dark NFT, and burning that token hardwires the NFT so it can claim Stock Token rewards from a 3% Uniswap v4 QUOTRON/WETH fee. Trade on quotrons.cash, hardwire a terminal, and claim NVDA, AAPL, TSLA, GME, SPCX, SPY, PLTR, NFLX, RDDT or MSTR. @Quotrons404 runs the app."
 official_links:
   - kind: site
     url: https://quotrons.cash
   - kind: x
     url: https://x.com/Quotrons404
+  - kind: docs
+    url: https://quotrons.cash/llms-full.txt
+  - kind: docs
+    url: https://quotrons.cash/integration.md
+  - kind: github
+    url: https://github.com/mavrkofficial/quotrons-brand-kit
+  - kind: other
+    url: https://opensea.io/collection/Quotrons404
+  - kind: other
+    url: https://www.sentry.trading/swap?chain=robinhood&token=0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F
 dependencies:
   - uniswap
   - stock-tokens
 deployments:
-  - label: QUOTRON token (ERC-404 core)
+  - label: QUOTRON V2 core (Quotron404V2)
     chain: robinhood-chain
     address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
     role: token
-    verified: false
+    verified: true
     sources:
       - S3
       - S4
       - S5
-  - label: Router
+      - S10
+      - S14
+      - S15
+      - S16
+      - S20
+  - label: Canonical router (QuotronWethRouter)
     chain: robinhood-chain
     address: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
     role: router
-    verified: false
+    verified: true
     sources:
       - S3
       - S5
-  - label: Uniswap v4 hook
+      - S11
+      - S17
+      - S20
+      - S37
+  - label: Canonical Uniswap v4 hook (QuotronWethHook)
     chain: robinhood-chain
     address: "0x62E200Cc8e4D95cf622f40Dd70f407C883EcB0cc"
     role: other
-    verified: false
+    verified: true
     sources:
       - S3
       - S5
+      - S11
+      - S18
+      - S20
+      - S38
+  - label: V2 ERC-721 mirror (QuotronMirrorV2)
+    chain: robinhood-chain
+    address: "0x027ACa2794E44f24950D81227DcD516FfBB49d6e"
+    role: other
+    verified: false
+    sources:
+      - S10
+      - S19
+      - S20
+  - label: V2 reflections (QuotronReflectionsV2)
+    chain: robinhood-chain
+    address: "0xe04fba61FD54Ba78Dd450A30d8Af40167aF5d3Ec"
+    role: other
+    verified: false
+    sources:
+      - S10
+      - S20
+      - S32
+  - label: View quoter (QuotronWethQuoter)
+    chain: robinhood-chain
+    address: "0xb8960fdC8A0Be155d196C2795b75747763562df2"
+    role: other
+    verified: false
+    sources:
+      - S11
+      - S12
+      - S20
+  - label: Epoch converter (QuotronEpochConverter)
+    chain: robinhood-chain
+    address: "0x24e62Dd5C7058CC41ad9c5375C137460ea1Da2FE"
+    role: other
+    verified: false
+    sources:
+      - S10
+      - S33
+  - label: Recovery Safe
+    chain: robinhood-chain
+    address: "0x15277aA1ecC13734d57C519a2DAA1cc4A748bA89"
+    role: multisig
+    verified: false
+    sources:
+      - S10
+      - S20
+      - S31
+  - label: Owner / blacklist guardian (EIP-7702)
+    chain: robinhood-chain
+    address: "0x7171E64E979265aeD6588577D1c6b60A701d7866"
+    role: admin
+    verified: false
+    sources:
+      - S14
+      - S16
+      - S20
+  - label: QUOTRON/USDG Uniswap v3 pair
+    chain: robinhood-chain
+    address: "0xb77e03DF4CAe1752aa1E2b52C46794026b46873E"
+    role: other
+    verified: true
+    sources:
+      - S21
+      - S39
+  - label: V1 QUOTRON core (retired)
+    chain: robinhood-chain
+    address: "0x40686524e56AfF0F1446958725dCF6e6dA5381E6"
+    role: token
+    verified: false
+    sources:
+      - S10
+      - S34
 review:
   researcher: harsharn10
   approver: pending
@@ -60,10 +153,23 @@ findings:
       class: claim
       sources:
         - S5
+    - text: "Receipts: llms.txt, llms-full.txt, integration.md, manifest.json, X profile and four posts, Pond Street, OpenSea V2 / overview / lowercase mint, GitHub brand kit, Blockscout token/tx/router/hook/mirror/reflections/converter/Safe/V1, DexScreener token API, and RPC calls were opened on 2026-09-03 and excerpts copied from the responses."
+      class: verified
+      sources:
+        - S9
+        - S10
+        - S14
+        - S20
+        - S21
+    - text: "Numbers: DexScreener volume and marketCap are Uniswap v4 QUOTRON/WETH 0x0b142aaf…, not all QUOTRON pairs. Holders 3649 is the ERC-20 token. Hardwired 2792 and liquid 1652 are RPC views that satisfy the 4,444 invariant. Site dashboard census figures were not copied from the SPA shell. [claim R-7 R-13]"
+      class: verified
+      sources:
+        - S20
   risk:
     - text: "owner() on the QUOTRONS token and the QuotronWethHook returns 0x7171…7866, which the explorer marks as an EIP-7702 delegated account: one externally owned key delegating to smart-account code, not a multisig, with no timelock in the ownership chain."
       class: verified
-      sources: [S8]
+      sources:
+        - S8
     - text: The project discloses a recovery Safe and a blacklist guardian role for V2; who holds those keys and what they can do to user terminals is not documented in the intake.
       class: claim
       sources:
@@ -72,6 +178,33 @@ findings:
       class: claim
       sources:
         - S6
+    - text: "Adversarial: the strongest contrary reading is that Quotrons is the Ink xStocks venue, or Sentry, or StonkBrokers, because @cruelhandeth ships at Ink, posted Sentry as a QUOTRON venue, and V2 fees buy STONKBROKER. The 4663 collection, router and Uniswap v4 pool id are distinct from Sentry and from StonkBrokers 0x539c…; Pond Street itself splits the Ink venue from the Robinhood collection. A weaker contrary reading is that V2 still trades ten stock pools: OpenSea overview says that, DexScreener and the manifest show one WETH pool."
+      class: inference
+      sources:
+        - S21
+        - S26
+        - S27
+        - S30
+    - text: Owner, blacklist guardian and Safe signer 1 are the same EIP-7702 key; recovery can move user terminals.
+      class: verified
+      sources:
+        - S20
+        - S31
+    - text: OpenSea overview still describes ten QUOTRON/stock pools (V1).
+      class: claim
+      sources:
+        - S30
+    - text: Ink xStocks venue and Sentry swap are related surfaces, not this collection's 4663 contracts.
+      class: claim
+      sources:
+        - S26
+        - S27
+    - text: No audit report was located.
+      class: unknown
+    - text: Lowercase OpenSea slug quotrons404 is a different 10,000-item mint.
+      class: claim
+      sources:
+        - S35
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token, router and hook addresses from project docs not reproduced on Blockscout
@@ -79,5 +212,38 @@ findings:
     - text: Reward epoch status on Robinhood Chain
     - text: V1 exploit postmortem not reviewed
     - text: Whether the Desktop drop shares the same control plane
+    - text: "Does QuotronEpochConverter on 4663 actually convert WETH into Robinhood Stock Tokens for hardwired terminals, and what is the live epoch counter versus the Ink xStocks page at /xstocks? Next: eth_call converter views and open quotrons.cash/xstocks rendered state"
+    - text: "Can the EIP-7702 owner key, which is also Safe owner 1 of 2, pause the core and also satisfy recoveryAdmin (threshold 2) with the second key 0xd1de…9e58? Next: read Safe tx history and whether 0xd1de… is a distinct operator"
+    - text: "Is there an audit whose scope matches Quotron404V2, the hook, router and recovery path? Next: record any report URL as a claim when published"
+    - text: "Does @QuotronsDesktop share this control plane, and did the 2026-09-01 mint ship? Next: resolve the handle and compare collection contract to 0x027A…"
+    - text: "Is there a public Solidity repository beyond the brand kit? Next: leave explorer-verified source as the code receipt unless a core repo appears"
+    - text: "Are the lowercase OpenSea slug quotrons404 and PEPE QUOTRONS operated by this team? Next: leave unmerged unless a primary post links those collections"
   unresolved:
     - text: A 25 Aug CT post claimed the same developer as RobinWifHat and a coming pad with a fee split; Proofline did not verify it. A secondary source noted the reward venue on Ink had not run an epoch as of 2026-08-29; whether Robinhood Chain V2 epochs run independently is unchecked.
+    - text: product.mechanism remains unresolved (CON-1).
+themes:
+  - nft
+  - rwa
+  - stock-paired:nvda
+  - hook
+metrics:
+  - kind: volume_24h
+    value: 961782
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S21
+  - kind: market_cap
+    value: 9776980
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S21
+  - kind: holders
+    value: 3649
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15

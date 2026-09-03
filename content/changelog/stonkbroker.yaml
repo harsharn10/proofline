@@ -12,3 +12,186 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 7ed151ff2fe1a5f2
+- date: 2026-09-03
+  slug: stonkbroker
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: 4,444 ERC-6551 token-bound NFTs whose wallets hold Stock Tokens, with a $STONKBROKER activation token, an Anvil AMM and an announced STORMM options overlay on Uniswap v4.
+    themes: null
+    official_links:
+      - kind: site
+        url: https://stonkbrokers.cash
+      - kind: x
+        url: https://x.com/ClutchMarkets
+    deployments:
+      - label: $STONKBROKER token (CollectionToken, workbook sheet 02)
+        chain: robinhood-chain
+        address: "0xe934e36a439c94017b64a3fece66af12099abf50"
+        role: token
+        verified: false
+        sources:
+          - S5
+      - &a1
+        label: NFT collection (ERC-721 + ERC-6551)
+        chain: robinhood-chain
+        address: not-verified
+        role: token
+        verified: false
+        sources: []
+      - &a2
+        label: Anvil AMM
+        chain: robinhood-chain
+        address: not-verified
+        role: other
+        verified: false
+        sources: []
+    metrics:
+      - kind: tvl
+        value: 25599049
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S9
+      - kind: fees_24h
+        value: 33776
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S9
+      - kind: revenue_24h
+        value: 18835
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S9
+  new:
+    summary: StonkBrokers is a 4,444-piece ERC-6551 NFT collection on Robinhood Chain. Each NFT owns a token-bound wallet that can hold Stock Tokens. A user buys $STONKBROKER, swaps 666,666 tokens plus an ETH fee on the Anvil AMM for a broker, then pays an activation fee for Clock In stock-token drops. Clutch Markets operates the suite. STORMM options are posted for September 2026.
+    themes:
+      - nft
+      - rwa
+      - options
+    official_links:
+      - kind: site
+        url: https://stonkbrokers.cash
+      - kind: x
+        url: https://x.com/ClutchMarkets
+      - kind: site
+        url: https://stonkbrokers.io
+      - kind: docs
+        url: https://www.stonkbrokers.cash/docs
+      - kind: docs
+        url: https://www.stonkbrokers.cash/docs/stonkbroker-token
+      - kind: github
+        url: https://github.com/Clutch-L4bs/stonkbroker-erc20
+      - kind: app
+        url: https://www.stonkbrokers.cash/marketplace
+      - kind: other
+        url: https://www.clutch.markets/
+      - kind: other
+        url: https://opensea.io/collection/stonkbrokers-434284142
+    deployments:
+      - label: $STONKBROKER token (CollectionToken)
+        chain: robinhood-chain
+        address: "0xe934e36A439C94017B64a3FecE66AF12099aBF50"
+        role: token
+        verified: true
+        sources:
+          - S5
+          - S13
+          - S14
+          - S17
+      - *a1
+      - *a2
+      - label: StonkBrokers NFT collection (ERC-721 + ERC-6551)
+        chain: robinhood-chain
+        address: "0x539CdD042c2f3d93EbC5BE7DfFf0c79F3B4fAbF0"
+        role: token
+        verified: true
+        sources:
+          - S12
+          - S18
+          - S19
+      - label: Anvil NFT AMM vault (StonkNFTAMMVault)
+        chain: robinhood-chain
+        address: "0xE302733accF4800146E55fC45B46b4E4fFC032D2"
+        role: vault
+        verified: false
+        sources:
+          - S12
+          - S20
+      - label: Activation Manager
+        chain: robinhood-chain
+        address: "0xacD5ae3c060C1137FE2Ee86B0aB2EF697456f664"
+        role: other
+        verified: false
+        sources:
+          - S12
+          - S21
+      - label: Stonk Launcher factory
+        chain: robinhood-chain
+        address: "0x80a77001456bc986083678F9a112B1EC2Aa07281"
+        role: factory
+        verified: false
+        sources:
+          - S12
+      - label: Token deployer / collection Ownable path
+        chain: robinhood-chain
+        address: "0xb668382cF44038a3E8140E789060F6A809787CDa"
+        role: admin
+        verified: false
+        sources:
+          - S14
+          - S16
+          - S18
+          - S19
+    metrics:
+      - kind: tvl
+        value: 1016688.16
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S24
+      - kind: fees_24h
+        value: 9200
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S25
+      - kind: revenue_24h
+        value: 4474
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S26
+      - kind: holders
+        value: 33012
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S15
+      - kind: volume_24h
+        value: 32432
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S27
+      - kind: market_cap
+        value: 29647685
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S22
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: d38bfc9fe6b90bc6

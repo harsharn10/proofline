@@ -1,0 +1,122 @@
+slug: schiffy
+name: SCHIFFY
+symbol: SCHIFFY
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against GLD. LongLauncher deploys SCHIFFY in one create call and seeds the SCHIFFY/GLD book. Traders buy and sell SCHIFFY on Uniswap v4. GLD is the SPDR Gold Trust Robinhood Token rail, not this subject. No official handle was set this pass. DexScreener lists x.com/schiffygld and t.co/8zv22DgJl8 (https://schiffy.gold); flag unconfirmed-official.
+themes:
+  - memecoin
+  - stock-paired:gld
+  - rwa
+official_links:
+  - kind: site
+    url: https://schiffy.gold
+  - kind: x
+    url: https://x.com/schiffygld
+dependencies: []
+deployments:
+  - label: SCHIFFY token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x42aFA2124ca5a2B83898E46B2dA9a190995b1E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S3
+      - S5
+  - label: LongLauncher (create target)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S18
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S18
+  - label: GLD SPDR Gold Trust Robinhood Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0xC9a981FEE1F9DEc688bb123ccDeCc63D0deBFC4e"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S16
+metrics:
+  - kind: volume_24h
+    value: 902731.89
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 272759.82
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 1280826.03
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 1826
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/Airlock/GLD/LongLauncher and the create tx plus logs, RPC name/symbol/owner/eth_getCode, DexScreener token and search, Gecko pool/token/info, /rhj/assets, @schiffygld, t.co, and schiffy.gold were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 902731.89 is the Gecko SCHIFFY/GLD pool 24h volume, not the 910709.10 token all-pools figure. Reserve 272759.82 is that pool. DexScreener 916420.04 / 282567.78 is the same pair, different aggregator. RPC totalSupply 993437836110533055084396978 vs Gecko token total_supply 1e27. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that SCHIFFY is UBIK or CASHBIRD, or that it is a Bankr product, or that @schiffygld is official. UBIK is 0x8124…68Bd. CASHBIRD is 0x38C8…1e18. The create target is LongLauncher. The site HTML has no CA."
+      class: inference
+      sources:
+        - S4
+        - S13
+        - S15
+        - S19
+    - text: Quote token GLD is a Robinhood Stock Token rail shared with other pairs, including UBIK/GLD and CASHBIRD/GLD. [verified R-12 R-15] - Pool USD reserve is SCHIFFY plus GLD, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko dex label Bankr does not match the LongLauncher create target. [verified R-4 R-8] - No official handle or domain this pass; X and schiffy.gold are unconfirmed-official. [claim R-7 R-13 R-19] - Other SCHIFF tickers exist on robinhood. [claim R-15] - Site burn copy was not matched to verified source this pass. [claim R-19] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does schiffy.gold bidirectionally list token 0x42aF…1E18 (CA in HTML, copy button, or docs), and does @schiffygld bio or a pinned post list schiffy.gold? Next: re-read schiffy.gold after a client render that injects the CA; re-read the X bio for a domain"
+    - text: "Is 0x21E2…7A66 the LONG protocol fee split, and does verified DopplerHookInitializer source leave other privileged paths? Next: read DopplerHookInitializer and LongLauncher fee-split in verified source on Blockscout"
+    - text: "Does the site burn/payout copy match a live hook fee path, and why is RPC totalSupply 993.4M against a 1e9 mint? Next: eth_call remaining supply math and read DopplerERC20V1 burn/fee functions on the explorer"
+    - text: "Which other robinhood SCHIFFY or SCHIFF tickers stay live besides 0x42aF…1E18? Next: re-run search if a second SCHIFFY book crosses the liquidity bar"
+  unresolved: []

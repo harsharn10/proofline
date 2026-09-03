@@ -1,15 +1,61 @@
 slug: sight
 name: Sight
-symbol: null
+symbol: SIGHT
 category: Prediction market
 lifecycle: announced
 coverage: stub
-summary: Prediction market announced for Robinhood Chain; the project states it has no token and plans a Genesis NFT mint on 2026-09-02.
+summary: "Robinhood Chain memecoin UP/DOWN prediction app: users stake ETH on whether a token's Uniswap price rises or falls over a roughly 15-minute round, then claim from the round contract. Access is invite-gated in docs and, from 14 September 2026, NFT-holder only per @sight_hood. Sight Genesis is a 1,776-supply ERC-721 on chain 4663. sighthood.com and @sight_hood run the product."
 official_links:
   - kind: x
     url: https://x.com/sight_hood
+  - kind: site
+    url: https://sighthood.com
+  - kind: app
+    url: https://app.sighthood.com
+  - kind: docs
+    url: https://docs.sighthood.com
+  - kind: other
+    url: https://quest.sighthood.com
+  - kind: telegram
+    url: https://t.me/sight_hood
 dependencies: []
-deployments: []
+deployments:
+  - label: Sight Genesis ERC-721
+    chain: robinhood-chain
+    address: "0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D"
+    role: token
+    verified: true
+    sources:
+      - S9
+      - S10
+      - S11
+      - S12
+  - label: ERC721SeaDropCloneable
+    chain: robinhood-chain
+    address: "0x09a26fC8FCEF18192E267D7A6da9dFb4be81Dd6A"
+    role: implementation
+    verified: true
+    sources:
+      - S10
+      - S12
+      - S22
+  - label: ERC721SeaDropCloneFactory
+    chain: robinhood-chain
+    address: "0x008EbCCaE39d001200c3003c3225ce0A00690066"
+    role: factory
+    verified: true
+    sources:
+      - S11
+      - S23
+  - label: Sight Genesis owner
+    chain: robinhood-chain
+    address: "0x4de0D3A415E1109Fb55702Da2989Dd9D5d912584"
+    role: admin
+    verified: false
+    sources:
+      - S10
+      - S11
+      - S12
 review:
   researcher: harsharn10
   approver: pending
@@ -28,9 +74,43 @@ findings:
       class: claim
       sources:
         - S3
+    - text: "Receipts: sighthood.com, docs (intro, rounds, fees, claiming, FAQ, risks), app, quest, @sight_hood profile and posts, @booj1e, OpenSea collection and stats, Blockscout NFT/impl/factory/createClone/ERC-20, RPC, and t.me/sight_hood were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-2 R-7 R-9] - Numbers: holders 1175 is the Blockscout token count, not OpenSea num_owners 1178. Volume 19.34 ETH is OpenSea one_day volume, not an all-chains TVL. totalSupply 1776 is the RPC return. [claim R-7 R-18] [verified R-9] - Adversarial: the strongest contrary reading is that Sight has no Robinhood product and the OpenSea collection is unrelated. createClone from 0x4de0… with name Sight Genesis, OpenSea project_url sighthood.com, and the @sight_hood mint posts argue they are the same name; PredictionRound still missing keeps lifecycle announced."
+      class: inference
+      sources:
+        - S9
+        - S11
+        - S13
+    - text: "PredictionRound / UniswapPrice addresses were not reproduced; round ETH custody is unread. [claim R-3] - Unclaimed winnings may be swept after 14 days. [claim R-25] - One EOA owns the Genesis SeaDrop clone. [verified R-9] - Flag: ca-collision — Blockscout lists ERC-20s named Sight / SIGHT besides the Genesis ERC-721. [claim R-17] - Uniswap pool data is the resolution source."
+      class: claim
+      sources:
+        - S30
   missing:
     - text: No market contract reviewed — lifecycle announced
     - text: Resolution design
     - text: Collateral custody
     - text: Official site not located
+    - text: "Where are the PredictionRound, UniswapPrice, and protocol fee-recipient contracts on 4663, and do any have non-empty code? Next: read app network calls after wallet connect; search Blockscout for sweepUnclaimed and protocolFeeBps"
+    - text: "Can owner 0x4de0… change SeaDrop allowlists, metadata, or mint after the 1,776 sell-out, and is there a timelock? Next: eth_call remaining SeaDrop admin getters; read ERC721SeaDropCloneable owner functions"
+    - text: "Does NFT-holder access from 14 Sep replace the invite-code gate in docs, or do both apply? Next: re-read docs on 14 Sep and compare the app onboarding flow"
+    - text: "Is there an audit of PredictionRound / UniswapPrice, or only the shared SeaDrop clone source? Next: ask in public and match any report to bytecode once addresses exist"
+    - text: "Does t.me/sight_hood get a reverse link from sighthood.com or @sight_hood? Next: re-check the bio and site footer"
+    - text: "Where is the source repository for PredictionRound named in docs? Next: search GitHub for sweepUnclaimed PredictionRound Sight"
   unresolved: []
+themes:
+  - prediction
+  - nft
+  - memecoin
+metrics:
+  - kind: holders
+    value: 1175
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S10
+  - kind: volume_24h
+    value: 19.34
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S21

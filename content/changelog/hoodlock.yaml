@@ -25,3 +25,159 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 8a3ba4f3a0eaf323
+- date: 2026-09-03
+  slug: hoodlock
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Native liquidity locker with a $LOCK token; 25% of Mintera.art revenue buys LOCK per the project, and a fee-split launchpad is announced.
+    themes: null
+    official_links:
+      - kind: site
+        url: https://hoodlock.tech
+      - kind: x
+        url: https://x.com/HoodLockRH
+    deployments:
+      - label: LOCK token (account bio)
+        chain: robinhood-chain
+        address: "0xd5BF43f29BF7Aa5bb42Ae9e217b84B86EB7a4B94"
+        role: token
+        verified: false
+        sources:
+          - S3
+          - S4
+      - &a1
+        label: Locker contract
+        chain: robinhood-chain
+        address: not-verified
+        role: other
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    summary: Native ERC-20 locker on Robinhood Chain. A user approves a token, pays a flat ETH fee, and verified RobinhoodLocker holds the balance until an unlock time that can only be extended. The same suite burns to the dead address and vests with a cliff. $LOCK is a Pons-launched token at hoodlock.tech / @HoodLockRH. Uniswap v3 and v4 LP NFTs are not lockable here.
+    themes:
+      - tooling
+      - launchpad
+      - nft
+    official_links:
+      - kind: site
+        url: https://hoodlock.tech
+      - kind: x
+        url: https://x.com/HoodLockRH
+      - kind: app
+        url: https://hoodlock.tech/app
+      - kind: docs
+        url: https://hoodlock.tech/docs
+      - kind: discord
+        url: https://discord.gg/hdXKRP9BN
+    deployments:
+      - label: LOCK token (PonsLauncherToken)
+        chain: robinhood-chain
+        address: "0xd5BF43f29BF7Aa5bb42Ae9e217b84B86EB7a4B94"
+        role: token
+        verified: true
+        sources:
+          - S3
+          - S4
+          - S10
+          - S11
+          - S12
+          - S17
+          - S18
+      - *a1
+      - label: RobinhoodLocker
+        chain: robinhood-chain
+        address: "0xD0f7d8c6e9f6D80c297bEbe4F7fD1B9C8125C32F"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S6
+          - S13
+          - S14
+          - S18
+      - label: RobinhoodBurner
+        chain: robinhood-chain
+        address: "0x6Bf43Ca706FAa8EA46803299C191484e82280652"
+        role: other
+        verified: true
+        sources:
+          - S6
+          - S15
+          - S18
+      - label: RobinhoodVesting
+        chain: robinhood-chain
+        address: "0x910e19bcC4bce46999994Ed7297E0Fc4431ec72E"
+        role: other
+        verified: true
+        sources:
+          - S6
+          - S16
+          - S18
+      - label: LOCK/WETH Uniswap v3 pool
+        chain: robinhood-chain
+        address: "0x4562cA679DcCc38f2dd59d28B2eBFEC99f507AF2"
+        role: other
+        verified: true
+        sources:
+          - S17
+          - S19
+          - S31
+      - label: PonsLaunchFactory (token creator_address_hash)
+        chain: robinhood-chain
+        address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+        role: factory
+        verified: false
+        sources:
+          - S11
+          - S17
+      - label: Locker/burner/vesting admin EOA (also token deployer)
+        chain: robinhood-chain
+        address: "0x79c1230cAb12d53D040f5FE1F5279e1A481CCeA2"
+        role: admin
+        verified: false
+        sources:
+          - S17
+          - S18
+      - label: Locker fee collector
+        chain: robinhood-chain
+        address: "0x58EE7b355F6e347e9874deD2e877D0C7b9726B4F"
+        role: other
+        verified: false
+        sources:
+          - S18
+    metrics:
+      - kind: holders
+        value: 1169
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S12
+      - kind: volume_24h
+        value: 48402.95
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S19
+      - kind: market_cap
+        value: 97761
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S19
+      - kind: tvl
+        value: 33439.04
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S19
+          - S20
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: bf6330a7957e08eb

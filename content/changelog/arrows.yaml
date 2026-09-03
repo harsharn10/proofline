@@ -25,3 +25,176 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: a88e2a9efe53df1c
+- date: 2026-09-03
+  slug: arrows
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Fully collateralized options on tokenized stocks as transferable ERC-1155s with writer vaults earning premiums; live at small size since late August per the project.
+    themes: null
+    official_links:
+      - kind: site
+        url: https://arrows.finance
+      - kind: x
+        url: https://x.com/arrowsonhood
+    deployments:
+      - label: ARROWS token
+        chain: robinhood-chain
+        address: "0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e"
+        role: token
+        verified: false
+        sources:
+          - S3
+          - S4
+      - &a1
+        label: Option and writer-vault contracts
+        chain: robinhood-chain
+        address: not-verified
+        role: vault
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    summary: Fully collateralized European calls and puts on Robinhood Stock Tokens and ETH, issued as transferable ERC-1155s. A user buys a long or deposits stock, WETH or USDG into a maturity writer vault that escrows maximum loss. Calls settle in-kind; puts settle in USDG. arrows.finance and @arrowsonhood run the surface. Distinct from Arrow Finance, the CDP.
+    themes:
+      - options
+      - rwa
+      - vault
+      - nft
+      - stock-paired:nvda
+    official_links:
+      - kind: site
+        url: https://arrows.finance
+      - kind: x
+        url: https://x.com/arrowsonhood
+      - kind: site
+        url: https://www.arrows.finance
+      - kind: app
+        url: https://app.arrows.finance
+      - kind: docs
+        url: https://docs.arrows.finance
+      - kind: telegram
+        url: https://t.me/arrowsportal
+      - kind: github
+        url: https://github.com/arrows0/contracts
+    deployments:
+      - label: ARROWS token (PonsV2LauncherToken)
+        chain: robinhood-chain
+        address: "0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e"
+        role: token
+        verified: true
+        sources:
+          - S3
+          - S4
+          - S10
+          - S12
+          - S13
+          - S14
+      - *a1
+      - label: Config
+        chain: robinhood-chain
+        address: "0x410C428d7602EcB5B8C3255030e9852C2791445C"
+        role: other
+        verified: true
+        sources:
+          - S7
+          - S14
+          - S19
+      - label: SeriesFactory
+        chain: robinhood-chain
+        address: "0xD03c98E93DF68BB5ADc9C27B3dD57863542A9D8f"
+        role: factory
+        verified: true
+        sources:
+          - S7
+          - S14
+          - S16
+      - label: OptionToken
+        chain: robinhood-chain
+        address: "0x9Af7485f5B8427C628E5F967aD9AA0f9289d015D"
+        role: token
+        verified: true
+        sources:
+          - S7
+          - S14
+          - S15
+      - label: CollateralVault
+        chain: robinhood-chain
+        address: "0xd334f914544b570A5fd03b6956f997107dE9C840"
+        role: vault
+        verified: true
+        sources:
+          - S7
+          - S14
+          - S17
+      - label: VaultRouter
+        chain: robinhood-chain
+        address: "0x09D965dD46Cc65fEbeea720295a18B798B4dF0ba"
+        role: router
+        verified: true
+        sources:
+          - S7
+          - S14
+          - S18
+      - label: FeeSplitter
+        chain: robinhood-chain
+        address: "0xf5B9330931E5941e287d40237aDE0Bd6eacb8edc"
+        role: other
+        verified: false
+        sources:
+          - S7
+          - S14
+          - S30
+      - label: TokenStake
+        chain: robinhood-chain
+        address: "0xFCda38304cF81E03ADeF0cb5BB26C171A93168b6"
+        role: other
+        verified: false
+        sources:
+          - S7
+          - S14
+          - S31
+      - label: ETH MaturityCallVault
+        chain: robinhood-chain
+        address: "0x277Ba3F49d550E031bD10E66E2deD624B20db2B4"
+        role: vault
+        verified: false
+        sources:
+          - S7
+          - S14
+          - S32
+      - label: ETH MaturityPutVault
+        chain: robinhood-chain
+        address: "0x37D30B87050d65c28E67A97AE02e02c8Da2A0C3a"
+        role: vault
+        verified: false
+        sources:
+          - S7
+          - S14
+          - S33
+    metrics:
+      - kind: volume_24h
+        value: 75629.28
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S20
+      - kind: market_cap
+        value: 166632
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S20
+      - kind: holders
+        value: 1048
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S12
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: e779ea0083675a5a

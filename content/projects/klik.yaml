@@ -1,0 +1,80 @@
+slug: klik
+name: Klik
+symbol: KLIK
+category: Programmable-hook launchpad
+lifecycle: mainnet
+coverage: stub
+summary: "Klik is a permissionless token launchpad. Docs: Ethereum, Base, Robinhood Chain, and Arc. A launch is one `deployCoin` transaction into a Uniswap V4 pool with a Klik hook; there is no presale. Robinhood Chain factory 0x16cF6788…0dd7 is verified as Factory_whook.sol. The handle is @klik_evm; the site is klik.finance."
+themes:
+  - launchpad
+official_links:
+  - kind: app
+    url: https://klik.finance
+  - kind: docs
+    url: https://klik.finance/docs
+  - kind: x
+    url: https://x.com/klik_evm
+  - kind: github
+    url: https://github.com/klikfinance/klik
+  - kind: other
+    url: https://klik.finance/hook-labs
+dependencies: []
+deployments:
+  - label: Robinhood Chain factory
+    chain: robinhood-chain
+    address: "0x16cF6788B762EE8969744586eD16fc5705140dd7"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S10
+      - S11
+      - S12
+  - label: UniversalKlikHook
+    chain: robinhood-chain
+    address: "0x745d717620052a97a22dEEE2e5Eba59583f3e0CC"
+    role: other
+    verified: true
+    sources:
+      - S10
+      - S12
+      - S13
+      - S14
+  - label: platformController()
+    chain: robinhood-chain
+    address: "0x81EE2B6BcfcF9a614036578e5E4f2B02e507da5a"
+    role: admin
+    verified: true
+    sources:
+      - S10
+      - S11
+      - S14
+      - S21
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: klik.finance, /docs, X profile and Latest posts, GitHub user/repo/README, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-2 R-10 R-11] - Numbers: `tokenCount` 5923, bytecode lengths, nonce, and `platformController()` are chain 4663 RPC. DexScreener liq/volume are one robinhood v4 pair, not pad TVL. Factory search of 0x16cF…0dd7 returned 0 pairs. [verified R-10 R-16] - Adversarial: strongest contrary reading is that 0x16cF…0dd7 is a leftover factory and new launches use a Hook Labs address, or that the team left Robinhood Chain. Docs set the Robinhood row to this address; RPC `deployCoinEnabled()` is true and `deployCoin` landed on 2026-09-03. The 15 Jul post says the pad remains operational on this chain. Pons and LONG are different products."
+      class: inference
+      sources:
+        - S2
+        - S6
+        - S10
+        - S15
+    - text: platformController is one EOA with hook-swap, pause, and fee-withdraw. [verified R-10 R-12] - Hook implementation is verified but `is_fully_verified` false. [verified R-13] - Ethereum platform token 0x5886e4d8…81f1 is not on chain 4663; several RH tokens are also named KLIK. [verified R-16 R-20] [claim R-3] - No audit report URL. [unknown] - 3 Sep stock-pair claim is not in the docs factory table this pass. [claim R-5] - GitHub README mints do not match docs.
+      class: claim
+      sources:
+        - S18
+  missing:
+    - text: "Does the Robinhood factory expose a stock-token quote path that matches the 2026-09-03 @klik_evm post, or is that path only on Base? Next: read liquidityConfigs and deployCoin quote asset on 4663; do not file stock-paired as a leaf until a stock token appears in a factory pool"
+    - text: "Who holds the Ethereum Safe 0xe6b2a647…78cc, and is platformController 0x81EE…da5a the same key on other chains? Next: eth_call platformController on Ethereum factory 0x254Bf550…266ad and compare"
+    - text: "Is there an audit report whose scope matches Factory_whook.sol 0x16cF6788…0dd7 and UniversalKlikHook 0x745d…e0CC? Next: record any published report as a claim with the exact scope"
+    - text: "What is tokenCount on a 30-day window versus Emerson's 361 figure, and does Emerson still count this factory? Next: open dune.com/0x_emerson/robinhood-memecoin-launchpads-comparison-30d and copy the Klik row with as-of time"
+    - text: "Which GitHub commit, if any, matches Factory_whook.sol on Blockscout? Next: do not treat klikfinance/klik as the live contract source; record a source mirror if one appears"
+    - text: "Are Tempo and Hook Labs live on chain 4663, or only on Ethereum / Arc as the docs table states? Next: do not use the Ethereum Hook Labs factory addresses on Robinhood Chain"
+  unresolved: []

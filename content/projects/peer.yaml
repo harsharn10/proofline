@@ -1,0 +1,110 @@
+slug: peer
+name: Peer
+symbol: PEER
+category: Options market
+lifecycle: mainnet
+coverage: stub
+summary: Binary options on a fomo trader's total account PnL. A user buys a USDG call or put on whether that PnL is higher at close than at open, over 24 hours or 7 days. Settlement is the median of three published leaderboard snapshots. Collateral sits in PeerMarketV1 on chain 4663. $PEER is a Pons v2 token and is not the settlement asset.
+themes:
+  - options
+  - prediction
+official_links:
+  - kind: site
+    url: https://peer.family/
+  - kind: app
+    url: https://peer.family/discover
+  - kind: docs
+    url: https://peer.family/docs
+  - kind: x
+    url: https://x.com/PeerDotFamily
+dependencies: []
+deployments:
+  - label: PEER token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0x96f0889cBC2D1423Fd64fd1307335fE72f1a198E"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S8
+  - label: PeerMarketV1
+    chain: robinhood-chain
+    address: "0xCeaF31F0aA9961A562C5d4CdD6265BC6104428CA"
+    role: other
+    verified: true
+    sources:
+      - S6
+      - S9
+  - label: PeerFlywheel
+    chain: robinhood-chain
+    address: "0xb48Fb40942a7440A0085BE66fd3f4d478834aEFB"
+    role: other
+    verified: false
+    sources:
+      - S10
+      - S15
+  - label: PeerDistributor
+    chain: robinhood-chain
+    address: "0x4c40e7C591F1f21A9c307d2C093Bd988aD2d938B"
+    role: other
+    verified: false
+    sources:
+      - S11
+metrics:
+  - kind: tvl
+    value: 380
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+      - S6
+  - kind: market_cap
+    value: 85390
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S12
+  - kind: volume_24h
+    value: 281456.61
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S12
+  - kind: holders
+    value: 391
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: peer.family, /docs, /discover, /m/1, Blockscout token/market/flywheel/distributor/txs, RPC, DexScreener PEER pairs, Llama protocol/peer, and two @PeerDotFamily posts were opened on 2026-09-03 and excerpts copied. [verified R-1 R-5 R-6 R-12] - Numbers: 380.00 is the PeerMarketV1 USDG chain balance, not DexScreener marketCap 85390 and not the $1.4M fomo 30d volume on the AJC card. marketCount 20 is the contract, not a 1-open reading. [claim R-1 R-7 R-12] [verified R-6] - Adversarial: the strongest contrary reading is that this Peer is Llama/ZKP2P @peerxyz or that only one market is open. Llama peer is Base payments; RPC reads 20 Status.Open and /discover lists 20 routes."
+      class: inference
+      sources:
+        - S3
+        - S6
+        - S13
+    - text: Resolver is one EOA; grace void is 7 days. [verified R-6] [claim R-2] - Owner and guardian are the same EOA with pause and void, no timelock. [verified R-6] - Homepage 15% trader escrow versus FEE_TRADER_BPS 0. [disputed R-1 R-2] - No audit report was located. [unknown] - Llama Peer is ZKP2P on Base, not this venue. [verified R-14] - $PEER is a Pons v2 token; it is not USDG collateral.
+      class: verified
+      sources:
+        - S5
+        - S8
+  missing:
+    - text: "Does any live /discover filter or on-chain status other than markets(id).status show only 1 open market, matching the briefing's 1-open reading? Next: decode userCost for every id; open remaining /m/n pages; watch 1d closesAt 1788443010"
+    - text: "Which homepage sentence is the live fee split: 15% trader escrow or FEE_TRADER_BPS 0? Next: read escrowOf on PeerMarketV1 for listed traderIds"
+    - text: "Is @PeerDotFamily bidirectional-official, or does the site add a handle later? Next: re-read site footer and any later official post that names the handle"
+    - text: "Where is the professional-audit artifact matching PeerMarketV1 / PeerFlywheel / PeerDistributor on 4663? Next: ask in public if an auditor is named"
+    - text: "Is there an official GitHub, Telegram or Discord? Next: leave NULL unless a later official post names one"
+  unresolved:
+    - text: product.mechanism remains unresolved (CON-1).
+    - text: activity.status remains unresolved (CON-2).

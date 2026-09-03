@@ -25,3 +25,121 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 67f40f82bca6f833
+- date: 2026-09-03
+  slug: lemon
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    category: Launchpad · mechanism not classified
+    lifecycle: announced
+    summary: Launch and trading pad on Robinhood Chain whose coins get an X account posting on-chain facts; Hyperliquid tools claimed through a Lemon terminal.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/lemondotfun
+    deployments:
+      - &a1
+        label: Launch / terminal contracts
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    category: Uniswap-pool launchpad
+    lifecycle: mainnet
+    summary: "A Uniswap V3 Instant launchpad on Robinhood Chain. A creator sends one transaction through LemonLaunchFactory: the factory deploys a 1-billion fixed-supply ERC-20, seeds a TOKEN/WETH 1% full-range pool, and locks the LP NFT in LemonLaunchLocker. Fees split 30/70 platform/creator. Users launch and trade at lemon.fun, operated as @lemondotfun. Optional stock-dividend vaults and per-coin X agents are claimed on the same site."
+    themes:
+      - launchpad
+      - memecoin
+      - rwa
+      - agent
+    official_links:
+      - kind: x
+        url: https://x.com/lemondotfun
+      - kind: site
+        url: https://lemon.fun
+      - kind: app
+        url: https://lemon.fun/launch
+      - kind: docs
+        url: https://lemon.fun/docs
+      - kind: telegram
+        url: https://t.me/lemondotfun
+      - kind: other
+        url: https://lemon.fun/leverage/BTC
+    deployments:
+      - *a1
+      - label: LemonLaunchFactory (Instant V3)
+        chain: robinhood-chain
+        address: "0x2bA793Fd69Bf251Fd1Af90b576bE8B9fA6Be46DB"
+        role: factory
+        verified: true
+        sources:
+          - S5
+          - S15
+          - S19
+          - S20
+      - label: LemonLaunchLocker
+        chain: robinhood-chain
+        address: "0xC10309Cf03Bc81c121a8270E3A28E159a9296903"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S16
+          - S19
+      - label: Platform fee receiver / owner EOA
+        chain: robinhood-chain
+        address: "0xEF2c099803Fff879443009722AA2B9C46E020aB6"
+        role: admin
+        verified: true
+        sources:
+          - S5
+          - S18
+          - S19
+      - label: $LEMON.FUN (official pad token)
+        chain: robinhood-chain
+        address: "0xf0E17e54239CD945Cd7bEa471a3a2CA6a8C7f7A3"
+        role: token
+        verified: true
+        sources:
+          - S9
+          - S17
+          - S19
+          - S21
+      - label: LEMON/WETH Uniswap V3 pool
+        chain: robinhood-chain
+        address: "0x01fe057d1C5FB09A4ac02860758DDf26Df9336B5"
+        role: other
+        verified: true
+        sources:
+          - S17
+          - S22
+          - S23
+    metrics:
+      - kind: volume_24h
+        value: 124714
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S22
+      - kind: market_cap
+        value: 735282
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S22
+      - kind: holders
+        value: 12457
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S17
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 0d8561c7f0c3e8b0

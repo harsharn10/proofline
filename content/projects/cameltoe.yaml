@@ -1,0 +1,114 @@
+slug: cameltoe
+name: CAMELTOE
+symbol: CAMELTOE
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched into a Uniswap v4 pool quoted against LULU. Historical RWAERC20LaunchpadFactory deploys Cameltoe (CAMELTOE) in one createLaunch call and seeds the CAMELTOE/LULU book. Traders buy and sell CAMELTOE on Uniswap v4. cameltoerh.fun embeds the contract; no bidirectional official handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:lulu
+  - rwa
+official_links:
+  - kind: site
+    url: https://cameltoerh.fun
+  - kind: x
+    url: https://x.com/cameltoerh
+dependencies: []
+deployments:
+  - label: CAMELTOE token
+    chain: robinhood-chain
+    address: "0xc32B91Fe216aF1B834dB02f33326E983Ad8Cf201"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S17
+  - label: Historical RWAERC20LaunchpadFactory (token factory())
+    chain: robinhood-chain
+    address: "0xe64AC4113848BBC1a6dDE1A6D1da96720A36F297"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S5
+  - label: LaunchTokenDeployer (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x6544AF3524a8d9135Eb5765CECE6E514d85D615b"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S5
+      - S14
+  - label: LaunchHook (Uniswap v4 hook on CAMELTOE/LULU)
+    chain: robinhood-chain
+    address: "0x778b0c4EeA7D35D66513B587bA87FC9084b0EaCC"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S13
+      - S17
+  - label: LULU Stock Token (pair quote / rhj rail)
+    chain: robinhood-chain
+    address: "0x4e62068525Ab11FE768e29dfD00ef909B9803016"
+    role: token
+    verified: true
+    sources:
+      - S9
+      - S12
+      - S17
+metrics:
+  - kind: volume_24h
+    value: 4804580.44
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 148504.51
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 1477018.7
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 2118
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/LULU/hook/deployer/ASS and the createLaunch tx, RPC name/symbol/factory/owner/launchCreationEnabled, DexScreener token and ASS search, Gecko pool/token, /rhj/assets, cameltoerh.fun, and X from:cameltoerh were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-7 R-9 R-10] - Numbers: 4804580.44 is the Gecko CAMELTOE/LULU pool 24h volume, not the 5419911.37 token all-pools figure. Reserve 148504.51 is that pool. DexScreener 5057794.83 / 160580.74 is the same pair, different aggregator. [claim R-6 R-7 R-8] - Adversarial: the strongest contrary reading is that CAMELTOE is the same name as ASS/LULU or an official Lululemon product. ASS factory() is 0xcE9C…5B0d with token 0x47cB…7901. LULU is the rhj rail, not the meme. No official Lululemon handle was located for this token."
+      class: inference
+      sources:
+        - S9
+        - S15
+        - S16
+    - text: Quote token LULU 0x4e62…3016 is a Robinhood Stock Token rail in GET /rhj/assets; pool USD reserve is CAMELTOE plus LULU, not a USDG backstop. [verified R-7 R-9] - Historical factory launchCreationEnabled is false; ASS/LULU is a different token on 0xcE9C…5B0d. [verified R-5 R-16] - X handle is unconfirmed-official; site embeds the CA. [claim R-10 R-11] - CAMELTOE ticker collisions at other 4663 addresses. [claim R-6] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @CamelToeRH bio or a pinned post bidirectionally link to token 0xc32B…F201 and cameltoerh.fun? Next: re-read the X profile and DexScreener token profile after a Claim Profile; search new posts that embed the CA and the domain"
+    - text: "Is token 0xc32B…F201 source later verified on Blockscout, and does it match LaunchTokenDeployer output? Next: re-fetch api/v2/smart-contracts/0xc32B…F201"
+    - text: "Can factory owner 0x5519a8…044D change fees or quotes on 0xe64A…F297 now that launchCreationEnabled is false? Next: read remaining Ownable modifiers on src/RWAERC20LaunchpadFactory.sol"
+    - text: "Do the other robinhood CAMELTOE tickers (0x8CDf…F201, 0xBfBf…d35A, 0xE975…Aa23) share a deployer with 0xc32B…F201? Next: eth_getCode and factory() on each address"
+  unresolved: []

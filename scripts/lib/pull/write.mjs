@@ -9,7 +9,7 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { Document } from "yaml";
 
-const DOC_KEYS = ["slug", "pulled_at", "chain", "addresses", "metrics", "market", "activity", "errors"];
+const DOC_KEYS = ["slug", "pulled_at", "chain", "addresses", "metrics", "market", "structure", "activity", "errors"];
 const ADDRESS_KEYS = [
   "address", "label", "role", "is_contract", "source_verified", "contract_name",
   "proxy", "owner", "owner_type", "safe", "created_block", "created_at", "holders", "errors",
@@ -20,13 +20,16 @@ const METRIC_KEYS = ["kind", "value", "as_of", "source_url"];
 const ERROR_KEYS = ["step", "message"];
 const MARKET_KEYS = [
   "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
-  "price_usd", "price_change_h24", "fdv", "first_pair_at", "errors",
+  "price_usd", "price_change_h24", "fdv", "first_pair_at", "top10_share",
+  "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad", "errors",
 ];
 const PAIR_KEYS = [
   "dex", "pair_address", "quote_symbol", "price_usd", "liquidity_usd", "volume_h24",
   "volume_h6", "txns_h24", "price_change_h24", "fdv", "created_at",
 ];
 const TXNS_KEYS = ["buys", "sells"];
+const STRUCTURE_KEYS = ["pulled_at", "mint", "renounced", "lp", "errors"];
+const LP_KEYS = ["pair", "locked_share", "holder_kind", "reason"];
 const ACTIVITY_KEYS = ["pulled_at", "addresses", "last_activity_at", "txns_24h", "launches_24h"];
 const ACTIVITY_ADDRESS_KEYS = [
   "address", "label", "role", "transactions_count", "token_transfers_count",
@@ -36,7 +39,7 @@ const ACTIVITY_ADDRESS_KEYS = [
 /** Snapshot column order. One JSON line per run in content/pulled/history/<slug>.jsonl. */
 export const HISTORY_KEYS = [
   "at", "holders", "liquidity_usd", "volume_h24", "trades_h24",
-  "price_usd", "fdv", "txns_total", "launches_24h", "tvl",
+  "price_usd", "fdv", "txns_total", "launches_24h", "tvl", "revenue_24h", "top10_share",
 ];
 
 export const HISTORY_DIR = "content/pulled/history";
@@ -61,6 +64,7 @@ export function orderDocument(doc) {
   });
   ordered.metrics = (doc.metrics ?? []).map((m) => pick(m, METRIC_KEYS));
   ordered.market = orderMarket(doc.market);
+  ordered.structure = orderStructure(doc.structure);
   ordered.activity = orderActivity(doc.activity);
   ordered.errors = orderErrors(doc.errors);
   return ordered;
@@ -76,6 +80,14 @@ export function orderMarket(market) {
     return pair;
   });
   ordered.errors = orderErrors(market.errors);
+  return ordered;
+}
+
+export function orderStructure(structure) {
+  if (!structure) return null;
+  const ordered = pick(structure, STRUCTURE_KEYS);
+  ordered.lp = (structure.lp ?? []).map((row) => pick(row, LP_KEYS));
+  ordered.errors = orderErrors(structure.errors);
   return ordered;
 }
 
@@ -164,6 +176,7 @@ export function snapshotFrom(doc) {
   const activity = doc?.activity ?? null;
   const counts = (activity?.addresses ?? []).map((a) => a?.transactions_count).filter(Number.isInteger);
   const tvl = (doc?.metrics ?? []).find((m) => m?.kind === "tvl");
+  const revenue = (doc?.metrics ?? []).find((m) => m?.kind === "revenue_24h");
   return {
     at: doc?.pulled_at ?? null,
     holders: tokenHolders(doc),
@@ -175,6 +188,8 @@ export function snapshotFrom(doc) {
     txns_total: counts.length ? counts.reduce((a, b) => a + b, 0) : null,
     launches_24h: activity?.launches_24h ?? null,
     tvl: typeof tvl?.value === "number" ? tvl.value : null,
+    revenue_24h: typeof revenue?.value === "number" ? revenue.value : null,
+    top10_share: typeof market?.top10_share === "number" ? market.top10_share : null,
   };
 }
 

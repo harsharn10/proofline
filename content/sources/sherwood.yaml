@@ -66,9 +66,295 @@ sources:
     publisher: DefiLlama
     kind: third-party-data
     accessed_at: 2026-09-02T07:20:00Z
-    claim: "DefiLlama lists Sherwood (slug sherwood, category Privacy) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs"
+    claim: DefiLlama lists Sherwood (slug sherwood, category Privacy) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs
     excerpt: "api.llama.fi/protocols on 2026-09-02: chains include Robinhood Chain; chainTvls[Robinhood Chain] $105,170. Aggregator figure, not reproduced on chain."
     hash: null
     archive_url: null
     researcher: claude
+    available: true
+  - id: S7
+    url: https://sherwood.cash/
+    publisher: Sherwood
+    kind: official-site
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: sherwood.cash home
+    excerpt: "HTML title Sherwood — private swaps. JS contracts table: SherwoodVault the single immutable multi-asset custodian; SwapLogic view-only Uniswap route builder, UUPS-upgradeable; Verifier2 Groth16; Admin registers assets, router allowlist, fee capped at 10%, SwapLogic upgrades. Footer links https://x.com/sherw00d_cash and https://t.me/sherwood_cash. Bundle embeds vault 0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S8
+    url: https://github.com/sherwood-cash/contracts/blob/main/README.md
+    publisher: sherwood-cash
+    kind: repository
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: contracts README
+    excerpt: Smart contracts for Sherwood (https://sherwood.cash) — a privacy mixer and shielded DEX on the Robinhood chain. Deposits, withdrawals and swaps are shielded with zero-knowledge proofs, and every asset lives in its own Poseidon Merkle tree inside a single vault. SherwoodVault — the immutable vault. SwapLogic — UUPS-upgradeable router logic. Proxy — ERC-1967 UUPS; upgrade authority is controlled by the admin.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S9
+    url: https://api.llama.fi/protocol/sherwood
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: Sherwood protocol row
+    excerpt: name Sherwood category Privacy chains [Robinhood Chain] twitter sherw00d_cash description Sherwood is a privacy mixer + shielded DEX on Robinhood chain. module sherwood/index.js audits 0 listedAt 1785338533. currentChainTvls Robinhood Chain 72357.59239. tvl last date 1788393911 totalLiquidityUSD 72357. tokensInUsd last ETH 36852.66 USDG 4785.32 SHERWOOD 27707.55.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S10
+    url: https://github.com/DefiLlama/DefiLlama-Adapters/blob/main/projects/sherwood/index.js
+    publisher: DefiLlama
+    kind: repository
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: sherwood adapter VAULT
+    excerpt: "// Sherwood (sherwood.cash) — a privacy mixer + shielded DEX on Robinhood chain. const VAULT = '0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736' const DEPLOY_BLOCK = 21248162. methodology: TVL is the balance of every asset (native ETH, USDG and any token registered through a shielded swap) held by the Sherwood vault on Robinhood chain."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S11
+    url: https://robinhoodchain.blockscout.com/address/0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:54:00Z
+    claim: Address 0xf540…0736 SherwoodVault
+    excerpt: hash 0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736 name SherwoodVault is_contract true is_verified true proxy_type null creator 0x93080bdF26050307d410d372640D4398397E0A6E tx 0xcb41e3cc681c1b47c4ba3328e1e5bac165ecaefcae7267ff281a3f120665de22. Smart-contract compiler v0.8.24 is_partially_verified true file_path contracts/SherwoodVault.sol. Recent to-calls include transact and executeSwap on 2026-09-02.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S12
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Robinhood Chain RPC
+    kind: explorer
+    accessed_at: 2026-09-03T02:54:00Z
+    claim: eth_getCode and SherwoodVault views
+    excerpt: eth_chainId 0x1237. Vault eth_getCode 46838 hex chars. admin 0x93080bdF26050307d410d372640D4398397E0A6E code 0x. protocolFeeRecipient 0x6cEE2DC8A42A5AA3f28799ea8Ebd23Ea5e07cc08 code 0x. swapLogic 0x52445Ae1B988CfDc668EB15628629ED7d0890C6A. swapFeeBps 50 withdrawFeeBps 50 CONFIG_TIMELOCK 0 MAX_PROTOCOL_FEE_BPS 1000 permissionlessSwaps 1. verifier2 0x3d7bEA6294BC033fAA7e0e06F2D94088106CDb79 weth 0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S13
+    url: https://robinhoodchain.blockscout.com/tx/0xcb41e3cc681c1b47c4ba3328e1e5bac165ecaefcae7267ff281a3f120665de22
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:54:00Z
+    claim: Vault creation tx 0xcb41e3cc…
+    excerpt: timestamp 2026-07-28T02:52:54.000000Z status ok result success block_number 21248162 from 0x93080bdF26050307d410d372640D4398397E0A6E is_contract false created_contract 0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736 name SherwoodVault.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S14
+    url: https://robinhoodchain.blockscout.com/token/0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: Token 0xD4DC…92c1
+    excerpt: api/v2/tokens name Sherwood symbol SHERWOOD decimals 18 holders_count 658 total_supply 1000000000000000000000000000 type ERC-20. api/v2/addresses is_contract true is_verified true name PonsV2LauncherToken creator_address_hash 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42 creation_transaction_hash 0x5f0f903bab3ca1e77c16922b3eddca1899d360353c8b76305515b60113f530d5.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S15
+    url: https://robinhoodchain.blockscout.com/tx/0x5f0f903bab3ca1e77c16922b3eddca1899d360353c8b76305515b60113f530d5
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: SHERWOOD launchAndBuy tx
+    excerpt: timestamp 2026-08-08T19:55:38Z block 31341426 status ok method launchAndBuy to 0xe33E9E479dF8802cb0866d5d05258bEc4cF62948 name PonsV2LaunchAndBuy from 0x2c61c825e7D268cc2b4796E01c8d587408ba4F46. params name Sherwood symbol SHERWOOD twitter https://x.com/sherw00d_cash description SHERWOOD is the token powering Sherwood, the first privacy protocol on Robinhood. Swap privately. Fund anonymous wallets. Leave no trace. pairToken 0x0.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S16
+    url: https://api.dexscreener.com/latest/dex/tokens/0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: latest/dex/tokens SHERWOOD
+    excerpt: 3 robinhood uniswap pairs. Lead Uniswap v4 SHERWOOD/ETH pairAddress 0x2e03323ecfe5e6e4c287bdb731ea0f8857e5afbbded6612fdca4b8de20d0d874 liquidity.usd 51680.99 volume.h24 60337.16 marketCap 319875 priceUsd 0.0003240 pairCreatedAt 1786370278000. info.websites https://sherwood.cash/ https://sherwood.cash/docs https://github.com/orgs/sherwood-cash; socials https://x.com/sherw00d_cash https://t.me/sherwood_cash.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S17
+    url: https://x.com/sherw00d_cash
+    publisher: sherwood.cash (@sherw00d_cash)
+    kind: social
+    accessed_at: 2026-09-03T02:52:00Z
+    claim: X profile @sherw00d_cash
+    excerpt: "Display name sherwood.cash, handle @sherw00d_cash. Bio: Swap privately. Fund anonymous wallets. Leave no trace. Integrate privacy into your agents. $SHERWOOD. Built by @forezy_. Followers 972. Profile page HTML contains sherwood.cash."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S18
+    url: https://x.com/sherw00d_cash/status/2095222920285196402
+    publisher: sherwood.cash (@sherw00d_cash)
+    kind: social
+    accessed_at: 2026-09-03T02:52:00Z
+    claim: What's new in Sherwood v2
+    excerpt: What's new in Sherwood v2? The privacy engine is upgrading to a 4/4 circuit. Today, each private action can combine up to 2 of your shielded balances at a time. In v2, that becomes 4 in and 4 out, in a single proof.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S19
+    url: https://x.com/sherw00d_cash/status/2095059401518289329
+    publisher: sherwood.cash (@sherw00d_cash)
+    kind: social
+    accessed_at: 2026-09-03T02:52:00Z
+    claim: $SHERWOOD LIMIT ORDER UPDATE
+    excerpt: $SHERWOOD LIMIT ORDER UPDATE. You can now place limit orders to trade any token privately. Set your price and let Sherwood handle the rest.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S20
+    url: https://x.com/sherw00d_cash/status/2095334966892826934
+    publisher: sherwood.cash (@sherw00d_cash)
+    kind: social
+    accessed_at: 2026-09-03T02:52:00Z
+    claim: Privacy beyond payments
+    excerpt: monero:native and $ZEC brought privacy to payments. But sending money privately is only the beginning. $SHERWOOD pushes privacy further. Trade any token. Trade stocks. Manage your portfolio. Withdraw to a fresh wallet.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S21
+    url: https://x.com/sherw00d_cash/status/2094785627141157266
+    publisher: sherwood.cash (@sherw00d_cash)
+    kind: social
+    accessed_at: 2026-09-03T02:52:00Z
+    claim: Airdrop Season 1
+    excerpt: During $SHERWOOD Airdrop Season 1, we distributed 5% of the total supply, worth around $38K at ATH. One of the biggest airdrops on Robinhood Chain. Season 2 will be even bigger.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S22
+    url: https://x.com/sherw00d_cash/status/2094080702279295306
+    publisher: sherwood.cash (@sherw00d_cash)
+    kind: social
+    accessed_at: 2026-09-03T02:52:00Z
+    claim: TVL crossed $80K
+    excerpt: $SHERWOOD TVL just crossed $80K, with over $50K worth of $SHERWOOD locked in the Vault. Privacy never stops growing.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S23
+    url: https://x.com/sherw00d_cash/status/2093669997361152392
+    publisher: sherwood.cash (@sherw00d_cash)
+    kind: social
+    accessed_at: 2026-09-03T02:52:00Z
+    claim: Contracts are immutable
+    excerpt: $SHERWOOD contracts are immutable. Your funds can’t be drained through a malicious upgrade. PrivacyCash contract is upgradeable. If the deployer key is compromised, an attacker could potentially push a malicious upgrade and drain the funds.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S24
+    url: https://t.me/sherwood_cash
+    publisher: Telegram
+    kind: social
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: t.me/sherwood_cash
+    excerpt: "Page title Telegram: View @sherwood_cash. og:title Sherwood. og:description You can view and join @sherwood_cash right away."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S25
+    url: https://robinhoodchain.blockscout.com/address/0x52445Ae1B988CfDc668EB15628629ED7d0890C6A
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: SwapLogic proxy 0x52445Ae1…
+    excerpt: hash 0x52445Ae1B988CfDc668EB15628629ED7d0890C6A name ERC1967Proxy is_contract true is_verified true proxy_type eip1967 implementation 0x10562a98b0eB2BFF853275da5F34BF498192d45B is_verified false. creator 0x93080bdF26050307d410d372640D4398397E0A6E creation_transaction_hash 0x6c8741da95b866a5c02d94c76f7894eff95349179ee02fda645ea49427c70e5b timestamp 2026-07-28T02:52:56Z.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S26
+    url: https://api.llama.fi/summary/fees/sherwood?dataType=dailyFees
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: Sherwood dailyFees
+    excerpt: "name Sherwood twitter sherw00d_cash total24h 25.87 total7d 224.16 total30d 456.75 totalAllTime 467.91. totalDataChartBreakdown last [1788307200, {Robinhood Chain: {Sherwood: 25.87}}]. Fees methodology: Protocol fee charged on shielded withdrawals and swaps, always collected in ETH or USDG (ProtocolFeeCharged events)."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S27
+    url: https://api.llama.fi/summary/fees/sherwood?dataType=dailyRevenue
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: Sherwood dailyRevenue
+    excerpt: "name Sherwood total24h 25.87 total7d 224.16 total30d 456.75 totalAllTime 467.91. totalDataChartBreakdown last [1788307200, {Robinhood Chain: {Sherwood: 25.87}}]. Revenue methodology: All the fees charged on shielded withdrawals and swaps are retained by the protocol."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S28
+    url: https://github.com/sherwood-cash
+    publisher: GitHub
+    kind: repository
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: org sherwood-cash
+    excerpt: "login sherwood-cash name Sherwood.cash html_url https://github.com/sherwood-cash public_repos 5. Repos: contracts, dimension-adapters, DefiLlama-Adapters, sherwood-sdk, sherwood-mcp."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S29
+    url: https://github.com/sherwood-cash/contracts/blob/main/scripts/deployRobinhood.js
+    publisher: sherwood-cash
+    kind: repository
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: deployRobinhood.js
+    excerpt: Router allowlisting and the SwapLogic pointer are 2-step (propose -> enable) but the vault's CONFIG_TIMELOCK is 0, so both halves run back-to-back here. PROTOCOL_FEE_BPS fee rate, capped at 1000 (10%). Default 30 (0.30%). ADMIN_ADDRESS admin/multisig (defaults to deployer).
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S30
+    url: https://robinhoodchain.blockscout.com/address/0x3d7bEA6294BC033fAA7e0e06F2D94088106CDb79
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T03:00:00Z
+    claim: Verifier2 0x3d7bEA62…
+    excerpt: hash 0x3d7bEA6294BC033fAA7e0e06F2D94088106CDb79 name Verifier2 is_contract true is_verified true.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S31
+    url: https://github.com/DefiLlama/dimension-adapters/blob/master/fees/sherwood/index.ts
+    publisher: DefiLlama
+    kind: repository
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: sherwood fees adapter
+    excerpt: 'Sherwood (sherwood.cash) — a privacy mixer + shielded DEX on Robinhood chain. const VAULT = "0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736". event ProtocolFeeCharged. start: "2026-07-28". Fees always land in native ETH or USDG. There is no supply side, so every fee is protocol revenue.'
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S32
+    url: https://docs.sherwood.sh/
+    publisher: Sherwood Protocol
+    kind: docs
+    accessed_at: 2026-09-03T02:50:00Z
+    claim: docs.sherwood.sh home
+    excerpt: Sherwood Protocol enables any agent to manage an onchain fund with vaults, governed strategies, and verifiable track records. Sherwood is live on Robinhood testnet (chain 46630). Mainnet launch is ahead. Test capital only.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
     available: true

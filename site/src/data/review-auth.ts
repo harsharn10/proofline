@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import * as nodeCrypto from "node:crypto";
 import { createMiddleware } from "@tanstack/react-start";
 import { getResponseHeaders } from "@tanstack/react-start/server";
 import { applySiteSecurityHeaders } from "./security-headers";
@@ -59,7 +59,7 @@ function basicCredential(request: Request): string | null {
 }
 
 function credentialHash(token: string): string {
-  return createHash("sha256").update(token).digest("hex");
+  return nodeCrypto.createHash("sha256").update(token).digest("hex");
 }
 
 export async function authenticateReviewRequest(request: Request): Promise<ReviewPrincipal | null> {

@@ -25,3 +25,141 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: f93752ecc86099a3
+- date: 2026-09-02
+  slug: sinjoh
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "Fee router: launch and creator fees are bought back into PONS and NVDA airdrops and INJOH burns per the project; Yield Banks and raffle products are announced."
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/SinjohDeFi
+    deployments:
+      - label: INJOH token (account bio)
+        chain: robinhood-chain
+        address: "0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D"
+        role: token
+        verified: false
+        sources:
+          - S2
+          - S3
+    metrics: null
+  new:
+    summary: A fee-routing layer on top of Robinhood Chain launchpads. Creators launch through Sinjoh on Pons, Flap, pools.trade or LetsCash; collected fees hit a per-launch router that splits, swaps, airdrops, burns or adds liquidity on a config locked at deploy. Holders of customer tokens receive those routed assets. INJOH is the protocol token, launched on Pons. sinjoh.com and @SinjohDeFi run the surface.
+    themes:
+      - launchpad
+      - rwa
+      - stock-paired:nvda
+      - nft
+      - vault
+    official_links:
+      - kind: x
+        url: https://x.com/SinjohDeFi
+      - kind: site
+        url: https://www.sinjoh.com
+      - kind: app
+        url: https://app.sinjoh.com
+      - kind: github
+        url: https://github.com/Sinjoh-Finance/sinjoh-contracts
+    deployments:
+      - label: INJOH token (PonsLauncherToken)
+        chain: robinhood-chain
+        address: "0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D"
+        role: token
+        verified: true
+        sources:
+          - S2
+          - S3
+          - S7
+          - S8
+          - S9
+      - label: INJOH/WETH Uniswap v3 pair
+        chain: robinhood-chain
+        address: "0xB09fa4f04032b9d9e690ac4a1d29523b5f9A72DC"
+        role: other
+        verified: true
+        sources:
+          - S9
+          - S10
+          - S6
+          - S28
+      - label: INJOH SinjohFeeRouter clone
+        chain: robinhood-chain
+        address: "0x7E97EadeA120321c65CC09B6FDECc6Eb15D55b2f"
+        role: router
+        verified: false
+        sources:
+          - S9
+          - S12
+          - S13
+      - label: SinjohFeeRouter implementation
+        chain: robinhood-chain
+        address: "0x17c76Ff58b7Da12E116bb22ebDcc7F31Cadf9B64"
+        role: implementation
+        verified: false
+        sources:
+          - S12
+          - S13
+          - S18
+      - label: SinjohFeeRouterFactory
+        chain: robinhood-chain
+        address: "0xFA51E67f799699A237D558F5FbE7B170F8c5584d"
+        role: factory
+        verified: false
+        sources:
+          - S12
+          - S14
+          - S18
+      - label: PonsLaunchFactory (INJOH creator)
+        chain: robinhood-chain
+        address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+        role: factory
+        verified: false
+        sources:
+          - S7
+          - S9
+          - S11
+      - label: SinjohRevenueCollector
+        chain: robinhood-chain
+        address: "0x5Bb7582557F5be30b62c335Ad3ccf4bA79E138c5"
+        role: other
+        verified: false
+        sources:
+          - S15
+          - S18
+      - label: Revenue-collector owner / GitHub governance key
+        chain: robinhood-chain
+        address: "0x39E2f5eFdFd808F26B98979a06BA11ea82E1C85f"
+        role: admin
+        verified: false
+        sources:
+          - S15
+          - S16
+          - S18
+    metrics:
+      - kind: volume_24h
+        value: 940940.38
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S6
+      - kind: market_cap
+        value: 2338177
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S6
+      - kind: holders
+        value: 2292
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S8
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: ecd65d2bfbf56651

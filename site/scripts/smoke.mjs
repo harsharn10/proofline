@@ -17,6 +17,9 @@ const ROUTES = [
   "/n/hoodfun",
   "/feed",
   "/methodology",
+  "/disclaimer",
+  "/terms",
+  "/privacy",
   "/changelog",
   "/d/stock-tokens",
 ];
@@ -90,6 +93,45 @@ async function main() {
       const csp = res.headers.get("content-security-policy") ?? "";
       if (!csp.includes("default-src 'self'") || !csp.includes("object-src 'none'") || !csp.includes("frame-ancestors 'none'"))
         failures.push(`${route} is missing the required Content-Security-Policy`);
+    }
+
+    const publicHtml = await fetch(`${BASE}/`).then((response) => response.text());
+    const legalChecks = [
+      [
+        "/",
+        publicHtml,
+        [
+          "Icarus is an independent, automated information service",
+          "Full disclaimer.",
+          'href="/disclaimer"',
+        ],
+      ],
+      [
+        "/disclaimer",
+        await fetch(`${BASE}/disclaimer`).then((response) => response.text()),
+        ["No endorsement, approval, or affiliation", "rug pull", "Verify independently"],
+      ],
+      [
+        "/terms",
+        await fetch(`${BASE}/terms`).then((response) => response.text()),
+        ["Terms of Use", "No advice, endorsement, or reliance", "Prohibited use"],
+      ],
+      [
+        "/privacy",
+        await fetch(`${BASE}/privacy`).then((response) => response.text()),
+        [
+          "Privacy Policy",
+          "Information handled",
+          "does not currently sell visitor personal information",
+        ],
+      ],
+    ];
+    for (const [route, html, expected] of legalChecks) {
+      for (const phrase of expected) {
+        const present = html.includes(phrase);
+        console.log(`  ${present ? "ok  " : "FAIL"} ${route} includes legal copy: ${phrase}`);
+        if (!present) failures.push(`${route} is missing required legal copy: ${phrase}`);
+      }
     }
 
     const reviewRes = await fetch(`${BASE}/review`, { redirect: "manual" });

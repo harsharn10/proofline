@@ -2,7 +2,16 @@ import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
-import { headlineMetric } from "./types";
+import {
+  DEFAULT_KPIS,
+  SECTION_KPIS,
+  dexScreenerSearchUrl,
+  explorerTokenUrl,
+  headlineMetric,
+} from "./types";
+// Shared with scripts/score.mjs so site and Telegram eligibility cannot drift.
+// @ts-expect-error The repository-level helper is intentionally plain ESM.
+import { locatedOnChain as locatedOnChainCore, meetsShareBar as meetsShareBarCore, officialSurfaceConfirmed as officialSurfaceConfirmedCore } from "../../../scripts/lib/share-bar.mjs";
 import type {
   ChangelogEntry,
   Deployment,
@@ -14,7 +23,9 @@ import type {
   DossierBundle,
   Findings,
   Derived,
+  HistoryPoint,
   Kpis,
+  LatestIcarusItem,
   LatestFeedItem,
   Link,
   Metric,
@@ -24,9 +35,11 @@ import type {
   Research,
   Review,
   SectionDef,
+  SectionLeader,
   SiteConfig,
   SourceEntry,
   TreeRef,
+  TrendingEntry,
 } from "./types";
 
 // schema/taxonomy.json — the one taxonomy. Sections in home order; leaves keyed by "domain/leaf".
@@ -34,6 +47,11 @@ type TaxonomyFile = {
   sections: Array<SectionDef & { domains: string[]; leaves?: string[] }>;
   leaves: Record<string, { label: string }>;
 };
+
+// Optional daily backfills (content/pulled/series/<slug>.json), read through the same virtual
+// snapshot as every other content directory. `?? {}` is for the Node rule tests in
+// scripts/test.mjs, which import this module with a stub snapshot — never for the browser bundle.
+const pulledSeries: Record<string, string> = rawContent.pulledSeries ?? {};
 
 function parseYaml<T>(raw: string): T {
   return YAML.parse(raw) as T;
@@ -87,19 +105,45 @@ type ProjectFile = {
   deployments: Deployment[];
   review: Review;
   findings: Findings;
+  themes?: string[];
 };
 
 type SourcesFile = { slug: string; sources: SourceEntry[] };
 type FeedFile = { slug: string; items: Dossier["feed"] };
 // The subset of census.yaml the site reads: the official handle and the desk's taxonomy
 // placement per slug (schema/census.schema.json).
-type CensusEntry = { slug: string; handle?: string; role?: "subject" | "observe"; tree?: { primary?: string; secondary?: string[] } };
+type CensusEntry = {
+  slug: string;
+  handle?: string;
+  role?: "subject" | "observe";
+  identity: { entity_kind: DirectoryEntry["entityKind"]; status: DirectoryEntry["identityStatus"] };
+  official_links?: Link[];
+  qualifying?: { citable?: { value: boolean; note: string; verified: boolean } };
+  tree?: { primary?: string; secondary?: string[] };
+};
+
+type PulledCardFields = {
+  market?: {
+    top10_share?: number | null;
+    launchpad?: { slug: string; via: "factory" | "creator"; address: string } | null;
+  } | null;
+  structure?: {
+    mint?: "owner-can-mint" | "no-mint-function" | "unknown";
+    lp?: Array<{
+      pair: string | null;
+      locked_share: number | null;
+      holder_kind: "burn" | "locker" | "burn-and-locker" | "none" | null;
+      reason: string | null;
+    }>;
+  } | null;
+};
 
 type DerivedFile = {
   generated_at: string;
   methodology_version: string;
   projects: Record<string, Record<string, unknown>>;
   trending: string[];
+  shareBar?: Record<string, boolean>;
 };
 
 // derived.json values pass through these narrow gates so a malformed emitter row degrades to
@@ -183,7 +227,9 @@ type ServerContent = {
   dossiers: Dossier[];
   dependencies: Record<string, DependencyCard>;
   changelog: ChangelogEntry[];
+  censusBySlug: Map<string, CensusEntry>;
   treeBySlug: Record<string, TreeRef>;
+  histories: Record<string, HistoryPoint[]>;
   generatedAt: string;
   now: number;
 };
@@ -217,7 +263,9 @@ function loadContent(): ServerContent {
   // the dossier eyebrow and the peer set all key off this placement.
   const treeBySlug: Record<string, TreeRef> = {};
   const roleBySlug: Record<string, "subject" | "observe"> = {};
+  const censusBySlug = new Map(census.map((row) => [row.slug, row]));
   for (const row of census) {
+    censusBySlug.set(row.slug, row);
     const tree = resolveTree(row.tree?.primary, taxonomy);
     if (tree) treeBySlug[row.slug] = tree;
     roleBySlug[row.slug] = row.role === "observe" ? "observe" : "subject";
@@ -248,6 +296,9 @@ function loadContent(): ServerContent {
     const feed = feedFile ? [...feedFile.items].sort((a, b) => b.date.localeCompare(a.date)) : [];
     const pulled = readYamlOrWarn<PulledFile | null>(rawContent.pulled[`${slug}.yaml`], `pulled/${slug}.yaml`, slug, null);
     const history = parseHistory(rawContent.pulledHistory[`${slug}.jsonl`]);
+    const dailySeries = parseDailySeries(pulledSeries[`${slug}.json`]);
+    const censusRow = censusBySlug.get(slug);
+    const pulledCard = pulled as (PulledFile & PulledCardFields) | null;
     const changelog = changelogAll
       .filter((entry) => entry.slug === slug)
       .sort((a, b) => b.date.localeCompare(a.date));
@@ -272,7 +323,30 @@ function loadContent(): ServerContent {
       changelog,
       derived: withPulledMetrics(pickDerived(derivedFile.projects[slug], slug, project.coverage), pulled),
       pulled,
-      kpis: kpisFor({ lifecycle: project.lifecycle, deployments: project.deployments }, pulled, history, buildNow),
+      kpis: kpisFor({ lifecycle: project.lifecycle }, pulled, history, buildNow),
+      card: {
+        officialConfirmed: officialSurfaceConfirmed(censusRow),
+        handle: censusRow?.handle ?? null,
+        themes: Array.isArray(project.themes) ? project.themes.filter((tag) => typeof tag === "string").slice(0, 5) : [],
+        history: history.map((point) => ({
+          at: point.at,
+          holders: point.holders ?? null,
+          volume24h: point.volume_h24 ?? null,
+          trades24h: point.trades_h24 ?? null,
+          launches24h: point.launches_24h ?? null,
+          revenue24h: point.revenue_24h ?? null,
+        })),
+        dailySeries,
+        top10Share: pulledCard?.market?.top10_share ?? null,
+        launchpad: pulledCard?.market?.launchpad ?? null,
+        mint: pulledCard?.structure?.mint ?? null,
+        liquidityLocks: (pulledCard?.structure?.lp ?? []).map((row) => ({
+          pair: row.pair,
+          lockedShare: row.locked_share,
+          holderKind: row.holder_kind,
+          reason: row.reason,
+        })),
+      },
     };
   });
 
@@ -282,7 +356,14 @@ function loadContent(): ServerContent {
     dossiers: directorySortKey(dossiers),
     dependencies,
     changelog: changelogAll,
+    censusBySlug,
     treeBySlug,
+    histories: Object.fromEntries(
+      Object.keys(rawContent.projects).map((file) => {
+        const slug = file.replace(/\.yaml$/, "");
+        return [slug, parseHistory(rawContent.pulledHistory[`${slug}.jsonl`])];
+      }),
+    ),
     generatedAt: derivedFile.generated_at,
     now: buildNow,
   };
@@ -299,11 +380,19 @@ function getCachedContent(): ServerContent {
 
 // --- Slices ------------------------------------------------------------------------
 
-// Home shows only the newest 5 — the full firehose lives on /feed (IA brief: declutter home).
-const LATEST_FEED_COUNT = 5;
-const LATEST_FEED_BODY_MAX = 240;
-
-function toDirectoryEntry(d: Dossier, treeBySlug: Record<string, TreeRef>): DirectoryEntry {
+function toDirectoryEntry(
+  d: Dossier,
+  treeBySlug: Record<string, TreeRef>,
+  censusBySlug: Map<string, CensusEntry>,
+): DirectoryEntry {
+  const tree = treeBySlug[d.slug] ?? null;
+  const census = censusBySlug.get(d.slug);
+  const officialConfirmed = officialSurfaceConfirmed(census);
+  const hasContractOn4663 = locatedOnChain(d.pulled);
+  const factoryLaunches24h =
+    d.pulled?.activity?.addresses
+      .filter((address) => address.role === "factory")
+      .reduce((sum, address) => sum + (address.launches_24h ?? 0), 0) ?? 0;
   return {
     slug: d.slug,
     name: d.name,
@@ -312,12 +401,24 @@ function toDirectoryEntry(d: Dossier, treeBySlug: Record<string, TreeRef>): Dire
     lifecycle: d.lifecycle,
     coverage: d.coverage,
     role: d.role,
+    entityKind: census?.identity.entity_kind ?? "unknown",
+    identityStatus: census?.identity.status ?? "provisional",
+    officialConfirmed,
+    hasContractOn4663,
+    shareBarMetric:
+      census?.identity.entity_kind === "token" || tree?.sectionId === "launchpads"
+        ? "liquidity"
+        : "tvl",
     summary: d.summary,
+    officialLinks: d.links,
+    dependencyIds: d.dependencies,
+    reviewedAt: d.review.reviewed_at,
     derived: d.derived,
     feedCount: d.feed.length,
-    tree: treeBySlug[d.slug] ?? null,
+    tree,
     holders: tokenHolders(d.pulled),
     kpis: d.kpis,
+    factoryLaunches24h,
   };
 }
 
@@ -335,15 +436,13 @@ function withPulledMetrics(derived: Derived, pulled: PulledFile | null): Derived
 
 const DAY = 86_400_000;
 
-type HistoryLine = { at: string; holders?: number | null; liquidity_usd?: number | null; volume_h24?: number | null; trades_h24?: number | null; txns_total?: number | null; launches_24h?: number | null; tvl?: number | null };
-
-function parseHistory(raw: string | undefined): HistoryLine[] {
+function parseHistory(raw: string | undefined): HistoryPoint[] {
   if (!raw) return [];
-  const lines: HistoryLine[] = [];
+  const lines: HistoryPoint[] = [];
   for (const line of raw.split("\n")) {
     if (!line.trim()) continue;
     try {
-      const v = JSON.parse(line) as HistoryLine;
+      const v = JSON.parse(line) as HistoryPoint;
       if (typeof v.at === "string") lines.push(v);
     } catch {
       /* a bad line never breaks the page */
@@ -352,8 +451,170 @@ function parseHistory(raw: string | undefined): HistoryLine[] {
   return lines.sort((a, b) => a.at.localeCompare(b.at));
 }
 
+// --- Home and category rules -------------------------------------------------------
+
+export function meetsShareBar(entry: DirectoryEntry): boolean {
+  return meetsShareBarCore(entry);
+}
+
+export function trendingNow(
+  entries: DirectoryEntry[],
+  histories: Record<string, HistoryPoint[]>,
+): TrendingEntry[] {
+  return entries
+    .filter(
+      (entry) =>
+        entry.kpis.status === "live" && meetsShareBar(entry) && entry.kpis.volume24h !== null,
+    )
+    .sort((a, b) => b.kpis.volume24h! - a.kpis.volume24h! || a.name.localeCompare(b.name))
+    .slice(0, 5)
+    .map((entry) => {
+      const anchor = new Date(
+        entry.kpis.readAt ?? histories[entry.slug]?.at(-1)?.at ?? "",
+      ).getTime();
+      const target = anchor - DAY;
+      const prior = (histories[entry.slug] ?? [])
+        .filter((point) => {
+          const at = new Date(point.at).getTime();
+          return Number.isFinite(at) && at < anchor && typeof point.volume_h24 === "number";
+        })
+        .sort(
+          (a, b) =>
+            Math.abs(new Date(a.at).getTime() - target) -
+            Math.abs(new Date(b.at).getTime() - target),
+        )[0];
+      const priorValue = prior?.volume_h24;
+      const change24h =
+        typeof priorValue === "number" && priorValue > 0
+          ? ((entry.kpis.volume24h! - priorValue) / priorValue) * 100
+          : null;
+      return { entry, change24h };
+    });
+}
+
+export function newLaunches(entries: DirectoryEntry[], now = Date.now()): DirectoryEntry[] {
+  return entries
+    .filter((entry) => {
+      if (!entry.kpis.firstPairAt || !meetsShareBar(entry)) return false;
+      const age = now - new Date(entry.kpis.firstPairAt).getTime();
+      return age >= 0 && age <= 14 * DAY;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.kpis.firstPairAt!).getTime() - new Date(a.kpis.firstPairAt!).getTime() ||
+        a.name.localeCompare(b.name),
+    );
+}
+
+// "Launches below $25K are not listed: N today". The launch count is a 24-hour figure, so only
+// the listed names whose first pool is also inside that window can be subtracted from it —
+// New launches itself is a 14-day list.
+export function notListedCount(
+  entries: DirectoryEntry[],
+  listed: DirectoryEntry[],
+  now = Date.now(),
+): number {
+  const factoryLaunches = entries.reduce((sum, entry) => sum + entry.factoryLaunches24h, 0);
+  const listedToday = listed.filter((entry) => {
+    if (!entry.kpis.firstPairAt) return false;
+    const age = now - new Date(entry.kpis.firstPairAt).getTime();
+    return age >= 0 && age <= DAY;
+  }).length;
+  return Math.max(0, factoryLaunches - listedToday);
+}
+
+export function announcedNow(entries: DirectoryEntry[]): DirectoryEntry[] {
+  return entries
+    .filter(
+      (entry) =>
+        entry.kpis.status === "announced" &&
+        entry.officialConfirmed &&
+        entry.summary.trim().length > 0,
+    )
+    .sort((a, b) => b.reviewedAt.localeCompare(a.reviewedAt) || a.name.localeCompare(b.name));
+}
+
+export function sectionLeaders(section: SectionDef, entries: DirectoryEntry[]): SectionLeader[] {
+  const key = (SECTION_KPIS[section.id] ?? ["volume24h"])[0]!;
+  const ranked = entries
+    .filter(
+      (entry) =>
+        entry.tree?.sectionId === section.id && meetsShareBar(entry) && entry.kpis[key] !== null,
+    )
+    .sort((a, b) => Number(b.kpis[key]) - Number(a.kpis[key]) || a.name.localeCompare(b.name))
+    .slice(0, 5)
+    .map((entry) => ({ entry, announced: false }));
+  if (ranked.length >= 3) return ranked;
+  const announced = announcedNow(entries)
+    .filter((entry) => entry.tree?.sectionId === section.id)
+    .slice(0, 3 - ranked.length)
+    .map((entry) => ({ entry, announced: true }));
+  return [...ranked, ...announced];
+}
+
+export function latestFromIcarus(
+  changelog: ChangelogEntry[],
+  feed: LatestFeedItem[],
+  n = 4,
+): LatestIcarusItem[] {
+  const updates: LatestIcarusItem[] = changelog.map((entry) => ({
+    kind: "icarus",
+    date: entry.date,
+    slug: entry.slug,
+    who: "Icarus",
+    title: entry.title,
+    body: entry.detail,
+    sourceUrl: null,
+  }));
+  const posts: LatestIcarusItem[] = feed.map(({ name, item }) => ({
+    kind: "post",
+    date: item.date,
+    slug: name.slug,
+    who: item.account ?? (item.kind === "onchain" ? "on-chain" : (name.symbol ?? name.name)),
+    title: item.title,
+    body: item.body,
+    sourceUrl: item.sourceUrl ?? null,
+  }));
+  return [...updates, ...posts]
+    .sort(
+      (a, b) =>
+        b.date.localeCompare(a.date) ||
+        a.slug.localeCompare(b.slug) ||
+        a.title.localeCompare(b.title),
+    )
+    .slice(0, Math.max(0, n));
+}
+
+function parseDailySeries(raw: string | undefined): Record<string, Array<{ at: string; value: number }>> {
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const result: Record<string, Array<{ at: string; value: number }>> = {};
+    for (const [key, rows] of Object.entries(parsed)) {
+      if (!Array.isArray(rows)) continue;
+      const points = rows.flatMap((row) => {
+        if (!Array.isArray(row) || row.length < 2 || typeof row[0] !== "string" || typeof row[1] !== "number") return [];
+        return [{ at: row[0], value: row[1] }];
+      });
+      if (points.length > 0) result[key] = points;
+    }
+    return result;
+  } catch {
+    return {};
+  }
+}
+
+// One definition, shared with the score emitter (scripts/lib/share-bar.mjs).
+export function locatedOnChain(pulled: PulledFile | null): boolean {
+  return locatedOnChainCore(pulled) as boolean;
+}
+
+export function officialSurfaceConfirmed(census: CensusEntry | undefined): boolean {
+  return officialSurfaceConfirmedCore(census) as boolean;
+}
+
 // Change over `days`: the latest snapshot against the newest one at least that many days older.
-function deltaFrom(history: HistoryLine[], key: "holders", days: number): number | null {
+function deltaFrom(history: HistoryPoint[], key: "holders", days: number): number | null {
   if (history.length < 2) return null;
   const latest = history[history.length - 1]!;
   const latestAt = new Date(latest.at).getTime();
@@ -366,17 +627,17 @@ function deltaFrom(history: HistoryLine[], key: "holders", days: number): number
 // Every tracker number on a card comes from here: DexScreener market read, Blockscout activity read,
 // holder counts and their 7-day change from snapshots, DefiLlama TVL. Status is computed from the
 // reads, never typed by a person.
-function kpisFor(d: { lifecycle: Dossier["lifecycle"]; deployments: Deployment[] }, pulled: PulledFile | null, history: HistoryLine[], now: number): Kpis {
+function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | null, history: HistoryPoint[], now: number): Kpis {
   const market = pulled?.market ?? null;
   const activity = pulled?.activity ?? null;
-  const located = d.deployments.some((x) => x.address !== "not-verified");
+  const located = locatedOnChain(pulled);
   const holders = tokenHolders(pulled);
   const lastActivityAt = activity?.last_activity_at ?? null;
   const tvl = pulled?.metrics.find((m) => m.kind === "tvl")?.value ?? null;
   const trades = market?.trades_h24 ?? null;
   let status: Kpis["status"];
   if (d.lifecycle === "testnet-only") status = "testnet";
-  else if (!located && !market?.pairs?.length) status = "announced";
+  else if (!located) status = "announced";
   else {
     const age = lastActivityAt ? now - new Date(lastActivityAt).getTime() : null;
     if ((age !== null && age <= 7 * DAY) || (trades ?? 0) > 0) status = "live";
@@ -451,6 +712,52 @@ function toDependencyRef(card: DependencyCard): DependencyRef {
   return { id: card.id, name: card.name, kind: card.kind, summary: card.summary, deployments: card.deployments };
 }
 
+function sourceLinksFor(dossier: Dossier, site: SiteConfig): DossierBundle["related"][number]["sourceLinks"] {
+  const market = dexScreenerSearchUrl(dossier.symbol ?? dossier.name);
+  const address = dossier.pulled?.addresses.find((row) => row.role === "token")?.address ?? dossier.pulled?.addresses[0]?.address;
+  const explorer = address ? explorerTokenUrl(site.chain.explorer, address) : undefined;
+  const llama = dossier.pulled?.metrics.find((metric) => metric.kind === "tvl")?.source_url;
+  return {
+    liquidityUsd: market,
+    volume24h: market,
+    trades24h: market,
+    priceChange24h: market,
+    fdv: market,
+    ...(explorer ? { holders: explorer, holdersDelta7d: explorer, launches24h: explorer, txnsTotal: explorer } : {}),
+    ...(llama ? { tvl: llama } : {}),
+  };
+}
+
+function relatedFor(
+  dossier: Dossier,
+  all: Dossier[],
+  treeBySlug: Record<string, TreeRef>,
+  site: SiteConfig,
+): DossierBundle["related"] {
+  const sectionId = treeBySlug[dossier.slug]?.sectionId;
+  if (!sectionId) return [];
+  const key = (SECTION_KPIS[sectionId] ?? DEFAULT_KPIS)[0]!;
+  return all
+    .filter((entry) => treeBySlug[entry.slug]?.sectionId === sectionId)
+    .sort((a, b) => {
+      const av = a.kpis[key];
+      const bv = b.kpis[key];
+      if (typeof av === "number" && typeof bv === "number" && av !== bv) return bv - av;
+      if ((av === null) !== (bv === null)) return av === null ? 1 : -1;
+      return a.name.localeCompare(b.name);
+    })
+    .map((entry) => ({
+      slug: entry.slug,
+      name: entry.name,
+      symbol: entry.symbol,
+      kpis: entry.kpis,
+      score: entry.derived.score,
+      officialConfirmed: entry.card.officialConfirmed,
+      launchpad: entry.card.launchpad?.slug ?? null,
+      sourceLinks: sourceLinksFor(entry, site),
+    }));
+}
+
 // --- Server functions ---------------------------------------------------------------
 
 // The directory: the sections in order, one slim entry per name, and the dependency cards as chips.
@@ -460,7 +767,14 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
   return {
     site: content.site,
     sections: content.sections,
-    entries: content.dossiers.map((d) => toDirectoryEntry(d, content.treeBySlug)),
+    entries: content.dossiers.map((d) =>
+      toDirectoryEntry(d, content.treeBySlug, content.censusBySlug),
+    ),
+    histories: content.histories,
+    changelog: content.changelog,
+    feed: content.dossiers.flatMap((d) =>
+      d.feed.map((item) => ({ name: { slug: d.slug, symbol: d.symbol, name: d.name }, item })),
+    ),
     dependencies: Object.values(content.dependencies)
       .map((c) => ({ id: c.id, name: c.name, kind: c.kind }))
       .sort((a, b) => a.name.localeCompare(b.name)),
@@ -491,6 +805,7 @@ export const getDossier = createServerFn({ method: "GET" })
       tree,
       section: tree?.sectionId ? (content.sections.find((s) => s.id === tree.sectionId) ?? null) : null,
       now: content.now,
+      related: dossier ? relatedFor(dossier, content.dossiers, content.treeBySlug, content.site) : [],
     };
   });
 

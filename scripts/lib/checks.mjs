@@ -35,6 +35,100 @@ export function referencedSourceIds(project) {
   return ids;
 }
 
+/** Contract-plus-pair evidence used by the one-time lifecycle migration. */
+export function mainnetReceiptFromPulled(pulled) {
+  if (pulled?.chain !== "robinhood-chain") return null;
+  const pairs = (pulled.market?.pairs ?? []).filter((pair) => pair?.pair_address);
+  if (!pairs.length) return null;
+  const contracts = (pulled.addresses ?? []).filter((row) => row?.is_contract === true && /^0x[0-9a-fA-F]{40}$/.test(row.address ?? ""));
+  if (!contracts.length) return null;
+  // The receipt has to be the contract the market is actually about: the market's own token, or the
+  // contract behind one of its pairs. Any other contract in the file (a router, a helper, whatever the
+  // puller happened to see first) proves nothing about this name, so there is no fallback — no match
+  // means no receipt, and the caller leaves the lifecycle where it is.
+  const marketAddress = String(pulled.market?.token_address ?? "").toLowerCase();
+  const pairAddresses = new Set(pairs.map((pair) => String(pair.pair_address).toLowerCase()));
+  const contract =
+    contracts.find((row) => row.address.toLowerCase() === marketAddress) ??
+    contracts.find((row) => pairAddresses.has(row.address.toLowerCase())) ??
+    null;
+  if (!contract?.created_at) return null;
+  return { address: contract.address, createdAt: contract.created_at };
+}
+
+/** The reader-facing records behind the two reads the puller makes: the explorer, and DexScreener. */
+const EXPLORER_ADDRESS_PAGE = "https://robinhoodchain.blockscout.com/address/";
+const DEXSCREENER_PAIR_PAGE = "https://dexscreener.com/robinhood/";
+
+/**
+ * The receipt a pulled chain read gives one deployment address, or null when the puller has not
+ * established it. This is the second thing that turns a machine read into a citable receipt, and it
+ * lives beside `mainnetReceiptFromPulled` so there is one place that does it: an address the puller
+ * has reached is evidence a controller does not have to reproduce by hand, while one it has not
+ * reached stays unverified rather than being taken on trust.
+ *
+ * The puller reaches an address two ways. `addresses[]` is its explorer read, which knows whether the
+ * address holds code and whether that code's source is verified. `market.pairs[]` is its DexScreener
+ * read: a pool the market data names is a contract that exists and trades, established by a different
+ * endpoint, so it carries that endpoint's publisher and kind rather than the explorer's.
+ */
+export function deploymentReceiptFromPulled(pulled, address) {
+  if (pulled?.chain !== "robinhood-chain") return null;
+  const wanted = String(address ?? "").toLowerCase();
+  if (!wanted || wanted === "not-verified") return null;
+
+  const row = (pulled.addresses ?? []).find((entry) => String(entry?.address ?? "").toLowerCase() === wanted);
+  // schema/pulled.schema.json carries source_verified on every address; null means Blockscout never
+  // answered, which is not the same as "unverified source" but is equally not an establishment.
+  const established = row?.is_contract === true && (!("source_verified" in row) || row.source_verified === true);
+  if (row && established && pulled.pulled_at) return {
+    address: row.address,
+    pulledAt: pulled.pulled_at,
+    receipt: `pulled ${row.address} ${pulled.pulled_at}`,
+    url: `${EXPLORER_ADDRESS_PAGE}${row.address}`,
+    publisher: "Robinhood Chain Blockscout",
+    kind: "explorer",
+    detail: `is_contract true, source_verified true${row.contract_name ? `, contract ${row.contract_name}` : ""}`,
+  };
+
+  const marketPulledAt = pulled.market?.pulled_at;
+  const pair = (pulled.market?.pairs ?? []).find((entry) => String(entry?.pair_address ?? "").toLowerCase() === wanted);
+  if (pair && marketPulledAt) return {
+    address: pair.pair_address,
+    pulledAt: marketPulledAt,
+    receipt: `pulled pair ${pair.pair_address} ${marketPulledAt}`,
+    url: `${DEXSCREENER_PAIR_PAGE}${pair.pair_address}`,
+    publisher: "DexScreener",
+    kind: "third-party-data",
+    detail: `market pair for ${pulled.market?.token_address ?? "the project token"} on Robinhood Chain (4663)`,
+  };
+  return null;
+}
+
+function pulledContractHasActivity(pulled) {
+  if (pulled?.chain !== "robinhood-chain") return false;
+  const contracts = new Set((pulled.addresses ?? []).filter((row) => row?.is_contract === true).map((row) => String(row.address).toLowerCase()));
+  return (pulled.activity?.addresses ?? []).some((row) => {
+    if (!contracts.has(String(row.address).toLowerCase())) return false;
+    return Boolean(row.last_tx_at) || Number(row.transactions_count ?? 0) > 0 || Number(row.token_transfers_count ?? 0) > 0;
+  });
+}
+
+/** Warn when a typed Announced lifecycle disagrees with machine reads. */
+export function lifecycleDriftWarnings(census, pulledBySlug) {
+  const warnings = [];
+  for (const row of census ?? []) {
+    if (row.lifecycle !== "announced") continue;
+    const pulled = pulledBySlug?.get(row.slug);
+    if (!pulled || pulled.chain !== "robinhood-chain") continue;
+    const pairCreated = (pulled.market?.pairs ?? []).some((pair) => pair?.pair_address);
+    const activeContract = pulledContractHasActivity(pulled);
+    if (pairCreated || activeContract)
+      warnings.push(`census: ${row.slug} is announced but pulled chain reads show ${pairCreated ? "a market pair" : "contract activity"} on 4663`);
+  }
+  return warnings;
+}
+
 export function crossCheck(content) {
   const errors = [], warnings = [];
   const censusSlugs = new Set();

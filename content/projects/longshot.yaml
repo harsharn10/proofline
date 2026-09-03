@@ -1,26 +1,91 @@
 slug: longshot
 name: Longshot
-symbol: null
-category: Stock-paired token factory
-lifecycle: announced
+symbol: LONGSHOT
+category: Bonding-curve launchpad
+lifecycle: mainnet
+lifecycle_source: pulled 0x8701E2C87ade58325601f4F9bf37ADF46Cb75745 2026-08-12T22:53:45.000Z
 coverage: stub
-summary: Launch and fee-routing protocol on Robinhood Chain; fees split into a fixed Hyperliquid perp position, holder rewards and the protocol.
+summary: "Fee-routed token factory: trading fees fund one immutable Hyperliquid long or short, holder rewards, and a 20% operations cut. A creator picks underlying, direction and leverage, then deploys; on Robinhood Chain LaunchFactoryV4 uses a bonding curve that graduates to Uniswap v4. The official LONGSHOT token trades versus WETH. @uselongshot runs it at uselongshot.xyz."
 official_links:
-  - kind: site
+  - kind: docs
     url: https://www.uselongshot.xyz
   - kind: x
     url: https://x.com/uselongshot
+  - kind: telegram
+    url: https://t.me/uselongshot
+  - kind: github
+    url: https://github.com/LongshotRH/Longshot
 dependencies:
   - hyperliquid
 deployments:
-  - label: RH Chain token (PRD Appendix A)
+  - label: LONGSHOT token (official CA)
     chain: robinhood-chain
     address: "0x8701E2C87ade58325601f4F9bf37ADF46Cb75745"
     role: token
-    verified: false
+    verified: true
     sources:
       - S5
       - S4
+      - S9
+      - S10
+      - S12
+  - label: LaunchFactoryV4 (Robinhood Chain)
+    chain: robinhood-chain
+    address: "0xE1E635c1d952C4136f1fBF816c072EBb5D3E3661"
+    role: factory
+    verified: true
+    sources:
+      - S6
+      - S13
+      - S14
+  - label: LaunchLensV4 (Robinhood Chain)
+    chain: robinhood-chain
+    address: "0xCFd8902c696fb74FA64ea6Fe339e149e5c50b00f"
+    role: other
+    verified: false
+    sources:
+      - S6
+      - S15
+  - label: BondingRouterV4 (Robinhood Chain)
+    chain: robinhood-chain
+    address: "0x1BAfB314515Cedf96Ac8D569304934EefA051bcA"
+    role: router
+    verified: false
+    sources:
+      - S6
+      - S16
+  - label: LONGSHOT / WETH Uniswap v3 pool
+    chain: robinhood-chain
+    address: "0xCA3C6DBF5F875156B146FCa72BCeed53A8414fC7"
+    role: other
+    verified: true
+    sources:
+      - S11
+      - S12
+      - S17
+  - label: Pre-V4 launch contract that created the official token
+    chain: robinhood-chain
+    address: "0xB2F8c34181878E410bbbcEb9A992Ea7c66dc877E"
+    role: factory
+    verified: false
+    sources:
+      - S11
+      - S12
+  - label: PoolAccountRegistry (Robinhood Chain)
+    chain: robinhood-chain
+    address: "0x7A367caCc51227B4bF315eabB6Ee501FD01a4fE9"
+    role: other
+    verified: false
+    sources:
+      - S6
+      - S12
+  - label: LaunchFactoryV4 keeper
+    chain: robinhood-chain
+    address: "0xd9C0B4110bc29391c953d986d3a91E6114D0Ad60"
+    role: other
+    verified: false
+    sources:
+      - S12
 review:
   researcher: harsharn10
   approver: pending
@@ -39,6 +104,16 @@ findings:
       class: claim
       sources:
         - S4
+    - text: "Receipts: every URL above was opened on 2026-09-03 and its excerpt copied from the page or API. [verified R-1 R-4 R-12] - Numbers: market cap, 24h volume and holders are the 4663 pair or token slice, not an all-chains total. [verified R-5 R-12] - Adversarial: the strongest contrary reading is that Longshot is LONG (app.long.xyz) or longshot.finance on Solana; the official domain, handle, CA and factory addresses argue against both."
+      class: inference
+      sources:
+        - S6
+        - S7
+        - S9
+    - text: LaunchFactoryV4 bytecode is unverified; owner is one EOA. [verified R-7 R-8] - Official 4663 pool liquidity is $4,446, below a $25k pool bar. [verified R-12] - Perp liquidation can zero that isolated margin while the token keeps trading. [claim R-1] - No named audit report was located. [claim R-1] - github.com/LongshotRH/Longshot returned 404.
+      class: claim
+      sources:
+        - S20
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from PRD Appendix A not yet reproduced on Blockscout
@@ -46,4 +121,34 @@ findings:
     - text: Fee-split contract and admin powers unknown
     - text: An independent audit was not found in this review
     - text: Multi-chain footprint (Base, Solana, BNB, HyperEVM per the workbook) not reviewed
+    - text: "Which on-chain function is isLaunchPool, and do the two Launched pools still hold liquidity on 4663? Next: decode unverified LaunchFactoryV4 source or call LaunchLensV4.getLaunch on the two token addresses"
+    - text: "When does the factory owner enable stock underlyings, and which Stock Token symbols are capped? Next: eth_call the leverage-cap mapping once source is verified"
+    - text: "Is github.com/LongshotRH/Longshot private, renamed, or a stale HTML string? Next: re-open the URL after a public push and compare bytecode"
+    - text: "Does pre-V4 contract 0xB2F8…877E still accept launches, or is V4 the only live factory? Next: compare launch selectors and watch new Launched logs"
+    - text: "Is there an audit of LaunchFactoryV4 bytecode? Next: record any later report whose scope matches 0xE1E6…3661"
   unresolved: []
+themes:
+  - launchpad
+  - rwa
+  - memecoin
+metrics:
+  - kind: market_cap
+    value: 4439
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17
+  - kind: volume_24h
+    value: 4.09
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17
+  - kind: holders
+    value: 60
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S10

@@ -1,0 +1,117 @@
+slug: vaccinu
+name: VACCINU
+symbol: VACCINU
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against MRNA. LongLauncher.create from 0xcF2e…61eD minted VACCINU on 2026-09-01T22:36:37Z into pool 0xe4fc…e5e6 via DopplerERC20V1Factory and Airlock. Traders buy and sell VACCINU against the Moderna Robinhood Token. No official site was located this pass. DexScreener lists @VaccinuRH without a bidirectional official-crosslink.
+themes:
+  - memecoin
+  - stock-paired:mrna
+  - rwa
+  - inu
+official_links:
+  - kind: x
+    url: https://x.com/VaccinuRH
+dependencies: []
+deployments:
+  - label: VACCINU token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xcF1968747bC573294e468FD0cDaB0Dc61B971E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S4
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: LongLauncher (create() target)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S13
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S6
+      - S14
+  - label: MRNA Moderna • Robinhood Token (pair quote / numeraire)
+    chain: robinhood-chain
+    address: "0x43B07D15cE533bEc5476d70C22a78a1B2B662155"
+    role: token
+    verified: true
+    sources:
+      - S11
+      - S12
+metrics:
+  - kind: volume_24h
+    value: 3038939.61
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 263032.57
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 839408.33
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 1497
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/LongLauncher/Airlock/MRNA and create tx 0xb226…cf0c, RPC name/symbol/owner/isPoolLocked/tokenURI, DexScreener, Gecko pool/token/info/dexes, /rhj/assets, IPFS tokenURI, @VaccinuRH, @morningxbt, @ChudCrentis, and the netlify claim post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-11] - Numbers: 3038939.61 is the Gecko VACCINU/MRNA pool 24h volume, not the 3069023.31 token all-pools figure. Reserve 263032.57 is that pool. DexScreener 3078005.72 / 252552.02 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that VACCINU is a Bankr-official or Moderna-official product. Create is LongLauncher, Bankr API latest 50 has no row, and no official handle or domain was located."
+      class: inference
+      sources:
+        - S4
+        - S11
+    - text: Quote token MRNA 0x43B0…2155 is a Robinhood Stock Token rail in GET /rhj/assets; pool USD reserve is VACCINU plus MRNA, not a USDG backstop. [verified R-11 R-12] - Gecko dex label bankr-robinhood can be read as a Bankr mint; the create tx is LongLauncher. [verified R-4 R-8] - No official handle or domain this pass; @VaccinuRH is unconfirmed-official. [claim R-7 R-17] - Same-ticker clones including VACCCINU 0x6473…1E18. Flag ca-collision. [claim R-21] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0xcF19…1E18? Next: re-read DexScreener token profile after a Claim Profile; ask whether @VaccinuRH or @morningxbt pins the LongLauncher create tx"
+    - text: "Does the launcher EOA 0xcF2e…61eD map to a public handle? Next: trace the EOA on Blockscout and any post that embeds 0xcF2e…61eD"
+    - text: "Should Gecko dex bankr-robinhood be treated as Bankr-minted or as Doppler-hook taxonomy? Next: compare hook 0x4e34…a544 against a known Bankr launch and a known LONG launch"
+    - text: "Which of the Blockscout Vaccinu-named tokens besides 0xcF19…1E18 share the VACCINU/MRNA book? Next: keep ca-collision on any new same-ticker 4663 deploy"
+  unresolved: []

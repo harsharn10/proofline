@@ -2,23 +2,50 @@ slug: robindex
 name: Robindex
 symbol: ROBINDEX
 category: Market scanner
-lifecycle: announced
+lifecycle: mainnet
+lifecycle_source: pulled 0xd82f70F530AFf45b831d6eE17062B4E85395C6F3 2026-08-04T13:23:42.000Z
 coverage: stub
-summary: Token scanner and Telegram bot for Robinhood Chain (robindex.pro) with a $ROBINDEX token; not a stock index and not Robinhood Index Vaults.
+summary: "A live token scanner for Robinhood Chain: paste a 0x address for market stats, holders and a 0–99 safety score, or browse a DexPaprika board that ranks Uniswap pools every three minutes and posts volume spikes to Telegram. Users scan at robindex.pro or via the Telegram bot. The $ROBINDEX token is a Pons-launched ERC-20; this is not The Index and not Robinscan."
 official_links:
   - kind: site
     url: https://robindex.pro/about
   - kind: x
     url: https://x.com/robindexpro
+  - kind: site
+    url: https://robindex.pro
+  - kind: app
+    url: https://robindex.pro/scanner
+  - kind: telegram
+    url: https://t.me/robindextrending
+  - kind: telegram
+    url: https://t.me/robindexchat
+  - kind: telegram
+    url: https://t.me/robindextrendingbot
+  - kind: other
+    url: https://medium.com/@robindex/robindex-didnt-stop-building-0642ab32de72
 dependencies: []
 deployments:
-  - label: ROBINDEX token (About page and X bio per the dossier)
+  - label: ROBINDEX token (PonsLauncherToken)
     chain: robinhood-chain
     address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
     role: token
-    verified: false
+    verified: true
     sources:
       - S3
+      - S7
+      - S16
+      - S17
+      - S21
+  - label: Uniswap v3 ROBINDEX/WETH pool
+    chain: robinhood-chain
+    address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
+    role: other
+    verified: true
+    sources:
+      - S18
+      - S19
+      - S21
+      - S22
 review:
   researcher: harsharn10
   approver: pending
@@ -37,9 +64,53 @@ findings:
       class: claim
       sources:
         - S3
+    - text: "Receipts: robindex.pro, /about, /safety, /scanner, @robindexpro profile and posts, t.me/robindextrending, Medium, Blockscout token/pool/tx/source, RPC, DexScreener, robinscan.io token URL, and the three other Robindex domains were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-11 R-16 R-17] - Numbers: 44344 is DexScreener marketCap/fdv for the ROBINDEX/WETH pair, not an all-chains total. 21045.16 is pair liquidity.usd. 238 is Blockscout holders_count. [claim R-12 R-17] - Adversarial: the strongest contrary reading is that Robindex is The Index, an ERC-4626 index vault, or Robinscan. Contrary signals are domain, handle, leaf and the reproduced Pons token 0xd82f…C6F3; @robindexpro posted a Robinscan verify code for that token rather than claiming the explorer."
+      class: inference
+      sources:
+        - S6
+        - S9
+        - S12
+        - S16
+    - text: The token has no on-chain scanner, fee or treasury function in verified source. [verified R-18] - Official CA is 0xd82f…C6F3; /safety says any other $ROBINDEX is not from the project. Flag ca-collision. [claim R-2] - robindex.money ($RDEX), robindex.finance ($RBD) and robindex.online (OTC) use the Robindex name without a site or constructor link this pass. Flag third-party-link. [claim R-22 R-23 R-24] - Distinct from The Index, Robinhood Index Vaults, and Robinscan. [claim R-7 R-11] - LP position 579618 is in PonsLaunchLocker. [verified R-13] - No matching audit report was located.
+      class: unknown
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from the About page not reproduced on Blockscout
     - text: Token utility and treasury
     - text: Three other products share the name
+    - text: "Does $ROBINDEX have any on-chain utility for the scanner, ads, or Telegram bot, or is it only a Pons-launched ERC-20? Next: read /list-token and any fee or access-gated routes on robindex.pro; search the deployer EOA for other contracts"
+    - text: "Are robindex.money, robindex.finance and robindex.online operated by the same accounts as robindex.pro? Next: compare deployers, WHOIS, and whether @robindexpro ever linked those domains"
+    - text: "Is there an audit whose scope matches PonsLauncherToken 0xd82f…C6F3? Next: ask in public and record the answer as a claim"
+    - text: "Does /create on robindex.pro deploy through Pons or another factory? Next: open /create and match any factory address to census launchpads"
+    - text: "Where is the source repository for the scanner app? Next: search GitHub for DexPaprika Robinhood scanner code and the @robindexpro / @Mike_Majestic orgs"
   unresolved: []
+themes:
+  - tooling
+metrics:
+  - kind: market_cap
+    value: 44344
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S22
+  - kind: volume_24h
+    value: 6983.97
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S22
+  - kind: tvl
+    value: 21045.16
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S22
+  - kind: holders
+    value: 238
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17

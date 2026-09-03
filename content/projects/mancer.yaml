@@ -2,11 +2,11 @@ slug: mancer
 name: Mancer
 symbol: MANCER
 category: Trading aggregator
-lifecycle: beta
+lifecycle: mainnet
 coverage: stub
-summary: "Native DEX aggregator and non-custodial order layer (routed swaps, signed limit and stop orders, OCO brackets, recurring buys), in a gated beta for Chain Mancers and StonkBrokers holders; the project says its router and order contracts are under audit; a Shield product is announced."
+summary: "Mancer is Robinhood Chain's DEX aggregator and non-custodial order layer: a quote races eligible venues, the winning route (or a split) executes in one transaction, and signed limit, stop, OCO and recurring orders stay in the user's wallet until fill. A user connects a wallet at mancer.xyz. Blockhash / @MancerXYZ run the executor; the $MANCER token is a separate Clutch CollectionToken."
 official_links:
-  - kind: site
+  - kind: app
     url: https://mancer.xyz
   - kind: docs
     url: https://mancer.xyz/docs
@@ -14,22 +14,70 @@ official_links:
     url: https://mancer.xyz/whitepaper.pdf
   - kind: x
     url: https://x.com/MancerXYZ
+  - kind: discord
+    url: https://discord.gg/mancer
+  - kind: other
+    url: https://mancer.xyz/status
+  - kind: other
+    url: https://chainmancer.xyz/
 dependencies:
   - uniswap
 deployments:
-  - label: $MANCER token (workbook sheet 02)
+  - label: $MANCER token (CollectionToken, Clutch NFT-Token AMM)
     chain: robinhood-chain
-    address: "0xc72f232a6869e6cf34dc06129affd07f8a2a246a"
+    address: "0xc72F232a6869e6CF34dC06129AfFD07F8a2a246A"
     role: token
-    verified: false
+    verified: true
     sources:
       - S6
+      - S12
+      - S13
+      - S14
+      - S16
   - label: Aggregator router
     chain: robinhood-chain
     address: not-verified
     role: router
     verified: false
     sources: []
+  - label: MancerRouter (live; 1,343 txs this pass)
+    chain: robinhood-chain
+    address: "0xFBA80Ff9C50462661f9D328E033e251251537FA5"
+    role: router
+    verified: false
+    sources:
+      - S16
+      - S17
+  - label: MancerOrders (live; 79 txs this pass)
+    chain: robinhood-chain
+    address: "0x22Db8B8a0D14916f7A84909a0d92DF9024B57f88"
+    role: other
+    verified: false
+    sources:
+      - S16
+      - S18
+  - label: CollectionTokenDeployer (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x662003BF6049e36b4E887D47b8df8718fFBbc6C2"
+    role: factory
+    verified: false
+    sources:
+      - S12
+      - S15
+  - label: MancerRouter (earlier verified copy; 17 txs)
+    chain: robinhood-chain
+    address: "0x67b7ec06828425BdDF02C52789B7939924608f79"
+    role: router
+    verified: false
+    sources:
+      - S17
+  - label: MancerOrders (earlier verified copy; 1 tx)
+    chain: robinhood-chain
+    address: "0xff86B3D4266c9374DA9D8A473E8533965ab6A0C3"
+    role: other
+    verified: false
+    sources:
+      - S18
 review:
   researcher: harsharn10
   approver: pending
@@ -69,6 +117,15 @@ findings:
       sources:
         - S8
         - S5
+    - text: "Receipts: site, docs, whitepaper, status, Blockscout, RPC, DexScreener, Sherlock report URL, and the cited X posts were opened on 2026-09-02. [verified R-1 R-8 R-9 R-16] - Numbers: DexScreener figures are aggregator prints for MANCER pairs, not explorer pool inventory. [claim R-11] - Adversarial: the strongest contrary reading is that Mancer is only a Clutch memecoin with a docs site. The verified Router/Orders, 1,343 router txs, public-open post, and swap widget CA argue the aggregator is a separate live product that happens to share a deployer with the token."
+      class: inference
+      sources:
+        - S17
+        - S24
+    - text: Signed cancel is executor-honored; chain exits are on-chain cancel or allowance revoke. [claim R-2] - Venue allowlist owner and the live AllowanceTarget were not reproduced. [unknown] - Live Router was deployed 20 Aug; Sherlock audit window is 24–27 Aug — bytecode match to the final commit is open. [claim R-13] [verified R-9] - $MANCER is a Clutch CollectionToken, not a MancerRouter receipt; presenting Clutch NFT backing as aggregator TVL would mix products. [verified R-6] - Mancer Shield is an announcement, not a deployment this pass.
+      class: claim
+      sources:
+        - S26
   missing:
     - text: Router, settlement, executor and token addresses not yet located; the $MANCER token address comes from the workbook and is not reproduced
     - text: Non-custodial and minimum-output claims not yet reproduced against deployed contracts
@@ -77,5 +134,35 @@ findings:
     - text: Executor availability, key management and monitoring not independently verified
     - text: NFT fee-claim mechanics unverified
     - text: "Shield: announced only — no deployment evidence reviewed"
+    - text: "Which MancerAllowanceTarget is the live Router isolated-approval target, and who can change the venue allowlist? Next: read MancerRouter verified source for allowanceTarget() / allowlist owner and match a live approval"
+    - text: "Does AMMFactoryV2 0x432D20AA… still exist on 4663? Next: RPC eth_getCode on 0x432D20AAe5605b1E94C114283d7155eBc6727351"
+    - text: "Can the Sherlock report commit 3a5374b4… be matched to the live Router/Orders bytecode? Next: compare runtime code hash of 0xFBA80Ff9… to the final commit artifacts"
+    - text: "Where is the Chain Mancers NFT contract, and does it actually receive aggregator fees? Next: Blockscout search ChainMancer / Collection NFT and fee-forward on MancerRouter"
+    - text: "Is Mancer Shield deployed anywhere on 4663? Next: search Shield / MancerShield on Blockscout after a contract announcement"
   unresolved:
     - text: Whether the audit announced on 2026-08-25 has been published; no report was found in this review.
+themes:
+  - tooling
+  - nft
+  - memecoin
+metrics:
+  - kind: holders
+    value: 9901
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S13
+  - kind: tvl
+    value: 445813.78
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S20
+  - kind: volume_24h
+    value: 556008.76
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S20

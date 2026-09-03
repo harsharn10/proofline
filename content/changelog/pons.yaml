@@ -78,3 +78,407 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 308e5124fca61014
+- date: 2026-09-02
+  slug: pons
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "Native launchpad on Robinhood Chain with two documented generations: v1 launches fixed-supply tokens straight into locked Uniswap V3 WETH pools; v2 sells from a bonding curve that graduates into a permanently locked Uniswap v4 pool and can pair against approved assets such as tokenised stocks. Per its docs v2 is deployed, creator-allowlisted and still under audit."
+    themes: null
+    official_links:
+      - kind: site
+        url: https://ponsfamily.com
+      - kind: docs
+        url: https://docs.ponsfamily.com
+      - kind: docs
+        url: https://docs.ponsfamily.com/docs/v2
+      - kind: x
+        url: https://x.com/ponsdotfamily
+    deployments:
+      - label: PONS token (PonsLauncherToken)
+        chain: robinhood-chain
+        address: "0x39dBED3a2bd333467115dE45665cC57F813C4571"
+        role: token
+        verified: true
+        sources:
+          - S17
+          - S13
+          - S14
+          - S6
+          - S3
+          - S4
+      - label: v1 active launch factory (PonsLaunchFactory)
+        chain: robinhood-chain
+        address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+        role: factory
+        verified: true
+        sources:
+          - S18
+          - S13
+          - S4
+      - label: v1 active locker (PonsLaunchLocker)
+        chain: robinhood-chain
+        address: "0x736D76699C26D0d966744cAe304C000d471f7F35"
+        role: vault
+        verified: true
+        sources:
+          - S19
+          - S13
+      - label: v1 legacy factory (source not verified on the explorer)
+        chain: robinhood-chain
+        address: "0x0c37a24F5D23A486FA692d1500881d698B1F77a4"
+        role: factory
+        verified: true
+        sources:
+          - S20
+          - S13
+      - label: v1 legacy locker (source not verified on the explorer)
+        chain: robinhood-chain
+        address: "0x31ca5E101941A93A7DD6d0497928700625CF54B5"
+        role: vault
+        verified: true
+        sources:
+          - S21
+          - S13
+      - label: v2 launch factory (PonsV2LaunchFactory)
+        chain: robinhood-chain
+        address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+        role: factory
+        verified: true
+        sources:
+          - S22
+          - S16
+      - label: v2 Uniswap v4 hook (V2MemeHook)
+        chain: robinhood-chain
+        address: "0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044"
+        role: other
+        verified: true
+        sources:
+          - S23
+          - S16
+      - label: v2 fee escrow (V2FeeEscrow)
+        chain: robinhood-chain
+        address: "0xd3AFEB2a57f70eF218Aa82451c51B2fb0416Ac9e"
+        role: vault
+        verified: true
+        sources:
+          - S24
+          - S16
+      - label: v2 buyback vault (V2BuybackVault)
+        chain: robinhood-chain
+        address: "0x42df2a798f82289E177311362e8f5ccC45c1219c"
+        role: vault
+        verified: true
+        sources:
+          - S25
+          - S16
+      - label: v2 launch locker (V2LaunchLocker)
+        chain: robinhood-chain
+        address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+        role: vault
+        verified: true
+        sources:
+          - S26
+          - S16
+      - label: v2 launch-and-buy router (PonsV2LaunchAndBuy)
+        chain: robinhood-chain
+        address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+        role: router
+        verified: true
+        sources:
+          - S27
+          - S16
+      - label: v2 launch deployer (PonsV2LaunchDeployer)
+        chain: robinhood-chain
+        address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+        role: other
+        verified: true
+        sources:
+          - S28
+          - S16
+      - label: v2 graduation executor (V2GraduationExecutor)
+        chain: robinhood-chain
+        address: "0xC7819B64A1dAECD7eC19856d026cb14EfBd89046"
+        role: other
+        verified: true
+        sources:
+          - S29
+          - S16
+      - label: v2 graduation guard (PonsV2GraduationGuard)
+        chain: robinhood-chain
+        address: "0xf5695117b99B6f6401e67d4195BD653628176C6C"
+        role: other
+        verified: true
+        sources:
+          - S30
+          - S16
+      - label: Owner of the factories, lockers, hook and buyback vault — Safe 2-of-3 (SafeL2 1.4.1)
+        chain: robinhood-chain
+        address: "0x263ed295dAFaE1d9AAdD6E56c4B6F9f38eE019Dd"
+        role: multisig
+        verified: true
+        sources:
+          - S31
+          - S33
+    metrics:
+      - kind: fees_24h
+        value: 4700000
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S12
+      - kind: revenue_24h
+        value: 868850
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S12
+      - kind: volume_24h
+        value: 86499622
+        currency: USD
+        as_of: 2026-08-31
+        class: claim
+        sources:
+          - S12
+  new:
+    summary: "The chain's dominant launchpad. Pons launches tokens on Robinhood Chain in two generations: v1 mints a fixed-supply token straight into a locked Uniswap V3 WETH pool; v2 sells from a bonding curve that graduates into a permanently locked Uniswap v4 pool and can pair against approved assets such as tokenised stocks. Users launch and trade from their own wallets. Pons Labs, LLC runs the site and @ponsdotfamily."
+    themes:
+      - launchpad
+      - memecoin
+      - rwa
+      - stock-paired
+      - hook
+    official_links:
+      - kind: site
+        url: https://ponsfamily.com
+      - kind: docs
+        url: https://docs.ponsfamily.com
+      - kind: docs
+        url: https://docs.ponsfamily.com/docs/v2
+      - kind: x
+        url: https://x.com/ponsdotfamily
+      - kind: app
+        url: https://www.ponsfamily.com/launchpad
+      - kind: telegram
+        url: https://t.me/ponsdotfamily
+    deployments:
+      - label: PONS token (PonsLauncherToken), created by v1 legacy factory
+        chain: robinhood-chain
+        address: "0x39dBED3a2bd333467115dE45665cC57F813C4571"
+        role: token
+        verified: true
+        sources:
+          - S17
+          - S13
+          - S14
+          - S6
+          - S3
+          - S4
+          - S35
+          - S41
+          - S42
+          - S54
+      - label: v1 active launch factory (PonsLaunchFactory)
+        chain: robinhood-chain
+        address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+        role: factory
+        verified: true
+        sources:
+          - S18
+          - S13
+          - S4
+          - S35
+          - S49
+          - S70
+      - label: v1 active locker (PonsLaunchLocker)
+        chain: robinhood-chain
+        address: "0x736D76699C26D0d966744cAe304C000d471f7F35"
+        role: vault
+        verified: true
+        sources:
+          - S19
+          - S13
+          - S35
+          - S58
+          - S71
+      - label: v1 legacy factory (created the PONS token; source not verified on the explorer)
+        chain: robinhood-chain
+        address: "0x0c37a24F5D23A486FA692d1500881d698B1F77a4"
+        role: factory
+        verified: true
+        sources:
+          - S20
+          - S13
+          - S35
+          - S41
+          - S50
+      - label: v1 legacy locker (source not verified on the explorer)
+        chain: robinhood-chain
+        address: "0x31ca5E101941A93A7DD6d0497928700625CF54B5"
+        role: vault
+        verified: true
+        sources:
+          - S21
+          - S13
+          - S35
+          - S59
+      - label: v2 launch factory (PonsV2LaunchFactory)
+        chain: robinhood-chain
+        address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+        role: factory
+        verified: true
+        sources:
+          - S22
+          - S16
+          - S36
+          - S48
+      - label: v2 Uniswap v4 hook (V2MemeHook)
+        chain: robinhood-chain
+        address: "0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044"
+        role: other
+        verified: true
+        sources:
+          - S23
+          - S16
+          - S36
+          - S60
+          - S72
+      - label: v2 fee escrow (V2FeeEscrow)
+        chain: robinhood-chain
+        address: "0xd3AFEB2a57f70eF218Aa82451c51B2fb0416Ac9e"
+        role: vault
+        verified: true
+        sources:
+          - S24
+          - S16
+          - S36
+          - S61
+          - S73
+      - label: v2 buyback vault (V2BuybackVault)
+        chain: robinhood-chain
+        address: "0x42df2a798f82289E177311362e8f5ccC45c1219c"
+        role: vault
+        verified: true
+        sources:
+          - S25
+          - S16
+          - S36
+          - S62
+          - S74
+      - label: v2 launch locker (V2LaunchLocker)
+        chain: robinhood-chain
+        address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+        role: vault
+        verified: true
+        sources:
+          - S26
+          - S16
+          - S36
+          - S63
+          - S75
+      - label: v2 launch-and-buy router (PonsV2LaunchAndBuy)
+        chain: robinhood-chain
+        address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+        role: router
+        verified: true
+        sources:
+          - S27
+          - S16
+          - S36
+          - S64
+          - S76
+      - label: v2 launch deployer (PonsV2LaunchDeployer)
+        chain: robinhood-chain
+        address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+        role: other
+        verified: true
+        sources:
+          - S28
+          - S16
+          - S36
+          - S65
+          - S77
+      - label: v2 graduation executor (V2GraduationExecutor)
+        chain: robinhood-chain
+        address: "0xC7819B64A1dAECD7eC19856d026cb14EfBd89046"
+        role: other
+        verified: true
+        sources:
+          - S29
+          - S16
+          - S36
+          - S66
+          - S78
+      - label: v2 graduation guard (PonsV2GraduationGuard)
+        chain: robinhood-chain
+        address: "0xf5695117b99B6f6401e67d4195BD653628176C6C"
+        role: other
+        verified: true
+        sources:
+          - S30
+          - S16
+          - S36
+          - S67
+          - S79
+      - label: Owner Safe (SafeProxy / SafeL2)
+        chain: robinhood-chain
+        address: "0x263ed295dAFaE1d9AAdD6E56c4B6F9f38eE019Dd"
+        role: multisig
+        verified: true
+        sources:
+          - S31
+          - S33
+          - S47
+          - S51
+      - label: PONS/WETH Uniswap V3 pool (reference pool in v1 docs)
+        chain: robinhood-chain
+        address: "0x10CC6BD38112cAc182db90B6a71d8Bb5939526bA"
+        role: other
+        verified: true
+        sources:
+          - S35
+          - S43
+          - S56
+          - S69
+    metrics:
+      - kind: fees_24h
+        value: 4557472
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S45
+      - kind: revenue_24h
+        value: 909887
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S46
+      - kind: volume_24h
+        value: 94220826
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S44
+      - kind: holders
+        value: 63412
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S42
+      - kind: market_cap
+        value: 292421152.09
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S42
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: e4ab4fb9083c64cc

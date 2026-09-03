@@ -3,7 +3,7 @@
 //   node scripts/compile-packet.mjs <packet.md> [--content-dir <dir>] [--dry-run]
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
-import { parse, stringify } from "yaml";
+import { parseDocument, parse, stringify } from "yaml";
 import { parsePacket, checkPacket, compile } from "./lib/packet.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { checkResearch } from "./lib/research-md.mjs";
@@ -28,6 +28,11 @@ async function yamlOr(path, fallback) {
   catch (error) { if (error.code === "ENOENT") return fallback; throw error; }
 }
 
+async function textOr(path, fallback) {
+  try { return await readFile(path, "utf8"); }
+  catch (error) { if (error.code === "ENOENT") return fallback; throw error; }
+}
+
 function validationErrors(result, census) {
   const checks = [
     ["census.yaml", validateAgainst("census", census)],
@@ -43,6 +48,34 @@ function validationErrors(result, census) {
   });
   checks.push([`research/${result.project.slug}.md`, researchErrors]);
   return checks.flatMap(([path, errors]) => errors.map((error) => `${path}: ${error}`));
+}
+
+/**
+ * Write one census row without flattening the file. census.yaml carries controller comments — which
+ * receipt a lifecycle rests on, why a row is where it is — and re-emitting the whole array from parsed
+ * data would delete every one of them. Only the compiled row's node is replaced, and the comments its
+ * top-level keys carried move onto the new node.
+ */
+export function censusTextWithRow(text, row) {
+  const doc = text === null ? parseDocument("[]\n") : parseDocument(text);
+  const rows = doc.contents?.items ?? [];
+  const next = doc.createNode(row);
+  const index = rows.findIndex((node) => node?.get?.("slug") === row.slug);
+  if (index >= 0) {
+    for (const pair of rows[index].items ?? []) {
+      const key = pair.key?.value;
+      const carried = next.items.find((item) => item.key?.value === key);
+      if (!carried) continue;
+      for (const field of ["comment", "commentBefore"]) {
+        if (pair.value?.[field] != null && carried.value != null) carried.value[field] = pair.value[field];
+        if (pair.key?.[field] != null && carried.key != null) carried.key[field] = pair.key[field];
+      }
+    }
+    if (rows[index].commentBefore != null) next.commentBefore = rows[index].commentBefore;
+    if (rows[index].comment != null) next.comment = rows[index].comment;
+    doc.contents.items[index] = next;
+  } else doc.contents.items.push(next);
+  return doc.toString({ lineWidth: 0 });
 }
 
 async function appendChangelog(path, entry) {
@@ -71,28 +104,37 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
   const feedPath = join(root, "feed", `${slug}.yaml`);
   const researchPath = join(root, "research", `${slug}.md`);
   const changelogPath = join(root, "changelog", `${slug}.yaml`);
-  const census = await yamlOr(censusPath, []);
+  const pulledPath = join(root, "pulled", `${slug}.yaml`);
+  const censusText = await textOr(censusPath, null);
+  const census = censusText === null ? [] : parse(censusText) ?? [];
   const priorProject = await yamlOr(projectPath, null);
   const priorCensusRow = census.find((row) => row.slug === slug) ?? null;
   const priorSources = await yamlOr(sourcesPath, null);
   const priorFeed = await yamlOr(feedPath, null);
-  const result = compile(packet, priorProject, priorCensusRow, priorSources, priorFeed);
+  const priorResearch = await textOr(researchPath, null);
+  // content/pulled is machine output; a half-written file must not stop a compile.
+  let pulled = null;
+  try { pulled = await yamlOr(pulledPath, null); } catch { pulled = null; }
+  // The census goes in so the compiler can drop an alias that is only another canonical name (§7).
+  const result = compile(packet, priorProject, priorCensusRow, priorSources, priorFeed, { pulled, priorResearch, census });
   const nextCensus = priorCensusRow
     ? census.map((row) => row.slug === slug ? result.censusRow : row)
     : [...census, result.censusRow];
   const errors = validationErrors(result, nextCensus);
   if (errors.length) throw new Error(errors.join("\n"));
-  const files = [censusPath, projectPath, sourcesPath, researchPath, feedPath, changelogPath];
+  // A feed file with no items is not a feed; only write one once there is something to read.
+  const writesFeed = result.feed.items.length > 0 || priorFeed !== null;
+  const files = [censusPath, projectPath, sourcesPath, researchPath, ...(writesFeed ? [feedPath] : []), changelogPath];
   if (dryRun) {
     for (const path of files) console.log(path);
     return { ...result, files, dryRun: true };
   }
-  for (const path of [projectPath, sourcesPath, researchPath, feedPath, changelogPath]) await mkdir(dirname(path), { recursive: true });
-  await writeFile(censusPath, stringify(nextCensus, { lineWidth: 0 }));
+  for (const path of files) await mkdir(dirname(path), { recursive: true });
+  await writeFile(censusPath, censusTextWithRow(censusText, result.censusRow));
   await writeFile(projectPath, stringify(result.project, { lineWidth: 0 }));
   await writeFile(sourcesPath, stringify(result.sources, { lineWidth: 0 }));
   await writeFile(researchPath, result.research);
-  await writeFile(feedPath, stringify(result.feed, { lineWidth: 0 }));
+  if (writesFeed) await writeFile(feedPath, stringify(result.feed, { lineWidth: 0 }));
   await appendChangelog(changelogPath, result.changelog);
   return { ...result, files, dryRun: false };
 }
@@ -100,7 +142,12 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
 if (process.argv[1] && import.meta.url === new URL(`file://${resolve(process.argv[1])}`).href) {
   try {
     const result = await runCompile(argumentsFor(process.argv.slice(2)));
-    console.log(`${result.dryRun ? "would compile" : "compiled"} ${result.project.slug}: ${result.files.length} canonical paths`);
+    for (const message of result.notices) console.log(`note  ${result.project.slug}: ${message}`);
+    const { autoTaggedParagraphs, skippedMetrics, skippedDeployments } = result.degraded;
+    console.log(
+      `${result.dryRun ? "would compile" : "compiled"} ${result.project.slug}: ${result.files.length} canonical paths` +
+      ` · ${autoTaggedParagraphs} auto-tagged paragraph(s) · ${skippedMetrics} skipped metric(s) · ${skippedDeployments} skipped deployment(s)`,
+    );
   } catch (error) {
     console.error(error.message);
     process.exit(1);

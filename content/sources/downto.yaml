@@ -198,9 +198,240 @@ sources:
     publisher: Robinhood Chain public RPC (rpc.mainnet.chain.robinhood.com) and Blockscout
     kind: explorer
     accessed_at: 2026-09-02T14:05:00Z
-    claim: "owner() on Create3Factory (0xD778…7882), the indexedexManager proxy (0x0968…d0bc) and the feeCollector proxy (0x20af…0b2E) returns 0x72BeA6Fa…933B, an externally owned account (eth_getCode empty)"
-    excerpt: "eth_call owner() selector 0x8da5cb5b on the three contracts → 0x72bea6fa3e68ef18c87d045aac7c4aa5249d933b; eth_getCode on that address → 0x (EOA). Read by scripts/pull.mjs on 2026-09-02 (content/pulled/downto.yaml)."
+    claim: owner() on Create3Factory (0xD778…7882), the indexedexManager proxy (0x0968…d0bc) and the feeCollector proxy (0x20af…0b2E) returns 0x72BeA6Fa…933B, an externally owned account (eth_getCode empty)
+    excerpt: eth_call owner() selector 0x8da5cb5b on the three contracts → 0x72bea6fa3e68ef18c87d045aac7c4aa5249d933b; eth_getCode on that address → 0x (EOA). Read by scripts/pull.mjs on 2026-09-02 (content/pulled/downto.yaml).
     hash: null
     archive_url: null
     researcher: claude
+    available: true
+  - id: S18
+    url: https://app.downto.finance/explore
+    publisher: Down To Finance
+    kind: official-site
+    accessed_at: 2026-09-02T23:12:00Z
+    claim: Explore DETFs
+    excerpt: "Use a DETF that is already live. Open one. Mint, bond, or trade. No live DETF is listed on this network yet. Footer: Docs href https://github.com ; Audits: pending."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S19
+    url: https://robinhoodchain.blockscout.com/tx/0xbebe5e0ab1e68af3a9e08b8175f331b342104d5ee2c6f439b46726e1281bb687
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T23:18:00Z
+    claim: DTF creation tx 0xbebe5e0a…
+    excerpt: status ok; timestamp 2026-08-25T01:26:48Z; block 45332515; method launchAndBuy; from EOA 0xeD1FA21329fc45860cAB5D5E26a5fafcCDAcd6D5; to PonsV2LaunchAndBuy 0xe33E9E479dF8802cb0866d5d05258bEc4cF62948.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S20
+    url: https://robinhoodchain.blockscout.com/address/0x961b4E050492E2744B8D20404Cd43A11D371577c?tab=txs
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T23:20:00Z
+    claim: DETDFPkg transactions
+    excerpt: "api/v2/addresses/0x961b4E…577c/transactions: 14 items, all method deployVault status ok. First 2026-08-25T09:31:36Z hash 0x9e09114f…f044e8; last 2026-08-26T00:58:58Z hash 0x814847568c1d55109ae85a5db6a2e95faa0a5c66f718d79fc04bb59b10c82875 from 0xc7c0f73D705404326b04d8F0f52b7136E8e982B9."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S21
+    url: https://robinhoodchain.blockscout.com/api/v2/tokens/0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T23:16:00Z
+    claim: DTF token holders_count
+    excerpt: name Down to Finance; symbol DTF; holders_count 8785; total_supply 1000000000000000000000000000; decimals 18; type ERC-20; volume_24h 3586063.69652062; exchange_rate 0.00727896.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S22
+    url: https://x.com/downto_finance
+    publisher: Down to Finance (@downto_finance)
+    kind: social
+    accessed_at: 2026-09-02T23:14:00Z
+    claim: X profile @downto_finance
+    excerpt: "Down to Finance @downto_finance. Bio: Decentralized ETFs. Blue verified. Followers 3331."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S23
+    url: https://api.dexscreener.com/latest/dex/tokens/0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-02T23:21:00Z
+    claim: DTF token pairs on Robinhood
+    excerpt: Uniswap v3 DTF/WETH 0x0F2CA1D996224a0c9dd140B865142aAD381A4287 liquidity.usd 250351.54 volume.h24 2375773.21 marketCap 6554824 priceUsd 0.006554. Uniswap v4 DTF/ETH 0xbc58bf…b4ee liq 231981.44 vol 320975.08. info.websites https://downto.finance/ socials x.com/downto_finance. 17 pairs.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S24
+    url: https://api.llama.fi/protocols
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-02T23:21:00Z
+    claim: protocols API filter
+    excerpt: No protocols row named Down to Finance, DTF, DETF, or IndexedEx. Robinhood Chain rows exist for other names (ArrowPad, Morpho Blue, NetNet Capital Management). Tokens existing is not a protocol TVL row.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S25
+    url: https://app.downto.finance/research/detf
+    publisher: Down To Finance
+    kind: docs
+    accessed_at: 2026-09-02T23:13:00Z
+    claim: "DETFs: one token over a basket"
+    excerpt: "A DETF (Decentralized ETF) is one token for a basket you pick. Make it, bond to turn it on, then mint or burn. IndexedEx lets you run a money plan as one token. Typical path: create the DETF, bond to turn it on, then mint, hold, or burn. This is not a stock ETF."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S26
+    url: https://robinhoodchain.blockscout.com/token/0x2ec89AFBa136119C5252FC47D14E2BD2144B10d2
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-02T23:18:00Z
+    claim: Second DTF token 0x2ec89AFB…
+    excerpt: name Down to Finance; symbol DTF; decimals 9; holders_count 676; is_verified true; contract name dtf. Verified source header names https://downtofinance.cc and https://x.com/downtofinancerh. DexScreener pairs null for this address.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S27
+    url: https://app.downto.finance/staking
+    publisher: Down To Finance
+    kind: official-site
+    accessed_at: 2026-09-02T23:12:00Z
+    claim: Protocol DETF staking
+    excerpt: Protocol DETF — a live Decentralized ETF (DETF) instance. No Protocol DETF configured on this network. Check that featured-fee-detfs or protocol-detfs is present under app/addresses/ for the active chain.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S28
+    url: https://x.com/downto_finance/status/2094143857328038182
+    publisher: Down to Finance (@downto_finance)
+    kind: social
+    accessed_at: 2026-09-02T23:14:00Z
+    claim: Delay in launching DETF creation and staking
+    excerpt: I apologize for the delay in launching the DETF creation and staking. Simple answer, is that the extensive test suites take several hours to compile and run. This is the final test run before launch.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S29
+    url: https://x.com/downto_finance/status/2094547733768270250
+    publisher: Down to Finance (@downto_finance)
+    kind: social
+    accessed_at: 2026-09-02T23:14:00Z
+    claim: Tests last step before deploying
+    excerpt: Test runs are down to fixing some of the tests themselves. Vault behavior passes under every scenario. I will only need to do a full run again as the last step before deploying.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S30
+    url: https://x.com/downto_finance/status/2095249056977338487
+    publisher: Down to Finance (@downto_finance)
+    kind: social
+    accessed_at: 2026-09-02T23:14:00Z
+    claim: DETF explainer post
+    excerpt: A DETF is a decentralized ETF. Standard Exchange Vaults wrap a strategy in a vault token. DETFs combine strategies and use the market for management. Bond NFTs mint matching DETF into liquidity. A rebasing claim token owns a bond NFT.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S31
+    url: https://github.com/cyotee/indexedex/commits/main
+    publisher: GitHub
+    kind: repository
+    accessed_at: 2026-09-02T23:22:00Z
+    claim: cyotee/indexedex commits on main
+    excerpt: "Commits on Aug 27, 2026: feat(dtf): archive listed DETFs and pause one-strategy create, cyotee, b5b5784. Frontend README names apps/dtf as Down To Finance: https://downto.finance (app: https://app.downto.finance)."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S32
+    url: https://robinhoodchain.blockscout.com/address/0x912467fc912f0f88df3b0d221946de78f38d4559
+    publisher: Robinhood Chain Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T03:25:33.096Z
+    claim: Contract record for 0x912467fc912f0f88df3b0d221946de78f38d4559 on Robinhood Chain (4663), read into content/pulled/downto.yaml.
+    excerpt: "pulled 0x912467fc912f0f88df3b0d221946de78f38d4559 2026-09-03T03:25:33.096Z: is_contract true, source_verified true, contract PonsV2BondingCurve."
+    hash: null
+    archive_url: null
+    researcher: pull
+    available: true
+  - id: S33
+    url: https://robinhoodchain.blockscout.com/address/0x976949aB55830fA4794bF40C88ea7D7567931003
+    publisher: Robinhood Chain Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T03:25:33.096Z
+    claim: Contract record for 0x976949aB55830fA4794bF40C88ea7D7567931003 on Robinhood Chain (4663), read into content/pulled/downto.yaml.
+    excerpt: "pulled 0x976949aB55830fA4794bF40C88ea7D7567931003 2026-09-03T03:25:33.096Z: is_contract true, source_verified true, contract DiamondPackageCallBackFactory."
+    hash: null
+    archive_url: null
+    researcher: pull
+    available: true
+  - id: S34
+    url: https://robinhoodchain.blockscout.com/address/0xD7786b10BC8Bc97dc7651CAb7B97086c8b227882
+    publisher: Robinhood Chain Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T03:25:33.096Z
+    claim: Contract record for 0xD7786b10BC8Bc97dc7651CAb7B97086c8b227882 on Robinhood Chain (4663), read into content/pulled/downto.yaml.
+    excerpt: "pulled 0xD7786b10BC8Bc97dc7651CAb7B97086c8b227882 2026-09-03T03:25:33.096Z: is_contract true, source_verified true, contract Create3Factory."
+    hash: null
+    archive_url: null
+    researcher: pull
+    available: true
+  - id: S35
+    url: https://robinhoodchain.blockscout.com/address/0x8BB5FCC67e8CCa44DC41dd08A5e2b2B392C22945
+    publisher: Robinhood Chain Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T03:25:33.096Z
+    claim: Contract record for 0x8BB5FCC67e8CCa44DC41dd08A5e2b2B392C22945 on Robinhood Chain (4663), read into content/pulled/downto.yaml.
+    excerpt: "pulled 0x8BB5FCC67e8CCa44DC41dd08A5e2b2B392C22945 2026-09-03T03:25:33.096Z: is_contract true, source_verified true, contract UniswapV4HookDiamondPackageCallBackFactory."
+    hash: null
+    archive_url: null
+    researcher: pull
+    available: true
+  - id: S36
+    url: https://robinhoodchain.blockscout.com/address/0x09682b00D873D913ada0bB69B4D4c9631810d0bc
+    publisher: Robinhood Chain Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T03:25:33.096Z
+    claim: Contract record for 0x09682b00D873D913ada0bB69B4D4c9631810d0bc on Robinhood Chain (4663), read into content/pulled/downto.yaml.
+    excerpt: "pulled 0x09682b00D873D913ada0bB69B4D4c9631810d0bc 2026-09-03T03:25:33.096Z: is_contract true, source_verified true, contract MinimalDiamondCallBackProxy."
+    hash: null
+    archive_url: null
+    researcher: pull
+    available: true
+  - id: S37
+    url: https://robinhoodchain.blockscout.com/address/0x20af9A1e21a59a411cd3b0C40E70AF9084770b2E
+    publisher: Robinhood Chain Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T03:25:33.096Z
+    claim: Contract record for 0x20af9A1e21a59a411cd3b0C40E70AF9084770b2E on Robinhood Chain (4663), read into content/pulled/downto.yaml.
+    excerpt: "pulled 0x20af9A1e21a59a411cd3b0C40E70AF9084770b2E 2026-09-03T03:25:33.096Z: is_contract true, source_verified true, contract MinimalDiamondCallBackProxy."
+    hash: null
+    archive_url: null
+    researcher: pull
+    available: true
+  - id: S38
+    url: https://dexscreener.com/robinhood/0x0F2CA1D996224a0c9dd140B865142aAD381A4287
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-03T03:25:33.096Z
+    claim: Contract record for 0x0F2CA1D996224a0c9dd140B865142aAD381A4287 on Robinhood Chain (4663), read into content/pulled/downto.yaml.
+    excerpt: "pulled pair 0x0F2CA1D996224a0c9dd140B865142aAD381A4287 2026-09-03T03:25:33.096Z: market pair for 0xeE5576Fa1Bcaa380e591D01245f406f3f384eb01 on Robinhood Chain (4663)."
+    hash: null
+    archive_url: null
+    researcher: pull
     available: true

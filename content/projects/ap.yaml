@@ -1,0 +1,129 @@
+slug: ap
+name: ap
+symbol: AP
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against Apple • Robinhood Token (AAPL). LongLauncher.create on 2026-07-13 minted ap (AP) and seeded the AP/AAPL book. Traders buy and sell AP against AAPL. alpharhc.xyz publishes the CA; @Alpha_RHC is the project handle. AAPL is the quote rail, not this token.
+themes:
+  - memecoin
+  - stock-paired:aapl
+official_links:
+  - kind: site
+    url: https://alpharhc.xyz
+  - kind: x
+    url: https://x.com/Alpha_RHC
+  - kind: telegram
+    url: https://t.me/alpharhc
+  - kind: app
+    url: https://app.uniswap.org/swap?chain=robinhood&inputCurrency=0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9&outputCurrency=0x69c68e4c00c6f6e4ac027300293a879be1e11e18
+dependencies: []
+deployments:
+  - label: AP token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x69c68e4C00C6F6e4Ac027300293a879Be1E11E18"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S6
+  - label: DopplerERC20V1Factory (token creator)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S16
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S14
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S15
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S5
+      - S6
+  - label: Apple • Robinhood Token (pair quote rail)
+    chain: robinhood-chain
+    address: "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S6
+      - S12
+      - S13
+metrics:
+  - kind: volume_24h
+    value: 1495153.52
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: tvl
+    value: 473728.53
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: market_cap
+    value: 2741732
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: holders
+    value: 1621
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S4
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: DexScreener token API, Gecko pool/token, Blockscout token/create tx/logs/AAPL/impl/factory/launcher, RPC eth_getCode and eth_call, alpharhc.xyz, @Alpha_RHC profile and two posts, @thebearjesus, Telegram preview, /rhj/assets, AAPLCAT, and AAPLDOG search were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-2 R-4 R-5 R-6 R-7 R-12] - Numbers: 835369.15 is the Gecko AP/AAPL pool 24h volume, not the 926253.95 token all-pools figure. Reserve 1008373.09 is that pool. DexScreener 1495153.52 / 473728.53 is the same pair, different aggregator. [claim R-1 R-2 R-3] - Adversarial: the strongest contrary reading is that AP is packed ICOIN, AAPLCAT, AAPLDOG, or a Bankr agent launch because Gecko labels the pool bankr-robinhood and all quote AAPL. ICOIN is 0x5d6EF…1e18, AAPLCAT is 0xbD6B…9BA3, AAPLDOG is 0x06e52E5f…1e18, and the create transaction calls LongLauncher.create from 0x1Ae51740…5305. AAPL 0xaF3D…93f9 is the rail."
+      class: inference
+      sources:
+        - S2
+        - S5
+        - S12
+        - S20
+        - S21
+    - text: Quote token AAPL is a Robinhood Stock Token rail; pool USD reserve is AP plus AAPL, not a USDG backstop. [verified R-2 R-12 R-13] - Gecko reserve and DexScreener liquidity for pool 0x29482ee4…56e0 disagree this pass. [claim R-1 R-2] - Token owner() is Airlock; create-from EOA also deployed LongLauncher. [verified R-6 R-15] - Telegram preview has no CA this pass. [claim R-11] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does the @Alpha_RHC profile website field itself point at alpharhc.xyz, or only the site-to-handle direction? Next: open the X profile website chip and a post that embeds the full CA from @Alpha_RHC"
+    - text: "What does Lock beneficiary 0xEDeAa06E…eDa8 (5%) do after create, and is it a fee splitter or an EOA? Next: trace later fee distributions from the hook 0x4e346895…a544"
+    - text: "Does t.me/alpharhc pin CA 0x69c68e4C…1E18 once joined? Next: open the join page / first messages if they become public without joining"
+    - text: "Why do Gecko reserve ($1.01M) and DexScreener liquidity ($474k) disagree on the same AP/AAPL pool? Next: archive both aggregator payloads if the gap stays this wide"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

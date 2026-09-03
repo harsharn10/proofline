@@ -3,9 +3,11 @@
 // `ok <name>` line per group, non-zero exit on any failure. Run from the repo root:
 //   node scripts/test-packet.mjs
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { parse, stringify } from "yaml";
-import { parsePacket, validatePacket, BODY_SECTIONS } from "./lib/packet.mjs";
+import { compile, parsePacket, validatePacket, validatePacketDirectory, themesFromBody, BODY_SECTIONS } from "./lib/packet.mjs";
 import { validateAgainst, TAXONOMY_LEAVES } from "./lib/schemas.mjs";
 
 let failures = 0;
@@ -155,16 +157,103 @@ await test("packet referential checks", async () => {
   const duplicate = withFrontmatter(seed, (fm) => { fm.claims.push(structuredClone(fm.claims[0])); });
   assert.ok(check(duplicate).some((error) => error.includes("duplicate claim id")), "a reused claim id is rejected");
 
-  const collision = withFrontmatter(seed, (fm) => { fm.identity.aliases = ["Pons"]; });
-  assert.ok(check(collision).some((error) => error.includes("possible_matches")), "a canonical name collision must be recorded");
+  // A shared name and nothing else is a warning: the compiler drops the alias (§7).
+  const nameOnly = withFrontmatter(seed, (fm) => { fm.identity.aliases = ["Pons"]; });
+  const warnings = [];
+  assert.deepEqual(check(nameOnly, { warnings }), [], "a name that collides with nothing else does not fail the packet");
+  assert.ok(warnings.some((w) => w.includes("also names canonical slug pons")), warnings.join("; "));
+
+  // A shared official surface is evidence the two records may be one entity, and must be disclosed.
+  const pons = census.find((row) => row.slug === "pons");
+  const strong = withFrontmatter(seed, (fm) => { fm.identity.official_handle = pons.handle; });
+  assert.ok(check(strong).some((error) => error.includes("possible_matches")), "a shared official handle must be recorded");
   const disclosed = withFrontmatter(seed, (fm) => {
-    fm.identity.aliases = ["Pons"];
-    fm.identity.possible_matches = [{ slug: "pons", signals: ["same-normalized-name"], contrary_signals: ["different domain and handle"] }];
+    fm.identity.official_handle = pons.handle;
+    fm.identity.possible_matches = [{ slug: "pons", signals: ["shared-handle"], contrary_signals: ["different domain"] }];
   });
   assert.deepEqual(check(disclosed), [], "a recorded collision is not an error");
 
   const grok = withFrontmatter(seed, (fm) => { fm.producer = "supergrok"; });
   assert.ok(check(grok).some((error) => error.includes("verifier")), "supergrok files verifier packets only");
+});
+
+// 6b. The shape that used to stop the whole compile: a launchpad and the tokens launched through it.
+// Every launch links its page on the pad's app and some list the pad's name; none of that makes the pad
+// and the token one entity, and none of it may block the batch.
+await test("a launchpad and its launches collide weakly, and the compiler drops the borrowed alias", async () => {
+  const pad = {
+    slug: "long", name: "LONG", handle: "@longdotxyz",
+    identity: { aliases: ["long.xyz", "LongLauncher"], symbols: [], entity_kind: "protocol" },
+    official_links: [{ kind: "site", url: "https://app.long.xyz" }, { kind: "x", url: "https://x.com/longdotxyz" }],
+  };
+  const seed = await fixture("seed-valid");
+
+  // The launched token: its own site and handle, the pad's app page as an `app` link, the pad's name as
+  // an alias, and its ticker in both the symbol and the alias list.
+  const launch = withFrontmatter(seed, (fm) => {
+    fm.identity.canonical_name = "iCoin";
+    fm.identity.aliases = ["ICOIN", "LONG"];
+    fm.identity.symbols = ["ICOIN"];
+    fm.identity.official_handle = "@iCoinRH";
+    fm.identity.official_domain = "https://icoin.example";
+    fm.links = [
+      { kind: "site", url: "https://icoin.example", authenticity: "confirmed" },
+      { kind: "app", url: "https://app.long.xyz/tokens/0x5d6ef090a1461b11c9427ac319260122d1c61e18", authenticity: "unconfirmed" },
+    ];
+  });
+  const warnings = [];
+  assert.deepEqual(
+    validatePacket(launch, { census: [pad], path: pathFor(launch.frontmatter), warnings }), [],
+    "a launch page on the pad's app is not a claim on the pad's identity",
+  );
+  assert.equal(warnings.length, 1, warnings.join("; "));
+  assert.match(warnings[0], /name "LONG" also names canonical slug long/);
+
+  // The same collision the other way round: the pad names its launches, and is still not one of them.
+  const launchRow = {
+    slug: "icoin", name: "iCoin", handle: "@iCoinRH",
+    identity: { aliases: ["ICOIN"], symbols: ["ICOIN"], entity_kind: "token" },
+    official_links: [{ kind: "app", url: "https://app.long.xyz/tokens/0x5d6ef090a1461b11c9427ac319260122d1c61e18" }],
+  };
+  const padPacket = withFrontmatter(seed, (fm) => {
+    fm.slug = "long";
+    fm.owned_slugs = ["long"];
+    fm.work_id = "WORK-20260902-grok-heavy-long";
+    fm.allowed_paths = ["research/inbox/packets/long/WORK-20260902-grok-heavy-long.md"];
+    fm.name = "LONG";
+    fm.identity.canonical_name = "LONG";
+    fm.identity.aliases = ["long.xyz"];
+    fm.identity.official_handle = "@longdotxyz";
+    fm.identity.official_domain = "https://app.long.xyz";
+    fm.links = [{ kind: "site", url: "https://app.long.xyz", authenticity: "confirmed" }];
+  });
+  assert.deepEqual(
+    validatePacket(padPacket, { census: [launchRow], path: pathFor(padPacket.frontmatter) }), [],
+    "the pad's own domain appearing as a token's app link is not a shared official domain",
+  );
+
+  // A real shared surface still has to be disclosed.
+  const sameHandle = withFrontmatter(launch, (fm) => { fm.identity.official_handle = "@longdotxyz"; });
+  assert.ok(
+    validatePacket(sameHandle, { census: [pad], path: pathFor(sameHandle.frontmatter) })
+      .some((error) => error.includes("the official handle @longdotxyz")),
+    "one handle on two records is evidence, and must be recorded",
+  );
+
+  // And the borrowed alias never reaches the registry. compile() needs a packet with the full field set,
+  // so this half runs on the compiler fixture wearing the same identity.
+  const compilable = withFrontmatter(
+    parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8")),
+    (fm) => {
+      fm.identity.canonical_name = "iCoin";
+      fm.identity.aliases = ["ICOIN", "LONG"];
+      fm.identity.symbols = ["ICOIN"];
+      fm.identity.official_handle = "@iCoinRH";
+    },
+  );
+  const compiled = compile(compilable, null, null, null, null, { census: [pad] });
+  assert.deepEqual(compiled.censusRow.identity.aliases, ["ICOIN"], "the pad's name is dropped from the launch's row");
+  assert.ok(compiled.notices.includes("alias LONG is another name's slug (long); dropped"), compiled.notices.join("; "));
 });
 
 // 7. The taxonomy enum in the schema is the taxonomy registry, not a copy that drifted.
@@ -183,6 +272,59 @@ await test("packet taxonomy enum matches schema/taxonomy.json", async () => {
     ok.classification.primary_leaf = leaf;
     assert.deepEqual(validateAgainst("packet", ok), [], `leaf ${leaf} is accepted`);
   }
+});
+
+// 8. The Icarus additions are date-gated library rules, leaving pre-2026-09-03 packet-v2 valid.
+await test("Icarus packet fields are required from 2026-09-03", async () => {
+  const current = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
+  assert.deepEqual(check(current, { census: [] }), [], "current seed has a summary paragraph, themes and URL-backed events");
+  assert.deepEqual(validateAgainst("packet", current.frontmatter), [], "additive event and link fields pass the schema");
+
+  const noThemes = parsePacket(`---\n${stringify(current.frontmatter, { lineWidth: 0 })}---\n\n## What it is\n\nA reader summary.\n`);
+  assert.ok(check(noThemes, { census: [] }).some((error) => error.includes("Themes:")), "current seed needs themes");
+  const noEvents = withFrontmatter(current, (fm) => { fm.events = []; });
+  assert.ok(check(noEvents, { census: [] }).some((error) => error.includes("event")), "current seed needs a URL-backed event");
+
+  const legacy = await fixture("seed-valid");
+  assert.equal(String(legacy.frontmatter.as_of).slice(0, 10), "2026-09-02");
+  assert.deepEqual(check(legacy), [], "older seed remains backward compatible");
+});
+
+// 9. The themes line is a declaration in one place only; anywhere else it is prose.
+await test("themes are read only from the line after the What it is paragraph", async () => {
+  const summary = "Icarus Fields reads public chain state and publishes what changed.";
+  assert.deepEqual(themesFromBody(`## What it is\n\n${summary}\n\nThemes: chain-data, tooling\n`), ["chain-data", "tooling"]);
+  assert.deepEqual(themesFromBody(`## What it is\n\n${summary}\n\nMore prose.\n\nThemes: chain-data\n`), [], "a line further down the section is prose");
+  assert.deepEqual(themesFromBody(`## What it is\n\n${summary}\n\n\`\`\`\nThemes: chain-data\n\`\`\`\n`), [], "a fenced example is not a declaration");
+  assert.deepEqual(themesFromBody(`## Why it matters\n\nx\n\nThemes: chain-data\n`), [], "only the What it is section declares themes");
+  assert.deepEqual(themesFromBody(`## What it is\n\n${summary}\n`), [], "no line, no themes");
+
+  const current = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
+  const misplaced = parsePacket(
+    `---\n${stringify(current.frontmatter, { lineWidth: 0 })}---\n\n## What it is\n\n${summary}\n\nMore prose.\n\nThemes: chain-data, tooling\n`,
+  );
+  assert.ok(check(misplaced, { census: [] }).some((error) => error.includes("Themes:")), "a misplaced themes line is not a themes line");
+});
+
+// 10. One work id spans a whole batch of slugs; the clash the directory walk reports is per (work_id, slug).
+await test("work_id uniqueness is per (work_id, slug)", async () => {
+  const root = await mkdtemp(join(tmpdir(), "proofline-packet-dir-"));
+  const file = (slug, name, workId) =>
+    writeFile(join(root, slug, `${name}.md`), `---\nwork_id: ${workId}\nslug: ${slug}\n---\n\n## What it is\n\nx\n`);
+  try {
+    for (const slug of ["alpha", "beta"]) await mkdir(join(root, slug), { recursive: true });
+    await file("alpha", "WORK-20260903-grok-heavy-batch", "WORK-20260903-grok-heavy-batch");
+    await file("beta", "WORK-20260903-grok-heavy-batch", "WORK-20260903-grok-heavy-batch");
+    const batch = await validatePacketDirectory(root, []);
+    assert.deepEqual(batch.errors.filter((error) => error.includes("work_id")), [], "one work id may cover many slugs");
+    assert.equal(batch.files, 2);
+
+    await file("alpha", "second-file", "WORK-20260903-grok-heavy-batch");
+    const clash = await validatePacketDirectory(root, []);
+    const reported = clash.errors.filter((error) => error.includes("work_id"));
+    assert.equal(reported.length, 1, `two packets for one slug under one work id is still an error: ${reported.join("; ")}`);
+    assert.ok(reported[0].includes("for slug alpha"), reported[0]);
+  } finally { await rm(root, { recursive: true, force: true }); }
 });
 
 console.log(failures ? `${failures} failure(s)` : "all packet tests passed");

@@ -5,18 +5,21 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, cp, rm, writeFile, appendFile, readFile, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { parse } from "yaml";
+import { parse, stringify } from "yaml";
 import { validateInboxYaml, yamlParseErrors } from "./lib/inbox.mjs";
 import { vocabularyWarnings } from "./lib/voice.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
-import { normalizeUrl } from "./lib/checks.mjs";
+import { normalizeUrl, lifecycleDriftWarnings, mainnetReceiptFromPulled, deploymentReceiptFromPulled } from "./lib/checks.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { entryKey, legacyEntryKey, reviewKeyFor, selectUnsent, selectApproved, publicationFingerprint } from "./lib/telegram.mjs";
 import { addSourceKeys, sourceKeyFor } from "./migrations/add-source-keys.mjs";
 import { addFeedHashIds, feedIdFor } from "./migrations/add-feed-hash-ids.mjs";
 import { splitChangelog } from "./migrations/split-changelog.mjs";
 import { addReviewKeys } from "./migrations/add-review-keys.mjs";
-import { parsePacket, validatePacket, PRODUCER_IDS } from "./lib/packet.mjs";
+import { parsePacket, validatePacket, checkPacket, compile, PRODUCER_IDS } from "./lib/packet.mjs";
+import { checkResearch, REQUIRED_HEADINGS } from "./lib/research-md.mjs";
+import { runCompile, censusTextWithRow } from "./compile-packet.mjs";
+import { migrateLifecycle } from "./migrations/lifecycle-from-pulled.mjs";
 
 let failures = 0;
 async function test(name, fn) {
@@ -250,6 +253,397 @@ await test("changelog filename must match every entry slug", async () => {
     const { errors } = await validateContent(root);
     assert.ok(errors.some((error) => error.includes('changelog/pons.yaml[0]: slug field is "arrow"')), errors.join("\n"));
   } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+// 8. Icarus card fields: one seed packet compiles through validation, and rerunning it changes nothing.
+await test("packet compiles Icarus card fields and feed idempotently", async () => {
+  const packetPath = "fixtures/compile-packet/icarus-fields.md";
+  const packet = parsePacket(await readFile(packetPath, "utf8"));
+  assert.deepEqual(validatePacket(packet, { census: [], path: "research/inbox/packets/icarus-fields/WORK-20260903-codex-icarus-fields.md" }), []);
+  const compiled = compile(packet);
+  assert.equal(compiled.project.summary, "Icarus Fields reads public Robinhood Chain state and publishes changes with links to the underlying receipts.");
+  assert.deepEqual(compiled.project.themes, ["chain-data", "monitoring", "tooling"]);
+  assert.deepEqual(compiled.project.official_links.map((link) => link.kind), ["site", "docs", "github", "explorer", "dexscreener", "app"]);
+  assert.equal(new Set(compiled.project.official_links.map((link) => normalizeUrl(link.url))).size, compiled.project.official_links.length);
+  assert.deepEqual(compiled.feed.items.map((item) => item.kind), ["company", "ct", "onchain", "risk"]);
+  assert.equal(compiled.feed.items[0].account, "@fields");
+  assert.equal(compiled.feed.items[1].account, "@reader");
+  assert.equal(compiled.feed.items[0].body, packet.frontmatter.events[0].summary);
+  for (const item of compiled.feed.items) {
+    assert.match(item.id, /^[0-9a-f]{16}$/);
+    assert.ok(item.sourceUrl);
+    assert.ok(item.title.length <= 80);
+  }
+
+  const controllerProject = { ...compiled.project, summary: "Controller summary stays.", themes: ["controller"], controller_edited: true };
+  const preserved = compile(packet, controllerProject, compiled.censusRow, compiled.sources, compiled.feed);
+  assert.equal(preserved.project.summary, "Controller summary stays.");
+  assert.deepEqual(preserved.project.themes, ["controller"]);
+
+  const temp = await mkdtemp(join(tmpdir(), "proofline-icarus-compile-"));
+  const content = join(temp, "content");
+  try {
+    await cp("content", content, { recursive: true });
+    await runCompile({ packetPath, contentDir: content });
+    const first = new Map();
+    async function snapshot(dir, relative = "") {
+      for (const entry of await readdir(dir, { withFileTypes: true })) {
+        const rel = join(relative, entry.name), path = join(dir, entry.name);
+        if (entry.isDirectory()) await snapshot(path, rel);
+        else first.set(rel, await readFile(path, "utf8"));
+      }
+    }
+    await snapshot(content);
+    const checked = await validateContent(content);
+    assert.deepEqual(checked.errors, [], checked.errors.join("\n"));
+    await runCompile({ packetPath, contentDir: content });
+    const second = new Map();
+    async function snapshotAgain(dir, relative = "") {
+      for (const entry of await readdir(dir, { withFileTypes: true })) {
+        const rel = join(relative, entry.name), path = join(dir, entry.name);
+        if (entry.isDirectory()) await snapshotAgain(path, rel);
+        else second.set(rel, await readFile(path, "utf8"));
+      }
+    }
+    await snapshotAgain(content);
+    assert.deepEqual(second, first, "second compile produces no content diff");
+  } finally { await rm(temp, { recursive: true, force: true }); }
+});
+
+// 9. The lifecycle warning is broader than the migration: activity warns, but only contract+pair flips.
+await test("lifecycle migration requires a contract and pair and records its receipt", async () => {
+  const temp = await mkdtemp(join(tmpdir(), "proofline-lifecycle-"));
+  try {
+    for (const dir of ["projects", "pulled"]) await mkdir(join(temp, dir), { recursive: true });
+    await writeFile(join(temp, "census.yaml"), [
+      "- slug: alpha", "  lifecycle: announced", "- slug: activity-only", "  lifecycle: announced",
+      "- slug: already-flipped", "  lifecycle: mainnet   # ruling C: mainnet rests on the project's own posts", "",
+    ].join("\n"));
+    for (const slug of ["alpha", "activity-only"])
+      await writeFile(join(temp, "projects", `${slug}.yaml`), `slug: ${slug}\nlifecycle: announced\n`);
+    await writeFile(
+      join(temp, "projects", "already-flipped.yaml"),
+      "slug: already-flipped\nlifecycle: mainnet\nlifecycle_source: pulled 0x9999999999999999999999999999999999999999 2026-08-01T00:00:00.000Z\n",
+    );
+    const address = "0x1111111111111111111111111111111111111111";
+    const pulled = (pairs) => [
+      "slug: fixture", "chain: robinhood-chain", "addresses:", `  - address: "${address}"`, "    is_contract: true",
+      "    created_at: 2026-09-03T10:00:00.000Z", "market:", `  token_address: "${address}"`, "  pairs:",
+      ...(pairs ? ["    - pair_address: \"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"", "      created_at: 2026-09-03T10:05:00.000Z"] : []),
+      "activity:", "  addresses:", `    - address: "${address}"`, "      transactions_count: 2", "      last_tx_at: 2026-09-03T11:00:00.000Z", "",
+    ].join("\n");
+    await writeFile(join(temp, "pulled", "alpha.yaml"), pulled(true));
+    await writeFile(join(temp, "pulled", "activity-only.yaml"), pulled(false));
+    const census = parse(await readFile(join(temp, "census.yaml"), "utf8"));
+    const pulledBySlug = new Map([
+      ["alpha", parse(await readFile(join(temp, "pulled", "alpha.yaml"), "utf8"))],
+      ["activity-only", parse(await readFile(join(temp, "pulled", "activity-only.yaml"), "utf8"))],
+    ]);
+    assert.equal(lifecycleDriftWarnings(census, pulledBySlug).length, 2);
+    assert.deepEqual(await migrateLifecycle(temp, { dryRun: true }), [{ slug: "alpha", address, createdAt: "2026-09-03T10:00:00.000Z" }]);
+    assert.match(await readFile(join(temp, "projects", "alpha.yaml"), "utf8"), /lifecycle: announced/);
+    assert.deepEqual(await migrateLifecycle(temp), [{ slug: "alpha", address, createdAt: "2026-09-03T10:00:00.000Z" }]);
+    assert.match(await readFile(join(temp, "projects", "alpha.yaml"), "utf8"), new RegExp(`lifecycle_source: pulled ${address} 2026-09-03T10:00:00.000Z`));
+    assert.match(await readFile(join(temp, "projects", "activity-only.yaml"), "utf8"), /lifecycle: announced/);
+
+    // The census comment names the receipt, both on the row just flipped and on one flipped earlier;
+    // a note explaining why the row used to be announced never outlives the flip.
+    const flippedCensus = await readFile(join(temp, "census.yaml"), "utf8");
+    assert.match(flippedCensus, new RegExp(`^  lifecycle: mainnet   # pulled: ${address} 2026-09-03T10:00:00.000Z$`, "m"));
+    assert.match(flippedCensus, /^ {2}lifecycle: mainnet {3}# pulled: 0x9999999999999999999999999999999999999999 2026-08-01T00:00:00.000Z$/m);
+    assert.ok(!flippedCensus.includes("ruling C"), flippedCensus);
+    assert.match(flippedCensus, /^- slug: activity-only\n {2}lifecycle: announced$/m, "an unflipped row is untouched");
+
+    assert.deepEqual(await migrateLifecycle(temp), [], "migration rerun is idempotent");
+    assert.equal(await readFile(join(temp, "census.yaml"), "utf8"), flippedCensus, "the comment pass is idempotent too");
+  } finally { await rm(temp, { recursive: true, force: true }); }
+});
+
+// 10. The mainnet receipt names the market's own contract or a pair's, never whichever contract came first.
+await test("mainnet receipt never falls back to an unrelated contract", async () => {
+  const token = "0x1111111111111111111111111111111111111111";
+  const pair = "0x2222222222222222222222222222222222222222";
+  const unrelated = "0x3333333333333333333333333333333333333333";
+  const pulled = (contractAddress) => ({
+    slug: "fixture",
+    chain: "robinhood-chain",
+    addresses: [{ address: contractAddress, is_contract: true, created_at: "2026-09-03T10:00:00.000Z" }],
+    market: { token_address: token, pairs: [{ pair_address: pair, created_at: "2026-09-03T10:05:00.000Z" }] },
+  });
+  assert.deepEqual(mainnetReceiptFromPulled(pulled(token)), { address: token, createdAt: "2026-09-03T10:00:00.000Z" });
+  assert.deepEqual(mainnetReceiptFromPulled(pulled(pair)), { address: pair, createdAt: "2026-09-03T10:00:00.000Z" });
+  assert.equal(mainnetReceiptFromPulled(pulled(unrelated)), null, "an unrelated contract is not a receipt");
+
+  const temp = await mkdtemp(join(tmpdir(), "proofline-receipt-"));
+  try {
+    for (const dir of ["projects", "pulled"]) await mkdir(join(temp, dir), { recursive: true });
+    await writeFile(join(temp, "census.yaml"), "- slug: alpha\n  lifecycle: announced\n");
+    await writeFile(join(temp, "projects", "alpha.yaml"), "slug: alpha\nlifecycle: announced\n");
+    await writeFile(join(temp, "pulled", "alpha.yaml"), stringify(pulled(unrelated)));
+    assert.deepEqual(await migrateLifecycle(temp), [], "no receipt means no flip");
+    assert.match(await readFile(join(temp, "projects", "alpha.yaml"), "utf8"), /lifecycle: announced/);
+  } finally { await rm(temp, { recursive: true, force: true }); }
+});
+
+// 11. content/pulled is machine output: a broken file warns, it does not fail content validation.
+await test("an unparseable pulled file warns instead of failing validation", async () => {
+  const temp = await mkdtemp(join(tmpdir(), "proofline-pulled-"));
+  const content = join(temp, "content");
+  try {
+    await cp("content", content, { recursive: true });
+    await writeFile(join(content, "pulled", "broken.yaml"), "a: 1\n  b: [unclosed\n");
+    const { errors, warnings } = await validateContent(content);
+    assert.deepEqual(errors.filter((error) => error.includes("pulled/broken.yaml")), [], errors.join("\n"));
+    assert.ok(warnings.some((warning) => warning.includes("pulled/broken.yaml")), warnings.join("\n"));
+  } finally { await rm(temp, { recursive: true, force: true }); }
+});
+
+// 12. A collector packet that got parts of the world wrong still compiles: the unusable parts are
+//     dropped, each with a notice, and everything else lands.
+const degradedPacket = parsePacket(await readFile("fixtures/compile-packet/degraded.md", "utf8"));
+const reshaped = (edit) => {
+  const frontmatter = structuredClone(degradedPacket.frontmatter);
+  edit(frontmatter);
+  return { frontmatter, body: degradedPacket.body };
+};
+
+await test("compile degrades unusable packet fields instead of refusing the packet", async () => {
+  assert.deepEqual(checkPacket(degradedPacket.frontmatter, degradedPacket.body), [], "the fixture is a valid packet");
+  const result = compile(degradedPacket);
+  assert.deepEqual(validateAgainst("project", result.project), [], "the compiled project passes its schema");
+
+  // A value that is a sentence, or a negative one, is not a figure: it is skipped and filed as a gap.
+  assert.deepEqual(result.project.metrics.map((metric) => metric.kind), ["tvl"]);
+  assert.equal(result.degraded.skippedMetrics, 2);
+  assert.ok(result.project.findings.missing.some((gap) => gap.text.includes("volume_24h is not published as a figure")), JSON.stringify(result.project.findings.missing));
+  assert.ok(result.project.findings.missing.some((gap) => gap.text.includes("market_cap is not published as a figure: the packet reported -4200")));
+  assert.ok(result.notices.some((note) => note.startsWith("metric volume_24h: skipped")), result.notices.join("\n"));
+
+  // An address that is a sentence is never written into the canonical record.
+  assert.deepEqual(result.project.deployments.map((row) => row.address), ["0x2222222222222222222222222222222222222222"]);
+  assert.equal(result.degraded.skippedDeployments, 1);
+  assert.ok(result.notices.some((note) => note.includes('deployment "Alpha vault manager": skipped')), result.notices.join("\n"));
+
+  // The census handle pattern is narrower than the packet's free-text field.
+  assert.ok(!("handle" in result.censusRow), "an unresolved handle is not written to the census");
+  assert.ok(result.notices.some((note) => note.startsWith("handle: skipped")));
+
+  // Themes are clamped, not thrown on, because the count rule is date-gated in the packet check.
+  assert.deepEqual(result.project.themes, ["amm", "trading", "native", "routing", "liquidity"]);
+  assert.ok(result.notices.some((note) => note.startsWith("themes: kept the first 5 of 6")));
+
+  // Untagged body paragraphs are tagged from the claims they name, else from the primary official receipt.
+  assert.equal(result.degraded.autoTaggedParagraphs, 2);
+  assert.ok(result.research.includes("cannot be read on chain. [claim S2]"), result.research);
+  assert.ok(result.research.includes("per CLM-2. [inference S2]"), "the tag is the referenced claim's own class and receipts");
+  assert.deepEqual(
+    checkResearch(result.research, { slug: "alpha", coverage: "stub", ledgerIds: new Set(result.sources.sources.map((row) => row.id)) }),
+    [],
+    "the compiled record satisfies the tag grammar it is checked against",
+  );
+});
+
+await test("compile never lowers coverage, never touches scoring, and never lowers lifecycle", async () => {
+  const seeded = compile(degradedPacket);
+  const scoring = { risk: { assessed: "Elevated", reason: "Owner path unread." } };
+  const priorResearch = `---\nslug: alpha\ncoverage: full\nmethodology_version: proofline-v1.0\n---\n\n# Alpha — research record\n\n${
+    REQUIRED_HEADINGS.map((heading) => `## ${heading}\n\nA full-depth ${heading.toLowerCase()} paragraph written by review. [claim S1]`).join("\n\n")}\n`;
+  const priorProject = { ...seeded.project, coverage: "full", scoring };
+  const priorCensusRow = { ...seeded.censusRow, coverage: "full" };
+
+  const result = compile(degradedPacket, priorProject, priorCensusRow, seeded.sources, seeded.feed, { priorResearch });
+  assert.equal(result.project.coverage, "full", "a collector packet does not demote a full profile to a stub");
+  assert.equal(result.censusRow.coverage, "full", "the census row mirrors it");
+  assert.deepEqual(result.project.scoring, scoring, "scoring is untouched");
+  assert.match(result.research, /^---\nslug: alpha\ncoverage: full\n/, "the research front matter mirrors the coverage");
+  assert.ok(!result.research.includes("_Research pending._"), "a full record is never written back down to a pending line");
+  assert.deepEqual(
+    checkResearch(result.research, { slug: "alpha", coverage: "full", ledgerIds: new Set(result.sources.sources.map((row) => row.id)) }),
+    [],
+    "the full record still passes its own checks",
+  );
+
+  // Lifecycle: an announced packet does not undo a mainnet the chain read already established.
+  const announced = reshaped((frontmatter) => { frontmatter.classification.lifecycle = "announced"; });
+  const address = "0x1111111111111111111111111111111111111111";
+  const pulled = {
+    chain: "robinhood-chain",
+    addresses: [{ address, is_contract: true, created_at: "2026-09-03T10:00:00.000Z" }],
+    market: { token_address: address, pairs: [{ pair_address: "0xaaaa", created_at: "2026-09-03T10:05:00.000Z" }] },
+  };
+  const kept = compile(announced, { ...priorProject, lifecycle: "mainnet" }, priorCensusRow, seeded.sources, seeded.feed, { pulled, priorResearch });
+  assert.equal(kept.project.lifecycle, "mainnet");
+  assert.ok(kept.notices.some((note) => note.startsWith("lifecycle: kept mainnet")), kept.notices.join("\n"));
+  const demoted = compile(announced, { ...priorProject, lifecycle: "mainnet" }, priorCensusRow, seeded.sources, seeded.feed, { priorResearch });
+  assert.equal(demoted.project.lifecycle, "announced", "without a chain read there is nothing holding mainnet up");
+});
+
+await test("the feed carries reader-facing events under ids that survive an edit", async () => {
+  const result = compile(degradedPacket);
+  assert.deepEqual(result.feed.items.map((item) => item.title), ["Router reproduced"], "site_recommendation none is not published");
+
+  // The id is the event, not the wording: an edited (or over-long) title replaces its item, never adds one.
+  const retitled = reshaped((frontmatter) => { frontmatter.events[0].title = "Router reproduced on chain 4663 after a second read of the deployment bytecode"; });
+  const second = compile(retitled, null, null, result.sources, result.feed);
+  assert.equal(second.feed.items.length, 1, "a retitled event replaces its feed item");
+  assert.equal(second.feed.items[0].id, result.feed.items[0].id);
+  assert.equal(second.feed.items[0].title, retitled.frontmatter.events[0].title);
+});
+
+await test("a compile adds official links and never deletes a stored one", async () => {
+  const seeded = compile(degradedPacket);
+  const stored = [
+    { kind: "discord", url: "https://discord.gg/alpha" },
+    { kind: "other", url: "https://alpha.example/press" },
+    { kind: "site", url: "https://alpha.example/" },
+  ];
+  const result = compile(degradedPacket, { ...seeded.project, official_links: stored }, { ...seeded.censusRow, official_links: stored }, seeded.sources, seeded.feed);
+  for (const link of stored)
+    assert.ok(
+      result.project.official_links.some((row) => normalizeUrl(row.url) === normalizeUrl(link.url)),
+      `${link.kind} link survives: ${JSON.stringify(result.project.official_links)}`,
+    );
+  for (const kind of ["discord", "other"])
+    assert.ok(result.project.official_links.some((row) => row.kind === kind), `${kind} keeps its kind`);
+  assert.ok(result.project.official_links.some((row) => row.kind === "whitepaper"), "the packet's whitepaper link is added");
+  assert.equal(
+    new Set(result.project.official_links.map((link) => normalizeUrl(link.url))).size,
+    result.project.official_links.length,
+    "only exact duplicates are dropped",
+  );
+  assert.deepEqual(validateAgainst("project", result.project), []);
+  assert.deepEqual(validateAgainst("census", [result.censusRow]), []);
+});
+
+await test("a compile writes one census row and keeps the file's comments", async () => {
+  const text = [
+    "# Coverage universe — one row per canonical name.",
+    "",
+    "- slug: keep-me",
+    "  name: Keep Me",
+    "  lifecycle: mainnet   # pulled: 0x9999999999999999999999999999999999999999 2026-08-01T00:00:00.000Z",
+    "  coverage: stub",
+    "",
+    "- slug: alpha",
+    "  name: Alpha",
+    "  lifecycle: mainnet   # pulled: 0x1111111111111111111111111111111111111111 2026-08-02T00:00:00.000Z",
+    "  coverage: stub",
+    "",
+  ].join("\n");
+  const row = compile(degradedPacket).censusRow;
+  const once = censusTextWithRow(text, row);
+  assert.ok(once.includes("# Coverage universe"), "the file's own header comment survives");
+  assert.ok(once.includes("# pulled: 0x9999999999999999999999999999999999999999"), "another row's receipt comment survives");
+  assert.ok(once.includes("# pulled: 0x1111111111111111111111111111111111111111"), "the compiled row keeps the comment on its own lifecycle line");
+  assert.equal(parse(once).length, 2, "the row is replaced, not appended");
+  assert.equal(parse(once)[1].category, row.category, "the compiled row is the one written");
+  assert.equal(censusTextWithRow(once, row), once, "rewriting the same row changes nothing");
+
+  const added = censusTextWithRow(text, { ...row, slug: "brand-new" });
+  assert.equal(parse(added).length, 3, "a slug with no row is appended");
+  assert.ok(added.includes("# Coverage universe"));
+});
+
+await test("a pulled chain read verifies a deployment and is cited as its source", async () => {
+  const router = "0x2222222222222222222222222222222222222222";
+  const vault = "0x5555555555555555555555555555555555555555";
+  const pulledAt = "2026-09-03T10:00:00.000Z";
+  const pulledRow = (address, extra = {}) => ({ address, is_contract: true, source_verified: true, contract_name: "AlphaRouter", ...extra });
+  const pulled = { slug: "alpha", pulled_at: pulledAt, chain: "robinhood-chain", addresses: [pulledRow(router)] };
+
+  // The rule itself: read, then not read, then read but not established.
+  assert.equal(deploymentReceiptFromPulled(pulled, router.toUpperCase()).receipt, `pulled ${router} ${pulledAt}`);
+  assert.equal(deploymentReceiptFromPulled(pulled, vault), null, "an address the puller has not read has no receipt");
+  assert.equal(deploymentReceiptFromPulled({ ...pulled, addresses: [pulledRow(router, { is_contract: false })] }, router), null);
+  assert.equal(deploymentReceiptFromPulled({ ...pulled, addresses: [pulledRow(router, { source_verified: false })] }, router), null, "unverified source is not an establishment");
+  assert.equal(deploymentReceiptFromPulled({ ...pulled, addresses: [pulledRow(router, { source_verified: null })] }, router), null, "a Blockscout read that never answered is not one either");
+  assert.equal(deploymentReceiptFromPulled({ ...pulled, pulled_at: undefined }, router), null, "a read with no timestamp is not a receipt");
+
+  // A router the packet asserts but never reproduced is unverified until something reproduces it.
+  const unreproduced = reshaped((frontmatter) => { frontmatter.claims[0].class = "claim"; frontmatter.claims[0].reproduction_ids = []; });
+  const withoutRead = compile(unreproduced);
+  assert.deepEqual(withoutRead.project.deployments.map((row) => row.verified), [false]);
+
+  const result = compile(unreproduced, null, null, null, null, { pulled });
+  const [deployment] = result.project.deployments;
+  assert.equal(deployment.verified, true, "the chain read verifies it");
+  assert.ok(result.notices.some((note) => note.includes(`verified from the chain read — pulled ${router} ${pulledAt}`)), result.notices.join("\n"));
+
+  const cited = result.sources.sources.find((source) => deployment.sources.includes(source.id) && source.researcher === "pull");
+  assert.ok(cited, `the pulled read is cited: ${JSON.stringify(deployment.sources)}`);
+  assert.equal(cited.url, `https://robinhoodchain.blockscout.com/address/${router}`);
+  assert.equal(cited.kind, "explorer");
+  assert.equal(cited.accessed_at, pulledAt);
+  assert.ok(cited.excerpt.startsWith(`pulled ${router} ${pulledAt}:`), cited.excerpt);
+  assert.deepEqual(validateAgainst("sources", result.sources), [], "the ledger still passes its schema");
+  assert.deepEqual(validateAgainst("project", result.project), []);
+
+  // A pool DexScreener names is a contract the puller has read, from its other endpoint.
+  const pool = "0x1010101010101010101010101010101010101010";
+  const marketPulledAt = "2026-09-03T09:00:00.000Z";
+  const withMarket = {
+    ...pulled,
+    market: { token_address: router, pulled_at: marketPulledAt, pairs: [{ pair_address: pool }] },
+  };
+  const pairRead = deploymentReceiptFromPulled(withMarket, pool.toUpperCase());
+  assert.equal(pairRead.receipt, `pulled pair ${pool} ${marketPulledAt}`);
+  assert.equal(pairRead.url, `https://dexscreener.com/robinhood/${pool}`);
+  assert.equal(pairRead.kind, "third-party-data");
+  assert.equal(pairRead.publisher, "DexScreener");
+  assert.equal(deploymentReceiptFromPulled({ ...withMarket, market: { ...withMarket.market, pulled_at: undefined } }, pool), null, "a market read with no timestamp is not a receipt");
+
+  const poolPacket = reshaped((frontmatter) => {
+    frontmatter.claims[0].class = "claim";
+    frontmatter.claims[0].reproduction_ids = [];
+    frontmatter.deployments[0].address.value = pool;
+    frontmatter.claims[0].value = pool;
+  });
+  const poolResult = compile(poolPacket, null, null, null, null, { pulled: withMarket });
+  const [poolDeployment] = poolResult.project.deployments;
+  assert.equal(poolDeployment.verified, true, "the pool is verified from the market read");
+  const poolSource = poolResult.sources.sources.find((source) => poolDeployment.sources.includes(source.id) && source.researcher === "pull");
+  assert.equal(poolSource.kind, "third-party-data");
+  assert.equal(poolSource.url, `https://dexscreener.com/robinhood/${pool}`);
+  assert.deepEqual(validateAgainst("sources", poolResult.sources), []);
+
+  // Compiling again against the same read reuses the entry; a later pull refreshes what it says it read.
+  const again = compile(unreproduced, result.project, result.censusRow, result.sources, result.feed, { pulled });
+  assert.equal(again.sources.sources.filter((source) => source.researcher === "pull").length, 1, "one entry per address, not one per compile");
+  const repulled = { ...pulled, pulled_at: "2026-09-04T10:00:00.000Z" };
+  const refreshed = compile(unreproduced, result.project, result.censusRow, result.sources, result.feed, { pulled: repulled });
+  const refreshedEntry = refreshed.sources.sources.find((source) => source.researcher === "pull");
+  assert.equal(refreshedEntry.accessed_at, "2026-09-04T10:00:00.000Z", "a newer read updates the entry it already has");
+  assert.equal(refreshed.sources.sources.filter((source) => source.researcher === "pull").length, 1);
+});
+
+await test("a re-listed deployment keeps the evidence it already has", async () => {
+  const router = "0x2222222222222222222222222222222222222222";
+  const stored = [{
+    label: "Alpha router (reproduced on the explorer by review)",
+    chain: "robinhood-chain",
+    address: router,
+    role: "router",
+    verified: true,
+    sources: ["S20", "S13"],
+  }];
+  // The packet re-lists the address with no reproduction of its own, and no chain read backs it.
+  const unreproduced = reshaped((frontmatter) => { frontmatter.claims[0].class = "claim"; frontmatter.claims[0].reproduction_ids = []; });
+  const seeded = compile(unreproduced);
+  assert.equal(seeded.project.deployments[0].verified, false, "on its own the packet establishes nothing");
+
+  const result = compile(unreproduced, { ...seeded.project, deployments: stored }, seeded.censusRow, seeded.sources, seeded.feed);
+  const [deployment] = result.project.deployments;
+  assert.equal(deployment.verified, true, "a compile never lowers verified on a row someone reproduced");
+  for (const id of ["S20", "S13"]) assert.ok(deployment.sources.includes(id), `stored source ${id} survives: ${deployment.sources}`);
+  assert.ok(deployment.sources.length > 2, "the packet's own citations are added alongside");
+  assert.equal(deployment.sources.length, new Set(deployment.sources).size, "sources are not duplicated");
+  assert.deepEqual(validateAgainst("project", result.project), []);
+
+  // An address the packet brings that is not stored is added, not merged into someone else's row.
+  const fresh = reshaped((frontmatter) => { frontmatter.deployments[0].address.value = "0x3333333333333333333333333333333333333333"; frontmatter.claims[0].value = "0x3333333333333333333333333333333333333333"; });
+  const added = compile(fresh, { ...seeded.project, deployments: stored }, seeded.censusRow, seeded.sources, seeded.feed);
+  assert.equal(added.project.deployments.length, 2);
+  assert.equal(added.project.deployments[0].verified, true, "the stored row is untouched");
 });
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }

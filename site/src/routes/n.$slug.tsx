@@ -1,13 +1,13 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { DOSSIER_TABS, Dossier, type DossierTab } from "@/components/dossier";
 import { getDossier } from "@/data/content-server";
+import { readerCopy } from "@/lib/dejargon";
 
 export const Route = createFileRoute("/n/$slug")({
-  // URL-synced tabs on a full record: /n/<slug>?tab=evidence. Overview is the clean default URL;
-  // anything unrecognized falls back to it. An initial-research page has no tabs and ignores it.
+  // URL-synced card tabs. Commentary is the clean default URL; legacy or unknown values fall back.
   validateSearch: (search: Record<string, unknown>): { tab?: DossierTab } => {
     const tab = search.tab;
-    if (typeof tab === "string" && tab !== "overview" && (DOSSIER_TABS as readonly string[]).includes(tab)) {
+    if (typeof tab === "string" && tab !== "commentary" && (DOSSIER_TABS as readonly string[]).includes(tab)) {
       return { tab: tab as DossierTab };
     }
     return {};
@@ -18,6 +18,15 @@ export const Route = createFileRoute("/n/$slug")({
     if (!dossier) throw notFound();
     return { dossier, ...rest };
   },
+  // One title mechanism site-wide: route head(), rendered by <HeadContent /> in __root.tsx.
+  head: ({ loaderData }) => ({
+    meta: loaderData?.dossier
+      ? [
+          { title: `${loaderData.dossier.name} · Icarus` },
+          { name: "description", content: readerCopy(loaderData.dossier.summary) },
+        ]
+      : [],
+  }),
   component: NamePage,
   notFoundComponent: () => (
     <main className="wrap narrow pb-10">
@@ -35,24 +44,19 @@ export const Route = createFileRoute("/n/$slug")({
 });
 
 function NamePage() {
-  const { dossier, site, dependencies, peers, tree, section, now } = Route.useLoaderData();
+  const { dossier, site, dependencies, tree, section, now, related } = Route.useLoaderData();
   const { tab } = Route.useSearch();
   return (
     <>
-      <div className="wrap narrow pt-3">
-        <Link to="/" className="backlink">
-          ← all names
-        </Link>
-      </div>
       <Dossier
         dossier={dossier}
         site={site}
         dependencies={dependencies}
-        peers={peers}
         tree={tree}
         section={section}
         now={now}
-        tab={dossier.coverage === "full" ? (tab ?? "overview") : "overview"}
+        tab={tab ?? "commentary"}
+        related={related}
       />
     </>
   );

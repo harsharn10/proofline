@@ -2,22 +2,71 @@ slug: wire
 name: Wire
 symbol: WIRE
 category: Agent execution platform
-lifecycle: announced
+lifecycle: mainnet
+lifecycle_source: pulled 0x8ECEA3d0E648DB646d824AA51EedeB16aC3d6878 2026-07-17T19:04:11.000Z
 coverage: stub
-summary: Command layer that launches tokens on Pons and executes trades from X, Telegram or web, with a $WIRE token.
+summary: A command layer that turns an X, Telegram or web mention into an on-chain trade on Robinhood Chain. Users tag @wirebotRH to buy, sell, send, launch on Pons or open a prediction market from a handle-tied wallet. $WIRE is the app token. @wirebotRH runs wirebot.trade.
 official_links:
   - kind: x
     url: https://x.com/wirebotRH
+  - kind: site
+    url: https://wirebot.trade
+  - kind: docs
+    url: https://wirebot.trade/docs
+  - kind: app
+    url: https://app.wirebot.trade
+  - kind: telegram
+    url: https://t.me/rh_wirebot
 dependencies: []
 deployments:
-  - label: WIRE token (account bio)
+  - label: WIRE token (PonsLauncherToken)
     chain: robinhood-chain
     address: "0x8ECEA3d0E648DB646d824AA51EedeB16aC3d6878"
     role: token
-    verified: false
+    verified: true
     sources:
       - S2
       - S3
+      - S8
+      - S9
+      - S10
+      - S11
+  - label: WIRE/WETH Uniswap v3 pool (token liquidityPool())
+    chain: robinhood-chain
+    address: "0xD55246642DD114bc21dB98C6f2261161a6158388"
+    role: other
+    verified: true
+    sources:
+      - S11
+      - S13
+      - S14
+      - S27
+  - label: Pons v1 legacy factory (token launchFactory() / creator_address_hash)
+    chain: robinhood-chain
+    address: "0x0c37a24F5D23A486FA692d1500881d698B1F77a4"
+    role: factory
+    verified: false
+    sources:
+      - S9
+      - S12
+      - S15
+  - label: Token deployer EOA
+    chain: robinhood-chain
+    address: "0xFe4B46C8Dbdf982a4F68C5268de440D1DB790920"
+    role: admin
+    verified: false
+    sources:
+      - S11
+      - S12
+      - S22
+  - label: Prediction-market contract named in the 2026-07-20 post
+    chain: robinhood-chain
+    address: "0x695d6Bd8E647060fbB069E602eB64ac058c206c5"
+    role: other
+    verified: false
+    sources:
+      - S23
+      - S24
 review:
   researcher: harsharn10
   approver: pending
@@ -31,11 +80,52 @@ findings:
       sources:
         - S4
         - S2
+    - text: "Receipts: wirebot.trade, /docs, app.wirebot.trade, X profile and named status URLs, t.me/rh_wirebot, Blockscout address/token/tx APIs, DexScreener latest/dex/tokens, DefiLlama protocols, github.com/wirebotRH (404), and RPC eth_getCode/eth_call were opened on 2026-09-02; excerpts are copied from those responses."
+      class: verified
+      sources:
+        - S6
+        - S9
+        - S11
+        - S13
+    - text: "Numbers: 401332.48 USD is DexScreener Uniswap v3 WIRE/WETH volume.h24, not all WIRE pairs and not the site's $137K bot-volume counter; 3928 is Blockscout holders_count; 158574.12 USD is that v3 pair's liquidity.usd, not protocol TVL."
+      class: claim
+      sources:
+        - S6
+        - S10
+        - S13
   risk:
     - text: The account posted on 2026-08-30 that it had patched a missing router approval on post-graduation buys; a fix of that kind implies buys through the command layer failed for some period.
       class: inference
       sources:
         - S4
+    - text: "Adversarial: the strongest contrary reading is that Wire is Bankr or Lemon, or that census `announced` still holds because the command layer is off-chain. Distinct handle, CA and Pons factory path, plus a live Uniswap v3 book and same-day `launchToken` txs on Pons v2, argue against a merge and meet the mainnet bar."
+      class: inference
+      sources:
+        - S8
+        - S13
+        - S21
+    - text: Fee-treasury and burn-sink addresses are undocumented; the 2.5M burned figure is a site counter. [claim R-1]
+      class: unknown
+    - text: Handle-tied wallet derivation (MPC vs bot-held key) is a site/docs claim, not a reproduced factory.
+      class: claim
+      sources:
+        - S6
+        - S7
+    - text: A 30 Aug reply said post-graduation buys missed a router approval for some period.
+      class: claim
+      sources:
+        - S16
+    - text: Bio lists perps as live; docs still say they unlock at launch.
+      class: disputed
+      sources:
+        - S7
+        - S8
+    - text: Prediction contract `0x695d6Bd8…` is unverified. Pons v1 factory source is unverified. No audit report was located. [claim R-10 R-19]
+      class: unknown
+    - text: "Telegram `t.me/rh_wirebot` is a bot-start page, not a bidirectional official group. Flag: unconfirmed-official."
+      class: claim
+      sources:
+        - S20
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from the bio not reproduced on Blockscout
@@ -43,5 +133,48 @@ findings:
     - text: Protocol fee custody
     - text: Details of the 2026-08-30 router-approval patch
     - text: An independent audit was not found in this review
+    - text: "Which 4663 address holds the 1% protocol fee and runs the buyback-and-burn, and does a dead-address balance match the site's 2.5M WIRE burned? Next: trace a command-layer fill to the fee split and eth_call the burn sink"
+    - text: "How are handle-tied wallets derived (MPC/Privy or otherwise), and which key signs a tweet-originated transaction? Next: read app.wirebot.trade wallet creation requests and match from-addresses on the live-feed txs"
+    - text: "Is prediction contract 0x695d6Bd8… still the live market, and what is its verified source? Next: eth_getCode, read methods, and match a recent create-market command to that address"
+    - text: "Is there an audit of the bot, the wallet, or the prediction contract? Next: open any report URL the project posts and match commit/address scope"
+    - text: "Are perps live on 4663 or still a preview, and which venue (Clutch or other) would they wrap? Next: open the perps page authenticated and look for a live order tx"
+    - text: "Where is the Uniswap v3 position NFT for the WIRE/WETH pool held (Pons locker vs deployer)? Next: query positions owned by the v1 legacy locker 0x31ca5E10… and the deployer"
   unresolved:
     - text: How user keys are custodied when commands arrive from X or Telegram is not described in the intake.
+    - text: Bio lists perps as live; docs still say they unlock at launch.
+    - text: product.mechanism remains unresolved (CON-1).
+themes:
+  - agent
+  - launchpad
+  - prediction
+  - rwa
+  - index
+metrics:
+  - kind: holders
+    value: 3928
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S10
+  - kind: volume_24h
+    value: 401332.48
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S13
+  - kind: tvl
+    value: 158574.12
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S13
+      - S25
+  - kind: market_cap
+    value: 1334343
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S13

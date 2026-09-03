@@ -25,3 +25,119 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: d63d239b5d00c4ff
+- date: 2026-09-03
+  slug: website
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    lifecycle: announced
+    summary: Tokenized ad slots on Robinhood Chain that pay ETH to slot owners; v2 live since 2026-08-11 per the project.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/notawebsite_rh
+    deployments:
+      - &a1
+        label: Slot contract / WEBSITE token
+        chain: robinhood-chain
+        address: not-verified
+        role: token
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    lifecycle: mainnet
+    summary: "Tokenized advertising market: 165 visible elements on notawebsite.fun are separately owned on-chain slots. A user pays ETH to claim or take a slot, then edits its content; a take costs 1.4× and credits the prior owner 1.15×. Each slot is an ERC-721 (TINAW). $WEBSITE is a Pons-launched ERC-20 used to burn for upgrades. The same account is building PageMarkets for any publisher page. Operator: @notawebsite_rh."
+    themes:
+      - rwa
+      - nft
+      - memecoin
+      - tooling
+      - stock-paired:nvda
+    official_links:
+      - kind: x
+        url: https://x.com/notawebsite_rh
+      - kind: site
+        url: https://notawebsite.fun
+      - kind: docs
+        url: https://notawebsite.fun/docs
+      - kind: app
+        url: https://pagemarkets.com
+      - kind: github
+        url: https://github.com/vibecodermaxi/websitekit
+      - kind: other
+        url: https://linktr.ee/notawebsite
+      - kind: other
+        url: https://websitekit.org
+      - kind: other
+        url: https://www.ponsfamily.com/launchpad/0x0762C1708F0D23F86b29D6B857121FF7DF357506
+    deployments:
+      - *a1
+      - label: WEBSITE ERC-20 (PonsLauncherToken)
+        chain: robinhood-chain
+        address: "0x0762C1708F0D23F86b29D6B857121FF7DF357506"
+        role: token
+        verified: true
+        sources:
+          - S9
+          - S10
+          - S14
+      - label: TinawSlots v2 (TINAW ERC-721)
+        chain: robinhood-chain
+        address: "0xa112f87dd43D4265Bdd3918A4bb593C7F83ED50a"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S11
+      - label: TinawSlots v1 (frozen board)
+        chain: robinhood-chain
+        address: "0x28Ddf599f8c16ee36a77D7b420973F7201a8BF3c"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S12
+      - label: Uniswap v3 website/WETH pool
+        chain: robinhood-chain
+        address: "0x6D489e07d7Fe2b4Bc5749f75d56337888B68a34a"
+        role: other
+        verified: false
+        sources:
+          - S10
+          - S14
+      - label: Slot operator / treasury / creator
+        chain: robinhood-chain
+        address: "0x15e1D12Fc8A7bF97eaaB211d6353F585C53905c6"
+        role: admin
+        verified: true
+        sources:
+          - S5
+          - S11
+          - S13
+    metrics:
+      - kind: volume_24h
+        value: 547112.4
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S14
+      - kind: market_cap
+        value: 956387.595040786
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S9
+      - kind: holders
+        value: 1590
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S9
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 21e6ff18ccf71ecd

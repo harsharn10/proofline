@@ -4,23 +4,40 @@ symbol: STONKBROKER
 category: Token-bound treasury NFT
 lifecycle: mainnet
 coverage: stub
-summary: 4,444 ERC-6551 token-bound NFTs whose wallets hold Stock Tokens, with a $STONKBROKER activation token, an Anvil AMM and an announced STORMM options overlay on Uniswap v4.
+summary: StonkBrokers is a 4,444-piece ERC-6551 NFT collection on Robinhood Chain. Each NFT owns a token-bound wallet that can hold Stock Tokens. A user buys $STONKBROKER, swaps 666,666 tokens plus an ETH fee on the Anvil AMM for a broker, then pays an activation fee for Clock In stock-token drops. Clutch Markets operates the suite. STORMM options are posted for September 2026.
 official_links:
   - kind: site
     url: https://stonkbrokers.cash
   - kind: x
     url: https://x.com/ClutchMarkets
+  - kind: site
+    url: https://stonkbrokers.io
+  - kind: docs
+    url: https://www.stonkbrokers.cash/docs
+  - kind: docs
+    url: https://www.stonkbrokers.cash/docs/stonkbroker-token
+  - kind: github
+    url: https://github.com/Clutch-L4bs/stonkbroker-erc20
+  - kind: app
+    url: https://www.stonkbrokers.cash/marketplace
+  - kind: other
+    url: https://www.clutch.markets/
+  - kind: other
+    url: https://opensea.io/collection/stonkbrokers-434284142
 dependencies:
   - stock-tokens
   - uniswap
 deployments:
-  - label: $STONKBROKER token (CollectionToken, workbook sheet 02)
+  - label: $STONKBROKER token (CollectionToken)
     chain: robinhood-chain
-    address: "0xe934e36a439c94017b64a3fece66af12099abf50"
+    address: "0xe934e36A439C94017B64a3FecE66AF12099aBF50"
     role: token
-    verified: false
+    verified: true
     sources:
       - S5
+      - S13
+      - S14
+      - S17
   - label: NFT collection (ERC-721 + ERC-6551)
     chain: robinhood-chain
     address: not-verified
@@ -33,28 +50,90 @@ deployments:
     role: other
     verified: false
     sources: []
+  - label: StonkBrokers NFT collection (ERC-721 + ERC-6551)
+    chain: robinhood-chain
+    address: "0x539CdD042c2f3d93EbC5BE7DfFf0c79F3B4fAbF0"
+    role: token
+    verified: true
+    sources:
+      - S12
+      - S18
+      - S19
+  - label: Anvil NFT AMM vault (StonkNFTAMMVault)
+    chain: robinhood-chain
+    address: "0xE302733accF4800146E55fC45B46b4E4fFC032D2"
+    role: vault
+    verified: false
+    sources:
+      - S12
+      - S20
+  - label: Activation Manager
+    chain: robinhood-chain
+    address: "0xacD5ae3c060C1137FE2Ee86B0aB2EF697456f664"
+    role: other
+    verified: false
+    sources:
+      - S12
+      - S21
+  - label: Stonk Launcher factory
+    chain: robinhood-chain
+    address: "0x80a77001456bc986083678F9a112B1EC2Aa07281"
+    role: factory
+    verified: false
+    sources:
+      - S12
+  - label: Token deployer / collection Ownable path
+    chain: robinhood-chain
+    address: "0xb668382cF44038a3E8140E789060F6A809787CDa"
+    role: admin
+    verified: false
+    sources:
+      - S14
+      - S16
+      - S18
+      - S19
 metrics:
   - kind: tvl
-    value: 25599049
+    value: 1016688.16
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-02
     class: claim
     sources:
-      - S9
+      - S24
   - kind: fees_24h
-    value: 33776
+    value: 9200
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-03
     class: claim
     sources:
-      - S9
+      - S25
   - kind: revenue_24h
-    value: 18835
+    value: 4474
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-03
     class: claim
     sources:
-      - S9
+      - S26
+  - kind: holders
+    value: 33012
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15
+  - kind: volume_24h
+    value: 32432
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S27
+  - kind: market_cap
+    value: 29647685
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S22
 review:
   researcher: harsharn10
   approver: pending
@@ -84,6 +163,18 @@ findings:
       class: claim
       sources:
         - S5
+    - text: "Receipts: official cash and io terminals, docs, token whitepaper, X profile and named status URLs, Unchained, GitHub ERC-20 README, DexScreener token API, GeckoTerminal pool search, DefiLlama protocol/fees/dexs URLs, and Blockscout address/tx/source APIs were opened on 2026-09-03; excerpts are copied from those responses. [verified R-1 R-2 R-3 R-4 R-8 R-12 R-13 R-14 R-18] - Numbers: holders 33012 is the Blockscout token field; 24h volume 3357621.82 USD and liquidity 3581052.52 USD are the DexScreener Uniswap v4 STONKBROKER/ETH pair slice, not all-pairs; Gecko reserve_in_usd 5890033.38 is the same pool under a different field; Llama TVL 1016688.16 is the Robinhood Chain locker WETH slice, not staking 23.5M and not pair liquidity. [claim R-5 R-12 R-13 R-14] - Adversarial: the strongest contrary reading is that StonkBrokers is the chain's launchpad (DefiLlama category Launchpad; Smart Launch and Stonk Launcher are live) or that it is Stonks.fun / @realstonkbroker. Official copy names an ERC-6551 collection and Anvil NFTFi first; $STONKBROKER was created by an EOA CollectionToken constructor, not a launcher factory; @realstonkbroker bios itself as Fan Account; Stonks.fun is a different handle and ticker."
+      class: inference
+      sources:
+        - S11
+        - S12
+        - S16
+        - S35
+    - text: NFT collection and Anvil stack were deployed from one EOA with an Ownable path on the collection; live owner() is unread. [inference R-8 R-9] - Token-bound Stock Token balances and who can executeCall were not sampled. [unknown] - Activation weight clears on transfer per docs, so secondary NFT buyers start at base until they pay again. [claim R-2] - STORMM / Leverage Machine is still a September 2026 module with no live address in the contract table. [claim R-2 R-19] - DexScreener liquidity.usd 3.58M and GeckoTerminal reserve_in_usd 5.89M describe the same pool. [disputed R-12 R-13] - HasLock ERC-20 PDFs are project-hosted and named to Admir Zlatic (0xSimpleFarmer); DefiLlama lists no audit links. [claim R-3 R-14] - Operator legal name is not a single string (SB (BVI) Ltd vs Clutch Labs, LLC). [disputed R-2 R-24] - @realstonkbroker repeats the CA as a Fan Account; the official handle on the site is @ClutchMarkets.
+      class: claim
+      sources:
+        - S11
+        - S35
   missing:
     - text: Collection, registry and Anvil addresses not located; the token address comes from the workbook and is not reproduced
     - text: Who can move assets out of a token-bound account
@@ -91,5 +182,19 @@ findings:
     - text: STORMM and the Leverage Machine are announced for September 2026 — no deployment evidence reviewed
     - text: DefiLlama parent versus launchpad TVL split unexplained
     - text: The TVL harvested here ($25,599,049) is DefiLlama's parent-level figure for StonkBrokers; the research intake notes the StonkBrokers launchpad page shows about $1.05M — a child/parent split this harvest did not reconcile.
+    - text: "What does owner() return on the NFT collection, Anvil vault, ActivationManager, loan vault and locker contracts, and is there a timelock? Next: eth_call owner() / pendingOwner() on 0x539c…, 0xE302…, 0xacD5…, 0xa7b9… and the V3/V4 lockers"
+    - text: "Who can move Stock Tokens out of a broker TBA besides the current ERC-721 holder, and does a transfer empty the wallet? Next: pick three tokenIds, resolve ERC-6551 accounts, read Stock Token balances and a recent executeCall"
+    - text: "Are any STORMM / CoveredCallVault addresses live on 4663, or is September 2026 still docs-only? Next: search Blockscout for CoveredCallVault / STORMM from 0xb668… after 2026-09-01"
+    - text: "How does the HasLock ERC-20 PDF relate to Hashlock the auditor firm, given the named reviewer is Admir Zlatic (0xSimpleFarmer)? Next: read the PDF signer block and Hashlock directory for SSCAC 2026-02-03"
+    - text: "Which legal entity is the operator: SB (BVI) Ltd or Clutch Labs, LLC (New York)? Next: controller identity pass; keep both claims open"
+    - text: "Is there an official Telegram, and what is the Discord invite named in the NYC dinner post? Next: record URLs if a later official post publishes them"
+    - text: "Why does docs footer GitHub Clutch-L4bs/stonkbrokers 404 while stonkbroker-erc20 is public? Next: treat protocol source as unpublished until the org repo opens"
   unresolved:
     - text: DefiLlama shows about $25.6M parent TVL against $1.05M on its launchpad page — a parent/child split Proofline could not explain.
+    - text: economics.metric remains unresolved (CON-1).
+    - text: security.audit remains unresolved (CON-2).
+    - text: team.identity remains unresolved (CON-3).
+themes:
+  - nft
+  - rwa
+  - options

@@ -1,0 +1,103 @@
+slug: dollar-1
+name: Trump $1 Coin
+symbol: $1
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A Pons v2 memecoin that graduated into a locked Uniswap v4 pool quoted against the Robinhood DJT stock token. Traders buy and sell Trump $1 Coin ($1) on that DJT book and on later USDG books. PonsV2LaunchFactory created it. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:djt
+official_links: []
+dependencies: []
+deployments:
+  - label: Trump $1 Coin token
+    chain: robinhood-chain
+    address: "0xdCe5C6317222C5b6e5d963EeAC010DFc4dA9e6da"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S3
+  - label: PonsV2LaunchFactory
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S12
+  - label: V2LaunchLocker (top holder / locked position)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: true
+    sources:
+      - S4
+      - S11
+      - S19
+  - label: DJT Robinhood Stock Token (pair quote)
+    chain: robinhood-chain
+    address: "0x1D11f0496982706C5e14A514D4E79F2e6BdE4516"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S10
+      - S13
+metrics:
+  - kind: volume_24h
+    value: 10198421.95
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 110454.92
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 1761828
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 9786
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/locker/DJT and both launch txs, RPC name/symbol/locker/factory/eth_getLogs, DexScreener, Gecko pool/token, /rhj/assets, US Mint 403, @MintDetector1 and @tqshou1 were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-8 R-10] - Numbers: 10007137.006 is the Gecko djt/$1 pool 24h volume, not the 17954964.29 token all-pools figure. Reserve 109789.53 is that pool. DexScreener 10198421.95 / 110454.92 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this token is an official US Mint or Trump Media product, or a LONG launch. /rhj/assets lists DJT as a Robinhood Stock Token at a different address from the $1 token; TokenLaunched is on PonsV2LaunchFactory; no official handle or domain was located."
+      class: inference
+      sources:
+        - S5
+        - S10
+        - S14
+    - text: Token source is not verified on Blockscout. [verified R-1] - Factory owner is a SafeProxy; owners and threshold were not read this pass. [verified R-20] - Pool USD reserve is $1 plus DJT, not a USDG-only backstop. [claim R-7 R-8] - No official handle or domain this pass; DexScreener website is a third-party-link. [claim R-7 R-16] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0xdCe5…e6da? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle"
+    - text: "Who are the SafeProxy 0x263e…19Dd owners and threshold, and can that Safe call factory admin setters? Next: eth_call getOwners and getThreshold on 0x263e…19Dd"
+    - text: "Will the token source be verified on Blockscout? Next: re-read the token contract tab after a verification tx"
+    - text: "What is unverified 0xb2a748…7a14 that received the launch tx, relative to launchForwarder 0xe33E…2948? Next: compare bytecode or factory LaunchForwarderSet logs to 0xb2a748…7a14"
+    - text: "What does the US Mint product page say, beyond the DexScreener URL path? Next: archive the product page if it becomes readable without the challenge"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

@@ -161,6 +161,38 @@ export type PulledMarket = {
   price_change_h24: number | null;
   fdv: number | null;
   first_pair_at: string | null;
+  // Share of circulating supply (total supply less burned) held by the ten largest live holders.
+  // Burn addresses leave both the numerator and the denominator; burned_share reports them instead.
+  top10_share: number | null;
+  // Same, over the ten largest holders that are also not a pair, a vault or locker, or a pool
+  // contract — including the Uniswap v4 PoolManager singleton, which holds v4 liquidity under its
+  // own address and so never appears among the pairs.
+  top10_share_ex_pools: number | null;
+  // Absent on files written before the field existed, so optional as well as nullable.
+  burned_share?: number | null;
+  top10_as_of: string | null;
+  // shared: true (via "shared-factory") means the creator is infrastructure many projects deploy
+  // through: render it as "via Doppler (LONG)", never as "launched by LONG".
+  launchpad: {
+    slug: string;
+    via: "factory" | "creator" | "shared-factory";
+    address: string;
+    shared?: boolean;
+  } | null;
+  errors: Array<{ step: string; message: string }>;
+};
+export type PulledStructure = {
+  pulled_at: string;
+  mint: "owner-can-mint" | "no-mint-function" | "unknown";
+  renounced: boolean | null;
+  // locked_share 0 means "read, and nothing is locked"; null means the read could not tell, and
+  // `reason` says why. Never render a null as zero.
+  lp: Array<{
+    pair: string | null;
+    locked_share: number | null;
+    holder_kind: "burn" | "locker" | "burn-and-locker" | "none" | null;
+    reason: string | null;
+  }>;
   errors: Array<{ step: string; message: string }>;
 };
 // Blockscout activity read per address (scripts/lib/pull/activity.mjs).
@@ -189,6 +221,7 @@ export type PulledFile = {
   addresses: PulledAddress[];
   metrics: Array<{ kind: MetricKind; value: number; as_of: string; source_url: string }>;
   market?: PulledMarket | null;
+  structure?: PulledStructure | null;
   activity?: PulledActivity | null;
   errors: Array<{ step: string; message: string }>;
 };
@@ -323,7 +356,15 @@ export type DirectoryEntry = {
   lifecycle: Lifecycle;
   coverage: Coverage;
   role: CensusRole;
+  entityKind: "protocol" | "application" | "token" | "infrastructure" | "tool" | "collection" | "unknown";
+  identityStatus: "verified" | "provisional" | "conflicted";
+  officialConfirmed: boolean;
+  hasContractOn4663: boolean;
+  shareBarMetric: "liquidity" | "tvl";
   summary: string;
+  officialLinks: Link[];
+  dependencyIds: string[];
+  reviewedAt: string;
   derived: Derived;
   feedCount: number;
   // census tree.primary placement — the home page's section grouping and the card's product label.
@@ -331,6 +372,31 @@ export type DirectoryEntry = {
   // Holder count of the project's token contract from content/pulled, when read. Chip figure of last resort.
   holders: number | null;
   kpis: Kpis;
+  factoryLaunches24h: number;
+};
+
+export type HistoryPoint = {
+  at: string;
+  holders?: number | null;
+  liquidity_usd?: number | null;
+  volume_h24?: number | null;
+  trades_h24?: number | null;
+  txns_total?: number | null;
+  launches_24h?: number | null;
+  revenue_24h?: number | null;
+  tvl?: number | null;
+};
+
+export type TrendingEntry = { entry: DirectoryEntry; change24h: number | null };
+export type SectionLeader = { entry: DirectoryEntry; announced: boolean };
+export type LatestIcarusItem = {
+  kind: "icarus" | "post";
+  date: string;
+  slug: string;
+  who: string;
+  title: string;
+  body: string;
+  sourceUrl: string | null;
 };
 
 // A dependency card as the home page lists it: enough to label and link the chip.
@@ -363,6 +429,31 @@ export type Dossier = {
   derived: Derived;
   pulled: PulledFile | null;
   kpis: Kpis;
+  // Card-only facts normalized by content-server. These stay deliberately narrow so future
+  // puller/compiler fields can land without shipping raw files or guessing in the browser.
+  card: {
+    officialConfirmed: boolean;
+    handle: string | null;
+    themes: string[];
+    history: Array<{
+      at: string;
+      holders: number | null;
+      volume24h: number | null;
+      trades24h: number | null;
+      launches24h: number | null;
+      revenue24h: number | null;
+    }>;
+    dailySeries: Record<string, Array<{ at: string; value: number }>>;
+    top10Share: number | null;
+    launchpad: { slug: string; via: "factory" | "creator"; address: string } | null;
+    mint: "owner-can-mint" | "no-mint-function" | "unknown" | null;
+    liquidityLocks: Array<{
+      pair: string | null;
+      lockedShare: number | null;
+      holderKind: "burn" | "locker" | "burn-and-locker" | "none" | null;
+      reason: string | null;
+    }>;
+  };
 };
 
 export type DependencyControl = {
@@ -424,11 +515,12 @@ export type AccountRef = { handle: string; tier: AccountTier; role: AccountRole 
 
 export type SiteConfig = {
   name: string;
+  title: string;
   tagline: string;
   methodology_version: string;
   maintainer: { id: string; display: string };
   corrections: { destination: string; acknowledge_within_days: number };
-  telegram: { enabled: boolean; weekly_heartbeat: boolean };
+  telegram: { enabled: boolean; weekly_heartbeat: boolean; url: string };
   chain: {
     name: string;
     id: number;
@@ -449,6 +541,9 @@ export type DirectoryBundle = {
   site: SiteConfig;
   sections: SectionDef[];
   entries: DirectoryEntry[];
+  histories: Record<string, HistoryPoint[]>;
+  changelog: ChangelogEntry[];
+  feed: LatestFeedItem[];
   dependencies: DependencyListing[];
   generatedAt: string; // build/derived.json generated_at — when scores were last computed
   now: number; // build time (ms epoch) for relative "2 min ago" wording
@@ -479,6 +574,16 @@ export type DossierBundle = {
   tree: TreeRef | null;
   section: SectionDef | null;
   now: number;
+  related: Array<{
+    slug: string;
+    name: string;
+    symbol: string | null;
+    kpis: Kpis;
+    score: number | null;
+    officialConfirmed: boolean;
+    launchpad: string | null;
+    sourceLinks: Partial<Record<KpiKey, string>>;
+  }>;
 };
 
 // --- Visitor-facing taxonomy ------------------------------------------------------------
@@ -642,7 +747,7 @@ export function headlineMetric(derived: Pick<Derived, "metrics" | "rank">): Metr
 // Title-attr caveat for a reported figure (hard rule: every reported number carries its
 // as-of); the visible `reported` chip sits next to the value.
 export function reportedTitle(asOf: string): string {
-  return `as of ${asOf} — reported by the source, not verified by Proofline`;
+  return `as of ${asOf} — reported by the source, not verified by Icarus`;
 }
 
 // --- Labels -----------------------------------------------------------------

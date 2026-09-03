@@ -66,7 +66,7 @@ sources:
     publisher: DefiLlama
     kind: third-party-data
     accessed_at: 2026-09-02T07:20:00Z
-    claim: "DefiLlama lists SwapHood V3 (slug swaphood-v3, category Dexs) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs"
+    claim: DefiLlama lists SwapHood V3 (slug swaphood-v3, category Dexs) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs
     excerpt: "api.llama.fi/protocols on 2026-09-02: chains include Robinhood Chain; chainTvls[Robinhood Chain] $11,886. Aggregator figure, not reproduced on chain."
     hash: null
     archive_url: null
@@ -78,9 +78,339 @@ sources:
     publisher: DefiLlama
     kind: third-party-data
     accessed_at: 2026-09-02T07:20:00Z
-    claim: "DefiLlama lists SwapHood V2 (slug swaphood-v2, category Dexs) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs"
+    claim: DefiLlama lists SwapHood V2 (slug swaphood-v2, category Dexs) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs
     excerpt: "api.llama.fi/protocols on 2026-09-02: chains include Robinhood Chain; chainTvls[Robinhood Chain] $3,650. Aggregator figure, not reproduced on chain."
     hash: null
     archive_url: null
     researcher: claude
+    available: true
+  - id: S8
+    url: https://www.swaphood.finance/
+    publisher: SwapHood
+    kind: official-site
+    accessed_at: 2026-09-03T02:48:00Z
+    claim: SwapHood | MetaDEX on Robinhood
+    excerpt: "title SwapHood | MetaDEX on Robinhood. meta twitter:site @SwapHoodFi. twitter:title SwapHood — MetaDEX for permissionless markets. description: Trade any ERC-20, provide liquidity, and earn rewards with SwapHood, the institutional-grade MetaDEX. og:url https://swaphood.finance/"
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S9
+    url: https://swaphood-finance.gitbook.io/swaphood-finance-docs/welcome-to-swaphood
+    publisher: SwapHood
+    kind: docs
+    accessed_at: 2026-09-03T02:40:00Z
+    claim: Welcome to SwapHood
+    excerpt: SwapHood is a liquidity protocol implemented in a system of non-upgradeable smart contracts on the RobinHood blockchain. Anyone can become a liquidity provider (LP) for a pool by depositing an equivalent value of each underlying token in return for pool tokens. In practice, SwapHood applies a 0.30% fee to trades, which is added to reserves.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S10
+    url: https://swaphood-finance.gitbook.io/swaphood-finance-docs/contract-addresses
+    publisher: SwapHood
+    kind: docs
+    accessed_at: 2026-09-03T02:41:00Z
+    claim: Contract Addresses
+    excerpt: "TOKENS: $HOOD 0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c; $xHOOD 0xd3125799EEcb4c9eB6b9d570d15a782808D9BDC3; $h33 0xA7036C8C28F96e8cE242d0Af45d1B395B69DAF38. V2 SwapHood Factory 0xE7206Ecac3A51afe7e6179182ad4130A26068dD1. V3 Factory 0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S11
+    url: https://swaphood-finance.gitbook.io/swaphood-finance-docs/official-links
+    publisher: SwapHood
+    kind: docs
+    accessed_at: 2026-09-03T02:43:00Z
+    claim: Official Links
+    excerpt: "Website: http://swaphood.finance Twitter: https://x.com/SwapHoodFi Telegram: https://telegram.me/SwapHood Linktree: https://linktr.ee/SwapHood Discord: https://discord.gg/vjJcXctWYm"
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S12
+    url: https://swaphood-finance.gitbook.io/swaphood-finance-docs/yields/tokenomics
+    publisher: SwapHood
+    kind: docs
+    accessed_at: 2026-09-03T02:42:00Z
+    claim: Tokenomics
+    excerpt: "Max Supply: 5,000,000. Daily Emissions: 2,500. Liquidity was bootstrapped via the SwapHood Farms, with emissions highly concentrated (75%) to the HOOD/ETH pair. While HOOD provides incentives to Liquidity Providers on the Farms, it will also receive 50% of the protocol revenue (retroactively Generated Trading Fees): Initially via token buybacks."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S13
+    url: https://swaphood-finance.gitbook.io/swaphood-finance-docs/yields/farms
+    publisher: SwapHood
+    kind: docs
+    accessed_at: 2026-09-03T02:42:00Z
+    claim: Farms
+    excerpt: "After users create a liquidity pool, on either V2 or Concentrated Liquidity, the pair can be deposited to earn $HOOD. V2: HOOD/ETH 75% of emissions 3,750 HOOD per day; VIRTUALS/ETH 2.5% 125 HOOD per day. V3: ETH/USDG 20% 1000 HOOD per day; CASHCAT/ETH 2.5% 125 HOOD per day."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S14
+    url: https://swaphood-finance.gitbook.io/swaphood-finance-docs/yields/revenue-sharing
+    publisher: SwapHood
+    kind: docs
+    accessed_at: 2026-09-03T02:42:00Z
+    claim: Revenue Sharing
+    excerpt: "95% to $h33 (xHOOD stakers) - Protocol fees flow to active participants. This flows in the following way: HOOD is bought back, then this HOOD is used to increase h33 backing. SwapHood implements an exit rebase where exit penalties (50% tax) are streamed to h33 holders. xHOOD solves the need for token lock-ups; $h33 (Liquid staked xHOOD) solves the need for liquid wrappers."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S15
+    url: https://x.com/SwapHoodFi
+    publisher: "@SwapHoodFi"
+    kind: social
+    accessed_at: 2026-09-03T02:44:00Z
+    claim: SwapHood profile
+    excerpt: Display name SwapHood, handle @SwapHoodFi, bio 'The first HOOD-aligned DEX / Powering deep liquidity on Robinhood', website https://www.swaphood.finance/, joined 2026-07-09.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S16
+    url: https://x.com/SwapHoodFi/status/2076428615948870029
+    publisher: "@SwapHoodFi"
+    kind: social
+    accessed_at: 2026-09-03T02:44:00Z
+    claim: SwapHood and $HOOD are now fully LIVE
+    excerpt: "SwapHood and $HOOD are now fully LIVE. Connect, explore, deposit and trade exclusively on Robinhood Chain. $HOOD Official CA: 0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c"
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S17
+    url: https://x.com/SwapHoodFi/status/2095235208060752251
+    publisher: "@SwapHoodFi"
+    kind: social
+    accessed_at: 2026-09-03T02:45:00Z
+    claim: HOOD is designed around a flywheel fueled by protocol buybacks
+    excerpt: "HOOD is designed around a flywheel fueled by protocol buybacks. Liquidity creates trading activity. Activity generates protocol fees. Revenue funds HOOD buybacks. Buybacks increase h33 backing. Quoted 2026-08-08: Max supply 5,000,000; Daily emissions ~ 2,375. The SwapHood team owns no HOOD (We own no liquidity)."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S18
+    url: https://x.com/SwapHoodFi/status/2095077189716725833
+    publisher: "@SwapHoodFi"
+    kind: social
+    accessed_at: 2026-09-03T02:45:00Z
+    claim: Another buyback completed for SwapHoods' HOOD token
+    excerpt: Another buyback completed for SwapHoods' HOOD token. 633.93 HOOD bought back with 0.012 ETH
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S19
+    url: https://x.com/SwapHoodFi/status/2094874530992800233
+    publisher: "@SwapHoodFi"
+    kind: social
+    accessed_at: 2026-09-03T02:45:00Z
+    claim: Native SwapHood farms are built to feed the $HOOD flywheel
+    excerpt: Native SwapHood farms are built to feed the $HOOD flywheel. Earn HOOD through HOOD/ETH. Put rewards back into liquidity or $h33. Protocol revenue funds $HOOD buybacks. Buybacks strengthen $h33 backing. 100% Community Owned LP
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S20
+    url: https://robinhoodchain.blockscout.com/address/0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:51:00Z
+    claim: Address 0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c
+    excerpt: "API v2: hash 0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c, name SwapHood Token, is_contract true, is_verified true, creator 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb, creation_transaction_hash 0xb1f07a06ccdaa7551176091c51e2f04484b8e95709e161a8a04e0ba40107d478. token name SwapHood Token, symbol HOOD, holders_count 407, total_supply 146417179931997003789074."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S21
+    url: https://robinhoodchain.blockscout.com/address/0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:51:00Z
+    claim: Address 0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7
+    excerpt: "API v2: hash 0x0Ec554F0BfF0Be6C99d1e95C8015bb0950f6A2C7, name PancakeV3Factory, is_contract true, is_verified true, creator 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb, creation_transaction_hash 0x103a9a7357893f4354c70576b46f11f10bb074b0e6a48b0e038bda6c996bb64e."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S22
+    url: https://robinhoodchain.blockscout.com/address/0xE7206Ecac3A51afe7e6179182ad4130A26068dD1
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:51:00Z
+    claim: Address 0xE7206Ecac3A51afe7e6179182ad4130A26068dD1
+    excerpt: "API v2: hash 0xE7206Ecac3A51afe7e6179182ad4130A26068dD1, name SwapHoodFactory, is_contract true, is_verified true, creator 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb, creation_transaction_hash 0x5ad644dbf5242a30eee14c6637fafb098d95687c1fd739c9512499babc3431aa."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S23
+    url: https://robinhoodchain.blockscout.com/address/0xA7036C8C28F96e8cE242d0Af45d1B395B69DAF38
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:51:00Z
+    claim: Address 0xA7036C8C28F96e8cE242d0Af45d1B395B69DAF38
+    excerpt: "API v2: hash 0xA7036C8C28F96e8cE242d0Af45d1B395B69DAF38, name h33, is_contract true, is_verified true, creator 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb, creation_transaction_hash 0x4ef275beaf15a2c8a5c4fba3a34461555fd6cba8afd76175effdaeb72b5ae6ba. token name Hood Liquid Staking Token, symbol h33, holders_count 135, total_supply 6164868971941563069401."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S24
+    url: https://robinhoodchain.blockscout.com/address/0xeA7ba72BE3baaB20546bFdA880b7E285E5a51168
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:51:00Z
+    claim: Address 0xeA7ba72BE3baaB20546bFdA880b7E285E5a51168
+    excerpt: "API v2: hash 0xeA7ba72BE3baaB20546bFdA880b7E285E5a51168, name SwapHoodPair, is_contract true, is_verified true, creator 0xE7206Ecac3A51afe7e6179182ad4130A26068dD1, creation_transaction_hash 0x3bcb690e784f3ccf6bec9b48549b7ad1dd06aa29b42f1a56d6be70133a0d45c8. token name Volatile AMM - WETH/HOOD, symbol vAMM-WETH/HOOD, holders_count 41."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S25
+    url: https://robinhoodchain.blockscout.com/address/0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:51:00Z
+    claim: Address 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb
+    excerpt: "API v2: hash 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb, is_contract false, is_verified false, creator null. RPC eth_getCode empty; owner() on HOOD and PancakeV3Factory returns this address."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S26
+    url: https://robinhoodchain.blockscout.com/address/0xd3125799EEcb4c9eB6b9d570d15a782808D9BDC3
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:54:00Z
+    claim: Address 0xd3125799EEcb4c9eB6b9d570d15a782808D9BDC3
+    excerpt: "API v2: hash 0xd3125799EEcb4c9eB6b9d570d15a782808D9BDC3, name xHOOD, is_contract true, is_verified true, creator 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb, creation_transaction_hash 0x38bcc30ba23603bab22a68859276398df545d2aa8b16c757afd8e8abf25ac9e6. token name xHood, symbol xHOOD, holders_count 2, total_supply 61193311943412847737992."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S27
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:50:00Z
+    claim: Robinhood Chain RPC eth_getCode and owner()
+    excerpt: "eth_blockNumber 0x329f050 (53080144). eth_getCode non-empty: HOOD 5407 bytes, PancakeV3Factory 5558, h33 6216, SwapHoodFactory 18647, pair 12765, xHOOD 5945. owner() HOOD and V3 factory 0xe49c113adff614ac8dfc81f36e6a4848af1fadfb. owner() SwapHoodFactory execution reverted. owner EOA code empty."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S28
+    url: https://api.dexscreener.com/token-pairs/v1/robinhood/0x1FcBc77a759e502E36836b7787C9A8B4f5Da666c
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:46:00Z
+    claim: HOOD token pairs on Robinhood
+    excerpt: dexId swaphood labels v2 pairAddress 0xeA7ba72BE3baaB20546bFdA880b7E285E5a51168 baseToken SwapHood Token HOOD quoteToken WETH 0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73 priceUsd 0.1104 liquidity.usd 2743.22 volume.h24 2081.61 fdv 16177. websites swaphood.finance, docs.swaphood.finance. socials x.com/SwapHoodFi, t.me/SwapHood, discord.gg/vjJcXctWYm.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S29
+    url: https://api.llama.fi/protocol/swaphood
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: SwapHood parent protocol
+    excerpt: "name SwapHood. currentChainTvls Robinhood Chain 16765. twitter SwapHoodFi. url https://www.swaphood.finance/#/. github null. description: SwapHood is a liquidity protocol implemented in a system of non-upgradeable smart contracts on the RobinHood blockchain. otherProtocols SwapHood, SwapHood V3, SwapHood V2."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S30
+    url: https://api.llama.fi/protocol/swaphood-v2
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:47:00Z
+    claim: SwapHood V2 protocol
+    excerpt: "name SwapHood V2. chain Robinhood Chain. audits 0. twitter SwapHoodFi. parentProtocol parent#swaphood. category Dexs. currentChainTvls Robinhood Chain 3284.92754. methodology: Value of the tokens locked in the liquidity pools."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S31
+    url: https://api.llama.fi/protocol/swaphood-v3
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: SwapHood V3 protocol
+    excerpt: name SwapHood V3. chain Robinhood Chain. audits 0. twitter SwapHoodFi. parentProtocol parent#swaphood. tags CLMM. category Dexs. currentChainTvls Robinhood Chain 13481.19164.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S32
+    url: https://api.llama.fi/summary/fees/swaphood?dataType=dailyFees
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: SwapHood parent daily fees
+    excerpt: id parent#swaphood name SwapHood total24h 65.05 total7d 346.06 totalAllTime 34226.31
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S33
+    url: https://robinhoodchain.blockscout.com/tx/0xb1f07a06ccdaa7551176091c51e2f04484b8e95709e161a8a04e0ba40107d478
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:51:00Z
+    claim: HOOD creation transaction 0xb1f07a06…
+    excerpt: timestamp 2026-07-09T17:02:11.000000Z, status ok, result success, from 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb, to null (contract create).
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S34
+    url: https://robinhoodchain.blockscout.com/tx/0x103a9a7357893f4354c70576b46f11f10bb074b0e6a48b0e038bda6c996bb64e
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:51:00Z
+    claim: PancakeV3Factory creation transaction 0x103a9a73…
+    excerpt: timestamp 2026-07-10T11:43:12.000000Z, status ok, result success, from 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb, to null (contract create).
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S35
+    url: https://robinhoodchain.blockscout.com/tx/0x3bcb690e784f3ccf6bec9b48549b7ad1dd06aa29b42f1a56d6be70133a0d45c8
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:51:00Z
+    claim: WETH/HOOD pair creation transaction 0x3bcb690e…
+    excerpt: timestamp 2026-07-12T20:18:23.000000Z, status ok, result success, from 0xe49C113adFf614Ac8DFC81F36E6A4848af1fadfb, to SwapHoodFactory 0xE7206Ecac3A51afe7e6179182ad4130A26068dD1.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S36
+    url: https://api.llama.fi/summary/dexs/swaphood-v2?dataType=dailyVolume
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: SwapHood V2 daily volume
+    excerpt: id 8205 name SwapHood V2 total24h 2494 total7d 7529.7 totalAllTime 403191.07
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S37
+    url: https://api.llama.fi/summary/dexs/swaphood-v3?dataType=dailyVolume
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: SwapHood V3 daily volume
+    excerpt: id 8206 name SwapHood V3 total24h 61998 total7d 425684 totalAllTime 25397445
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
     available: true

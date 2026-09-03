@@ -1,0 +1,106 @@
+slug: frong
+name: FRONG
+symbol: FRONG
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: "Uniswap v4 Instant Launch ERC-20 on Robinhood Chain: LiquidityLauncher.multicall created a 1 billion-supply UERC20 and opened a hookless native-ETH 0.25% pool. Holders trade FRONG against ETH on that pools.trade book and later WETH and USDG books. @frongcommunity publishes the contract. The token is not the pools.trade pad."
+themes:
+  - memecoin
+  - launchpad
+official_links:
+  - kind: x
+    url: https://x.com/frongcommunity
+  - kind: telegram
+    url: https://t.me/FrongCommunity
+  - kind: other
+    url: https://pools.trade
+dependencies: []
+deployments:
+  - label: FRONG token (UERC20)
+    chain: robinhood-chain
+    address: "0x6245e67affA44a23077f0Ea7f981a8DC743a0c47"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S5
+  - label: pools.trade token factory (UERC20Factory)
+    chain: robinhood-chain
+    address: "0x000000e200088D55C39a11F609E5F667729ad49b"
+    role: factory
+    verified: true
+    sources:
+      - S1
+      - S6
+  - label: LiquidityLauncher v3.0.0 (createToken caller)
+    chain: robinhood-chain
+    address: "0x00004c4ccc709Ef590F7C81102C0689F0263D4e9"
+    role: factory
+    verified: false
+    sources:
+      - S4
+      - S7
+      - S5
+  - label: InstantLaunchStrategy used at FRONG create (fees-on)
+    chain: robinhood-chain
+    address: "0x60D73b21cDf2EA846ab3d58699BBbb8F29d72491"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S5
+  - label: Uniswap v3 FRONG/WETH 1% pool
+    chain: robinhood-chain
+    address: "0x09a431261E3d0F1dc2f7e0b14718DBBBCBe19Ae4"
+    role: other
+    verified: false
+    sources:
+      - S8
+      - S21
+metrics:
+  - kind: tvl
+    value: 878519.25
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: volume_24h
+    value: 1196949.03
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 10118761.54
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: holders
+    value: 15165
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk: []
+  missing:
+    - text: "Is UNI-V4-POSM 409801 still held by the pools.trade FeeSplitter, and does locked_liquidity_percentage stay 100? Next: eth_call ownerOf(409801) on PositionManager 0x58daec3116aae6D93017bAAea7749052E8a04fA7"
+    - text: "How does InstantLaunchStrategy 0x60D73b21…2491 relate to the current InstantLaunchStrategy 0x23f82095…27f1 in the pools-trade packet? Next: compare bytecode and Blockscout source for 0x23f82095…27f1"
+    - text: "Is there an audit of UERC20.sol / LiquidityLauncher for this deployment? Next: read Uniswap/liquidity-launcher README and any audit links on the pad docs"
+    - text: "Does frongcoin.site belong to this token? Next: open frongcoin.site and record the published contract as a contrary identity note"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

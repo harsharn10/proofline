@@ -1,0 +1,169 @@
+slug: sentry
+name: Sentry
+symbol: SENTRY
+category: Uniswap-pool launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Sentry is a token launchpad and swap app on Robinhood Chain and Ink. A launch deploys a fixed-supply ERC-20 into a Uniswap pool in one transaction; there is no bonding curve and no graduation. New launches use Uniswap v4 with the position locked in SentryLPVault. A legacy V3 factory remains on each chain. The app also quotes Uni V3/V2/v4 and PancakeSwap V3 on Robinhood, and Uni V3 on Ink. The handle is @sentrylauncher; the site is sentry.trading.
+themes:
+  - launchpad
+official_links:
+  - kind: site
+    url: https://sentry.trading
+  - kind: app
+    url: https://www.sentry.trading
+  - kind: docs
+    url: https://sentry.trading/sentry-guide.md
+  - kind: docs
+    url: https://mavrk.gitbook.io/sentry-docs/
+  - kind: x
+    url: https://x.com/sentrylauncher
+  - kind: telegram
+    url: https://t.me/sentrylauncher
+  - kind: other
+    url: https://defillama.com/protocol/sentry
+dependencies: []
+deployments:
+  - label: Robinhood v4 WETH launch factory (SentryLaunchFactoryV4 proxy)
+    chain: robinhood-chain
+    address: "0x472286b7d5c1B2A3cE1132eF73d3BcCF446C5cc1"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S10
+      - S11
+  - label: Robinhood v4 stock-pair launch factory (SentryLaunchFactoryV4 proxy)
+    chain: robinhood-chain
+    address: "0xd0A93885a387e3a8a14dd82776CF9104a3676b3A"
+    role: factory
+    verified: false
+    sources:
+      - S2
+      - S10
+      - S12
+  - label: Robinhood legacy v3 launch factory (retired)
+    chain: robinhood-chain
+    address: "0x9e8f6f8214b01Fd4Cf1d73FB1fb7cf9f811036Cb"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S4
+      - S10
+      - S13
+  - label: Robinhood v4 factory implementation
+    chain: robinhood-chain
+    address: "0x818FdD15Dbe95851a0bd8c5389c49ed6d4FE2bBf"
+    role: implementation
+    verified: false
+    sources:
+      - S10
+      - S11
+      - S12
+  - label: Robinhood SentryLPVault
+    chain: robinhood-chain
+    address: "0x0F0E601041Ec765B8bAB8c166840E291253F2Df0"
+    role: vault
+    verified: true
+    sources:
+      - S2
+      - S10
+      - S14
+  - label: Robinhood factory owner()
+    chain: robinhood-chain
+    address: "0xbF551eED83c7eaEE63854a2013Eb94f18600B7C5"
+    role: admin
+    verified: true
+    sources:
+      - S10
+      - S21
+  - label: SENTRY platform token (SentryTokenRelaunch)
+    chain: robinhood-chain
+    address: "0x1EcA20cfa4AF2e2fA2F4CE2bF8d97bFa184FD4D7"
+    role: token
+    verified: false
+    sources:
+      - S2
+      - S10
+      - S15
+  - label: Ink v4 launch factory (SentryLaunchFactoryV4Ink proxy; chain id 57073)
+    chain: other
+    address: "0xcF44b151aee1Ef69677f24cadED4d2d61b0D45BD"
+    role: factory
+    verified: false
+    sources:
+      - S2
+      - S22
+      - S23
+  - label: Ink legacy v3 launch factory (chain id 57073)
+    chain: other
+    address: "0xDc37e11B68052d1539fa23386eE58Ac444bf5BE1"
+    role: factory
+    verified: false
+    sources:
+      - S2
+      - S22
+      - S23
+  - label: Ink SentryLPVault (chain id 57073)
+    chain: other
+    address: "0x86585D4474C78c1C0fA1f8771682E9aD020787eC"
+    role: vault
+    verified: false
+    sources:
+      - S2
+      - S22
+      - S23
+metrics:
+  - kind: tvl
+    value: 199219.49
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S16
+  - kind: fees_24h
+    value: 19422
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S17
+  - kind: revenue_24h
+    value: 5968
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S20
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: sentry.trading, sentry-guide.md, JS bundle, X profile and posts, Llama protocol/fees/page/adapters, GitHub 404, Blockscout api/v2, Ink explorer api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-2 R-13 R-19] - Numbers: TVL and fees are dual-chain from api.llama.fi; RH slice is 99133.68 TVL and 2363 of 24h fees. Bytecode lengths, nonces, owner(), creatorFeeBps, and ERC1967 slots are chain 4663 and 57073 RPC. [verified R-13 R-19 R-28] - Adversarial: strongest contrary reading is that Sentry is Robinhood-native only, or is Coinbarrel / Pons / Bankr / LONG / Safehood. Llama chains and Ink RPC with empty 4663 code argue against robinhood-native. Coinbarrel launcher is 0x4234…e70; Pons is a bonding-curve pad; Bankr is named as a separate route in the Sentry guide."
+      class: inference
+      sources:
+        - S2
+        - S4
+        - S10
+        - S15
+    - text: Upgradeable factories; owner is one EOA with no code on 4663. [verified R-13 R-27] - Ink factories have empty code on 4663; chain_scope is multichain, Ink rows are chain other. [verified R-28] - Llama description 65/35 does not match RH creatorFeeBps 7000. [verified R-13] [claim R-19] - Guide says SENTRY is renounced; RPC owner() is the factory EOA. [verified R-13 R-18] [claim R-2] - No audit report URL. [unknown] - Llama 24h fees are mostly Ink, not Robinhood Chain. [claim R-20 R-21] - Llama Ink v3 list includes CitadelEscape 0x733733…, not in the official guide.
+      class: claim
+      sources:
+        - S4
+        - S23
+  missing:
+    - text: "Does owner 0xbf55…B7C5 sit behind a Safe or timelock on any chain, or do all upgradeable Sentry factories remain Ownable by this EOA? Next: eth_getCode on 57073 and Ethereum; read proxy admin() if TransparentUpgradeableProxy uses a separate ProxyAdmin"
+    - text: "Is SENTRY 0x1EcA…4D7 actually renounced, and what does owner() mean on SentryTokenRelaunch? Next: read verified source for Ownable vs dead-address; do not treat the guide sentence as reproduced"
+    - text: "Is there an audit report whose scope matches RH factories 0x4722…5cc1 / 0xd0A9…6b3A and Ink 0xcF44…45BD? Next: record any published report as a claim with the exact scope"
+    - text: "Where is the canonical source repository? Next: treat gitbook as docs host until a repo URL appears on sentry.trading"
+    - text: "Does the Llama fees adapter 70/30 apply to Ink V3 (creatorFeeBps 6500) and to v4 hook fees, or only RH V3 collects? Next: do not use 7d fee 220733 as a Robinhood-only figure; Ink was 17059 of 19422 in the last 24h slice"
+    - text: "What is CitadelEscape 0x733733…B2E4 on Ink relative to the official launch factories? Next: do not file as a 4663 factory; record any official docs that name it"
+  unresolved:
+    - text: product.mechanism remains unresolved (CON-1).
+    - text: control.owner remains unresolved (CON-2).

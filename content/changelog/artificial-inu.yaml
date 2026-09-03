@@ -36,3 +36,121 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: 93510a893b40b8c2
+- date: 2026-09-02
+  slug: artificial-inu
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: "Flagship LONG launch: $AI paired to tokenized NVDA on Uniswap, with a community vault the project says accumulates NVDA from trading fees."
+    themes: null
+    official_links:
+      - kind: site
+        url: https://artificialinu.com
+      - kind: x
+        url: https://x.com/ArtificiallyInu
+    deployments:
+      - label: $AI token (PRD Appendix A)
+        chain: robinhood-chain
+        address: "0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18"
+        role: token
+        verified: false
+        sources:
+          - S7
+      - &a1
+        label: Community vault
+        chain: robinhood-chain
+        address: not-verified
+        role: vault
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    summary: "Artificial Inu is the LONG factory's flagship stock-paired memecoin: $AI trades against tokenized NVDA in a Uniswap v4 pool on Robinhood Chain. A user swaps AI for NVDA, or uses the secondary WETH book. The official site and @ArtificiallyInu account describe a community vault that takes NVDA buy fees and burns or locks AI sell fees; those fee paths were not reproduced this pass."
+    themes:
+      - memecoin
+      - ai
+      - stock-paired:nvda
+      - dog
+      - rwa
+    official_links:
+      - kind: site
+        url: https://artificialinu.com
+      - kind: x
+        url: https://x.com/ArtificiallyInu
+      - kind: docs
+        url: https://artificialinu.com/how-it-works
+    deployments:
+      - label: $AI token (EIP-1167 clone)
+        chain: robinhood-chain
+        address: "0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18"
+        role: token
+        verified: true
+        sources:
+          - S7
+          - S13
+          - S15
+          - S29
+      - *a1
+      - label: DopplerERC20V1 implementation
+        chain: robinhood-chain
+        address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+        role: implementation
+        verified: false
+        sources:
+          - S29
+      - label: DopplerERC20V1Factory (token creator_address_hash)
+        chain: robinhood-chain
+        address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+        role: factory
+        verified: false
+        sources:
+          - S18
+      - label: LongLauncher (creation tx `to`; PRD 0x22e9…eeED)
+        chain: robinhood-chain
+        address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+        role: factory
+        verified: false
+        sources:
+          - S16
+          - S17
+      - label: Airlock (token owner())
+        chain: robinhood-chain
+        address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+        role: admin
+        verified: false
+        sources:
+          - S15
+          - S19
+    metrics:
+      - kind: holders
+        value: 35487
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S14
+      - kind: tvl
+        value: 3715804.1
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S22
+      - kind: volume_24h
+        value: 22890375.6
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S22
+      - kind: market_cap
+        value: 267172264
+        currency: USD
+        as_of: 2026-09-02
+        class: claim
+        sources:
+          - S20
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: ebf7913b4f973446

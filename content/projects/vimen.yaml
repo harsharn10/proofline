@@ -1,10 +1,10 @@
 slug: vimen
 name: Vimen
-symbol: null
+symbol: MAG7
 category: Redeemable RWA basket
 lifecycle: mainnet
 coverage: stub
-summary: Immutable in-kind index baskets for Robinhood Stock Tokens with per-basket deposit caps and no claimed admin keys over funds.
+summary: In-kind index baskets of Robinhood Stock Tokens. A user deposits listed Stock Tokens or chain-native tokens, or pays USDG or ETH through VimenZap4, and receives one ERC-20 share; redeem burns the share and returns the same units. Frozen baskets lock the recipe at deploy; agentic baskets let an agent rebalance inside contract ceilings. First-party frozen guardian is Safe 0xc7aBc67fBB12B69240A4C213c39547C8a345Ec02.
 official_links:
   - kind: github
     url: https://github.com/vimenprotocol/vimen
@@ -12,6 +12,12 @@ official_links:
     url: https://vimen.org
   - kind: x
     url: https://x.com/vimenprotocol
+  - kind: site
+    url: https://www.vimen.org
+  - kind: app
+    url: https://app.vimen.org
+  - kind: docs
+    url: https://docs.vimen.org/docs
 dependencies:
   - stock-tokens
 deployments:
@@ -21,14 +27,166 @@ deployments:
     role: vault
     verified: false
     sources: []
+  - label: MAG7 basket (BasketToken)
+    chain: robinhood-chain
+    address: "0xe1c1ADAD813736427B334e798fd2EbC7d2C7A9DF"
+    role: vault
+    verified: true
+    sources:
+      - S11
+      - S13
+      - S25
+  - label: AI6 basket (BasketToken)
+    chain: robinhood-chain
+    address: "0x8fF1d77a09A3292b34457175710Bb0C0A1C22601"
+    role: vault
+    verified: false
+    sources:
+      - S11
+      - S14
+  - label: HOOD6 basket (BasketToken)
+    chain: robinhood-chain
+    address: "0x0CE04932513Fa1768B5b9444c6A21Ae0DdA005C5"
+    role: vault
+    verified: false
+    sources:
+      - S11
+      - S15
+  - label: HOOD6V2 basket
+    chain: robinhood-chain
+    address: "0x42AF29661e5499e526A1e8e0179fc5272c07F4aE"
+    role: vault
+    verified: false
+    sources:
+      - S11
+  - label: VIRTS basket
+    chain: robinhood-chain
+    address: "0xFF71762cB8bc2a6890eC34Ce3a311d9e410c0Aa7"
+    role: vault
+    verified: false
+    sources:
+      - S11
+  - label: VVIRT agentic basket
+    chain: robinhood-chain
+    address: "0xca485830173695650b6bcD773fA0443E87656f5b"
+    role: vault
+    verified: false
+    sources:
+      - S11
+      - S21
+      - S27
+  - label: VMAG agentic basket
+    chain: robinhood-chain
+    address: "0x39b3B771D6fAbF4eFD775Ae090AfDdf14f82520F"
+    role: vault
+    verified: false
+    sources:
+      - S11
+  - label: VCT agentic basket
+    chain: robinhood-chain
+    address: "0x43ec05E56CE74bbaFeaE3049e669b14C04347629"
+    role: vault
+    verified: false
+    sources:
+      - S11
+  - label: VIM token (AgentTokenV4 EIP-1167 clone)
+    chain: robinhood-chain
+    address: "0x43E7Cb9984aD95aA808ac21998cc8D5f909e47aF"
+    role: token
+    verified: true
+    sources:
+      - S12
+      - S16
+      - S24
+      - S26
+      - S31
+  - label: AgentTokenV4 implementation
+    chain: robinhood-chain
+    address: "0x581f7B996E6D3E436c537989157c9CB36421419b"
+    role: implementation
+    verified: false
+    sources:
+      - S16
+  - label: BasketFactory (frozen shelf)
+    chain: robinhood-chain
+    address: "0x6D8C85C8Ac7620aBb3010EE29b20Da1c76093BEf"
+    role: factory
+    verified: true
+    sources:
+      - S11
+      - S18
+      - S23
+  - label: BasketFactory2 (agentic shelf)
+    chain: robinhood-chain
+    address: "0x1A3e4B71c58f77a995c1a4C7D76A4296CFDDd489"
+    role: factory
+    verified: true
+    sources:
+      - S11
+      - S19
+      - S23
+      - S27
+  - label: BasketFactory legacy (Llama)
+    chain: robinhood-chain
+    address: "0x51dB1A456CA238843A159589Cf28710616b2F988"
+    role: factory
+    verified: false
+    sources:
+      - S23
+  - label: VimenZap4
+    chain: robinhood-chain
+    address: "0x4e1D58DDceFf8f340690D0f7F7FDb37FB13Ff388"
+    role: router
+    verified: false
+    sources:
+      - S11
+      - S20
+  - label: Protocol Safe (frozen guardian / fee recipient)
+    chain: robinhood-chain
+    address: "0xc7aBc67fBB12B69240A4C213c39547C8a345Ec02"
+    role: multisig
+    verified: false
+    sources:
+      - S11
+      - S17
+  - label: CuratorGuardian (agentic / factory guardian)
+    chain: robinhood-chain
+    address: "0xc93B74B490D1bDD71045766C90F1F743D0c356Be"
+    role: admin
+    verified: false
+    sources:
+      - S11
+      - S33
+      - S34
 metrics:
   - kind: tvl
-    value: 9208
+    value: 9452.82436
     currency: USD
-    as_of: 2026-08-31
+    as_of: 2026-09-03
     class: claim
     sources:
-      - S7
+      - S22
+      - S23
+  - kind: market_cap
+    value: 235686
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S24
+  - kind: volume_24h
+    value: 18160.41
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S24
+  - kind: holders
+    value: 7
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S13
 review:
   researcher: harsharn10
   approver: pending
@@ -50,10 +208,30 @@ findings:
       class: claim
       sources:
         - S6
+    - text: "Receipts: www.vimen.org, /vim, docs, GitHub README and SECURITY.md, @vimenprotocol posts, Blockscout addresses and txs, RPC, Llama protocol and adapter, and DexScreener VIM pairs were opened on 2026-09-03 and excerpts copied. [verified R-1 R-5 R-14 R-16] - Numbers: 9452.82 is the Robinhood Chain slice from api.llama.fi/protocol/vimen, not an all-chains total and not DexScreener $VIM marketCap 235686. MAG7 supply is 53.325670672318175e18, not 1e18. [claim R-14 R-16] [verified R-5] - Adversarial: the strongest contrary reading is that Vimen is PonsVault $VAULT or an ERC-4626 index vault. $VAULT is PonsLauncherToken from PonsVaultLauncher; MAG7 is BasketToken from EOA 0xB15e…b189; rIDX remains a different repository with no shared address."
+      class: inference
+      sources:
+        - S13
+        - S32
+    - text: Issuer freeze on any constituent reverts whole-basket redeem. [claim R-25] - First-party Safe is threshold 1. [verified R-9] - No professional audit report was located; Llama audits 0. [unknown] - $VIM owner() 0xe220…2567 sits on the Virtuals AgentTokenV4 clone (tax/blacklist on that token per SECURITY.md), not on basket custody. [verified R-8] [claim R-25] - PonsVault $VAULT is a separate Pons fee-layer token.
+      class: verified
+      sources:
+        - S32
   missing:
     - text: Deployed addresses and bytecode vs repository
     - text: Immutability / no-admin-key claim not reproduced
     - text: Basket caps and redemption path
     - text: An independent audit was not found in this review
     - text: Basket composition (MAG7, AI6, HOOD6 per the workbook) not reproduced
+    - text: "Which BasketToken setters does guardian() actually expose on the verified MAG7 source (pause, cap, fee recipient), and does redeem stay callable while mint is paused? Next: read verified BasketToken source on Blockscout for MAG7 and call mintPaused/supplyCap"
+    - text: "What is the live recipe on VVIRT/VMAG/VCT (constituents()/units()) after agent rebalances, versus the frozen MAG7/AI6/HOOD6 sets? Next: eth_call constituents() and units() on each agentic basket and map addresses to tickers"
+    - text: "Where is the professional-audit artifact, if any, matching BasketToken / BasketToken2 on 4663? Next: open GitHub security advisories page and any auditor named in later posts"
+    - text: "What is the VBILL / SGOV-SPY basket address the app lists as opening, and does it have code on 4663? Next: BasketFactory2.allBaskets() and app basket route"
+    - text: "Is telegram or discord an official surface? Next: leave NULL unless a later official post names one"
   unresolved: []
+themes:
+  - rwa
+  - index
+  - vault
+  - stock-paired:nvda
+  - agent

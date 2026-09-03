@@ -1,8 +1,11 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { parse } from "yaml";
 import { validateContent } from "./lib/validate-content.mjs";
 import { derive, computeRanks } from "./lib/score.mjs";
 import { computeTrending } from "./lib/trending.mjs";
 import { cohortForLeaf } from "./lib/taxonomy.mjs";
+import { locatedOnChain, meetsShareBar, officialSurfaceConfirmed } from "./lib/share-bar.mjs";
 
 const args = process.argv.slice(2);
 const force = args.includes("--force");
@@ -53,11 +56,46 @@ const trending = Object.keys(projects).filter((slug) => projects[slug].trending)
 const withMetrics = Object.keys(projects).filter((slug) => projects[slug].metrics.length > 0).length;
 const ranked = Object.keys(projects).filter((slug) => projects[slug].rank !== null).length;
 
+const pulledBySlug = new Map();
+try {
+  const pulledDir = join(root, "pulled");
+  for (const file of (await readdir(pulledDir)).filter((name) => name.endsWith(".yaml")).sort()) {
+    const pulled = parse(await readFile(join(pulledDir, file), "utf8"));
+    if (pulled?.slug) pulledBySlug.set(pulled.slug, pulled);
+  }
+} catch (error) {
+  if (error?.code !== "ENOENT") throw error;
+}
+
+const censusBySlug = new Map(content.census.map((row) => [row.slug, row]));
+const shareBar = Object.fromEntries(
+  [...content.projects]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([slug]) => {
+      const census = censusBySlug.get(slug);
+      const pulled = pulledBySlug.get(slug);
+      const cohort = cohortForLeaf(census?.tree?.primary);
+      const tvl = pulled?.metrics?.find((metric) => metric.kind === "tvl")?.value ?? null;
+      return [
+        slug,
+        meetsShareBar({
+          officialConfirmed: officialSurfaceConfirmed(census),
+          hasContractOn4663: locatedOnChain(pulled),
+          shareBarMetric:
+            census?.identity?.entity_kind === "token" || cohort?.id === "launchpads"
+              ? "liquidity"
+              : "tvl",
+          kpis: { liquidityUsd: pulled?.market?.liquidity_usd ?? null, tvl },
+        }),
+      ];
+    }),
+);
+
 console.log(["slug".padEnd(24), "cov  ", "scr", " ", "conf", "risk     ", "", "", ""].join("  "));
 for (const r of rows) console.log(r);
 console.log("\n* = provisional (confidence 50–69)");
 
 await mkdir("build", { recursive: true });
-const out = { generated_at: new Date().toISOString(), methodology_version: content.site.methodology_version, projects, trending };
+const out = { generated_at: new Date().toISOString(), methodology_version: content.site.methodology_version, projects, trending, shareBar };
 await writeFile("build/derived.json", JSON.stringify(out, null, 2) + "\n");
-console.log(`wrote build/derived.json (${Object.keys(projects).length} projects, ${trending.length} trending, ${withMetrics} with metrics, ${ranked} ranked)`);
+console.log(`wrote build/derived.json (${Object.keys(projects).length} projects, ${trending.length} trending, ${withMetrics} with metrics, ${ranked} ranked, ${Object.values(shareBar).filter(Boolean).length} above share bar)`);

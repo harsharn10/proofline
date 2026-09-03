@@ -8,68 +8,110 @@ methodology_version: proofline-v1.0
 
 ## Identity
 
-Statics is an EqualFi Labs protocol whose public design spans a fixed-supply Genesis token and Operator NFTs plus a later multi-asset suite for baskets, a Statics Dollar, lending, flash loans and Uniswap v4 liquidity. [claim S1 S9]
+Statics Protocol is classified as Redeemable RWA basket.
+
+Statics Protocol's live Genesis layer is a fixed-supply STATICS token created through Doppler Airlock into a Uniswap v4 STATICS/WETH multicurve, plus a 5,555 Operator NFT collection the docs back at 180,000 STATICS each. A user buys STATICS on that book or acquires an Operator from the vault. EqualFi Labs publishes the contracts; the basket, Dollar, hook DEX and credit suite remain a separate unreleased rollout.
+
+Themes: rwa, vault, nft, hook, lending
 
 ## Deployment
 
-Statics says the Genesis launch is live on Robinhood mainnet with a fixed one-billion-token supply, 800 million tokens across six Doppler curves and a fixed collection of 5,555 Operators backed by 180,000 STATICS each. [claim S1]
+STATICS token (DopplerERC20V1 EIP-1167 clone): 0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd on robinhood-chain. [verified S15 S16 S19 S25]
 
-The basket, Dollar, lending and general-pool suite follows a separate deployment and governance lifecycle. The published Robinhood address manifest reviewed in this pass is explicitly testnet-only (chain 46630) and must not be treated as a mainnet deployment record. [claim S1 S3 S9]
+DopplerERC20V1 implementation: 0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599 on robinhood-chain. [claim S17 S19]
 
-The workbook records a STATICS token at `0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd`; neither it nor any Genesis contract has been reproduced on the explorer. [claim S6 S7]
+DopplerERC20V1Factory: 0x1B37D3a72082029c44B35B604Ea473617580b69a on robinhood-chain. [claim S18 S19]
+
+Airlock (token owner(); launch tx to): 0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862 on robinhood-chain. [claim S19 S20 S25]
+
+StaticsGenesisVault: 0x8AAAF9a22f439589987B8f1e69d79ca4f648C297 on robinhood-chain. [claim S21 S25 S19]
+
+Statics Operators NFT (StaticsGenesis, STATOPS): 0xad5E9F96A91D1A6F550580b157af2068A0e8F0BE on robinhood-chain. [claim S22 S25 S19]
+
+Doppler pool initializer hook (STATICS/WETH canonical pool hook): 0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544 on robinhood-chain. [claim S23 S25]
 
 ## Control
 
-The documented architecture places both `StaticsDiamond` and `StaticsDollarCoreDiamond` under one `StaticsTimelock`. A configured multisig proposes and cancels operations, execution is open after the delay, and a guardian may pause exposure-increasing actions and quarantine baskets. [claim S2 S10]
-
-The documented mainnet default delay is seven days, but the deployed mainnet timelock address, current delay, signer identities and threshold were not independently reproduced in this pass. [claim S2]
+_Research pending._
 
 ## Security
 
-The official security model says Statics holds user assets and that repository tests are not an external audit. It says the broader multi-asset and Statics Dollar diamonds require independent review before production use. [claim S10]
-
-Basket creation can become permissionless and accept arbitrary ERC-20 constituents. The security model explicitly identifies negative rebases, arbitrary burns, deceptive balances, blocklists, transfer pauses and hostile callbacks as behaviors that can halt or damage affected baskets. [claim S10]
-
-Diamond cuts remain the implementation-upgrade boundary until governance executes a future reviewed cut that removes that authority. [claim S2 S10]
+`owner()` on the STATICS token returns Airlock `0xeb7C…0862`. Factory source is the Airlock-gated DopplerERC20V1Factory. Genesis JSON lists governance `0x603A8A2f…b9Ff` and `governanceOwnershipAccepted: false`. Docs put both future Diamonds under one StaticsTimelock with a seven-day mainnet default. SECURITY.md says repository tests are not an external audit and the broader diamonds need independent review before production use. No audit report URL was located this pass. [verified S19 S25] [claim S29 S30] [unknown]
 
 ## Engineering
 
-The public repository contains Solidity sources, an SDK, deployment tooling and focused unit, integration, fork, fuzz and invariant test paths under a BUSL-1.1 license. Its documented architecture separates Dollar Core custody from the shared Statics Diamond while using namespaced accounting for baskets, rewards, lending and fee flows. [claim S9]
-
-Repository tests and documentation are engineering evidence, not evidence that a specific mainnet deployment matches the reviewed commit or has passed an independent audit. [inference S9 S10]
+_Research pending._
 
 ## Team
 
-The repositories and documentation are published under EqualFi Labs. Named contributors, the operating legal entity and governance signer identities were not established in this pass. [claim S9]
+Contracts and docs are published under EqualFi Labs at github.com/EqualFiLabs/statics. The official handle is @StaticsProtocol; the bio carries the STATICS CA. @hooftly posts as a builder tagged to @staticsprotocol and @EqualFiLabs. Named legal entity, signer identities and whether the governance address is a completed Safe were not established beyond the genesis JSON roles. Telegram `t.me/EqualFi` appears on DexScreener and is not confirmed from the site this pass. [verified S14 S25 S27] [claim S23]
 
 ## Product and economics
 
-The live Genesis design allocates 800 million STATICS to six launch curves, 100.1 million to treasury vesting, 99.9 million to Operator backing and 120 million as a permanent market tail. Each circulating Operator is described as gross-backed by 180,000 STATICS. [claim S1]
+STATICS is an ERC-20 at `0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd`, an EIP-1167 clone of DopplerERC20V1. The launch transaction called Airlock.create. The live book is Uniswap v4 STATICS/WETH pool `0xe79228…e8a` with WETH `0x0Bd7D308…AD73`. [verified S15 S20 S23]
 
-The later suite is designed for fixed-composition baskets, a shared PositionNFT, self-backed basket lending, Statics Dollar issuance and hook-managed Uniswap v4 liquidity. Those capabilities must not be presented as live merely because the Genesis launch is live. [claim S1 S9]
+Docs separate that Genesis layer from the later basket, Dollar, lending and general-pool Diamonds. The 30 Aug official quote says the DEX is not live and credit is not enabled. Testnet Diamond and testnet STATICS addresses are empty on chain 4663. [verified S19 S32] [claim S13 S31]
 
-The official account's 30–31 Aug posts describe STATICS stakers picking any 12 assets and earning from every pool trading them, Operators borrowing up to 95% against their backing, and a planned USDstx options-based stable; the same posts say the DEX is not live and credit is not enabled. [claim S8 S6]
+Operators are an ERC-721 named Statics Operators (`STATOPS`) at `0xad5E…F0BE`. The Genesis vault is `0x8AAA…C297`. Docs assign 180,000 STATICS of gross backing per circulating Operator and split IDs 1–5000 (vault) from 5001–5555 (treasury vesting). [verified S21 S22] [claim S28]
+
+Blockscout holders_count is 1026 with total supply 1,000,000,000 × 1e18. DexScreener STATICS/WETH Uniswap v4 liquidity.usd is 14246101.38, volume.h24 3477557.3, fdv 22501108 as of 2026-09-02T22:55:00Z. Gecko prints the same pool created 2026-08-27T19:24:28Z with reserve_in_usd -3408657.19 and volume_usd.h24 3415619.05, dex id bankr-robinhood. Genesis epoch end in the manifest is 2026-09-11T11:59:00Z. [verified S16 S23 S24] [claim S25]
 
 ## Communications
 
-The rollout page clearly separates fixed onchain parameters from contingent outcomes such as volume, rewards, liquidity growth, arbitrage participation and valuation. [claim S1]
+Official account posted a MCG Live booking for @hooftly [claim S33]
+
+Official account quoted the MemeFi basket-arbitrage thesis [claim S34]
+
+@hooftly posted the MemeFi STATICS/stock-pair thesis [claim S35]
+
+Official account quoted the STATICS credit explainer [claim S36]
+
+Official account posted that Operators are available [claim S37]
+
+Official account quoted the DEX-not-live Genesis explainer [claim S31]
 
 ## Findings
 
-Statics provides unusually detailed public architecture and threat-model documentation. The central publication risk is scope confusion: the live Genesis system and the broader upgradeable basket/Dollar/lending suite are distinct rollout stages. [inference S1 S9 S10]
+Token owner-only functions sit on the shared Doppler Airlock. The published genesis manifest still has governance ownership unaccepted. DexScreener prints about $14.25M of STATICS/WETH liquidity while Gecko prints a negative reserve for the same pool id. The hook DEX and credit paths the site describes were still marked not live in the 30 Aug official quote. [claim S12]
+
+- Token owner-only functions sit on shared Doppler Airlock, which also owns other RH tokens including $AI. [verified S19]
+- Genesis JSON still records governance ownership as unaccepted. [claim S25]
+- STATICS/WETH liquidity is not one number across aggregators, and Gecko's reserve print is negative. [verified S23 S24]
+- Hook DEX and credit were still described as not live on 30 Aug; presenting baskets, USDstx or 95% LTV credit as live would overstate the rollout. [claim S13 S31]
+- No independent audit report was located. [unknown]
+
+- Receipts: site, rollout, tokenomics, operators, timelock, testnet page, GitHub README, SECURITY.md, genesis JSON, Blockscout, RPC, DexScreener, Gecko and the cited X posts were opened on 2026-09-02 and excerpts copied from those pages. [verified S12 S13 S19 S23 S25]
+- Numbers: DexScreener and Gecko figures are aggregator chain-slice prints for the STATICS/WETH pool, not an explorer reproduction of PoolManager inventory. [verified S23 S24]
+- Adversarial: the strongest contrary reading is that Statics is another LONG/Doppler memecoin with docs for an unreleased basket protocol. Airlock.create, the verified Genesis vault/Operators, the mainnet genesis JSON, and empty testnet Diamond code on 4663 keep Genesis live and the Diamond suite separate. Shared Airlock with $AI is recorded as a possible match, not a merge. [inference S20 S25 S19]
 
 ## Sources
 
-- S1 — [Rollout and availability](https://docs.staticsprotocol.com/docs/rollout/), reviewed 2026-08-31.
-- S2 — [Timelock and roles](https://docs.staticsprotocol.com/docs/governance/timelock-and-roles/), reviewed 2026-08-31.
-- S3 — [Robinhood testnet deployment](https://docs.staticsprotocol.com/docs/reference/robinhood-testnet-deployment/), retained as testnet-only context.
-- S4, S5 — site and X account (census links).
-- S6–S8 — Research intake artifacts (ecosystem map, workbook, X fills).
-- S9 — [EqualFiLabs/statics](https://github.com/EqualFiLabs/statics), reviewed 2026-08-31.
-- S10 — [Statics security model](https://github.com/EqualFiLabs/statics/blob/master/SECURITY.md), reviewed 2026-08-31.
-
-See `content/sources/statics-protocol.yaml` for every entry's accessed_at, claim and excerpt.
+- S12 — Official site.
+- S13 — Rollout and availability.
+- S14 — X account @StaticsProtocol.
+- S15 — Address 0x2d8d…EAdd.
+- S16 — Token 0x2d8d…EAdd.
+- S17 — DopplerERC20V1 implementation 0x3Be8…C599.
+- S18 — DopplerERC20V1Factory 0x1B37…b69a.
+- S19 — eth_getCode / owner / name / symbol at block 52942780.
+- S20 — Launch tx 0x4ab656be….
+- S21 — StaticsGenesisVault 0x8AAA…C297.
+- S22 — StaticsGenesis Operators 0xad5E…F0BE.
+- S23 — Token pairs API 0x2d8d…EAdd.
+- S24 — STATICS/WETH pool API.
+- S25 — Robinhood mainnet genesis manifest.
+- S27 — statics README.
+- S28 — Operators overview.
+- S29 — Timelock and roles.
+- S30 — SECURITY.md.
+- S31 — Scratching the surface of Statics Protocol.
+- S32 — Robinhood testnet deployment (not mainnet Genesis).
+- S33 — MCG Live booking.
+- S34 — MemeFi 🤝 $STATICS.
+- S35 — MemeFi basket / stock-pair thesis.
+- S36 — Credit via $STATICS.
+- S37 — Operators are available.
 
 ## Review metadata
 
-First primary-source pass by harsharn10 on 2026-08-31 (research desk commit 5393021, intaken 2026-08-31). Coverage remains a stub pending mainnet address verification, deployed governance reads and independent audit evidence.
+Compiled from WORK-20260903-grok-heavy-icarus-research by grok-heavy as of 2026-09-02T22:59:00Z; methodology_version: proofline-v1.0.

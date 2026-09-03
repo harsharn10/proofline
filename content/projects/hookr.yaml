@@ -2,39 +2,87 @@ slug: hookr
 name: Hookr
 symbol: HOOKR
 category: Programmable-hook launchpad
-lifecycle: announced
+lifecycle: mainnet
+lifecycle_source: pulled 0x18E674231A58c239Dc7DaeDcffE15Ec3A24cff5c 2026-08-06T04:20:57.000Z
 coverage: stub
-summary: "Uniswap v4 hook launchpad and hook marketplace: launch a token whose pool rules (anti-snipe, surge fee, auto-burn) are the product."
+summary: Hookr composes Uniswap v4 hooks on Robinhood Chain. A user stacks up to five on-swap rules, publishes the hook for royalties, and opens a new token pool with those rules fixed at creation. Instant launches open at a platform-wide 2.5 ETH FDV; auctions use Uniswap CCA. $HOOKR trades in a hookless v4 pool. The deployer EOA is labelled nodar.eth.
 official_links:
   - kind: site
     url: https://hookr.fun
   - kind: x
     url: https://x.com/Hookrfun
+  - kind: docs
+    url: https://hookr.fun/docs
+  - kind: app
+    url: https://hookr.fun/builder
+  - kind: x
+    url: https://x.com/hookrfun
+  - kind: github
+    url: https://github.com/Hookr-fun/hookr-contracts
 dependencies:
   - uniswap
 deployments:
-  - label: HOOKR token (hookr.fun + GitHub per the desk)
+  - label: HOOKR token
     chain: robinhood-chain
     address: "0x18E674231A58c239Dc7DaeDcffE15Ec3A24cff5c"
     role: token
-    verified: false
+    verified: true
     sources:
       - S3
       - S4
-  - label: Hook launchpad
+      - S7
+      - S9
+      - S23
+  - label: HookrLaunchpad generation 3 (GitHub README live table; retained)
     chain: robinhood-chain
     address: "0xaAed6fab06D53311220F35421Dda5cc6D6e9d6C3"
     role: factory
-    verified: false
+    verified: true
     sources:
       - S3
-  - label: Hook contract
+      - S12
+      - S21
+  - label: HookrHook generation 3 (GitHub README live table; retained)
     chain: robinhood-chain
     address: "0xd0005624Da88a688BcaB3DBFB4d1Cb23d32Ca0CC"
     role: other
-    verified: false
+    verified: true
     sources:
       - S3
+      - S13
+      - S21
+  - label: HookrLaunchpadV5 (docs current live)
+    chain: robinhood-chain
+    address: "0xa043caBE645636899dDe91Cce4693C00a015e660"
+    role: factory
+    verified: true
+    sources:
+      - S8
+      - S10
+  - label: HookrHook generation 5 (docs current live)
+    chain: robinhood-chain
+    address: "0xe7c3461A4c762fF9dB4F91BeE3Cf8deAaFc2E8CC"
+    role: other
+    verified: true
+    sources:
+      - S8
+      - S11
+  - label: Bounded HookrSwapRouter (docs current live)
+    chain: robinhood-chain
+    address: "0x644ac2e784059e1C01F24f99DF7795aE2be06ca0"
+    role: router
+    verified: false
+    sources:
+      - S8
+      - S25
+  - label: HookrFlywheelBurner
+    chain: robinhood-chain
+    address: "0x8Cee20FA000aF3266AC2cD2cBeEFbcD19D98FD89"
+    role: other
+    verified: false
+    sources:
+      - S8
+      - S26
 review:
   researcher: harsharn10
   approver: pending
@@ -61,6 +109,17 @@ findings:
       class: claim
       sources:
         - S6
+    - text: "Receipts: official site, docs, X profile and status URLs, GitHub README, DexScreener token API, DefiLlama protocol URL, and Blockscout address/tx APIs were opened on 2026-09-03; excerpts are copied from those responses. [verified R-1 R-2 R-3 R-4 R-5 R-6 R-7 R-8 R-9 R-14 R-15 R-17] - Numbers: holders 5412 is the Blockscout token field; 24h volume 2560204.85 USD and liquidity 625860.84 USD are the DexScreener HOOKR/ETH v4 pair slice, not an all-pairs or all-chains total; DefiLlama has no Hookr protocol TVL. [claim R-3 R-14 R-19] - Adversarial: the strongest contrary reading is that Hookr is the chain's pad competitor (Pons-class) or that it is HookOS / What The Hook / pools.trade. Official copy names a hook marketplace, states independence from pools.trade, and uses different handles from HookOS and WTH; $HOOKR's own pool is hookless and was created on LiquidityLauncher, which cuts the other way — the project token is not a HookrLaunchpad graduate."
+      class: inference
+      sources:
+        - S7
+        - S14
+        - S23
+    - text: Owner is an EOA path with two-step handover and no timelock on fee, timing, and protocol-fee withdrawal. [inference R-4 R-16] - Docs and GitHub state there is no independent audit. [claim R-15 R-16] - Two launchpad generations are live; GitHub still tables generation 3 as live while docs name V5. [disputed R-2 R-15] - New website launches were posted as paused on 2026-09-02 during a modular contract move. [claim R-9] - Hook rules cannot be changed on a live pool; a parameter error is permanent for that token. [claim R-16] - $HOOKR's listed market is hookless and was launched on LiquidityLauncher, so holder flow on that pair is not a read of hooked-pool activity.
+      class: verified
+      sources:
+        - S7
+        - S23
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token, launchpad and hook addresses from the site and GitHub not reproduced on Blockscout
@@ -68,5 +127,47 @@ findings:
     - text: Fee split into Hook Blocks not verified against contracts
     - text: An independent audit was not found in this review
     - text: Hook Tokens not yet issued per the builder
+    - text: "What does owner() return on HookrLaunchpadV5 and HookrLaunchpad today, and has pendingOwner been set? Next: eth_call owner() and pendingOwner() on both launchpads from an archive-capable 4663 RPC"
+    - text: "Is the 2026-09-02 launch pause UI-only, or did V5 writes close on chain? Next: compare docs release-manifest gate and recent V5 TokenLaunched events after 2026-09-02T15:39Z"
+    - text: "Taxonomy has no hook mechanism tag and no hook-marketplace leaf outside launch/hook-programmable, so a full profile still sits in the Launchpads section next to Pons Next: controller decision: add a hook mechanism tag and/or a trading or tooling hook-marketplace leaf so ranking does not treat Hookr as a pad competitor"
+    - text: "HookOS (@hookosfun, $HOOK 0x85d4e6F147BFb5729378E451F32cf5287dE75f97) is a separate multi-chain hook pad and is not a census slug, so it cannot be filed under possible_matches Next: keep HookOS off this row; seed it only if a confirmed Robinhood official surface appears"
+    - text: "Fee split, royalty, and flywheel buyback amounts were not reproduced from live swaps Next: read a V5 collectPoolFees tx and a flywheel buyback against HookrFlywheelBurner"
+    - text: "Is there an official Telegram or Discord? Next: record if a later official post names one"
   unresolved:
     - text: Hookr is not on the DefiLlama dump; addresses come from the project's site and GitHub per Proofline's research and were not reproduced.
+    - text: deployment.address remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).
+themes:
+  - hook
+  - tooling
+  - memecoin
+  - launchpad
+metrics:
+  - kind: holders
+    value: 5412
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: volume_24h
+    value: 2560204.85
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S20
+  - kind: market_cap
+    value: 9295895
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S20
+  - kind: tvl
+    value: 625860.84
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S20
+      - S24

@@ -90,9 +90,251 @@ sources:
     publisher: DefiLlama
     kind: third-party-data
     accessed_at: 2026-09-02T07:20:00Z
-    claim: "DefiLlama lists NOXA Fun (slug noxa-fun, category Launchpad) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs"
+    claim: DefiLlama lists NOXA Fun (slug noxa-fun, category Launchpad) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs
     excerpt: "api.llama.fi/protocols on 2026-09-02: chains include Robinhood Chain; chainTvls[Robinhood Chain] $5.55M. Aggregator figure, not reproduced on chain."
     hash: null
     archive_url: null
     researcher: claude
+    available: true
+  - id: S9
+    url: https://api.llama.fi/protocol/noxa-fun
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T00:40:00Z
+    claim: NOXA Fun protocol API
+    excerpt: name NOXA Fun; url https://fun.noxa.eth.limo/; twitter Noxa_Fi; category Launchpad; chains Monad MegaETH Intuition Stable Merlin Robinhood Chain; audits 0; github null; currentChainTvls Robinhood Chain 5522002.3726; description Hybrid launchpad with V3 single-sided LP and graduation mechanics.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S10
+    url: https://api.llama.fi/summary/fees/noxa-fun?dataType=dailyFees
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T00:40:00Z
+    claim: NOXA Fun daily fees summary
+    excerpt: "total24h 153498; chainBreakdown Robinhood Chain total24h 153498; methodology Fees: Includes uniswap swap fees for tokens graduated from noxa fun (filtered by pools with >$1000 TVL); Revenue: Revenue is disabled for now; SupplySideRevenue: All fees collected from swaps are distributed to the creator of the token."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S11
+    url: https://github.com/DefiLlama/DefiLlama-Adapters/blob/main/projects/noxa-fun/index.js
+    publisher: DefiLlama
+    kind: repository
+    accessed_at: 2026-09-03T00:36:00Z
+    claim: noxa-fun TVL adapter
+    excerpt: robinhood locker 0x7F03effbd7ceB22A3D80Dd468f67eF27826acD85; nftManager 0x73991a25c818bf1f1128deaab1492d45638de0d3; methodology TVL is the value of the base tokens(wrapped native / stable) in the locked LPs; doublecounted true.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S12
+    url: https://github.com/DefiLlama/dimension-adapters/blob/master/dexs/noxa-fun/index.ts
+    publisher: DefiLlama
+    kind: repository
+    accessed_at: 2026-09-03T00:37:00Z
+    claim: noxa-fun fees adapter factory map
+    excerpt: "CHAIN.ROBINHOOD factory 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB start 2026-06-16 fromBlock 61688. TokenLaunched event. Fees: Uniswap swap fees for tokens graduated from noxa fun (filtered by pools with >$1000 TVL)."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S13
+    url: https://robinhoodchain.blockscout.com/address/0xd9ec2db5f3d1b236843925949fe5bd8a3836fccb
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:48:00Z
+    claim: Address 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB
+    excerpt: "API v2: hash 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB, is_contract true, is_verified false, creator 0x7E035Fb048a31e0481b88074557415b1C187242B, creation_transaction_hash 0x5e512a7f9a931c4dc9b5b09d8dd5c80b66968cf393474b21e5613769df656b37; metadata tag Launch Factory."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S14
+    url: https://robinhoodchain.blockscout.com/tx/0x5e512a7f9a931c4dc9b5b09d8dd5c80b66968cf393474b21e5613769df656b37
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:48:00Z
+    claim: Factory creation tx 0x5e512a7f…
+    excerpt: timestamp 2026-06-16T13:53:01.000000Z, status ok, result success, block_number 61688, from 0x7E035Fb048a31e0481b88074557415b1C187242B ens_domain_name dev.noxa.eth, to null (contract creation).
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S15
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Robinhood Chain RPC
+    kind: explorer
+    accessed_at: 2026-09-03T00:45:00Z
+    claim: eth_getCode factory and adapter locker
+    excerpt: eth_blockNumber 0x328c3d4 (53003220). eth_getCode 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB 22811 bytes. eth_getCode 0x7F03effbd7ceB22A3D80Dd468f67eF27826acD85 empty (0x).
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S16
+    url: https://robinhoodchain.blockscout.com/address/0x020bfc650a365f8bb26819deaabf3e21291018b4
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:48:00Z
+    claim: CASHCAT 0x020bfC650A365f8BB26819deAAbF3E21291018b4
+    excerpt: "API v2: hash 0x020bfC650A365f8BB26819deAAbF3E21291018b4, name LaunchToken, is_contract true, is_verified true, creator_address_hash 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB, creation_transaction_hash 0x0e6d23f0babd02ede4aefaa923486591d783e1180c277c71e2f2a39fc74a4661; token name Cash Cat symbol CASHCAT."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S17
+    url: https://robinhoodchain.blockscout.com/tx/0x0e6d23f0babd02ede4aefaa923486591d783e1180c277c71e2f2a39fc74a4661
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:48:00Z
+    claim: CASHCAT creation tx 0x0e6d23f0…
+    excerpt: timestamp 2026-06-18T20:01:25.000000Z, status ok, block_number 88836, from 0xcdfc08A1C1FBaFB355645E5ddC32122e5716cA90, to 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB (Launch Factory), method 0x686399cb.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S18
+    url: https://api.dexscreener.com/latest/dex/tokens/0x020bfC650A365f8BB26819deAAbF3E21291018b4
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-03T00:42:00Z
+    claim: CASHCAT token pairs on Robinhood
+    excerpt: pair 0xA70fc67C9F69da90B63a0e4C05D229954574E313 chainId robinhood dexId uniswap labels v3 baseToken CASHCAT 0x020b…18b4 quoteToken WETH; volume.h24 10367409.12 liquidity.usd 5494023.77 fdv 270978177; pairCreatedAt 1781812885000.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S19
+    url: https://x.com/Noxa_Fi/status/2077054908944076825
+    publisher: "@Noxa_Fi"
+    kind: social
+    accessed_at: 2026-09-03T00:50:00Z
+    claim: new interface at fun.noxa.eth; launches stay disabled
+    excerpt: the new interface is up at fun.noxa.eth you can access it via brave or https://fun.noxa.eth.limo https://fun.noxa.eth.link the interface lets you browse a historical snapshot of the tokens launched on noxa in the past, and claim any creator fees. there is only one solution to avoid dilution of the tokens, the staples and that is to keep new launches disabled. trading fees have been set to 100% for the creators
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S20
+    url: https://x.com/Noxa_Fi/status/2077773076142457275
+    publisher: "@Noxa_Fi"
+    kind: social
+    accessed_at: 2026-09-03T00:50:00Z
+    claim: original domains no longer controlled
+    excerpt: after our domains were taken down, our registrar had apparently resold them or taken over them, still unclear we are not in control of the original domains anymore the only interface is currently the one hosted on ens
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S21
+    url: https://x.com/Noxa_Fi/status/2080032772714844420
+    publisher: "@Noxa_Fi"
+    kind: social
+    accessed_at: 2026-09-03T00:50:00Z
+    claim: never acquired or transferred
+    excerpt: just to clarify noxa was never "acquired"; nor "transferred" by us we are NOT affiliated with any "new launchpad" nor token using the same name
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S22
+    url: https://x.com/Noxa_Fi
+    publisher: "@Noxa_Fi"
+    kind: social
+    accessed_at: 2026-09-03T00:50:00Z
+    claim: NOXA profile
+    excerpt: Display name NOXA, handle @Noxa_Fi, bio Always first on new blockchains. Live even before new chains' official launch! First DegenFi protocol. Built by @AmunPhantom. Joined May 2024. ~26.7K followers. Latest located post 22 Jul 2026.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S23
+    url: https://fun.noxa.eth.limo/
+    publisher: NOXA Fun
+    kind: official-site
+    accessed_at: 2026-09-03T00:41:00Z
+    claim: fun.noxa.eth.limo ENS snapshot
+    excerpt: "title NOXA Fun. meta description: A static interface for discovering launched tokens and claiming creator fees directly from smart contracts. og:description: Discover launched tokens and claim creator fees directly from smart contracts. Comment in HTML: This artifact lives on IPFS/ENS with no canonical HTTP origin."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S24
+    url: https://noxa.fun/
+    publisher: Vercel
+    kind: official-site
+    accessed_at: 2026-09-03T00:41:00Z
+    claim: noxa.fun deployment not found
+    excerpt: HTTP 404. The deployment could not be found on Vercel. DEPLOYMENT_NOT_FOUND.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S25
+    url: https://x.com/RHDaily__/status/2094908154672734344
+    publisher: "@RHDaily__"
+    kind: social
+    accessed_at: 2026-09-03T00:30:00Z
+    claim: Top Robinhood Chain Launchpads by 24H Volume
+    excerpt: Top Robinhood Chain Launchpads by 24H Volume 1. @ponsdotfamily $315.9M 2. @longdotxyz $47.5M 3. @o1_exchange $23.7M 4. @Noxa_Fi $21.3M 5. @TradePools $16.4M
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S26
+    url: https://docs.noxa.fi/launchpad/overview/
+    publisher: NOXA
+    kind: docs
+    accessed_at: 2026-09-03T00:35:00Z
+    claim: NOXA Fun Overview
+    excerpt: "NOXA Fun is a hybrid token launchpad at fun.noxa.fi. When you create a token: a new ERC-20 is deployed, single-sided liquidity is added to a V3 pool with the 1% fee tier, and the token is immediately tradeable. Graduation milestones are based on net buy amount / liquidity in the pool. The LP never moves — graduation is a milestone, not a migration."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S27
+    url: https://defillama.com/protocol/noxa-fun
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T00:38:00Z
+    claim: NOXA Fun protocol page
+    excerpt: "Website https://fun.noxa.eth.limo/ Twitter https://x.com/Noxa_Fi Category Launchpad. TVL by Chain Robinhood Chain $5.52m. Fees 24h $153,498 Robinhood Chain. Revenue 24h $0. Fees: Includes uniswap swap fees for tokens graduated from noxa fun."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S28
+    url: https://robinhoodchain.blockscout.com/address/0x7f03effbd7ceb22a3d80dd468f67ef27826acd85
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T00:48:00Z
+    claim: Adapter locker address 0x7F03…Cd85
+    excerpt: "API v2: hash 0x7F03efFbd7cEB22A3D80dD468f67eF27826ACd85, is_contract false, is_verified false, creator_address_hash null, name null. Same 20 bytes as the Llama Monad factory in the fees adapter."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S29
+    url: https://fun.noxa.fi/
+    publisher: fun.noxa.fi
+    kind: other
+    accessed_at: 2026-09-03T00:41:00Z
+    claim: fun.noxa.fi HTTP 200
+    excerpt: GET https://fun.noxa.fi/ returned HTTP 200 after @Noxa_Fi posted that original domains were no longer controlled. Page title and launch controls were not reproduced from the client-rendered HTML this pass.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S30
+    url: https://x.com/Noxa_fi_ETH
+    publisher: "@Noxa_fi_ETH"
+    kind: social
+    accessed_at: 2026-09-03T00:52:00Z
+    claim: NOXA | ETH profile
+    excerpt: "Display name NOXA | ETH, handle @Noxa_fi_ETH. Bio: Always first on new blockchains. Live even before new chains' official launch! First DegenFi protocol. NOXA | ETH. ~1.8K followers. Same bio stem as @Noxa_Fi."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
     available: true

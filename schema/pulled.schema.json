@@ -13,6 +13,7 @@
     "addresses": { "type": "array", "items": { "$ref": "#/$defs/pulledAddress" } },
     "metrics": { "type": "array", "items": { "$ref": "#/$defs/pulledMetric" } },
     "market": { "oneOf": [{ "$ref": "#/$defs/pulledMarket" }, { "type": "null" }] },
+    "structure": { "oneOf": [{ "$ref": "#/$defs/pulledStructure" }, { "type": "null" }] },
     "activity": { "oneOf": [{ "$ref": "#/$defs/pulledActivity" }, { "type": "null" }] },
     "errors": { "type": "array", "items": { "$ref": "#/$defs/pullError" } }
   },
@@ -134,7 +135,8 @@
       "additionalProperties": false,
       "required": [
         "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
-        "price_usd", "price_change_h24", "fdv", "first_pair_at", "errors"
+        "price_usd", "price_change_h24", "fdv", "first_pair_at", "top10_share",
+        "top10_share_ex_pools", "top10_as_of", "launchpad", "errors"
       ],
       "properties": {
         "token_address": { "oneOf": [{ "$ref": "shared#/$defs/address" }, { "type": "null" }] },
@@ -147,6 +149,60 @@
         "price_change_h24": { "type": ["number", "null"] },
         "fdv": { "type": ["number", "null"] },
         "first_pair_at": { "type": ["string", "null"], "format": "date-time" },
+        "top10_share": {
+          "$comment": "Share of CIRCULATING supply — total supply less everything sitting in a burn address — held by the ten largest live holders on holder page 1. Burn holders are excluded from both the numerator and the supply it divides, because burned tokens are neither held nor sellable; what was burned is reported separately as burned_share.",
+          "type": ["number", "null"], "minimum": 0, "maximum": 1
+        },
+        "top10_share_ex_pools": {
+          "$comment": "Same measure over the ten largest holders that are also not a DexScreener pair, a project vault or locker, or a pool contract (the Uniswap v4 PoolManager singleton holds v4 liquidity under its own address and never appears in pairs).",
+          "type": ["number", "null"], "minimum": 0, "maximum": 1
+        },
+        "burned_share": {
+          "$comment": "Share of total supply in burn addresses on holder page 1. Absent from files written before this field existed; a null means the read did not determine it.",
+          "type": ["number", "null"], "minimum": 0, "maximum": 1
+        },
+        "top10_as_of": { "type": ["string", "null"], "format": "date-time" },
+        "launchpad": {
+          "$comment": "via 'shared-factory' with shared: true means the creator is infrastructure many projects deploy through, so the slug names the operator, not the launcher of this token: read it as 'via Doppler (LONG)', never as 'launched by LONG'.",
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["slug", "via", "address"],
+              "properties": {
+                "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+                "via": { "enum": ["factory", "creator", "shared-factory"] },
+                "address": { "$ref": "shared#/$defs/address" },
+                "shared": { "type": "boolean" }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "errors": { "type": "array", "items": { "$ref": "#/$defs/pullStepError" } }
+      }
+    },
+    "lpLock": {
+      "$comment": "locked_share 0 is an assertion that nothing is locked, so it is written only when every LP holder read is a plain account. A holder that could be a locker this run has not located leaves the share null with `reason` saying so.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pair", "locked_share", "holder_kind", "reason"],
+      "properties": {
+        "pair": { "type": ["string", "null"] },
+        "locked_share": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "holder_kind": { "enum": ["burn", "locker", "burn-and-locker", "none", null] },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+    "pulledStructure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pulled_at", "mint", "renounced", "lp", "errors"],
+      "properties": {
+        "pulled_at": { "type": "string", "format": "date-time" },
+        "mint": { "enum": ["owner-can-mint", "no-mint-function", "unknown"] },
+        "renounced": { "type": ["boolean", "null"] },
+        "lp": { "type": "array", "items": { "$ref": "#/$defs/lpLock" } },
         "errors": { "type": "array", "items": { "$ref": "#/$defs/pullStepError" } }
       }
     },

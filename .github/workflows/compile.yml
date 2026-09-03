@@ -1,0 +1,177 @@
+name: Compile packets
+
+# The unattended half of docs/research-system.md §6. Grok Heavy PUTs packets onto long-lived producer
+# branches through the contents API; nobody merges those PRs. Every six hours this job lifts the packet
+# files off those branches, validates them, compiles the valid ones into content/, runs the content
+# gates, and pushes the result to main so Render redeploys.
+#
+# It never merges a PR and never lets a producer near content/: scripts/compile-inbox.mjs is the only
+# writer there, a packet compiles only if it validates, and a failed gate reverts the whole batch and
+# exits 2 rather than pushing a red main. Invalid packets are reported on the producer's PR and skipped
+# — one bad packet never blocks the rest.
+#
+# :47 past, 30 minutes after the pull's :17, so the two bots do not queue behind each other on the hour.
+on:
+  schedule:
+    - cron: "47 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "One producer branch to compile (default: every unmerged grok-heavy/, supergrok/, grok/ or codex/ branch)"
+        required: false
+        type: string
+
+# contents: push the compiled result to main. pull-requests + issues: report what was skipped.
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: compile
+  cancel-in-progress: false
+
+jobs:
+  compile:
+    name: Compile and push
+    runs-on: ubuntu-latest
+    # One bot on main at a time: the pull workflow shares this group. Two of them pushing at once would
+    # race on content/, and the loser's commit would be lost rather than merged.
+    concurrency:
+      group: main-bots
+      cancel-in-progress: false
+    timeout-minutes: 30
+    env:
+      # The default token, exactly as the pull workflow uses it: checkout leaves it in the remote URL for
+      # the push, and `gh` reads it from the environment for the PR comment and the issue.
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      # Never interpolated into a shell line — a branch name is attacker-controlled text.
+      BRANCH_INPUT: ${{ inputs.branch }}
+    steps:
+      # fetch-depth: 0 plus the full refspec below: the compiler diffs producer branches against main, so
+      # it needs every remote head, not just the one checkout would fetch.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch every producer branch
+        run: git fetch --no-tags --prune origin "+refs/heads/*:refs/remotes/origin/*"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        run: npm ci
+
+      # Exit 0 = compiled (possibly with skipped packets), 2 = a content gate failed and everything was
+      # reverted, 1 = the compiler itself could not run. Only 0 may reach the commit step.
+      - name: Compile the inbox
+        id: compile
+        run: |
+          set -uo pipefail
+          ARGS=()
+          if [ -n "${BRANCH_INPUT:-}" ]; then
+            case "$BRANCH_INPUT" in
+              grok-heavy/*|supergrok/*|grok/*|codex/*) ARGS=(--branch "$BRANCH_INPUT") ;;
+              *) echo "branch input '$BRANCH_INPUT' is not a producer branch"; exit 1 ;;
+            esac
+          fi
+          node scripts/compile-inbox.mjs "${ARGS[@]}" && CODE=0 || CODE=$?
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "compile-inbox exited $CODE"
+
+      # build/ is gitignored (build/derived.json included), so the commit is exactly the compiler's
+      # canonical output plus the packets it compiled. Copying the packets into main is what makes the
+      # next run a no-op: the branch file no longer differs from main.
+      - name: Commit and push the compiled content
+        if: steps.compile.outputs.code == '0'
+        run: |
+          set -euo pipefail
+          git add content research/inbox/packets
+          if git diff --cached --quiet; then
+            echo "no content change — nothing to commit"
+            exit 0
+          fi
+          COUNT="$(jq -r '.compiled | length' build/compile-report.json)"
+          BRANCHES="$(jq -r '[.branches[] | select((.compiled | length) > 0) | .branch] | join(", ")' build/compile-report.json)"
+          [ -n "$BRANCHES" ] || BRANCHES="no branch"
+          git -c user.name="proofline-bot" -c user.email="bot@proofline.local" \
+            commit -m "compile: $COUNT packets from $BRANCHES" -m "Producer: compile-bot"
+          # main moves while this job runs (merges, the pull bot): rebase onto it and retry.
+          git config user.name "proofline-bot"
+          git config user.email "bot@proofline.local"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep 20
+          done
+          echo "push failed after 3 attempts"; exit 1
+
+      # One comment per producer PR per distinct set of errors. A packet that stays broken is skipped
+      # every six hours; the marker stops the PR filling with the same comment forty times.
+      - name: Report skipped packets on the producer PRs
+        if: always() && steps.compile.outputs.code != '1'
+        run: |
+          set -uo pipefail
+          [ -f build/compile-report.json ] || { echo "no report"; exit 0; }
+          jq -c '.branches[] | select((.skipped | length) > 0)' build/compile-report.json | while read -r ROW; do
+            BRANCH="$(jq -r '.branch' <<< "$ROW")"
+            PR="$(gh pr list --repo "$REPO" --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')"
+            if [ -z "$PR" ]; then echo "$BRANCH: no open PR — skipped packets reported in the run log only"; continue; fi
+            MARKER="compile-bot: skipped $(jq -S -c '.skipped' <<< "$ROW" | sha256sum | cut -c1-12)"
+            if gh api "repos/$REPO/issues/$PR/comments" --paginate --jq ".[] | select(.body | contains(\"$MARKER\")) | .id" | grep -q .; then
+              echo "PR #$PR already carries this report — not repeating."
+              continue
+            fi
+            {
+              echo "These packets did not compile this run and were skipped. Everything else on this branch compiled; a skipped packet never blocks the rest of the batch."
+              echo
+              jq -r '.skipped[] | "**`" + .path + "`**\n\n```text\n" + (.errors | join("\n")) + "\n```\n"' <<< "$ROW"
+              echo "Fix by PUTting the same path again on this branch — the next compile (every 6 hours, :47) picks the new copy up. A packet that names a possible match created in the same batch is skipped this round and compiles on the next one, once that name is in the registry."
+              echo
+              echo "<!-- $MARKER -->"
+            } > comment.md
+            head -c 55000 comment.md > comment.trimmed.md
+            gh pr comment "$PR" --repo "$REPO" --body-file comment.trimmed.md
+          done
+
+      # A red gate is a stop-the-line event: main was not touched, and the report says why.
+      - name: Open or update the gate-failure issue
+        if: always() && steps.compile.outputs.code != '0'
+        run: |
+          set -uo pipefail
+          TITLE="Compile gate failed"
+          {
+            echo "The unattended compile ran at $(date -u '+%Y-%m-%dT%H:%M:%SZ') and did not push: the content gates failed, so \`content/\` and \`research/inbox/packets/\` were reverted and main is untouched."
+            echo
+            echo "Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo
+            if [ -f build/compile-report.md ]; then cat build/compile-report.md; else echo "The compiler could not run; see the run log."; fi
+          } > issue.md
+          head -c 60000 issue.md > issue.trimmed.md
+          NUMBER="$(gh issue list --repo "$REPO" --state open --search "$TITLE in:title" --json number,title --jq "[.[] | select(.title == \"$TITLE\")][0].number // empty")"
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --repo "$REPO" --body-file issue.trimmed.md
+          else
+            gh issue create --repo "$REPO" --title "$TITLE" --body-file issue.trimmed.md
+          fi
+
+      - name: Close the gate-failure issue once the gates are green again
+        if: success() && steps.compile.outputs.code == '0'
+        run: |
+          set -uo pipefail
+          TITLE="Compile gate failed"
+          NUMBER="$(gh issue list --repo "$REPO" --state open --search "$TITLE in:title" --json number,title --jq "[.[] | select(.title == \"$TITLE\")][0].number // empty")"
+          [ -n "$NUMBER" ] || exit 0
+          gh issue close "$NUMBER" --repo "$REPO" --comment "The compile gates passed on run ${{ github.run_id }}; main is current again."
+
+      # The job goes red so the failure is visible in the Actions list, not only in the issue.
+      - name: Fail the run when the compile did not push
+        if: always() && steps.compile.outputs.code != '0'
+        run: |
+          echo "compile-inbox exited ${{ steps.compile.outputs.code }} — see the 'Compile gate failed' issue."
+          exit 1

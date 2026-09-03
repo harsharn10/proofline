@@ -1,0 +1,125 @@
+slug: peptides
+name: PEPTIDES
+symbol: PEPTIDES
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against LLY. LongLauncher deploys Peptides (PEPTIDES) in one create call and seeds the PEPTIDES/LLY book. Traders buy and sell PEPTIDES on Uniswap v4. LLY is the Robinhood stock-token rail, not the project.
+themes:
+  - memecoin
+  - stock-paired:lly
+  - rwa
+  - graduation:long
+official_links:
+  - kind: site
+    url: https://www.peptidesrh.com/
+  - kind: x
+    url: https://x.com/PeptidesRH
+dependencies: []
+deployments:
+  - label: PEPTIDES token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x52F380A513112428723abF8AFED125824E4A1e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (token creator)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S18
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: true
+    sources:
+      - S5
+      - S14
+      - S18
+  - label: LLY Eli Lilly Robinhood Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0x8005d266423c7ea827372c9c864491e5786600ea"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S13
+metrics:
+  - kind: volume_24h
+    value: 1365898.18
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 372116.7
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 1187437.56
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 3619
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/LongLauncher/Airlock/LLY and the create tx plus internals, RPC name/symbol/owner/code sizes, DexScreener, Gecko pool/token/pools, /rhj/assets, peptidesrh.com, and @PeptidesRH were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 1365898.18 is the Gecko PEPTIDES/LLY pool 24h volume, not the 1610746.58 token all-pools figure. Reserve 372116.70 is that pool. DexScreener 5232293.94 / 828313.11 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that PEPTIDES is FATCOIN, the HIMS PEPTIDES clone, or a Bankr product. FATCOIN is a different address and factory. The HIMS clone has 7 holders. Gecko dex bankr-robinhood is an aggregator label; the create tx is LongLauncher into PoolManager."
+      class: inference
+      sources:
+        - S8
+        - S15
+        - S16
+    - text: DexScreener and Gecko disagree on PEPTIDES/LLY USD liquidity, volume, and FDV. [verified R-7 R-8] - Pool USD reserve is PEPTIDES plus LLY, not a USDG or WETH backstop. [claim R-7 R-8] - Token owner() is the shared Airlock used by other LongLauncher clones. [verified R-5 R-14] - A second PEPTIDES ticker exists at 0x28D5c848…1E18 against HIMS. [verified R-16] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Which aggregator is right for PEPTIDES/LLY USD liquidity, 24h volume, and FDV? Next: re-fetch both endpoints in the same minute and compare PoolManager reserves on RPC"
+    - text: "Why does Gecko label this Uniswap v4 pool dex bankr-robinhood? Next: compare Gecko dex metadata for other LongLauncher v4 pools"
+    - text: "Who holds create-tx from 0xe81C…0122 and fee beneficiary 0x21E2ce70…7A66? Next: trace those EOAs on Blockscout and any @PeptidesRH post that names them"
+    - text: "Does the older HIMS PEPTIDES 0x28D5c848…1E18 share a team with the LLY book? Next: read that create tx launcher field and any comms that cite 0x28D5…"
+    - text: "Is there an audit whose scope includes DopplerERC20V1 as used on this clone? Next: auditor report index for Doppler / Whetstone and a matching commit"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

@@ -25,3 +25,107 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: ea8e7d13f0a71f66
+- date: 2026-09-03
+  slug: mesh
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    summary: Machine-payments gateway (MPP) on Robinhood Chain with a MESH token; USDG fee epochs are paid to large holders and Pons is listed as a merchant.
+    themes: null
+    official_links:
+      - kind: x
+        url: https://x.com/MeshGateway
+    deployments:
+      - label: MESH token
+        chain: robinhood-chain
+        address: "0x14641000a501bdc736116abf84e6fcea9b90a713"
+        role: token
+        verified: false
+        sources:
+          - S2
+          - S3
+    metrics: null
+  new:
+    summary: An HTTP 402 machine-payments gateway on Robinhood Chain. An agent pays USDG per API call through a Permit2 witness transfer; Mesh's relayer broadcasts it and the stablecoin lands in the merchant wallet. Holders of MESH above 500,000 receive the day's protocol-fee pool as a tokenized stock. @MeshGateway runs meshgateway.co.
+    themes:
+      - tooling
+      - agent
+      - rwa
+      - memecoin
+    official_links:
+      - kind: x
+        url: https://x.com/MeshGateway
+      - kind: site
+        url: https://meshgateway.co
+      - kind: docs
+        url: https://docs.meshgateway.co/whitepaper
+      - kind: app
+        url: https://meshgateway.co/marketplace
+      - kind: github
+        url: https://github.com/meshgateway
+      - kind: telegram
+        url: https://t.me/MeshCommunity
+    deployments:
+      - label: MESH token (PonsV2LauncherToken)
+        chain: robinhood-chain
+        address: "0x14641000A501bdc736116aBf84e6fCeA9B90A713"
+        role: token
+        verified: true
+        sources:
+          - S2
+          - S3
+          - S8
+          - S10
+          - S11
+          - S12
+      - label: PonsV2BondingCurve (MESH launch curve)
+        chain: robinhood-chain
+        address: "0x8Bb3EDE48fE9d946aa6B5f953280cd681db22499"
+        role: other
+        verified: true
+        sources:
+          - S10
+          - S12
+      - label: MeshSplitterFactory
+        chain: robinhood-chain
+        address: "0x002565F730BEC9266Ae48D21E7eA0Efe8d597c09"
+        role: factory
+        verified: true
+        sources:
+          - S14
+          - S15
+          - S26
+      - label: x402ExactPermit2Proxy (settlement path)
+        chain: robinhood-chain
+        address: "0x402085c248EeA27D92E8b30b2C58ed07f9E20001"
+        role: router
+        verified: true
+        sources:
+          - S16
+          - S17
+    metrics:
+      - kind: holders
+        value: 1063
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S10
+      - kind: volume_24h
+        value: 162179.74
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S13
+      - kind: market_cap
+        value: 381954
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S25
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 87a7344d0858fc6e

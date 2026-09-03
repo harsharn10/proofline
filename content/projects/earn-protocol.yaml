@@ -2,34 +2,157 @@ slug: earn-protocol
 name: EARN
 symbol: EARN
 category: Savings vault
-lifecycle: announced
+lifecycle: mainnet
+lifecycle_source: pulled 0xa3b6aee90017b72c0812dc1e013de70eb2917ba3 2026-07-23T16:16:15.000Z
 coverage: stub
-summary: "Yield layer for tokenized stocks: Uniswap v4 strategy vaults on NVDA/USDG and GME/USDG, permissionless omnipools with zaps routed through Rialto, and a $EARN token that receives buybacks."
+summary: "A yield layer for tokenized stocks on Robinhood Chain: deposits go into Uniswap v4 strategy vaults or into permissionless Omnipools of up to eight tokens, and swap fees accrue to the position. Users deposit a stock token, USDG or ETH on earnonhood.com, receive vault or pool shares, and withdraw by burning those shares. @EARNONHOOD runs the app. $EARN is a Doppler-cloned ERC-20; the lead book is EARN/SPY."
 official_links:
   - kind: site
     url: https://earnonhood.com
   - kind: x
     url: https://x.com/EARNONHOOD
+  - kind: docs
+    url: https://earnonhood.com/docs
+  - kind: app
+    url: https://earnonhood.com/vault
+  - kind: app
+    url: https://earnonhood.com/omni/pools
+  - kind: app
+    url: https://earnonhood.com/steer
+  - kind: app
+    url: https://earnonhood.com/lend
 dependencies:
   - uniswap
   - rialto
   - stock-tokens
   - usdg
 deployments:
-  - label: EARN token (account bio; workbook sheet 02)
+  - label: EARN token (DopplerERC20V1 EIP-1167 clone)
     chain: robinhood-chain
     address: "0xa3b6aee90017b72c0812dc1e013de70eb2917ba3"
     role: token
-    verified: false
+    verified: true
     sources:
       - S4
       - S3
+      - S11
+      - S12
+      - S13
+      - S15
+      - S27
   - label: Strategy vaults / omnipools
     chain: robinhood-chain
     address: not-verified
     role: vault
     verified: false
     sources: []
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S15
+  - label: DopplerERC20V1Factory (token creator)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S13
+      - S14
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
+    role: other
+    verified: false
+    sources:
+      - S16
+      - S27
+  - label: Airlock owner Safe (SafeL2 proxy)
+    chain: robinhood-chain
+    address: "0x21E2ce70511e4FE542a97708e89520471DAa7A66"
+    role: multisig
+    verified: false
+    sources:
+      - S17
+      - S27
+  - label: NVDA/USDG Uniswap v4 vault (NvdaUsdgV4VaultV6)
+    chain: robinhood-chain
+    address: "0x0059F82A76B1Cb261ad71fA117a36CC0BB3Dfd6e"
+    role: vault
+    verified: true
+    sources:
+      - S8
+      - S18
+      - S27
+  - label: NVDA/USDG single-token zap (NvdaUsdgV4ZapV6)
+    chain: robinhood-chain
+    address: "0xD47D1187044B40DB1375ce60682AAC00a5356EFb"
+    role: router
+    verified: false
+    sources:
+      - S8
+      - S19
+  - label: GME/USDG vault (GME-USDG Vault V6)
+    chain: robinhood-chain
+    address: "0x2D26567eE8A4A24eaE17E8385380543E810Dd25a"
+    role: vault
+    verified: true
+    sources:
+      - S8
+      - S20
+      - S27
+  - label: GME/USDG single-token zap
+    chain: robinhood-chain
+    address: "0xb255934707e0796A8da4af7342002F8ef24d9f33"
+    role: router
+    verified: false
+    sources:
+      - S8
+      - S21
+  - label: EARN staking contract
+    chain: robinhood-chain
+    address: "0xeE7abf316E2824FbFB73aa3EA61217Dd600bD051"
+    role: vault
+    verified: false
+    sources:
+      - S22
+      - S37
+  - label: EARN Morpho VaultV2 (EARNVAULT / USDG)
+    chain: robinhood-chain
+    address: "0x8046118a5B0D1BCBcbd4d5f2C9AA9eecC5bf771d"
+    role: vault
+    verified: true
+    sources:
+      - S23
+      - S24
+      - S27
+  - label: Steer SPCX/USDG Uniswap v4 vault (BeaconProxy)
+    chain: robinhood-chain
+    address: "0x57b9b90610a4b9205c57fab92080e9cfbe7229f6"
+    role: vault
+    verified: false
+    sources:
+      - S25
+      - S39
+  - label: STOCK MEMES Omnipool (MEMESTOCKS)
+    chain: robinhood-chain
+    address: "0x00e7B76d0C0F0370C28A07aA9d9fDF92736238A6"
+    role: other
+    verified: true
+    sources:
+      - S26
+      - S30
+      - S27
+  - label: Protocol EOA (vault, stake and Morpho owner)
+    chain: robinhood-chain
+    address: "0x75741D131AbdD3973d6bA00f09948C15D138059d"
+    role: admin
+    verified: false
+    sources:
+      - S18
+      - S27
 review:
   researcher: harsharn10
   approver: pending
@@ -48,13 +171,25 @@ findings:
       sources:
         - S3
   risk:
-    - text: "owner() on the EARN token contract returns 0xeb7c…0862, the verified Airlock contract that also owns the EARN, Statics and Artificial Inu tokens; the token's owner-only functions are controlled by shared launch infrastructure, not by a project-held key or multisig."
+    - text: owner() on the EARN token contract returns 0xeb7c…0862, the verified Airlock contract that also owns the EARN, Statics and Artificial Inu tokens; the token's owner-only functions are controlled by shared launch infrastructure, not by a project-held key or multisig.
       class: verified
-      sources: [S6]
+      sources:
+        - S6
     - text: The name collides with Robinhood Earn, the Morpho-based USDG lending product inside the Robinhood app, which has no token; the two are unrelated per the workbook.
       class: claim
       sources:
         - S3
+    - text: "Receipts: earnonhood.com, /docs, /stake, /lend, /steer, /omni/create, X profile and seven posts, @0xDeployer, DexScreener, Blockscout token/tx/factory/Airlock/Safe/vaults/zaps/stake/Morpho/Steer/Omnipool, Morpho curator, RPC, and Llama protocols list were opened on 2026-09-02 and excerpts copied from the responses. [verified R-2 R-4 R-5 R-12 R-21] - Numbers: DexScreener liquidity and 24h volume are the Uniswap EARN/SPY book 0x1fb9a450…, not all EARN pairs and not vault TVL. Holders 2030 is all token holders. Morpho 144.040224 USDG is totalAssets on 0x8046…771d. Official $200k remains class claim. [claim R-4 R-6 R-18 R-22] - Adversarial: the strongest contrary reading is that this is Robinhood Earn, the in-app Morpho USDG product. That product has no EARN token and does not use earnonhood.com; this token, NVDA vault and Omnipool are separate 4663 contracts. A weaker contrary reading is that EARN is only a Doppler memecoin: the token is a Doppler/Airlock clone, but NvdaUsdgV4VaultV6 verified source and Morpho VaultV2 exist with code."
+      class: inference
+      sources:
+        - S9
+        - S11
+        - S18
+        - S23
+    - text: Vault, stake and Morpho owner is one EOA; no timelock was opened. [verified R-12 R-21] - GME vault, stake and Omnipool source are unverified; the stake page still says verified. [verified R-14 R-16] [claim R-31] - Posted TVL, Morpho 144 USDG and the EARN/SPY book are different slices. [claim R-4 R-22] [verified R-18] - Name collision with Robinhood Earn (in-app Morpho USDG, no token). [claim R-3] - No audit report was located. [unknown] - Permissionless Omnipools can include unaudited ERC-20s; the create page says a listing is not an endorsement.
+      class: claim
+      sources:
+        - S40
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Token address from the bio and workbook not reproduced on Blockscout
@@ -62,4 +197,45 @@ findings:
     - text: Strategy control and rebalancing powers
     - text: Protocol fee take (10% of omnipool swap fees per the workbook) not verified against contracts
     - text: An independent audit was not found in this review
-  unresolved: []
+    - text: "Can EOA 0x75741d… rebalance, pause or move NVDA/GME vault inventory without a timelock, and do the unverified GME vault and stake match the docs 85/15 fee and withdrawal path? Next: read setter access in NvdaUsdgV4VaultV6 and verify GME/stake source"
+    - text: "Which onchain balances sum to the posted $200k TVL (Omnipools vs Steer vaults vs strategy vaults vs Morpho 144 USDG)? Next: eth_call share supply and underlying on each listed vault and Omnipool"
+    - text: "Is there an audit whose scope matches NvdaUsdgV4VaultV6, the zaps, Omnipool AMM and Morpho curator config? Next: record any report URL as a claim when published"
+    - text: "Who holds the six Airlock Safe keys, and does that Safe retain token-owner rights (mint, blacklist, upgrade) on DopplerERC20V1? Next: read DopplerERC20V1 owner-only functions against Airlock"
+    - text: "Do telegram, discord or a public repository exist? Next: leave NULL unless a primary page names one"
+    - text: "Are the three 2026-09-02 themed Omnipools (AI Index, US Bluechip, Aero + Defense) published as contract addresses? Next: open /omni/pools once the app returns a pool list without a wallet"
+  unresolved:
+    - text: communications.status remains unresolved (CON-1).
+themes:
+  - vault
+  - rwa
+  - stock-paired:nvda
+  - lending
+  - memecoin
+metrics:
+  - kind: holders
+    value: 2030
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S12
+  - kind: market_cap
+    value: 2889181
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S10
+  - kind: volume_24h
+    value: 461012.52
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S10
+  - kind: tvl
+    value: 200000
+    currency: USD
+    as_of: 2026-09-02
+    class: claim
+    sources:
+      - S28

@@ -78,9 +78,262 @@ sources:
     publisher: DefiLlama
     kind: third-party-data
     accessed_at: 2026-09-02T07:20:00Z
-    claim: "DefiLlama lists NetNet Capital Management (slug netnet-capital-management, category Reserve Currency) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs"
+    claim: DefiLlama lists NetNet Capital Management (slug netnet-capital-management, category Reserve Currency) with a Robinhood Chain deployment; the chain-slice TVL is read from this page by scripts/pull.mjs
     excerpt: "api.llama.fi/protocols on 2026-09-02: chains include Robinhood Chain; chainTvls[Robinhood Chain] $0. Aggregator figure, not reproduced on chain."
     hash: null
     archive_url: null
     researcher: claude
+    available: true
+  - id: S8
+    url: https://netnet.capital/
+    publisher: NetNet Capital Management
+    kind: official-site
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: NetNet Capital Management homepage
+    excerpt: "title NetNet Capital Management. meta description: NetNet Capital Management, sponsor of NET — a reserve-backed digital instrument on Robinhood Chain. Prospectus available. og:url https://netnet.capital/. twitter:site @netnetcap. twitter:creator @netnetcap. connect-src includes https://rpc.mainnet.chain.robinhood.com."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S9
+    url: https://docs.netnet.capital/official-channels
+    publisher: NetNet Capital Management
+    kind: docs
+    accessed_at: 2026-09-03T02:50:00Z
+    claim: Official Channels
+    excerpt: Website netnet.capital. App app.netnet.capital. Docs docs.netnet.capital. X x.com/netnetcap. Telegram t.me/netnetcap. NET 0xCA9c78Dd337A67F6e0077F65F5E9218719d30eDf. sNET 0xb773ec2C326B7f98a5a83fc098825492F020a4c7. Staking 0xB078cc304A0B264C5F3680DC0488954ACcd02E87. Treasury 0x04822Ea321A0DEE6F40656172F29312104855d66. Canonical NET/USDG pair 0x59F95461E68e0c77605299791E1449f175165B54. Team multisig (Safe) 0x3Bb7A23316f82C0e984fA2E784846d8928a35f42. Chain 4663, deployed 2026-07-16.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S10
+    url: https://docs.netnet.capital/mechanism
+    publisher: NetNet Capital Management
+    kind: docs
+    accessed_at: 2026-09-03T02:50:00Z
+    claim: The Fund (Mechanism)
+    excerpt: NET is a reserve-backed token mirroring the OlympusDAO v1 architecture — Token, rebasing staked token, Treasury, BondDepository, Distributor — plus TaxCollector, GenesisBond, InverseBond, PremiumSeller, and pTEAM. Epoch is 8 hours. There are no owner functions anywhere on the emissions path. Every NET is at all times backed by at least 1 USDG of risk-free value. Bond floor is NAV. Buyback Program standing bid at NAV − 1.5%.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S11
+    url: https://docs.netnet.capital/treasury
+    publisher: NetNet Capital Management
+    kind: docs
+    accessed_at: 2026-09-03T02:50:00Z
+    claim: Treasury & NAV
+    excerpt: The reserve asset is USDG, and only USDG. At most 70% of treasury USDG may be deployed to Morpho. RFV = liquidUSDG + morphoPositionUSDG × (1 − 2%) + rfvOfPOL. NAV = RFV / totalSupply. Tokenized equities (NVDA, SPCX, AAPL; residual GOOGL, MSFT, COIN) are held in the NetNet RWA Sleeve — outside RFV and backing, never counted toward NAV. No code path moves reserves into the Sleeve.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S12
+    url: https://x.com/NetNetCap
+    publisher: "@NetNetCap"
+    kind: social
+    accessed_at: 2026-09-03T02:40:00Z
+    claim: NetNet Capital profile
+    excerpt: "Display name NetNet Capital, handle @NetNetCap. Bio: Reserve Manager for $NET on Robinhood Chain. Play Games with Stocks. Followers 14449. Blue Verified."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S13
+    url: https://api.llama.fi/protocol/netnet-capital-management
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-03T01:50:00Z
+    claim: NetNet Capital Management protocol row
+    excerpt: name NetNet Capital Management symbol NET category Reserve Currency chains [Robinhood Chain] twitter NetNetCap url https://netnet.capital address robinhood:0xCA9c78Dd337A67F6e0077F65F5E9218719d30eDf methodology NET staked in the NetNet staking contract. currentChainTvls Robinhood Chain 0 Robinhood Chain-staking 80630578.49838. tvl last date 1788400031 totalLiquidityUSD 0. gecko_id null.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S14
+    url: https://robinhoodchain.blockscout.com/address/0xCA9c78Dd337A67F6e0077F65F5E9218719d30eDf
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: Address 0xCA9c…0eDf NET
+    excerpt: "hash 0xCA9c78Dd337A67F6e0077F65F5E9218719d30eDf name NET is_contract true is_verified true creator 0xCfBd7e12A0f154a45576a73C1E409200068507B9 tx 0xbfe633ae…90f7. Token name NetNet symbol NET decimals 9 holders_count 6992 total_supply 65182030431346. file_path src/NET.sol compiler v0.8.30 is_partially_verified false. Comment: NET — NetNet reserve token. ERC-20, 9 decimals, immutable 500 bps fee-on-transfer."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S15
+    url: https://robinhoodchain.blockscout.com/tx/0xbfe633ae9d403bf2d5140fad11db3a561e06cabe0a96eda702ae64d26cb090f7
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: NET creation tx 0xbfe633ae…
+    excerpt: timestamp 2026-07-16T17:32:50.000000Z status ok result success from 0xCfBd7e12A0f154a45576a73C1E409200068507B9 is_contract false block_number 11439688 created_contract 0xCA9c78Dd337A67F6e0077F65F5E9218719d30eDf name NET is_verified true.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S16
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Robinhood Chain RPC
+    kind: explorer
+    accessed_at: 2026-09-03T03:05:00Z
+    claim: eth_getCode, ERC-20, treasury/guardian wiring, Safe owners
+    excerpt: block 53081492. NET name NetNet symbol NET decimals 9 totalSupply 65182030431346. treasury() 0x04822ea3…5d66. guardian() 0x3bb7a233…5f42. taxCollector() 0x086c5840…918e. canonicalPair() 0x59f95461…5b54. taxTotalBps() 500. wired true taxEnabled true. USDG.balanceOf(treasury) 2394555191728 (6 decimals). NET.balanceOf(staking) 58492822194093. Safe getThreshold 1, one owner 0xe7e86751…96f6.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S17
+    url: https://api.dexscreener.com/token-pairs/v1/robinhood/0xCA9c78Dd337A67F6e0077F65F5E9218719d30eDf
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:55:00Z
+    claim: Robinhood token-pairs for 0xCA9c…0eDf
+    excerpt: 21 pairs. Top Uniswap v4 NET/USDG 0x0d662a58507a46cd6a22632228306dc0d9c26f5fce90c37ced3b8358db33deb3 liq 1303258 vol 3509185. Uniswap v2 NET/USDG 0x59F95461E68e0c77605299791E1449f175165B54 liq 807830. Base token name NetNet symbol NET. info websites https://app.netnet.capital/ https://docs.netnet.capital/ socials https://x.com/netnetcap https://t.me/netnetcap.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S18
+    url: https://api.geckoterminal.com/api/v2/networks/robinhood/pools/0x0d662a58507a46cd6a22632228306dc0d9c26f5fce90c37ced3b8358db33deb3
+    publisher: GeckoTerminal
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:55:00Z
+    claim: NET/USDG 0.9% Uniswap v4 pool
+    excerpt: name NET / USDG 0.9% address 0x0d662a58507a46cd6a22632228306dc0d9c26f5fce90c37ced3b8358db33deb3 reserve_in_usd 1496392.7462 pool_created_at 2026-08-25T21:12:20Z. relationships base_token robinhood_0xca9c78dd337a67f6e0077f65f5e9218719d30edf quote_token robinhood_0x5fc5360d0400a0fd4f2af552add042d716f1d168 dex uniswap-v4-robinhood.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S19
+    url: https://api.geckoterminal.com/api/v2/networks/robinhood/tokens/0x116F00968269B7bfbaD4109cE591d6E74c0601d4
+    publisher: GeckoTerminal
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:55:00Z
+    claim: Cloudflare NET stock token
+    excerpt: address 0x116f00968269b7bfbad4109ce591d6e74c0601d4 name Cloudflare, Inc. • Robinhood Token symbol net. Distinct from NetNet 0xca9c78dd337a67f6e0077f65f5e9218719d30edf.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S20
+    url: https://x.com/NetNetCap/status/2095179011823730865
+    publisher: "@NetNetCap"
+    kind: social
+    accessed_at: 2026-09-03T02:40:00Z
+    claim: Treasury has officially surpassed $10,000,000
+    excerpt: "Shareholders, The NetNet Capital Management Treasury has officially surpassed $10,000,000. We started at $0 and in under two months are now the largest holders of NVDA, AAPL, and SPCX on @RobinhoodCrypto. We've built 15 unique RWA experiences, have had the #1 trending collection on @opensea two times, and truthfully... We are just getting started. More Soon."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S21
+    url: https://x.com/NetNetCap/status/2094867645078409568
+    publisher: "@NetNetCap"
+    kind: social
+    accessed_at: 2026-09-03T02:40:00Z
+    claim: NetNet Gear Collection verified on OpenSea
+    excerpt: Shareholders, The NetNet Gear Collection is now verified on @opensea. https://opensea.io/collection/netnet-gear This iteration of gear was minted via the Subway Runner Game. Already $150,000 of volume through the collection. Another loot drop looms. More Soon.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S22
+    url: https://x.com/NetNetCap/status/2094853746652287455
+    publisher: "@NetNetCap"
+    kind: social
+    accessed_at: 2026-09-03T02:40:00Z
+    claim: NAV per net is ~$150
+    excerpt: Shareholders, Two weeks ago when we joined @MCGlive market price of NET was $130. Today, two weeks later, NAV per net is ~$150. Where will we be two weeks from today?
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S23
+    url: https://x.com/NetNetCap/status/2094551068214694342
+    publisher: "@NetNetCap"
+    kind: social
+    accessed_at: 2026-09-03T02:40:00Z
+    claim: Treasury eclipsed $8,500,000
+    excerpt: "Shareholders, The NetNet Capital Management Treasury has eclipsed $8,500,000 in total assets. We are the #1 holder of three blue chip equities on @RobinhoodCrypto. The Subway Runner game just eclipsed $10M of notional play volume. Things are just beginning. More Soon."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S24
+    url: https://x.com/MCGlive/status/2094887701040558352
+    publisher: "@MCGlive"
+    kind: social
+    accessed_at: 2026-09-03T02:40:00Z
+    claim: $NET | @NetNetCap update stream
+    excerpt: "Today on MCG $NET | @NetNetCap NetNet Capital is the Reserve Manager for $NET on Robinhood Chain. Highlights include: Recap since last time; Treasury revenue breakdown; Subway game details; NFT rewards; The RW Play thesis; Wrapped staked token version; No-loss lottery explained."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S25
+    url: https://t.me/netnetcap
+    publisher: Telegram
+    kind: social
+    accessed_at: 2026-09-03T02:48:00Z
+    claim: t.me/netnetcap
+    excerpt: og:title NetNet Capital Management. og:description You can view and join @netnetcap right away. twitter:title NetNet Capital Management.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S26
+    url: https://app.netnet.capital/
+    publisher: NetNet Capital Management
+    kind: official-site
+    accessed_at: 2026-09-03T02:48:00Z
+    claim: NetNet Shareholder Services
+    excerpt: "title NetNet Shareholder Services. meta description: Shareholder Services: enroll in the dividend program, subscribe to bonds, review NAV, and use the buyback program. NetNet Capital Management. og:url https://app.netnet.capital/. twitter:site @netnetcap."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S27
+    url: https://x.com/NetNetCaps
+    publisher: "@NetNetCaps"
+    kind: social
+    accessed_at: 2026-09-03T02:40:00Z
+    claim: NetNetCaps profile
+    excerpt: "Display name NetNet Capital || SUPPORT ✪, handle @NetNetCaps. Bio: Reserve Manager for $NET on Robinhood Chain. Play Games with Stocks. Followers 627."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S28
+    url: https://robinhoodchain.blockscout.com/address/0x04822Ea321A0DEE6F40656172F29312104855d66
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: Address 0x0482…5d66 Treasury
+    excerpt: hash 0x04822Ea321A0DEE6F40656172F29312104855d66 name Treasury is_contract true is_verified true creator 0xCfBd7e12A0f154a45576a73C1E409200068507B9 creation_transaction_hash 0xae97500dbb92e8ecd0a28dda0c9871af777d61d93a227be516769472aabfb156.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S29
+    url: https://robinhoodchain.blockscout.com/address/0xB078cc304A0B264C5F3680DC0488954ACcd02E87
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: Address 0xB078…2E87 Staking
+    excerpt: hash 0xB078cc304A0B264C5F3680DC0488954ACcd02E87 name Staking is_contract true is_verified true creator 0xCfBd7e12A0f154a45576a73C1E409200068507B9 creation_transaction_hash 0x498f2123cdc769cb4bdd71b73ac97fd25472392c9322724faf54b91f93a534e9.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S30
+    url: https://api.geckoterminal.com/api/v2/networks/robinhood/tokens/0xCA9c78Dd337A67F6e0077F65F5E9218719d30eDf
+    publisher: GeckoTerminal
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:55:00Z
+    claim: NetNet token on Robinhood
+    excerpt: address 0xca9c78dd337a67f6e0077f65f5e9218719d30edf name NetNet symbol NET decimals 9 coingecko_coin_id netnet total_supply 65176018448616 normalized_total_supply 65176.018448616 price_usd 1266.1991346526 fdv_usd 82525818.1597401 market_cap_usd 6108502.05189367 volume_usd.h24 7142067.66328455 total_reserve_in_usd 2074748.83.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
     available: true
