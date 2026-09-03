@@ -392,6 +392,8 @@ function MetricsAndChart({ dossier, site, section, token, window }: Pick<NameCar
   const [active, setActive] = useState(series[0]?.key ?? "");
   const explorer = explorerHref(dossier, site);
   const llama = dossier.pulled?.metrics.find((metric) => metric.source_url.includes("defillama"))?.source_url ?? dossier.sources.find((source) => source.url.includes("defillama"))?.url;
+  const rialto = dossier.pulled?.market?.rialto ?? null;
+  const disagreement = dossier.pulled?.market?.volume_disagreement ?? null;
   return (
     <section className="card-metrics">
       <div className="card-metric-grid">
@@ -413,6 +415,8 @@ function MetricsAndChart({ dossier, site, section, token, window }: Pick<NameCar
       <div className="card-source-line">
         {dossier.card.top10Share !== null && explorer ? <a href={explorer}>Top 10 hold {(dossier.card.top10Share * 100).toFixed(1)}%</a> : null}
         <a href={dexScreenerSearchUrl(dossier.symbol ?? dossier.name)} target="_blank" rel="noreferrer"><Icon name="ext" /> DexScreener</a>
+        {rialto ? <a href={rialto.source_url} target="_blank" rel="noreferrer"><Icon name="ext" /> Rialto</a> : null}
+        {disagreement ? <span title="DexScreener and Rialto differ by more than 2×">sources disagree</span> : null}
         {llama ? <a href={llama} target="_blank" rel="noreferrer"><Icon name="ext" /> DefiLlama</a> : null}
         {explorer ? <a href={explorer} target="_blank" rel="noreferrer"><Icon name="ext" /> Explorer</a> : null}
       </div>

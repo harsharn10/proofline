@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { useLoaderData } from "@tanstack/react-router";
+import { formatUsd } from "@/data/types";
 
 export function StatBox({
   stats,
@@ -7,10 +9,19 @@ export function StatBox({
   stats: Array<{ label: string; value: ReactNode; href?: string }>;
   note: ReactNode;
 }) {
+  const { chainStats } = useLoaderData({ from: "/" });
+  const rialtoStats = chainStats ? [
+    ...(chainStats.tvlUsd !== null ? [{ label: "chain TVL", value: formatUsd(chainStats.tvlUsd), href: chainStats.tvlSourceUrl }] : []),
+    ...(chainStats.feeRevenueLatestDayUsd !== null ? [{
+      label: `fee revenue${chainStats.feeRevenueDay ? ` · ${chainStats.feeRevenueDay}` : ""}`,
+      value: formatUsd(chainStats.feeRevenueLatestDayUsd),
+      href: chainStats.economicsSourceUrl,
+    }] : []),
+  ] : [];
   return (
     <aside className="rounded-xl border-[0.5px] border-[var(--line)] bg-[var(--s2)] px-3.5 py-3 text-xs text-[var(--t2)]">
       <div className="grid grid-cols-2 gap-x-3.5 gap-y-2">
-        {stats.map((stat) => {
+        {[...stats, ...rialtoStats].map((stat) => {
           const content = (
             <>
               <b className="block text-base font-semibold text-[var(--t1)]">{stat.value}</b>
@@ -26,7 +37,10 @@ export function StatBox({
           );
         })}
       </div>
-      <div className="mt-2 text-[11px] text-[var(--t3)]">{note}</div>
+      <div className="mt-2 text-[11px] text-[var(--t3)]">
+        {note}
+        {chainStats ? <> · <a href={chainStats.tvlSourceUrl} className="text-[var(--acc)]">Rialto Analytics</a></> : null}
+      </div>
     </aside>
   );
 }
