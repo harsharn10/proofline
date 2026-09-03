@@ -523,6 +523,87 @@ export function themesFromBody(body) {
   return [...new Set(line.split(",").map((tag) => normalizeText(tag).toLowerCase()).filter(Boolean))];
 }
 
+/** Lines in one H2 section, with fenced examples removed. */
+function unfencedSectionLines(body, wanted) {
+  const out = [];
+  let fenced = false, active = false;
+  for (const raw of String(body ?? "").replace(/\r\n/g, "\n").split("\n")) {
+    if (/^\s*(?:```|~~~)/.test(raw)) { fenced = !fenced; continue; }
+    if (fenced) continue;
+    const heading = /^##\s+(.+?)\s*$/.exec(raw);
+    if (heading) { active = heading[1].trim().toLowerCase() === wanted.toLowerCase(); continue; }
+    if (active) out.push(raw);
+  }
+  return out;
+}
+
+/** TL;DR is a declaration immediately after the Themes declaration, not prose elsewhere. */
+export function tldrFromBody(body) {
+  const lines = unfencedSectionLines(body, "What it is");
+  const at = lines.findIndex((line) => /^\s*Themes:\s*.+/i.test(line));
+  if (at < 0) return "";
+  const next = lines.slice(at + 1).find((line) => line.trim());
+  const match = /^\s*TL;DR:\s*(.+?)\s*$/i.exec(next ?? "");
+  return normalizeText(match?.[1]);
+}
+
+/** Markdown bullets in one section, including indented continuation lines. */
+function sectionBullets(body, heading) {
+  const out = [];
+  let current = null;
+  for (const line of unfencedSectionLines(body, heading)) {
+    const bullet = /^\s*[-*]\s+(.+?)\s*$/.exec(line);
+    if (bullet) {
+      if (current) out.push(normalizeText(current));
+      current = bullet[1];
+    } else if (current && /^\s+\S/.test(line)) current += ` ${line.trim()}`;
+    else if (!line.trim() && current) { out.push(normalizeText(current)); current = null; }
+  }
+  if (current) out.push(normalizeText(current));
+  return out;
+}
+
+const CANONICAL_SOURCE_TAG_RE = /\[(?:verified|claim|inference|disputed)\s+S[1-9][0-9]*(?:\s+S[1-9][0-9]*)*\]\s*$/i;
+const PACKET_TAGS_END_RE = /(?:\s*\[(?:verified|claim|inference|disputed|unknown)(?:\s+R-[1-9][0-9]*)*\])+\s*$/i;
+
+function v3FieldsFromBody(body, receiptToSource, notice) {
+  const shape = (value, label) => {
+    const mapped = normalizeText(mappedTag(value, receiptToSource));
+    if (mapped.length <= 160) return mapped;
+    notice(`${label}: skipped; ${mapped.length} characters exceeds the 160-character card limit`);
+    return null;
+  };
+
+  const rawTldr = tldrFromBody(body);
+  const tldr = rawTldr ? shape(rawTldr, "tldr") : null;
+
+  const rawWhy = sectionBullets(body, "Why it matters");
+  let whyPeopleCare = null;
+  if (rawWhy.length && rawWhy.length !== 3)
+    notice(`why_people_care: skipped; expected exactly 3 bullets and found ${rawWhy.length}`);
+  else if (rawWhy.length === 3) {
+    const mapped = rawWhy.map((item, index) => shape(item, `why_people_care bullet ${index + 1}`));
+    if (mapped.every(Boolean) && mapped.every((item) => CANONICAL_SOURCE_TAG_RE.test(item))) whyPeopleCare = mapped;
+    else notice("why_people_care: skipped; every bullet needs a source id in its closing evidence tag");
+  }
+
+  const riskBullets = sectionBullets(body, "What could go wrong");
+  let rawRisks = riskBullets;
+  if (riskBullets.length > 3) notice(`risks: kept the first 3 of ${riskBullets.length} bullets`);
+  if (!riskBullets.length) {
+    const section = unfencedSectionLines(body, "What could go wrong").join("\n");
+    const parts = paragraphs(section);
+    rawRisks = parts.flatMap((paragraph) => {
+      const tags = paragraph.match(PACKET_TAGS_END_RE)?.[0]?.trim() ?? "";
+      const prose = normalizeText(tags ? paragraph.slice(0, paragraph.length - paragraph.match(PACKET_TAGS_END_RE)[0].length) : paragraph);
+      return prose.split(/(?<=[.!?])\s+(?=[A-Z0-9])/).filter(Boolean).map((sentence) => `${sentence}${tags ? ` ${tags}` : ""}`);
+    });
+    if (rawRisks.length) notice(`risks: no bullets found; split the section into sentences and kept the first ${Math.min(3, rawRisks.length)}`);
+  }
+  const risks = rawRisks.slice(0, 3).map((item, index) => shape(item, `risks bullet ${index + 1}`)).filter(Boolean);
+  return { tldr, whyPeopleCare, risks: risks.length ? risks : null };
+}
+
 function themeErrors(themes) {
   const errors = [];
   if (themes.length > 5) errors.push("Themes must contain no more than 5 tags");
@@ -957,7 +1038,7 @@ function researchDocument(frontmatter, body, receiptToSource, ledger, options = 
 function changedFields(prior, next) {
   if (!prior) return { prior: null, next: { coverage: next.coverage, lifecycle: next.lifecycle } };
   const before = {}, after = {};
-  for (const key of ["name", "category", "lifecycle", "summary", "themes", "official_links", "deployments", "metrics"]) {
+  for (const key of ["name", "category", "lifecycle", "summary", "tldr", "why_people_care", "risks", "themes", "official_links", "deployments", "metrics"]) {
     if (JSON.stringify(prior[key] ?? null) !== JSON.stringify(next[key] ?? null)) {
       before[key] = prior[key] ?? null;
       after[key] = next[key] ?? null;
@@ -1140,6 +1221,10 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
   const controllerEdited = priorProject?.controller_edited === true;
   const summary = controllerEdited ? priorProject.summary : compiledSummary;
   const themes = controllerEdited ? priorProject.themes : (compiledThemes.length ? compiledThemes : priorProject?.themes);
+  const compiledV3 = v3FieldsFromBody(body, receiptToSource, notice);
+  const tldr = controllerEdited ? priorProject?.tldr : (compiledV3.tldr ?? priorProject?.tldr);
+  const whyPeopleCare = controllerEdited ? priorProject?.why_people_care : (compiledV3.whyPeopleCare ?? priorProject?.why_people_care);
+  const risks = controllerEdited ? priorProject?.risks : (compiledV3.risks ?? priorProject?.risks);
   const project = {
     ...(priorProject ?? {}),
     slug: frontmatter.slug,
@@ -1149,6 +1234,9 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     lifecycle,
     coverage,
     summary,
+    ...(tldr ? { tldr } : {}),
+    ...(whyPeopleCare?.length ? { why_people_care: whyPeopleCare } : {}),
+    ...(risks?.length ? { risks } : {}),
     ...(themes?.length ? { themes } : {}),
     official_links: projectLinks,
     dependencies: [...new Set([...(priorProject?.dependencies ?? []), ...relationships])],

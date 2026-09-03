@@ -20,12 +20,12 @@ const METRIC_KEYS = ["kind", "value", "as_of", "source_url"];
 const ERROR_KEYS = ["step", "message"];
 const MARKET_KEYS = [
   "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
-  "price_usd", "price_change_h24", "fdv", "first_pair_at", "top10_share",
+  "price_usd", "price_change_h24", "market_cap_usd", "fdv_usd", "fdv", "first_pair_at", "top10_share",
   "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad", "errors",
 ];
 const PAIR_KEYS = [
   "dex", "pair_address", "quote_symbol", "price_usd", "liquidity_usd", "volume_h24",
-  "volume_h6", "txns_h24", "price_change_h24", "fdv", "created_at",
+  "volume_h6", "txns_h24", "price_change_h24", "market_cap", "fdv", "created_at",
 ];
 const TXNS_KEYS = ["buys", "sells"];
 const STRUCTURE_KEYS = ["pulled_at", "mint", "renounced", "lp", "errors"];
@@ -39,7 +39,7 @@ const ACTIVITY_ADDRESS_KEYS = [
 /** Snapshot column order. One JSON line per run in content/pulled/history/<slug>.jsonl. */
 export const HISTORY_KEYS = [
   "at", "holders", "liquidity_usd", "volume_h24", "trades_h24",
-  "price_usd", "fdv", "txns_total", "launches_24h", "tvl", "revenue_24h", "top10_share",
+  "price_usd", "market_cap", "fdv", "txns_total", "launches_24h", "tvl", "revenue_24h", "top10_share",
 ];
 
 export const HISTORY_DIR = "content/pulled/history";
@@ -184,6 +184,7 @@ export function snapshotFrom(doc) {
     volume_h24: market?.volume_h24 ?? null,
     trades_h24: market?.trades_h24 ?? null,
     price_usd: market?.price_usd ?? null,
+    market_cap: market?.market_cap_usd ?? null,
     fdv: market?.fdv ?? null,
     txns_total: counts.length ? counts.reduce((a, b) => a + b, 0) : null,
     launches_24h: activity?.launches_24h ?? null,

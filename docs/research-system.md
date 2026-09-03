@@ -310,6 +310,9 @@ The compiler maps a URL-backed packet event into `content/feed/<slug>.yaml`: the
 the body, the cited receipt URL becomes `sourceUrl`, and the stable id uses the formula above. A post by
 the project's official handle is `company`; another account is `ct`; an explorer or DefiLlama receipt
 is `onchain`; and a flagged event is `risk`. Existing items merge by id, so compiling twice is a no-op.
+The public wire labels those four stored kinds as `company` → **Announcements**, `ct` → **Talk**,
+`onchain` → **On-chain**, and `risk` → **Icarus notes**. The stored event summary is the wire gist
+verbatim apart from whitespace normalization; titles are limited to 80 characters.
 
 ## 9. Retired
 

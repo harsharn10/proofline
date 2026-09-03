@@ -105,7 +105,7 @@
       "additionalProperties": false,
       "required": [
         "dex", "pair_address", "quote_symbol", "price_usd", "liquidity_usd", "volume_h24",
-        "volume_h6", "txns_h24", "price_change_h24", "fdv", "created_at"
+        "volume_h6", "txns_h24", "price_change_h24", "market_cap", "fdv", "created_at"
       ],
       "properties": {
         "dex": { "type": ["string", "null"] },
@@ -125,6 +125,7 @@
           }
         },
         "price_change_h24": { "type": ["number", "null"] },
+        "market_cap": { "type": ["number", "null"] },
         "fdv": { "type": ["number", "null"] },
         "created_at": { "type": ["string", "null"], "format": "date-time" }
       }
@@ -135,7 +136,7 @@
       "additionalProperties": false,
       "required": [
         "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
-        "price_usd", "price_change_h24", "fdv", "first_pair_at", "top10_share",
+        "price_usd", "price_change_h24", "market_cap_usd", "fdv_usd", "fdv", "first_pair_at", "top10_share",
         "top10_share_ex_pools", "top10_as_of", "launchpad", "errors"
       ],
       "properties": {
@@ -147,6 +148,8 @@
         "trades_h24": { "type": ["integer", "null"], "minimum": 0 },
         "price_usd": { "type": ["number", "null"] },
         "price_change_h24": { "type": ["number", "null"] },
+        "market_cap_usd": { "type": ["number", "null"] },
+        "fdv_usd": { "type": ["number", "null"] },
         "fdv": { "type": ["number", "null"] },
         "first_pair_at": { "type": ["string", "null"], "format": "date-time" },
         "top10_share": {
