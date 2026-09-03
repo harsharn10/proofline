@@ -9,7 +9,7 @@ export function SiteFooter() {
     <footer className="sitefooter">
       <div className="wrap">
         <p className="footline">
-          Icarus is independent automated research, not advice or an endorsement. Verify everything.
+          {meta.disclaimer} <Link to="/disclaimer">Full disclaimer.</Link>
           {correction.href ? <a href={correction.href}>{correction.label}</a> : null}
         </p>
         <nav className="footerlinks" aria-label="Legal and methodology">

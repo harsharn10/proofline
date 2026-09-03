@@ -97,7 +97,15 @@ async function main() {
 
     const publicHtml = await fetch(`${BASE}/`).then((response) => response.text());
     const legalChecks = [
-      ["/", publicHtml, ["Important.", "Read the full disclaimer.", 'href="/disclaimer"']],
+      [
+        "/",
+        publicHtml,
+        [
+          "Icarus is an independent, automated information service",
+          "Full disclaimer.",
+          'href="/disclaimer"',
+        ],
+      ],
       [
         "/disclaimer",
         await fetch(`${BASE}/disclaimer`).then((response) => response.text()),
