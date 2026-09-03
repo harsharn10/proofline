@@ -48,15 +48,10 @@ type TaxonomyFile = {
   leaves: Record<string, { label: string }>;
 };
 
-// `vite.config.ts` predates the optional daily backfills. Keeping this glob here confines the
-// compatibility bridge to the card bundle; a missing directory simply produces an empty object.
-const rawCardSeries = typeof import.meta.glob === "function"
-  ? import.meta.glob("../../../content/pulled/series/*.json", {
-      eager: true,
-      query: "?raw",
-      import: "default",
-    }) as Record<string, string>
-  : {};
+// Optional daily backfills (content/pulled/series/<slug>.json), read through the same virtual
+// snapshot as every other content directory. `?? {}` is for the Node rule tests in
+// scripts/test.mjs, which import this module with a stub snapshot — never for the browser bundle.
+const pulledSeries: Record<string, string> = rawContent.pulledSeries ?? {};
 
 function parseYaml<T>(raw: string): T {
   return YAML.parse(raw) as T;
@@ -300,8 +295,7 @@ function loadContent(): ServerContent {
     const feed = feedFile ? [...feedFile.items].sort((a, b) => b.date.localeCompare(a.date)) : [];
     const pulled = readYamlOrWarn<PulledFile | null>(rawContent.pulled[`${slug}.yaml`], `pulled/${slug}.yaml`, slug, null);
     const history = parseHistory(rawContent.pulledHistory[`${slug}.jsonl`]);
-    const seriesPath = Object.keys(rawCardSeries).find((path) => path.endsWith(`/${slug}.json`));
-    const dailySeries = parseDailySeries(seriesPath ? rawCardSeries[seriesPath] : undefined);
+    const dailySeries = parseDailySeries(pulledSeries[`${slug}.json`]);
     const censusRow = censusBySlug.get(slug);
     const pulledCard = pulled as (PulledFile & PulledCardFields) | null;
     const changelog = changelogAll

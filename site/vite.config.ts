@@ -50,6 +50,7 @@ function prooflineContent(): Plugin {
         feed: directory("content/feed", ".yaml"),
         pulled: directory("content/pulled", ".yaml"),
         pulledHistory: directory("content/pulled/history", ".jsonl"),
+        pulledSeries: directory("content/pulled/series", ".json"),
       };
       return `export default ${JSON.stringify(snapshot)};`;
     },
