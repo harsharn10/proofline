@@ -1151,8 +1151,9 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
       { kind: "x", url: "https://x.com/fox_onrh" },
     ],
     // FoxPad's real row: a site link is on file, but the X account belongs to the FOX token and
-    // the pad's own handle is unconfirmed, so the listing test is not verified.
+    // the pad's own handle is unconfirmed, so the row sits on the watchlist (role observe).
     qualifying: { citable: { value: true, note: "the pad's own handle is unconfirmed", verified: false } },
+    role: "observe",
     ...overrides,
   });
   const barEntry = (census) => ({
@@ -1162,14 +1163,14 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     kpis: { liquidityUsd: 1_000_000, tvl: null },
   });
   const foxpad = censusRow();
-  const confirmed = censusRow({ qualifying: { citable: { value: true, note: "docs read", verified: true } } });
+  const confirmed = censusRow({ role: "subject" });
   try {
-    assert.equal(officialSurfaceConfirmedCore(foxpad), false, "an unverified listing test is not a confirmed surface");
+    assert.equal(officialSurfaceConfirmedCore(foxpad), false, "a watchlist row is not a confirmed surface");
     assert.equal(rules.officialSurfaceConfirmed(foxpad), false, "the site reads the same definition");
     assert.equal(meetsShareBarCore(barEntry(foxpad)), false, "the emitter keeps FoxPad off the share bar");
     assert.equal(rules.meetsShareBar(barEntry(foxpad)), false, "the site keeps FoxPad off the share bar");
 
-    assert.equal(officialSurfaceConfirmedCore(confirmed), true, "a verified listing test with a site link confirms");
+    assert.equal(officialSurfaceConfirmedCore(confirmed), true, "a subject row with a site link confirms even before the second-pass flag");
     assert.equal(rules.meetsShareBar(barEntry(confirmed)), true, "a confirmed surface still clears the bar");
     assert.equal(
       officialSurfaceConfirmedCore(censusRow({ official_links: [{ kind: "x", url: "https://x.com/fox_onrh" }] })),
@@ -1184,7 +1185,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.equal(
       officialSurfaceConfirmedCore({ slug: "x", identity: { status: "verified" }, official_links: [{ kind: "docs", url: "https://d.test" }] }),
       true,
-      "a row without a qualifying block falls back to its links",
+      "a row without a qualifying block or role reads as a subject with links",
     );
     assert.equal(officialSurfaceConfirmedCore(undefined), false, "a name with no registry row is never confirmed");
     console.log("ok   official surface confirmed");
