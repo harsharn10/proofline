@@ -1,0 +1,148 @@
+slug: doge-1
+name: DOGE-1
+symbol: DOGE-1
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply Pons v2 ERC-20 that graduated into a Uniswap v4 DOGE-1/SPCX pool. Traders buy and sell DOGE-1 against the SpaceX • Robinhood Token on that book. SPCX is the quote rail, not this profile. Distinct from packed SPACEHOOD and BEAVER, which are LongLauncher clones on the same rail.
+themes:
+  - memecoin
+  - stock-paired:spcx
+  - rwa
+  - launchpad
+official_links:
+  - kind: site
+    url: https://www.doge1coinrh.com/
+  - kind: x
+    url: https://x.com/Doge1CoinRH
+  - kind: telegram
+    url: https://t.me/Doge1onRH
+dependencies: []
+deployments:
+  - label: DOGE-1 token (PonsV2LauncherToken bytecode)
+    chain: robinhood-chain
+    address: "0x3eC8A8174129D5cBeCef67eE2AF8621319c34c03"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S5
+  - label: PonsV2LaunchDeployer
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: factory
+    verified: false
+    sources:
+      - S5
+      - S18
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S19
+  - label: PonsV2BondingCurve
+    chain: robinhood-chain
+    address: "0x73c35E838fFfE4ed0c415906655605a0D8b75137"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S23
+  - label: PonsV2LaunchAndBuy (create tx to)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S3
+      - S20
+  - label: V2LaunchLocker (graduated position)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S13
+  - label: SPCX Stock Token (pair quote / launch pairToken)
+    chain: robinhood-chain
+    address: "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S9
+      - S15
+  - label: DOGE-1 ticker collision (Pons v2, not this row)
+    chain: robinhood-chain
+    address: "0xbFa87Fa76e712d8102B38e0a4b9ACDC85c78A2f9"
+    role: token
+    verified: false
+    sources:
+      - S16
+      - S21
+  - label: DOGE1 ticker collision (LongLauncher, not this row)
+    chain: robinhood-chain
+    address: "0x3582C0Ed4324cb742266401E56C68d026118EbA3"
+    role: token
+    verified: false
+    sources:
+      - S17
+      - S21
+metrics:
+  - kind: volume_24h
+    value: 705142.752905416
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 53311.166
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 603801
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 894
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: Blockscout token/factory/deployer/lab/SPCX/launchAndBuy/CurveCompleted/createGraduatedPool/fee-recipient txs and collision tokens, RPC with Chrome UA, DexScreener token and search, one Gecko pool GET, /rhj/assets, the site HTML, Telegram preview, and @Doge1CoinRH were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8 R-9] - Numbers: 705142.75 is the Gecko DOGE-1/SPCX pool 24h volume. Reserve 53311.17 is that pool. DexScreener 722896.95 / 70959.97 is the same pair, different aggregator. [claim R-7 R-8] - Adversarial: the strongest contrary reading is that this row is SPACEHOOD, BEAVER, SPCX itself, or the other robinhood DOGE-1 tickers. Different CAs, create paths (Pons v2 vs LongLauncher vs BeaconProxy Stock), and bytecode sizes argue against those."
+      class: verified
+      sources:
+        - S5
+        - S9
+        - S16
+        - S17
+  risk:
+    - text: Quote token SPCX 0x4a0E…5eEa is a Robinhood Stock Token rail; this subject is the memecoin, not SPCX. [verified R-9 R-15] - Pool USD reserve is DOGE-1 plus SPCX, not a USDG or WETH backstop. [claim R-7 R-8] - Same-ticker robinhood books at 0xbFa87…A2f9 and 0x3582…EbA3. Flag ca-collision. [verified R-16 R-17 R-21] - Handle is unconfirmed-official; TG is a third-party-link with no CA in the preview. [claim R-7 R-11 R-12] - Token source unverified on this CA. No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @Doge1CoinRH later pin CA 0x3eC8…4c03, and does that match a DexScreener Claim Profile? Next: re-read the X bio and DexScreener info.socials after a Claim Profile"
+    - text: "Is 0xbFa87…A2f9 a copy ticker or a related deployer, and which book should aggregators treat as canonical? Next: one launchAndBuy pass on 0xbFa87 if a later assignment asks"
+    - text: "Does verified PonsV2LauncherToken source on a sibling clone apply to this unverified 3248 B CA? Next: compare deployed bytecode to a verified PonsV2LauncherToken"
+    - text: "Which window printed the assignment lead of ~$60,592 liq / ~$579,156 vol? Next: keep the DexScreener DOGE-1/SPCX pair slice; do not mix Gecko reserve with DexScreener fdv"
+  unresolved: []

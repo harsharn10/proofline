@@ -1,0 +1,129 @@
+slug: longdog
+name: LONGDOG
+symbol: LONGDOG
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 pool quoted against TSLA, the Tesla Robinhood Stock Token at 0x322F…3b2d. Traders buy and sell LONGDOG on that book. TSLA is the rail. This token is not the Tesla stock token, not census LONG, not packed doggie, not packed OPTIMUS, and not in-flight DOGECOIN/TSLA.
+themes:
+  - memecoin
+  - stock-paired:tsla
+  - dog
+official_links:
+  - kind: site
+    url: https://longdog.dog/
+  - kind: x
+    url: https://x.com/longdog_token
+  - kind: app
+    url: https://app.long.xyz/tokens/0xfe7e4b4850979ba7920ce786493b7371761f1e18
+dependencies: []
+deployments:
+  - label: LONGDOG token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xfe7E4b4850979BA7920ce786493B7371761F1e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S3
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S3
+      - S10
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S12
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S11
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S3
+      - S13
+  - label: TSLA quote (create numeraire / pair quote / Robinhood Stock Token rail)
+    chain: robinhood-chain
+    address: "0x322F0929c4625eD5bAd873c95208D54E1c003b2d"
+    role: token
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S15
+      - S18
+metrics:
+  - kind: tvl
+    value: 151778.18
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: volume_24h
+    value: 344761.9
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: market_cap
+    value: 315178.76
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: holders
+    value: 1086
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: Blockscout token/impl/factory/launcher/Airlock/TSLA and the create tx plus logs, RPC name/symbol/owner/code, DexScreener token and search, Gecko token, Gecko HTML title, /rhj/assets, longdog.dog, and @longdog_token posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-3 R-7 R-18] - Numbers: 345701.96 is the DexScreener LONGDOG/TSLA pool 24h volume, not the 344761.90 Gecko token all-pools figure. Reserve 151778.18 is that DexScreener pair. Gecko token total_reserve_in_usd 136421.57 is all-pools. [claim R-7 R-9] - Adversarial: the strongest contrary reading is that this LONGDOG is census LONG, is packed doggie, is packed OPTIMUS, is in-flight DOGECOIN/TSLA, is the TSLA stock token, or is the other robinhood LONGDOG CAs. Different CAs, names, pair ids and (for LONG) entity_kind argue against those."
+      class: verified
+      sources:
+        - S3
+        - S7
+        - S14
+        - S16
+        - S17
+        - S18
+  risk:
+    - text: Quote token TSLA 0x322F…3b2d is a Robinhood Stock Token rail in GET /rhj/assets; LONGDOG is not. [verified R-15 R-18] - Pool USD reserve is LONGDOG plus TSLA, not a USDG or WETH backstop. [claim R-7] - Handle is unconfirmed-official; site display string @LONGDOG is not the DexScreener X URL. [claim R-5 R-7 R-20] - Ticker LONGDOG collides with other robinhood CAs 0xa4fA…72F6 and 0xB338…69cc and with packed doggie / OPTIMUS / DOGECOIN TSLA books. [verified R-14 R-16 R-17] - No audit report URL this pass. [unknown] - A third-party claim URL reused the CA.
+      class: claim
+      sources:
+        - S21
+  missing:
+    - text: "Does any surface bidirectionally confirm @longdog_token as the official handle for 0xfe7E…1e18? Next: re-read Gecko token/info and the LONG Social Links field if the SPA renders; search new posts that embed the CA and the handle"
+    - text: "Why do DexScreener and Gecko disagree on LONGDOG reserve (~$152k TSLA book vs ~$136k Gecko token all-pools) and venue (uniswap v4 vs Bankr)? Next: retry Gecko pool once after the rate-limit window; compare PoolManager liquidity vs Gecko reserve formula used on other LONG TSLA books"
+    - text: "Does Airlock 0xeb7C…0862 hold remaining privileged paths on the DopplerERC20V1 clone (mint, pause, upgrade of the implementation)? Next: read DopplerERC20V1 verified source for mint/burn/pause and Airlock exit liquidity on the TSLA pool"
+    - text: "Is there an audit whose scope includes DopplerERC20V1 as deployed at 0x3Be8…C599? Next: LONG litepaper / Doppler docs if they name an auditor"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).
