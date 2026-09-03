@@ -9,7 +9,7 @@ import { parse, stringify } from "yaml";
 import { validateInboxYaml, yamlParseErrors } from "./lib/inbox.mjs";
 import { vocabularyWarnings } from "./lib/voice.mjs";
 import { validateContent } from "./lib/validate-content.mjs";
-import { normalizeUrl, lifecycleDriftWarnings, mainnetReceiptFromPulled } from "./lib/checks.mjs";
+import { normalizeUrl, lifecycleDriftWarnings, mainnetReceiptFromPulled, deploymentReceiptFromPulled } from "./lib/checks.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { entryKey, legacyEntryKey, reviewKeyFor, selectUnsent, selectApproved, publicationFingerprint } from "./lib/telegram.mjs";
 import { addSourceKeys, sourceKeyFor } from "./migrations/add-source-keys.mjs";
@@ -542,6 +542,50 @@ await test("a compile writes one census row and keeps the file's comments", asyn
   const added = censusTextWithRow(text, { ...row, slug: "brand-new" });
   assert.equal(parse(added).length, 3, "a slug with no row is appended");
   assert.ok(added.includes("# Coverage universe"));
+});
+
+await test("a pulled chain read verifies a deployment and is cited as its source", async () => {
+  const router = "0x2222222222222222222222222222222222222222";
+  const vault = "0x5555555555555555555555555555555555555555";
+  const pulledAt = "2026-09-03T10:00:00.000Z";
+  const pulledRow = (address, extra = {}) => ({ address, is_contract: true, source_verified: true, contract_name: "AlphaRouter", ...extra });
+  const pulled = { slug: "alpha", pulled_at: pulledAt, chain: "robinhood-chain", addresses: [pulledRow(router)] };
+
+  // The rule itself: read, then not read, then read but not established.
+  assert.equal(deploymentReceiptFromPulled(pulled, router.toUpperCase()).receipt, `pulled ${router} ${pulledAt}`);
+  assert.equal(deploymentReceiptFromPulled(pulled, vault), null, "an address the puller has not read has no receipt");
+  assert.equal(deploymentReceiptFromPulled({ ...pulled, addresses: [pulledRow(router, { is_contract: false })] }, router), null);
+  assert.equal(deploymentReceiptFromPulled({ ...pulled, addresses: [pulledRow(router, { source_verified: false })] }, router), null, "unverified source is not an establishment");
+  assert.equal(deploymentReceiptFromPulled({ ...pulled, addresses: [pulledRow(router, { source_verified: null })] }, router), null, "a Blockscout read that never answered is not one either");
+  assert.equal(deploymentReceiptFromPulled({ ...pulled, pulled_at: undefined }, router), null, "a read with no timestamp is not a receipt");
+
+  // A router the packet asserts but never reproduced is unverified until something reproduces it.
+  const unreproduced = reshaped((frontmatter) => { frontmatter.claims[0].class = "claim"; frontmatter.claims[0].reproduction_ids = []; });
+  const withoutRead = compile(unreproduced);
+  assert.deepEqual(withoutRead.project.deployments.map((row) => row.verified), [false]);
+
+  const result = compile(unreproduced, null, null, null, null, { pulled });
+  const [deployment] = result.project.deployments;
+  assert.equal(deployment.verified, true, "the chain read verifies it");
+  assert.ok(result.notices.some((note) => note.includes(`verified from the chain read — pulled ${router} ${pulledAt}`)), result.notices.join("\n"));
+
+  const cited = result.sources.sources.find((source) => deployment.sources.includes(source.id) && source.researcher === "pull");
+  assert.ok(cited, `the pulled read is cited: ${JSON.stringify(deployment.sources)}`);
+  assert.equal(cited.url, `https://robinhoodchain.blockscout.com/address/${router}`);
+  assert.equal(cited.kind, "explorer");
+  assert.equal(cited.accessed_at, pulledAt);
+  assert.ok(cited.excerpt.startsWith(`pulled ${router} ${pulledAt}:`), cited.excerpt);
+  assert.deepEqual(validateAgainst("sources", result.sources), [], "the ledger still passes its schema");
+  assert.deepEqual(validateAgainst("project", result.project), []);
+
+  // Compiling again against the same read reuses the entry; a later pull refreshes what it says it read.
+  const again = compile(unreproduced, result.project, result.censusRow, result.sources, result.feed, { pulled });
+  assert.equal(again.sources.sources.filter((source) => source.researcher === "pull").length, 1, "one entry per address, not one per compile");
+  const repulled = { ...pulled, pulled_at: "2026-09-04T10:00:00.000Z" };
+  const refreshed = compile(unreproduced, result.project, result.censusRow, result.sources, result.feed, { pulled: repulled });
+  const refreshedEntry = refreshed.sources.sources.find((source) => source.researcher === "pull");
+  assert.equal(refreshedEntry.accessed_at, "2026-09-04T10:00:00.000Z", "a newer read updates the entry it already has");
+  assert.equal(refreshed.sources.sources.filter((source) => source.researcher === "pull").length, 1);
 });
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }

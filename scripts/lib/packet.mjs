@@ -8,7 +8,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse } from "yaml";
 import { validateAgainst } from "./schemas.mjs";
-import { mainnetReceiptFromPulled } from "./checks.mjs";
+import { mainnetReceiptFromPulled, deploymentReceiptFromPulled } from "./checks.mjs";
 import { leafLabel } from "./taxonomy.mjs";
 import { conductWarnings } from "./voice.mjs";
 import { REQUIRED_HEADINGS, PENDING_LINE } from "./research-md.mjs";
@@ -863,6 +863,35 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
   let autoTaggedParagraphs = 0;
   const { ledger, receiptToSource } = sourceLedger(frontmatter, priorSources);
 
+  // A chain read the puller already made is a source in its own right. It joins the same ledger the
+  // packet receipts land in, keyed by URL and claim like every other entry, so one address has one
+  // entry however many times it is compiled; a later pull refreshes what that entry says it read.
+  const ledgerByIdentity = new Map(ledger.sources.map((source) => [sourceIdentity(source), source]));
+  let nextLedgerId = Math.max(0, ...ledger.sources.map((source) => Number(String(source.id).slice(1))).filter(Number.isFinite)) + 1;
+  const recordPulledSource = (chainRead, slug) => {
+    const candidate = {
+      url: chainRead.url,
+      publisher: "Robinhood Chain Blockscout",
+      kind: "explorer",
+      accessed_at: chainRead.pulledAt,
+      claim: `Contract record for ${chainRead.address} on Robinhood Chain (4663), read into content/pulled/${slug}.yaml.`,
+      excerpt: `${chainRead.receipt}: is_contract true, source_verified true${chainRead.contractName ? `, contract ${chainRead.contractName}` : ""}.`,
+      hash: null,
+      archive_url: null,
+      researcher: "pull",
+      available: true,
+    };
+    const existing = ledgerByIdentity.get(sourceIdentity(candidate));
+    if (existing) {
+      if (existing.researcher === "pull") Object.assign(existing, { accessed_at: candidate.accessed_at, excerpt: candidate.excerpt });
+      return existing.id;
+    }
+    const source = { id: `S${nextLedgerId++}`, ...candidate };
+    ledgerByIdentity.set(sourceIdentity(source), source);
+    ledger.sources.push(source);
+    return source.id;
+  };
+
   // Coverage only ever rises. A collector packet compiled onto a full profile leaves the profile full
   // and leaves its scoring block — owned by editorial review — exactly where it was.
   const priorCoverage = priorProject?.coverage ?? priorCensusRow?.coverage ?? null;
@@ -923,13 +952,24 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
       notice(`deployment "${normalizeText(deployment.label)}": skipped; address is not an address — ${normalizeText(address).slice(0, 90)}`);
       return [];
     }
+    const chain = deployment.address?.chain ?? "other";
+    const claimed = Boolean(address !== "not-verified" && deployment.address?.exists_on_4663 === true && claimForAddress(frontmatter, address));
+    const sources = sourceIds(deployment.receipt_ids, receiptToSource);
+    // Our own chain read is a reproduction. When the puller has already found this contract on 4663
+    // with verified source, the deployment is verified and cites that read; an address the puller has
+    // not reached stays unverified, waiting for someone to reproduce it.
+    const chainRead = chain === "robinhood-chain" && !claimed ? deploymentReceiptFromPulled(pulled, address) : null;
+    if (chainRead) {
+      notice(`deployment "${normalizeText(deployment.label)}": verified from the chain read — ${chainRead.receipt}`);
+      sources.push(recordPulledSource(chainRead, frontmatter.slug));
+    }
     return [{
       label: deployment.label,
-      chain: deployment.address?.chain ?? "other",
+      chain,
       address,
       role: deployment.role,
-      verified: Boolean(address !== "not-verified" && deployment.address?.exists_on_4663 === true && claimForAddress(frontmatter, address)),
-      sources: sourceIds(deployment.receipt_ids, receiptToSource),
+      verified: claimed || Boolean(chainRead),
+      sources: [...new Set(sources)],
     }];
   });
   // A metric is a number a reader can compare. A value the collector could not establish, or one that

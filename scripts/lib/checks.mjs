@@ -56,6 +56,34 @@ export function mainnetReceiptFromPulled(pulled) {
   return { address: contract.address, createdAt: contract.created_at };
 }
 
+/** The reader-facing Blockscout record for an address the puller read. */
+const EXPLORER_ADDRESS_PAGE = "https://robinhoodchain.blockscout.com/address/";
+
+/**
+ * The receipt a pulled chain read gives one deployment address, or null when the puller has not
+ * established it. This is the second thing that turns a machine read into a citable receipt, and it
+ * lives beside `mainnetReceiptFromPulled` so there is one place that does it: a contract the puller
+ * found on 4663 with verified source is evidence a controller does not have to reproduce by hand,
+ * while an address the puller has not read yet stays unverified rather than being taken on trust.
+ */
+export function deploymentReceiptFromPulled(pulled, address) {
+  if (pulled?.chain !== "robinhood-chain" || !pulled?.pulled_at) return null;
+  const wanted = String(address ?? "").toLowerCase();
+  if (!wanted || wanted === "not-verified") return null;
+  const row = (pulled.addresses ?? []).find((entry) => String(entry?.address ?? "").toLowerCase() === wanted);
+  if (!row || row.is_contract !== true) return null;
+  // schema/pulled.schema.json carries source_verified on every address; null means Blockscout never
+  // answered, which is not the same as "unverified source" but is equally not an establishment.
+  if ("source_verified" in row && row.source_verified !== true) return null;
+  return {
+    address: row.address,
+    pulledAt: pulled.pulled_at,
+    receipt: `pulled ${row.address} ${pulled.pulled_at}`,
+    url: `${EXPLORER_ADDRESS_PAGE}${row.address}`,
+    contractName: row.contract_name ?? null,
+  };
+}
+
 function pulledContractHasActivity(pulled) {
   if (pulled?.chain !== "robinhood-chain") return false;
   const contracts = new Set((pulled.addresses ?? []).filter((row) => row?.is_contract === true).map((row) => String(row.address).toLowerCase()));
