@@ -316,10 +316,15 @@ await test("lifecycle migration requires a contract and pair and records its rec
   try {
     for (const dir of ["projects", "pulled"]) await mkdir(join(temp, dir), { recursive: true });
     await writeFile(join(temp, "census.yaml"), [
-      "- slug: alpha", "  lifecycle: announced", "- slug: activity-only", "  lifecycle: announced", "",
+      "- slug: alpha", "  lifecycle: announced", "- slug: activity-only", "  lifecycle: announced",
+      "- slug: already-flipped", "  lifecycle: mainnet   # ruling C: mainnet rests on the project's own posts", "",
     ].join("\n"));
     for (const slug of ["alpha", "activity-only"])
       await writeFile(join(temp, "projects", `${slug}.yaml`), `slug: ${slug}\nlifecycle: announced\n`);
+    await writeFile(
+      join(temp, "projects", "already-flipped.yaml"),
+      "slug: already-flipped\nlifecycle: mainnet\nlifecycle_source: pulled 0x9999999999999999999999999999999999999999 2026-08-01T00:00:00.000Z\n",
+    );
     const address = "0x1111111111111111111111111111111111111111";
     const pulled = (pairs) => [
       "slug: fixture", "chain: robinhood-chain", "addresses:", `  - address: "${address}"`, "    is_contract: true",
@@ -340,7 +345,17 @@ await test("lifecycle migration requires a contract and pair and records its rec
     assert.deepEqual(await migrateLifecycle(temp), [{ slug: "alpha", address, createdAt: "2026-09-03T10:00:00.000Z" }]);
     assert.match(await readFile(join(temp, "projects", "alpha.yaml"), "utf8"), new RegExp(`lifecycle_source: pulled ${address} 2026-09-03T10:00:00.000Z`));
     assert.match(await readFile(join(temp, "projects", "activity-only.yaml"), "utf8"), /lifecycle: announced/);
+
+    // The census comment names the receipt, both on the row just flipped and on one flipped earlier;
+    // a note explaining why the row used to be announced never outlives the flip.
+    const flippedCensus = await readFile(join(temp, "census.yaml"), "utf8");
+    assert.match(flippedCensus, new RegExp(`^  lifecycle: mainnet   # pulled: ${address} 2026-09-03T10:00:00.000Z$`, "m"));
+    assert.match(flippedCensus, /^ {2}lifecycle: mainnet {3}# pulled: 0x9999999999999999999999999999999999999999 2026-08-01T00:00:00.000Z$/m);
+    assert.ok(!flippedCensus.includes("ruling C"), flippedCensus);
+    assert.match(flippedCensus, /^- slug: activity-only\n {2}lifecycle: announced$/m, "an unflipped row is untouched");
+
     assert.deepEqual(await migrateLifecycle(temp), [], "migration rerun is idempotent");
+    assert.equal(await readFile(join(temp, "census.yaml"), "utf8"), flippedCensus, "the comment pass is idempotent too");
   } finally { await rm(temp, { recursive: true, force: true }); }
 });
 
