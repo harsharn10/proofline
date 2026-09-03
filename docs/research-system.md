@@ -199,7 +199,11 @@ only one bot writes main at a time — and runs `scripts/compile-inbox.mjs`:
 3. **Compile.** Oldest `as_of` first, so a later packet supersedes an earlier one in the same batch. Each
    packet goes through the same `compile()` path as `scripts/compile-packet.mjs`, and every notice —
    auto-tagged paragraph, skipped metric, skipped deployment, lifecycle kept — is collected per packet.
-4. **Gate.** `npm run validate:release` must report 0 errors and `npm run score` must succeed. When every
+4. **Gate.** `npm run validate:release` must report 0 errors and `npm run score` must succeed. An identity
+   collision names two slugs and is filed against the established packet, which the batch never touched:
+   whichever side is *new* in this batch is the duplicate, both error lines are charged to it, and it is
+   skipped as `duplicate of <existing slug> on the official handle/domain; write an update packet for
+   <existing slug> instead of a new name`. The established name always keeps the slug. Otherwise, when every
    gate error names a slug this run compiled — a banned word that reached a summary, internal vocabulary
    in a finding — those packets are dropped, the batch is recompiled from main without them, and the
    gates run again, up to three times: one packet's prose must not hold up the other thirty. When even

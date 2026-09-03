@@ -208,24 +208,67 @@ const SLUG_PATTERNS = [
   /^changelog\.yaml: \[\d+\] \S+ ([a-z0-9][a-z0-9-]*) /,
 ];
 
+/** `<packet path>: identity matches canonical slug <slug> on <surface>; record it under …` */
+const IDENTITY_MATCH_RE = /^research\/inbox\/packets\/([a-z0-9][a-z0-9-]*)\/[^:]+: identity matches canonical slug ([a-z0-9][a-z0-9-]*) on (.+?); record it under/;
+/** `census identity "<name>" on <slug> collides with canonical slug <slug>` (scripts/lib/checks.mjs) */
+const CENSUS_IDENTITY_RE = /^census identity "[^"]*" on ([a-z0-9][a-z0-9-]*) collides with canonical slug ([a-z0-9][a-z0-9-]*)$/;
+
 /**
- * Which slugs a gate's output blames, and how many of its errors name no slug at all. A batch whose
- * every gate error points at a packet this run compiled can be retried without those packets; one
- * error that names site.yaml, accounts.yaml or a slug nobody touched cannot be fixed by dropping
- * anything, and the run stops.
+ * Which slugs a gate's output blames, which of them are duplicates of a name the registry already has,
+ * the error lines behind each, and how many errors name no slug at all. A batch whose every gate error
+ * points at a packet this run compiled can be retried without those packets; one error that names
+ * site.yaml or a slug nobody touched cannot be fixed by dropping anything, and the run stops.
+ *
+ * An identity collision is the one error that names *two* slugs, and by default the wrong one: the line
+ * is filed against the established packet — `research/inbox/packets/downto/…: identity matches canonical
+ * slug dtf` — which this run never touched, so the whole batch used to abort over a newcomer that is
+ * only a second name for something already covered. Whichever of the pair is new in this batch is the
+ * duplicate: the established name keeps the slug, both lines are charged to the newcomer, and dropping
+ * the newcomer clears them.
  */
-export function failingSlugs(output) {
+export function failingSlugs(output, newcomers = new Set()) {
   const slugs = new Set();
+  const duplicates = new Map();
+  const lines = new Map();
   let unattributed = 0;
+  const blame = (slug, message) => {
+    slugs.add(slug);
+    if (!lines.has(slug)) lines.set(slug, []);
+    lines.get(slug).push(message);
+  };
+
   for (const line of String(output).split("\n")) {
     if (!line.startsWith("error ")) continue;
     const message = line.slice("error ".length);
+
+    const identity = message.match(IDENTITY_MATCH_RE);
+    const registry = identity ? null : message.match(CENSUS_IDENTITY_RE);
+    const pair = identity
+      ? { a: identity[1], b: identity[2], surface: identity[3] }
+      : registry ? { a: registry[1], b: registry[2], surface: null } : null;
+    if (pair) {
+      const newcomer = newcomers.has(pair.a) ? pair.a : newcomers.has(pair.b) ? pair.b : null;
+      if (newcomer) {
+        const other = newcomer === pair.a ? pair.b : pair.a;
+        const known = duplicates.get(newcomer);
+        if (!known) duplicates.set(newcomer, { other, surface: pair.surface });
+        else if (pair.surface && !known.surface) known.surface = pair.surface;
+        blame(newcomer, message);
+        continue;
+      }
+      // Neither side is new: two established rows disagreeing is a controller's problem, not a batch's.
+    }
+
     const match = SLUG_PATTERNS.reduce((found, pattern) => found ?? message.match(pattern), null);
-    if (match) slugs.add(match[1]);
+    if (match) blame(match[1], message);
     else unattributed++;
   }
-  return { slugs, unattributed };
+  return { slugs, unattributed, duplicates, lines };
 }
+
+/** How a skipped duplicate is explained to the producer on its PR. */
+export const duplicateReason = ({ other, surface }) =>
+  `duplicate of ${other} on ${surface ?? "the official handle/domain"}; write an update packet for ${other} instead of a new name`;
 
 export async function compileInbox({ branches = [], dry = false, remote = "origin", fetch = true, base = `${remote}/main`, log = console.log } = {}) {
   const dirty = await git(["status", "--porcelain", "--", CONTENT_DIR, PACKET_ROOT]);
@@ -246,7 +289,7 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
   const report = {
     generated_at: new Date().toISOString(),
     dry, base, branches: [], compiled: [], inventory: [], notices: [],
-    gates: {}, shareBar: null, packetPaths: [], preexistingErrors: [], packetWarnings: [],
+    gates: {}, shareBar: null, packetPaths: [], preexistingErrors: [], packetWarnings: [], duplicates: [],
   };
 
   // 1. Collect. Every candidate lands in the working tree before anything is validated, so the
@@ -271,6 +314,8 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
   // 2. Validate. A packet with errors goes back the way main has it and is reported against its branch;
   //    the rest of the batch carries on.
   const census = parse(await readFile(join(CONTENT_DIR, "census.yaml"), "utf8")) ?? [];
+  // The registry as main has it, before anything in this batch is compiled: everything else is a newcomer.
+  const existingSlugs = new Set(census.map((row) => row.slug));
   let live = candidates;
   for (let pass = 0; pass < VALIDATION_PASSES; pass++) {
     const { errors, warnings } = await validatePacketDirectory(PACKET_ROOT, census);
@@ -361,22 +406,27 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
     if (validate.ok && score.ok) break;
 
     const failed = validate.ok ? score : validate;
-    const { slugs, unattributed } = failingSlugs(failed.output);
+    // A newcomer is a slug this batch compiled that the registry did not already have. Only a newcomer
+    // can be a duplicate of an established name, and only a newcomer can be dropped to clear one.
+    const newcomers = new Set(batch.map((candidate) => candidate.packet.frontmatter.slug).filter((slug) => !existingSlugs.has(slug)));
+    const { slugs, unattributed, duplicates, lines } = failingSlugs(failed.output, newcomers);
     const offenders = batch.filter((candidate) => slugs.has(candidate.packet.frontmatter.slug));
     const fixable = slugs.size > 0 && unattributed === 0 && offenders.length === slugs.size;
     if (!fixable || attempt === GATE_ATTEMPTS) break;
     log(`gate failed on ${[...slugs].join(", ")} — dropping those packets and recompiling the rest`);
     await restoreWorkingTree();
-    const byLine = new Map([...slugs].map((slug) => [slug, []]));
-    for (const line of failed.output.split("\n")) {
-      if (!line.startsWith("error ")) continue;
-      for (const slug of slugs) if (line.includes(`/${slug}.`) || line.includes(`/${slug}/`) || line.includes(` ${slug} `)) byLine.get(slug).push(line.slice("error ".length));
-    }
-    for (const candidate of offenders)
+    for (const candidate of offenders) {
+      const slug = candidate.packet.frontmatter.slug;
+      const duplicate = duplicates.get(slug);
+      if (duplicate) report.duplicates.push({ slug, branch: candidate.branch, path: candidate.path, ...duplicate });
       candidate.report.skipped.push({
         path: candidate.path,
-        errors: [`the compiled content failed a content gate, so this packet was left out of the batch:`, ...byLine.get(candidate.packet.frontmatter.slug)],
+        errors: [
+          duplicate ? duplicateReason(duplicate) : "the compiled content failed a content gate, so this packet was left out of the batch:",
+          ...(lines.get(slug) ?? []),
+        ],
       });
+    }
     batch = batch.filter((candidate) => !offenders.includes(candidate));
   }
   report.gates.validate = { ok: validate.ok, output: tail(validate.output) };
@@ -442,6 +492,12 @@ export function renderReport(report) {
     lines.push(`- after: ${report.shareBar.after.length} name(s)`);
     lines.push(`- added: ${report.shareBar.added.join(", ") || "none"}`);
     lines.push(`- removed: ${report.shareBar.removed.join(", ") || "none"}`);
+    lines.push("");
+  }
+  if (report.duplicates.length) {
+    lines.push("## Duplicate names (skipped, not compiled)");
+    for (const entry of report.duplicates)
+      lines.push(`- **${entry.slug}** — ${duplicateReason(entry)} (\`${entry.path}\`)`);
     lines.push("");
   }
   if (report.packetWarnings.length) {

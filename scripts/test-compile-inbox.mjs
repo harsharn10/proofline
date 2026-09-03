@@ -12,7 +12,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { parse } from "yaml";
-import { compileInbox, inventoryCandidateCount, isInventoryPacket } from "./compile-inbox.mjs";
+import { compileInbox, duplicateReason, failingSlugs, inventoryCandidateCount, isInventoryPacket } from "./compile-inbox.mjs";
 import { runCompile } from "./compile-packet.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -90,7 +90,6 @@ async function fixtureRepo(packets) {
   process.chdir(work);
   try { await runCompile({ packetPath: seedPath, contentDir: join(work, "content") }); }
   finally { process.chdir(previous); }
-  await rm(dirname(seedPath), { recursive: true, force: true });
 
   await git(work, "add", "-A");
   await git(work, "commit", "-q", "-m", "fixture: main with one project");
@@ -284,6 +283,80 @@ await test("an inventory packet is counted and kept as a record, never compiled"
     assert.ok(existsSync(join(work, packetPath("candidates", "WORK-20260903-grok-heavy-candidates"))),
       "the inventory is still kept as a record on main");
   } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+// The 2026-09-03 12:17, 17:27 and 22:07 runs all died here: two newcomers were second names for rows the
+// registry already had, and the collision was filed against the *established* packet, which the batch had
+// not touched — so the recovery had nothing it was allowed to drop and the whole run exited 2.
+await test("a newcomer that duplicates an established name is skipped, and the batch still lands", async () => {
+  // `alp` records alpha under possible_matches, so the packet itself validates; it collides only once it
+  // is compiled and the registry holds two rows claiming @alpha.
+  const duplicate = packetFor({
+    slug: "alp", name: "Alpha Redux", symbol: "ALR", address: "0x6666666666666666666666666666666666666666",
+    workId: "WORK-20260903-grok-heavy-alp",
+    mutate: (text) => text
+      .replace('official_handle: "@alp"', 'official_handle: "@alpha"')
+      .replace("aliases: []", 'aliases: [Alpha]')
+      .replace("possible_matches: []", 'possible_matches: [{ slug: alpha, signals: [shared-handle], contrary_signals: ["different address"] }]'),
+  });
+  const { root, work } = await fixtureRepo({
+    [packetPath("beta", "WORK-20260903-grok-heavy-beta")]: VALID,
+    [packetPath("alp", "WORK-20260903-grok-heavy-alp")]: duplicate,
+  });
+  try {
+    const report = await run(work, { branches: [PRODUCER_BRANCH] });
+    assert.equal(report.ok, true, "the batch recompiles without the duplicate and passes its gates");
+    assert.deepEqual(report.compiled, ["beta"], "the clean packet still lands");
+    assert.deepEqual(
+      report.duplicates.map((entry) => [entry.slug, entry.other]), [["alp", "alpha"]],
+      "the newcomer is the duplicate, never the established row",
+    );
+    assert.match(report.duplicates[0].surface, /@alpha/);
+    assert.ok(!existsSync(join(work, "content/projects/alp.yaml")), "no second row for a name the registry has");
+    assert.ok(existsSync(join(work, "content/projects/alpha.yaml")), "the established row is untouched");
+    assert.ok(!existsSync(join(work, packetPath("alp", "WORK-20260903-grok-heavy-alp"))));
+
+    const branch = report.branches.find((entry) => entry.branch === PRODUCER_BRANCH);
+    assert.equal(branch.skipped.length, 1);
+    assert.equal(branch.skipped[0].path, packetPath("alp", "WORK-20260903-grok-heavy-alp"));
+    assert.match(branch.skipped[0].errors[0], /^duplicate of alpha on .*; write an update packet for alpha instead of a new name$/);
+    // The line filed against main's own packet is charged to the newcomer, not left to abort the run.
+    assert.ok(
+      branch.skipped[0].errors.some((error) => error.startsWith("research/inbox/packets/alpha/")),
+      branch.skipped[0].errors.join("; "),
+    );
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+await test("identity collisions are charged to whichever side of the pair is new in this batch", () => {
+  // Verbatim from the 2026-09-03 22:07 run.
+  const output = [
+    'error census identity "Down to Finance" on dtf collides with canonical slug downto',
+    'error census identity "Longbow" on bow collides with canonical slug longbow',
+    "error research/inbox/packets/downto/WORK-20260902-grok-bot-downto.md: identity matches canonical slug dtf on the official handle @downto_finance; record it under identity.possible_matches",
+    "error research/inbox/packets/downto/WORK-20260903-grok-heavy-icarus-research.md: identity matches canonical slug dtf on the official handle @downto_finance; record it under identity.possible_matches",
+    "error research/inbox/packets/longbow/WORK-20260903-grok-heavy-icarus-research.md: identity matches canonical slug bow on the official handle @longbowlend; record it under identity.possible_matches",
+    'error research/saylormoon.md: banned word "moon"',
+  ].join("\n");
+
+  const blamed = failingSlugs(output, new Set(["dtf", "bow", "saylormoon"]));
+  assert.deepEqual([...blamed.slugs].sort(), ["bow", "dtf", "saylormoon"], "never downto or longbow");
+  assert.equal(blamed.unattributed, 0, "a census identity collision is attributed, not counted as unfixable");
+  assert.deepEqual(blamed.duplicates.get("dtf"), { other: "downto", surface: "the official handle @downto_finance" });
+  assert.deepEqual(blamed.duplicates.get("bow"), { other: "longbow", surface: "the official handle @longbowlend" });
+  assert.equal(blamed.lines.get("dtf").length, 3, "both forms of the error follow the newcomer");
+  assert.equal(blamed.lines.get("saylormoon").length, 1);
+  assert.equal(
+    duplicateReason(blamed.duplicates.get("dtf")),
+    "duplicate of downto on the official handle @downto_finance; write an update packet for downto instead of a new name",
+  );
+
+  // With no newcomer on either side the pair is two established rows: nobody in the batch can fix it, so
+  // the line falls back to the packet it was filed against and the run stops rather than dropping someone.
+  const stale = failingSlugs(output, new Set());
+  assert.deepEqual([...stale.slugs].sort(), ["downto", "longbow", "saylormoon"]);
+  assert.equal(stale.duplicates.size, 0);
+  assert.equal(stale.unattributed, 2, "the two census identity lines name no packet path");
 });
 
 await test("inventory detection reads both the reserved slug and an unknown-entity inventory name", () => {
