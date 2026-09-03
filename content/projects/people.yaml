@@ -1,0 +1,135 @@
+slug: people
+name: people
+symbol: people
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned onto a Pons v2 bonding curve quoted against native ETH, then graduated into a Uniswap v4 people/ETH pool. peoplemust.work spends that token to mint a People ERC-721 (hirePrice 33,333) assigned to stock-token offices. Traders buy and sell people on Uniswap v4.
+themes:
+  - memecoin
+  - bonding-curve
+  - nft
+  - graduation
+official_links:
+  - kind: site
+    url: https://peoplemust.work/
+  - kind: app
+    url: https://peoplemust.work/people-see
+  - kind: x
+    url: https://x.com/peopleonline_
+  - kind: x
+    url: https://x.com/0xcurs
+  - kind: app
+    url: https://www.ponsfamily.com/launchpad/0xD1efCE38684400cfE7343Ab52De8d1fbe4c54f18
+dependencies: []
+deployments:
+  - label: people token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0xD1efCE38684400cfE7343Ab52De8d1fbe4c54f18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S6
+  - label: PonsV2LaunchFactory
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: PonsV2BondingCurve (people launch curve)
+    chain: robinhood-chain
+    address: "0x1E99cf99910b8A586c803eDDcd7Aa76045f0a2f1"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S6
+  - label: PonsV2LaunchDeployer (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: other
+    verified: false
+    sources:
+      - S1
+      - S16
+  - label: People ERC-721 (people online NFT)
+    chain: robinhood-chain
+    address: "0x2e5AC9353c3E30Ef7439124dE13aF8fc350AD836"
+    role: other
+    verified: true
+    sources:
+      - S12
+      - S17
+  - label: V2LaunchLocker
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: other
+    verified: false
+    sources:
+      - S6
+      - S18
+  - label: Uniswap v4 PoolManager (people/ETH book)
+    chain: robinhood-chain
+    address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
+    role: other
+    verified: false
+    sources:
+      - S1
+      - S6
+metrics:
+  - kind: volume_24h
+    value: 1104020.2
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 32762.99
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 125554
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 1661
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/curve/NFT and both launch/graduation txs, RPC name/symbol/curve/launchFactory/socials/dead/NFT views, DexScreener, Gecko token/pool/search, peoplemust.work + deployments.json, @peopleonline_ profile and burn/founder posts, @peoplehoodx, and the vote post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8 R-12] - Numbers: 1104020.2 is the DexScreener people/ETH v4 pool 24h volume, not Gecko token all-pools 1208550.89. Reserve 32762.99 is that Dex pair; Gecko reserve 29911.70 is the same pool, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that @peoplehoodx 0xCDAdB6…b7dF is the official people token and 0xD1efCE…4f18 is a copy. Token socials(), DexScreener profile, and peoplemust.work payToken all reprint 0xD1efCE…4f18; @peoplehoodx reprints a different CA."
+      class: inference
+      sources:
+        - S12
+        - S19
+    - text: Quote is native ETH 0x0000…0000, not WETH 0x0Bd7…AD73 and not a stock token; Gecko still labels the book people/WETH. [verified R-7 R-8] - Same-ticker people tokens 0xCDAdB6…b7dF and 0x9f1B29…6Cd2 share the name. [claim R-19 R-20] - Netlify vote URL is a third-party-link, not on peoplemust.work. [claim R-15] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does peoplemust.work bidirectionally list the ERC-20 CA on the HTML homepage, or only in deployments.json / payToken? Next: re-read /buy and /how-it-works for a visible CA string"
+    - text: "Is 0xCDAdB6…b7dF / @peoplehoodx a fork of the same product, and does it share any deployer with 0xD1efCE…4f18? Next: RPC name/symbol/factory on 0xCDAdB6 and compare creator"
+    - text: "Who can change hirePrice / hiringOpen / office stock addresses on People.sol? Next: read setter access modifiers on src/People.sol via the explorer"
+    - text: "Does factory Ownable / fee recipient 0x263ed295…019Dd retain a path after graduation? Next: eth_call factory owner() and read executeCreatorFeeRecipientChange timelock"
+    - text: "Which Gecko window printed people/WETH vol ~$1,523,087 / liq ~$30,202? Next: archive a Gecko pool screenshot if the ~$1.52M window returns"
+  unresolved: []

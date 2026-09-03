@@ -1,0 +1,121 @@
+slug: oilcoin
+name: OilCoin
+symbol: OILCOIN
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against United States Oil Fund • Robinhood Token (USO). LongLauncher.create on 2026-09-02 minted OilCoin (OILCOIN) and seeded the OILCOIN/USO book. Traders buy and sell OILCOIN against USO. USO is the quote rail, not the subject. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:uso
+  - rwa
+  - graduation
+official_links: []
+dependencies: []
+deployments:
+  - label: OILCOIN token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S6
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S13
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S1
+      - S6
+      - S13
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S14
+  - label: USO Stock Token rail (pair quote)
+    chain: robinhood-chain
+    address: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
+    role: token
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S10
+      - S11
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S6
+metrics:
+  - kind: volume_24h
+    value: 855733.74
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 42823.7
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 46321
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 145
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/USO and the create tx, RPC name/symbol/owner/getAssetData/tokenURI, DexScreener token/pair/search, Gecko HTML, /rhj/assets, GitHub search, and X user/keyword search were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-6 R-7 R-10] - Numbers: 855733.74 is the DexScreener OILCOIN/USO pair 24h volume, not an all-pools figure. Liquidity 42823.7 is that pool. Gecko HTML $839.03K / $40,657.67 is the same pair, different aggregator. [claim R-7 R-9] - Adversarial: the strongest contrary reading is that this is packed CRUDECAT, in-flight GASOLINU, or the USO issuer. Those have different CAs; USO 0xa30FA3…D344 is the /rhj/assets rail, not the memecoin."
+      class: inference
+      sources:
+        - S10
+        - S16
+        - S19
+    - text: Quote token USO 0xa30FA3…D344 is the Robinhood Stock Token rail in GET /rhj/assets; OILCOIN is not. [verified R-10 R-11] - Pool USD reserve is OILCOIN plus USO, not a USDG or WETH backstop. [claim R-7] - Gecko HTML $40,657.67 vs DexScreener 42823.7 on the same pool. [claim R-7 R-9] - Same-ticker clones (OIL 0x9D438Ee3…1e18, OILCOIN/USAR 0x0F9D2c46…1E18) and colliding OilCoin handles. [claim R-8 R-16 R-17] - Distinct from packed CRUDECAT and from GASOLINU; merging them would misstate the pad and the book. [verified R-16 R-19] - No official handle or domain this pass. [claim R-7 R-17] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x9CB19d6e…1E18? Next: re-read DexScreener token profile after a Claim Profile; fetch tokenURI JSON from another IPFS gateway; search new posts that embed the CA and a handle"
+    - text: "Does Gecko JSON later return pool volume/reserve that can be cited beside DexScreener 855733.74 / 42823.7? Next: retry api.geckoterminal.com/api/v2/networks/robinhood/pools/0x413dc2a6…fbe1 with Mozilla UA; do not loop on 429"
+    - text: "Do Lock beneficiaries 0x21E2ce70…7A66 (5%) and 0x33Eb5e5d…bbF4 (95%) still control USO-side fees after graduation? Next: read Doppler lock / fee collector state and any LongFeeVaultFactory deployVault for this token"
+    - text: "Should ticker clones OIL 0x9D438Ee3…1e18 or OILCOIN 0x0F9D2c46…1E18/USAR get their own packets? Next: only if an assignment names those CAs"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

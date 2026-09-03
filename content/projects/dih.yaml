@@ -1,0 +1,127 @@
+slug: dih
+name: DIH
+symbol: DIH
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched on Pons v2 against MSFT, then graduated into a Uniswap v4 DIH/MSFT pool. PonsV2LaunchAndBuy deploys dih (DIH) in one launch call (here wrapped in Multicall3), fills a bonding curve, and createGraduatedPool seeds the DIH/MSFT book. Traders buy and sell DIH on that Uniswap v4 pool. MSFT is the pair rail, not the subject. Distinct from CLIPPY/MSFT. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:msft
+  - rwa
+  - pons-graduation
+official_links:
+  - kind: x
+    url: https://x.com/dihpons
+  - kind: site
+    url: https://www.justdih.com/
+dependencies: []
+deployments:
+  - label: DIH token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0x8A3bD7F2ef7b5d2D2a0F6BeF8B9bAaAd5A592B63"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: Pons v2 bonding curve
+    chain: robinhood-chain
+    address: "0x54264738a12B273e2cF7FE46F36E7f72Ac2A7a17"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S6
+  - label: PonsV2LaunchFactory
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+  - label: PonsV2LaunchAndBuy
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S4
+  - label: PonsV2LaunchDeployer
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: other
+    verified: false
+    sources:
+      - S1
+      - S3
+  - label: MSFT Microsoft • Robinhood Token (pair rail)
+    chain: robinhood-chain
+    address: "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S10
+      - S11
+  - label: V2LaunchLocker
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S12
+metrics:
+  - kind: volume_24h
+    value: 2090370.50735248
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 64191.42
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 678524.33
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: holders
+    value: 2530
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/MSFT/CLIPPY and launch, CurveCompleted, and createGraduatedPool txs, RPC name/symbol/factory/stock/graduated, DexScreener DIH and CLIPPY, Gecko pool/token, /rhj/assets, justdih.com, @dihpons, @r_xley, and the dex-paid post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-11] - Numbers: 2090370.51 is the Gecko DIH/MSFT pool 24h volume, not the 2584123.59 token all-pools figure. Reserve 64191.42 is that pool. DexScreener 2102718.58 / 69037.23 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this is CLIPPY/MSFT or the older Pons v1 Dih. CLIPPY is DopplerERC20V1 0x85856F…1E18 with clippyrh.com / @ClippyMSFT. Pons v1 Dih is 0x0c1e…9C74. This CA is Pons v2 0x8A3b…2B63."
+      class: inference
+      sources:
+        - S20
+        - S21
+    - text: "Quote token MSFT 0xe932…2e74 is a Robinhood Stock Token rail (GET /rhj/assets hit); USD pool reserve is DIH plus MSFT, not a USDG or WETH backstop. [verified R-11 R-10] - Pool USD reserve is DIH plus MSFT. [claim R-7 R-8] - Ticker collision: Pons v1 Dih 0x0c1e…9C74 and Dog In Hood 0x17bb…E4a4 also use DIH. [claim R-1] - No official handle or domain this pass; X and justdih.com are unconfirmed-official / third-party-link. [claim R-7 R-15 R-16] - No audit report URL this pass."
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x8A3b…2B63? Next: re-read DexScreener token profile after a Claim Profile; search new posts from @dihpons that embed the CA; fetch justdih.com JS bundles for a hardcoded CA"
+    - text: "Which other DIH tickers remain live, and do any share this deployer or factory? Next: eth_call launchFactory() on remaining search CAs if they stay in the book"
+    - text: "Does verified PonsV2LaunchFactory source leave any owner path that can reach this live curve or locked LP after graduation? Next: read createGraduatedPool and rescueSweptGraduation modifiers in src/v2/PonsV2LaunchFactory.sol on the explorer"
+    - text: "Does CLIPPY/MSFT remain the larger MSFT book, and does LONG still treat @ClippyMSFT as an OG pair? Next: re-read CLIPPY packet when that slug is seeded"
+  unresolved: []

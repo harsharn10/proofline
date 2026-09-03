@@ -1,0 +1,136 @@
+slug: beaver
+name: BEAVER
+symbol: BEAVER
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against SPCX. LongLauncher deploys BEAVERCOIN (BEAVER) in one create call and seeds the BEAVER/SPCX book. Traders buy and sell BEAVER on Uniswap v4. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:spcx
+  - rwa
+official_links: []
+dependencies: []
+deployments:
+  - label: BEAVERCOIN token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x6e401929BB5BEBB4807c462c8c9Fb8C6B76E1e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S4
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (create token factory field)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S6
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S5
+      - S6
+  - label: SPCX quote (create numeraire / pair quote)
+    chain: robinhood-chain
+    address: "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S10
+      - S21
+  - label: BEAVER ticker collision (Pons v2 Beaver, not this row)
+    chain: robinhood-chain
+    address: "0x6496D819C537673d4b3Efd981B99F7e4615Caf76"
+    role: token
+    verified: false
+    sources:
+      - S14
+      - S15
+      - S16
+  - label: PonsV2LaunchFactory (collision token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: false
+    sources:
+      - S15
+      - S19
+      - S27
+metrics:
+  - kind: volume_24h
+    value: 27180.7273430043
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 112503.87
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 202607
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 773
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/create tx/SPCX/Airlock/collision token and Pons txs, RPC with Mozilla UA, DexScreener, Gecko token/info/pool 404, /rhj/assets, Elon posts, @beaver_hood, cyberleek.lol, and ponsfamily launchpad were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-10] - Numbers: 1526719.52 is the DexScreener BEAVERCOIN/SPCX pool 24h volume, not Gecko token 27180.73. Reserve 112503.87 is that pool. Collision book volume 2082123.51 is 0x6496…af76, not this row. [claim R-7 R-8 R-16] - Adversarial: the strongest contrary reading is that Pons v2 0x6496…af76 is the official BEAVER because Gecko indexes it and DexScreener lists a website. That site is cyberleek.lol with no CA, the on-chain website HTML is a DJT bonding-curve page without 0x6496, and this row's token is the first LongLauncher SPCX book with higher liquidity."
+      class: inference
+      sources:
+        - S16
+        - S23
+        - S24
+    - text: Quote token SPCX is a Robinhood Stock Token rail; this subject is the memecoin, not SPCX. [verified R-10 R-21] - Pool USD reserve is BEAVERCOIN plus SPCX, not a USDG or WETH backstop. [claim R-7] - Ticker BEAVER is reused at 0x6496…af76 and 0xAfA1…18B0. Flag ca-collision. [verified R-14 R-16 R-25] - No official handle or domain this pass; Telegram was not located. [claim R-7 R-13] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does any surface bidirectionally confirm a project handle or domain for token 0x6e40…1e18? Next: re-read DexScreener after a Claim Profile and any LONG page that loads without 403"
+    - text: "Does Gecko later index Uniswap v4 pool 0x1d76…3598 so token volume matches the SPCX book? Next: re-GET the Gecko pool endpoint and compare volume_usd.h24 to DexScreener"
+    - text: "Does @beaver_hood later pin CA 0x6e40…1e18, and does DexScreener or LONG link that handle? Next: re-read the profile and DexScreener info.socials"
+    - text: "Is ponsfamily.com/launchpad/0xb6e47fab… meant to be the Pons v2 Beaver 0x6496…af76 page, or a different Beaver/DJT curve? Next: open the page after SPA hydration or match 0xb6e47fab to a curve/token via factory logs"
+    - text: "Is there an audit whose scope includes DopplerERC20V1 as used by LongLauncher on 4663? Next: auditor report index for Doppler / long.xyz and a matching commit"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

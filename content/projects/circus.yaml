@@ -1,0 +1,103 @@
+slug: circus
+name: Circus
+symbol: null
+category: Bonding-curve launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Circus is a Robinhood Chain token launchpad at circus.trade. Classic Curve launches a fixed-supply token onto an ETH bonding curve and graduates into a locked Uniswap pool. A second Fair Open lane is described as a Doppler locked Uniswap v4 pool with no bonding phase. The handle linked from the site footer is @circus_trade.
+themes:
+  - launchpad
+official_links:
+  - kind: site
+    url: https://circus.trade
+  - kind: app
+    url: https://circus.trade/create
+  - kind: docs
+    url: https://circus.trade/how-it-works
+  - kind: x
+    url: https://x.com/circus_trade
+  - kind: other
+    url: https://dune.com/0x_emerson/robinhood-memecoin-launchpads-comparison-30d
+  - kind: other
+    url: https://dune.com/okxweb3wallet/robinhood-chain-launchpads-rwa-paired-meme-analysis
+dependencies: []
+deployments:
+  - label: barcusLaunchpad / circusQuoteLaunchpad (ERC1967 proxy)
+    chain: robinhood-chain
+    address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S8
+      - S9
+  - label: Launchpad implementation (ERC1967 slot)
+    chain: robinhood-chain
+    address: "0x822E175C1ae12166A0Ea3299d083Da48E6C42B96"
+    role: implementation
+    verified: true
+    sources:
+      - S8
+      - S9
+      - S10
+  - label: CircusLocker (barcusLocker)
+    chain: robinhood-chain
+    address: "0xA256bC02dbB92ed1cB607a7DE7b0bbEBca29e930"
+    role: other
+    verified: true
+    sources:
+      - S3
+      - S11
+  - label: JS barcusTimelock
+    chain: robinhood-chain
+    address: "0xC126829B4b3782ad30484b298C762507bf9bCa2A"
+    role: timelock
+    verified: false
+    sources:
+      - S3
+      - S12
+  - label: Launchpad owner() / factory creator
+    chain: robinhood-chain
+    address: "0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681"
+    role: admin
+    verified: true
+    sources:
+      - S8
+      - S9
+  - label: circusQuoteLocker
+    chain: robinhood-chain
+    address: "0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S11
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: circus.trade, how-it-works, barcus-1 JS, X profile and posts, Emerson and OKX Dune, Llama protocols, GitHub org circus, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-3 R-8 R-13] - Numbers: token counts and volume are Dune aggregator rows, not Llama. Bytecode lengths, nonce, owner(), and the implementation slot are chain 4663 RPC. Site $1.20M / 41 graduated are HTML counters. [verified R-8] [claim R-13 R-14] - Adversarial: strongest contrary reading is that 0xb7fA…cb00 is a leftover quote-lane proxy and new launches use Doppler airlock 0xeb7C…0862, or that Emerson's Circus label is a registry alias for another pad. Official JS sets both barcusLaunchpad and circusQuoteLaunchpad to this address on chainId 4663; Emerson factory map labels it Circus. A second JS barcusLaunchpad 0x9F4e…D5Cf has no code on 4663. Pons, LONG, Varo, Coinbarrel, and LetsCash use different factories."
+      class: inference
+      sources:
+        - S3
+        - S8
+        - S13
+    - text: Factory is upgradeable; owner is one EOA with no code. [verified R-8] - Implementation source is not verified on Blockscout this pass. [verified R-10] - JS timelock is not the proxy owner; getMinDelay reverted. [verified R-8] [claim R-12] - Home Uniswap v3 versus how-it-works Uniswap v4 is an open conflict. [claim R-1 R-2] - No audit report URL. [unknown] - Emerson 30d DEX volume table omits Circus; OKX lifetime volume is a different method.
+      class: claim
+      sources:
+        - S13
+        - S14
+  missing:
+    - text: "Is launchpad implementation 0x822E…2B96 source-verified anywhere, and what is its source name? Next: read verified source if it lands; otherwise treat the proxy as shell-only"
+    - text: "Does a graduated Circus pair land in Uniswap v3 or v4, and which pool manager / nfpm from the JS map is used? Next: eth_getLogs or a graduated token (CRUDECAT 0xBD957Cc9…cF3e) against v3 and v4"
+    - text: "Is there an audit report whose scope matches factory 0xb7fA…cb00 and CircusLocker 0xA256…e930? Next: record any published report as a claim with the exact scope"
+    - text: "What is barcusTimelock 0xC126…a2A if getMinDelay() reverts, and does it control any proxy owner? Next: decode bytecode or verified source; eth_call roles if it is AccessManager"
+    - text: "Why do Emerson 30d tokens (597) and OKX lifetime tokens (2597) differ so far from factory nonce 4216, and why is Circus missing from Emerson 30d DEX volume? Next: do not mix the three figures; curve volume may sit outside dex.trades"
+    - text: "Is Fair Open / Doppler airlock 0xeb7C…0862 in production on circus.trade create, or only Classic Curve through 0xb7fA…cb00? Next: trace a Fair Open create tx if the UI exposes that lane"
+  unresolved:
+    - text: product.mechanism remains unresolved (CON-1).
