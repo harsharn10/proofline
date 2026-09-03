@@ -1,0 +1,115 @@
+slug: ass
+name: ASS
+symbol: ASS
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched into a Uniswap v4 pool quoted against LULU. Current RWAERC20LaunchpadFactory (o1 Launch Factory) deploys ASS in one createLaunch call and seeds the ASS/LULU book. Traders buy and sell ASS on Uniswap v4. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:lulu
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/dipwheeler
+dependencies: []
+deployments:
+  - label: ASS token
+    chain: robinhood-chain
+    address: "0x47cB7f9F0b6f4B7BbDa69Cb95F871a73C1687901"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S18
+  - label: RWAERC20LaunchpadFactory (token factory(); o1 current)
+    chain: robinhood-chain
+    address: "0xcE9C48cFa068947f77738c81Be406B53338E5B0d"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S5
+      - S21
+  - label: LaunchTokenDeployer (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0xf86dfDb678D8E5d932100Ef479A59fa65a82a5Eb"
+    role: factory
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S14
+  - label: LaunchHook (Uniswap v4 hook on ASS/LULU)
+    chain: robinhood-chain
+    address: "0x0310cFEbE1D7A69f2414f6595bBe9d17c5342aCc"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S13
+      - S18
+  - label: LULU Stock Token (pair quote / rhj rail)
+    chain: robinhood-chain
+    address: "0x4e62068525Ab11FE768e29dfD00ef909B9803016"
+    role: token
+    verified: true
+    sources:
+      - S9
+      - S12
+      - S18
+metrics:
+  - kind: volume_24h
+    value: 3791088.73
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 113655.57
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 867871.32
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 1340
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/LULU/hook/deployer/CAMELTOE and the createLaunch tx, RPC name/symbol/factory/owner/launchCreationEnabled, DexScreener token plus ASS LULU search plus Asscoin, Gecko pool/token/trending, /rhj/assets, o1 docs HTML, and X from:DipWheeler / CA posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-8 R-12] - Numbers: 3791088.73 is the Gecko ASS/LULU pool 24h volume, not the 4073878.81 token all-pools figure. Reserve 113655.57 is that pool. DexScreener 3879046.05 / 120519.64 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that ASS is the same name as CAMELTOE/LULU, Asscoin/SPY, or an official Lululemon product. CAMELTOE factory() is 0xe64A…F297 with token 0xc32B…F201. Asscoin is 0x0aB1…70A7 on SPY. LULU is the rhj rail, not the meme. No official Lululemon handle was located for this token."
+      class: inference
+      sources:
+        - S12
+        - S15
+        - S16
+        - S17
+    - text: Quote token LULU 0x4e62…3016 is a Robinhood Stock Token rail in GET /rhj/assets; pool USD reserve is ASS plus LULU, not a USDG backstop. [verified R-8 R-12] - Current factory launchCreationEnabled is true; CAMELTOE/LULU is a different token on 0xe64A…F297. [verified R-5 R-15 R-16] - DexScreener social is a third-party-link; no official handle or domain this pass. [claim R-7 R-19] - Ticker ASS is reused by Asscoin 0x0aB1…70A7 on an ASS/SPY book. [claim R-17] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x47cB…7901? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle"
+    - text: "Is token 0x47cB…7901 source later verified on Blockscout, and does it match LaunchTokenDeployer output? Next: re-fetch api/v2/smart-contracts/0x47cB…7901"
+    - text: "Does createLaunch metadata ipfs://bafkreidkbbhg5ftq3zbajclp6p5z2tjsehh6zysejgossaczzfwueaicmi list a site or handle? Next: retry ipfs gateway or Blockscout token metadata"
+    - text: "Does launch.o1.exchange/coin/0x47cB…7901 show the launch page and any socials? Next: retry the o1 coin page"
+    - text: "Can factory owner 0x5519a8…044D change fees or quotes on live ASS/LULU while launchCreationEnabled is true? Next: read remaining Ownable modifiers on src/RWAERC20LaunchpadFactory.sol and ERC20LaunchpadFactory.sol"
+  unresolved: []

@@ -1,0 +1,125 @@
+slug: palantard
+name: PALANTARD
+symbol: PALANTARD
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against Palantir Technologies • Robinhood Token. LongLauncher.create deployed Palantard (PALANTARD) on 2026-09-02 and seeded the PALANTARD/PLTR book. Traders buy and sell PALANTARD on Uniswap v4. PLTR is the pair rail, not this token. No official site was located this pass.
+themes:
+  - memecoin
+  - stock-paired:pltr
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/Palantards
+  - kind: app
+    url: https://app.long.xyz/tokens/0x0a2329aA1b3eEFE403aB3be5f5683d31Ebf81e18
+dependencies: []
+deployments:
+  - label: PALANTARD token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x0a2329aA1b3eEFE403aB3be5f5683d31Ebf81e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S5
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S15
+      - S18
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S21
+  - label: PLTR Palantir Technologies • Robinhood Token (pair quote / numeraire)
+    chain: robinhood-chain
+    address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S7
+      - S12
+      - S16
+metrics:
+  - kind: volume_24h
+    value: 714906.77
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 109720.68
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 163597.5
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 390
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/launcher/Airlock/PLTR and the create tx plus logs, RPC name/symbol/owner/code, DexScreener token and search, Gecko pool/token, /rhj/assets, and the @Palantards / @palantardmeme posts were opened on 2026-09-03 and excerpts copied from the responses. Gecko token/info returned 429 and was not retried. [verified R-1 R-5 R-8 R-12] - Numbers: 680493.53 is the Gecko PALANTARD/PLTR pool 24h volume, not the 682821.69 token all-pools figure. Reserve 71104.55 is that pool. DexScreener 714906.77 / 109720.68 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that PALANTARD is the LONG protocol, packed GOYBEAM, Palantir Inc., or the PALZ / Solana namesake. Creation is LongLauncher.create of 0x0a23…1e18 against PLTR 0x894E…4F2A; the other names are different CAs; GET /rhj/assets lists PLTR as the quote rail only."
+      class: inference
+      sources:
+        - S4
+        - S12
+        - S19
+        - S20
+    - text: Quote token PLTR 0x894E…4F2A is the Robinhood Stock Token rail in GET /rhj/assets; this token is not PLTR. [verified R-12 R-16] - Pool USD reserve is PALANTARD plus PLTR, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko reserve $71k versus DexScreener liquidity $110k; do not average. [claim R-7 R-8] - No bidirectional official handle or domain this pass; @Palantards is unconfirmed-official. [claim R-7 R-10] - Name collision with PALZ 0x09a2…1e18 / @palantardmeme and a Solana PALANTARD mint. [claim R-19 R-20] - Distinct from packed GOYBEAM and from PLTITS/BOMBA/MONITOR. [verified R-20] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x0a23…1e18? Next: re-read the LONG app token page; search @longdotxyz for a PALANTARD post that names this CA"
+    - text: "Does @Palantards remain the only handle that publishes CA 0x0a23…1e18, versus @palantardmeme for PALZ 0x09a2…1e18? Next: keep ticker-only on PALZ / Solana mint; do not merge"
+    - text: "Why does Gecko label the PALANTARD/PLTR pool dex as bankr-robinhood while DexScreener and PoolManager Initialize say Uniswap v4? Next: same gap as packed GOYBEAM; do not treat bankr as a second venue"
+    - text: "Which USD liquidity figure should a card use when Gecko reserve is $71k and DexScreener liquidity is $110k? Next: keep both receipts; do not average"
+    - text: "Does r/palantards or Palantir Inc. have any product link to token 0x0a23…1e18? Next: do not treat the listed-stock community as an official token surface"
+  unresolved: []

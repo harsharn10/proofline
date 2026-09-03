@@ -1,0 +1,115 @@
+slug: normie
+name: NORMIE
+symbol: NORMIE
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched through PonsV2LaunchAndBuy onto a bonding curve quoted against the Robinhood SPY Stock Token. CurveCompleted / LaunchSwept ten minutes later seeded a Uniswap v4 NORMIE/SPY book. Traders buy and sell NORMIE on that book. The quote leg is the live SPY rail.
+themes:
+  - memecoin
+  - stock-paired:spy
+  - graduation
+official_links:
+  - kind: site
+    url: https://normie-rh.xyz
+  - kind: x
+    url: https://x.com/RH_normie
+dependencies: []
+deployments:
+  - label: NORMIE token
+    chain: robinhood-chain
+    address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S16
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S5
+      - S6
+      - S20
+  - label: PonsV2BondingCurve
+    chain: robinhood-chain
+    address: "0xB75ECc0B9D174738D680B416a5760d24162BbFa3"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S16
+  - label: PonsV2LaunchAndBuy (create tx to)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S4
+      - S16
+  - label: SPY Stock Token (pair quote / rhj rail)
+    chain: robinhood-chain
+    address: "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S17
+metrics:
+  - kind: volume_24h
+    value: 1801288.6
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 29635.03
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 128678
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 2408
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/launchAndBuy/SPY and both launch and graduation txs, RPC name/symbol/launchFactory/curve/socials/owner, DexScreener, Gecko pool/token (GET 200), /rhj/assets, normie-rh.xyz HTML/JS, @RH_normie, and the netlify vote post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8 R-12 R-14] - Numbers: 1801288.6 is the DexScreener NORMIE/SPY pool 24h volume, not the 1949123.00 Gecko token all-pools figure. Reserve 29635.03 DexScreener / 29759.15 Gecko is that pool. Gecko pool fdv 13.6M is SPY-as-base. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this CA is the PAIR/SPY or STRATTON/SPY book, or that SPY here is not the Robinhood Stock Token. PairLaunchpadV5 created PAIR 0x6b1d…66be, STRATTON is 0xb7eae…8360, STACKS is 0xD998…D94C, and GET /rhj/assets lists this SPY address as ASSET_STATUS_ACTIVE."
+      class: inference
+      sources:
+        - S7
+        - S12
+        - S16
+    - text: Quote token SPY 0x117c…4C0C is the rhj rail; pool USD reserve is NORMIE plus SPY, not a USDG backstop. [verified R-7 R-12] - PonsV2LaunchFactory is Ownable2Step; token source is not verified at this address. [verified R-1 R-6 R-20] - Ticker-only NORMIE ERC-20s exist on Blockscout; this packet is the 0x92ef7C…1612 / SPY book only. [claim R-1] - Copypasta-pattern netlify vote pages are third-party-link. [claim R-19] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does verified PonsV2LauncherToken source at a twin address (e.g. STRATTON 0xb7eae…8360) apply to this unverified 3248 B bytecode? Next: diff runtime bytecode against the verified PonsV2LauncherToken implementation excluding immutables"
+    - text: "What can PonsV2LaunchFactory owner 0x263e…19Dd change on an already-graduated NORMIE book? Next: read setter modifiers in contracts/src/v2/PonsV2LaunchFactory.sol on the explorer"
+    - text: "Is there an audit report for Pons V2 that covers this factory? Next: open ponsfamily.com docs / any auditor named on the Pons census row"
+    - text: "Do the robinhood-main-dex-*.netlify.app vote pages bidirectionally link to @RH_normie or the CA in a way that would clear copypasta-pattern? Next: leave as third-party-link unless the site or @RH_normie posts the same URL"
+    - text: "Are ticker-only NORMIE ERC-20s (e.g. 0x6a4900…645C, 0xAd765F…120C beanormie.com) still live enough to confuse a card? Next: if a second NORMIE/SPY book appears, file ca-collision / ticker-only against this slug"
+  unresolved: []

@@ -1,0 +1,108 @@
+slug: pipedog
+name: PIPEDOG
+symbol: PIPEDOG
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A fixed-supply ERC-20 that trades in a Uniswap v3 PIPEDOG/WETH 1% pool. An EOA minted 12,345,678,912 PIPEDOG to itself at construction and opened that pool on Robinhood Chain. Traders buy and sell PIPEDOG against WETH. pipedog.xyz publishes the contract on a Uniswap token URL and links @pipedog_.
+themes:
+  - memecoin
+  - dog
+official_links:
+  - kind: site
+    url: https://pipedog.xyz
+  - kind: x
+    url: https://x.com/pipedog_
+  - kind: telegram
+    url: https://t.me/pipedogpipe
+dependencies: []
+deployments:
+  - label: PIPEDOG token (fixed-supply ERC-20)
+    chain: robinhood-chain
+    address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S4
+  - label: Uniswap v3 PIPEDOG/WETH 1% pool
+    chain: robinhood-chain
+    address: "0xB7f10f74B39291b9290b779978e19A7637C742D6"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S13
+      - S14
+  - label: UniswapV3Factory (pool creator)
+    chain: robinhood-chain
+    address: "0x1f7d7550B1b028f7571E69A784071F0205FD2EfA"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S13
+      - S15
+  - label: WETH (pair quote)
+    chain: robinhood-chain
+    address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    role: token
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S13
+metrics:
+  - kind: holders
+    value: 8592
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: volume_24h
+    value: 2924896.88
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: tvl
+    value: 8421367.62
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: market_cap
+    value: 26740450
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/source/create tx/pool/factory, RPC name/symbol/totalSupply/owner/token0/token1/fee/factory, DexScreener tokens and token-pairs v1, Gecko token/pool/info (first GET 200), pipedog.xyz, Telegram preview, @pipedog_, @onenine_btc, and @olie100x were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-6 R-8 R-9] - Numbers: 2924896.88 is the DexScreener PIPEDOG/WETH v3 24h volume, not Gecko token all-pools 2899701.85. Reserve 8458551.02 is the Gecko pool slice; DexScreener liquidity.usd 8421367.62 is the same pair, different aggregator. Holders 8592 is Blockscout, not Gecko 8540. [claim R-1 R-6 R-7 R-8] - Adversarial: the strongest contrary reading is that PIPEDOG is a Pons or hood.fun graduation. creator_address_hash is an EOA, creation tx has to: null, and UniswapV3Factory only created the pool."
+      class: inference
+      sources:
+        - S1
+        - S3
+        - S13
+    - text: "Reverse official handle is unconfirmed: @pipedog_ is listed on the site but latest posts did not embed the CA. [claim R-9 R-11] - Telegram preview has no CA; flag third-party-link. [claim R-10] - Pool USD reserve is PIPEDOG plus WETH. [claim R-6 R-8] - No project audit report URL this pass. [unknown] - Deployer received the full 12.345B at construction; remaining deployer balance was not read this pass."
+      class: verified
+      sources:
+        - S3
+  missing:
+    - text: "Does @pipedog_ embed CA 0x5Cb6…d8A6 or pipedog.xyz in bio, website field, or a pinned post? Next: re-read the profile website field and any pinned post that names the CA"
+    - text: "Does t.me/pipedogpipe pin the CA or a site that cross-links? Next: open the join page / first messages if they become public without joining"
+    - text: "What share of the 12.345B supply still sits on deployer 0xa359…e814? Next: Blockscout api/v2/tokens/0x5Cb6…/holders"
+    - text: "Is there a project-specific audit beyond the OpenZeppelin ERC20 import? Next: search new docs or a report URL if the site adds one"
+  unresolved: []

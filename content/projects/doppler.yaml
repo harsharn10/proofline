@@ -1,0 +1,113 @@
+slug: doppler
+name: Doppler
+symbol: null
+category: Bonding-curve launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Doppler is an onchain token-launch protocol. Teams pass launch parameters into an Airlock contract, which wires a token factory, hook initializer, governance, and migrator. Price discovery is a static, multicurve, or dynamic auction; liquidity can migrate after the auction. Custom hooks can run when the market opens, on each swap, or at graduation. On Robinhood Chain the live Airlock is `0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862` and the token factory is DopplerERC20V1Factory `0x1B37D3a72082029c44B35B604Ea473617580b69a`. The handle is @dopplerprotocol; the site is doppler.lol. This slug is the protocol, not a LONG clone token.
+themes:
+  - launchpad
+official_links:
+  - kind: site
+    url: https://doppler.lol
+  - kind: app
+    url: https://app.doppler.lol
+  - kind: docs
+    url: https://docs.doppler.lol
+  - kind: x
+    url: https://x.com/dopplerprotocol
+  - kind: github
+    url: https://github.com/whetstoneresearch/doppler
+  - kind: whitepaper
+    url: https://www.doppler.lol/whitepaper.pdf
+  - kind: other
+    url: https://docs.doppler.lol/reference/contract-addresses
+dependencies: []
+deployments:
+  - label: Airlock (unified create entry)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S13
+      - S14
+  - label: DopplerERC20V1Factory
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S13
+      - S15
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S3
+      - S13
+      - S16
+  - label: DopplerHookInitializer
+    chain: robinhood-chain
+    address: "0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S13
+      - S26
+  - label: UniswapV4Initializer
+    chain: robinhood-chain
+    address: "0x6cce158B6D1747617fc218592B4D60B239B957ea"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S13
+      - S27
+  - label: Airlock owner (SafeProxy)
+    chain: robinhood-chain
+    address: "0x21E2ce70511e4FE542a97708e89520471DAa7A66"
+    role: multisig
+    verified: false
+    sources:
+      - S13
+      - S17
+      - S18
+metrics:
+  - kind: volume_24h
+    value: 2200000
+    currency: USD
+    as_of: 2026-09-01
+    class: claim
+    sources:
+      - S11
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: doppler.lol, app.doppler.lol, docs explainer/addresses/security/home, X profile and posts, RH Daily board, GitHub repo and Deployments.md, Llama 400, Gecko 429, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-3 R-13 R-14] - Numbers: bytecode lengths, nonces, owner(), getThreshold(), and chainId 0x1237 are chain 4663 RPC. Airlock tx counts are Blockscout counters. $2.2M is the RH Daily post, not an all-chains total. [verified R-13 R-19] [claim R-11] - Adversarial: strongest contrary reading is that this slug is LONG, because LONG tokens are DopplerERC20V1 clones and LONG's trusted factory is this address. LongLauncher `0x22e9…eeED`, app.long.xyz, and @longdotxyz are a separate wrapper. This packet is the protocol at doppler.lol / @dopplerprotocol."
+      class: inference
+      sources:
+        - S3
+        - S5
+        - S15
+    - text: "Airlock owner is a 3-of-6 Safe with no timelock named in the Robinhood contract table. [verified R-18] - Factory nonce 115600: many clones share one implementation. [verified R-13] - Audit reports were not matched to 4663 addresses this pass. [claim R-4] - Homepage omits Robinhood while docs list chain 4663. [claim R-1 R-3] - 24h volume is a social board, not Llama or explorer. [claim R-11] - Shared Airlock with LONG, STATICS, and EARN is infra, not identity."
+      class: claim
+      sources:
+        - S12
+  missing:
+    - text: "Which owner-only Airlock functions (create, setModuleState, migrate) remain callable by the 3-of-6 Safe, and is there a timelock in front of the Safe? Next: read verified src/Airlock.sol for onlyOwner paths and any timelock module"
+    - text: "Do the OpenZeppelin/Certora/Cantina reports scope Robinhood 4663 Airlock 0xeb7C…0862 and factory 0x1B37…b69a, or only earlier Base/Unichain deployments? Next: open the Drive folder and Cantina findings and record matching addresses"
+    - text: "What share of the 115600 factory nonce and 9126 Airlock txs is LONG/Bankr/STATICS versus app.doppler.lol launches? Next: sample Airlock.create logs vs LongLauncher.create"
+    - text: "Is there a Robinhood Chain TVL/fees adapter, given Llama protocol/doppler 400? Next: do not invent an all-chains figure; record any later chain-slice adapter"
+  unresolved: []

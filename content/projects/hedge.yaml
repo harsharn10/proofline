@@ -1,0 +1,119 @@
+slug: hedge
+name: Hedgehogs
+symbol: HEDGE
+category: Token-bound treasury NFT
+lifecycle: mainnet
+coverage: stub
+summary: Hedgehogs is a 3,333-seat NFT collection on Robinhood Chain. The official site describes each ERC-721 as a manager seat bound to an ERC-6551 account that also functions as an ERC-4626 vault holding tokenized stocks and listed tokens. The site publishes $HEDGE at 0x8226DDA5F73619DEdC671e09Be738fA308da1944 on chain 4663 and states the mint is sold out. The token and collection contracts exist on chain 4663; neither has verified source.
+themes:
+  - nft-treasury
+  - token-bound-nft
+  - vault
+  - rwa
+  - erc-20
+official_links:
+  - kind: site
+    url: https://hedgehogs.tech
+  - kind: app
+    url: https://hedgehogs.tech/app
+  - kind: x
+    url: https://x.com/HedgeOnHood
+  - kind: explorer
+    url: https://robinhoodchain.blockscout.com/address/0x8226DDA5F73619DEdC671e09Be738fA308da1944
+  - kind: explorer
+    url: https://robinhoodchain.blockscout.com/address/0xe044b7Ffad1aC2aa1c52Ee98d593c7981Bd09534
+  - kind: dexscreener
+    url: https://dexscreener.com/robinhood/0x7ec4a638b2c948c041712dc51e77b2d54429450abb24227b4259376872a6bd88
+  - kind: other
+    url: https://opensea.io/collection/hedgehogsonrh
+dependencies: []
+deployments:
+  - label: $HEDGE token (explorer name Hedge, ERC-20)
+    chain: robinhood-chain
+    address: "0x8226DDA5F73619DEdC671e09Be738fA308da1944"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S12
+  - label: Hedgehogs NFT collection (explorer name Hedgehogs, symbol HOG, ERC-721)
+    chain: robinhood-chain
+    address: "0xe044b7Ffad1aC2aa1c52Ee98d593c7981Bd09534"
+    role: token
+    verified: true
+    sources:
+      - S2
+      - S4
+      - S13
+  - label: Site-labeled NAV oracle
+    chain: robinhood-chain
+    address: "0xe77667d58f30bEAEF072B4ac386eE4eDE0519348"
+    role: other
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: Site-labeled UpgradePool
+    chain: robinhood-chain
+    address: "0xb5430F00154d21719c3CAa53508C96678167555D"
+    role: other
+    verified: true
+    sources:
+      - S2
+      - S6
+  - label: Site-labeled TSLA price feed (EACAggregatorProxy)
+    chain: robinhood-chain
+    address: "0x4A1166a659A55625345e9515b32adECea5547C38"
+    role: proxy
+    verified: false
+    sources:
+      - S1
+      - S7
+  - label: Site-labeled NVDA price feed (EACAggregatorProxy)
+    chain: robinhood-chain
+    address: "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15"
+    role: proxy
+    verified: false
+    sources:
+      - S1
+      - S7
+  - label: Site-labeled AAPL price feed (EACAggregatorProxy)
+    chain: robinhood-chain
+    address: "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0"
+    role: proxy
+    verified: false
+    sources:
+      - S1
+      - S7
+  - label: Site-labeled SPY price feed (EACAggregatorProxy)
+    chain: robinhood-chain
+    address: "0x319724394D3A0e3669269846abE664Cd621f9f6A"
+    role: proxy
+    verified: false
+    sources:
+      - S1
+      - S7
+metrics:
+  - kind: holders
+    value: 332
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S4
+review:
+  researcher: grok-bot
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk: []
+  missing:
+    - text: "Can owner() on the token, collection, and oracle change fees, NAV, or the upgrade path without a timelock? Next: Read verified source if it appears, or eth_call the fee/oracle setters and record the access modifier"
+    - text: "Do the remaining app CFG addresses (drip, dex adapter, bulk/convert routers, ownerDrip, topDripV2, listed stock-token CAs) exist on 4663 with the labeled names? Next: Reproduce each remaining CFG address on Blockscout and record contract name plus explorer_source_verified"
+    - text: "X Latest from @HedgeOnHood and follow-list handles this window? Next: Re-run Latest on @HedgeOnHood and the accounts.yaml follow list when X is readable"
+    - text: "Is there a DefiLlama protocol row or GitHub org still missing? Next: Watch Llama listings and any repository link the official pages add"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

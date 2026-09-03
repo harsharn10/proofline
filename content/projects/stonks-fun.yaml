@@ -1,13 +1,15 @@
 slug: stonks-fun
 name: Stonks.fun
 symbol: STONKS
-category: Launchpad · mechanism not classified
-lifecycle: announced
+category: Redeemable RWA basket
+lifecycle: mainnet
 coverage: stub
-summary: DN-404 launchpad on Doppler whose fees burn the $STONKS platform token; a rebrand toward RWA baskets is announced.
+summary: Onchain index baskets of Robinhood stock tokens. A user picks holdings, sets weights, and mints one ERC-20 that is fully backed and redeemable in kind. MAG7, DEGEN and SILICON are live; the builder is open. Fees burn $STONKS. @stonksdotfun runs stonks.fun. $STONKS is a Doppler DN-404 from the earlier Uniswap v3 pad.
 official_links:
   - kind: x
     url: https://x.com/stonksdotfun
+  - kind: app
+    url: https://stonks.fun
 dependencies: []
 deployments:
   - label: STONKS token / factory
@@ -16,6 +18,81 @@ deployments:
     role: factory
     verified: false
     sources: []
+  - label: STONKS token (DopplerDN404)
+    chain: robinhood-chain
+    address: "0x3F298f2b7306Bf9a9e7177Ca461C58c4c2FDfa4c"
+    role: token
+    verified: true
+    sources:
+      - S8
+      - S14
+      - S15
+      - S16
+  - label: DN404Factory
+    chain: robinhood-chain
+    address: "0x37A9Fa204a4d3A429FDED7e3469ab076C854Bc9d"
+    role: factory
+    verified: true
+    sources:
+      - S16
+      - S17
+  - label: StonksLauncherV3
+    chain: robinhood-chain
+    address: "0x2a71F10b41ff0882C7Be2A5c0644722314976b42"
+    role: factory
+    verified: true
+    sources:
+      - S18
+      - S24
+  - label: Basket factory
+    chain: robinhood-chain
+    address: "0xd21cdd54943cA962Ee6f13F0eB48e6f591870d4a"
+    role: factory
+    verified: true
+    sources:
+      - S20
+      - S25
+  - label: MAG7 basket (stonks MAG7)
+    chain: robinhood-chain
+    address: "0xA5eC9f044671b7EbD186b59272C3ab7cB88Ae891"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S19
+      - S20
+  - label: DEGEN basket (stonks DEGEN)
+    chain: robinhood-chain
+    address: "0xc7ceC00967266Ef50023904669c375baA4A33308"
+    role: token
+    verified: false
+    sources:
+      - S5
+      - S27
+  - label: SILICON basket (stonks SILICON)
+    chain: robinhood-chain
+    address: "0x68c6775Da99a028432FB2A0753DBeb91479868F4"
+    role: token
+    verified: false
+    sources:
+      - S5
+      - S28
+  - label: Basket cash-redeem router
+    chain: robinhood-chain
+    address: "0x5fF3F0896c587a316B92DA88dd2578b18399a4bC"
+    role: router
+    verified: true
+    sources:
+      - S5
+      - S26
+  - label: STONKS/USDG Uniswap v3 pool
+    chain: robinhood-chain
+    address: "0x37C0Bd9540B76bE0c947a07B4be5173B799C8167"
+    role: other
+    verified: false
+    sources:
+      - S21
+      - S22
 review:
   researcher: harsharn10
   approver: pending
@@ -34,10 +111,49 @@ findings:
       class: claim
       sources:
         - S3
+    - text: "Receipts: stonks.fun HTML and JS bundle, @stonksdotfun profile and five posts, two @nikshepsvn posts, Blockscout API v2 plus RPC for $STONKS, DN404Factory, StonksLauncherV3, MAG7/DEGEN/SILICON, basket factory, router and the Uniswap v3 pool, and DexScreener token-pairs were opened on 2026-09-03; excerpts are copied from those pages. [verified R-1 R-2 R-11 R-19] - Numbers: 24h volume and market cap are the STONKS/USDG pair slice, not an all-chains figure; MAG7 holders 1 is not $STONKS holders 141. [verified R-11 R-16 R-19] - Adversarial: the strongest contrary reading is that this is StonkBrokers, The Index, Solana StonkFun, or still only an announced pad. Official CA, DopplerDN404 source name, StonksLauncherV3, createBasket MAG7 and the stonks.fun JS map argue against those merges; census announced is below the reproduced 4663 bar."
+      class: inference
+      sources:
+        - S8
+        - S14
+        - S18
+        - S19
+    - text: Basket factory, MAG7, DEGEN, SILICON and the cash-redeem router have unverified source; createBasket is callable by the same EOA that created $STONKS. [verified R-17 R-22 R-23] - DEGEN and SILICON supply is 0; MAG7 has one holder. A card that treats three flagship indexes as traded books would overstate activity. [verified R-16 R-19 R-24 R-25] - The posted 36.5% treasury burn is a social claim until the furnace address is reproduced. [claim R-6 R-10] - No audit report was located in this review.
+      class: unknown
   missing:
     - text: Mainnet status rests on the project's own posts; not independently verified
     - text: Factory and token addresses not located
     - text: Fee burn path not verified against contracts
     - text: An independent audit was not found in this review
     - text: Official site not located
+    - text: "What is the furnace contract address for the posted 36.5% $STONKS treasury burn, and does STONKS.balanceOf(furnace) match that share? Next: read the screenshot on the builder post or scan STONKS transfers from the deployer around 2026-09-01T13:48Z"
+    - text: "Who can call createBasket / change MAG7 weights / pause redeem on 0xd21cdd54… and MAG7, given unverified source? Next: eth_call owner/admin on factory and MAG7; decompile or wait for verified source"
+    - text: "Is there an audit whose scope includes DopplerDN404, StonksLauncherV3, the basket factory, MAG7, or the furnace? Next: ask in public for a report URL and match bytecode"
+    - text: "Why are DEGEN and SILICON totalSupply 0 if they were posted as flagship indexes, and does MAG7 hold the listed Stock Tokens 1:1? Next: eth_call assets() and balances of NVDA/AAPL/… on MAG7; watch a cashMint"
+    - text: "Is StonksLauncherV3 still taking launch() after the basket rebrand? Next: count recent Launch logs on 0x2a71F10b…"
   unresolved: []
+themes:
+  - launchpad
+  - rwa
+  - index
+metrics:
+  - kind: volume_24h
+    value: 6138.39
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S22
+  - kind: market_cap
+    value: 648468
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S22
+  - kind: holders
+    value: 1
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S19

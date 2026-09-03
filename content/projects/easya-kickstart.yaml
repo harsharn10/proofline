@@ -1,0 +1,116 @@
+slug: easya-kickstart
+name: EasyA Kickstart
+symbol: null
+category: Stock-paired token factory
+lifecycle: mainnet
+coverage: stub
+summary: EasyA Kickstart is a permissionless ideas launchpad with a Robinhood Chain lane at kickstart.easya.io/robinhood. A launch creates a Uniswap v4 pool with one-sided locked liquidity. Creators pair against ETH or one of 24 listed stock tokens and claim about 1% of volume in the paired asset. The ETH factory is PumpFactory proxy 0x519f…273e; the stock factory is StockLaunchpad proxy 0x785d…5Fc1. The handle is @EasyA_Kickstart.
+themes:
+  - launchpad
+official_links:
+  - kind: site
+    url: https://kickstart.easya.io
+  - kind: app
+    url: https://kickstart.easya.io/robinhood
+  - kind: app
+    url: https://kickstart.easya.io/robinhood/create
+  - kind: x
+    url: https://x.com/EasyA_Kickstart
+  - kind: other
+    url: https://kickstart.easya.io/api/robinhood/tokens
+  - kind: telegram
+    url: https://t.me/+PYEPxw-L9n81NDA0
+  - kind: github
+    url: https://github.com/EasyA-Tech/kickstart-skills
+dependencies: []
+deployments:
+  - label: ETH PumpFactory proxy
+    chain: robinhood-chain
+    address: "0x519fd71F5df8242Fb8BccAA346eA5B20c336273e"
+    role: factory
+    verified: true
+    sources:
+      - S8
+      - S10
+      - S11
+  - label: PumpFactory implementation
+    chain: robinhood-chain
+    address: "0x2A01f98D59A0f34869B5A52C705045135c29E815"
+    role: implementation
+    verified: false
+    sources:
+      - S10
+      - S11
+      - S18
+  - label: StockLaunchpad proxy
+    chain: robinhood-chain
+    address: "0x785dCae72C87Ad4d28A703A6c5db455891615Fc1"
+    role: factory
+    verified: true
+    sources:
+      - S8
+      - S12
+      - S13
+  - label: StockLaunchpad implementation
+    chain: robinhood-chain
+    address: "0xEF241C8da8e44B57296Cb1C58Cc6C769a04994BE"
+    role: implementation
+    verified: false
+    sources:
+      - S12
+      - S13
+      - S19
+  - label: ETH factory ProxyAdmin
+    chain: robinhood-chain
+    address: "0xC190fb813Df94A936643cDD29A45deeDD089ab66"
+    role: admin
+    verified: false
+    sources:
+      - S10
+      - S20
+  - label: StockLaunchpad ProxyAdmin
+    chain: robinhood-chain
+    address: "0xe2f56e355983482948B4029E2D3a9a552805c8e9"
+    role: admin
+    verified: false
+    sources:
+      - S12
+      - S21
+  - label: feeCollector / ProxyAdmin owner()
+    chain: robinhood-chain
+    address: "0x981DA90234D2570450b38bAc900D5244b386e587"
+    role: admin
+    verified: true
+    sources:
+      - S10
+      - S12
+      - S20
+      - S22
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: kickstart.easya.io, /robinhood, /robinhood/create, JS chunk 164, tokens API, X profile and posts, Llama protocol, GitHub 404, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-6 R-8 R-10 R-16] - Numbers: token counts are factory totalTokens plus StockLaunchpad totalTokens against the official chain=robinhood API total, not an all-chains figure. Bytecode lengths, nonces, and owner() are chain 4663 RPC. Llama TVL was not used as a RH number. [verified R-10 R-12 R-16] - Adversarial: strongest contrary reading is that 0x519f…273e is a leftover PumpFactory and new stock launches use a different factory, or that Kickstart on RH is only a frontend on pools.trade / LONG. Official JS sets 4663 protocol.factory and stockLaunchpad to these addresses; RPC implementation names are PumpFactory and StockLaunchpad; API total matches 3138+9. LONG, dontblink, and lunch.fun are different products."
+      class: inference
+      sources:
+        - S8
+        - S10
+        - S13
+    - text: Both factories are upgradeable; ProxyAdmin owner is one EOA with no code. [verified R-20 R-22] - StockLaunchpad admin 0xe2f5…c8e9 source is not verified on Blockscout this pass. [verified R-21] - No audit report URL. [unknown] - Llama Kickstart is Solana Meteora, not a Robinhood Chain slice. [claim R-17] - Creator fee is posted as 1% of volume; the create-page initial-buy copy names 2% protocol and creator fee. [claim R-3 R-7] - @EasyAKicksta collides on display name with 2 followers.
+      class: claim
+      sources:
+        - S24
+  missing:
+    - text: "Does ProxyAdmin owner 0x981d…e587 sit behind a Safe or timelock on any chain, and can it upgrade PumpFactory / StockLaunchpad without delay? Next: read verified ProxyAdmin and PumpFactory source for upgrade selectors and any delay"
+    - text: "Is StockLaunchpad admin 0xe2f5…c8e9 the same ProxyAdmin bytecode as 0xC190…ab66, and can its source be verified? Next: compare bytecode to 0xC190…ab66 and record verification if it lands"
+    - text: "Is there an audit report whose scope matches factory 0x519f…273e and StockLaunchpad 0x785d…5Fc1? Next: record any published report as a claim with the exact scope"
+    - text: "What is the on-chain creator/protocol fee split versus the 1% creator post and the 2% initial-buy copy? Next: eth_call fee fields on a live feeShare and read verified PumpFactory source"
+    - text: "Which GitHub commit matches the verified PumpFactory / StockLaunchpad source? Next: search the verified Blockscout source files for a repository URL"
+    - text: "Does Llama or another aggregator publish a Robinhood Chain TVL slice for Kickstart? Next: do not use Solana Meteora TVL as a chain-4663 figure; reread Llama if a RH adapter lands"
+    - text: "tvl is not published as a figure: NULL — api.llama.fi/protocol/easya-kickstart currentChainTvls empty; chains [Solana] only; no Robinhood Chain slice this pass"
+  unresolved: []

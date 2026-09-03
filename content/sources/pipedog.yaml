@@ -1,0 +1,200 @@
+slug: pipedog
+sources:
+  - id: S1
+    url: https://robinhoodchain.blockscout.com/address/0x5Cb6F181081301b44905F3ae15419112ecaBd8A6
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T04:46:08Z
+    claim: Token 0x5Cb6…d8A6 pipedog / PIPEDOG
+    excerpt: hash 0x5Cb6F181081301b44905F3ae15419112ecaBd8A6 name pipedog is_contract true is_verified true proxy_type null implementations []. creator_address_hash 0xa359E6190740930Bb65e611B553724b0CE73e814 creation_transaction_hash 0xfe28aa549e323eb3733b97213a61997e40888dd88c5a83bd6ea7d3554d2249db. token symbol PIPEDOG decimals 18 total_supply 12345678912000000000000000000 holders_count 8592 type ERC-20 circulating_market_cap 26719434.38 volume_24h 3847606.85.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S2
+    url: https://robinhoodchain.blockscout.com/address/0x5Cb6F181081301b44905F3ae15419112ecaBd8A6?tab=contract
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T04:46:08Z
+    claim: Verified source pipedog.sol
+    excerpt: 'ContractName pipedog compiler v0.8.20+commit.a1b79de6 is_verified true is_partially_verified false file_path pipedog.sol verified_at 2026-07-28T20:29:44Z. Source: import OpenZeppelin ERC20; constructor(uint256 initialSupply) ERC20("pipedog", "PIPEDOG") { _mint(msg.sender, initialSupply); }. Comment: No owner, no mint/burn, no transfer tax - the same minimal, renounceable shape launchbot deployed.'
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S3
+    url: https://robinhoodchain.blockscout.com/tx/0xfe28aa549e323eb3733b97213a61997e40888dd88c5a83bd6ea7d3554d2249db
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T04:46:08Z
+    claim: Token create tx 0xfe28aa54…49db
+    excerpt: timestamp 2026-07-28T20:29:10.000000Z status ok result success block_number 21879606 from 0xa359E6190740930Bb65e611B553724b0CE73e814 (is_contract false) to null created_contract pipedog 0x5Cb6F181081301b44905F3ae15419112ecaBd8A6 is_verified true. Log Transfer from 0x0 to 0xa359…e814 value 12345678912000000000000000000.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S4
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Robinhood Chain RPC
+    kind: explorer
+    accessed_at: 2026-09-03T04:47:16Z
+    claim: eth_getCode, name, symbol, totalSupply, owner() on PIPEDOG
+    excerpt: eth_blockNumber 0x32af4cd (53146829). Token code 1825 B. name pipedog symbol PIPEDOG decimals 18 totalSupply 0x27e41b32dc254928c9000000 (12345678912e18). owner() execution reverted. Deployer 0xa359…e814 code 0x.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S5
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Robinhood Chain RPC
+    kind: explorer
+    accessed_at: 2026-09-03T04:47:16Z
+    claim: token0, token1, fee, factory() on PIPEDOG/WETH pool
+    excerpt: Pool 0xB7f10f74B39291b9290b779978e19A7637C742D6 code 22142 B. token0 0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73. token1 0x5Cb6F181081301b44905F3ae15419112ecaBd8A6. fee 10000. factory() 0x1f7d7550B1b028f7571E69A784071F0205FD2EfA.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S6
+    url: https://api.dexscreener.com/latest/dex/tokens/0x5Cb6F181081301b44905F3ae15419112ecaBd8A6
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-03T04:46:20Z
+    claim: latest/dex/tokens PIPEDOG
+    excerpt: 4 robinhood pairs. Top pairAddress 0xB7f10f74B39291b9290b779978e19A7637C742D6 labels v3 dexId uniswap base pipedog / PIPEDOG quote WETH 0x0Bd7…AD73 liquidity.usd 8421367.62 volume.h24 2924896.88 fdv 26740450 marketCap 26740450 pairCreatedAt 1785270712000. info.websites https://pipedog.xyz/ info.socials x.com/pipedog_ t.me/pipedogpipe. Uniswap v4 ETH book liquidity.usd 251022.18.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S7
+    url: https://api.geckoterminal.com/api/v2/networks/robinhood/tokens/0x5Cb6F181081301b44905F3ae15419112ecaBd8A6
+    publisher: GeckoTerminal
+    kind: third-party-data
+    accessed_at: 2026-09-03T04:47:16Z
+    claim: pipedog token
+    excerpt: GET 200. name pipedog symbol PIPEDOG decimals 18 total_supply 12345678912e18 price_usd 0.002184702027 fdv_usd 26971629.71 market_cap_usd 26489718.12 volume_usd.h24 2899701.85 total_reserve_in_usd 4192383.77 coingecko_coin_id pipedog. Top pool robinhood_0xb7f10f74b39291b9290b779978e19a7637c742d6.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S8
+    url: https://api.geckoterminal.com/api/v2/networks/robinhood/pools/0xb7f10f74b39291b9290b779978e19a7637c742d6
+    publisher: GeckoTerminal
+    kind: third-party-data
+    accessed_at: 2026-09-03T04:48:00Z
+    claim: PIPEDOG/WETH Uniswap v3 1% pool
+    excerpt: name PIPEDOG / WETH 1% pool_created_at 2026-07-28T20:31:52Z fdv_usd 26447115.26 market_cap_usd 26447115.29 volume_usd.h24 2907235.25 reserve_in_usd 8458551.02 transactions.h24 buys 496 sells 484. dex uniswap-v3-robinhood.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S9
+    url: https://pipedog.xyz/
+    publisher: pipedog.xyz
+    kind: official-site
+    accessed_at: 2026-09-03T04:47:17Z
+    claim: pipedog (PIPEDOG) site
+    excerpt: "title pipedog (PIPEDOG). get-link https://app.uniswap.org/explore/tokens/robinhood/0x5Cb6F181081301b44905F3ae15419112ecaBd8A6. socials https://x.com/pipedog_ https://t.me/pipedogpipe https://www.coingecko.com/en/coins/pipedog https://coinmarketcap.com/currencies/pipedog/. Copy: pipedog robinhood dog / this is pipedog / is it pipe ?"
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S10
+    url: https://t.me/pipedogpipe
+    publisher: Telegram
+    kind: social
+    accessed_at: 2026-09-03T04:47:17Z
+    claim: t.me/pipedogpipe
+    excerpt: HTTP 200. og:title pipedog. og:description You can view and join @pipedogpipe right away. tgme_page_extra 1 946 members, 142 online. No contract address in the preview HTML this pass.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S11
+    url: https://x.com/pipedog_/status/2095227814534414701
+    publisher: "@pipedog_"
+    kind: social
+    accessed_at: 2026-09-03T04:50:00Z
+    claim: this data seems suspiciously pipe coded
+    excerpt: "Display name pipedog handle @pipedog_. Bio: this pipedog he has pipe he has question this not pipe. Post: this data seems suspiciously pipe coded. No contract or pipedog.xyz in the post text this pass."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S12
+    url: https://x.com/onenine_btc/status/2095360032778969172
+    publisher: "@onenine_btc"
+    kind: social
+    accessed_at: 2026-09-03T04:50:00Z
+    claim: Best non-equity paired meme's on Robinhood
+    excerpt: Best non-equity paired meme's on @RobinhoodApp 1) cash-cat:native $266m 2) pipedog:native $26m - OG Meme Character 3) $FRONG $10m 4) $PONGO Currently at $3.5m.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S13
+    url: https://robinhoodchain.blockscout.com/address/0xB7f10f74B39291b9290b779978e19A7637C742D6
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T04:48:00Z
+    claim: Address 0xB7f1…42D6 UniswapV3Pool
+    excerpt: hash 0xB7f10f74B39291b9290b779978e19A7637C742D6 name UniswapV3Pool is_contract true is_verified true creator_address_hash 0x1f7d7550B1b028f7571E69A784071F0205FD2EfA creation_transaction_hash 0x0abd4002d4a56e982ca813b486ceb16a0b5b97b49c95c1e58a78e6b29d83cab8.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S14
+    url: https://robinhoodchain.blockscout.com/tx/0x0abd4002d4a56e982ca813b486ceb16a0b5b97b49c95c1e58a78e6b29d83cab8
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T04:48:00Z
+    claim: Pool create tx 0x0abd4002…cab8
+    excerpt: timestamp 2026-07-28T20:31:52.000000Z status ok block_number 21881211 from 0xa359E6190740930Bb65e611B553724b0CE73e814 (is_contract false) to NonfungiblePositionManager 0x73991a25C818Bf1f1128dEAaB1492D45638DE0D3 method createAndInitializePoolIfNecessary token0 WETH 0x0Bd7…AD73 token1 PIPEDOG 0x5Cb6…d8A6 fee 10000.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S15
+    url: https://robinhoodchain.blockscout.com/address/0x1f7d7550B1b028f7571E69A784071F0205FD2EfA
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T04:48:00Z
+    claim: Address 0x1f7d…2EfA UniswapV3Factory
+    excerpt: hash 0x1f7d7550B1b028f7571E69A784071F0205FD2EfA name UniswapV3Factory is_contract true is_verified true creator_address_hash 0x9701fb0aDe1E269c8f64Ec0C7b3cfADB31A13A52.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S16
+    url: https://api.geckoterminal.com/api/v2/networks/robinhood/tokens/0x5Cb6F181081301b44905F3ae15419112ecaBd8A6/info
+    publisher: GeckoTerminal
+    kind: third-party-data
+    accessed_at: 2026-09-03T04:48:00Z
+    claim: pipedog token info
+    excerpt: GET 200. websites [https://pipedog.xyz] twitter_handle pipedog_ telegram_handle pipedogpipe holders.count 8540 last_updated 2026-09-03T04:27:02Z. categories Dog, Animal. gt_verified true.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S17
+    url: https://api.dexscreener.com/token-pairs/v1/robinhood/0x5Cb6F181081301b44905F3ae15419112ecaBd8A6
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-03T04:48:00Z
+    claim: token-pairs/v1 robinhood PIPEDOG
+    excerpt: HTTP 200 list length 4. First pairAddress 0xB7f10f74B39291b9290b779978e19A7637C742D6 liquidity.usd 8411140.21 (later snapshot than latest/dex/tokens 8421367.62).
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S18
+    url: https://x.com/olie100x/status/2095371334339461195
+    publisher: "@olie100x"
+    kind: social
+    accessed_at: 2026-09-03T04:50:00Z
+    claim: I gave you $PIPEDOG, it went to 65M
+    excerpt: I gave you $CATE, it went to 45M I gave you $PIPEDOG, it went to 65M I gave you $ANSEM, it went to 450M I have another memecoin at 1.5k mcap with 1000x+ potential.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true

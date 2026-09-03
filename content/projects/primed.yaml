@@ -1,0 +1,123 @@
+slug: primed
+name: PRIMED
+symbol: PRIMED
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against Amazon • Robinhood Token (AMZN). LongLauncher.create on 2026-09-02 minted PRIMED and seeded the PRIMED/AMZN book. Traders buy and sell PRIMED against AMZN. AMZN is the quote rail, not the subject. Distinct from SENDER/AMZN, RUFUS/AMZN, BEEFZOS/AMZN, and WADDLES/AMZN. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:amzn
+  - rwa
+official_links: []
+dependencies: []
+deployments:
+  - label: PRIMED token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xeB57dD11c2C0F5e9834193Bb71f72F02742A1E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S6
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S6
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S14
+  - label: Amazon • Robinhood Token (pair quote rail)
+    chain: robinhood-chain
+    address: "0x12f190a9F9d7D37a250758b26824B97CE941bF54"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S11
+      - S12
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+metrics:
+  - kind: volume_24h
+    value: 157793.21
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 41522.95
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 46464
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 130
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/AMZN/LongLauncher and create tx 0x4adc4def…822f, RPC name/symbol/owner/getAssetData, DexScreener tokens and search, Gecko pool/token (first GET 200), /rhj/assets, and X Latest $PRIMED / CA were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-6 R-7 R-8 R-11] - Numbers: 154206.41 is the Gecko AMZN/PRIMED pool 24h volume, not the 154206.56 token all-pools figure. Reserve 71257.25 is that pool. DexScreener 157793.21 / 41522.95 is the same pair, different aggregator. Gecko token fdv 46942.64 is the PRIMED figure; pool fdv 1997894.36 is not. [claim R-7 R-8 R-9 R-24] - Adversarial: the strongest contrary reading is that PRIMED is packed sender, rufus, beefzos, or waddles, an official Amazon product, the only AMZN pair, or a Bankr launch because Gecko dex id is bankr-robinhood. The token is 0xeB57…1E18, sender is 0x4d41…1e18, rufus is 0x218D…1E18, beefzos is 0x21d3…1e18, waddles is 0xbB6E…0CdD, /rhj/assets has no PRIMED row, and creation is LongLauncher.create."
+      class: inference
+      sources:
+        - S4
+        - S7
+        - S11
+        - S16
+        - S20
+    - text: Quote token AMZN 0x12f1…bF54 is the Robinhood Stock Token rail from GET /rhj/assets; PRIMED is not in that registry. [verified R-11 R-12] - Pool USD reserve is PRIMED plus AMZN, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko and DexScreener disagree on reserve and fdv; Gecko pool fdv_usd 1997894.36 is AMZN-as-base. [claim R-7 R-8 R-9] - No official handle or domain this pass; cr33per.net is a third-party-link. [claim R-7 R-17] - A Pons PRIMED at 0x037344…1Bb3 shares the ticker. [claim R-20 R-22] - reservedUntil 2026-09-03T20:55:20Z had not passed at collection. [verified R-5] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0xeB57…1E18? Next: re-read DexScreener token profile after a Claim Profile; fetch the IPFS CID on a non-Cloudflare gateway; search new posts that embed the CA and a handle"
+    - text: "Do Lock beneficiaries 0x56ca…8A7b (95%) and 0x21E2…7A66 (5%) still control AMZN-side fees after reservedUntil? Next: re-read LaunchCreated after 2026-09-03T20:55:20Z; read Doppler lock / fee collector state"
+    - text: "What is in ipfs://bafkreiaw3jrp4ubbneb3s5dmoccqrshqpdeemfxquxp3qbpb4hpawdybqi from the create tokenFactory bytes? Next: retry via another gateway or Blockscout token metadata if indexed"
+    - text: "Should Pons PRIMED 0x037344…1Bb3 get its own packet? Next: only if an assignment names that address"
+    - text: "Should any of the thin PRIMED/USDG or PRIMED/ETH books get their own notes? Next: only if an assignment names those pool ids"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

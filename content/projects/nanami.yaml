@@ -1,0 +1,129 @@
+slug: nanami
+name: NANAMI
+symbol: NANAMI
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against MSFT. LongLauncher.create deploys Windows chan (NANAMI) through DopplerERC20V1Factory and seeds the NANAMI/MSFT book. Traders buy and sell NANAMI against Microsoft • Robinhood Token. No official site was located this pass; @WindowschanRH posted the contract.
+themes:
+  - memecoin
+  - stock-paired:msft
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/WindowschanRH
+  - kind: other
+    url: https://www.youtube.com/watch?v=XBq-FFM5VhM
+  - kind: app
+    url: https://app.long.xyz/tokens/0x2895ee0AbF6B3DdbBC8D1C6fA52e42d226421E18
+dependencies: []
+deployments:
+  - label: NANAMI token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x2895ee0AbF6B3DdbBC8D1C6fA52e42d226421E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S14
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+      - S6
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S15
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S17
+  - label: MSFT Microsoft • Robinhood Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S16
+metrics:
+  - kind: volume_24h
+    value: 292280
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+      - S18
+  - kind: tvl
+    value: 34560.79
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+      - S18
+  - kind: market_cap
+    value: 36141
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+      - S8
+  - kind: holders
+    value: 131
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/LongLauncher/Airlock/MSFT and create tx logs, RPC name/symbol/owner/getCode, DexScreener tokens and token-pairs, Gecko token/pool/pools (HTTP 200), /rhj/assets, constructor IPFS, YouTube oembed, and the X posts cited were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8 R-12 R-13] - Numbers: 292280 is the DexScreener NANAMI/MSFT pool 24h volume, not Gecko token 270920.63. Liquidity 34560.79 is that pool. Gecko pool volume 270990.30 is the same pair, different aggregator. Gecko token fdv 345850.49 is the USDG dust book. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this is CLIPPY/MSFT, or a Pons v2 MSFT graduation (DIH / VERITY), or an official Microsoft product. CLIPPY is 0x85856F…1E18 with clippyrh.com / @ClippyMSFT. DIH/VERITY are Pons v2 CAs. This CA is LongLauncher Doppler 0x2895ee0AbF…1E18. GET /rhj/assets lists MSFT at 0xe932…2e74 as the rail, not NANAMI."
+      class: inference
+      sources:
+        - S1
+        - S4
+        - S12
+    - text: Quote token MSFT 0xe932…2e74 is a Robinhood Stock Token rail; NANAMI is not MSFT. [verified R-12 R-16] - Pool USD reserve is NANAMI plus MSFT, not a USDG backstop. [claim R-7 R-18] - Gecko token fdv follows a dust USDG pool; DexScreener MSFT book fdv is 36141. [claim R-7 R-9 R-24] - No official handle or domain this pass; @WindowschanRH is unconfirmed-official. [claim R-7 R-13] - Multiple other NANAMI tickers exist on Blockscout. [claim R-25] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x2895ee0AbF…1E18 (bio or domain embedding the CA)? Next: re-read DexScreener token profile after a Claim Profile; re-read @WindowschanRH bio if a CA is added"
+    - text: "Do the other Blockscout NANAMI tickers (0xeAE59…, 0xC9fF27…, 0xB218FC…) share a deployer with 0x2895ee0AbF…1E18? Next: open creator_address_hash on each extra ticker and record as ticker-only if a later packet is assigned"
+    - text: "Does verified DopplerERC20V1 / Airlock leave a privileged path after owner() is Airlock? Next: read owner-gated setters in src/tokens/DopplerERC20V1.sol on the explorer"
+    - text: "Does app.long.xyz/tokens/0x2895ee0AbF…1E18 render NANAMI without Cloudflare challenge? Next: open the token page from a browser session and copy any CA cross-link"
+    - text: "Why does Gecko report NANAMI/MSFT reserve_in_usd negative while DexScreener liquidity.usd is 34560.79? Next: re-fetch Gecko pool; keep DexScreener as the TVL receipt until reserve is non-negative"
+  unresolved: []

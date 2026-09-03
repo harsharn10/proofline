@@ -1,0 +1,120 @@
+slug: john
+name: JOHN
+symbol: JOHN
+category: Uniswap-pool launchpad
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 named Little John (JOHN) on Robinhood Chain. The deployer called enableTrading one block after create, which spun a Uniswap v2 JOHN/WETH pair. Traders buy and sell JOHN against WETH on that book. littlejohnhood.fun publishes the CA and links @little_john_x.
+themes:
+  - memecoin
+official_links:
+  - kind: site
+    url: https://www.littlejohnhood.fun
+  - kind: x
+    url: https://x.com/little_john_x
+dependencies: []
+deployments:
+  - label: JOHN token (unverified ERC-20)
+    chain: robinhood-chain
+    address: "0xE170dC96ca10103E0D4C5d9293C5A3A72Ee365a5"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+  - label: Uniswap v2 JOHN/WETH pair
+    chain: robinhood-chain
+    address: "0xD5b89CceE18C1eD101B793f4DBac34028963bD1C"
+    role: other
+    verified: true
+    sources:
+      - S6
+      - S7
+      - S8
+  - label: UniswapV2Factory (pair factory())
+    chain: robinhood-chain
+    address: "0x8bcEaA40B9AcdfAedF85AdF4FF01F5Ad6517937f"
+    role: factory
+    verified: true
+    sources:
+      - S7
+      - S16
+  - label: Deployer / owner() / taxWallet() (EIP-7702)
+    chain: robinhood-chain
+    address: "0x0B10d67A8360bce3815B453e8895366b2FbED5Fe"
+    role: admin
+    verified: false
+    sources:
+      - S1
+      - S4
+      - S5
+  - label: EIP-7702 implementation on owner
+    chain: robinhood-chain
+    address: "0x37A593d139ece78064032c19c943FF4f794dd2BA"
+    role: implementation
+    verified: false
+    sources:
+      - S4
+      - S5
+  - label: WETH (pair quote; rail)
+    chain: robinhood-chain
+    address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    role: token
+    verified: false
+    sources:
+      - S7
+      - S17
+metrics:
+  - kind: holders
+    value: 3656
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+      - S2
+  - kind: tvl
+    value: 114.5584500754
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: volume_24h
+    value: 0
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 550660.9143
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/creator/create tx/pair/factory/WETH/LP holders, RPC name/symbol/owner/reserves, Gecko token+pool (first GET 200), DexScreener tokens+search, CoinGecko, littlejohnhood.fun, @little_john_x posts, 4byte enableTrading, and the other Little John CA were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 114.5584500754 is the Gecko JOHN/WETH pool reserve, not CoinGecko 17195155. Volume 0 is that pool's h24, not CoinGecko 167501374. Holders 3656 is Blockscout holders_count. [verified R-1 R-8] - Adversarial: the strongest contrary reading is that 0x1E96…4fC4 is the same project or that CoinGecko's $17.2M tape is current. Blockscout shows a different LaunchToken CA with 58 holders; CoinGecko last_updated is 2026-07-13; live pool volume is 0."
+      class: inference
+      sources:
+        - S8
+        - S11
+        - S20
+    - text: Token source unverified; owner() still the EIP-7702 deployer. [verified R-1 R-5] - CoinGecko/Blockscout tape is last_updated 2026-07-13 versus live Gecko pool volume 0 / reserve $114.56. [verified R-8 R-11] - ca-collision with other Little John / JOHN CAs and with packed johndog (JOHNDOG / SGOV). [verified R-10 R-20] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does unverified source still let owner() change tax, maxTx, or the pair after enableTrading? Next: read bytecode or a later verified source for setters; re-call owner() after any new tx from 0x0B10"
+    - text: "Will CoinGecko / Blockscout tape refresh off the July 13 last_updated, or stay at $17.2M / $167.5M vs live $0 volume? Next: re-GET coins/little-john and the Gecko pool; if last_updated moves, restated metrics"
+    - text: "Does @little_john_x bio later embed 0xE170…365a5, or only the pool URL? Next: re-read the profile if a CA is added"
+    - text: "Which of the other Little John CAs (0x1E96…, 0x324f…, 0x8b49…) still has a live book? Next: RPC each CA if a later assignment asks to merge or split names"
+    - text: "Is there an audit or verified source for 0xE170…365a5? Next: re-read the explorer contract tab if a verify job lands"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

@@ -1,0 +1,145 @@
+slug: urmom
+name: urmom
+symbol: urmom
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply Pons v2 ERC-20 that graduated into a Uniswap v4 urmom/SPCX pool. Traders buy and sell urmom against the SpaceX • Robinhood Token on that book. SPCX is the quote rail, not this profile. Distinct from packed SPACEHOOD, BEAVER, and DOGE-1 on the same rail.
+themes:
+  - memecoin
+  - stock-paired:spcx
+  - rwa
+  - launchpad
+official_links:
+  - kind: x
+    url: https://x.com/UrMomOnRH
+dependencies: []
+deployments:
+  - label: urmom token (PonsV2LauncherToken bytecode)
+    chain: robinhood-chain
+    address: "0x4874845b0d4aCffd896DdE1E42828A543717AF7f"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S5
+  - label: PonsV2LaunchDeployer
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S18
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S19
+  - label: PonsV2BondingCurve
+    chain: robinhood-chain
+    address: "0xCaF55a3E96e6afF542c2882339C713a68Fa79744"
+    role: other
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+  - label: PonsV2LaunchAndBuy
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S3
+      - S20
+  - label: launch helper (create tx to)
+    chain: robinhood-chain
+    address: "0xe47e41f449fB934dd09A2015c9D3658fcBd8B286"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S5
+  - label: V2LaunchLocker (graduated position)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S6
+  - label: SPCX Stock Token (pair quote / launch pairToken)
+    chain: robinhood-chain
+    address: "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa"
+    role: token
+    verified: true
+    sources:
+      - S5
+      - S9
+      - S21
+  - label: URMOM ticker collision (Pons v2, not this row)
+    chain: robinhood-chain
+    address: "0x0423bEd328942Cb8bF79726b986893E1Eb863CBa"
+    role: token
+    verified: false
+    sources:
+      - S14
+      - S15
+      - S16
+metrics:
+  - kind: volume_24h
+    value: 793011.31
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 68970.73
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 574770
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 1192
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: Blockscout token/factory/deployer/curve/SPCX/launch/graduation/collision txs, RPC with Chrome UA, DexScreener token and search, /rhj/assets, and the X posts cited above were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-9] - Numbers: 793011.31 is the DexScreener urmom/SPCX pair 24h volume. Liquidity 68970.73 is that pool, not an all-pools figure. [claim R-7] - Adversarial: the strongest contrary reading is that this row is SPACEHOOD, BEAVER, DOGE-1, SPCX itself, or collision 0x0423…3CBa. Different CAs, create paths (Pons v2 vs LongLauncher vs BeaconProxy Stock), and bytecode sizes argue against those."
+      class: verified
+      sources:
+        - S5
+        - S9
+        - S14
+  risk:
+    - text: Quote token SPCX 0x4a0E…5eEa is a Robinhood Stock Token rail; this subject is the memecoin, not SPCX. [verified R-9 R-21] - Pool USD reserve is urmom plus SPCX, not a USDG or WETH backstop. [claim R-7] - Same-ticker robinhood book at 0x0423…3CBa. Flag ca-collision. [verified R-14 R-16 R-17] - Handle is unconfirmed-official; constructor twitter and DexScreener socials disagree. [claim R-5 R-7 R-11] - Collision posts advertised netlify claim URLs. Flag copypasta-pattern and third-party-link. [claim R-25] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does any surface bidirectionally confirm @UrMomOnRH or a domain for token 0x4874…AF7f? Next: re-read DexScreener after a Claim Profile and the X bio if a CA is pinned"
+    - text: "Does @buyurmom later pin 0x4874…AF7f, or does it stay on 0x0423…3CBa? Next: re-read the bio and both DexScreener info.socials"
+    - text: "Which window printed the assignment lead of ~$61,329 liq / ~$765,181 vol? Next: keep the DexScreener urmom/SPCX pair slice"
+    - text: "Does helper 0xe47e…B286 verified source later name the launchAndBuy wrapper? Next: read verified source if the explorer marks it verified"
+    - text: "Is there an audit whose scope includes PonsV2LauncherToken as used on 4663? Next: auditor report index for Pons v2 and a matching commit"
+  unresolved: []

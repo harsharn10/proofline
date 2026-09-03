@@ -1,0 +1,124 @@
+slug: beefzos
+name: BEEFZOS
+symbol: BEEFZOS
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against Amazon • Robinhood Token (AMZN). LongLauncher.create on 2026-09-02 minted Jeff Beefzos (BEEFZOS) and seeded the BEEFZOS/AMZN book. Traders buy and sell BEEFZOS against AMZN. AMZN is the quote rail, not the subject. Distinct from SENDER/AMZN and WADDLES/AMZN. No bidirectional official site was located this pass.
+themes:
+  - memecoin
+  - stock-paired:amzn
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/beefzos
+dependencies: []
+deployments:
+  - label: BEEFZOS token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x21d3462d3F0A5f661Ed46D033a8cF05595c11e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S6
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S6
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S6
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S13
+  - label: Amazon • Robinhood Token (pair quote rail)
+    chain: robinhood-chain
+    address: "0x12f190a9F9d7D37a250758b26824B97CE941bF54"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S11
+      - S12
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S6
+      - S14
+metrics:
+  - kind: volume_24h
+    value: 182159.76
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 42193.27
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 47573
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 66
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/AMZN/LongLauncher/Airlock and create tx 0xed8967d9…a8a8, RPC name/symbol/owner/getAssetData, DexScreener tokens and search, Gecko pool/token (first GET 200), /rhj/assets, and X Latest from:beefzos were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-6 R-7 R-8 R-11] - Numbers: 175435.85 is the Gecko AMZN/BEEFZOS pool 24h volume, not the 173430.53 token all-pools figure. Reserve 41081.39 is that pool. DexScreener 182159.76 / 42193.27 is the same pair, different aggregator. Gecko token fdv 50786.31 is the BEEFZOS figure; pool fdv 0.39 is not. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that BEEFZOS is packed sender or waddles, an official Amazon product, or a Bankr launch because Gecko dex id is bankr-robinhood. The token is 0x21d3…1e18, sender is 0x4d41…1e18, waddles is 0xbB6E…0CdD, /rhj/assets has no BEEFZOS row, and creation is LongLauncher.create."
+      class: inference
+      sources:
+        - S4
+        - S7
+        - S11
+        - S20
+    - text: Quote token AMZN 0x12f1…bF54 is the Robinhood Stock Token rail from GET /rhj/assets; BEEFZOS is not in that registry. [verified R-11 R-12] - Pool USD reserve is BEEFZOS plus AMZN, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko and DexScreener disagree on reserve and fdv; Gecko pool fdv_usd 0.39 is AMZN-as-base. [claim R-7 R-8 R-9] - No bidirectional official handle or domain this pass; @beefzos is unconfirmed-official. [claim R-7 R-15] - Other Jeff Beefzos CAs share the ticker. [claim R-20 R-21] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does DexScreener later list @beefzos or a site that bidirectionally links to token 0x21d3…1e18? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle that links back"
+    - text: "Do Lock beneficiaries 0xcC51…2A26 (95%) and 0x21E2…7A66 (5%) still control AMZN-side fees after reservedUntil? Next: re-read LaunchCreated after 2026-09-03T20:42:41Z; read Doppler lock / fee collector state"
+    - text: "What is in ipfs://bafkreiacedsui6m4xplget26kpbnp5gtegysnh7ysgr7asera4ukhtkvyu from the create tokenFactory bytes? Next: GET the CID on ipfs.io or another gateway and record whether it names 0x21d3…1e18"
+    - text: "Should any of the other Jeff Beefzos CAs (0x79780a…1e18 and Blockscout search hits) get their own packets? Next: only if an assignment names those addresses"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

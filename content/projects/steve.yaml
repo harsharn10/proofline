@@ -1,0 +1,130 @@
+slug: steve
+name: STEVE
+symbol: STEVE
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched on a Pons v2 bonding curve quoted against MSFT, then graduated into a locked Uniswap v4 STEVE/MSFT pool. Traders buy and sell STEVE on that book. Constructor socials name @SteveOnHood and stevecoin.us; the site JS embeds token 0x9a70…2375.
+themes:
+  - memecoin
+  - stock-paired:msft
+  - rwa
+  - launchpad
+official_links:
+  - kind: site
+    url: https://www.stevecoin.us/
+  - kind: x
+    url: https://x.com/SteveOnHood
+dependencies: []
+deployments:
+  - label: STEVE token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0x9a70d368DA240ACF67d5859aB750644DD5d12375"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: Pons v2 bonding curve
+    chain: robinhood-chain
+    address: "0xa10d4fcc393dDA87d7Ad11F7138ca0eF6E93e91b"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S6
+  - label: PonsV2LaunchFactory
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+  - label: PonsV2LaunchAndBuy
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S4
+      - S19
+  - label: PonsV2LaunchDeployer
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: other
+    verified: false
+    sources:
+      - S1
+      - S3
+  - label: MSFT Microsoft • Robinhood Token (pair rail)
+    chain: robinhood-chain
+    address: "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S11
+      - S12
+  - label: V2LaunchLocker
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S14
+      - S20
+metrics:
+  - kind: volume_24h
+    value: 269393.29
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 15296.58
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 35539
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 165
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/source/factory/MSFT, launchAndBuy 0x1e66…476e, CurveCompleted 0x4cec…6ec1, createGraduatedPool 0x08e0…d515, RPC name/symbol/factory/curve/socials, DexScreener, /rhj/assets, stevecoin.us HTML+JS, and @SteveOnHood profile/CA tweet were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-11] - Numbers: 269393.29 is the DexScreener STEVE/MSFT pool 24h volume, not an all-pools figure. Liquidity 15296.58 is that pool. Holders 165 is the Blockscout token page. [claim R-1 R-7] - Adversarial: the strongest contrary reading is that this is CLIPPY/MSFT, a packed Pons v2 MSFT graduation (DIH / VERITY), NANAMI, or an official Microsoft product. CLIPPY is 0x85856F…1E18 with clippyrh.com / @ClippyMSFT. DIH/VERITY/NANAMI are other CAs. This CA is Pons v2 0x9a70…2375. GET /rhj/assets lists MSFT at 0xe932…2e74 as the rail, not STEVE."
+      class: inference
+      sources:
+        - S1
+        - S5
+        - S11
+    - text: Quote token MSFT 0xe932…2e74 is the GET /rhj/assets rail, not the subject. [verified R-11 R-12] - Pool USD liquidity is STEVE plus MSFT, not a USDG backstop. [claim R-7] - Ticker-only collision with other 4663 STEVE tokens (e.g. 0x4Adb…ACF6). [claim R-1] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @SteveOnHood bio later embed CA 0x9a70…2375, or only the website field and the launch tweet? Next: re-read the profile bio and pinned posts after a Claim Profile"
+    - text: "Does verified PonsV2LaunchFactory source leave any privileged path on a graduated STEVE/MSFT pool beyond factory owner()? Next: read createGraduatedPool and locker modifiers in src/v2 on the explorer"
+    - text: "Which other 4663 STEVE tickers still trade, and do any share this deployer? Next: DexScreener each colliding CA if volume qualifies"
+    - text: "Does Gecko later return HTTP 200 for this token with a STEVE/MSFT pool slice? Next: retry Gecko token and pool endpoints when the first GET is 200"
+  unresolved: []

@@ -1,0 +1,105 @@
+slug: bigly
+name: BIGLY
+symbol: BIGLY
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A Pons v2 memecoin that graduated into a locked Uniswap v4 pool quoted against the Robinhood DJT stock token. Traders buy and sell BIGLY on that DJT book and on later USDG books. PonsV2LaunchFactory created it. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:djt
+official_links:
+  - kind: other
+    url: https://www.ponsfamily.com/launchpad/0x73114aBD7dCF37000d90d8DE9fd1dE3957B17c04
+  - kind: x
+    url: https://x.com/barrons_alt
+dependencies: []
+deployments:
+  - label: BIGLY token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0x73114aBD7dCF37000d90d8DE9fd1dE3957B17c04"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S3
+  - label: PonsV2LaunchFactory
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S12
+  - label: V2LaunchLocker (top holder / locked position)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: true
+    sources:
+      - S4
+      - S11
+      - S19
+  - label: DJT Robinhood Stock Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0x1D11f0496982706C5e14A514D4E79F2e6BdE4516"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S10
+      - S13
+metrics:
+  - kind: volume_24h
+    value: 348957.05
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 54487.27
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 428729
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 1208
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/locker/DJT and both launch/grad txs, RPC name/symbol/launchFactory/getLaunchedToken/isLocked, DexScreener, Gecko pool/token, /rhj/assets, Pons launchpad HTML, @AkahataMitai, @barrons_alt, and the netlify claim posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-10] - Numbers: 365205.75 is the Gecko djt/BIGLY pool 24h volume, not the 365507.07 token all-pools figure. Reserve 64208.96 is that pool. DexScreener 348957.05 / 54487.27 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that BIGLY is packed dollar-1 or an official Trump Media product. dollar-1 is 0xdCe5…e6da launched 2026-09-02; this token is 0x73114aBD…7c04 launched 2026-08-15; GET /rhj/assets has DJT as the rail and no BIGLY row."
+      class: inference
+      sources:
+        - S5
+        - S10
+    - text: Quote-side USD figures are DJT-denominated, not USDG. [verified R-7 R-8] - DexScreener fdv 428729 and Gecko pool fdv 1467999 disagree this pass. [claim R-7 R-8] - No official handle or domain this pass; Telegram/claim URLs on X are third-party-link / copypasta-pattern. [claim R-7 R-20] - Factory owner is a SafeProxy whose signers were not read. [verified R-4] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x73114aBD…7c04? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle that Pons or the token socials() also list"
+    - text: "Who are the SafeProxy 0x263e…19Dd owners and threshold, and can that Safe call factory admin setters? Next: eth_call getOwners and getThreshold on 0x263e…19Dd"
+    - text: "Why does getLaunchedToken.creatorFeeRecipient return 0x315B…0a09 while launchAndBuy params and PoolRegistered creator are 0xdEC7…7e75? Next: read factory fee-recipient update logs and the 0x315B…0a09 bytecode"
+    - text: "Does the on-chain description's DJT every 15 minutes reflection correspond to a live fee-split, or is it launch copy? Next: read V2MemeHook 0xE5e7…e044 verified source for DJT distribution cadence"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

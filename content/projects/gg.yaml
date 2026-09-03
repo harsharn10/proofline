@@ -1,0 +1,117 @@
+slug: gg
+name: GG
+symbol: GG
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched on Pons v2 and graduated into a Uniswap v4 pool quoted against GLD. PonsV2LaunchAndBuy.launchAndBuy from 0xC7c6…8600 minted Golden Goose (GG) on 2026-08-28T23:59:19Z onto a bonding curve, then swept into the GG/GLD book about 11.5 minutes later. Traders buy and sell GG on Uniswap v4 and on secondary WETH/USDG books. GLD is the quote rail, not this token. thegoldengoose.live embeds this CA. No bidirectional official handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:gld
+  - rwa
+  - pons-graduation
+official_links:
+  - kind: site
+    url: https://thegoldengoose.live
+  - kind: x
+    url: https://x.com/GoldenGooseRH
+dependencies: []
+deployments:
+  - label: GG token (Pons v2 launcher token)
+    chain: robinhood-chain
+    address: "0xcaCB0e9caCcee63ec4d82952E561a291c68Bcb68"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S5
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+  - label: PonsV2LaunchAndBuy (create target)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: factory
+    verified: false
+    sources:
+      - S4
+      - S6
+      - S19
+  - label: GG bonding curve (token curve)
+    chain: robinhood-chain
+    address: "0x529562938bfB293b7A1112041e2c9AC62FE10079"
+    role: other
+    verified: true
+    sources:
+      - S2
+      - S5
+      - S6
+      - S18
+  - label: GLD SPDR Gold Trust Robinhood Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0xC9a981FEE1F9DEc688bb123ccDeCc63D0deBFC4e"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S15
+metrics:
+  - kind: volume_24h
+    value: 613848.84
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 201551.84
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 5029694
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 6164
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/curve/factory/andbuy/GLD and launch/graduation txs, RPC name/symbol/deployer/launchFactory/curve/socials, DexScreener tokens+search, Gecko token GET 200 plus pool, /rhj/assets, thegoldengoose.live, @GoldenGooseRH, @Jonas00555724, @CCrypto2941, and the netlify vote posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8 R-12 R-13] - Numbers: 613848.84 is the Gecko gld/GG pool 24h volume, not the 3633381.84 token all-pools figure. Reserve 201551.84 is that pool. DexScreener 611987.16 / 204719.61 is the same pair, different aggregator. Gecko pool fdv is GLD-as-base. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that GG is the GLD rail or that 0x07Ff…1E18 is this token. /rhj/assets GLD is 0xC9a9…FC4e; this subject is 0xcaCB…cb68 with Pons v2 code 3248 B, not the Doppler clone."
+      class: inference
+      sources:
+        - S12
+        - S15
+        - S16
+    - text: Quote token GLD 0xC9a9…FC4e is a Robinhood Stock Token rail; GG is not GLD. [verified R-12 R-16] - Pool USD reserve is GG plus GLD, not a USDG or WETH backstop. [claim R-7 R-8] - No bidirectional official handle this pass; @GoldenGooseRH is unconfirmed-official. [claim R-7 R-10] - Same-ticker Golden Goose clones exist, including Doppler 0x07Ff…1E18. [verified R-17] - GLD holder-payout claims on the site and on X were not reproduced on the token this pass. [claim R-5 R-13] - Netlify vote/claim pages reused this CA. [claim R-19] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @GoldenGooseRH bio or a pinned post bidirectionally name thegoldengoose.live? Next: re-read the bio after a site pin; treat handle as official only with that cross-link"
+    - text: "Which contract pays GLD to GG holders, and can that path be reproduced on 4663? Next: trace GLD Transfer logs to holder wallets from the site ledger and name the payer contract"
+    - text: "Which transaction initialized Uniswap v4 pool 0x9009…43c5 and which hook did it attach? Next: search PoolManager Initialize for pool id 0x9009…43c5 in the next blocks after 48716111"
+    - text: "Why do DexScreener GG/GLD fdv (~$5.03M) and Gecko pool fdv (~$3.48M) disagree? Next: compare Gecko token price source pool vs the GLD book; do not collapse the two fdv figures"
+    - text: "What does launch image ipfs://bafkreig3r3schsxjlwu4yzr3ys3atmkfsrgke443l7rqylgj5xumec3b6u contain? Next: fetch the CID once for social_links / image without treating it as official"
+  unresolved: []
