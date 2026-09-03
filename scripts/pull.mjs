@@ -47,9 +47,14 @@ import {
   emptyActivity,
 } from "./lib/pull/activity.mjs";
 import { writePulled, createValidator, appendHistory, snapshotFrom } from "./lib/pull/write.mjs";
-import { buildLaunchpadIndex, excludedHolderAddresses, attributeCreator } from "./lib/pull/attribution.mjs";
+import {
+  buildLaunchpadIndex,
+  excludedHolderAddresses,
+  attributeCreator,
+  launchpadSlugsFrom,
+} from "./lib/pull/attribution.mjs";
 import { readTop10, readMintAndRenounce, readLpLocks } from "./lib/pull/token.mjs";
-import { writeSeries } from "./lib/pull/series.mjs";
+import { writeSeries, seriesReplacement } from "./lib/pull/series.mjs";
 
 const CHAIN = "robinhood-chain";
 const CONCURRENCY = 4;
@@ -187,13 +192,12 @@ async function main() {
     if (missing.length) throw new Error(`no census slug with a ${CHAIN} address or DefiLlama receipt: ${missing.join(", ")}`);
   }
 
-  const priorPulled = [];
-  for (const file of (await readdir("content/pulled")).filter((name) => name.endsWith(".yaml"))) {
-    const doc = await readYaml(join("content/pulled", file)).catch(() => null);
-    if (doc) priorPulled.push(doc);
-  }
-  const launchpads = buildLaunchpadIndex(priorPulled);
-  const holderExclusions = excludedHolderAddresses(priorPulled);
+  // Attribution and the holder exclusions are joins over the census and the project files, not over
+  // this directory's last output: reading content/pulled/*.yaml would make each run inherit the
+  // previous one's mistakes and would leave a --only run attributing against stale addresses.
+  const projectDocs = [...projects.entries()].map(([slug, project]) => ({ slug, addresses: addressesFor(project) }));
+  const launchpads = buildLaunchpadIndex(projectDocs, { launchpadSlugs: launchpadSlugsFrom(census) });
+  const holderExclusions = excludedHolderAddresses(projectDocs);
 
   const pace = createPacer(250);
   const deps = { pace };
@@ -222,7 +226,7 @@ async function main() {
   const totals = {
     addresses: 0, owners: 0, safes: 0, proxies: 0, holders: 0, metrics: 0,
     pairs: 0, markets: 0, top10: 0, top10ExPools: 0, launchpads: 0, mint: 0, renounced: 0,
-    lp: 0, revenue24h: 0, revenueSeries: 0, txns24h: 0, launches24h: 0, capped: 0,
+    lp: 0, revenue24h: 0, revenueSeries: 0, seriesKept: 0, txns24h: 0, launches24h: 0, capped: 0,
     errors: 0, files: 0, snapshots: 0,
   };
   const failures = [];
@@ -235,13 +239,17 @@ async function main() {
 
   for (const target of targets) {
     const slugStarted = Date.now();
-    const addresses = await mapWithConcurrency(target.addresses, CONCURRENCY, async (entry) => {
+    const reads = await mapWithConcurrency(target.addresses, CONCURRENCY, async (entry) => {
       const rpcResult = await readRpc(rpc, entry.address);
       const bsResult = args.rpcOnly
         ? null
         : await readBlockscout(blockscout, entry.address, { isToken: entry.role === "token" });
-      return mergeAddress(entry, rpcResult, bsResult);
+      return { row: mergeAddress(entry, rpcResult, bsResult), creator: bsResult?.creator ?? null };
     });
+    const addresses = reads.map((read) => read.row);
+    // /addresses/<addr> already answered with the creator; attribution reuses it rather than asking
+    // the explorer the same question a second time.
+    const creators = new Map(reads.map((read) => [read.row.address.toLowerCase(), read.creator]));
 
     // Who is still calling these contracts. One pass per address, capped at two in flight so a busy
     // factory's 24h walk cannot starve the rest of the slug.
@@ -271,18 +279,12 @@ async function main() {
           excluded: holderExclusions,
           pairAddresses: market.pairs.map((pair) => pair.pair_address),
         });
-        let launchpad = null;
-        try {
-          const creation = await blockscout.address(tokenAddress);
-          const creator = creation?.creator_address_hash ?? null;
-          launchpad = attributeCreator(creator, launchpads);
-          if (!creator) {
-            market.errors.push({ step: "launchpad", message: `addresses/${tokenAddress} did not return creator_address_hash or creation_tx_hash` });
-          } else if (!launchpad) {
-            market.errors.push({ step: "launchpad", message: `creator ${creator} did not match a known factory, curve or launcher deployer` });
-          }
-        } catch (e) {
-          market.errors.push({ step: "launchpad", message: `addresses/${tokenAddress}: ${e.message}` });
+        const creator = creators.get(tokenAddress.toLowerCase()) ?? null;
+        const launchpad = attributeCreator(creator, launchpads);
+        if (!creator) {
+          market.errors.push({ step: "launchpad", message: `addresses/${tokenAddress} did not return creator_address_hash` });
+        } else if (!launchpad) {
+          market.errors.push({ step: "launchpad", message: `creator ${creator} did not match a launchpad factory, curve or known launcher deployer` });
         }
         market = { ...market, ...top10, launchpad, errors: [...market.errors, ...top10.errors] };
 
@@ -304,11 +306,16 @@ async function main() {
     let metrics = [];
     let revenueSeries = null;
     const slugErrors = [...runErrors];
+    let seriesPlan = null;
     if (llamaSlug) {
       const out = await readProtocol(llama, llamaSlug, { asOf: pulledAt });
       metrics = out.metrics;
       revenueSeries = out.revenueSeries;
       slugErrors.push(...out.errors);
+      // Decided before the document is built so a kept-because-shorter series is a recorded fact on
+      // the file, not a line that only ever existed in one run's console output.
+      seriesPlan = await seriesReplacement(target.slug, revenueSeries ?? []);
+      if (seriesPlan.error) slugErrors.push(seriesPlan.error);
     }
 
     const doc = {
@@ -324,11 +331,9 @@ async function main() {
         // failed validation actually happened.
         appendHistory(target.slug, snapshotFrom(doc));
         totals.snapshots++;
-        if (llamaSlug) {
-          await writeSeries(target.slug, revenueSeries ?? [], { dry: false });
-        }
+        if (seriesPlan?.write) await writeSeries(target.slug, revenueSeries ?? [], { dry: false });
       }
-      if (args.dry && llamaSlug) await writeSeries(target.slug, revenueSeries ?? [], { dry: true });
+      if (seriesPlan && !seriesPlan.write && seriesPlan.existing > 0) totals.seriesKept++;
       const elapsed = ((Date.now() - slugStarted) / 1000).toFixed(1);
       console.log(`${summaryLine(target.slug, doc)} · ${elapsed}s${args.dry ? `  (would write ${path})` : ""}`);
     } catch (e) {
@@ -402,7 +407,7 @@ async function main() {
       `top10 ex pools ${totals.top10ExPools}/${targets.length} · launchpad ${totals.launchpads}/${targets.length} · ` +
       `mint ${totals.mint}/${targets.length} · renounced ${totals.renounced}/${targets.length} · ` +
       `LP reads ${totals.lp} · revenue 24h ${totals.revenue24h}/${targets.length} · ` +
-      `revenue series ${totals.revenueSeries}/${targets.length}`,
+      `revenue series ${totals.revenueSeries}/${targets.length} · ${totals.seriesKept} series kept`,
   );
   for (const f of safeThresholdOne) {
     console.log(`1-of-${f.signers ?? "?"} Safe owns ${f.slug} ${f.address} (owner ${f.owner})`);

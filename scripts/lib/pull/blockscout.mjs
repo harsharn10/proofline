@@ -23,16 +23,21 @@ export function toIsoOrNull(value) {
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
 
-/** Maps an /api/v2/addresses/<addr> body onto the pulled-address fields it owns. */
+/**
+ * Maps an /api/v2/addresses/<addr> body onto the pulled-address fields it owns, plus the creator.
+ * The creator is not a field of the address row — it belongs to launchpad attribution — but it
+ * arrives in this same response, so it is carried out of here rather than fetched a second time.
+ */
 export function parseAddressResponse(body) {
   if (!body || typeof body !== "object") {
-    return { is_contract: null, source_verified: null, contract_name: null, creation_tx: null, is_token: false };
+    return { is_contract: null, source_verified: null, contract_name: null, creation_tx: null, creator: null, is_token: false };
   }
   return {
     is_contract: typeof body.is_contract === "boolean" ? body.is_contract : null,
     source_verified: typeof body.is_verified === "boolean" ? body.is_verified : null,
     contract_name: typeof body.name === "string" && body.name.length > 0 ? body.name : null,
     creation_tx: body.creation_transaction_hash ?? body.creation_tx_hash ?? null,
+    creator: typeof body.creator_address_hash === "string" ? body.creator_address_hash : null,
     is_token: body.token !== null && body.token !== undefined,
   };
 }
@@ -71,7 +76,7 @@ export async function readAddress(client, address, { isToken = false } = {}) {
   const errors = [];
   const record = (message) => errors.push({ step: "blockscout", message });
 
-  let core = { is_contract: null, source_verified: null, contract_name: null, creation_tx: null, is_token: false };
+  let core = { is_contract: null, source_verified: null, contract_name: null, creation_tx: null, creator: null, is_token: false };
   try {
     core = parseAddressResponse(await client.address(address));
   } catch (e) {
@@ -104,6 +109,9 @@ export async function readAddress(client, address, { isToken = false } = {}) {
     created_block: created.created_block,
     created_at: created.created_at,
     holders,
+    // Carried alongside the row rather than in it: the pulled schema has no creator field, and
+    // launchpad attribution would otherwise refetch this exact response.
+    creator: core.creator,
     errors,
   };
 }
