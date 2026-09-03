@@ -3,7 +3,7 @@
 //   node scripts/compile-packet.mjs <packet.md> [--content-dir <dir>] [--dry-run]
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
-import { parse, stringify } from "yaml";
+import { parseDocument, parse, stringify } from "yaml";
 import { parsePacket, checkPacket, compile } from "./lib/packet.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { checkResearch } from "./lib/research-md.mjs";
@@ -50,6 +50,34 @@ function validationErrors(result, census) {
   return checks.flatMap(([path, errors]) => errors.map((error) => `${path}: ${error}`));
 }
 
+/**
+ * Write one census row without flattening the file. census.yaml carries controller comments — which
+ * receipt a lifecycle rests on, why a row is where it is — and re-emitting the whole array from parsed
+ * data would delete every one of them. Only the compiled row's node is replaced, and the comments its
+ * top-level keys carried move onto the new node.
+ */
+export function censusTextWithRow(text, row) {
+  const doc = text === null ? parseDocument("[]\n") : parseDocument(text);
+  const rows = doc.contents?.items ?? [];
+  const next = doc.createNode(row);
+  const index = rows.findIndex((node) => node?.get?.("slug") === row.slug);
+  if (index >= 0) {
+    for (const pair of rows[index].items ?? []) {
+      const key = pair.key?.value;
+      const carried = next.items.find((item) => item.key?.value === key);
+      if (!carried) continue;
+      for (const field of ["comment", "commentBefore"]) {
+        if (pair.value?.[field] != null && carried.value != null) carried.value[field] = pair.value[field];
+        if (pair.key?.[field] != null && carried.key != null) carried.key[field] = pair.key[field];
+      }
+    }
+    if (rows[index].commentBefore != null) next.commentBefore = rows[index].commentBefore;
+    if (rows[index].comment != null) next.comment = rows[index].comment;
+    doc.contents.items[index] = next;
+  } else doc.contents.items.push(next);
+  return doc.toString({ lineWidth: 0 });
+}
+
 async function appendChangelog(path, entry) {
   let text;
   try { text = await readFile(path, "utf8"); }
@@ -77,7 +105,8 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
   const researchPath = join(root, "research", `${slug}.md`);
   const changelogPath = join(root, "changelog", `${slug}.yaml`);
   const pulledPath = join(root, "pulled", `${slug}.yaml`);
-  const census = await yamlOr(censusPath, []);
+  const censusText = await textOr(censusPath, null);
+  const census = censusText === null ? [] : parse(censusText) ?? [];
   const priorProject = await yamlOr(projectPath, null);
   const priorCensusRow = census.find((row) => row.slug === slug) ?? null;
   const priorSources = await yamlOr(sourcesPath, null);
@@ -100,7 +129,7 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
     return { ...result, files, dryRun: true };
   }
   for (const path of files) await mkdir(dirname(path), { recursive: true });
-  await writeFile(censusPath, stringify(nextCensus, { lineWidth: 0 }));
+  await writeFile(censusPath, censusTextWithRow(censusText, result.censusRow));
   await writeFile(projectPath, stringify(result.project, { lineWidth: 0 }));
   await writeFile(sourcesPath, stringify(result.sources, { lineWidth: 0 }));
   await writeFile(researchPath, result.research);

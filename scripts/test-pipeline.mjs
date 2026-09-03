@@ -18,7 +18,7 @@ import { splitChangelog } from "./migrations/split-changelog.mjs";
 import { addReviewKeys } from "./migrations/add-review-keys.mjs";
 import { parsePacket, validatePacket, checkPacket, compile, PRODUCER_IDS } from "./lib/packet.mjs";
 import { checkResearch, REQUIRED_HEADINGS } from "./lib/research-md.mjs";
-import { runCompile } from "./compile-packet.mjs";
+import { runCompile, censusTextWithRow } from "./compile-packet.mjs";
 import { migrateLifecycle } from "./migrations/lifecycle-from-pulled.mjs";
 
 let failures = 0;
@@ -513,6 +513,35 @@ await test("a compile adds official links and never deletes a stored one", async
   );
   assert.deepEqual(validateAgainst("project", result.project), []);
   assert.deepEqual(validateAgainst("census", [result.censusRow]), []);
+});
+
+await test("a compile writes one census row and keeps the file's comments", async () => {
+  const text = [
+    "# Coverage universe — one row per canonical name.",
+    "",
+    "- slug: keep-me",
+    "  name: Keep Me",
+    "  lifecycle: mainnet   # pulled: 0x9999999999999999999999999999999999999999 2026-08-01T00:00:00.000Z",
+    "  coverage: stub",
+    "",
+    "- slug: alpha",
+    "  name: Alpha",
+    "  lifecycle: mainnet   # pulled: 0x1111111111111111111111111111111111111111 2026-08-02T00:00:00.000Z",
+    "  coverage: stub",
+    "",
+  ].join("\n");
+  const row = compile(degradedPacket).censusRow;
+  const once = censusTextWithRow(text, row);
+  assert.ok(once.includes("# Coverage universe"), "the file's own header comment survives");
+  assert.ok(once.includes("# pulled: 0x9999999999999999999999999999999999999999"), "another row's receipt comment survives");
+  assert.ok(once.includes("# pulled: 0x1111111111111111111111111111111111111111"), "the compiled row keeps the comment on its own lifecycle line");
+  assert.equal(parse(once).length, 2, "the row is replaced, not appended");
+  assert.equal(parse(once)[1].category, row.category, "the compiled row is the one written");
+  assert.equal(censusTextWithRow(once, row), once, "rewriting the same row changes nothing");
+
+  const added = censusTextWithRow(text, { ...row, slug: "brand-new" });
+  assert.equal(parse(added).length, 3, "a slug with no row is appended");
+  assert.ok(added.includes("# Coverage universe"));
 });
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }
