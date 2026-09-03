@@ -149,10 +149,21 @@
         "price_change_h24": { "type": ["number", "null"] },
         "fdv": { "type": ["number", "null"] },
         "first_pair_at": { "type": ["string", "null"], "format": "date-time" },
-        "top10_share": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
-        "top10_share_ex_pools": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "top10_share": {
+          "$comment": "Share of CIRCULATING supply — total supply less everything sitting in a burn address — held by the ten largest live holders on holder page 1. Burn holders are excluded from both the numerator and the supply it divides, because burned tokens are neither held nor sellable; what was burned is reported separately as burned_share.",
+          "type": ["number", "null"], "minimum": 0, "maximum": 1
+        },
+        "top10_share_ex_pools": {
+          "$comment": "Same measure over the ten largest holders that are also not a DexScreener pair, a project vault or locker, or a pool contract (the Uniswap v4 PoolManager singleton holds v4 liquidity under its own address and never appears in pairs).",
+          "type": ["number", "null"], "minimum": 0, "maximum": 1
+        },
+        "burned_share": {
+          "$comment": "Share of total supply in burn addresses on holder page 1. Absent from files written before this field existed; a null means the read did not determine it.",
+          "type": ["number", "null"], "minimum": 0, "maximum": 1
+        },
         "top10_as_of": { "type": ["string", "null"], "format": "date-time" },
         "launchpad": {
+          "$comment": "via 'shared-factory' with shared: true means the creator is infrastructure many projects deploy through, so the slug names the operator, not the launcher of this token: read it as 'via Doppler (LONG)', never as 'launched by LONG'.",
           "oneOf": [
             {
               "type": "object",
@@ -160,8 +171,9 @@
               "required": ["slug", "via", "address"],
               "properties": {
                 "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
-                "via": { "enum": ["factory", "creator"] },
-                "address": { "$ref": "shared#/$defs/address" }
+                "via": { "enum": ["factory", "creator", "shared-factory"] },
+                "address": { "$ref": "shared#/$defs/address" },
+                "shared": { "type": "boolean" }
               }
             },
             { "type": "null" }
@@ -171,6 +183,7 @@
       }
     },
     "lpLock": {
+      "$comment": "locked_share 0 is an assertion that nothing is locked, so it is written only when every LP holder read is a plain account. A holder that could be a locker this run has not located leaves the share null with `reason` saying so.",
       "type": "object",
       "additionalProperties": false,
       "required": ["pair", "locked_share", "holder_kind", "reason"],

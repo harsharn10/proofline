@@ -21,7 +21,7 @@ const ERROR_KEYS = ["step", "message"];
 const MARKET_KEYS = [
   "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
   "price_usd", "price_change_h24", "fdv", "first_pair_at", "top10_share",
-  "top10_share_ex_pools", "top10_as_of", "launchpad", "errors",
+  "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad", "errors",
 ];
 const PAIR_KEYS = [
   "dex", "pair_address", "quote_symbol", "price_usd", "liquidity_usd", "volume_h24",
