@@ -109,8 +109,12 @@ export function inventoryCandidateCount(packet) {
   if (listed) return Number(listed[1]);
   const matches = packet?.frontmatter?.identity?.possible_matches;
   if (Array.isArray(matches) && matches.length) return matches.length;
-  const section = body.match(/^##\s+Candidates?\b[^\n]*\n([\s\S]*?)(?=^##\s|$)/m);
-  return section ? (section[1].match(/^\s*[-*]\s+/gm) ?? []).length : 0;
+  const start = body.search(/^##[ \t]+Candidates?\b/m);
+  if (start < 0) return 0;
+  const rest = body.slice(start).split("\n").slice(1);
+  const end = rest.findIndex((line) => /^##[ \t]/.test(line));
+  const section = (end === -1 ? rest : rest.slice(0, end)).join("\n");
+  return (section.match(/^[ \t]*[-*][ \t]+/gm) ?? []).length;
 }
 
 /**
