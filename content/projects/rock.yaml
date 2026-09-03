@@ -118,3 +118,7 @@ findings:
     - text: "Does verified DopplerERC20V1 source expose a burn path matching the 1e27 mint vs 998376280590820425261189213 supply? Next: read burn/transfer hooks in src/tokens/DopplerERC20V1.sol on the explorer"
     - text: "Would a later Gecko pool slice confirm DexScreener ROCK/GLD 115262.98 / 113062.69? Next: retry api.geckoterminal.com/api/v2/networks/robinhood/tokens/0xB6b5…1E18 when GET is 200"
   unresolved: []
+risks:
+  - USD liquidity figures on the ROCK/GLD book count both sides, and the quote side is GLD, not USDG. [claim S10]
+  - A second ROCK token 0x000AEc…9c5C is a PonsLauncherToken. [claim S10]
+  - No official handle was located, so comms surfaces stay unconfirmed-official. [claim S10]

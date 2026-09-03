@@ -113,3 +113,7 @@ findings:
     - text: "Does launch.o1.exchange/coin/0x47cB…7901 show the launch page and any socials? Next: retry the o1 coin page"
     - text: "Can factory owner 0x5519a8…044D change fees or quotes on live ASS/LULU while launchCreationEnabled is true? Next: read remaining Ownable modifiers on src/RWAERC20LaunchpadFactory.sol and ERC20LaunchpadFactory.sol"
   unresolved: []
+risks:
+  - USD liquidity figures on the ASS/LULU book count both sides, and the quote side is LULU, not USDG. [claim S12]
+  - DexScreener and Gecko disagree on reserve and FDV for the same pool. [claim S12]
+  - DexScreener lists x.com/dipwheeler without a matching CA in that account's posts this pass. [claim S12]

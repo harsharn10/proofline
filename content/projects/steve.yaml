@@ -128,3 +128,7 @@ findings:
     - text: "Which other 4663 STEVE tickers still trade, and do any share this deployer? Next: DexScreener each colliding CA if volume qualifies"
     - text: "Does Gecko later return HTTP 200 for this token with a STEVE/MSFT pool slice? Next: retry Gecko token and pool endpoints when the first GET is 200"
   unresolved: []
+risks:
+  - USD liquidity on the STEVE/MSFT book counts both sides, and the quote side is MSFT, not USDG. [claim S8]
+  - Other 4663 tokens reuse the STEVE ticker, including Minecraft Steve 0x4Adb…ACF6. [claim S8]
+  - Factory owner() is a Safe; token owner() reverts. [claim S8]

@@ -153,3 +153,7 @@ findings:
     - text: "Which of the other CHUD CAs (0x03A6…A331 Pons v2 ETH book, Chudjak/Chudjack) later claim @RHChud or this CA? Next: re-read DexScreener token profiles if a Claim Profile moves"
     - text: "Gecko pool slice for 0x5536f402…476f once the first GET is HTTP 200? Next: retry Gecko token/pool GET; use only if first GET is 200"
   unresolved: []
+risks:
+  - USD liquidity figures on the chud/RDDT book count both sides, and the quote side is RDDT, not USDG. [claim S8]
+  - "Ticker-only pairing is not identity: 0x52E050…1e18 is a ca-collision with more displayed liquidity. [claim S8]"
+  - Constructor socials are empty; netlify claim URLs attached the CA (copypasta-pattern). [claim S8]

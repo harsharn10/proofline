@@ -125,3 +125,7 @@ findings:
     - text: "tvl is not published as a figure: the packet reported -355304.709249059"
   unresolved:
     - text: economics.metric remains unresolved (CON-1).
+risks:
+  - USD liquidity figures on the DEBTCOIN/SGOV book count both sides, and the quote side is SGOV, not USDG. [claim S10]
+  - Gecko reserve_in_usd was negative this pass, so that aggregator slice is not a USD reserve. [claim S10]
+  - No official handle was located, so comms surfaces stay unconfirmed-official. [claim S10]

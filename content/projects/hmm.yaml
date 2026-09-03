@@ -117,3 +117,7 @@ findings:
     - text: "Which aggregator book should the site quote when DexScreener liq is $833k and Gecko reserve is $690k? Next: keep both labeled as pool slices; do not mix Gecko token all-pools volume 2814703.17"
     - text: "Is there an audit of PonsLauncherToken.sol / PonsLaunchFactory.sol that names this HMM deployment? Next: search named auditors if Pons publishes one that covers v1 launcher tokens"
   unresolved: []
+risks:
+  - USD liquidity figures count HMM plus WETH, not a USDG backstop. [claim S10]
+  - DexScreener and Gecko disagree on the same pool's reserve ($833k vs $690k). [claim S10]
+  - Ticker HMM collides with unrelated search terms. [claim S10]

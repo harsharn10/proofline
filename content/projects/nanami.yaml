@@ -127,3 +127,7 @@ findings:
     - text: "Does app.long.xyz/tokens/0x2895ee0AbF…1E18 render NANAMI without Cloudflare challenge? Next: open the token page from a browser session and copy any CA cross-link"
     - text: "Why does Gecko report NANAMI/MSFT reserve_in_usd negative while DexScreener liquidity.usd is 34560.79? Next: re-fetch Gecko pool; keep DexScreener as the TVL receipt until reserve is non-negative"
   unresolved: []
+risks:
+  - USD liquidity on the NANAMI/MSFT book counts both sides, and the quote side is MSFT, not USDG. [claim S12]
+  - Gecko's token fdv follows a dust NANAMI/USDG pool, not the MSFT book. [claim S12]
+  - No official site was located; @WindowschanRH is unconfirmed-official. [claim S12]

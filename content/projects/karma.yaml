@@ -156,3 +156,7 @@ findings:
     - text: "Who is the current creator fee recipient after transferCreatorFeeRecipient 0x0c21798f…736b? Next: read decoded_input on that tx"
     - text: "Should aggregators treat Gecko fdv 1.48M / negative reserve as a quote-side RDDT artefact versus DexScreener fdv 42821 / liq 15134? Next: keep the DexScreener KARMA/RDDT pair slice; do not mix Gecko reserve with DexScreener fdv"
   unresolved: []
+risks:
+  - USD liquidity figures on the KARMA/RDDT book count both sides, and the quote side is RDDT, not USDG. [claim S9]
+  - "Ticker-only pairing is not identity: 0x55f9…1e18 is a ca-collision. [claim S9]"
+  - Constructor/DexScreener website is a YouTube watch URL (third-party-link). [claim S9]

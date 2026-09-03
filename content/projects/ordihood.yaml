@@ -131,3 +131,7 @@ findings:
     - text: "What remains of collision 0x6E9c…246F (curve 0x7b57ca2c…8d10) after holders_count 1? Next: RPC curve.graduated() and DexScreener tokens API on 0x6E9c…246F"
     - text: "Which Gecko window printed ORDIHOOD/WETH liq ~$59092 vol ~$1178232? Next: archive a Gecko pool screenshot if the ~$59k reserve reprint returns"
   unresolved: []
+risks:
+  - USD liquidity figures on the ORDIHOOD/WETH book count both sides against ETH, not USDG. [claim S11]
+  - Factory owner is a Pons Safe; the token owner() reverts. [claim S11]
+  - Ticker collision 0x6E9c…246F is a second Pons clone. [claim S11]

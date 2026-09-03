@@ -121,3 +121,7 @@ findings:
     - text: "Should any of the thin PRIMED/USDG or PRIMED/ETH books get their own notes? Next: only if an assignment names those pool ids"
   unresolved:
     - text: economics.metric remains unresolved (CON-1).
+risks:
+  - USD liquidity figures on the PRIMED/AMZN book count both sides, and the quote side is AMZN, not USDG. [claim S11]
+  - Gecko names the pool AMZN / PRIMED, so pool fdv_usd 1.99M is the AMZN-as-base figure and is not a PRIMED fdv. [claim S11]
+  - Gecko and DexScreener disagree on reserve and fdv for the same pool. [claim S11]

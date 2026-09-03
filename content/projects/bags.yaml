@@ -153,3 +153,6 @@ findings:
     - text: "Which of the 3943 factory registry tokens are still on the curve vs migrated, and what share of Emerson 30d volume is post-graduation Uniswap v4? Next: sample BagsLens.getTokenState on the registry tail"
     - text: "Are Llama protocol/bags TVL dummy.js empty because RH LP is locked in Uniswap v4 PositionManager rather than a Bags custody vault? Next: do not treat vault ETH as pad TVL; record a Llama adapter if one lands"
   unresolved: []
+risks:
+  - Docs give that owner setCreationFee, setHook, setTokenImpl, vault withdraw, and beacon upgradeTo. [verified S13 S16] [claim S3 S19]
+  - Llama RH fees mix V1 and V2 deployments; the docs address book names only this V2 factory. [verified S13 S16] [claim S3 S19]

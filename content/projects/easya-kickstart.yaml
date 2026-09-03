@@ -114,3 +114,7 @@ findings:
     - text: "Does Llama or another aggregator publish a Robinhood Chain TVL slice for Kickstart? Next: do not use Solana Meteora TVL as a chain-4663 figure; reread Llama if a RH adapter lands"
     - text: "tvl is not published as a figure: NULL — api.llama.fi/protocol/easya-kickstart currentChainTvls empty; chains [Solana] only; no Robinhood Chain slice this pass"
   unresolved: []
+risks:
+  - Both factories are upgradeable ERC1967 proxies. [verified S10 S20 S22] [claim S17]
+  - ProxyAdmin owner() on the ETH factory admin and the stock admin is one externally owned account with no code. [verified S10 S20 S22] [claim S17]
+  - The stock admin source is not verified. [verified S10 S20 S22] [claim S17]
