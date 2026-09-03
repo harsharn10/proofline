@@ -13,7 +13,7 @@ import {
   type DirectoryEntry,
   type KpiKey,
 } from "@/data/types";
-import { dejargon } from "@/lib/dejargon";
+import { readerCopy } from "@/lib/dejargon";
 
 type Filter = "all" | "live" | "announced" | "watchlist";
 const FILTERS: Array<{ value: Filter; label: string }> = [
@@ -187,7 +187,7 @@ function CategoryPage() {
                       <Link to="/n/$slug" params={{ slug: entry.slug }} className="block">
                         <b className="font-medium text-[var(--t1)]">{entry.name}</b>
                         <span className="block text-[11px] text-[var(--t3)]">
-                          {entry.tree?.label ?? dejargon(entry.summary)}
+                          {entry.tree?.label ?? readerCopy(entry.summary)}
                         </span>
                       </Link>
                     </td>

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Icon } from "@/components/ui/icon";
-import { dejargon } from "@/lib/dejargon";
+import { readerCopy } from "@/lib/dejargon";
 import { formatDate } from "@/lib/utils";
 
 export type FeedStreamItem = {
@@ -13,22 +13,6 @@ export type FeedStreamItem = {
   body: string;
   sourceUrl: string | null;
 };
-
-export function readerCopy(value: string): string {
-  return dejargon(value)
-    .replace(/\bProofline\b/g, "Icarus")
-    .replace(/\bdossier\b/gi, "research")
-    .replace(/\bresearch packets?\b/gi, "research")
-    .replace(/\bpackets?\b/gi, "research")
-    .replace(/\bcensus\b/gi, "registry")
-    .replace(/\bcoverage\b/gi, "review")
-    .replace(/\bInitial stub opened\b/g, "First profile opened")
-    .replace(/\bstub\b/gi, "short profile")
-    .replace(/\bprovisional\b/gi, "awaiting second review")
-    .replace(/\bderived\b/gi, "calculated")
-    .replace(/\bcohort\b/gi, "section")
-    .replace(/\bqualifying\b/gi, "listing");
-}
 
 export function FeedStream({ items }: { items: FeedStreamItem[] }) {
   return (

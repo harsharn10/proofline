@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { readerCopy } from "@/components/feed-stream";
+import { readerCopy } from "@/lib/dejargon";
 import { Icon } from "@/components/ui/icon";
 import type { LatestIcarusItem } from "@/data/types";
 import { formatDate } from "@/lib/utils";

@@ -14,7 +14,7 @@ import {
   Tag,
   type GrowthSeries,
 } from "@/components/ui";
-import { dejargon, hostLabel, shortAddress } from "@/lib/dejargon";
+import { hostLabel, readerCopy, shortAddress } from "@/lib/dejargon";
 import {
   DEFAULT_KPIS,
   KPI_LABEL,
@@ -122,22 +122,6 @@ function Missing({ children = "not checked" }: { children?: ReactNode }) {
   return <i className="card-missing">{children}</i>;
 }
 
-function readerText(text: string): string {
-  return dejargon(text)
-    .replace(/\bProofline\b/g, "Icarus")
-    .replace(/\bdossier\b/gi, "research")
-    .replace(/\bresearch packets?\b/gi, "research")
-    .replace(/\bpackets?\b/gi, "research")
-    .replace(/\bcensus\b/gi, "registry")
-    .replace(/\bcoverage\b/gi, "review")
-    .replace(/\bInitial stub opened\b/g, "First profile opened")
-    .replace(/\bstub\b/gi, "short profile")
-    .replace(/\bprovisional\b/gi, "awaiting second review")
-    .replace(/\bconfidence\b/gi, "evidence")
-    .replace(/\bcohort\b/gi, "section")
-    .replace(/\bqualifying\b/gi, "listing");
-}
-
 function FactRow({ label, children, tone }: { label: string; children: ReactNode; tone?: "good" | "warn" | "bad" }) {
   return (
     <div className="card-fact-row">
@@ -148,7 +132,7 @@ function FactRow({ label, children, tone }: { label: string; children: ReactNode
 }
 
 function firstSentence(summary: string): { first: string; rest: string } {
-  const clean = readerText(summary);
+  const clean = readerCopy(summary);
   const match = clean.match(/^(.+?[.!?])(?:\s+|$)(.*)$/s);
   if (!match) return { first: clean, rest: "" };
   return { first: match[1]!, rest: match[2] ?? "" };
@@ -444,7 +428,7 @@ function PeopleColumn({ dossier }: Pick<NameCardProps, "dossier">) {
     ...dossier.feed.map((item) => ({
       key: `feed-${item.id}`,
       date: item.date,
-      text: item.title,
+      text: readerCopy(item.title),
       who: item.account ?? (item.kind === "onchain" ? "on-chain" : "project"),
       href: item.sourceUrl ?? `/n/${dossier.slug}?tab=sources`,
       link: item.kind === "company" || item.kind === "ct" ? "post" : "read",
@@ -452,7 +436,7 @@ function PeopleColumn({ dossier }: Pick<NameCardProps, "dossier">) {
     ...dossier.changelog.map((item, index) => ({
       key: `change-${index}-${item.date}`,
       date: item.date,
-      text: readerText(item.title),
+      text: readerCopy(item.title),
       who: "Icarus",
       href: `/n/${dossier.slug}?tab=commentary`,
       link: "read",
@@ -535,11 +519,11 @@ function Commentary({ dossier }: Pick<NameCardProps, "dossier">) {
       {findings.map(({ finding, risk }, index) => (
         <article key={`${risk ? "risk" : "positive"}-${index}`}>
           <h3 className={risk ? "is-risk" : undefined}>{evidenceLabel(finding.class, risk)}</h3>
-          <p>{readerText(finding.text)} <SourceRefs ids={finding.sources} /></p>
+          <p>{readerCopy(finding.text)} <SourceRefs ids={finding.sources} /></p>
         </article>
       ))}
-      {dossier.findings.unresolved.map((gap, index) => <article key={`unresolved-${index}`}><h3>Disputed</h3><p>{readerText(gap.text)}</p></article>)}
-      {dossier.findings.missing.map((gap, index) => <article key={`missing-${index}`}><h3>Open</h3><p>{readerText(gap.text)}</p></article>)}
+      {dossier.findings.unresolved.map((gap, index) => <article key={`unresolved-${index}`}><h3>Disputed</h3><p>{readerCopy(gap.text)}</p></article>)}
+      {dossier.findings.missing.map((gap, index) => <article key={`missing-${index}`}><h3>Open</h3><p>{readerCopy(gap.text)}</p></article>)}
       {findings.length + dossier.findings.unresolved.length + dossier.findings.missing.length === 0 ? <p className="card-empty">No commentary yet.</p> : null}
     </div>
   );
@@ -554,7 +538,7 @@ function Sources({ dossier }: Pick<NameCardProps, "dossier">) {
           <span>{source.id}</span>
           <div>
             <div><strong>{source.publisher}</strong><time>{source.accessed_at.slice(0, 10)}</time><a href={source.url} target="_blank" rel="noreferrer">{hostLabel(source.url)} <Icon name="ext" /></a></div>
-            <p>{readerText(source.claim)}</p>
+            <p>{readerCopy(source.claim)}</p>
           </div>
         </li>
       ))}
@@ -587,7 +571,7 @@ export function NameCard(props: NameCardProps) {
   const token = props.section?.id === "tokens";
   return (
     <article className="card-page">
-      <PageMeta title={`${props.dossier.name} · Icarus`} description={props.dossier.summary} />
+      <PageMeta title={`${props.dossier.name} · Icarus`} description={readerCopy(props.dossier.summary)} />
       <div className="card-back-row">
         <Link to="/" hash={props.section?.id}>← {props.section?.label ?? "All names"}</Link>
       </div>

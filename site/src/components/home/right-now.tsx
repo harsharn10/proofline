@@ -8,7 +8,7 @@ import {
   type DirectoryEntry,
   type TrendingEntry,
 } from "@/data/types";
-import { dejargon } from "@/lib/dejargon";
+import { readerCopy } from "@/lib/dejargon";
 
 function Card({
   title,
@@ -113,7 +113,7 @@ export function RightNow({
               <StatusPill status={entry.kpis.status} />
               <b className="font-medium">{entry.symbol ?? entry.name}</b>
               <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] text-[var(--t3)]">
-                {dejargon(entry.summary)}
+                {readerCopy(entry.summary)}
               </span>
               <span className="ml-auto whitespace-nowrap font-medium">
                 {relativeTime(entry.kpis.firstPairAt!, now)}
@@ -141,7 +141,7 @@ export function RightNow({
             <Row key={entry.slug} entry={entry}>
               <b className="font-medium">{entry.name}</b>
               <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] text-[var(--t3)]">
-                {dejargon(entry.summary)}
+                {readerCopy(entry.summary)}
               </span>
               <span className="ml-auto whitespace-nowrap font-medium">
                 {relativeTime(entry.reviewedAt, now)}
