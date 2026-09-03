@@ -161,6 +161,38 @@ export type PulledMarket = {
   price_change_h24: number | null;
   fdv: number | null;
   first_pair_at: string | null;
+  // Share of circulating supply (total supply less burned) held by the ten largest live holders.
+  // Burn addresses leave both the numerator and the denominator; burned_share reports them instead.
+  top10_share: number | null;
+  // Same, over the ten largest holders that are also not a pair, a vault or locker, or a pool
+  // contract — including the Uniswap v4 PoolManager singleton, which holds v4 liquidity under its
+  // own address and so never appears among the pairs.
+  top10_share_ex_pools: number | null;
+  // Absent on files written before the field existed, so optional as well as nullable.
+  burned_share?: number | null;
+  top10_as_of: string | null;
+  // shared: true (via "shared-factory") means the creator is infrastructure many projects deploy
+  // through: render it as "via Doppler (LONG)", never as "launched by LONG".
+  launchpad: {
+    slug: string;
+    via: "factory" | "creator" | "shared-factory";
+    address: string;
+    shared?: boolean;
+  } | null;
+  errors: Array<{ step: string; message: string }>;
+};
+export type PulledStructure = {
+  pulled_at: string;
+  mint: "owner-can-mint" | "no-mint-function" | "unknown";
+  renounced: boolean | null;
+  // locked_share 0 means "read, and nothing is locked"; null means the read could not tell, and
+  // `reason` says why. Never render a null as zero.
+  lp: Array<{
+    pair: string | null;
+    locked_share: number | null;
+    holder_kind: "burn" | "locker" | "burn-and-locker" | "none" | null;
+    reason: string | null;
+  }>;
   errors: Array<{ step: string; message: string }>;
 };
 // Blockscout activity read per address (scripts/lib/pull/activity.mjs).
@@ -189,6 +221,7 @@ export type PulledFile = {
   addresses: PulledAddress[];
   metrics: Array<{ kind: MetricKind; value: number; as_of: string; source_url: string }>;
   market?: PulledMarket | null;
+  structure?: PulledStructure | null;
   activity?: PulledActivity | null;
   errors: Array<{ step: string; message: string }>;
 };

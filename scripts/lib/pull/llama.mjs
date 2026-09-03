@@ -3,6 +3,7 @@
 // all-chain total (assignment: "chain-slice TVL, never the all-chain total").
 
 import { requestJson } from "./http.mjs";
+import { revenueDaily } from "./series.mjs";
 
 export const LLAMA_BASE = "https://api.llama.fi";
 
@@ -41,12 +42,27 @@ export function latestChainTvl(body, chain = LLAMA_CHAIN) {
   return { value, as_of: seconds ? new Date(seconds * 1000).toISOString() : null };
 }
 
-/** 24h total for the Robinhood Chain slice of a /summary response; falls back to nothing. */
+/**
+ * 24h total for the Robinhood Chain slice of a /summary response. There is no fallback: `total24h`
+ * on the body is the protocol's figure across every chain it runs on, and publishing that as a
+ * Robinhood Chain number would silently credit this chain with Base's and Arbitrum's fees. A
+ * response with no chainBreakdown returns null and the caller records why.
+ */
 export function chainTotal24h(body, chain = LLAMA_CHAIN) {
-  const slice = body?.chainBreakdown?.[chain];
-  const value = slice?.total24h;
+  const breakdown = body?.chainBreakdown;
+  if (!breakdown || typeof breakdown !== "object") return null;
+  const value = breakdown?.[chain]?.total24h;
   if (typeof value !== "number" || !Number.isFinite(value)) return null;
   return value;
+}
+
+/** Why chainTotal24h returned null, in the words a reader of errors[] needs. */
+export function missing24hReason(body, chain = LLAMA_CHAIN) {
+  const breakdown = body?.chainBreakdown;
+  if (!breakdown || typeof breakdown !== "object") {
+    return "the response carries no chainBreakdown, and its all-chain total is not a Robinhood Chain figure";
+  }
+  return `${chain} is not one of the chains the response breaks down (${Object.keys(breakdown).join(", ") || "none"})`;
 }
 
 export function createLlamaClient({ base = LLAMA_BASE, deps = {} } = {}) {
@@ -65,6 +81,7 @@ export function createLlamaClient({ base = LLAMA_BASE, deps = {} } = {}) {
 export async function readProtocol(client, llamaSlug, { asOf, chain = LLAMA_CHAIN } = {}) {
   const metrics = [];
   const errors = [];
+  let revenueSeries = [];
   const record = (message) => errors.push({ step: "llama", message });
 
   const tvlUrl = client.protocolUrl(llamaSlug);
@@ -82,13 +99,22 @@ export async function readProtocol(client, llamaSlug, { asOf, chain = LLAMA_CHAI
   ];
   for (const { kind, url } of summaries) {
     try {
-      const value = chainTotal24h(await client.get(url), chain);
+      const body = await client.get(url);
+      const value = chainTotal24h(body, chain);
+      // Every null figure names its reason: an absent chain slice is a fact about the protocol, and
+      // the one thing it must never become is the all-chain total wearing this chain's name.
       if (value !== null) metrics.push({ kind, value, as_of: asOf, source_url: url });
+      else record(`${kind} ${llamaSlug}: ${missing24hReason(body, chain)}`);
+      if (kind === "revenue_24h") {
+        revenueSeries = revenueDaily(body, { chain });
+        if (revenueSeries.length === 0) record(`revenue_daily ${llamaSlug}: no ${chain} daily series in the response`);
+      }
     } catch (e) {
-      // A protocol with no fees or no DEX adapter answers 404; that is an absence, not a failure.
-      if (!/HTTP 404/.test(e.message)) record(`${kind} ${llamaSlug}: ${e.message}`);
+      // Revenue is a requested field, so even an expected 404 must explain its null value. The
+      // older optional fees/DEX reads keep their existing quiet-absence behaviour.
+      if (kind === "revenue_24h" || !/HTTP 404/.test(e.message)) record(`${kind} ${llamaSlug}: ${e.message}`);
     }
   }
 
-  return { metrics, errors };
+  return { metrics, errors, revenueSeries };
 }
