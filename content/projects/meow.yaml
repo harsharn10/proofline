@@ -1,0 +1,124 @@
+slug: meow
+name: MEOW
+symbol: MEOW
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against AMD. LongLauncher deploys a DopplerERC20V1 token whose on-chain name is AMD and symbol is MEOW, then seeds the MEOW/AMD book. Traders buy and sell MEOW on Uniswap v4. AMD is the quote rail. No official site was located this pass; DexScreener lists an X account that reprints the CA.
+themes:
+  - memecoin
+  - stock-paired:amd
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/meow_robinhood
+dependencies: []
+deployments:
+  - label: MEOW token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x7235Cf5eA4674FE09531706954B5f1aD6E0A1e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S12
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S12
+  - label: AMD • Robinhood Token (pair quote rail)
+    chain: robinhood-chain
+    address: "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S7
+      - S10
+      - S11
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S19
+metrics:
+  - kind: volume_24h
+    value: 554392.11
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 53771.13
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 63473.61
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 260
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/launcher/Airlock/AMD and create tx 0x33aa…8612, RPC name/symbol/owner/getAssetData, DexScreener, Gecko pool/token, /rhj/assets, CHIP and MD DexScreener searches, and the @meow_robinhood profile were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-10] - Numbers: 587708.52 is the DexScreener MEOW/AMD pool 24h volume, not the Gecko 554392.11 pool figure or the 555248.34 token figure. Liquidity 53771.13 is DexScreener. Gecko reserve -10478.77 is not used as TVL. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that MEOW is the AMD Stock Token, or that CHIP/MD are the same name. /rhj/assets AMD is 0x8692…3fdC; this token is 0x7235…1e18 with symbol MEOW; CHIP is 0xE38B…6E59; MD is 0x3abb…1e18."
+      class: inference
+      sources:
+        - S10
+        - S16
+        - S17
+    - text: Quote token AMD 0x8692…3fdC is the Robinhood Stock Token rail; MEOW is not in GET /rhj/assets. [verified R-10 R-11] - Pool USD reserve on DexScreener is MEOW plus AMD, not a USDG or WETH backstop. [claim R-7] - Gecko reserve_in_usd is negative this pass; do not card it. [claim R-8] - On-chain name() AMD collides with the rail ticker; CHIP and MD are separate AMD-quoted tokens. [verified R-1 R-16 R-17] - No official handle or domain this pass; X is unconfirmed-official. [claim R-7 R-13] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x7235…1e18? Next: re-read DexScreener token profile after a Claim Profile; search a site that embeds the CA and the handle"
+    - text: "Why is Gecko MEOW/AMD reserve_in_usd negative while DexScreener liquidity.usd is $53.8k? Next: re-fetch the Gecko pool after the reserve field is non-negative; do not card the negative reserve"
+    - text: "Does verified LongLauncher / DopplerERC20V1 source leave a privileged path beyond Airlock owner()? Next: read create and Airlock setters in src/LongLauncher.sol and src/Airlock.sol on the explorer"
+    - text: "Should CHIP 0xE38B…6E59 or MD 0x3abb…1e18 share a card with MEOW because both quote AMD? Next: keep separate packets; re-check only if a shared official handle appears"
+    - text: "Which Gecko token pool produced fdv_usd 344376 vs the AMD book 63474? Next: open Gecko token/pools and name the pool that drives the token fdv"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

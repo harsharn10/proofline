@@ -1,0 +1,122 @@
+slug: incel
+name: INCEL
+symbol: INCEL
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-initial-supply ERC-20 cloned into a Uniswap v4 pool quoted against INTC. LongLauncher.create from 0x37e771…0DfB minted Incel Inside (INCEL) on 2026-07-22T13:20:04Z into pool 0x11de…aef0 via DopplerERC20V1Factory and Airlock. Traders buy and sell INCEL against the Intel Robinhood Token. incelinside.com displays the CA. DexScreener lists @incelrh without a bidirectional official-crosslink from the handle back to the site.
+themes:
+  - memecoin
+  - stock-paired:intc
+  - rwa
+official_links:
+  - kind: site
+    url: https://incelinside.com
+  - kind: x
+    url: https://x.com/incelrh
+  - kind: app
+    url: https://app.long.xyz/tokens/0x12d834f0780c367909319c73f42310dc0b201e18
+dependencies: []
+deployments:
+  - label: INCEL token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x12d834F0780c367909319c73f42310Dc0b201E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S4
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: LongLauncher (create() target)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S13
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S6
+      - S14
+  - label: INTC Intel • Robinhood Token (pair quote / numeraire)
+    chain: robinhood-chain
+    address: "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681"
+    role: token
+    verified: true
+    sources:
+      - S11
+      - S12
+metrics:
+  - kind: volume_24h
+    value: 462081.7
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 260739.34
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 804587.25
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 759
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/LongLauncher/Airlock/INTC and create tx 0xbfc332…fc96, RPC name/symbol/owner/isPoolLocked/tokenURI, DexScreener, Gecko pool/token/info, /rhj/assets, IPFS tokenURI, incelinside.com, @incelrh, @ghostdotenv, Bankr launches, the Pons same-name token, and the netlify claim/vote posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-11 R-18] - Numbers: 462081.70 is the Gecko INCEL/INTC pool 24h volume, not the 487324.12 token all-pools figure. Reserve 260739.34 is that pool. DexScreener 493022.97 / 216898.35 is the same pair, different aggregator. Live RPC totalSupply is 9.920e26, not Gecko token 1e27. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that INCEL is a Bankr-official or Intel-official product. Create is LongLauncher, Bankr API latest 50 has no row, INTC is the rhj/assets rail, and the site is incelinside.com not intel.com."
+      class: inference
+      sources:
+        - S4
+        - S11
+        - S18
+        - S23
+    - text: Quote token INTC 0xc72b…9681 is a Robinhood Stock Token rail in GET /rhj/assets; pool USD reserve is INCEL plus INTC, not a USDG backstop. [verified R-11 R-12] - Gecko dex label bankr-robinhood can be read as a Bankr mint; the create tx is LongLauncher. [verified R-4 R-8 R-23] - @incelrh is unconfirmed-official; the handle does not name incelinside.com this pass. [claim R-17 R-18] - Same-ticker clones including PonsLauncherToken Incel Inside 0xb93d…0E41. Flag ca-collision. [claim R-21] - Netlify claim and vote URLs that embed the CA. Flag copypasta-pattern | third-party-link. [claim R-20 R-24] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @incelrh later name incelinside.com so the handle and site are bidirectional? Next: re-read @incelrh bio and incelinside.com footer after a profile edit"
+    - text: "Does the launcher EOA 0x37e771…0DfB map to a public handle? Next: trace the EOA on Blockscout and any post that embeds 0x37e771…0DfB"
+    - text: "Should Gecko dex bankr-robinhood be treated as Bankr-minted or as Doppler-hook taxonomy? Next: compare hook 0x4e34…a544 against a known Bankr launch and a known LONG launch"
+    - text: "Which of the Blockscout INCEL-named tokens besides 0x12d834…1E18 share the INCEL/INTC book? Next: keep ca-collision on any new same-ticker 4663 deploy"
+  unresolved: []

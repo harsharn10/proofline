@@ -1,0 +1,113 @@
+slug: juggernaut
+name: JUGGERNAUT
+symbol: JUGGERNAUT
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by the NOXA Fun Launch Factory into a Uniswap v3 JUGGERNAUT/WETH 1% pool. Traders buy and sell The Juggernaut (JUGGERNAUT) on that ETH book. Site juggernautrh.com lists the CA and @Juggernautrh.
+themes:
+  - memecoin
+  - eth-book
+  - noxa-launch
+official_links:
+  - kind: site
+    url: https://juggernautrh.com/
+  - kind: x
+    url: https://x.com/Juggernautrh
+  - kind: telegram
+    url: https://t.me/juggernaut_rh
+  - kind: other
+    url: https://fun.noxa.fi/robinhood/token/0xd7321801caae694090694ff55a9323139f043b88
+  - kind: other
+    url: https://x.com/vladtenev/status/1926051737258918360
+dependencies: []
+deployments:
+  - label: JUGGERNAUT token (LaunchToken)
+    chain: robinhood-chain
+    address: "0xD7321801CAae694090694Ff55A9323139F043B88"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S5
+  - label: NOXA Fun launch factory (token creator / launchFactory)
+    chain: robinhood-chain
+    address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
+    role: factory
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+      - S18
+  - label: Uniswap v3 JUGGERNAUT/WETH 1% pool (liquidityPool)
+    chain: robinhood-chain
+    address: "0x588b0785f50063260003B7790C42f1eF74902746"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S17
+  - label: WETH9 (pairToken / pair quote)
+    chain: robinhood-chain
+    address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    role: token
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S7
+metrics:
+  - kind: volume_24h
+    value: 1727572.61
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: tvl
+    value: 487000.38
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: market_cap
+    value: 6456627
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: holders
+    value: 16850
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/pool/create tx/logs/source, RPC name/symbol/launchFactory/pairToken/liquidityPool, DexScreener tokens+search, Gecko search, juggernautrh.com, @Juggernautrh website and migrate posts, Telegram preview, Vlad post, @RHDaily__, and ticker-clone token page were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-6 R-8] - Numbers: 1720192.78 is the Gecko JUGGERNAUT/WETH 1% search-row 24h volume, not Blockscout token volume_24h 4244639. Reserve 485702.46 is that pool. DexScreener 1727572.61 / 487000.38 is the same pair, different aggregator. [claim R-1 R-6 R-7] - Adversarial: the strongest contrary reading is that the $1.40M JUGGERNAUT/WETH 0.3% book or the Pons-tagged @juggernautonrh HOODon token is canonical. Those are different CAs and a different handle; the site and liquidityPool() both name 0xD732…3B88 / 0x588b…2746."
+      class: inference
+      sources:
+        - S7
+        - S8
+        - S21
+    - text: Same-ticker The Juggernauts 0x6b3A…9A17 shows ~$1.40M Gecko reserve with ~$10 24h volume; it is not 0xD732…3B88. [verified R-7 R-16] - Quote token is WETH, not a stock token; still distinct from packed CHUMP and SHRUB ETH books. [verified R-6 R-15] - Telegram is a third-party-link; handle-collision accounts exist. [claim R-10 R-21] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @Juggernautrh embed CA 0xD732…3B88 in a post or profile website field? Next: re-read the X profile website card and any pinned post that embeds the CA"
+    - text: "Why does RPC launchBlock() return 25362237 while Blockscout creation tx is block 126005? Next: compare LaunchToken bytecode to verified source launchBlock assignment"
+    - text: "Does t.me/juggernaut_rh pin CA 0xD732…3B88 or juggernautrh.com? Next: open the join page / first messages if they become public without joining"
+    - text: "Is Gecko pool 0x588b…2746 still the trending JUGGERNAUT/WETH book vs the 0x0E03…F224 The Juggernauts clone? Next: retry the pool endpoint after the 429 window; do not loop"
+    - text: "Does verified LaunchToken leave a factory callback after restrictionBlocks? Next: read remaining LaunchToken.sol transfer hooks on the explorer"
+  unresolved: []

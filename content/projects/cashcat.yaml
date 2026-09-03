@@ -1,0 +1,92 @@
+slug: cashcat
+name: CASHCAT
+symbol: CASHCAT
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A Uniswap v3 memecoin minted through the now-inactive NOXA Fun factory. Holders trade CASHCAT against WETH on the original 1% pool and later books. cashcat.cc and @cashcat_token publish the contract. The token is not a protocol and is not the LetsCash pad, which the same site lists as a separate buyback launcher.
+themes:
+  - memecoin
+  - dog
+official_links:
+  - kind: site
+    url: https://cashcat.cc
+  - kind: x
+    url: https://x.com/cashcat_token
+  - kind: telegram
+    url: https://t.me/cashcat_robinhood
+  - kind: other
+    url: https://cashcattoken.xyz
+dependencies: []
+deployments:
+  - label: CASHCAT token (LaunchToken)
+    chain: robinhood-chain
+    address: "0x020bfC650A365f8BB26819deAAbF3E21291018b4"
+    role: token
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S5
+  - label: NOXA Fun launch factory (token creator / launchFactory)
+    chain: robinhood-chain
+    address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
+    role: factory
+    verified: false
+    sources:
+      - S2
+      - S3
+      - S6
+  - label: Uniswap v3 CASHCAT/WETH 1% pool (liquidityPool)
+    chain: robinhood-chain
+    address: "0xA70fc67C9F69da90B63a0e4C05D229954574E313"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S6
+      - S7
+metrics:
+  - kind: volume_24h
+    value: 9863326.17
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 2681689.71
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 273660683
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 104938
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk: []
+  missing:
+    - text: "Was the Uniswap v3 position NFT for pool 0xA70f…E313 burned, as cashcat.cc states 100% in pool / LP burned? Next: eth_call positions(tokenId) / ownerOf on 0x7399…e0d3 for the launch positionId"
+    - text: "Why does launchBlock() return 25346701 while the creation tx is block 88836? Next: compare deployed bytecode to LaunchToken.sol or decode constructor args from tx input"
+    - text: "What factory address does LetsCash use, and does any CASHCAT buyback/burn path from letscash.fun hit 0x020b…18b4? Next: read letscash.fun tokenomics and match a factory on 4663"
+    - text: "Is there an audit of LaunchToken.sol? Next: search named auditors if the project publishes one"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

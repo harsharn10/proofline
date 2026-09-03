@@ -1,0 +1,104 @@
+slug: nudes
+name: Send Nudes
+symbol: NUDES
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: Send Nudes is a SNAP-quoted memecoin on Robinhood Chain. A user swaps NUDES for Snap Inc. Robinhood Token in a Uniswap v4 pool created in one o1.exchange factory transaction. @SendNudesRH publishes the contract. The token is not SENDNUDES at 0xaa23…1e18.
+themes:
+  - memecoin
+  - stock-paired:snap
+official_links:
+  - kind: x
+    url: https://x.com/SendNudesRH
+  - kind: other
+    url: https://www.geckoterminal.com/robinhood/pools/0x383957bce2341f59ff97c47eda2ad3b3b839b7050adc8a4747a398abca0ad552
+  - kind: other
+    url: https://dexscreener.com/robinhood/0x383957bce2341f59ff97c47eda2ad3b3b839b7050adc8a4747a398abca0ad552
+dependencies: []
+deployments:
+  - label: NUDES token (Send Nudes)
+    chain: robinhood-chain
+    address: "0xbe98b75361935b18d688409424a869a4C3dC7401"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S4
+  - label: o1 historical RWAERC20LaunchpadFactory (createLaunch)
+    chain: robinhood-chain
+    address: "0xe64AC4113848BBC1a6dDE1A6D1da96720A36F297"
+    role: factory
+    verified: false
+    sources:
+      - S4
+      - S5
+  - label: Historical LaunchHook (launch mint recipient)
+    chain: robinhood-chain
+    address: "0x778b0c4EeA7D35D66513B587bA87FC9084b0EaCC"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S16
+  - label: Snap Inc. Robinhood Token (quote)
+    chain: robinhood-chain
+    address: "0xF6589F11Bc40b669e584073F428B05562F568733"
+    role: token
+    verified: false
+    sources:
+      - S4
+      - S9
+metrics:
+  - kind: tvl
+    value: 427508.5
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: volume_24h
+    value: 15127315.96
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 10805902
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: holders
+    value: 5750
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: RPC, Blockscout address/token/tx/factory/hook/SNAP/SENDNUDES/other NUDES, DexScreener token and SENDNUDES search, Gecko pool and token, @SendNudesRH profile and two posts, and @xueqiu88 were opened on 2026-09-03; excerpts are copied from those responses. [verified R-1 R-2 R-4 R-6 R-7] - Numbers: Gecko reserve and DexScreener liquidity are separate SNAP-book figures, not averaged. $15.1M is Gecko all-pools volume. Holders is Blockscout holders_count. [verified R-2 R-6 R-7 R-8] - Adversarial: the strongest contrary reading is that SENDNUDES 0xaa23…1e18 or NUDES 0xDda2…1E18 is this name, or that the token came from the current o1 factory 0xcE9C…5B0d. Different CAs, symbols, and holder counts argue against the first; the Launched log is on 0xe64A…F297 and current-factory topic1 search returned 0 logs."
+      class: verified
+      sources:
+        - S4
+        - S14
+        - S15
+  risk:
+    - text: Token source is not verified; the address page still shows a null creator. [verified R-2] - NUDES/SNAP liquidity is $427.5k on DexScreener and $465.0k on Gecko for the same pool id. [verified R-6 R-7] - All-pools Gecko volume is $15.1M; the SNAP book is about $6.3M. [verified R-7 R-8] - SENDNUDES and a six-holder NUDES EIP-1167 share the SNAP quote and can be opened by ticker search. [verified R-14] [claim R-17] - No audit report was located this pass.
+      class: unknown
+  missing:
+    - text: "Will Blockscout backfill creator_address_hash / creation_transaction_hash for 0xbe98…7401 so the address page matches the Launched log? Next: re-read the address API after indexer catch-up"
+    - text: "Is the NUDES bytecode verified anywhere, and does it match o1 LaunchToken source? Next: compare bytecode hash to launchTokenBytecodeHash() on 0xe64A…F297"
+    - text: "Who controls EIP-7702 caller 0x0736…1021, and can that key still change creator-fee routing on the historical factory? Next: eth_call creator lookup on AnnouncementRegistry 0x6a95…E29F and read historical factory creator-admin views"
+    - text: "Is there an official site beyond the IPFS metadata CID in createLaunch? Next: resolve the CID and search for a domain"
+    - text: "Is there an audit whose scope includes this LaunchHook 0x778b…EaCC / historical factory bytecode? Next: match XORS reports named in the o1-exchange packet to 0xe64A…F297"
+  unresolved: []

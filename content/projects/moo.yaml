@@ -1,0 +1,121 @@
+slug: moo
+name: Memory cow Moo
+symbol: MOO
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A LONG-launched ERC-20 that trades in a Uniswap v4 pool quoted against tokenized Micron (MU). LongLauncher.create deployed Memory cow Moo on 20 Jul 2026. Traders buy and sell MOO against MU on that book. @memorycowmoo is the handle DexScreener lists and LONG named as the MU pair.
+themes:
+  - memecoin
+  - stock-paired:mu
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/memorycowmoo
+dependencies: []
+deployments:
+  - label: MOO token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xD9dB30BB0D2b8d2eae3826A1372117E058791e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S3
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S1
+      - S20
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S6
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S4
+      - S5
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S3
+      - S19
+  - label: Micron Technology • Robinhood Token (pair asset)
+    chain: robinhood-chain
+    address: "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD"
+    role: token
+    verified: false
+    sources:
+      - S4
+      - S7
+      - S23
+metrics:
+  - kind: tvl
+    value: 4482942.7
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: volume_24h
+    value: 6358275
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 28902315
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 5998
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/Airlock/MU/SEMI/stale clone and the create tx, RPC name/symbol/owner/code, DexScreener token-pairs and search, Gecko pool/token/trending, @memorycowmoo, @longdotxyz, @LBankUpdates, Gate, and @bankrbot were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-3 R-7 R-8] - Numbers: 1724771.11 is DexScreener MOO/MU liquidity, not the 4482942.70 Gecko pool reserve or the 3634297.89 token total_reserve. 6491540.67 is that pair's 24h volume, not the 9801463.01 token all-pools figure. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that Bankr CA 0x2e74…fbA3 is canonical Memory cow Moo, or that SEMI is this MU pair. 0x2e74 has 2 holders and no DexScreener pairs; SEMI is 0x5F03…BaC8 / semivault.xyz / @Semivaultxyz. Live book 0xD9dB…1e18 was created by LongLauncher three days earlier."
+      class: inference
+      sources:
+        - S15
+        - S16
+        - S17
+        - S18
+    - text: DexScreener $1.72M, Gecko pool $4.48M, and Gecko token reserve $3.63M disagree on liquidity. [verified R-7 R-8 R-9] - Same-name clone 0x2e74…fbA3 and two low-liquidity MOO/MU copycat bases exist. [verified R-16] [claim R-21] - Handle-to-CA link is unconfirmed-official this pass. [claim R-10] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @memorycowmoo post CA 0xD9dB…1e18, or is there a site that bidirectionally links the handle to that contract? Next: re-read the handle for a CA post and any new homepage"
+    - text: "Is there an audit of DopplerERC20V1 / LongLauncher covering this clone? Next: search LONG docs and the DopplerERC20V1 source comments for an audit URL"
+    - text: "What privileged paths sit on Airlock 0xeb7C…0862 for this token? Next: read Airlock verified source for setters that bind this clone"
+    - text: "Which liquidity figure is the MOO/MU book: DexScreener $1.72M, Gecko pool $4.48M, or Gecko token reserve $3.63M? Next: compare pool token balances via RPC against both aggregators"
+    - text: "Does the Bankr clone 0x2e74…fbA3 still have any live pool, or is it inert at 2 holders? Next: watch that address if a pool appears"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).

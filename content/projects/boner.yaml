@@ -1,0 +1,124 @@
+slug: boner
+name: BONER
+symbol: BONER
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A LONG-launched memecoin quoted against the HIMS stock token. Holders swap BONER for HIMS in the Uniswap v4 pool created with the token. @bonercoinlong publishes the contract from boneronlong.xyz. The token is not the LONG factory.
+themes:
+  - memecoin
+  - stock-paired:hims
+official_links:
+  - kind: site
+    url: https://boneronlong.xyz
+  - kind: app
+    url: https://app.long.xyz/tokens/0x98096d17e191b3da1d5f99a6d7b3584351b11e18
+  - kind: x
+    url: https://x.com/bonercoinlong
+  - kind: other
+    url: https://boner.fyi
+dependencies: []
+deployments:
+  - label: BONER token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x98096d17e191B3dA1d5f99a6D7b3584351b11E18"
+    role: token
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S4
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S4
+      - S15
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S2
+      - S16
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S17
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: true
+    sources:
+      - S4
+      - S18
+  - label: Quote asset HIMS stock token
+    chain: robinhood-chain
+    address: "0xCceE82fE024c36fA15E1005edE3E9e4787e23D09"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S5
+      - S19
+  - label: LONG fee receiver / Spank Bank wallet
+    chain: robinhood-chain
+    address: "0x79aEaE6a47ff2e551F60bd87DBd6358eFeaF4DC8"
+    role: other
+    verified: false
+    sources:
+      - S1
+      - S3
+      - S13
+metrics:
+  - kind: tvl
+    value: 3295257.08
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: volume_24h
+    value: 18586776.21
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: market_cap
+    value: 46372736.95
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: holders
+    value: 16057
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk: []
+  missing:
+    - text: "Which Airlock functions can change BONER supply, pool, or ownership after LongLauncher.create? Next: read owner-only setters on DopplerERC20V1 and Airlock getAssetData for 0x98096d…1E18"
+    - text: "Is there an audit of DopplerERC20V1 / LongLauncher covering this clone? Next: search named auditors if LONG or Doppler publishes one"
+    - text: "Does Blockscout HIMS total_supply 73,319 this pass match the 58,714 float The Defiant posted on 2026-08-31? Next: pull HIMS totalSupply history around 2026-08-30/31 and 2026-09-03"
+    - text: "Is there a Telegram, GitHub org, or docs URL besides boneronlong.xyz and the LONG token page? Next: re-check DexScreener info.socials and the X bio"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

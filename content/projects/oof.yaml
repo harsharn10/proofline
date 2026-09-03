@@ -1,0 +1,119 @@
+slug: oof
+name: OOF
+symbol: OOF
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against RBLX. LongLauncher deploys OOF in one create call and seeds the OOF/RBLX book. Traders buy and sell OOF on Uniswap v4. RBLX is the Roblox Robinhood Token rail, not this subject. No official site was located this pass. DexScreener lists x.com/OOFonRH; flag unconfirmed-official.
+themes:
+  - memecoin
+  - stock-paired:rblx
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/OOFonRH
+dependencies: []
+deployments:
+  - label: OOF token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xeA3b282273E9ab901790694aDD171C2606D71e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S3
+      - S5
+  - label: LongLauncher (create target)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S18
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S18
+  - label: RBLX Roblox Robinhood Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0xF0C4BF4C582cb3836e98394b1d4e7B7281101bE8"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S17
+metrics:
+  - kind: volume_24h
+    value: 1263410.12
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 154681.29
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 382482.27
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 1663
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/Airlock/RBLX and the create tx plus logs, RPC name/symbol/owner/eth_getCode, DexScreener token and search, Gecko pool/token, /rhj/assets, @OOFonRH, @0xBedouin, and the discovery-inventory ROBLOXIANS row were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 1263410.12 is the Gecko OOF/RBLX pool 24h volume, not the 1294777.86 token all-pools figure. Reserve 154681.29 is that pool. DexScreener 1326686.46 / 163516.07 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that OOF is ROBLOXIANS, or that it is a Bankr product, or that @OOFonRH is official. ROBLOXIANS is 0xB528…c10D. The create target is LongLauncher. The X bio has no CA."
+      class: inference
+      sources:
+        - S4
+        - S13
+        - S16
+    - text: Quote token RBLX is a Robinhood Stock Token rail shared with other pairs, including in-flight ROBLOXIANS. [verified R-12 R-16] - Pool USD reserve is OOF plus RBLX, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko dex label Bankr does not match the LongLauncher create target. [verified R-4 R-8] - No official handle or domain this pass; X is unconfirmed-official. [claim R-7 R-13] - Other OOF tickers exist on robinhood. [claim R-15] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @OOFonRH bidirectionally link to token 0xeA3b…1e18 (CA in bio, pinned post, or DexScreener Claim Profile)? Next: re-read the bio and DexScreener token profile after a Claim Profile; search new posts that embed the CA"
+    - text: "Is 0x21E2…7A66 the LONG protocol fee split, and does verified DopplerHookInitializer source leave other privileged paths? Next: read DopplerHookInitializer and LongLauncher fee-split in verified source on Blockscout"
+    - text: "Will in-flight robloxians (0xB528…c10D) compile as its own census row, or does any later packet try to merge it with oof because both quote RBLX? Next: keep CAs separate when robloxians is packed; RBLX remains the rail"
+    - text: "Which other robinhood OOF tickers stay live besides 0xeA3b…1e18? Next: re-run search if a second OOF book crosses the liquidity bar"
+  unresolved: []

@@ -1,0 +1,126 @@
+slug: hotdog
+name: HOTDOG
+symbol: HOTDOG
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A Costco-paired memecoin minted through lunch.fun's V3 pair launcher. Holders trade HOTDOG against COST on Uniswap v3 1% pool 0x264a…F55c. hotdogonrh.com and @HOTDOGonRH publish contract 0x4544…188C.
+themes:
+  - memecoin
+  - stock-paired:cost
+official_links:
+  - kind: site
+    url: https://www.hotdogonrh.com
+  - kind: x
+    url: https://x.com/HOTDOGonRH
+  - kind: telegram
+    url: https://t.me/HOTDOGonRH
+  - kind: other
+    url: https://lunch.fun/coin/0x45443A4a7b58ab26A4B4D72616cf36D5aAE7188C
+dependencies: []
+deployments:
+  - label: HOTDOG token (LunchTokenPlain)
+    chain: robinhood-chain
+    address: "0x45443A4a7b58ab26A4B4D72616cf36D5aAE7188C"
+    role: token
+    verified: true
+    sources:
+      - S8
+      - S13
+      - S14
+  - label: lunch Stock/USDG-pair launcher (V3)
+    chain: robinhood-chain
+    address: "0x568E12B312751992DCfE387CFc8EC7D63E941103"
+    role: factory
+    verified: false
+    sources:
+      - S7
+      - S10
+      - S14
+  - label: Uniswap v3 HOTDOG/COST 1% pool
+    chain: robinhood-chain
+    address: "0x264ad13Bfc0585208b7d8b1712df51B096a5F55c"
+    role: other
+    verified: false
+    sources:
+      - S9
+      - S12
+      - S14
+      - S15
+  - label: Costco • Robinhood Token (COST)
+    chain: robinhood-chain
+    address: "0x4EA005168D7F09a7A0Ba9D1DEf21a479950E44C2"
+    role: token
+    verified: false
+    sources:
+      - S11
+      - S14
+  - label: Launch caller (creator())
+    chain: robinhood-chain
+    address: "0x4b03CA54Be3d815453D37182E893a6E36B7d6781"
+    role: admin
+    verified: false
+    sources:
+      - S9
+      - S14
+  - label: lunch V3 pair fee locker
+    chain: robinhood-chain
+    address: "0x46F1DdD98a51016804b5a42db71d6985E76c8326"
+    role: other
+    verified: false
+    sources:
+      - S6
+      - S25
+metrics:
+  - kind: volume_24h
+    value: 40454.99
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15
+  - kind: tvl
+    value: 75171.89
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15
+  - kind: market_cap
+    value: 487932
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15
+  - kind: holders
+    value: 221
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: hotdogonrh.com, @HOTDOGonRH profile and dated posts, t.me/HOTDOGonRH, lunch.fun/coin and /api/launches?q=HOTDOG, lunch.fun/docs, Blockscout API v2, RPC eth_getCode and eth_call, DexScreener and Gecko for 0x4544…188C and 0x1C1…566f were opened on 2026-09-03; excerpts are copied from those pages. [verified R-1 R-8 R-14 R-15 R-16] - Numbers: $39,742.19 / $75,093 are Gecko Uniswap v3 1% HOTDOG/COST 0x264a…F55c, not the Pons V2 Dex $7.56M / $181.9K book and not an all-chains figure. [verified R-16 R-18] - Adversarial: the strongest contrary reading is that the Gecko ~$182k / ~$7.5M HOTDOG/COST pair is this lunch V3 token, or that @hotdogonpons is the official handle. Contract 0x4544…188C's Gecko pool is Uniswap v3 1% 0x264a…F55c at ~$40k 24h / ~$75k reserve; the $7.56M book names 0x1C1…566f. Site and @HOTDOGonRH publish 0x4544…188C."
+      class: verified
+      sources:
+        - S1
+        - S16
+        - S18
+  risk:
+    - text: A second HOTDOG/COST pair (token 0x1C1…566f, Gecko Pons V2 Dex) showed ~$7.56M 24h volume and ~$182k liquidity this pass. [verified R-18 R-19] - The lunch V3 pair launcher is an ERC1967 proxy owned by EOA 0x7B2D…8cC9; tokenURI() reads a base from that launcher. [verified R-10 R-13 R-14] - This pass did not reproduce the LP NFT lock. [claim R-6 R-7] - No audit report was located this pass. [unknown] - lunch.fun/api/launches?q=HOTDOG returns additional HOTDOG-ticker rows at other addresses.
+      class: claim
+      sources:
+        - S6
+  missing:
+    - text: "Is the Uniswap v3 position NFT for pool 0x264a…F55c locked in LunchV3PairFeeLockerFrozen 0x46F1…8326, as lunch docs state LP locked from block one? Next: read the launch tx logs for the NonfungiblePositionManager tokenId and ownerOf on the position manager"
+    - text: "Does Pons V2 Dex HOTDOG 0x1C1…566f have a site or handle that publishes that CA, so it can take its own seed slug? Next: open hotdogrh.wtf after JS load, @hotdogonpons media, and Pons factory creator for 0x1C1…566f"
+    - text: "Is there an audit of LunchTokenPlain / LunchV3PairLauncherFrozen as deployed on 4663? Next: record any report URL from lunch.fun or the launcher owner as a claim"
+    - text: "Which of the extra lunch.fun HOTDOG-ticker rows (0xd8a3…, 0x83fe…, 0x24fa…, 0x8ba0…, 0xb2fd…) still have books, and should they stay as ticker notes only? Next: leave them as ticker notes unless one grows an official CA-linked surface"
+  unresolved: []

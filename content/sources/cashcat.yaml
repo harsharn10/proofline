@@ -1,0 +1,233 @@
+slug: cashcat
+sources:
+  - id: S1
+    url: https://cashcat.cc/
+    publisher: Cash Cat
+    kind: official-site
+    accessed_at: 2026-09-03T02:53:00Z
+    claim: cashcat.cc home
+    excerpt: "CA:0x020bfc650a365f8bb26819deaabf3e21291018b4. Official social accounts https://x.com/cashcat_token and https://telegram.me/cashcat_robinhood. How to use: paste the contract; DexScreener 0xA70fc67C9F69da90B63a0e4C05D229954574E313. The Numbers: 1B total supply, 0/0 Tax, 100% In pool. LP Burned, $274.69M Market cap, $80.04M 24h volume. FAQ: Is this affiliated with Robinhood? No. LetsCash: Launch a memecoin… platform's cut buys back and burns CASHCAT. Check it out https://letscash.fun @letscashfun."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S2
+    url: https://robinhoodchain.blockscout.com/address/0x020bfc650a365f8bb26819deaabf3e21291018b4
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:55:00Z
+    claim: CASHCAT 0x020bfC650A365f8BB26819deAAbF3E21291018b4
+    excerpt: "API v2: hash 0x020bfC650A365f8BB26819deAAbF3E21291018b4, name LaunchToken, is_contract true, is_verified true, creator_address_hash 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB, creation_transaction_hash 0x0e6d23f0babd02ede4aefaa923486591d783e1180c277c71e2f2a39fc74a4661; token name Cash Cat symbol CASHCAT holders_count 104938 total_supply 1000000000000000000000000000 volume_24h 94876384.61101197 circulating_market_cap 266711132.25614527."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S3
+    url: https://robinhoodchain.blockscout.com/tx/0x0e6d23f0babd02ede4aefaa923486591d783e1180c277c71e2f2a39fc74a4661
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:55:00Z
+    claim: CASHCAT creation tx 0x0e6d23f0…
+    excerpt: timestamp 2026-06-18T20:01:25.000000Z, status ok, block_number 88836, from 0xcdfc08A1C1FBaFB355645E5ddC32122e5716cA90, to 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB (Launch Factory), method 0x686399cb, value 20500000000000000. Token mint 1e27 CASHCAT; transfer 999999999999999999999987491 to UniswapV3Pool 0xA70fc67C9F69da90B63a0e4C05D229954574E313.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S4
+    url: https://robinhoodchain.blockscout.com/address/0x020bfC650A365f8BB26819deAAbF3E21291018b4?tab=contract
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:58:00Z
+    claim: LaunchToken verified source
+    excerpt: "API v2 smart-contracts: name LaunchToken, compiler_version v0.8.30+commit.73712a01, is_verified true, is_fully_verified false, is_partially_verified true, file_path contracts/LaunchToken.sol. Contract LaunchToken is ERC20; constructor mints config.supply to msg.sender; launchFactory/pairToken/poolFee/positionManager/dexFactory immutables; no owner(); no transfer tax."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S5
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Robinhood Chain RPC
+    kind: explorer
+    accessed_at: 2026-09-03T02:59:00Z
+    claim: eth_getCode and ERC-20 / LaunchToken calls
+    excerpt: eth_blockNumber 0x329fe0b (53083659). eth_getCode 0x020b…18b4 4830 bytes. name() Cash Cat; symbol() CASHCAT; decimals 18; totalSupply 1e27; owner() revert. launchFactory() 0xD9eC…FccB; pairToken() 0x0Bd7…AD73; poolFee 10000; liquidityPool() 0xA70f…E313; deployer() 0xcdfc…6cA90; maxWalletBps 200; maxTxBps 10000; restrictionBlocks 366.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S6
+    url: https://robinhoodchain.blockscout.com/address/0xd9ec2db5f3d1b236843925949fe5bd8a3836fccb
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-03T02:55:00Z
+    claim: NOXA factory 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB
+    excerpt: "API v2: hash 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB, is_contract true, is_verified false, creator_address_hash 0x7E035Fb048a31e0481b88074557415b1C187242B, creation_transaction_hash 0x5e512a7f9a931c4dc9b5b09d8dd5c80b66968cf393474b21e5613769df656b37. Tagged Launch Factory. RPC eth_getCode 22811 bytes."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S7
+    url: https://api.dexscreener.com/latest/dex/tokens/0x020bfC650A365f8BB26819deAAbF3E21291018b4
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:54:00Z
+    claim: CASHCAT token pairs on Robinhood
+    excerpt: pair 0xA70fc67C9F69da90B63a0e4C05D229954574E313 chainId robinhood dexId uniswap labels v3 baseToken CASHCAT quoteToken WETH volume.h24 9863326.17 liquidity.usd 5503958.38 marketCap 273660683 pairCreatedAt 1781812885000. pair 0xd42A491087a15E5afd51FEb3606066Cc152d2b09 labels v3 CASHCAT/WETH volume.h24 31297376.88 liquidity.usd 2681689.71. info.websites https://cashcat.cc/ socials x.com/cashcat_token t.me/cashcat_robinhood.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S8
+    url: https://api.geckoterminal.com/api/v2/networks/robinhood/tokens/0x020bfc650a365f8bb26819deaabf3e21291018b4/pools?page=1
+    publisher: GeckoTerminal
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:57:00Z
+    claim: CASHCAT token and pools
+    excerpt: "Token: volume_usd.h24 69935625.2499211 fdv_usd 273085779.41398 market_cap_usd 272112380.641089 coingecko_coin_id cash-cat. Pools: CASHCAT/WETH 0.3% 0xd42a491087a15e5afd51feb3606066cc152d2b09 dex uniswap-v3-robinhood volume_usd.h24 30766613.5308175 reserve_in_usd 2672816.2084; CASHCAT/WETH 1% 0xa70fc67c9f69da90b63a0e4c05d229954574e313 volume_usd.h24 9787247.91160075 reserve_in_usd 5524215.5489."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S9
+    url: https://api.geckoterminal.com/api/v2/networks/robinhood/trending_pools?page=1
+    publisher: GeckoTerminal
+    kind: third-party-data
+    accessed_at: 2026-09-03T02:57:00Z
+    claim: Robinhood trending pools
+    excerpt: "trending_pools page 1: rank 5 CASHCAT / WETH 0.3% volume_usd.h24 30784220.4386402 reserve_in_usd 2674185.7185. Same page animal WETH books: CHUMP/WETH 1% 5343097.24; SHRUB/WETH 4854693.28; FRONG/WETH 0.25% 5972155.08."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S10
+    url: https://www.letscash.fun/
+    publisher: LetsCash
+    kind: official-site
+    accessed_at: 2026-09-03T02:56:00Z
+    claim: letscash.fun home
+    excerpt: "letscash.fun: launch and trade memecoins on Robinhood Chain. Metric label: CASHCAT bought — CASHCAT bought on-chain with platform fees, burned and held together. Link: legacy coins — Coins launched during the first beta, when this was CashCat. They still trade. https://legacy.letscash.fun"
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S11
+    url: https://x.com/cashcat_token
+    publisher: "@cashcat_token"
+    kind: social
+    accessed_at: 2026-09-03T02:58:00Z
+    claim: Cash Cat profile
+    excerpt: Display name Cash Cat, handle @cashcat_token, bio Robinhood original name was Cash Cat. Location Robinhood Chain. Website cashcattoken.xyz. Joined June 2026. ~21.4K followers.
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S12
+    url: https://x.com/cashcat_token/status/2075015043553407405
+    publisher: "@cashcat_token"
+    kind: social
+    accessed_at: 2026-09-03T02:52:00Z
+    claim: Buy $Cashcat — posted CA
+    excerpt: Buy $Cashcat on the best crypto wallet Just paste the contract and swap! Cross-chain payments supported - no need to wait for bridges! 0x020bfc650a365f8bb26819deaabf3e21291018b4
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S13
+    url: https://x.com/0xHood_/status/2095315840770187486
+    publisher: "@0xHood_"
+    kind: social
+    accessed_at: 2026-09-03T02:50:00Z
+    claim: Robinhood Chain DEX volume ATH
+    excerpt: Robinhood Chain DEX volume ATH $PONS ATH $CASHCAT ATH The chain, the pad, and the cat all printing highs together
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S14
+    url: https://x.com/carddog_token/status/2095247273034912207
+    publisher: "@carddog_token"
+    kind: social
+    accessed_at: 2026-09-03T02:50:00Z
+    claim: Noxa has $CASHCAT now Pons got $CARDDOG
+    excerpt: Noxa has $CASHCAT now Pons got $CARDDOG. Which would you choose - Cash or Card? Let the war begin 0x4fab762e1c3340eb0bf76726b6b77038da666ba7
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S15
+    url: https://x.com/cashcat_token/status/2094865387951182071
+    publisher: "@cashcat_token"
+    kind: social
+    accessed_at: 2026-09-03T02:58:00Z
+    claim: Meme contest first place
+    excerpt: First place goes to @wyn_studio for this amazing 3D animation. Congrats and check your DMs! Huge thanks to all the community for participating in our first meme contest. Stay tuned for more in the future In the meantime, keep the memes flowing
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S16
+    url: https://cashcattoken.xyz/
+    publisher: Vercel
+    kind: official-site
+    accessed_at: 2026-09-03T02:58:00Z
+    claim: cashcattoken.xyz redirect to cashcat.cc
+    excerpt: "HTTP 308. location: https://cashcat.cc/. refresh: 0;url=https://cashcat.cc/. server: Vercel."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S17
+    url: https://x.com/cashcat_tokende
+    publisher: "@cashcat_tokende"
+    kind: social
+    accessed_at: 2026-09-03T02:50:00Z
+    claim: Cash Cat || SUPPORT profile
+    excerpt: "Display name Cash Cat || SUPPORT, handle @cashcat_tokende. Bio: Robinhood original name was Cash Cat. ~315 followers. Same bio stem as @cashcat_token."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S18
+    url: https://x.com/cashcatoken
+    publisher: "@cashcatoken"
+    kind: social
+    accessed_at: 2026-09-03T02:50:00Z
+    claim: CashCat profile
+    excerpt: "Display name CashCat, handle @cashcatoken. Bio: Robinhood original name was Cash Cat. ~367 followers. Same bio stem as @cashcat_token."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S19
+    url: https://x.com/cashcat_token/status/2085369513315364900
+    publisher: "@cashcat_token"
+    kind: social
+    accessed_at: 2026-09-03T02:58:00Z
+    claim: Thanks to Robinhood for the listing
+    excerpt: The Cash Cat community wants to give a big thanks to the @RobinhoodApp @RobinhoodCrypto team for being incredible partners and allowing this to happen. We are excited to continue growing together!
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S20
+    url: https://x.com/RobinhoodApp/status/2085358038181990461
+    publisher: "@RobinhoodApp"
+    kind: social
+    accessed_at: 2026-09-03T02:58:00Z
+    claim: New asset $CASHCAT
+    excerpt: New asset now available to trade in the app and on Robinhood Legend. $CASHCAT (Cash Cat)
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true
+  - id: S21
+    url: https://t.me/cashcat_robinhood
+    publisher: Telegram
+    kind: social
+    accessed_at: 2026-09-03T02:58:00Z
+    claim: t.me/cashcat_robinhood
+    excerpt: "og:title Cash Cat. og:description The original name for Robinhood was Cash Cat. Title Telegram: View @cashcat_robinhood."
+    hash: null
+    archive_url: null
+    researcher: grok-heavy
+    available: true

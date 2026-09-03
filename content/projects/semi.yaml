@@ -1,0 +1,116 @@
+slug: semi
+name: SEMI
+symbol: SEMI
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: SEMI is an ERC-20 that trades in one Uniswap v4 pool against Robinhood's tokenized Micron (MU). Swaps pay a 5% hook fee converted to MU; staking earns ratchet mints only when MU backing per token makes a new high; bonding sends MU into the locked book for discounted SEMI. SemiVault at semivault.xyz / @Semivaultxyz publishes the token 0x5F03…BaC8 and the verified contract set.
+themes:
+  - memecoin
+  - stock-paired:mu
+official_links:
+  - kind: site
+    url: https://www.semivault.xyz
+  - kind: app
+    url: https://www.semivault.xyz/v2
+  - kind: x
+    url: https://x.com/Semivaultxyz
+  - kind: telegram
+    url: https://t.me/semivault
+dependencies: []
+deployments:
+  - label: SEMI token (SemiToken)
+    chain: robinhood-chain
+    address: "0x5F038759F6DE38fD3A85C0440daff1240238BaC8"
+    role: token
+    verified: true
+    sources:
+      - S2
+      - S3
+      - S5
+  - label: SemiMinter (token minter())
+    chain: robinhood-chain
+    address: "0x033dA8E5dfeDA56bfC3C8AC6A68C36c77D697BeC"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S6
+  - label: "SemiLauncher (site: owns the locked LP)"
+    chain: robinhood-chain
+    address: "0xBae7Af495b74D2ee0f1824Dfd544933d83106DEB"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S15
+  - label: "SemiHook (site: harvest lives here)"
+    chain: robinhood-chain
+    address: "0x7b89c56Da91425F35D07290eCFEcF4E58dc13088"
+    role: other
+    verified: false
+    sources:
+      - S1
+      - S16
+  - label: MU (Micron Technology • Robinhood Token)
+    chain: robinhood-chain
+    address: "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD"
+    role: token
+    verified: false
+    sources:
+      - S7
+      - S8
+      - S17
+metrics:
+  - kind: tvl
+    value: 5617276.28
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: volume_24h
+    value: 2820873.18
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 3621189
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 1232
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: site HTML and JS, Blockscout token/source/create tx/minter/launcher/hook/MU/MOO/search, RPC eth_getCode and SemiToken calls, DexScreener token, Gecko pool and token, X posts, Telegram preview, GitHub search were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-2 R-5 R-7 R-8] - Numbers: 2820873.18 is the Gecko SEMI/MU pool 24h volume, not the Gecko token all-pools 2840325.89. Reserve 5617276.28 is that pool. DexScreener 2404077.99 / 1111103.62 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that SEMI is the same MU-paired book as MOO, or a LONG Doppler clone. MOO is 0xD9dB…1e18 created by DopplerERC20V1Factory 0x1B37…b69a with handle @memorycowmoo; SEMI is SemiToken 0x5F03…BaC8 created by 0x0D45…10aC with site semivault.xyz / @Semivaultxyz."
+      class: inference
+      sources:
+        - S2
+        - S19
+        - S20
+    - text: DexScreener and Gecko disagree on SEMI/MU liquidity for the same pool id. [verified R-7 R-8] - Gecko token fdv/price disagree with the SEMI/MU pool fdv/price. [verified R-8 R-9] - Supply is elastic through SemiMinter; live supply is not the 10M genesis figure. [verified R-3 R-5] - Other SEMI tickers on 4663 are not this contract. [verified R-20] - No third-party audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Which of the nine site-listed contracts currently holds the Uniswap v4 LP NFT, and does verified SemiLauncher source omit withdraw? Next: read SemiLauncher.sol on Blockscout and query PoolManager positions for the launcher address"
+    - text: "Can deployer 0x0D45…10aC still call setMinter, or is minter already frozen at SemiMinter 0x033d…7BeC? Next: read MinterFrozen logs on the token and confirm setMinter reverts on a call"
+    - text: "Is there a third-party audit artifact, or only the FAB post's 54/54 live checks / 60/60 unit tests? Next: search the X media tab and any docs path for a PDF or auditor name"
+    - text: "Do the low-holder SEMI tickers 0xc1a0…1e69, 0xC770…97b5, 0x1EF7…55B7 share this deployer or only the ticker? Next: open each token page creator_address_hash and DexScreener pair"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

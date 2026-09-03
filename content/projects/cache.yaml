@@ -1,0 +1,124 @@
+slug: cache
+name: CACHE
+symbol: CACHE
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against SNDK. LongLauncher deploys Cache Cow (CACHE) in one create call and seeds the CACHE/SNDK book. Traders buy and sell CACHE on Uniswap v4. SNDK is a Robinhood Stock Token rail. Distinct from OP/SNDK. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:sndk
+  - rwa
+official_links:
+  - kind: app
+    url: https://app.long.xyz/tokens/0xafe41f4356c24f716111de1fbbc84e061d291e18
+  - kind: x
+    url: https://x.com/CacheCowLong
+dependencies: []
+deployments:
+  - label: CACHE token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xAfe41f4356c24f716111DE1fbbC84e061D291E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S3
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S3
+      - S8
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S1
+      - S9
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S11
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S3
+      - S12
+  - label: SNDK quote (create numeraire / pair quote / Robinhood Stock Token rail)
+    chain: robinhood-chain
+    address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+    role: token
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S10
+      - S13
+metrics:
+  - kind: tvl
+    value: 517626.29
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+  - kind: volume_24h
+    value: 2921925.11
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: market_cap
+    value: 2917945.22
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: holders
+    value: 2321
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/launcher/Airlock/SNDK and the create tx, RPC name/symbol/owner/code, DexScreener tokens, Gecko token and info, /rhj/assets, OP/SNDK DexScreener, CacheCat token, @CacheCowLong, the netlify claim post, and @FarmerJoe0x were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-3 R-7 R-12] - Numbers: 2920351.77 is the DexScreener CACHE/SNDK pair 24h volume, not the Gecko token all-pools 2921925.11. Liquidity 517626.29 is that DexScreener pair. Gecko fdv_usd 2917945.22 is the token endpoint; DexScreener fdv 2741437 is the same pair, different aggregator. Holders 2453 vs 2321. [claim R-2 R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that CACHE is the official Sandisk / OP product, or that it is the LONG protocol. OP/SNDK is Sandisk Optimus 0xF25C…3214 with sandisk.com / @sandiskoptimus. CACHE is 0xAfe41…1E18 created by LongLauncher, entity_kind token. /rhj/assets SNDK row is the rail, not this token."
+      class: inference
+      sources:
+        - S10
+        - S14
+    - text: Quote token SNDK 0xB90A…6400 is a Robinhood Stock Token rail; CACHE is not that token. [verified R-12 R-15] - Pool USD reserve on DexScreener is CACHE plus SNDK, not a USDG or WETH backstop. [claim R-7] - Gecko token reserve 0.0 and pool 429 this pass, so Gecko book liquidity is unverified. [claim R-8] - No official handle or domain this pass; @CacheCowLong is unconfirmed-official. [claim R-7 R-9 R-20] - Third-party-link / copypasta-pattern netlify claim and vote URLs used this CA. [claim R-21] - No audit report URL this pass. [unknown] - Distinct OP/SNDK token 0xF25C…3214 can be confused with this CACHE/SNDK book.
+      class: verified
+      sources:
+        - S14
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0xAfe41…1E18? Next: re-read DexScreener token profile after a Claim Profile; search new posts from @CacheCowLong that embed the CA"
+    - text: "What is live Gecko reserve_in_usd / volume_usd.h24 on CACHE/SNDK pool 0x23bc…404b? Next: one Gecko pool GET after the 429 window; do not loop"
+    - text: "Does @CacheCowLong pin CA 0xAfe41…1E18 or a domain that cross-links? Next: re-read the profile and any pinned post"
+    - text: "Are the netlify claim/vote URLs a copypasta pattern across other Robinhood CAs? Next: compare the same hosts against other packed tokens"
+    - text: "Does Sandisk Optimus OP 0xF25C…3214 share a deployer with CACHE? Next: Blockscout creator_address_hash on 0xF25C…3214 if an OP packet is assigned"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

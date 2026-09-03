@@ -1,0 +1,116 @@
+slug: johndog
+name: JOHNDOG
+symbol: JOHNDOG
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against SGOV. Token 0x64bc…1e18 is an EIP-1167 DopplerERC20V1 clone named John Dog / JOHNDOG. Traders buy and sell JOHNDOG on Uniswap v4 against the SGOV rail. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:sgov
+  - rwa
+  - graduation
+official_links:
+  - kind: other
+    url: https://dexxyswap.com
+dependencies: []
+deployments:
+  - label: JOHNDOG token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x64bcF4aA85559526cFf0528BCDc0Cb9d3ea41e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S4
+  - label: DopplerERC20V1Factory (implementation creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S2
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S4
+  - label: SGOV • Robinhood Token (pair quote; rail)
+    chain: robinhood-chain
+    address: "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5"
+    role: token
+    verified: false
+    sources:
+      - S5
+      - S6
+  - label: Uniswap v4 PoolManager (token-transfer counterparty)
+    chain: robinhood-chain
+    address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
+    role: router
+    verified: false
+    sources:
+      - S7
+metrics:
+  - kind: volume_24h
+    value: 3402161.96
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: tvl
+    value: 176778.87
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+  - kind: market_cap
+    value: 900999.34
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: holders
+    value: 1938
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl and a live approve tx, RPC name/symbol/owner/eth_getCode, DexScreener token, and one Gecko pool GET were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-5 R-6] - Numbers: 3501375.34 / 176778.87 is the DexScreener JOHNDOG/SGOV book. Gecko volume 3402161.96 is the same pool. Gecko reserve_in_usd -599778.93 is not TVL. fdv 415313 (DS) vs 900999.34 (Gecko) is an open conflict. [claim R-5 R-6] - Adversarial: the strongest contrary reading is that JOHNDOG is Bankr-the-pad, LONG, DOGGIE, HOTDOG, or another JOHNDOG CA, or that Gecko -599k is TVL. Token address, SGOV quote, DS liquidity, and empty official surfaces contradict those merges."
+      class: inference
+      sources:
+        - S5
+        - S6
+    - text: Quote token SGOV 0x92FD…F9B5 is a Robinhood Token rail; pool USD figures count JOHNDOG plus SGOV. [verified R-5 R-6] - Gecko reserve_in_usd printed negative this pass; do not copy as TVL. [verified R-6] - DexScreener search lists other JOHNDOG/JohnDog CAs; this packet is 0x64bc…1e18 only. [claim R-5] - No official handle or domain this pass; dexxyswap.com is a third-party-link. [claim R-5] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x64bc…1e18? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle"
+    - text: "What is the create tx and launcher for 0x64bc…1e18 (Bankr Airlock create vs LongLauncher vs other)? Next: retry getcontractcreation after rate limit; decode Airlock create() around 2026-09-02T01:25:14Z"
+    - text: "Does Gecko later print a non-negative reserve_in_usd for JOHNDOG/SGOV 0xa934…1e0a? Next: re-GET the Gecko pool once; keep DS liquidity as the book until reserve is non-negative"
+    - text: "Which of the other DexScreener JOHNDOG/JohnDog CAs, if any, share a deployer with 0x64bc…1e18? Next: eth_getCode/name/symbol on those CAs only if a later assignment asks"
+    - text: "Does dexxyswap.com bidirectionally claim JOHNDOG 0x64bc…1e18? Next: open dexxyswap.com once and record whether the CA is on-page"
+    - text: "tvl is not published as a figure: NULL — Gecko reserve_in_usd printed -599778.93 this pass; not a TVL figure. DexScreener JOHNDOG/SGOV liquidity.usd 176778.87 is the reproduced book."
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

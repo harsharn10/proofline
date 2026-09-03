@@ -1,0 +1,123 @@
+slug: monitor
+name: MONITOR
+symbol: MONITOR
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against PLTR. LongLauncher deploys The Situation (MONITOR) in one create call and seeds the MONITOR/PLTR book. Traders buy and sell MONITOR on Uniswap v4. No official site was located this pass.
+themes:
+  - memecoin
+  - stock-paired:pltr
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/monitoringmeme
+dependencies: []
+deployments:
+  - label: MONITOR token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x1a911bb954dAA9CB38513423075bE74450351e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S15
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (create-data token factory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S12
+      - S15
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S14
+  - label: PLTR Palantir Technologies • Robinhood Token (pair quote / numeraire)
+    chain: robinhood-chain
+    address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S7
+      - S10
+      - S13
+metrics:
+  - kind: volume_24h
+    value: 304579.55
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 126292.12
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 241021.8
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 290
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/LongLauncher/Airlock/PLTR and create tx 0x77eb…2b37, RPC name/symbol/owner/code, DexScreener, Gecko pool, /rhj/assets, @monitoringmeme, and @treyerl were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 292367.30 is the Gecko MONITOR/PLTR pool 24h volume. Reserve 82421.45 is that pool. DexScreener 304579.55 / 126292.12 is the same pair, different aggregator. [claim R-7 R-8] - Adversarial: the strongest contrary reading is that MONITOR is GOYBEAM, PALANTARD, or the CurvePump MONITOR ticker, or that Gecko's bankr-robinhood label makes this a Bankr launch. Creation is LongLauncher.create of 0x1a91…1e18 against PLTR 0x894E…4F2A; the other names are different CAs."
+      class: inference
+      sources:
+        - S4
+        - S16
+        - S17
+    - text: Quote token PLTR 0x894E…4F2A is a Robinhood Stock Token; MONITOR is a separate LongLauncher clone. [verified R-12 R-16] - Pool USD reserve is MONITOR plus PLTR, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko reserve 82421.45 and DexScreener liquidity 126292.12 are different aggregator slices of the same pair. [claim R-7 R-8] - Ticker MONITOR also names CurvePump token 0x5cE9…d9eF. [verified R-20] - No official handle or domain this pass; X is a third-party-link. [claim R-7 R-13] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x1a91…1e18? Next: re-read DexScreener token profile after a Claim Profile; search a site that embeds the CA"
+    - text: "Does Blockscout later set creator_address_hash on 0x1a91…1e18 to DopplerERC20V1Factory, matching GOYBEAM? Next: re-fetch api/v2/addresses/0x1a91…1e18 creator fields"
+    - text: "Is CurvePump The Situation / MONITOR 0x5cE9…d9eF later confused with this slug? Next: keep CAs separate; do not merge on ticker MONITOR"
+    - text: "Why does Gecko label MONITOR/PLTR dex bankr-robinhood while create is LongLauncher? Next: treat as aggregator labeling unless Bankr docs name this CA"
+    - text: "What is Gecko token all-pools volume for 0x1a91…1e18? Next: single GET later; do not loop 429s"
+  unresolved: []

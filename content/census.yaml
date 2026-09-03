@@ -1293,29 +1293,54 @@
       value: true
       note: research story pass.
       verified: false
-
 - slug: agent-name-service
   name: Agent Name Service
   category: Agent identity service
-  lifecycle: announced
+  lifecycle: mainnet
   coverage: stub
   role: observe # fails a qualifying test; listed, never scored (issue #35)
   identity:
-    aliases: []
-    symbols: []
+    aliases:
+      - AgentNS
+      - ANS
+      - .agent
+    symbols:
+      - ANS
     entity_kind: tool
-    chain_scope: unknown
+    chain_scope: robinhood-native
     status: provisional
   official_links:
-    - { kind: x, url: https://x.com/RHAgentNS }
+    - kind: x
+      url: https://x.com/RHAgentNS
+    - kind: site
+      url: https://www.agentsn.xyz
+    - kind: docs
+      url: https://www.agentsn.xyz/docs
+    - kind: app
+      url: https://www.agentsn.xyz/register
   discovery_source: Grok desk map 2026-08-31 (agents/agent-identity; lifecycle unknown)
   handle: "@RHAgentNS"
-  tree: { primary: agents/agent-identity, secondary: [ tooling/names ] }
+  tree:
+    primary: agents/agent-identity
+    secondary:
+      - tooling/names
   qualifying:
-    deployed_on_chain: { value: false, note: "No deployment evidence for the registrar — lifecycle unknown (EVAL 2026-08-31 §5, T1)", verified: false }
-    native_play: { value: true, note: "Name registry for agents with a claimed yearly fee", verified: false }
-    citable: { value: true, note: "X account; no site located", verified: false }
-    research_story: { value: true, note: "Registrar ownership, fee custody and name revocation powers", verified: false }
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
 - slug: hookr
   name: Hookr
   category: Programmable-hook launchpad
@@ -2486,3 +2511,1339 @@
       value: true
       note: research story pass.
       verified: false
+- slug: cashcat
+  name: CASHCAT
+  identity:
+    aliases:
+      - Cash Cat
+    symbols:
+      - CASHCAT
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Launchpad-graduated token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://cashcat.cc
+    - kind: x
+      url: https://x.com/cashcat_token
+    - kind: telegram
+      url: https://t.me/cashcat_robinhood
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@cashcat_token"
+  tree:
+    primary: launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: peer
+  name: Peer
+  identity:
+    aliases:
+      - Peer.family
+      - PeerMarketV1
+    symbols:
+      - PEER
+    entity_kind: protocol
+    chain_scope: robinhood-native
+    status: provisional
+  category: Options market
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://peer.family/
+    - kind: app
+      url: https://peer.family/discover
+    - kind: docs
+      url: https://peer.family/docs
+    - kind: x
+      url: https://x.com/PeerDotFamily
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: markets/options
+    secondary:
+      - markets/prediction
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: clanker
+  name: Clanker
+  identity:
+    aliases:
+      - tokenbot
+      - clanker.world
+    symbols:
+      - CLANKER
+    entity_kind: protocol
+    chain_scope: multichain
+    status: provisional
+  category: Uniswap-pool launchpad
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://clanker.world
+    - kind: app
+      url: https://www.clanker.world/deploy
+    - kind: docs
+      url: https://clanker.gitbook.io/documentation
+    - kind: x
+      url: https://x.com/clanker_world
+    - kind: github
+      url: https://github.com/clanker-devco
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@clanker_world"
+  tree:
+    primary: launch/uni-pool-launch
+    secondary:
+      - agents/agent-execution
+      - launch/stock-paired-factory
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: jinqian
+  name: JINQIAN
+  identity:
+    aliases:
+      - Money Mushroom
+    symbols:
+      - JINQIAN
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: telegram
+      url: https://t.me/JinquanCTO
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: coinbarrel
+  name: Coinbarrel
+  identity:
+    aliases:
+      - CoinBarrel
+      - Coinbarrel V2
+    symbols: []
+    entity_kind: protocol
+    chain_scope: multichain
+    status: provisional
+  category: Programmable-hook launchpad
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: app
+      url: https://coinbarrel.com
+    - kind: docs
+      url: https://docs.coinbarrel.com
+    - kind: x
+      url: https://x.com/UseCoinbarrel
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@UseCoinbarrel"
+  tree:
+    primary: launch/hook-programmable
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: frong
+  name: FRONG
+  identity:
+    aliases:
+      - frong
+    symbols:
+      - FRONG
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Launchpad-graduated token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: x
+      url: https://x.com/frongcommunity
+    - kind: telegram
+      url: https://t.me/FrongCommunity
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@frongcommunity"
+  tree:
+    primary: launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: moo
+  name: Memory cow Moo
+  identity:
+    aliases:
+      - MOO
+    symbols:
+      - MOO
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: x
+      url: https://x.com/memorycowmoo
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@memorycowmoo"
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: nudes
+  name: Send Nudes
+  identity:
+    aliases:
+      - NUDES
+    symbols:
+      - NUDES
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: x
+      url: https://x.com/SendNudesRH
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@SendNudesRH"
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: ouroboros
+  name: OUROBOROS
+  identity:
+    aliases:
+      - Ouroboros
+    symbols:
+      - OUROBOROS
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://ouroborus.space/
+    - kind: x
+      url: https://x.com/OuroborosOOO
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@OuroborosOOO"
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: semi
+  name: SEMI
+  identity:
+    aliases:
+      - SemiVault
+      - semivault.xyz
+    symbols:
+      - SEMI
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://www.semivault.xyz
+    - kind: app
+      url: https://www.semivault.xyz/v2
+    - kind: x
+      url: https://x.com/Semivaultxyz
+    - kind: telegram
+      url: https://t.me/semivault
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@Semivaultxyz"
+  tree:
+    primary: rwa-products/stock-paired-token
+    secondary:
+      - yield/gamified-mining
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: hotdog
+  name: HOTDOG
+  identity:
+    aliases:
+      - hotdog
+      - Costco $HOTDOG
+    symbols:
+      - HOTDOG
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://www.hotdogonrh.com
+    - kind: x
+      url: https://x.com/HOTDOGonRH
+    - kind: telegram
+      url: https://t.me/HOTDOGonRH
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@HOTDOGonRH"
+  tree:
+    primary: rwa-products/stock-paired-token
+    secondary:
+      - launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: boner
+  name: BONER
+  identity:
+    aliases:
+      - Boner Coin
+    symbols:
+      - BONER
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://boneronlong.xyz
+    - kind: app
+      url: https://app.long.xyz/tokens/0x98096d17e191b3da1d5f99a6d7b3584351b11e18
+    - kind: x
+      url: https://x.com/bonercoinlong
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@bonercoinlong"
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: dollar-1
+  name: Trump $1 Coin
+  identity:
+    aliases:
+      - Trump $1
+    symbols:
+      - $1
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links: []
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+    secondary:
+      - launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: goybeam
+  name: GOYBEAM
+  identity:
+    aliases: []
+    symbols:
+      - GOYBEAM
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: x
+      url: https://x.com/longPLTRgoybeam
+    - kind: app
+      url: https://app.long.xyz/tokens/0x1fe2abf68aad1d5b7a0339fbbfdbad8e2b1d1e18
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: oof
+  name: OOF
+  identity:
+    aliases: []
+    symbols:
+      - OOF
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: x
+      url: https://x.com/OOFonRH
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: peptides
+  name: PEPTIDES
+  identity:
+    aliases:
+      - Peptides
+    symbols:
+      - PEPTIDES
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://www.peptidesrh.com/
+    - kind: x
+      url: https://x.com/PeptidesRH
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@PeptidesRH"
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: vaccinu
+  name: VACCINU
+  identity:
+    aliases: []
+    symbols:
+      - VACCINU
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: x
+      url: https://x.com/VaccinuRH
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+    secondary:
+      - launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: ripe
+  name: Ripe Protocol
+  identity:
+    aliases:
+      - Ripe DAO Governance Token
+      - Ripe
+    symbols:
+      - RIPE
+    entity_kind: protocol
+    chain_scope: multichain
+    status: provisional
+  category: RWA lending market
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://www.ripe.finance
+    - kind: app
+      url: https://app.ripe.finance/robinhood/leaderboard
+    - kind: docs
+      url: https://docs.ripe.finance
+    - kind: x
+      url: https://x.com/ripe_dao
+    - kind: github
+      url: https://github.com/Ripe-Foundation/ripe-protocol
+    - kind: discord
+      url: https://discord.gg/hightop
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@ripe_dao"
+  tree:
+    primary: credit/rwa-lending
+    secondary:
+      - credit/cdp
+      - credit/lending-primitive
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: cameltoe
+  name: CAMELTOE
+  identity:
+    aliases:
+      - Cameltoe
+    symbols:
+      - CAMELTOE
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://cameltoerh.fun
+    - kind: x
+      url: https://x.com/cameltoerh
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: kirkland
+  name: KIRKLAND
+  identity:
+    aliases:
+      - Kirkland
+    symbols:
+      - KIRKLAND
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: x
+      url: https://x.com/kirklandcto
+    - kind: telegram
+      url: https://t.me/kirklandcto
+    - kind: discord
+      url: https://discord.gg/uxento
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+    secondary:
+      - launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: schiffy
+  name: SCHIFFY
+  identity:
+    aliases:
+      - Schiffy
+    symbols:
+      - SCHIFFY
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://schiffy.gold
+    - kind: x
+      url: https://x.com/schiffygld
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: johndog
+  name: JOHNDOG
+  identity:
+    aliases:
+      - John Dog
+    symbols:
+      - JOHNDOG
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links: []
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+    secondary:
+      - launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: ap
+  name: ap
+  identity:
+    aliases:
+      - Alpha AI
+      - AlphaAI
+    symbols:
+      - AP
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://alpharhc.xyz
+    - kind: x
+      url: https://x.com/Alpha_RHC
+    - kind: telegram
+      url: https://t.me/alpharhc
+    - kind: app
+      url: https://app.uniswap.org/swap?chain=robinhood&inputCurrency=0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9&outputCurrency=0x69c68e4c00c6f6e4ac027300293a879be1e11e18
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@Alpha_RHC"
+  tree:
+    primary: rwa-products/stock-paired-token
+    secondary:
+      - launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: chip
+  name: CHIP
+  identity:
+    aliases:
+      - Cyber Hardware-Integrated Pup
+    symbols:
+      - CHIP
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Launchpad-graduated token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://CHIPxAMD.com
+    - kind: x
+      url: https://x.com/CHIPxAMD
+    - kind: telegram
+      url: https://t.me/CHIPxAMD
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: launch/graduation-token
+    secondary:
+      - rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: flops
+  name: FLOPS
+  identity:
+    aliases:
+      - Flops
+    symbols:
+      - FLOPS
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: app
+      url: https://app.long.xyz/tokens/0x9dad613c96bd6e9d0f4fd840d53557dc5ede1e18
+    - kind: x
+      url: https://x.com/Flops_rh
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+    secondary:
+      - launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: meow
+  name: MEOW
+  identity:
+    aliases:
+      - AMD
+      - Artificial Meow Domination
+    symbols:
+      - MEOW
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: x
+      url: https://x.com/meow_robinhood
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+    secondary:
+      - launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: monitor
+  name: MONITOR
+  identity:
+    aliases:
+      - The Situation
+    symbols:
+      - MONITOR
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: x
+      url: https://x.com/monitoringmeme
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: incel
+  name: INCEL
+  identity:
+    aliases:
+      - Incel Inside
+    symbols:
+      - INCEL
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://incelinside.com
+    - kind: x
+      url: https://x.com/incelrh
+    - kind: app
+      url: https://app.long.xyz/tokens/0x12d834f0780c367909319c73f42310dc0b201e18
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+    secondary:
+      - launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: juggernaut
+  name: JUGGERNAUT
+  identity:
+    aliases:
+      - The Juggernaut
+    symbols:
+      - JUGGERNAUT
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Launchpad-graduated token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://juggernautrh.com/
+    - kind: x
+      url: https://x.com/Juggernautrh
+    - kind: telegram
+      url: https://t.me/juggernaut_rh
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@Juggernautrh"
+  tree:
+    primary: launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: tendies
+  name: TENDIES
+  identity:
+    aliases: []
+    symbols:
+      - TENDIES
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Launchpad-graduated token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: x
+      url: https://x.com/TendiesRH
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: launch/graduation-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true
+- slug: klik
+  name: Klik
+  identity:
+    aliases:
+      - KLIK
+      - Klik Finance
+    symbols:
+      - KLIK
+    entity_kind: protocol
+    chain_scope: multichain
+    status: provisional
+  category: Programmable-hook launchpad
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: app
+      url: https://klik.finance
+    - kind: docs
+      url: https://klik.finance/docs
+    - kind: x
+      url: https://x.com/klik_evm
+    - kind: github
+      url: https://github.com/klikfinance/klik
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@klik_evm"
+  tree:
+    primary: launch/hook-programmable
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: sentry
+  name: Sentry
+  identity:
+    aliases:
+      - Sentry Launcher
+    symbols:
+      - SENTRY
+    entity_kind: protocol
+    chain_scope: multichain
+    status: provisional
+  category: Uniswap-pool launchpad
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: site
+      url: https://sentry.trading
+    - kind: app
+      url: https://www.sentry.trading
+    - kind: docs
+      url: https://sentry.trading/sentry-guide.md
+    - kind: docs
+      url: https://mavrk.gitbook.io/sentry-docs/
+    - kind: x
+      url: https://x.com/sentrylauncher
+    - kind: telegram
+      url: https://t.me/sentrylauncher
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  handle: "@sentrylauncher"
+  tree:
+    primary: launch/uni-pool-launch
+    secondary:
+      - trading/aggregator
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: false
+    citable:
+      value: true
+      note: citable pass.
+      verified: false
+    research_story:
+      value: true
+      note: research story pass.
+      verified: false
+- slug: cache
+  name: CACHE
+  identity:
+    aliases:
+      - Cache Cow
+    symbols:
+      - CACHE
+    entity_kind: token
+    chain_scope: robinhood-native
+    status: provisional
+  category: Stock-paired token
+  lifecycle: mainnet
+  coverage: stub
+  official_links:
+    - kind: app
+      url: https://app.long.xyz/tokens/0xafe41f4356c24f716111de1fbbc84e061d291e18
+    - kind: x
+      url: https://x.com/CacheCowLong
+  discovery_source: grok-heavy packet WORK-20260903-grok-heavy-icarus-research
+  tree:
+    primary: rwa-products/stock-paired-token
+  qualifying:
+    deployed_on_chain:
+      value: true
+      note: deployed on chain pass.
+      verified: true
+    native_play:
+      value: true
+      note: native play pass.
+      verified: true
+    citable:
+      value: true
+      note: citable pass.
+      verified: true
+    research_story:
+      value: true
+      note: research story pass.
+      verified: true

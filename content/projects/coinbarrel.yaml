@@ -1,0 +1,130 @@
+slug: coinbarrel
+name: Coinbarrel
+symbol: null
+category: Programmable-hook launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Coinbarrel is a token launchpad on Robinhood Chain. A launch creates a Uniswap V4 pool with a Coinbarrel Hook V5 in one transaction; there is no bonding curve and no graduation. Liquidity is minted into permanent custody. New launches go through the live V5 launcher. A Simple V3 launcher remains deployed for older markets. Creators can pair against ETH, USDG, or enabled stock tokens. The handle is @UseCoinbarrel; the site is coinbarrel.com.
+themes:
+  - launchpad
+official_links:
+  - kind: app
+    url: https://coinbarrel.com
+  - kind: docs
+    url: https://docs.coinbarrel.com
+  - kind: x
+    url: https://x.com/UseCoinbarrel
+  - kind: other
+    url: https://coinbarrel.com/integrations/robinhood/deployments.json
+  - kind: other
+    url: https://docs.coinbarrel.com/developers/robinhood-contract-addresses
+dependencies: []
+deployments:
+  - label: Unified Hook V5 launcher proxy
+    chain: robinhood-chain
+    address: "0x4234e536aa5da8be18d41ef6f86533430e264e70"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S13
+      - S14
+  - label: V5 launcher implementation
+    chain: robinhood-chain
+    address: "0xe398af2721c1dad61eb6d81a4f12f6cb66a4f5a2"
+    role: implementation
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S13
+      - S14
+  - label: Legacy Simple V3 launcher proxy
+    chain: robinhood-chain
+    address: "0x985dfae571a0c5c90ac997f08687056d2ce1e46f"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S15
+      - S16
+  - label: Unified Hook V5 proxy
+    chain: robinhood-chain
+    address: "0xf667c59cd75ab1d7943fc8284edab51f3a76bfff"
+    role: proxy
+    verified: true
+    sources:
+      - S3
+      - S7
+      - S17
+      - S18
+  - label: Permanent V5 liquidity custody
+    chain: robinhood-chain
+    address: "0x418ece71c4ece08b71db8c53d59b6bc345efc659"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S17
+      - S22
+  - label: V5 launcher and hook owner()
+    chain: robinhood-chain
+    address: "0x30e4b6dc3139e28b5c5e493d395a0aca4f1cddba"
+    role: admin
+    verified: true
+    sources:
+      - S13
+      - S17
+      - S27
+metrics:
+  - kind: tvl
+    value: 55358.35
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S19
+  - kind: fees_24h
+    value: 2304
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S20
+  - kind: revenue_24h
+    value: 673
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S26
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: coinbarrel.com, docs pages, deployments.json, X profile and posts, Llama protocol/fees/page/adapter, market API, GitHub 404, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-3 R-13 R-19] - Numbers: TVL and fees are the Robinhood Chain slice from api.llama.fi, not an all-chains total. Bytecode lengths, nonces, and owner() are chain 4663 RPC. Market total 259 is the official tokens API with chain=robinhood. [verified R-13 R-19 R-23] - Adversarial: strongest contrary reading is that 0x4234…e70 is a leftover Advanced V4 proxy and new launches use a different factory, or that Llama fees mix legacy V3 with V5. Docs and deployments.json set advancedV5.launcherProxy to this address with status public-live; RPC implementation slot matches launcherImplementation 0xe398…f5a2. Hookr and What The Hook are different products."
+      class: inference
+      sources:
+        - S3
+        - S4
+        - S13
+    - text: V5 launcher and Hook are upgradeable; owner is one EOA with no code. [verified R-13 R-17] - Launcher implementation source is not verified on Blockscout this pass. [verified R-14] - Simple V3 launcher 0x985d…e46f still has code and is not a new-launch path. [verified R-15] [claim R-8] - No audit report URL. [unknown] - Handle posts a Solana $CB mint that is not this chain's launcher. [claim R-25] - Llama 7d fee figure differs between the API (110181) and the protocol page (108291).
+      class: claim
+      sources:
+        - S20
+        - S21
+  missing:
+    - text: "Is V5 launcher implementation 0xe398…f5a2 source-verified anywhere, and what is its source name? Next: read verified source if it lands; otherwise treat the proxy as shell-only"
+    - text: "Does owner 0x30e4…ddba sit behind a Safe, timelock, or other contract on any chain, or is every V5 proxy Ownable2Step held by this EOA? Next: eth_call owner() on fee router, stock registry, impairment controller, and position vault"
+    - text: "Is there an audit report whose scope matches launcher 0x4234…e70 and Hook 0xf667…bfff? Next: record any published report as a claim with the exact scope"
+    - text: "Which GitHub commit matches docs contractSourceCommits hook 12fa5e83… and feeLocker 5bc92578…? Next: search those commit hashes if a source mirror appears"
+    - text: "What is the relationship between Solana mint FG53WF6VGMb3eg19A76p4x6Ht267q2kze89h79MhZ9CB ($CB) and the Robinhood Hook V5 pad? Next: do not treat $CB as a Robinhood Chain deployment; record any official docs that name the mint"
+    - text: "Are Arc and Stable venues in the Robinhood Chain TVL slice, and is BSC paused as the registry states? Next: do not use the Robinhood launcher address on Arc or BSC; reproduce those venues in a later pass if coverage expands"
+  unresolved: []

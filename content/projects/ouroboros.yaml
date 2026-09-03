@@ -1,0 +1,115 @@
+slug: ouroboros
+name: OUROBOROS
+symbol: OUROBOROS
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A fixed-supply ERC-20 on Robinhood Chain quoted against the CRCL Stock Token. OuroborosHook takes a 1% CRCL fee on Uniswap v4 swaps, forbids outside LP, and burns tokens from CRCL buybacks. A user buys or sells OUROBOROS on that pool. EOA 0x0130…4a90 deployed the token and hook; owner() reverts on both.
+themes:
+  - memecoin
+  - stock-paired:crcl
+official_links:
+  - kind: site
+    url: https://ouroborus.space/
+  - kind: x
+    url: https://x.com/OuroborosOOO
+dependencies: []
+deployments:
+  - label: OUROBOROS token (verified ERC-20)
+    chain: robinhood-chain
+    address: "0x87aF913718f73168D4566bBF51683792aC2680eB"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S4
+      - S23
+  - label: OuroborosHook (Uniswap v4 hook)
+    chain: robinhood-chain
+    address: "0x7bc2AF6Fb9A989505e9629470869a19143532AEC"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S10
+  - label: Hook deploy helper (unverified)
+    chain: robinhood-chain
+    address: "0x6dd59681d3Da8d0Ece6Fe9b92F88C50765f65b35"
+    role: factory
+    verified: true
+    sources:
+      - S8
+      - S20
+  - label: CRCL Stock Token (pair quote)
+    chain: robinhood-chain
+    address: "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5"
+    role: token
+    verified: true
+    sources:
+      - S10
+      - S17
+      - S18
+  - label: Uniswap v4 PoolManager
+    chain: robinhood-chain
+    address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
+    role: other
+    verified: false
+    sources:
+      - S8
+      - S10
+metrics:
+  - kind: volume_24h
+    value: 71093113.05
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S12
+  - kind: tvl
+    value: 73684.75
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S12
+  - kind: market_cap
+    value: 491103.57
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S12
+  - kind: holders
+    value: 574
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/hook/helper/CRCL and the create/deploy/transfer/bootstrap txs, RPC name/symbol/website/poolId/crcl/bootstrapped, DexScreener token and pair, Gecko pool and token info, /rhj/assets, ouroborus.space, @OuroborosOOO posts, and @scalper_news were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-10 R-12 R-17] - Numbers: 71093113.05 is the Gecko OUROBOROS/CRCL pool 24h volume, not a DexScreener figure and not an all-pools total. Reserve 73684.75 is that pool. DexScreener 73339566.86 / 73395.02 is the same pair, different aggregator. Volume is class claim. [claim R-12 R-14] - Adversarial: the strongest contrary reading is that OUROBOROS is the ourolayer.com $OURO fee-layer token or a LONG/PAIR factory clone. website() is ouroborus.space, the CA is 0x87aF…80eB, factory() reverts, and create was a plain EOA create plus a custom hook."
+      class: inference
+      sources:
+        - S4
+        - S15
+        - S23
+    - text: 24h Gecko volume is ~965× pool reserve; the number is filed as claim only. [claim R-12] - Pool USD reserve is OUROBOROS plus CRCL, not a USDG backstop. [claim R-12 R-14] - Site HTML this pass does not embed the CA or handle. [claim R-15] - Helper 0x6dd5…5b35 is unverified. [verified R-20] - No audit report URL this pass. [unknown] - Third-party netlify claim/vote URLs embed this CA.
+      class: claim
+      sources:
+        - S24
+  missing:
+    - text: "Does ouroborus.space client JS embed CA 0x87aF…80eB or @OuroborosOOO so the site→handle/CA link is bidirectional? Next: fetch Next.js chunks listed on the homepage and search for the CA and handle"
+    - text: "What is unverified helper 0x6dd5…5b35 beyond deploy() — any remaining privileged path? Next: wait for Blockscout verification or disassemble deploy() and any owner/pause selectors"
+    - text: "Is there an audit report for Ouroboros.sol or OuroborosHook.sol? Next: re-read docs/site if an audit URL is added"
+    - text: "Why do Gecko fdv_usd 491104 and DexScreener fdv 455485 differ on the same pool? Next: compare circulating vs total supply inputs each aggregator uses"
+    - text: "Do the netlify claim/vote hosts resolve to this project's site or an unrelated page? Next: open one URL in a throwaway fetch and record the title if it still embeds the CA"
+  unresolved: []
