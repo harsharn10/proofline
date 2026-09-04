@@ -1,13 +1,13 @@
 slug: bomba
-pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
     label: BOMBA token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: Bombardilo
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -17,8 +17,12 @@ addresses:
     safe: null
     created_block: null
     created_at: null
-    holders: 738
-    errors: []
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
   - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
     label: DopplerERC20V1 implementation
     role: implementation
@@ -90,7 +94,7 @@ addresses:
         - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
         - "0xdf95cc445469816234ad95f702c79d25bce401a7"
         - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
-        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+        - "0x5f512dfeacc95e8c47135a1ebbdf5a9e70a0eeff"
     created_block: 646829
     created_at: 2026-06-30T22:03:11.000Z
     holders: null
@@ -110,54 +114,54 @@ addresses:
     safe: null
     created_block: 48285
     created_at: 2026-06-10T15:26:04.000Z
-    holders: 35744
+    holders: 35715
     errors: []
 metrics: []
 market:
   token_address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0xa1bb85096e15d26cca05bda378052dd4dccf24527286cf76d9dc51332eba1e79"
       quote_symbol: PLTR
-      price_usd: 0.00004119
-      liquidity_usd: 39208.49
-      volume_h24: 18982.37
-      volume_h6: 2230.28
+      price_usd: 0.00004681
+      liquidity_usd: 43430.9
+      volume_h24: 16973.72
+      volume_h6: 4332.63
       txns_h24:
-        buys: 264
-        sells: 210
-      price_change_h24: -46.23
-      market_cap: 41009
-      fdv: 41009
+        buys: 218
+        sells: 193
+      price_change_h24: -35.84
+      market_cap: 46598
+      fdv: 46598
       created_at: 2026-08-31T18:30:19.000Z
     - dex: uniswap
       pair_address: "0xd8b8aed67c6417a7b37d74b566bcd934206d8617a63203186d2419b0c449f2bf"
       quote_symbol: USDG
       price_usd: 0.00004457
       liquidity_usd: 16.94
-      volume_h24: 5.75
+      volume_h24: 2.05
       volume_h6: 0
       txns_h24:
-        buys: 1
-        sells: 2
-      price_change_h24: -22.49
+        buys: 0
+        sells: 1
+      price_change_h24: null
       market_cap: 44371
       fdv: 44371
       created_at: 2026-09-01T18:03:01.000Z
-  liquidity_usd: 39225.43
-  volume_h24: 18988.12
-  trades_h24: 477
-  price_usd: 0.00004119
-  price_change_h24: -46.23
-  market_cap_usd: 41009
-  fdv_usd: 41009
-  fdv: 41009
+  liquidity_usd: 43447.84
+  volume_h24: 16975.77
+  trades_h24: 412
+  price_usd: 0.00004681
+  price_change_h24: -35.84
+  market_cap_usd: 46598
+  fdv_usd: 46598
+  fdv: 46598
   first_pair_at: 2026-08-31T18:30:19.000Z
-  top10_share: 0.8463881853029278
-  top10_share_ex_pools: 0.1486761584013512
-  burned_share: 0.0045625254536131
-  top10_as_of: 2026-09-04T16:22:34.904Z
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
   launchpad: null
   rialto: null
   pair_asset:
@@ -173,8 +177,16 @@ market:
   errors:
     - step: launchpad
       message: addresses/0x525F24BF41F178174788C3297Af9c0Af1bA01E18 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x525F24BF41F178174788C3297Af9c0Af1bA01E18/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x525F24BF41F178174788C3297Af9c0Af1bA01E18
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x525F24BF41F178174788C3297Af9c0Af1bA01E18
 structure:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   mint: unknown
   renounced: false
   lp:
@@ -188,20 +200,26 @@ structure:
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: mint
+      message: 'smart-contracts/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
       label: BOMBA token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 570
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T16:15:52.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 42
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       label: DopplerERC20V1 implementation
       role: implementation
@@ -227,10 +245,10 @@ activity:
       role: factory
       transactions_count: 13369
       token_transfers_count: 4
-      last_tx_at: 2026-09-04T16:25:01.000Z
+      last_tx_at: 2026-09-04T20:52:03.000Z
       last_method: create
       txns_24h: 2000
-      launches_24h: 1997
+      launches_24h: 1998
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -239,9 +257,9 @@ activity:
       role: admin
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-04T16:05:30.000Z
+      last_tx_at: 2026-09-04T20:42:51.000Z
       last_method: create
-      txns_24h: 138
+      txns_24h: 112
       launches_24h: null
       errors: []
     - address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
@@ -249,12 +267,12 @@ activity:
       role: token
       transactions_count: 14903
       token_transfers_count: 55
-      last_tx_at: 2026-09-04T17:09:45.000Z
-      last_method: transfer
-      txns_24h: 1415
+      last_tx_at: 2026-09-04T21:51:23.000Z
+      last_method: approve
+      txns_24h: 1198
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T17:09:45.000Z
-  txns_24h: 3595
-  launches_24h: 1997
+  last_activity_at: 2026-09-04T21:51:23.000Z
+  txns_24h: 3310
+  launches_24h: 1998
 errors: []

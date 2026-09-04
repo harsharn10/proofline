@@ -1,13 +1,13 @@
 slug: wojak
-pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x86d916F551b8E05240c1Eb14E65F733B6d181e18"
     label: WOJAK token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: wojak
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: 52667119
-    created_at: 2026-09-02T15:03:30.000Z
-    holders: 267
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x86d916F551b8E05240c1Eb14E65F733B6d181e18: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x86d916F551b8E05240c1Eb14E65F733B6d181e18: HTTP 402: {"error":"Out of credits"}'
   - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
     label: DopplerERC20V1 implementation
     role: implementation
@@ -90,7 +94,7 @@ addresses:
         - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
         - "0xdf95cc445469816234ad95f702c79d25bce401a7"
         - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
-        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+        - "0x5f512dfeacc95e8c47135a1ebbdf5a9e70a0eeff"
     created_block: 646829
     created_at: 2026-06-30T22:03:11.000Z
     holders: null
@@ -110,14 +114,14 @@ addresses:
     safe: null
     created_block: 46131
     created_at: 2026-06-09T21:14:17.000Z
-    holders: 18253
+    holders: 18324
     errors: []
   - address: "0xaCE55FE98Bab14366dD49aB5AA5dF76aA11A3c6f"
     label: WOJAK ticker collision (Wojak / WETH LaunchToken, not this row)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: LaunchToken
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -125,47 +129,47 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 100867
-    created_at: 2026-06-19T09:58:41.000Z
-    holders: 1265
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0xaCE55FE98Bab14366dD49aB5AA5dF76aA11A3c6f: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0xaCE55FE98Bab14366dD49aB5AA5dF76aA11A3c6f: HTTP 402: {"error":"Out of credits"}'
 metrics: []
 market:
   token_address: "0x86d916F551b8E05240c1Eb14E65F733B6d181e18"
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x85bbed65b8e20c2ccf52cec4dcd6aa42d904bc74868e85fd0700e34670b8ba70"
       quote_symbol: RDDT
-      price_usd: 0.00007755
-      liquidity_usd: 59682.56
-      volume_h24: 17184.86
-      volume_h6: 7122.08
+      price_usd: 0.0000767
+      liquidity_usd: 59247.51
+      volume_h24: 15585.58
+      volume_h6: 1049.09
       txns_h24:
-        buys: 204
-        sells: 186
-      price_change_h24: -17.42
-      market_cap: 77557
-      fdv: 77557
+        buys: 180
+        sells: 162
+      price_change_h24: -21.35
+      market_cap: 76710
+      fdv: 76710
       created_at: 2026-09-02T15:03:30.000Z
-  liquidity_usd: 59682.56
-  volume_h24: 17184.86
-  trades_h24: 390
-  price_usd: 0.00007755
-  price_change_h24: -17.42
-  market_cap_usd: 77557
-  fdv_usd: 77557
-  fdv: 77557
+  liquidity_usd: 59247.51
+  volume_h24: 15585.58
+  trades_h24: 342
+  price_usd: 0.0000767
+  price_change_h24: -21.35
+  market_cap_usd: 76710
+  fdv_usd: 76710
+  fdv: 76710
   first_pair_at: 2026-09-02T15:03:30.000Z
-  top10_share: 0.7236017899466214
-  top10_share_ex_pools: 0.2191962870397911
-  burned_share: 0
-  top10_as_of: 2026-09-04T16:22:34.904Z
-  launchpad:
-    slug: doppler
-    via: factory
-    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
-    shared: false
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
   rialto: null
   pair_asset:
     ticker: RDDT
@@ -177,9 +181,19 @@ market:
     change_7d: 64735.06
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: launchpad
+      message: addresses/0x86d916F551b8E05240c1Eb14E65F733B6d181e18 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x86d916F551b8E05240c1Eb14E65F733B6d181e18: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x86d916F551b8E05240c1Eb14E65F733B6d181e18/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x86d916F551b8E05240c1Eb14E65F733B6d181e18
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x86d916F551b8E05240c1Eb14E65F733B6d181e18
 structure:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   mint: unknown
   renounced: false
   lp:
@@ -189,20 +203,26 @@ structure:
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: mint
+      message: 'smart-contracts/0x86d916F551b8E05240c1Eb14E65F733B6d181e18: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x86d916F551b8E05240c1Eb14E65F733B6d181e18"
       label: WOJAK token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T16:19:13.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 37
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x86d916F551b8E05240c1Eb14E65F733B6d181e18: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       label: DopplerERC20V1 implementation
       role: implementation
@@ -228,10 +248,10 @@ activity:
       role: factory
       transactions_count: 13369
       token_transfers_count: 4
-      last_tx_at: 2026-09-04T16:25:01.000Z
+      last_tx_at: 2026-09-04T20:52:03.000Z
       last_method: create
       txns_24h: 2000
-      launches_24h: 1997
+      launches_24h: 1998
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -240,9 +260,9 @@ activity:
       role: admin
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-04T16:05:30.000Z
+      last_tx_at: 2026-09-04T20:42:51.000Z
       last_method: create
-      txns_24h: 138
+      txns_24h: 112
       launches_24h: null
       errors: []
     - address: "0x05b37Fb53A299a1b874A619e1c4C404D52C36F4C"
@@ -250,7 +270,7 @@ activity:
       role: token
       transactions_count: 17102
       token_transfers_count: 37
-      last_tx_at: 2026-09-04T17:22:32.000Z
+      last_tx_at: 2026-09-04T22:18:28.000Z
       last_method: approve
       txns_24h: 2000
       launches_24h: null
@@ -260,14 +280,18 @@ activity:
     - address: "0xaCE55FE98Bab14366dD49aB5AA5dF76aA11A3c6f"
       label: WOJAK ticker collision (Wojak / WETH LaunchToken, not this row)
       role: token
-      transactions_count: 6070
-      token_transfers_count: 47
-      last_tx_at: 2026-09-04T17:45:35.000Z
-      last_method: approve
-      txns_24h: 212
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
-  last_activity_at: 2026-09-04T17:45:35.000Z
-  txns_24h: 4387
-  launches_24h: 1997
+      errors:
+        - step: blockscout
+          message: 'counters/0xaCE55FE98Bab14366dD49aB5AA5dF76aA11A3c6f: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+  last_activity_at: 2026-09-04T22:18:28.000Z
+  txns_24h: 4112
+  launches_24h: 1998
 errors: []

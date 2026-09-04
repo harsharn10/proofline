@@ -1,13 +1,13 @@
 slug: cashbird
-pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
     label: CASHBIRD token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: cashbird
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: 52053085
-    created_at: 2026-09-01T21:50:40.000Z
-    holders: 1654
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x38C8f642A04FEaC9899990276b4207fE4F621e18: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x38C8f642A04FEaC9899990276b4207fE4F621e18: HTTP 402: {"error":"Out of credits"}'
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
     label: DopplerERC20V1Factory (token creator)
     role: factory
@@ -85,7 +89,7 @@ addresses:
     safe: null
     created_block: 20947470
     created_at: 2026-07-27T18:30:23.000Z
-    holders: 19841
+    holders: 20860
     errors: []
   - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
     label: Airlock (token owner)
@@ -107,7 +111,7 @@ addresses:
         - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
         - "0xdf95cc445469816234ad95f702c79d25bce401a7"
         - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
-        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+        - "0x5f512dfeacc95e8c47135a1ebbdf5a9e70a0eeff"
     created_block: 646829
     created_at: 2026-06-30T22:03:11.000Z
     holders: null
@@ -115,82 +119,120 @@ addresses:
 metrics: []
 market:
   token_address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0xf25fc6cf0b524e236ffe33e762caee47ef7284ec65c175900a1542a6bc91fdfb"
       quote_symbol: GLD
-      price_usd: 0.0001885
-      liquidity_usd: 114933.37
-      volume_h24: 156270.05
-      volume_h6: 66151.18
+      price_usd: 0.0002272
+      liquidity_usd: 128901.36
+      volume_h24: 252845.9
+      volume_h6: 171919.02
       txns_h24:
-        buys: 991
-        sells: 983
-      price_change_h24: -10.39
-      market_cap: 188598
-      fdv: 188598
+        buys: 1577
+        sells: 1603
+      price_change_h24: -0.53
+      market_cap: 227270
+      fdv: 227270
       created_at: 2026-09-01T21:50:40.000Z
+    - dex: uniswap
+      pair_address: "0xd5b3468b66ce4e7c3287224cf70926cc1e7bd6df6551aba88dcd03c65b7e5fed"
+      quote_symbol: USDG
+      price_usd: 0.0001983
+      liquidity_usd: 54.71
+      volume_h24: 84.72
+      volume_h6: 84.72
+      txns_h24:
+        buys: 14
+        sells: 14
+      price_change_h24: 17.83
+      market_cap: 198327
+      fdv: 198327
+      created_at: 2026-09-04T18:46:17.000Z
     - dex: uniswap
       pair_address: "0x1e336b3e5645ec59a8a37d24567750442dc586d6d2d1a4651c313ecfdbbe0344"
       quote_symbol: ETH
-      price_usd: 0.0002101
-      liquidity_usd: 298.96
-      volume_h24: 249.5
-      volume_h6: 78.08
+      price_usd: 0.0002422
+      liquidity_usd: 320.9
+      volume_h24: 303.33
+      volume_h6: 156.26
       txns_h24:
-        buys: 13
-        sells: 18
-      price_change_h24: -2.26
-      market_cap: 210109
-      fdv: 210109
+        buys: 20
+        sells: 25
+      price_change_h24: 28.14
+      market_cap: 242270
+      fdv: 242270
       created_at: 2026-09-01T22:30:17.000Z
     - dex: uniswap
       pair_address: "0x14d4a9d8d97a832bd0d744e10cdd09106c1a3cc4bc35854ffbb8ba09f4ebfe90"
       quote_symbol: USDG
-      price_usd: 0.0002284
-      liquidity_usd: 22.75
-      volume_h24: 0.42
-      volume_h6: 0.04
+      price_usd: 0.0002859
+      liquidity_usd: 28.43
+      volume_h24: 0.44
+      volume_h6: 0.07
       txns_h24:
-        buys: 2
+        buys: 3
         sells: 2
-      price_change_h24: 92788
-      market_cap: 228484
-      fdv: 228484
+      price_change_h24: 116148
+      market_cap: 285944
+      fdv: 285944
       created_at: 2026-09-01T22:10:27.000Z
+    - dex: uniswap
+      pair_address: "0x86bce5e30ef851a8908810b45d884c0ec01e91ff3b2ce1d66839821e105fe923"
+      quote_symbol: USDG
+      price_usd: 0.00000268
+      liquidity_usd: 0.11
+      volume_h24: 0.1
+      volume_h6: 0.1
+      txns_h24:
+        buys: 1
+        sells: 0
+      price_change_h24: null
+      market_cap: 2681
+      fdv: 2681
+      created_at: 2026-09-04T20:05:50.000Z
     - dex: uniswap
       pair_address: "0x644f260c2b63411356711092fc00e332a9bee181e3b70af6b7a4c6a5f4cc7544"
       quote_symbol: USDG
-      price_usd: 0.0002078
-      liquidity_usd: 0.9
-      volume_h24: 0.16
-      volume_h6: 0.08
+      price_usd: 0.0002743
+      liquidity_usd: 1.04
+      volume_h24: 0.24
+      volume_h6: 0.15
       txns_h24:
-        buys: 1
+        buys: 2
         sells: 1
-      price_change_h24: 41.62
-      market_cap: 207858
-      fdv: 207858
+      price_change_h24: 86.89
+      market_cap: 274313
+      fdv: 274313
       created_at: 2026-09-01T22:11:38.000Z
-  liquidity_usd: 115255.98
-  volume_h24: 156520.13
-  trades_h24: 2011
-  price_usd: 0.0001885
-  price_change_h24: -10.39
-  market_cap_usd: 188598
-  fdv_usd: 188598
-  fdv: 188598
+    - dex: uniswap
+      pair_address: "0xb7caf20a16111cc806e03c8383771cb9d64398aedf952273d6132fb823e4aa7a"
+      quote_symbol: ETH
+      price_usd: 0.00005666
+      liquidity_usd: 2.66
+      volume_h24: 0.2
+      volume_h6: 0.2
+      txns_h24:
+        buys: 2
+        sells: 0
+      price_change_h24: 4.98
+      market_cap: 56663
+      fdv: 56663
+      created_at: 2026-09-03T10:32:48.000Z
+  liquidity_usd: 129309.21
+  volume_h24: 253234.93
+  trades_h24: 3264
+  price_usd: 0.0002272
+  price_change_h24: -0.53
+  market_cap_usd: 227270
+  fdv_usd: 227270
+  fdv: 227270
   first_pair_at: 2026-09-01T21:50:40.000Z
-  top10_share: 0.5243080625585381
-  top10_share_ex_pools: 0.1720398399941437
-  burned_share: 0
-  top10_as_of: 2026-09-04T16:22:34.904Z
-  launchpad:
-    slug: doppler
-    via: factory
-    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
-    shared: false
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
   rialto: null
   pair_asset:
     ticker: GLD
@@ -202,13 +244,27 @@ market:
     change_7d: -178873.23
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: launchpad
+      message: addresses/0x38C8f642A04FEaC9899990276b4207fE4F621e18 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x38C8f642A04FEaC9899990276b4207fE4F621e18: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x38C8f642A04FEaC9899990276b4207fE4F621e18/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x38C8f642A04FEaC9899990276b4207fE4F621e18
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x38C8f642A04FEaC9899990276b4207fE4F621e18
 structure:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   mint: unknown
   renounced: false
   lp:
     - pair: "0xf25fc6cf0b524e236ffe33e762caee47ef7284ec65c175900a1542a6bc91fdfb"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xd5b3468b66ce4e7c3287224cf70926cc1e7bd6df6551aba88dcd03c65b7e5fed"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
@@ -220,26 +276,40 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x86bce5e30ef851a8908810b45d884c0ec01e91ff3b2ce1d66839821e105fe923"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x644f260c2b63411356711092fc00e332a9bee181e3b70af6b7a4c6a5f4cc7544"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xb7caf20a16111cc806e03c8383771cb9d64398aedf952273d6132fb823e4aa7a"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: mint
+      message: 'smart-contracts/0x38C8f642A04FEaC9899990276b4207fE4F621e18: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
       label: CASHBIRD token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T17:52:13.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 188
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x38C8f642A04FEaC9899990276b4207fE4F621e18: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory (token creator)
       role: factory
@@ -265,10 +335,10 @@ activity:
       role: factory
       transactions_count: 13369
       token_transfers_count: 4
-      last_tx_at: 2026-09-04T16:25:01.000Z
+      last_tx_at: 2026-09-04T20:52:03.000Z
       last_method: create
       txns_24h: 2000
-      launches_24h: 1997
+      launches_24h: 1998
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -277,7 +347,7 @@ activity:
       role: token
       transactions_count: 10814
       token_transfers_count: 17
-      last_tx_at: 2026-09-04T17:14:07.000Z
+      last_tx_at: 2026-09-04T21:58:58.000Z
       last_method: approve
       txns_24h: 2000
       launches_24h: null
@@ -289,12 +359,12 @@ activity:
       role: other
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-04T16:05:30.000Z
+      last_tx_at: 2026-09-04T20:42:51.000Z
       last_method: create
-      txns_24h: 138
+      txns_24h: 112
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T17:52:13.000Z
-  txns_24h: 4326
-  launches_24h: 1997
+  last_activity_at: 2026-09-04T21:58:58.000Z
+  txns_24h: 4112
+  launches_24h: 1998
 errors: []

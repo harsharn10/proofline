@@ -1,13 +1,13 @@
 slug: clarus
-pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x22ea949763dB855880264A8FB689E07021661e18"
     label: CLARUS token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: The Dogcow
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: 47970843
-    created_at: 2026-08-28T03:16:38.000Z
-    holders: 546
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x22ea949763dB855880264A8FB689E07021661e18: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x22ea949763dB855880264A8FB689E07021661e18: HTTP 402: {"error":"Out of credits"}'
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
     label: DopplerERC20V1Factory (token creator)
     role: factory
@@ -90,7 +94,7 @@ addresses:
         - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
         - "0xdf95cc445469816234ad95f702c79d25bce401a7"
         - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
-        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+        - "0x5f512dfeacc95e8c47135a1ebbdf5a9e70a0eeff"
     created_block: 646829
     created_at: 2026-06-30T22:03:11.000Z
     holders: null
@@ -98,68 +102,64 @@ addresses:
 metrics: []
 market:
   token_address: "0x22ea949763dB855880264A8FB689E07021661e18"
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0xc0ebbeede3977751f06e4fffb384699dbb3cba55ec10507b42959f8df02c1841"
       quote_symbol: AAPL
-      price_usd: 0.0003488
-      liquidity_usd: 164027.95
-      volume_h24: 98431.56
-      volume_h6: 4138.22
+      price_usd: 0.000298
+      liquidity_usd: 143958.39
+      volume_h24: 62643.95
+      volume_h6: 32546.16
       txns_h24:
-        buys: 504
-        sells: 495
-      price_change_h24: -10.87
-      market_cap: 348839
-      fdv: 348839
+        buys: 408
+        sells: 381
+      price_change_h24: -32.68
+      market_cap: 298006
+      fdv: 298006
       created_at: 2026-08-28T03:16:38.000Z
     - dex: uniswap
       pair_address: "0xc8e19043b0ebcd35ed582281502fd306606d10d29e1b0a2d68a41c37edc3d71f"
       quote_symbol: AAPL
-      price_usd: 0.000349
-      liquidity_usd: 9081.52
-      volume_h24: 6228.91
-      volume_h6: 583.14
+      price_usd: 0.0003221
+      liquidity_usd: null
+      volume_h24: 4882.2
+      volume_h6: 494.65
       txns_h24:
-        buys: 29
-        sells: 42
-      price_change_h24: -26.06
-      market_cap: 349030
-      fdv: 349030
+        buys: 24
+        sells: 41
+      price_change_h24: -29.59
+      market_cap: 322184
+      fdv: 322184
       created_at: 2026-09-03T20:57:58.000Z
     - dex: uniswap
       pair_address: "0xe8dad9db5c5b0e2d6ebb9ee45881c22a31d373589d1ef5b91569f820c244c067"
       quote_symbol: ETH
-      price_usd: 0.0002873
-      liquidity_usd: 16.08
-      volume_h24: 58.33
-      volume_h6: 4.2
+      price_usd: 0.0002921
+      liquidity_usd: 16.3
+      volume_h24: 18.79
+      volume_h6: 8.37
       txns_h24:
-        buys: 7
-        sells: 11
-      price_change_h24: -29.92
-      market_cap: 287333
-      fdv: 287333
+        buys: 2
+        sells: 5
+      price_change_h24: -34.38
+      market_cap: 292180
+      fdv: 292180
       created_at: 2026-09-01T22:12:14.000Z
-  liquidity_usd: 173125.55
-  volume_h24: 104718.8
-  trades_h24: 1088
-  price_usd: 0.0003488
-  price_change_h24: -10.87
-  market_cap_usd: 348839
-  fdv_usd: 348839
-  fdv: 348839
+  liquidity_usd: 143974.69
+  volume_h24: 67544.94
+  trades_h24: 861
+  price_usd: 0.000298
+  price_change_h24: -32.68
+  market_cap_usd: 298006
+  fdv_usd: 298006
+  fdv: 298006
   first_pair_at: 2026-08-28T03:16:38.000Z
-  top10_share: 0.4856923425527227
-  top10_share_ex_pools: 0.1933026032052046
-  burned_share: 0
-  top10_as_of: 2026-09-04T16:22:34.904Z
-  launchpad:
-    slug: doppler
-    via: factory
-    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
-    shared: false
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
   rialto: null
   pair_asset:
     ticker: AAPL
@@ -171,9 +171,19 @@ market:
     change_7d: 271065.66
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: launchpad
+      message: addresses/0x22ea949763dB855880264A8FB689E07021661e18 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x22ea949763dB855880264A8FB689E07021661e18: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x22ea949763dB855880264A8FB689E07021661e18/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x22ea949763dB855880264A8FB689E07021661e18
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x22ea949763dB855880264A8FB689E07021661e18
 structure:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   mint: unknown
   renounced: false
   lp:
@@ -191,20 +201,26 @@ structure:
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: mint
+      message: 'smart-contracts/0x22ea949763dB855880264A8FB689E07021661e18: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x22ea949763dB855880264A8FB689E07021661e18"
       label: CLARUS token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 1143
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T16:44:15.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 97
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x22ea949763dB855880264A8FB689E07021661e18: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory (token creator)
       role: factory
@@ -230,10 +246,10 @@ activity:
       role: factory
       transactions_count: 13369
       token_transfers_count: 4
-      last_tx_at: 2026-09-04T16:25:01.000Z
+      last_tx_at: 2026-09-04T20:52:03.000Z
       last_method: create
       txns_24h: 2000
-      launches_24h: 1997
+      launches_24h: 1998
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -242,12 +258,12 @@ activity:
       role: admin
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-04T16:05:30.000Z
+      last_tx_at: 2026-09-04T20:42:51.000Z
       last_method: create
-      txns_24h: 138
+      txns_24h: 112
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T16:44:15.000Z
-  txns_24h: 2235
-  launches_24h: 1997
+  last_activity_at: 2026-09-04T20:52:03.000Z
+  txns_24h: 2112
+  launches_24h: 1998
 errors: []

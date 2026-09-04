@@ -1,13 +1,13 @@
 slug: pltits
-pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18"
     label: PLTITS token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: Palantits
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -17,8 +17,12 @@ addresses:
     safe: null
     created_block: null
     created_at: null
-    holders: 266
-    errors: []
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18: HTTP 402: {"error":"Out of credits"}'
   - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
     label: DopplerERC20V1 implementation
     role: implementation
@@ -90,7 +94,7 @@ addresses:
         - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
         - "0xdf95cc445469816234ad95f702c79d25bce401a7"
         - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
-        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+        - "0x5f512dfeacc95e8c47135a1ebbdf5a9e70a0eeff"
     created_block: 646829
     created_at: 2026-06-30T22:03:11.000Z
     holders: null
@@ -110,40 +114,54 @@ addresses:
     safe: null
     created_block: 48285
     created_at: 2026-06-10T15:26:04.000Z
-    holders: 35744
+    holders: 35715
     errors: []
 metrics: []
 market:
   token_address: "0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18"
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x9734b611c4fd6a9f4a760589c105e3d3813677bee387efdec6aa129f8b541bd1"
       quote_symbol: PLTR
-      price_usd: 0.00002455
-      liquidity_usd: 24973.13
-      volume_h24: 3642.38
-      volume_h6: 356.23
+      price_usd: 0.0000253
+      liquidity_usd: 25742.42
+      volume_h24: 3646.16
+      volume_h6: 123.43
       txns_h24:
-        buys: 75
+        buys: 72
         sells: 48
-      price_change_h24: -25.61
-      market_cap: 24551
-      fdv: 24551
+      price_change_h24: -22.63
+      market_cap: 25300
+      fdv: 25300
       created_at: 2026-09-02T07:21:16.000Z
-  liquidity_usd: 24973.13
-  volume_h24: 3642.38
-  trades_h24: 123
-  price_usd: 0.00002455
-  price_change_h24: -25.61
-  market_cap_usd: 24551
-  fdv_usd: 24551
-  fdv: 24551
+    - dex: uniswap
+      pair_address: "0x1d79cc001c0167902dddd9a9a5108885b748ca1fe58afe25b0fd5d1f22436fe9"
+      quote_symbol: ETH
+      price_usd: 0.00007015
+      liquidity_usd: 11.1
+      volume_h24: 3.07
+      volume_h6: 3.07
+      txns_h24:
+        buys: 0
+        sells: 2
+      price_change_h24: -49.22
+      market_cap: 70153
+      fdv: 70153
+      created_at: 2026-09-02T09:17:01.000Z
+  liquidity_usd: 25753.52
+  volume_h24: 3649.23
+  trades_h24: 122
+  price_usd: 0.0000253
+  price_change_h24: -22.63
+  market_cap_usd: 25300
+  fdv_usd: 25300
+  fdv: 25300
   first_pair_at: 2026-09-02T07:21:16.000Z
-  top10_share: 1
-  top10_share_ex_pools: 0.1218681297508749
-  burned_share: 0
-  top10_as_of: 2026-09-04T16:22:34.904Z
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
   launchpad: null
   rialto: null
   pair_asset:
@@ -160,9 +178,15 @@ market:
     - step: launchpad
       message: addresses/0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18 did not return creator_address_hash
     - step: top10_share
-      message: holder balances exceeded the circulating supply read for 0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18; the share was clamped
+      message: 'tokens/0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18
 structure:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   mint: unknown
   renounced: false
   lp:
@@ -170,22 +194,32 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x1d79cc001c0167902dddd9a9a5108885b748ca1fe58afe25b0fd5d1f22436fe9"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
+    - step: mint
+      message: 'smart-contracts/0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18: HTTP 402: {"error":"Out of credits"}'
     - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18"
       label: PLTITS token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T16:13:49.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 21
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x5c9F9a42310541A24Dc5cEE4CC96345FeaeA1E18: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       label: DopplerERC20V1 implementation
       role: implementation
@@ -211,10 +245,10 @@ activity:
       role: factory
       transactions_count: 13369
       token_transfers_count: 4
-      last_tx_at: 2026-09-04T16:25:01.000Z
+      last_tx_at: 2026-09-04T20:52:03.000Z
       last_method: create
       txns_24h: 2000
-      launches_24h: 1997
+      launches_24h: 1998
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -223,9 +257,9 @@ activity:
       role: admin
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-04T16:05:30.000Z
+      last_tx_at: 2026-09-04T20:42:51.000Z
       last_method: create
-      txns_24h: 138
+      txns_24h: 112
       launches_24h: null
       errors: []
     - address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
@@ -233,12 +267,12 @@ activity:
       role: token
       transactions_count: 14903
       token_transfers_count: 55
-      last_tx_at: 2026-09-04T17:09:45.000Z
-      last_method: transfer
-      txns_24h: 1415
+      last_tx_at: 2026-09-04T21:51:23.000Z
+      last_method: approve
+      txns_24h: 1198
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T17:09:45.000Z
-  txns_24h: 3574
-  launches_24h: 1997
+  last_activity_at: 2026-09-04T21:51:23.000Z
+  txns_24h: 3310
+  launches_24h: 1998
 errors: []

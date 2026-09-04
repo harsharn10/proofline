@@ -1,13 +1,13 @@
 slug: op
-pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
     label: OP token (PonsV2LauncherToken)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: Sandisk Optimus
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 51169078
-    created_at: 2026-08-31T21:02:01.000Z
-    holders: 420
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory
     role: factory
@@ -78,26 +82,26 @@ addresses:
     safe: null
     created_block: 48293
     created_at: 2026-06-10T15:27:03.000Z
-    holders: 24558
+    holders: 24537
     errors: []
 metrics: []
 market:
   token_address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
       quote_symbol: SNDK
-      price_usd: 0.00008013
-      liquidity_usd: 26762.19
-      volume_h24: 160790.94
-      volume_h6: 16639.65
+      price_usd: 0.00009993
+      liquidity_usd: 30101.24
+      volume_h24: 118731
+      volume_h6: 14099.29
       txns_h24:
-        buys: 461
-        sells: 366
-      price_change_h24: -44.1
-      market_cap: 80139
-      fdv: 80139
+        buys: 374
+        sells: 279
+      price_change_h24: -0.8
+      market_cap: 99932
+      fdv: 99932
       created_at: 2026-08-31T21:02:46.000Z
     - dex: uniswap
       pair_address: "0x0ce46e76a7f9227ef31fbe8737dbd91dbc2aeb72e8888e1c3accc3e5094fad20"
@@ -105,7 +109,7 @@ market:
       price_usd: 0.00002473
       liquidity_usd: 1.96
       volume_h24: 1.2
-      volume_h6: 1.2
+      volume_h6: 0
       txns_h24:
         buys: 0
         sells: 1
@@ -113,24 +117,20 @@ market:
       market_cap: 24732
       fdv: 24732
       created_at: 2026-09-03T18:38:32.000Z
-  liquidity_usd: 26764.15
-  volume_h24: 160792.14
-  trades_h24: 828
-  price_usd: 0.00008013
-  price_change_h24: -44.1
-  market_cap_usd: 80139
-  fdv_usd: 80139
-  fdv: 80139
+  liquidity_usd: 30103.2
+  volume_h24: 118732.2
+  trades_h24: 654
+  price_usd: 0.00009993
+  price_change_h24: -0.8
+  market_cap_usd: 99932
+  fdv_usd: 99932
+  fdv: 99932
   first_pair_at: 2026-08-31T21:02:46.000Z
-  top10_share: 0.450429872692119
-  top10_share_ex_pools: 0.2335709443897627
-  burned_share: 0
-  top10_as_of: 2026-09-04T16:22:34.904Z
-  launchpad:
-    slug: pons
-    via: creator
-    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
-    shared: false
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
   rialto: null
   pair_asset:
     ticker: SNDK
@@ -142,10 +142,20 @@ market:
     change_7d: 85948.84
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: launchpad
+      message: addresses/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214
 structure:
-  pulled_at: 2026-09-04T16:22:34.904Z
-  mint: no-mint-function
+  pulled_at: 2026-09-04T20:46:36.233Z
+  mint: unknown
   renounced: null
   lp:
     - pair: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
@@ -157,30 +167,38 @@ structure:
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
+    - step: mint
+      message: 'smart-contracts/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
+      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
       label: OP token (PonsV2LauncherToken)
       role: token
-      transactions_count: 1476
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T17:19:38.000Z
-      last_method: approve
-      txns_24h: 148
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: PonsV2LaunchFactory
       role: factory
       transactions_count: 76659
       token_transfers_count: 6719
-      last_tx_at: 2026-09-04T16:23:54.000Z
-      last_method: transferCreatorFeeRecipient
+      last_tx_at: 2026-09-04T20:47:30.000Z
+      last_method: launchToken
       txns_24h: 2000
-      launches_24h: 859
+      launches_24h: 845
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -199,12 +217,12 @@ activity:
       role: token
       transactions_count: 6510
       token_transfers_count: 39
-      last_tx_at: 2026-09-04T17:18:28.000Z
+      last_tx_at: 2026-09-04T22:07:40.000Z
       last_method: approve
-      txns_24h: 713
+      txns_24h: 511
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T17:19:38.000Z
-  txns_24h: 2861
-  launches_24h: 859
+  last_activity_at: 2026-09-04T22:07:40.000Z
+  txns_24h: 2511
+  launches_24h: 845
 errors: []

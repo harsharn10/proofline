@@ -1,13 +1,13 @@
 slug: circus
-pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
     label: barcusLaunchpad / circusQuoteLaunchpad (ERC1967 proxy)
     role: factory
     is_contract: true
-    source_verified: true
-    contract_name: ERC1967Proxy
+    source_verified: null
+    contract_name: null
     proxy:
       type: eip1967
       implementation: "0x822e175c1ae12166a0ea3299d083da48e6c42b96"
@@ -15,15 +15,17 @@ addresses:
     owner: "0x90ae1f7ded5b00599bf6bfdea6a1ef1f05fa0681"
     owner_type: eoa
     safe: null
-    created_block: 14971385
-    created_at: 2026-07-20T19:59:48.000Z
+    created_block: null
+    created_at: null
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: 'addresses/0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00: HTTP 402: {"error":"Out of credits"}'
   - address: "0x822E175C1ae12166A0Ea3299d083Da48E6C42B96"
     label: Launchpad implementation (ERC1967 slot)
     role: implementation
     is_contract: true
-    source_verified: false
+    source_verified: null
     contract_name: null
     proxy:
       type: none
@@ -32,49 +34,17 @@ addresses:
     owner: "0x0000000000000000000000000000000000000000"
     owner_type: none
     safe: null
-    created_block: 46405673
-    created_at: 2026-08-26T07:23:45.000Z
+    created_block: null
+    created_at: null
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: 'addresses/0x822E175C1ae12166A0Ea3299d083Da48E6C42B96: HTTP 402: {"error":"Out of credits"}'
   - address: "0xA256bC02dbB92ed1cB607a7DE7b0bbEBca29e930"
     label: CircusLocker (barcusLocker)
     role: other
     is_contract: true
-    source_verified: true
-    contract_name: CircusLocker
-    proxy:
-      type: none
-      implementation: null
-      admin: null
-    owner: null
-    owner_type: none
-    safe: null
-    created_block: 14971409
-    created_at: 2026-07-20T19:59:50.000Z
-    holders: null
-    errors: []
-  - address: "0xC126829B4b3782ad30484b298C762507bf9bCa2A"
-    label: JS barcusTimelock
-    role: timelock
-    is_contract: true
-    source_verified: false
-    contract_name: null
-    proxy:
-      type: none
-      implementation: null
-      admin: null
-    owner: null
-    owner_type: none
-    safe: null
-    created_block: 11939851
-    created_at: 2026-07-17T07:27:54.000Z
-    holders: null
-    errors: []
-  - address: "0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681"
-    label: Launchpad owner() / factory creator
-    role: admin
-    is_contract: false
-    source_verified: false
+    source_verified: null
     contract_name: null
     proxy:
       type: none
@@ -86,12 +56,14 @@ addresses:
     created_block: null
     created_at: null
     holders: null
-    errors: []
-  - address: "0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D"
-    label: circusQuoteLocker
-    role: other
+    errors:
+      - step: blockscout
+        message: 'addresses/0xA256bC02dbB92ed1cB607a7DE7b0bbEBca29e930: HTTP 402: {"error":"Out of credits"}'
+  - address: "0xC126829B4b3782ad30484b298C762507bf9bCa2A"
+    label: JS barcusTimelock
+    role: timelock
     is_contract: true
-    source_verified: false
+    source_verified: null
     contract_name: null
     proxy:
       type: none
@@ -100,14 +72,54 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 17878655
-    created_at: 2026-07-24T04:56:23.000Z
+    created_block: null
+    created_at: null
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: 'addresses/0xC126829B4b3782ad30484b298C762507bf9bCa2A: HTTP 402: {"error":"Out of credits"}'
+  - address: "0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681"
+    label: Launchpad owner() / factory creator
+    role: admin
+    is_contract: false
+    source_verified: null
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681: HTTP 402: {"error":"Out of credits"}'
+  - address: "0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D"
+    label: circusQuoteLocker
+    role: other
+    is_contract: true
+    source_verified: null
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D: HTTP 402: {"error":"Out of credits"}'
 metrics: []
 market:
   token_address: null
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -131,71 +143,93 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
       label: barcusLaunchpad / circusQuoteLaunchpad (ERC1967 proxy)
       role: factory
-      transactions_count: 115283
-      token_transfers_count: 110716
-      last_tx_at: 2026-09-04T17:35:51.000Z
-      last_method: "0xd6ae6e44"
-      txns_24h: 2000
-      launches_24h: 1
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
+      launches_24h: null
       errors:
-        - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
+        - step: blockscout
+          message: 'counters/0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x822E175C1ae12166A0Ea3299d083Da48E6C42B96"
       label: Launchpad implementation (ERC1967 slot)
       role: implementation
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-08-26T07:23:45.000Z
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
       last_method: null
-      txns_24h: 0
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x822E175C1ae12166A0Ea3299d083Da48E6C42B96: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0xA256bC02dbB92ed1cB607a7DE7b0bbEBca29e930"
       label: CircusLocker (barcusLocker)
       role: other
-      transactions_count: 233
-      token_transfers_count: 1425
-      last_tx_at: 2026-08-28T00:39:38.000Z
-      last_method: harvestAndWithdraw
-      txns_24h: 0
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0xA256bC02dbB92ed1cB607a7DE7b0bbEBca29e930: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0xC126829B4b3782ad30484b298C762507bf9bCa2A"
       label: JS barcusTimelock
       role: timelock
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-07-17T07:27:54.000Z
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
       last_method: null
-      txns_24h: 0
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0xC126829B4b3782ad30484b298C762507bf9bCa2A: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681"
       label: Launchpad owner() / factory creator
       role: admin
-      transactions_count: 127
-      token_transfers_count: 9
-      last_tx_at: 2026-07-20T19:59:02.000Z
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
       last_method: null
-      txns_24h: 0
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D"
       label: circusQuoteLocker
       role: other
-      transactions_count: 7
-      token_transfers_count: 44
-      last_tx_at: 2026-09-04T16:29:14.000Z
-      last_method: harvestAndWithdraw
-      txns_24h: 4
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
-  last_activity_at: 2026-09-04T17:35:51.000Z
-  txns_24h: 2004
-  launches_24h: 1
+      errors:
+        - step: blockscout
+          message: 'counters/0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+  last_activity_at: null
+  txns_24h: null
+  launches_24h: null
 errors: []

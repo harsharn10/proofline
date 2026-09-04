@@ -1,13 +1,13 @@
 slug: yolo
-pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA"
     label: YOLO token (PonsLauncherToken)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: PonsLauncherToken
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 10204613
-    created_at: 2026-07-15T07:15:15.000Z
-    holders: 12124
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA: HTTP 402: {"error":"Out of credits"}'
   - address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
     label: PonsLaunchFactory (token creator / launchFactory())
     role: factory
@@ -45,8 +49,8 @@ addresses:
     label: YOLO/WETH Uniswap v3 pool (canonical liquidityPool)
     role: other
     is_contract: true
-    source_verified: true
-    contract_name: UniswapV3Pool
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -54,10 +58,12 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 10204613
-    created_at: 2026-07-15T07:15:15.000Z
+    created_block: null
+    created_at: null
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: 'addresses/0x52FcB1D83191E06ef2d2D9f460609CA22a923558: HTTP 402: {"error":"Out of credits"}'
   - address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
     label: WETH (pairToken / quote)
     role: token
@@ -73,7 +79,7 @@ addresses:
     safe: null
     created_block: 2
     created_at: 2026-04-30T16:52:11.000Z
-    holders: 528582
+    holders: 528761
     errors: []
   - address: "0x736D76699C26D0d966744cAe304C000d471f7F35"
     label: PonsLaunchLocker (UNI-V3-POS 129850)
@@ -100,99 +106,99 @@ addresses:
 metrics: []
 market:
   token_address: "0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA"
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x52FcB1D83191E06ef2d2D9f460609CA22a923558"
       quote_symbol: WETH
-      price_usd: 0.0102
-      liquidity_usd: 462064.22
-      volume_h24: 1199198.64
-      volume_h6: 307453.36
+      price_usd: 0.008832
+      liquidity_usd: 429627.4
+      volume_h24: 1292705.51
+      volume_h6: 448444.34
       txns_h24:
-        buys: 1175
-        sells: 922
-      price_change_h24: -23.75
-      market_cap: 9899117
-      fdv: 9899117
+        buys: 1271
+        sells: 1032
+      price_change_h24: -29.89
+      market_cap: 8567127
+      fdv: 8567127
       created_at: 2026-07-15T07:15:15.000Z
     - dex: uniswap
       pair_address: "0x977a1ab226bba4bc21951a54e56addfad6f22968fd4a8ae2889ba26e6bfeaea2"
       quote_symbol: USDG
-      price_usd: 0.01005
-      liquidity_usd: 94849.05
-      volume_h24: 108533.33
-      volume_h6: 24864.82
+      price_usd: 0.00898
+      liquidity_usd: 89955.95
+      volume_h24: 117216.69
+      volume_h6: 35234.33
       txns_h24:
-        buys: 172
-        sells: 164
-      price_change_h24: -23.3
-      market_cap: 9758115
-      fdv: 9758115
+        buys: 171
+        sells: 171
+      price_change_h24: -31.02
+      market_cap: 8710820
+      fdv: 8710820
       created_at: 2026-07-30T17:13:07.000Z
     - dex: uniswap
       pair_address: "0x590f5cdcadc06b4942d7c40ac81d43e33d700832102bea9f15e5736235fe44a6"
       quote_symbol: ETH
-      price_usd: 0.01011
-      liquidity_usd: 16615.71
-      volume_h24: 102613.9
-      volume_h6: 26798.5
+      price_usd: 0.008845
+      liquidity_usd: 15494.77
+      volume_h24: 109291.87
+      volume_h6: 36917.76
       txns_h24:
-        buys: 286
-        sells: 239
-      price_change_h24: -23.64
-      market_cap: 9816134
-      fdv: 9816134
+        buys: 302
+        sells: 257
+      price_change_h24: -30.09
+      market_cap: 8580546
+      fdv: 8580546
       created_at: 2026-08-30T12:13:27.000Z
     - dex: uniswap
       pair_address: "0x7775ea9e8e329be084fe8ed55af01e31af14d6ab8da2179966f2b8b3b0acacb5"
       quote_symbol: USDG
-      price_usd: 0.01015
-      liquidity_usd: 6623.3
-      volume_h24: 66920.59
-      volume_h6: 15730.53
+      price_usd: 0.008903
+      liquidity_usd: 5974.72
+      volume_h24: 65389.99
+      volume_h6: 19055.5
       txns_h24:
-        buys: 616
-        sells: 641
-      price_change_h24: -23.27
-      market_cap: 9853607
-      fdv: 9853607
+        buys: 580
+        sells: 605
+      price_change_h24: -29.72
+      market_cap: 8636366
+      fdv: 8636366
       created_at: 2026-07-22T01:22:22.000Z
-    - dex: uniswap
-      pair_address: "0xd89117fd0791d1241b41366110631098da3c704379f29e87c3c9efe7493a895d"
-      quote_symbol: ETH
-      price_usd: 0.009724
-      liquidity_usd: 29.65
-      volume_h24: 8.93
-      volume_h6: 2.32
-      txns_h24:
-        buys: 5
-        sells: 8
-      price_change_h24: -23.29
-      market_cap: 9432759
-      fdv: 9432759
-      created_at: 2026-08-30T22:32:45.000Z
     - dex: uniswap
       pair_address: "0x45abc85f618164223301921dee13d94ea1437d8738140b6a4e908fda20dbb9bc"
       quote_symbol: ETH
-      price_usd: 0.009945
-      liquidity_usd: 7.48
-      volume_h24: 8.32
-      volume_h6: 0.16
+      price_usd: 0.009407
+      liquidity_usd: 7.29
+      volume_h24: 8.21
+      volume_h6: 0.1
       txns_h24:
         buys: 1
         sells: 3
-      price_change_h24: -18.51
-      market_cap: 9647600
-      fdv: 9647600
+      price_change_h24: 50091
+      market_cap: 9125640
+      fdv: 9125640
       created_at: 2026-07-19T15:17:13.000Z
+    - dex: uniswap
+      pair_address: "0xd89117fd0791d1241b41366110631098da3c704379f29e87c3c9efe7493a895d"
+      quote_symbol: ETH
+      price_usd: 0.009269
+      liquidity_usd: 28.99
+      volume_h24: 7.09
+      volume_h6: 0.37
+      txns_h24:
+        buys: 5
+        sells: 7
+      price_change_h24: -22.08
+      market_cap: 8991463
+      fdv: 8991463
+      created_at: 2026-08-30T22:32:45.000Z
     - dex: uniswap
       pair_address: "0x57d24d5a62ba1e5336bf6a47287418f8afd3bb7402edb5fb89fbdd3f033f9428"
       quote_symbol: YOLO
       price_usd: 0.00001938
       liquidity_usd: 19188.43
       volume_h24: 470.07
-      volume_h6: 470.07
+      volume_h6: 0
       txns_h24:
         buys: 6
         sells: 6
@@ -200,37 +206,57 @@ market:
       market_cap: 19381
       fdv: 19381
       created_at: 2026-09-04T15:10:51.000Z
-  liquidity_usd: 599377.84
-  volume_h24: 1477753.78
-  trades_h24: 4244
-  price_usd: 0.0102
-  price_change_h24: -23.75
-  market_cap_usd: 9899117
-  fdv_usd: 9899117
-  fdv: 9899117
+    - dex: uniswap
+      pair_address: "0x90674ba6d25f6274f539221bb2364716e7189481bcb93aaaab24b6b08da61575"
+      quote_symbol: YOLO
+      price_usd: 0.000006394
+      liquidity_usd: 5868.9
+      volume_h24: 13610.41
+      volume_h6: 13610.41
+      txns_h24:
+        buys: 79
+        sells: 59
+      price_change_h24: 80.79
+      market_cap: 6367
+      fdv: 6367
+      created_at: 2026-09-04T21:52:59.000Z
+  liquidity_usd: 566146.45
+  volume_h24: 1598699.84
+  trades_h24: 4555
+  price_usd: 0.008832
+  price_change_h24: -29.89
+  market_cap_usd: 8567127
+  fdv_usd: 8567127
+  fdv: 8567127
   first_pair_at: 2026-07-15T07:15:15.000Z
-  top10_share: 0.1975828295177486
-  top10_share_ex_pools: 0.1866784919789222
-  burned_share: 0.0300000065834114
-  top10_as_of: 2026-09-04T16:22:34.904Z
-  launchpad:
-    slug: pons
-    via: factory
-    address: "0xa5aab3f0c6eeadf30ef1d3eb997108e976351feb"
-    shared: false
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
   rialto: null
   pair_asset: null
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: launchpad
+      message: addresses/0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA
 structure:
-  pulled_at: 2026-09-04T16:22:34.904Z
-  mint: no-mint-function
+  pulled_at: 2026-09-04T20:46:36.233Z
+  mint: unknown
   renounced: null
   lp:
     - pair: "0x52FcB1D83191E06ef2d2D9f460609CA22a923558"
       locked_share: null
       holder_kind: null
-      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
+      reason: LP token details could not be read from the explorer
     - pair: "0x977a1ab226bba4bc21951a54e56addfad6f22968fd4a8ae2889ba26e6bfeaea2"
       locked_share: null
       holder_kind: null
@@ -243,11 +269,11 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0xd89117fd0791d1241b41366110631098da3c704379f29e87c3c9efe7493a895d"
+    - pair: "0x45abc85f618164223301921dee13d94ea1437d8738140b6a4e908fda20dbb9bc"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x45abc85f618164223301921dee13d94ea1437d8738140b6a4e908fda20dbb9bc"
+    - pair: "0xd89117fd0791d1241b41366110631098da3c704379f29e87c3c9efe7493a895d"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
@@ -255,22 +281,36 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x90674ba6d25f6274f539221bb2364716e7189481bcb93aaaab24b6b08da61575"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
+    - step: mint
+      message: 'smart-contracts/0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
+      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
+    - step: lp
+      message: 'tokens/0x52fcb1d83191e06ef2d2d9f460609ca22a923558: HTTP 402: {"error":"Out of credits"}'
 activity:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA"
       label: YOLO token (PonsLauncherToken)
       role: token
-      transactions_count: 59138
-      token_transfers_count: 69
-      last_tx_at: 2026-09-04T17:41:59.000Z
-      last_method: approve
-      txns_24h: 1007
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
       label: PonsLaunchFactory (token creator / launchFactory())
       role: factory
@@ -284,20 +324,24 @@ activity:
     - address: "0x52FcB1D83191E06ef2d2D9f460609CA22a923558"
       label: YOLO/WETH Uniswap v3 pool (canonical liquidityPool)
       role: other
-      transactions_count: 2
-      token_transfers_count: 233160
-      last_tx_at: 2026-08-27T02:12:56.000Z
-      last_method: increaseObservationCardinalityNext
-      txns_24h: 0
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x52FcB1D83191E06ef2d2D9f460609CA22a923558: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
       label: WETH (pairToken / quote)
       role: token
       transactions_count: 1973059
       token_transfers_count: 318
-      last_tx_at: 2026-09-04T17:17:03.000Z
-      last_method: deposit
+      last_tx_at: 2026-09-04T22:06:22.000Z
+      last_method: withdraw
       txns_24h: 2000
       launches_24h: null
       errors:
@@ -308,14 +352,14 @@ activity:
       role: vault
       transactions_count: 903584
       token_transfers_count: 3416081
-      last_tx_at: 2026-09-04T16:20:39.000Z
+      last_tx_at: 2026-09-04T20:44:34.000Z
       last_method: collectFees
       txns_24h: 2000
       launches_24h: null
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
-  last_activity_at: 2026-09-04T17:41:59.000Z
-  txns_24h: 5027
+  last_activity_at: 2026-09-04T22:06:22.000Z
+  txns_24h: 4020
   launches_24h: 20
 errors: []

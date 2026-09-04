@@ -1,13 +1,13 @@
 slug: oilcoin
-pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
     label: OILCOIN token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: OilCoin
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -17,8 +17,12 @@ addresses:
     safe: null
     created_block: null
     created_at: null
-    holders: 136
-    errors: []
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
     label: DopplerERC20V1Factory (create tokenFactory)
     role: factory
@@ -85,7 +89,7 @@ addresses:
     safe: null
     created_block: 48277
     created_at: 2026-06-10T15:25:06.000Z
-    holders: 6270
+    holders: 6267
     errors: []
   - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
     label: Airlock (token owner)
@@ -107,7 +111,7 @@ addresses:
         - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
         - "0xdf95cc445469816234ad95f702c79d25bce401a7"
         - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
-        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+        - "0x5f512dfeacc95e8c47135a1ebbdf5a9e70a0eeff"
     created_block: 646829
     created_at: 2026-06-30T22:03:11.000Z
     holders: null
@@ -115,49 +119,49 @@ addresses:
 metrics: []
 market:
   token_address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x413dc2a61b3684cfe76522d39027cf486a71535bd0e538243be95aed87e2fbe1"
       quote_symbol: USO
-      price_usd: 0.00004495
-      liquidity_usd: 41180.8
-      volume_h24: 15836.08
-      volume_h6: 646.97
+      price_usd: 0.00004114
+      liquidity_usd: 38543.52
+      volume_h24: 8186.44
+      volume_h6: 1433.58
       txns_h24:
-        buys: 183
-        sells: 156
-      price_change_h24: -38.54
-      market_cap: 44958
-      fdv: 44958
+        buys: 87
+        sells: 66
+      price_change_h24: -26.21
+      market_cap: 41140
+      fdv: 41140
       created_at: 2026-09-02T18:45:10.000Z
     - dex: uniswap
       pair_address: "0x8c68451d45caaada65cec323775ac2e45d668e5ccea1380768d8313aa724f5fb"
       quote_symbol: USDG
-      price_usd: 0.00006257
-      liquidity_usd: 51.76
-      volume_h24: 4.23
-      volume_h6: 0
+      price_usd: 0.00004072
+      liquidity_usd: 41.77
+      volume_h24: 5.28
+      volume_h6: 5.01
       txns_h24:
         buys: 0
-        sells: 3
-      price_change_h24: -11.88
-      market_cap: 62574
-      fdv: 62574
+        sells: 2
+      price_change_h24: -34.92
+      market_cap: 40724
+      fdv: 40724
       created_at: 2026-09-02T20:21:06.000Z
-  liquidity_usd: 41232.56
-  volume_h24: 15840.31
-  trades_h24: 342
-  price_usd: 0.00004495
-  price_change_h24: -38.54
-  market_cap_usd: 44958
-  fdv_usd: 44958
-  fdv: 44958
+  liquidity_usd: 38585.29
+  volume_h24: 8191.72
+  trades_h24: 155
+  price_usd: 0.00004114
+  price_change_h24: -26.21
+  market_cap_usd: 41140
+  fdv_usd: 41140
+  fdv: 41140
   first_pair_at: 2026-09-02T18:45:10.000Z
-  top10_share: 0.8454332974204257
-  top10_share_ex_pools: 0.1824457987209374
-  burned_share: 0
-  top10_as_of: 2026-09-04T16:22:34.904Z
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
   launchpad: null
   rialto: null
   pair_asset:
@@ -173,8 +177,16 @@ market:
   errors:
     - step: launchpad
       message: addresses/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18
 structure:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   mint: unknown
   renounced: false
   lp:
@@ -188,20 +200,26 @@ structure:
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: mint
+      message: 'smart-contracts/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T16:22:34.904Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
       label: OILCOIN token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T14:17:19.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 73
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory (create tokenFactory)
       role: factory
@@ -227,10 +245,10 @@ activity:
       role: factory
       transactions_count: 13369
       token_transfers_count: 4
-      last_tx_at: 2026-09-04T16:25:01.000Z
+      last_tx_at: 2026-09-04T20:52:03.000Z
       last_method: create
       txns_24h: 2000
-      launches_24h: 1997
+      launches_24h: 1998
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -239,9 +257,9 @@ activity:
       role: token
       transactions_count: 8257
       token_transfers_count: 45
-      last_tx_at: 2026-09-04T17:21:19.000Z
+      last_tx_at: 2026-09-04T22:12:30.000Z
       last_method: approve
-      txns_24h: 1952
+      txns_24h: 1548
       launches_24h: null
       errors: []
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
@@ -249,12 +267,12 @@ activity:
       role: other
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-04T16:05:30.000Z
+      last_tx_at: 2026-09-04T20:42:51.000Z
       last_method: create
-      txns_24h: 138
+      txns_24h: 112
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T17:21:19.000Z
-  txns_24h: 4163
-  launches_24h: 1997
+  last_activity_at: 2026-09-04T22:12:30.000Z
+  txns_24h: 3660
+  launches_24h: 1998
 errors: []
