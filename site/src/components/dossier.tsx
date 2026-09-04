@@ -8,7 +8,7 @@ import type {
   TreeRef,
 } from "@/data/types";
 
-export const DOSSIER_TABS = ["commentary", "contracts", "sources"] as const;
+export const DOSSIER_TABS = ["contracts", "control", "checks", "sources"] as const;
 export type DossierTab = (typeof DOSSIER_TABS)[number];
 
 export function Dossier({

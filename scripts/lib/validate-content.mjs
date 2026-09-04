@@ -32,6 +32,23 @@ export function filterOwnWords(warnings, own) {
   });
 }
 
+/** Reader-card completeness and source rules for the optional v3 project fields. */
+export function v3FieldIssues(project, slug = project?.slug ?? "unknown") {
+  const errors = [], warnings = [];
+  if (["mainnet", "beta"].includes(project?.lifecycle)) {
+    if (!project.tldr) warnings.push(`projects/${slug}.yaml: ${project.lifecycle} name has no TL;DR yet`);
+    if (!project.why_people_care) warnings.push(`projects/${slug}.yaml: ${project.lifecycle} name has no Why people care bullets yet`);
+  }
+  if (project?.why_people_care) {
+    if (project.why_people_care.length !== 3) errors.push(`projects/${slug}.yaml: why_people_care must contain exactly 3 bullets`);
+    project.why_people_care.forEach((bullet, index) => {
+      if (!/\[(?:verified|claim|inference|disputed)\s+S[1-9][0-9]*(?:\s+S[1-9][0-9]*)*\]\s*$/i.test(bullet))
+        errors.push(`projects/${slug}.yaml: why_people_care[${index}] must end with a source id in brackets`);
+    });
+  }
+  return { errors, warnings };
+}
+
 export async function validateContent(root = "content", { release = false } = {}) {
   const errors = [], warnings = [];
   let content;
@@ -120,12 +137,24 @@ export async function validateContent(root = "content", { release = false } = {}
   // plain reader language the same day, so nothing here is grandfathered behind --release.
   const vocab = (text, where) => vocabularyWarnings(text, where).forEach((w) => errors.push(w));
   for (const [slug, project] of content.projects) {
+    const v3 = v3FieldIssues(project, slug);
+    errors.push(...v3.errors); warnings.push(...v3.warnings);
     const summaryWords = String(project.summary ?? "").trim().split(/\s+/).filter(Boolean).length;
     if (summaryWords > 120) errors.push(`projects/${slug}.yaml: summary has ${summaryWords} words; maximum is 120`);
     else if (summaryWords > 80) warnings.push(`projects/${slug}.yaml: summary has ${summaryWords} words; target is 80 or fewer`);
     voice(project.summary, `projects/${slug}.yaml: summary`, { slug });
     conduct(project.summary, `projects/${slug}.yaml: summary`);
     vocab(project.summary, `projects/${slug}.yaml: summary`);
+    for (const [field, values] of [
+      ["tldr", project.tldr ? [project.tldr] : []],
+      ["why_people_care", project.why_people_care ?? []],
+      ["risks", project.risks ?? []],
+    ]) values.forEach((value, index) => {
+      const where = `projects/${slug}.yaml: ${field}${values.length > 1 ? `[${index}]` : ""}`;
+      voice(value, where, { slug });
+      conduct(value, where);
+      vocab(value, where);
+    });
     for (const kind of ["positive", "risk", "missing", "unresolved"])
       (project.findings?.[kind] ?? []).forEach((f, i) => {
         voice(f.text, `projects/${slug}.yaml: findings.${kind}[${i}]`, { slug });

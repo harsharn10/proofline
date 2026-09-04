@@ -116,3 +116,9 @@ findings:
     - text: "Is there an audit whose scope matches PonsLauncherToken 0x62C71c…32eA? Next: ask in public and record the answer as a claim"
     - text: "Do the handles @yolorobinhoodx / @YOLOROBINHOOD / @Yolo_robinhood post a different CA? Next: open each profile bio and latest posts for a competing CA"
   unresolved: []
+tldr: PonsLaunchFactory launched a fixed-supply ERC-20 into a Uniswap v3 YOLO/WETH pool. Traders buy and sell YOLO on that book.
+tldr_source: derived
+risks:
+  - USD liquidity on the YOLO/WETH book counts both sides. [claim S13]
+  - Constructor socials were empty, so the site and handle are later surfaces. [claim S13]
+  - Other X handles reuse the YOLO name. [claim S13]

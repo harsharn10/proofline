@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { DeploymentGrid } from "@/components/deployment-grid";
+import { Wire } from "@/components/wire/wire";
 import {
   Badge,
   DataTable,
@@ -9,11 +10,12 @@ import {
   LinkPill,
   MetricTile,
   SegmentedControl,
+  SourceRefs,
   StatusPill,
   Tag,
   type GrowthSeries,
 } from "@/components/ui";
-import { hostLabel, readerCopy, shortAddress } from "@/lib/dejargon";
+import { hostLabel, readerCopy, shortAddress, sourcedLine } from "@/lib/dejargon";
 import {
   DEFAULT_KPIS,
   KPI_LABEL,
@@ -28,8 +30,8 @@ import {
   relativeTime,
   type DependencyRef,
   type Dossier,
-  type DossierBundle,
   type EvidenceClass,
+  type DossierBundle,
   type KpiKey,
   type SectionDef,
   type SiteConfig,
@@ -99,7 +101,7 @@ function explorerHref(dossier: Dossier, site: SiteConfig): string | null {
 }
 
 function kpiHref(dossier: Dossier, key: KpiKey, site: SiteConfig): string | null {
-  if (["liquidityUsd", "volume24h", "trades24h", "priceChange24h", "fdv"].includes(key)) {
+  if (["liquidityUsd", "volume24h", "trades24h", "priceChange24h", "marketCap", "fdv"].includes(key)) {
     return dexScreenerSearchUrl(dossier.symbol ?? dossier.name);
   }
   if (key === "tvl") {
@@ -279,6 +281,7 @@ function CardHeader({ dossier, site, dependencies, tree, section, now, token, wi
             </Badge>
           ) : null}
         </div>
+        <Tldr dossier={dossier} />
         <HeaderTags dossier={dossier} site={site} dependencies={dependencies} tree={tree} token={token} />
       </div>
       <SegmentedControl label="Chart window" options={WINDOW_OPTIONS} value={window} onChange={onWindow} />
@@ -287,12 +290,36 @@ function CardHeader({ dossier, site, dependencies, tree, section, now, token, wi
   );
 }
 
+// The header line under the name. A TL;DR carries its evidence tag like any other sourced field,
+// so it renders through sourcedLine and its ids become footnotes rather than visible "[claim S7]".
+function Tldr({ dossier }: Pick<NameCardProps, "dossier">) {
+  if (!dossier.tldr) return null;
+  const line = sourcedLine(dossier.tldr);
+  return <p className="card-tldr">{line.text} <SourceRefs ids={line.sources} /></p>;
+}
+
 function SummaryPanel({ dossier, site }: Pick<NameCardProps, "dossier" | "site">) {
   const { first, rest } = firstSentence(dossier.summary);
   return (
-    <section className="card-summary">
+    <section className="card-block card-summary">
+      <h2>Overview</h2>
       <p><strong>{first}</strong>{rest ? ` ${rest}` : ""}</p>
       <OfficialLinks dossier={dossier} site={site} />
+    </section>
+  );
+}
+
+function WhyPeopleCare({ dossier }: Pick<NameCardProps, "dossier">) {
+  if (dossier.whyPeopleCare.length === 0) return null;
+  return (
+    <section className="card-block card-bullets">
+      <h2>Why people care</h2>
+      <ul>
+        {dossier.whyPeopleCare.map((value, index) => {
+          const line = sourcedLine(value);
+          return <li key={index}>{line.text} <SourceRefs ids={line.sources} /></li>;
+        })}
+      </ul>
     </section>
   );
 }
@@ -334,7 +361,18 @@ function TokenStructure({ dossier, site }: Pick<NameCardProps, "dossier" | "site
       <FactRow label="Ownership" tone={owner?.label === "One key" ? "warn" : undefined}>{owner ? <a href={owner.href ?? undefined}>{owner.label}</a> : <Missing />}</FactRow>
       <FactRow label="Liquidity">{liquidity ? <a href={dexScreenerSearchUrl(dossier.symbol ?? dossier.name)}>{liquidity}</a> : <Missing />}</FactRow>
       <FactRow label="Mint" tone={dossier.card.mint === "owner-can-mint" ? "warn" : undefined}>{mint ? <a href={explorer ?? undefined}>{mint}</a> : <Missing />}</FactRow>
-      <FactRow label="Top-10 hold">{dossier.card.top10Share !== null ? <a href={explorer ?? undefined}>{(dossier.card.top10Share * 100).toFixed(1)}%</a> : <Missing />}</FactRow>
+      <FactRow label="Top-10 hold, pools out">
+        {dossier.card.top10ShareExPools !== null
+          ? <a href={explorer ?? undefined}>{(dossier.card.top10ShareExPools * 100).toFixed(1)}%</a>
+          : dossier.card.top10Share !== null
+            ? <a href={explorer ?? undefined}>{(dossier.card.top10Share * 100).toFixed(1)}%</a>
+            : <Missing />}
+      </FactRow>
+      <FactRow label="Burned supply">
+        {dossier.card.burnedShare !== null
+          ? <a href={explorer ?? undefined}>{(dossier.card.burnedShare * 100).toFixed(1)}%</a>
+          : <Missing />}
+      </FactRow>
     </>
   );
 }
@@ -387,15 +425,20 @@ function chartSeries(dossier: Dossier, token: boolean): GrowthSeries[] {
 }
 
 function MetricsAndChart({ dossier, site, section, token, window }: Pick<NameCardProps, "dossier" | "site" | "section"> & { token: boolean; window: ChartWindow }) {
-  const keys = SECTION_KPIS[section?.id ?? ""] ?? DEFAULT_KPIS;
+  const sectionKeys = SECTION_KPIS[section?.id ?? ""] ?? DEFAULT_KPIS;
+  const keys: KpiKey[] = token
+    ? (["marketCap", ...sectionKeys.filter((key) => key !== "marketCap")] as KpiKey[]).slice(0, 4)
+    : sectionKeys;
   const series = useMemo(() => chartSeries(dossier, token), [dossier, token]);
   const [active, setActive] = useState(series[0]?.key ?? "");
   const explorer = explorerHref(dossier, site);
   const llama = dossier.pulled?.metrics.find((metric) => metric.source_url.includes("defillama"))?.source_url ?? dossier.sources.find((source) => source.url.includes("defillama"))?.url;
+  const top10Share = token ? (dossier.card.top10ShareExPools ?? dossier.card.top10Share) : dossier.card.top10Share;
   const rialto = dossier.pulled?.market?.rialto ?? null;
   const disagreement = dossier.pulled?.market?.volume_disagreement ?? null;
   return (
-    <section className="card-metrics">
+    <section className="card-block card-metrics">
+      <div className="card-block-head"><h2>Numbers</h2></div>
       <div className="card-metric-grid">
         {keys.slice(0, 4).map((key) => {
           const value = dossier.kpis[key];
@@ -413,7 +456,7 @@ function MetricsAndChart({ dossier, site, section, token, window }: Pick<NameCar
       </div>
       {series.length > 0 ? <GrowthChart series={series} window={window} active={active} onChange={setActive} /> : <p className="card-empty">No snapshots yet.</p>}
       <div className="card-source-line">
-        {dossier.card.top10Share !== null && explorer ? <a href={explorer}>Top 10 hold {(dossier.card.top10Share * 100).toFixed(1)}%</a> : null}
+        {top10Share !== null && explorer ? <a href={explorer}>Top 10 hold{token ? ", pools out" : ""} {(top10Share * 100).toFixed(1)}%</a> : null}
         {/* A disagreement is only useful if the reader can check it, so the row carries both 24h
             figures on their own links instead of an unclickable "sources disagree". */}
         {disagreement && rialto ? (
@@ -440,43 +483,14 @@ function MetricsAndChart({ dossier, site, section, token, window }: Pick<NameCar
   );
 }
 
-function PeopleColumn({ dossier }: Pick<NameCardProps, "dossier">) {
-  const items = [
-    ...dossier.feed.map((item) => ({
-      key: `feed-${item.id}`,
-      date: item.date,
-      text: readerCopy(item.title),
-      who: item.account ?? (item.kind === "onchain" ? "on-chain" : "project"),
-      href: item.sourceUrl ?? `/n/${dossier.slug}?tab=sources`,
-      link: item.kind === "company" || item.kind === "ct" ? "post" : "read",
-    })),
-    ...dossier.changelog.map((item, index) => ({
-      key: `change-${index}-${item.date}`,
-      date: item.date,
-      text: readerCopy(item.title),
-      who: "Icarus",
-      href: `/n/${dossier.slug}?tab=commentary`,
-      link: "read",
-    })),
-  ]
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, 6);
+function CardWire({ dossier, now }: Pick<NameCardProps, "dossier" | "now">) {
   return (
-    <section>
-      <div className="card-column-title">
-        <h2><Icon name="msg" /> What people are saying</h2>
-        <Link to="/feed" search={{ name: dossier.slug } as never}>All →</Link>
+    <section className="card-block" id="commentary">
+      <div className="card-block-head">
+        <h2>Commentary</h2>
+        <Link to="/feed" search={{ name: dossier.slug }}>All →</Link>
       </div>
-      {items.length > 0 ? (
-        <div className="card-people">
-          {items.map((item) => (
-            <article key={item.key}>
-              <p>{item.text}</p>
-              <small>{item.who} · {dateLabel(item.date)} · <a href={item.href}>{item.link}</a></small>
-            </article>
-          ))}
-        </div>
-      ) : <p className="card-empty">Nothing published yet.</p>}
+      <Wire items={dossier.wire.slice(0, 6)} now={now} />
     </section>
   );
 }
@@ -512,41 +526,85 @@ function RelatedTable({ dossier, section, related }: Pick<NameCardProps, "dossie
   );
 }
 
-// Spec §3 rule 1: how a statement is supported, in the same words on a risk and a positive.
+function Risks({ dossier }: Pick<NameCardProps, "dossier">) {
+  const rows = dossier.risks.length > 0
+    ? dossier.risks.slice(0, 3).map(sourcedLine)
+    : dossier.findings.risk.slice(0, 3).map((finding) => ({
+        text: readerCopy(finding.text),
+        sources: finding.sources ?? [],
+      }));
+  if (rows.length === 0) return null;
+  return (
+    <section className="card-block card-risks">
+      <h2>What could go wrong</h2>
+      <ul>{rows.map((row, index) => <li key={index}>{row.text} <SourceRefs ids={row.sources} /></li>)}</ul>
+    </section>
+  );
+}
+
+// README §3 rule 1's evidence vocabulary. Every check the research recorded gets one of these
+// words, so a reader can tell an on-chain read from something the project said about itself.
 const EVIDENCE_WORDS: Record<EvidenceClass, string> = {
   verified: "checked on chain",
   claim: "from the project",
   inference: "from the evidence",
   disputed: "disputed",
-  unknown: "unconfirmed",
+  unknown: "not classified",
 };
 
-function evidenceLabel(kind: EvidenceClass, risk: boolean): string {
-  const words = EVIDENCE_WORDS[kind] ?? EVIDENCE_WORDS.unknown;
-  return risk ? `Risk · ${words}` : `${words.charAt(0).toUpperCase()}${words.slice(1)}`;
-}
-
-function SourceRefs({ ids }: { ids?: string[] }) {
-  if (!ids?.length) return null;
-  return <>{ids.map((id) => <sup key={id}><Link from="/n/$slug" search={{ tab: "sources" }} hash={`source-${id}`} resetScroll={false}>{id.replace(/^S/, "")}</Link></sup>)}</>;
-}
-
-function Commentary({ dossier }: Pick<NameCardProps, "dossier">) {
-  const findings = [
-    ...dossier.findings.risk.map((finding) => ({ finding, risk: true })),
-    ...dossier.findings.positive.map((finding) => ({ finding, risk: false })),
-  ];
+/**
+ * The full research record behind the card: what checked out, what is still open, what two sources
+ * disagree about. The three risk bullets at the bottom of the page are the headline; this tab is
+ * where a diligence reader finds everything else, with its evidence word and its footnotes.
+ */
+function Checks({ dossier }: Pick<NameCardProps, "dossier">) {
+  const { positive, missing, unresolved } = dossier.findings;
+  if (positive.length + missing.length + unresolved.length === 0)
+    return <p className="card-empty">Nothing checked yet.</p>;
   return (
-    <div className="card-commentary">
-      {findings.map(({ finding, risk }, index) => (
-        <article key={`${risk ? "risk" : "positive"}-${index}`}>
-          <h3 className={risk ? "is-risk" : undefined}>{evidenceLabel(finding.class, risk)}</h3>
-          <p>{readerCopy(finding.text)} <SourceRefs ids={finding.sources} /></p>
-        </article>
-      ))}
-      {dossier.findings.unresolved.map((gap, index) => <article key={`unresolved-${index}`}><h3>Disputed</h3><p>{readerCopy(gap.text)}</p></article>)}
-      {dossier.findings.missing.map((gap, index) => <article key={`missing-${index}`}><h3>Open</h3><p>{readerCopy(gap.text)}</p></article>)}
-      {findings.length + dossier.findings.unresolved.length + dossier.findings.missing.length === 0 ? <p className="card-empty">No commentary yet.</p> : null}
+    <div className="card-checks">
+      {positive.length > 0 ? (
+        <section>
+          <h3>What checked out · {positive.length}</h3>
+          <ul>
+            {positive.map((finding, index) => (
+              <li key={index}>
+                <span className={`card-check-word is-${finding.class}`}>{EVIDENCE_WORDS[finding.class]}</span>
+                {readerCopy(finding.text)} <SourceRefs ids={finding.sources} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      {missing.length > 0 ? (
+        <section>
+          <h3>Open · {missing.length}</h3>
+          <ul>
+            {missing.map((gap, index) => (
+              <li key={index}>
+                <span className="card-check-word is-open">Open</span>
+                {readerCopy(gap.text)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      {unresolved.length > 0 ? (
+        <section>
+          <h3>Still disputed · {unresolved.length}</h3>
+          <ul>
+            {unresolved.map((gap, index) => (
+              <li key={index}>
+                <span className="card-check-word is-disputed">disputed</span>
+                {readerCopy(gap.text)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      <p className="card-checks-note">
+        Risks are listed above under What could go wrong. This tab is the rest of the record.
+      </p>
     </div>
   );
 }
@@ -568,20 +626,34 @@ function Sources({ dossier }: Pick<NameCardProps, "dossier">) {
   );
 }
 
-function CardTabs({ dossier, site, tab }: Pick<NameCardProps, "dossier" | "site" | "tab">) {
+function CardTabs({ dossier, site, tab, token }: Pick<NameCardProps, "dossier" | "site" | "tab"> & { token: boolean }) {
+  const checkCount =
+    dossier.findings.positive.length + dossier.findings.missing.length + dossier.findings.unresolved.length;
   const tabs: Array<{ id: DossierTab; label: string }> = [
-    { id: "commentary", label: "Commentary" },
     { id: "contracts", label: dossier.deployments.length ? `Contracts · ${dossier.deployments.length}` : "Contracts" },
+    { id: "control", label: "Control" },
+    { id: "checks", label: checkCount ? `Checks · ${checkCount}` : "Checks" },
     { id: "sources", label: dossier.sources.length ? `Sources · ${dossier.sources.length}` : "Sources" },
   ];
   return (
     <section className="card-block card-tab-block">
+      <h2>Details</h2>
       <nav className="card-tabs" aria-label="Name details">
-        {tabs.map((item) => <Link key={item.id} from="/n/$slug" search={item.id === "commentary" ? {} : { tab: item.id }} resetScroll={false} className={tab === item.id ? "on" : undefined}>{item.label}</Link>)}
+        {tabs.map((item) => <Link key={item.id} from="/n/$slug" search={item.id === "contracts" ? {} : { tab: item.id }} resetScroll={false} className={tab === item.id ? "on" : undefined}>{item.label}</Link>)}
       </nav>
       <div className="card-tab-panel">
-        {tab === "commentary" ? <Commentary dossier={dossier} /> : null}
         {tab === "contracts" ? (dossier.deployments.length > 0 ? <DeploymentGrid deployments={dossier.deployments} explorerBase={site.chain.explorer} /> : <p className="card-empty">No contracts located yet.</p>) : null}
+        {tab === "control" ? (
+          <div className="card-control">
+            <OfficialAndStructure dossier={dossier} site={site} token={token} />
+            {!token && dossier.derived.score !== null ? (
+              <p className="card-control-note">
+                Control {dossier.derived.score}/100 · evidence {dossier.derived.confidence ?? "not checked"}%{dossier.review.approver === "pending" ? " · awaiting second review" : ""}. This describes operator power and review depth, not quality or safety.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+        {tab === "checks" ? <Checks dossier={dossier} /> : null}
         {tab === "sources" ? <Sources dossier={dossier} /> : null}
       </div>
     </section>
@@ -599,13 +671,12 @@ export function NameCard(props: NameCardProps) {
       <div className="name-card">
         <CardHeader {...props} token={token} window={window} onWindow={setWindow} />
         <SummaryPanel dossier={props.dossier} site={props.site} />
-        <div className="card-columns">
-          <OfficialAndStructure dossier={props.dossier} site={props.site} token={token} />
-          <MetricsAndChart dossier={props.dossier} site={props.site} section={props.section} token={token} window={window} />
-          <PeopleColumn dossier={props.dossier} />
-        </div>
+        <WhyPeopleCare dossier={props.dossier} />
+        <MetricsAndChart dossier={props.dossier} site={props.site} section={props.section} token={token} window={window} />
+        <CardWire dossier={props.dossier} now={props.now} />
         <RelatedTable dossier={props.dossier} section={props.section} related={props.related} />
-        <CardTabs dossier={props.dossier} site={props.site} tab={props.tab} />
+        <Risks dossier={props.dossier} />
+        <CardTabs dossier={props.dossier} site={props.site} tab={props.tab} token={token} />
       </div>
     </article>
   );

@@ -128,3 +128,13 @@ findings:
     - text: "What is the relationship between Solana mint FG53WF6VGMb3eg19A76p4x6Ht267q2kze89h79MhZ9CB ($CB) and the Robinhood Hook V5 pad? Next: do not treat $CB as a Robinhood Chain deployment; record any official docs that name the mint"
     - text: "Are Arc and Stable venues in the Robinhood Chain TVL slice, and is BSC paused as the registry states? Next: do not use the Robinhood launcher address on Arc or BSC; reproduce those venues in a later pass if coverage expands"
   unresolved: []
+risks:
+  - The V5 launcher and Hook are upgradeable ERC1967 proxies. owner() on both is one externally owned account with no code and no pending owner. [verified S13 S17] [claim S6 S8]
+  - Docs say that EOA held six proxy-owner and upgrade roles at deployment. [verified S13 S17] [claim S6 S8]
+  - The Simple V3 launcher still has code, so an integrator that posts to 0x985d…e46f is on a path docs mark as not a new-launch choice. [verified S13 S17] [claim S6 S8]
+tldr: Coinbarrel is a token launchpad on Robinhood Chain.
+tldr_source: derived
+why_people_care:
+  - "Hook V5 is the live new-launch path on this chain: one transaction into a Uniswap V4 pool, not a bonding curve that later graduates. [claim S2 S19 S20 S21]"
+  - Llama's Robinhood Chain slice shows modest locked quote-asset TVL against seven-day fees around 108k to 110k USD. [claim S2 S19 S20 S21]
+  - The pad is not a census row. [claim S2 S19 S20 S21]

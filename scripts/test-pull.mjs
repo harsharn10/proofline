@@ -1100,6 +1100,7 @@ const rawPair = (over = {}) => ({
   volume: { h24: 10, h6: 5 },
   txns: { h24: { buys: 3, sells: 4 } },
   priceChange: { h24: 1.5 },
+  marketCap: 800,
   fdv: 1000,
   pairCreatedAt: JULY,
   ...over,
@@ -1117,6 +1118,7 @@ test("aggregates pairs: sums depth, volume and trades, quotes the deepest pool",
       volume: { h24: 90, h6: 40 },
       txns: { h24: { buys: 10, sells: 2 } },
       priceChange: { h24: -3 },
+      marketCap: 700,
       fdv: 900,
       pairCreatedAt: AUGUST,
     }),
@@ -1133,17 +1135,20 @@ test("aggregates pairs: sums depth, volume and trades, quotes the deepest pool",
   assert.equal(agg.liquidity_usd, 1000);
   assert.equal(agg.volume_h24, 105);
   assert.equal(agg.trades_h24, 21);
-  // Price, change and FDV all come from the deepest pool, never from an average across depths.
+  // Price, change, market cap and FDV all come from the deepest pool, never from an average across depths.
   assert.equal(topLiquidityPair(pairs).dex, "0swap");
   assert.equal(agg.price_usd, 0.42);
   assert.equal(agg.price_change_h24, -3);
+  assert.equal(agg.market_cap_usd, 700);
+  assert.equal(agg.fdv_usd, 900);
   assert.equal(agg.fdv, 900);
   assert.equal(agg.first_pair_at, new Date(JULY).toISOString());
 
   // No pairs at all is every figure null, not zero.
   assert.deepEqual(aggregatePairs([]), {
     liquidity_usd: null, volume_h24: null, trades_h24: null,
-    price_usd: null, price_change_h24: null, fdv: null, first_pair_at: null,
+    price_usd: null, price_change_h24: null, market_cap_usd: null, fdv_usd: null,
+    fdv: null, first_pair_at: null,
   });
 });
 
@@ -1372,7 +1377,7 @@ test("the snapshot takes the token holder count, the market totals and the TVL m
       { kind: "tvl", value: 9208000 },
       { kind: "revenue_24h", value: 909887 },
     ],
-    market: { liquidity_usd: 1000, volume_h24: 500, trades_h24: 21, price_usd: 0.42, fdv: 900, top10_share: 0.41 },
+    market: { liquidity_usd: 1000, volume_h24: 500, trades_h24: 21, price_usd: 0.42, market_cap_usd: 800, fdv: 900, top10_share: 0.41 },
     activity: { addresses: [{ transactions_count: 10 }, { transactions_count: 5 }, { transactions_count: null }], launches_24h: 3 },
   });
   assert.deepEqual(snap, {
@@ -1382,6 +1387,7 @@ test("the snapshot takes the token holder count, the market totals and the TVL m
     volume_h24: 500,
     trades_h24: 21,
     price_usd: 0.42,
+    market_cap: 800,
     fdv: 900,
     txns_total: 15,
     launches_24h: 3,
@@ -1427,6 +1433,8 @@ test("a document carrying both new blocks validates and keeps its key order", ()
       trades_h24: 14,
       price_usd: 0.5,
       price_change_h24: 1.5,
+      market_cap_usd: 800,
+      fdv_usd: 1000,
       fdv: 1000,
       first_pair_at: new Date(JULY).toISOString(),
       top10_share: 0.1,
@@ -1475,11 +1483,11 @@ test("a document carrying both new blocks validates and keeps its key order", ()
   ]);
   assert.deepEqual(Object.keys(doc.market.pairs[0]), [
     "dex", "pair_address", "quote_symbol", "price_usd", "liquidity_usd", "volume_h24",
-    "volume_h6", "txns_h24", "price_change_h24", "fdv", "created_at",
+    "volume_h6", "txns_h24", "price_change_h24", "market_cap", "fdv", "created_at",
   ]);
   assert.deepEqual(Object.keys(doc.market), [
     "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
-    "price_usd", "price_change_h24", "fdv", "first_pair_at", "top10_share",
+    "price_usd", "price_change_h24", "market_cap_usd", "fdv_usd", "fdv", "first_pair_at", "top10_share",
     "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad", "rialto",
     "pair_asset", "volume_disagreement", "errors",
   ]);

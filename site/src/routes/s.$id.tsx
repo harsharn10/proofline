@@ -1,6 +1,7 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { DataTable } from "@/components/ui/data-table";
 import { StatusPill } from "@/components/ui/status-pill";
+import { Wire } from "@/components/wire/wire";
 import { getContent } from "@/data/content-server";
 import {
   KPI_LABEL,
@@ -9,6 +10,7 @@ import {
   formatCount,
   formatKpi,
   formatUsd,
+  readFigure,
   relativeTime,
   type DirectoryEntry,
   type KpiKey,
@@ -74,9 +76,8 @@ function CategoryPage() {
   const { f: searchFilter } = Route.useSearch();
   const f = searchFilter ?? "all";
   const navigate = useNavigate({ from: Route.fullPath }) as any;
-  const { sections, entries, dependencies, chainStats, now } = Route.useLoaderData() as Awaited<
-    ReturnType<typeof getContent>
-  >;
+  const bundle = Route.useLoaderData() as Awaited<ReturnType<typeof getContent>>;
+  const { sections, entries, dependencies, chainStats, now } = bundle;
   const section = sections.find((item) => item.id === id);
 
   if (!section) {
@@ -91,7 +92,12 @@ function CategoryPage() {
   }
 
   const sectionEntries = entries.filter((entry) => entry.tree?.sectionId === section.id);
+  const sectionSlugs = new Set(sectionEntries.map((entry) => entry.slug));
+  const sectionWire = bundle.wire.filter((item) => sectionSlugs.has(item.slug)).slice(0, 4);
   const keys = SECTION_KPIS[section.id] ?? ["volume24h", "liquidityUsd", "holders", "trades24h"];
+  // Tokens carry market cap inside SECTION_KPIS, so the standalone column is only for the sections
+  // that do not — otherwise the table would print the same figure twice.
+  const showsMarketCap = (section.id === "tokens" || section.id === "launchpads") && !keys.includes("marketCap");
   const rows = rankRows(sectionEntries, keys[0]!).filter((entry) => rowMatches(entry, f));
   const live = sectionEntries.filter((entry) => entry.kpis.status === "live").length;
   const dormant = sectionEntries.filter((entry) => entry.kpis.status === "dormant").length;
@@ -202,6 +208,7 @@ function CategoryPage() {
                     {KPI_LABEL[key]}
                   </th>
                 ))}
+                {showsMarketCap ? <th>Market cap</th> : null}
                 <th>Control</th>
               </tr>
             </thead>
@@ -239,6 +246,19 @@ function CategoryPage() {
                         </Link>
                       </td>
                     ))}
+                    {showsMarketCap ? (
+                      <td>
+                        {entry.entityKind === "token" || section.id === "tokens" ? (
+                          <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer">
+                            {readFigure(entry.kpis.marketCap) !== null
+                              ? formatUsd(entry.kpis.marketCap!)
+                              : readFigure(entry.kpis.fdv) !== null
+                                ? `FDV ${formatUsd(entry.kpis.fdv!)}`
+                                : "—"}
+                          </a>
+                        ) : "—"}
+                      </td>
+                    ) : null}
                     <td>
                       <Link to="/n/$slug" params={{ slug: entry.slug }}>
                         {entry.derived.score !== null ? (
@@ -263,6 +283,14 @@ function CategoryPage() {
           <span>Dash = not read, never zero</span>
           <span>Announced = nothing located on chain yet</span>
         </p>
+      </section>
+
+      <section className="mt-[26px]">
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-3 px-0.5">
+          <h2 className="m-0 text-sm font-semibold">The wire</h2>
+          <span className="text-[11px] text-[var(--t3)]">newest in {section.label.toLowerCase()}</span>
+        </div>
+        <Wire items={sectionWire} now={now} />
       </section>
     </main>
   );

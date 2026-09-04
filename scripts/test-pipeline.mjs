@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { parse, stringify } from "yaml";
 import { validateInboxYaml, yamlParseErrors } from "./lib/inbox.mjs";
 import { vocabularyWarnings } from "./lib/voice.mjs";
-import { validateContent } from "./lib/validate-content.mjs";
+import { validateContent, v3FieldIssues } from "./lib/validate-content.mjs";
 import { normalizeUrl, lifecycleDriftWarnings, mainnetReceiptFromPulled, deploymentReceiptFromPulled } from "./lib/checks.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { entryKey, legacyEntryKey, reviewKeyFor, selectUnsent, selectApproved, publicationFingerprint } from "./lib/telegram.mjs";
@@ -20,6 +20,7 @@ import { parsePacket, validatePacket, checkPacket, compile, PRODUCER_IDS } from 
 import { checkResearch, REQUIRED_HEADINGS } from "./lib/research-md.mjs";
 import { runCompile, censusTextWithRow } from "./compile-packet.mjs";
 import { migrateLifecycle } from "./migrations/lifecycle-from-pulled.mjs";
+import { backfillV3Fields, BATCH_PACKET } from "./migrations/backfill-v3-fields.mjs";
 
 let failures = 0;
 async function test(name, fn) {
@@ -488,6 +489,166 @@ await test("the feed carries reader-facing events under ids that survive an edit
   assert.equal(second.feed.items.length, 1, "a retitled event replaces its feed item");
   assert.equal(second.feed.items[0].id, result.feed.items[0].id);
   assert.equal(second.feed.items[0].title, retitled.frontmatter.events[0].title);
+});
+
+await test("compile maps TL;DR, three sourced reasons and paragraph risks", async () => {
+  const source = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
+  const body = [
+    "## What it is", "", "Icarus Fields tracks public chain changes.", "",
+    "Themes: chain-data, tooling", "", "```", "TL;DR: This fenced example is ignored.", "```", "",
+    "TL;DR: Tracks live Robinhood Chain changes for readers.", "",
+    "## Why it matters", "",
+    "- It turns chain changes into a short reader update. [claim R-1]",
+    "- Independent walkthroughs make the output easier to check. [claim R-2]",
+    "- Explorer links let readers verify contract activity. [verified R-3]", "",
+    "## What could go wrong", "",
+    "Indexer delays can hide a recent update. Readers should check the linked source before acting. [claim R-4]",
+  ].join("\n");
+  const result = compile({ frontmatter: source.frontmatter, body });
+  assert.equal(result.project.tldr, "Tracks live Robinhood Chain changes for readers.");
+  assert.deepEqual(result.project.why_people_care, [
+    "It turns chain changes into a short reader update. [claim S1]",
+    "Independent walkthroughs make the output easier to check. [claim S2]",
+    "Explorer links let readers verify contract activity. [verified S3]",
+  ]);
+  assert.deepEqual(result.project.risks, [
+    "Indexer delays can hide a recent update. [claim S4]",
+    "Readers should check the linked source before acting. [claim S4]",
+  ], "a one-paragraph section still fills more than one slot");
+  assert.equal(result.project.tldr_source, undefined, "a real TL;DR line is not tagged as derived");
+  assert.ok(result.notices.some((notice) => notice.includes("read the section's 1 paragraphs as bullets")), result.notices.join("\n"));
+  assert.deepEqual(validateAgainst("project", result.project), []);
+
+  const tooFew = compile({ frontmatter: source.frontmatter, body: body.replace(/\n- Explorer links[^\n]+/, "") });
+  assert.equal(tooFew.project.why_people_care, undefined, "two bullets never get padded");
+  assert.ok(tooFew.notices.some((notice) => notice.includes("expected exactly 3 bullets and found 2")));
+
+  const protectedProject = {
+    ...result.project,
+    controller_edited: true,
+    tldr: "Controller TL;DR.",
+    why_people_care: ["One. [claim S1]", "Two. [claim S1]", "Three. [claim S1]"],
+    risks: ["Controller risk. [claim S1]"],
+  };
+  const protectedResult = compile({ frontmatter: source.frontmatter, body }, protectedProject, result.censusRow, result.sources, result.feed);
+  assert.equal(protectedResult.project.tldr, protectedProject.tldr);
+  assert.deepEqual(protectedResult.project.why_people_care, protectedProject.why_people_care);
+  assert.deepEqual(protectedResult.project.risks, protectedProject.risks);
+});
+
+await test("compile derives the v3 fields a packet did not write, and never drops a risk for length", async () => {
+  const source = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
+  const long = (lead) =>
+    `${lead} the operator can change fees, pairing assets, launch configuration and the graduation ` +
+    "components on a live market, and every one of those calls lands as soon as the signers confirm it";
+  const body = [
+    "## What it is", "",
+    "Icarus Fields tracks public chain changes. It reads the explorer directly. A third sentence runs " +
+      "long enough that the TL;DR budget cannot hold it alongside the first two sentences of the summary.", "",
+    "Themes: chain-data, tooling", "",
+    "## Why it matters", "",
+    "It turns chain changes into a short reader update. Independent walkthroughs make the output easier " +
+      "to check. [claim R-1]", "",
+    "Explorer links let readers verify `contract()` activity. [verified R-3]", "",
+    "## What could go wrong", "",
+    `${long("There is no timelock, so")} [claim R-4]`, "",
+    "Indexer delays can hide a recent update. [claim R-4]", "",
+    "A third paragraph fills the last slot. [claim R-4]", "",
+    "A fourth paragraph is over the cap. [claim R-4]",
+  ].join("\n");
+  const result = compile({ frontmatter: source.frontmatter, body });
+
+  assert.equal(result.project.tldr, "Icarus Fields tracks public chain changes. It reads the explorer directly.");
+  assert.equal(result.project.tldr_source, "derived");
+  assert.ok(result.notices.includes("tldr derived from summary"), result.notices.join("\n"));
+
+  assert.equal(result.project.why_people_care.length, 3);
+  assert.equal(result.project.why_people_care[0], "It turns chain changes into a short reader update. [claim S1]");
+  assert.equal(
+    result.project.why_people_care[2],
+    "Explorer links let readers verify contract() activity. [verified S3]",
+    "backticks never reach the content record",
+  );
+  assert.ok(result.notices.includes("why_people_care derived from paragraphs"), result.notices.join("\n"));
+
+  assert.equal(result.project.risks.length, 3, "three slots stay filled");
+  assert.ok(result.project.risks[0].startsWith("There is no timelock,"), "the first risk written is the first risk kept");
+  assert.ok(result.project.risks[0].endsWith("[claim S4]"), "the source tag survives the trim");
+  assert.ok(result.project.risks[0].includes("…"), "an over-length risk is trimmed, not dropped");
+  assert.ok(result.project.risks.every((risk) => risk.length <= 200), result.project.risks.map((r) => r.length).join(","));
+  assert.equal(result.project.risks[1], "Indexer delays can hide a recent update. [claim S4]");
+  assert.deepEqual(validateAgainst("project", result.project), []);
+});
+
+await test("an empty Why it matters and an untitled summary are reported, not silently dropped", async () => {
+  const source = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
+  const body = ["## What it is", "", "Icarus Fields tracks public chain changes.", "", "Themes: chain-data", "",
+    "## Why it matters", "", "- Only one bullet here. [claim R-1]"].join("\n");
+  const result = compile({ frontmatter: source.frontmatter, body });
+  assert.equal(result.project.why_people_care, undefined);
+  assert.ok(result.notices.some((notice) => notice.includes("why_people_care: empty")), result.notices.join("\n"));
+});
+
+await test("v3 field validation warns on gaps and rejects unsourced reasons", () => {
+  const missing = v3FieldIssues({ slug: "alpha", lifecycle: "mainnet" });
+  assert.equal(missing.errors.length, 0);
+  assert.equal(missing.warnings.length, 2);
+  const invalid = v3FieldIssues({
+    slug: "alpha", lifecycle: "beta", tldr: "Short summary.",
+    why_people_care: ["One. [claim S1]", "Two has no source."],
+  });
+  assert.ok(invalid.errors.some((error) => error.includes("exactly 3")));
+  assert.ok(invalid.errors.some((error) => error.includes("why_people_care[1]")));
+});
+
+await test("the v3 backfill changes only new fields and feed bodies, then becomes a no-op", async () => {
+  const temp = await mkdtemp(join(tmpdir(), "proofline-v3-backfill-"));
+  const packetRoot = join(temp, "packets");
+  const contentRoot = join(temp, "content");
+  try {
+    const source = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
+    source.body = source.body.replace(
+      "Themes: chain-data, monitoring, tooling",
+      [
+        "Themes: chain-data, monitoring, tooling", "", "TL;DR: Tracks live chain changes for readers.", "",
+        "## Why it matters", "", "- First reason. [claim R-1]", "- Second reason. [claim R-2]", "- Third reason. [verified R-3]", "",
+        "## What could go wrong", "", "Indexer delays can hide updates. [claim R-4]",
+      ].join("\n"),
+    );
+    const compiled = compile(source);
+    const project = structuredClone(compiled.project);
+    for (const field of ["tldr", "why_people_care", "risks"]) delete project[field];
+    const feed = structuredClone(compiled.feed);
+    feed.items[0].body = "Old body.";
+    await mkdir(join(packetRoot, source.frontmatter.slug), { recursive: true });
+    for (const dir of ["projects", "sources", "feed"]) await mkdir(join(contentRoot, dir), { recursive: true });
+    await writeFile(join(packetRoot, source.frontmatter.slug, BATCH_PACKET), `---\n${stringify(source.frontmatter, { lineWidth: 0 })}---\n\n${source.body}\n`);
+    await writeFile(join(contentRoot, "census.yaml"), stringify([compiled.censusRow], { lineWidth: 0 }));
+    await writeFile(join(contentRoot, "projects", `${source.frontmatter.slug}.yaml`), stringify(project, { lineWidth: 0 }));
+    await writeFile(join(contentRoot, "sources", `${source.frontmatter.slug}.yaml`), stringify(compiled.sources, { lineWidth: 0 }));
+    await writeFile(join(contentRoot, "feed", `${source.frontmatter.slug}.yaml`), stringify(feed, { lineWidth: 0 }));
+
+    const first = await backfillV3Fields({ packetRoot, contentRoot });
+    assert.deepEqual(
+      { packets: first.packets, projectsChanged: first.projectsChanged, feedsChanged: first.feedsChanged, tldr: first.tldr, why: first.why_people_care, risks: first.risks },
+      { packets: 1, projectsChanged: 1, feedsChanged: 1, tldr: 1, why: 1, risks: 1 },
+    );
+    const updated = parse(await readFile(join(contentRoot, "projects", `${source.frontmatter.slug}.yaml`), "utf8"));
+    assert.equal(updated.tldr, compiled.project.tldr);
+    assert.deepEqual(updated.why_people_care, compiled.project.why_people_care);
+    assert.deepEqual(updated.risks, compiled.project.risks);
+    const snapshot = await Promise.all([
+      readFile(join(contentRoot, "projects", `${source.frontmatter.slug}.yaml`), "utf8"),
+      readFile(join(contentRoot, "feed", `${source.frontmatter.slug}.yaml`), "utf8"),
+    ]);
+    const second = await backfillV3Fields({ packetRoot, contentRoot });
+    assert.equal(second.projectsChanged, 0);
+    assert.equal(second.feedsChanged, 0);
+    assert.deepEqual(await Promise.all([
+      readFile(join(contentRoot, "projects", `${source.frontmatter.slug}.yaml`), "utf8"),
+      readFile(join(contentRoot, "feed", `${source.frontmatter.slug}.yaml`), "utf8"),
+    ]), snapshot, "a second run changes no bytes");
+  } finally { await rm(temp, { recursive: true, force: true }); }
 });
 
 await test("a compile adds official links and never deletes a stored one", async () => {

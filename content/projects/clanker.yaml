@@ -106,3 +106,13 @@ findings:
     - text: "Which Uniswap v4 hook/locker/mevModule bytecode is enabled on the RH factory (0x48B8…e8cc / 0xE491…4A09 / 0xEA1F…299e)? Next: GET Blockscout /api/v2/smart-contracts for those three addresses"
     - text: "Does clanker.world footer or docs page hyperlink https://x.com/clanker_world, or is the handle confirmed only from the X bio? Next: open clanker.world footer and /docs for an explicit X URL"
   unresolved: []
+risks:
+  - owner() is a contract that can deprecate the factory and swap hooks, lockers and the team fee recipient. [claim S1]
+  - Gitbook's deployed-contracts table omits Robinhood, so a reader who stops at docs will miss the live 4663 factory. [claim S1]
+  - Ticker CLANKER on this chain is the LONG/Doppler clone, not a Clanker.sol token. [claim S1]
+tldr: A Farcaster and X deploy bot that mints a 100 billion-supply ERC-20 into a locked Uniswap v4 pool.
+tldr_source: derived
+why_people_care:
+  - The factory is a native Uniswap v4 pad on chain 4663 with its own Clanker.sol, not a wrapper of Pons or Doppler. [claim S1]
+  - Site stats still show new RH deploys while @clanker_world's recent X replies send under-200-follower accounts to Base. [claim S1]
+  - RH $CLANKER 0xd246…1E18 is a different product. [claim S1]

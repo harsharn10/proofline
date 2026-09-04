@@ -122,3 +122,13 @@ findings:
     - text: "Are the other robinhood Gmerald tickers (0x785Dcc33…, 0x83509E45…, 0xEc5C958e…) related deployers or copy tickers? Next: one Blockscout name/creator pass on those three CAs"
     - text: "Which window printed the assignment lead of ~$58,206 liq / ~$2,077,175 vol? Next: keep the DexScreener GMERALD/GME pair slice; do not use Gecko pool fdv_usd 1.95M as GMERALD fdv"
   unresolved: []
+tldr: A one-billion-supply Pons v2 ERC-20 that graduated into a Uniswap v4 GMERALD/GME pool.
+tldr_source: derived
+why_people_care:
+  - The GMERALD/GME Uniswap v4 book printed about $2.30M of 24h volume on Gecko at collection, with the quote leg the workbook GME Stock Token 0x1b0E…153E. [claim S1]
+  - KITTY/GME is a different token (Roaring Kitty 0x96F10D7A…9aB4). [claim S1]
+  - DexScreener search also lists other robinhood Gmerald tickers versus ETH and Solana rows with the same ticker. [claim S1]
+risks:
+  - USD liquidity figures on the GMERALD/GME book count both sides, and the quote side is GME, not USDG. [claim S1]
+  - Gecko names the pool GME/GMERALD and reports pool fdv on the GME base. [claim S1]
+  - DexScreener lists gmerald.xyz and x.com/gmeraldexe, but the on-chain website field is empty and no bidirectional handle check ran this pass, so comms stay unconfirmed-official. [claim S1]

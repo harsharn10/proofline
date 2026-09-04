@@ -114,3 +114,13 @@ findings:
     - text: "Which GitHub commit, if any, matches contracts/factory.sol on Blockscout? Next: record a source mirror if one appears; do not treat Llama protocol/cube as this pad"
     - text: "Are 15 Aug $CUBE volume/burn/revenue figures (75k volume, 37721 burned, 500 platform revenue) still on-chain, and did later deployCoin calls continue after 21 Aug? Next: eth_call tokenByIndex across 0..61 and decode the named burn/buy txs"
   unresolved: []
+risks:
+  - owner() on Factory, CubeHook, and CubeFeeVault is one externally owned account with no code. [verified S8 S10 S20]
+  - Verified source lets that address replace the hook, replace the vault, pause public deploy, and withdraw vault balances. [verified S8 S10 S20]
+  - There is no timelock. cube.family timed out this pass, so the live UI was not re-read. [verified S8 S10 S20]
+tldr: Cube Family is a token launchpad on Robinhood Chain.
+tldr_source: derived
+why_people_care:
+  - The RH factory is verified and still has publicDeployEnabled() == 1, with tokenCount() 62. [verified S8 S9] [claim S23]
+  - That is a live Uni v4 hook pad on this chain, not a bonding-curve name. [verified S8 S9] [claim S23]
+  - Llama has no cube-family row; protocol/cube is a different Solana DEX. [verified S8 S9] [claim S23]

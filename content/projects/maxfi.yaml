@@ -157,3 +157,13 @@ metrics:
     class: claim
     sources:
       - S19
+risks:
+  - Vault owner() and ProxyAdmin owner() return the same externally owned account, so upgrades sit with one key. [claim S6]
+  - Llama's Robinhood TVL and fees sit on the Snuggle module, so a MaxFi-only all-chains figure does not exist there. [claim S6]
+  - The security page states V30 used AI analysis tools, while the homepage and an official post name Valves/Valve Security. [claim S6]
+tldr: No-swap concentrated-liquidity manager on Robinhood Chain.
+tldr_source: derived
+why_people_care:
+  - Robinhood stock-token / USDG and meme pools are deposited through maxfi.tech, not snuggle.fi. [claim S6]
+  - DefiLlama has no MaxFi protocol row; the Snuggle adapter's Robinhood chain slice is the MaxFi-labeled vault 0x1195…6DCE. [claim S6]
+  - That slice is the live book for tokenized-stock LP on chain 4663. [claim S6]

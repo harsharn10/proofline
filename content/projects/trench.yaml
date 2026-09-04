@@ -129,3 +129,9 @@ findings:
   unresolved:
     - text: product.mechanism remains unresolved (CON-1).
     - text: product.mechanism remains unresolved (CON-2).
+tldr: Trench is a bonding-curve token launchpad at trench.today.
+tldr_source: derived
+risks:
+  - The factory and TrenchManager are upgradeable TransparentUpgradeableProxy contracts. [verified S8 S9] [claim S2 S15]
+  - ProxyAdmin owner() and factory storage slot 0 are one externally owned account. [verified S8 S9] [claim S2 S15]
+  - Docs lock V4 LP in TrenchPositionLocker for one year; that locker was not decoded this pass. [verified S8 S9] [claim S2 S15]

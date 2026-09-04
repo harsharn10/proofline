@@ -125,6 +125,7 @@
           }
         },
         "price_change_h24": { "type": ["number", "null"] },
+        "market_cap": { "$comment": "Optional: written by every pull since 2026-09-03; files pulled before that date carry no key and stay valid.", "type": ["number", "null"] },
         "fdv": { "type": ["number", "null"] },
         "created_at": { "type": ["string", "null"], "format": "date-time" }
       }
@@ -148,6 +149,8 @@
         "trades_h24": { "type": ["integer", "null"], "minimum": 0 },
         "price_usd": { "type": ["number", "null"] },
         "price_change_h24": { "type": ["number", "null"] },
+        "market_cap_usd": { "$comment": "Optional for the same reason as marketPair.market_cap: the puller always writes both, older committed files carry neither.", "type": ["number", "null"] },
+        "fdv_usd": { "type": ["number", "null"] },
         "fdv": { "type": ["number", "null"] },
         "first_pair_at": { "type": ["string", "null"], "format": "date-time" },
         "top10_share": {

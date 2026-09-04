@@ -128,3 +128,13 @@ findings:
     - text: "Which of the other DexScreener KIRKLAND tickers share this deployer or factory? Next: eth_call launchFactory() on those CAs if they remain in the search"
     - text: "Does verified PonsV2LaunchFactory source leave any owner path that can reach this live curve or locked LP after graduation? Next: read createGraduatedPool and rescueSweptGraduation modifiers in src/v2/PonsV2LaunchFactory.sol on the explorer"
   unresolved: []
+risks:
+  - USD liquidity figures on the KIRKLAND/COST book count both sides, and the quote side is COST, not USDG. [claim S11]
+  - Gecko's pool fdv prices COST as base (~$1.18M) and is not KIRKLAND fdv (token fdv ~$252k). [claim S11]
+  - DexScreener lists @kirklandcto while on-chain socials are empty. [claim S11]
+tldr: A one-billion-supply ERC-20 launched on Pons v2 against COST, then graduated into a Uniswap v4 KIRKLAND/COST pool.
+tldr_source: derived
+why_people_care:
+  - The KIRKLAND/COST Uniswap v4 book printed about $2.84M of 24h volume on Gecko at collection, with the quote token the Costco • Robinhood Token at 0x4EA0…44C2. [claim S11]
+  - GET /rhj/assets has that COST row, so the pair leg is a Robinhood Stock Token rail rather than a parody quote. [claim S11]
+  - The token is a Pons v2 graduation, distinct from lunch.fun HOTDOG 0x4544…188C and Pons HOTDOG 0x1C1D…566f. [claim S11]

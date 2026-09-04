@@ -19,6 +19,8 @@ import {
   chunkMessage,
   publicationFingerprint,
   readDotEnv,
+  selectWireItems,
+  buildWireMessages,
 } from "./lib/telegram.mjs";
 import { validateContent, ownWordSet, filterOwnWords } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
@@ -712,16 +714,32 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.equal(aboveBar.length, 1, "name above the generated share bar remains eligible");
     assert.deepEqual(belowBar, [], "name below the generated share bar is excluded");
     assert.equal(messages.length, 1, "one direct publication produces one card");
-    assert.ok(messages[0].includes("<b>NEW PROFILE · PONS</b>"), "event kicker");
+    assert.ok(messages[0].includes("<b>NEW PROFILE · PONS</b>"), "a publication keeps its own kicker");
     assert.ok(messages[0].includes("<b>Icarus view</b>"), "Icarus view");
     assert.ok(messages[0].includes("Control 41/100 · evidence 64% · awaiting second review"), "control and evidence line");
     assert.ok(messages[0].includes("https://x.test/n/pons"), "profile link");
     assert.ok(messages[0].endsWith("Read the full Pons research →</a>"), "event card ends with its link");
     assert.ok(messages[0].includes("A &lt;b&gt;full&lt;/b&gt; research record"), "html escaped");
-    assert.ok(roundupMessages[0].includes("<b>ICARUS ROUNDUP · 2026-08-31</b>"), "roundup card");
+    assert.ok(roundupMessages[0].includes("<b>ICARUS WIRE · 2026-08-31</b>"), "wire roundup card");
     assert.ok(roundupMessages[0].endsWith("Open research →</a>"), "roundup ends with a card link");
     assert.equal(chunks.length, 2, "chunked");
     assert.deepEqual(readDotEnv("A=1\n# c\nB=\"two words\"\n"), { A: "1", B: "two words" });
+
+    // A risk alert never arrives under a routine kicker, and trending always carries its caveat.
+    const riskAlert = buildMessages(
+      aboveBar.map((entry) => ({ ...entry, channel: { ...entry.channel, event: "risk-alert" } })),
+      { siteName: "Icarus", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "", profilePath: "/n/" },
+    );
+    assert.ok(riskAlert[0].includes("<b>RISK ALERT · PONS</b>"), "a risk alert keeps its own kicker");
+    const trending = buildMessages(
+      aboveBar.map((entry) => ({ ...entry, channel: { ...entry.channel, event: "trending" } })),
+      { siteName: "Icarus", date: "2026-08-31", projects, derivedBySlug: derived, siteUrl: "", profilePath: "/n/" },
+    );
+    assert.ok(trending[0].includes("<b>TRENDING · PONS</b>"), "trending is not relabelled as talk");
+    assert.ok(
+      trending[0].includes("Trending measures attention"),
+      "a trending card always carries the attention caveat",
+    );
     console.log("ok   telegram publications");
   } catch (err) { failures++; console.error(`FAIL telegram publications: ${err.message}`); }
 }
@@ -1027,12 +1045,14 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   const markdownMock = dataModule(
     `export const parseResearchMarkdown=()=>({sections:[]});export const renderWholeMarkdown=()=>""`,
   );
+  const dejargonMock = dataModule(`export const readerCopy=(value)=>value`);
   const typesMock = dataModule(`
     export const headlineMetric=()=>null;
     export const DEFAULT_KPIS=["volume24h"];
     export const SECTION_KPIS={launchpads:["volume24h","launches24h","liquidityUsd","holders"],tokens:["liquidityUsd","volume24h","holders","priceChange24h"]};
     export const dexScreenerSearchUrl=(value)=>"https://dex.test/"+value;
     export const explorerTokenUrl=(base,address)=>base+"/token/"+address;
+    export const tldrLine=(entry)=>entry.tldr ?? (String(entry.summary ?? "").trim().match(/^(.+?[.!?])(?:\\s|$)/)?.[1] ?? String(entry.summary ?? "").trim());
   `);
   const hooks = registerHooks({
     resolve(specifier, context, nextResolve) {
@@ -1042,6 +1062,8 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
         return { url: markdownMock, shortCircuit: true };
       if (context.parentURL?.startsWith(contentServerUrl) && specifier === "./types")
         return { url: typesMock, shortCircuit: true };
+      if (context.parentURL?.startsWith(contentServerUrl) && specifier === "../lib/dejargon")
+        return { url: dejargonMock, shortCircuit: true };
       return nextResolve(specifier, context);
     },
   });
@@ -1058,6 +1080,11 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     hasContractOn4663: true,
     shareBarMetric: "liquidity",
     summary: `${slug} summary`,
+    tldr: `${slug} in one sentence`,
+    announcementAt: "2026-09-01T00:00:00Z",
+    announcementUrl: "https://official.test/post",
+    officialLinks: [{ kind: "site", url: "https://official.test" }],
+    sourceLinks: { market: "https://dex.test", holders: "https://explorer.test" },
     reviewedAt: "2026-09-01T00:00:00Z",
     tree: { sectionId: "launchpads" },
     factoryLaunches24h: 0,
@@ -1066,6 +1093,9 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
       liquidityUsd: 30_000,
       tvl: null,
       volume24h: 100,
+      marketCap: 1_000_000,
+      fdv: null,
+      holders: 42,
       firstPairAt: "2026-09-01T00:00:00Z",
       readAt: "2026-09-02T21:00:00Z",
     },
@@ -1084,6 +1114,8 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   });
   const olderAnnouncement = entry("wire", {
     hasContractOn4663: false,
+    tldr: null,
+    announcementAt: "2026-08-20T00:00:00Z",
     reviewedAt: "2026-08-20T00:00:00Z",
     kpis: { ...entry("x").kpis, status: "announced", liquidityUsd: null, volume24h: null, firstPairAt: null },
   });
@@ -1119,26 +1151,89 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
       "never negative",
     );
     assert.deepEqual(rules.announcedNow([olderAnnouncement, announced]).map((item) => item.slug), ["sight", "wire"]);
+    assert.equal(rules.announcedNow([olderAnnouncement, announced]).at(-1).tldr, null, "missing summaries form the muted tail");
 
     const leaders = rules.sectionLeaders(
       { id: "launchpads", label: "Launchpads", description: "" },
       [pons, announced, olderAnnouncement],
     );
+    // README 1(f): an announced name with no TL;DR line still leads with the first sentence of its
+    // research summary. Only a name with neither is not ready for a slot.
     assert.deepEqual(leaders.map((item) => [item.entry.slug, item.announced]), [
       ["pons", false],
       ["sight", true],
       ["wire", true],
     ]);
-
-    const latest = rules.latestFromIcarus(
-      [{ date: "2026-09-02", slug: "pons", title: "Read", detail: "Detail" }],
-      [{
-        name: { slug: "artificial-inu", symbol: "AI", name: "Artificial Inu" },
-        item: { date: "2026-09-01", title: "Post", body: "Body", kind: "ct", account: "@ai" },
-      }],
-      2,
+    const unwritten = entry("blank", {
+      hasContractOn4663: false,
+      tldr: null,
+      summary: "   ",
+      kpis: { ...entry("x").kpis, status: "announced", liquidityUsd: null, volume24h: null, firstPairAt: null },
+    });
+    assert.deepEqual(
+      rules.announcedNow([unwritten, announced]).map((item) => item.slug),
+      ["sight"],
+      "an announced name with no summary and no TL;DR never holds a slot",
     );
-    assert.deepEqual(latest.map((item) => item.kind), ["icarus", "post"]);
+
+    const wire = rules.wireItems({
+      entries: [pons, ai],
+      changelog: [
+        { date: "2026-09-04", slug: "pons", type: "coverage", severity: "Material", title: "Profile refreshed", detail: "Bookkeeping" },
+        { date: "2026-09-03", slug: "pons", type: "correction", severity: "Material", title: "Material correction", detail: "The picture changed." },
+        { date: "2026-09-02", slug: "pons", type: "risk", severity: "Info", title: "Low-priority note", detail: "Not material." },
+      ],
+      feed: [
+        {
+          name: { slug: "artificial-inu", symbol: "AI", name: "Artificial Inu" },
+          item: { id: "talk", date: "2026-09-04", title: "A very long talk headline ".repeat(6), body: "Body", kind: "ct", account: "@ai", sourceUrl: "https://x.com/ai/status/1" },
+        },
+        {
+          name: { slug: "pons", symbol: "PONS", name: "Pons" },
+          item: { id: "missing-link", date: "2026-09-05", title: "No receipt", body: "Body", kind: "company" },
+        },
+      ],
+    });
+    assert.deepEqual(wire.map((item) => item.kind), ["talk", "note"], "bookkeeping, low-severity notes and receipt-free posts stay out");
+    assert.equal(wire[0].account, "@ai", "Talk carries the posting handle");
+    assert.ok(wire[0].headline.length <= 80, "wire headlines stay within 80 characters");
+    assert.deepEqual(wire.map((item) => item.at), ["2026-09-04", "2026-09-03"], "wire is newest first");
+    assert.equal(
+      wire[1].url,
+      "/n/pons#commentary",
+      "an Icarus note links the Commentary section, not a Details tab that no longer accepts it",
+    );
+
+    // Telegram reads the same wire. Same fixture in, same kinds and same order out, so the digest
+    // and the site can never describe the same event with two different words.
+    const telegramWire = selectWireItems(
+      {
+        projects: new Map([["pons", { name: "Pons" }], ["artificial-inu", { name: "Artificial Inu" }]]),
+        feed: new Map([
+          ["artificial-inu", { items: [{ id: "talk", date: "2026-09-04", title: "A talk headline", body: "Body", kind: "ct", account: "@ai", sourceUrl: "https://x.com/ai/status/1" }] }],
+          ["pons", { items: [{ id: "missing-link", date: "2026-09-05", title: "No receipt", body: "Body", kind: "company" }] }],
+        ]),
+        changelog: [
+          { date: "2026-09-04", slug: "pons", type: "coverage", severity: "Material", title: "Profile refreshed", detail: "Bookkeeping" },
+          { date: "2026-09-03", slug: "pons", type: "correction", severity: "Material", title: "Material correction", detail: "The picture changed." },
+          { date: "2026-09-02", slug: "pons", type: "risk", severity: "Info", title: "Low-priority note", detail: "Not material." },
+        ],
+      },
+      { pons: true, "artificial-inu": true },
+    );
+    assert.deepEqual(telegramWire.map((item) => item.kind), wire.map((item) => item.kind), "Telegram reads the site's wire kinds");
+    assert.deepEqual(telegramWire.map((item) => item.at), wire.map((item) => item.at), "and in the same order");
+    assert.deepEqual(
+      selectWireItems({ projects: new Map(), feed: new Map(), changelog: [] }, {}),
+      [],
+      "a name below the share bar never reaches Telegram",
+    );
+    const wireMessages = buildWireMessages(telegramWire, {
+      siteName: "Icarus", date: "2026-09-04", siteUrl: "https://x.test", profilePath: "/n/",
+    });
+    assert.ok(wireMessages[0].includes("<b>TALK · ARTIFICIAL INU</b>"), "a wire item carries its kind and name");
+    assert.ok(wireMessages[0].includes("<b>A talk headline</b>"), "headline first");
+    assert.ok(wireMessages[0].trimEnd().endsWith("</a>"), "and the link last");
     console.log("ok   Icarus home and category rules");
   } catch (err) {
     failures++;

@@ -149,3 +149,13 @@ findings:
     - text: "Do the ChainSecurity and Anatomist PDFs cover the Robinhood RipeHq/RipeToken deploy? Next: open both PDFs and match contract names/addresses to 4663"
     - text: "Is discord.gg/hightop linked from ripe.finance or only aggregators? Next: re-read ripe.finance footer and docs community page"
   unresolved: []
+risks:
+  - Aggregator marketCap (~$4.1M) is not the pool FDV (~$935k) and likely blends Base RIPE 0x2A0a…dDC0 with this RH token. [claim S10]
+  - Pool USD reserve is RIPE plus NVDA, not USDG. [claim S10]
+  - Privileged pause/mint paths exist on RipeToken even though owner() reverts. [claim S10]
+tldr: A lending protocol that mints GREEN against tokenized stocks.
+tldr_source: derived
+why_people_care:
+  - The DexScreener RIPE/NVDA book is the visible print (~$1.17M 24h volume, ~$222k reserve on Gecko), but the name is Ripe Protocol's Robinhood-chain governance token… [claim S10]
+  - Llama ripe-protocol TVL ~$305k uses this CA as robinhood ripeToken and this pair as pool2. [claim S10]
+  - NVDA 0xd060…9EEC is the official Stock Token rail. [claim S10]

@@ -116,3 +116,13 @@ findings:
     - text: "Are the other Blockscout Chilleez/CHILLZ clones (0x409e, 0x7E8B, 0x9399, 0xb8F0) abandoned pads or active books? Next: DexScreener/RPC each clone address and record any NFLX book"
     - text: "Is there a GitHub repository or audit for FlapTaxTokenV3 on this chain? Next: docs.flap.sh/flap and Sourcify metadata on 0x7777C874…3333"
   unresolved: []
+risks:
+  - USD liquidity on the CHILLZ/NFLX book counts both sides, and the quote side is NFLX, not USDG. [claim S13]
+  - Same-ticker CHILL/NFLX at 0x57ff…1e18 and same-name Chilleez clones are easy to mix in a search. [claim S13]
+  - DexScreener also lists a Netflix character article as a website; the token site says it is not affiliated with Netflix. [claim S13]
+tldr: A one-billion-supply ERC-20 cloned into a Uniswap v2 pool quoted against NFLX.
+tldr_source: derived
+why_people_care:
+  - The CHILLZ/NFLX Uniswap v2 book printed about $290.7k of 24h volume on DexScreener at collection, with ~$73.7k pool liquidity, against an official NFLX Stock Token (GET /rhj/assets… [claim S13]
+  - That makes CHILLZ a graduation-name using the stock-tokens rail rather than a fake quote. [claim S13]
+  - Several other CHILL and Chilleez tickers sit on the same chain. [claim S13]

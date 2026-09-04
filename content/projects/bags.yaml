@@ -153,3 +153,13 @@ findings:
     - text: "Which of the 3943 factory registry tokens are still on the curve vs migrated, and what share of Emerson 30d volume is post-graduation Uniswap v4? Next: sample BagsLens.getTokenState on the registry tail"
     - text: "Are Llama protocol/bags TVL dummy.js empty because RH LP is locked in Uniswap v4 PositionManager rather than a Bags custody vault? Next: do not treat vault ETH as pad TVL; record a Llama adapter if one lands"
   unresolved: []
+risks:
+  - BagsFactory and BagsVault are upgradeable ERC1967 proxies. owner() on both, and on the two beacons that retarget every live curve and fee-share… [verified S13 S16] [claim S3 S19]
+  - Docs give that owner setCreationFee, setHook, setTokenImpl, vault withdraw, and beacon upgradeTo. [verified S13 S16] [claim S3 S19]
+  - Llama RH fees mix V1 and V2 deployments; the docs address book names only this V2 factory. [verified S13 S16] [claim S3 S19]
+tldr: Bags is a bonding-curve token launchpad on Robinhood Chain at bags.fm.
+tldr_source: derived
+why_people_care:
+  - "The factory is live and taking launches: allTokensLength() 3943 this pass, Emerson 30d 1,611 tokens and about $1.40M DEX volume, Llama Robinhood Chain fees 7d 71083 USD. [claim S2 S19 S22]"
+  - That is smaller than Pons or LONG on the same Emerson board, but it is a documented on-chain pad with verified source, not a census row. [claim S2 S19 S22]
+  - Distinct from packed Pons, hood.fun, FoxPad, Clanker, and Coinbarrel. [claim S2 S19 S22]

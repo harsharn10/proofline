@@ -66,3 +66,13 @@ findings:
     - text: "Does DefiLlama have a Varo chain-slice adapter? Next: search Llama dimension-adapters for varo or rialto-launchpad"
     - text: "Is varo.fun / varodotfun.vercel.app the same product? Next: treat as a name collision unless a shared CA appears"
   unresolved: []
+tldr: Varo is a Robinhood Chain token launchpad by Rialto.
+tldr_source: derived
+why_people_care:
+  - It is a live Uniswap v3 instant pad on chain 4663 with a reproduced factory, a first-party JS constant for that factory, and an OKX Dune lifetime DEX volume of $109.92M. [claim S1]
+  - The name is not in the 49-row census. [claim S1]
+  - Rialto already sits as a prop-AMM dependency card; Varo is the issuance product on a rialto.xyz subdomain. [claim S1]
+risks:
+  - The factory is an ERC1967 proxy whose implementation is unverified and whose owner() call reverted, so the upgrade path is not named. [claim S1]
+  - Liquidity is locked in a Uniswap v3 position at launch, so a failed launch cannot be unwound by pulling LP. [claim S1]
+  - Quote-asset list and protocol fee bps are API-configured, not read from a verified getter this pass. [claim S1]

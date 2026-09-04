@@ -114,3 +114,13 @@ findings:
     - text: "Why do DexScreener GB/AMD fdv (~$202k) and Gecko token fdv (~$441k) disagree by ~2x? Next: compare Gecko token price source pool vs the AMD book; do not collapse the two fdv figures"
     - text: "What does launch image ipfs://bafkreicg5fx4phz7gulbiydsyklb5a5kij2nsae7xldi3emhsrg2vqhmoa contain? Next: fetch the CID once for social_links / image without treating it as official"
   unresolved: []
+tldr: A one-billion-supply ERC-20 launched on Pons v2 and graduated into a Uniswap v4 pool quoted against AMD.
+tldr_source: derived
+why_people_care:
+  - The GB/AMD Uniswap v4 book printed about $810k of 24h volume on DexScreener and about $57.1k of Gecko pool reserve at collection, against an active Robinhood AMD Stock Token. [claim S13]
+  - Several other AMD-paired names (CHIP, MD, MEOW) share that rail and are different tokens. [claim S13]
+  - Assignment lead of DexScreener liq ~$35,988 / vol ~$834,001 is this same book; live DexScreener this pass is 35896.73 / 809601.07. [claim S13]
+risks:
+  - USD liquidity figures on the GB/AMD book count both sides, and the quote side is AMD, not USDG. [claim S13]
+  - Gecko pool fdv treats AMD as the base and is not the GB token fdv. [claim S13]
+  - DexScreener GB/AMD fdv (~$202k) and Gecko token fdv (~$441k) disagree. [claim S13]

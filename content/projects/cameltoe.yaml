@@ -112,3 +112,13 @@ findings:
     - text: "Can factory owner 0x5519a8…044D change fees or quotes on 0xe64A…F297 now that launchCreationEnabled is false? Next: read remaining Ownable modifiers on src/RWAERC20LaunchpadFactory.sol"
     - text: "Do the other robinhood CAMELTOE tickers (0x8CDf…F201, 0xBfBf…d35A, 0xE975…Aa23) share a deployer with 0xc32B…F201? Next: eth_getCode and factory() on each address"
   unresolved: []
+risks:
+  - USD liquidity figures on the CAMELTOE/LULU book count both sides, and the quote side is LULU, not USDG. [claim S10]
+  - DexScreener and Gecko disagree on reserve and FDV for the same pool. [claim S10]
+  - The X URL on the site did not show a contract in the profile bio this pass. [claim S10]
+tldr: A one-billion-supply ERC-20 launched into a Uniswap v4 pool quoted against LULU.
+tldr_source: derived
+why_people_care:
+  - The CAMELTOE/LULU Uniswap v4 book printed about $4.80M of 24h volume on Gecko at collection, with the quote token using the Lululemon Robinhood Stock Token. [claim S10]
+  - GET /rhj/assets has a LULU row at 0x4e62…3016, so the pair leg is a listed rail rather than an unofficial ticker. [claim S10]
+  - ASS/LULU is a different token on the current factory. [claim S10]

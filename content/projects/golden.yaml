@@ -104,3 +104,13 @@ findings:
     - text: "Does Robinhood later list a GOLDEN Stock Token, and would it share this 0xdFee…217a address? Next: re-fetch /rhj/assets if a GOLDEN ticker appears"
     - text: "Why did Gecko pool fdv_usd print $1.46M while DexScreener GOLDEN fdv is $5948? Next: keep using Gecko token fdv or DexScreener pair fdv for GOLDEN, not the DJT-as-base pool fdv"
   unresolved: []
+risks:
+  - USD liquidity figures on the GOLDEN/DJT book count both sides, and the quote side is DJT, not USDG. [claim S10]
+  - Gecko pool fdv_usd prices DJT as base and is not GOLDEN fdv. [claim S10]
+  - No bidirectional official handle was located, so comms surfaces stay unconfirmed-official. [claim S10]
+tldr: A one-billion-supply ERC-20 cloned through Pons v2 into a Uniswap v4 pool quoted against DJT.
+tldr_source: derived
+why_people_care:
+  - The GOLDEN/DJT Uniswap v4 book printed about $285k of 24h volume on Gecko at collection, with the quote token the Robinhood DJT Stock Token at 0x1D11…4516. [claim S10]
+  - GET /rhj/assets lists that address. [claim S10]
+  - DJT is a rail. [claim S10]

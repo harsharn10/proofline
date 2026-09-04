@@ -129,3 +129,13 @@ metrics:
     class: claim
     sources:
       - S19
+risks:
+  - Token owner() is Airlock, not the launching X account, so Doppler/Airlock admin rights sit outside the Bankr profile. [claim S9]
+  - Vesting recipient is locked at launch even if the fee recipient is later transferred. [claim S9]
+  - $GOON (Doppler clone) and $GOONER (LaunchFactory) share a ticker stem and are different contracts. [claim S9]
+tldr: "X-native agent execution: a mention or console prompt mints a token through Doppler Airlock into a locked Uniswap v4 pool, and 95% of the 0.7% pool swap fee…"
+tldr_source: derived
+why_people_care:
+  - This is the X/console command path that mints on Robinhood Chain instead of wrapping Pons. [claim S9]
+  - Launches share DopplerERC20V1Factory and Airlock with LONG, so a Bankr ticker and a LONG ticker can be clones of the same implementation with the same owner(). [claim S9]
+  - "@RHDaily__ still listed Bankr at $2.0M 24h pad volume on 1 Sep, eighth on that board. [claim S9]"

@@ -111,3 +111,13 @@ findings:
     - text: "Is there an audit whose scope includes historical factory 0xe64A…F297 / LaunchHook 0x778b…EaCC as used on this clone? Next: match XORS reports named in the o1-exchange packet to 0xe64A…F297"
   unresolved:
     - text: economics.metric remains unresolved (CON-1).
+risks:
+  - USD liquidity figures on the RETARD/LLY book count both sides, and Gecko's pool GET reports an LLY-as-base FDV about 20 times the RETARD fdv on DexScreener and the Gecko token endpoint. [claim S12]
+  - A later Doppler RETARDATIDE or WETH RETARD book is a different address. [claim S12]
+  - Token source is unverified. [claim S12]
+tldr: A one-billion-supply ERC-20 created into a Uniswap v4 pool quoted against LLY.
+tldr_source: derived
+why_people_care:
+  - The RETARD/LLY Uniswap v4 book printed about $332k of 24h volume on DexScreener at collection (Gecko printed $324k on the same pool id). [claim S12]
+  - The quote token is the Eli Lilly Robinhood Token in GET /rhj/assets. [claim S12]
+  - PEPTIDES and FATCOIN quote the same LLY rail through different factories or a different createLaunch and are not this token. [claim S12]

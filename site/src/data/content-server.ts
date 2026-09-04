@@ -2,12 +2,14 @@ import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
+import { readerCopy } from "../lib/dejargon";
 import {
   DEFAULT_KPIS,
   SECTION_KPIS,
   dexScreenerSearchUrl,
   explorerTokenUrl,
   headlineMetric,
+  tldrLine,
 } from "./types";
 // Shared with scripts/score.mjs so site and Telegram eligibility cannot drift.
 // @ts-expect-error The repository-level helper is intentionally plain ESM.
@@ -26,7 +28,6 @@ import type {
   Derived,
   HistoryPoint,
   Kpis,
-  LatestIcarusItem,
   LatestFeedItem,
   Link,
   Metric,
@@ -41,6 +42,7 @@ import type {
   SourceEntry,
   TreeRef,
   TrendingEntry,
+  WireItem,
 } from "./types";
 
 // schema/taxonomy.json — the one taxonomy. Sections in home order; leaves keyed by "domain/leaf".
@@ -101,6 +103,9 @@ type ProjectFile = {
   lifecycle: Dossier["lifecycle"];
   coverage: Dossier["coverage"];
   summary: string;
+  tldr?: string;
+  why_people_care?: string[];
+  risks?: string[];
   official_links: Link[];
   dependencies: string[];
   deployments: Deployment[];
@@ -241,6 +246,7 @@ type ServerContent = {
   censusBySlug: Map<string, CensusEntry>;
   treeBySlug: Record<string, TreeRef>;
   histories: Record<string, HistoryPoint[]>;
+  wire: WireItem[];
   chainStats: ChainStats | null;
   generatedAt: string;
   now: number;
@@ -341,6 +347,9 @@ function loadContent(): ServerContent {
       coverage: project.coverage,
       role: roleBySlug[slug] ?? "subject",
       summary: project.summary,
+      tldr: typeof project.tldr === "string" ? project.tldr : null,
+      whyPeopleCare: Array.isArray(project.why_people_care) ? project.why_people_care : [],
+      risks: Array.isArray(project.risks) ? project.risks : [],
       links: project.official_links,
       dependencies: project.dependencies,
       deployments: project.deployments,
@@ -348,6 +357,7 @@ function loadContent(): ServerContent {
       review: project.review,
       research,
       feed,
+      wire: [],
       sources: sourcesFile.sources,
       changelog,
       derived: withPulledMetrics(pickDerived(derivedFile.projects[slug], slug, project.coverage), pulled),
@@ -367,6 +377,8 @@ function loadContent(): ServerContent {
         })),
         dailySeries,
         top10Share: pulledCard?.market?.top10_share ?? null,
+        top10ShareExPools: pulled?.market?.top10_share_ex_pools ?? null,
+        burnedShare: pulled?.market?.burned_share ?? null,
         launchpad: pulledCard?.market?.launchpad ?? null,
         mint: pulledCard?.structure?.mint ?? null,
         liquidityLocks: (pulledCard?.structure?.lp ?? []).map((row) => ({
@@ -378,6 +390,18 @@ function loadContent(): ServerContent {
       },
     };
   });
+
+  const compiledWire = wireItems({
+    entries: dossiers.map((dossier) => toDirectoryEntry(dossier, treeBySlug, censusBySlug, site)),
+    feed: dossiers.flatMap((dossier) => dossier.feed.map((item) => ({
+      name: { slug: dossier.slug, symbol: dossier.symbol, name: dossier.name },
+      item,
+    }))),
+    changelog: changelogAll,
+  });
+  for (const dossier of dossiers) {
+    dossier.wire = compiledWire.filter((item) => item.slug === dossier.slug);
+  }
 
   return {
     site,
@@ -393,6 +417,7 @@ function loadContent(): ServerContent {
         return [slug, parseHistory(rawContent.pulledHistory[`${slug}.jsonl`])];
       }),
     ),
+    wire: compiledWire,
     chainStats,
     generatedAt: derivedFile.generated_at,
     now: buildNow,
@@ -414,6 +439,7 @@ function toDirectoryEntry(
   d: Dossier,
   treeBySlug: Record<string, TreeRef>,
   censusBySlug: Map<string, CensusEntry>,
+  site: SiteConfig,
 ): DirectoryEntry {
   const tree = treeBySlug[d.slug] ?? null;
   const census = censusBySlug.get(d.slug);
@@ -423,6 +449,9 @@ function toDirectoryEntry(
     d.pulled?.activity?.addresses
       .filter((address) => address.role === "factory")
       .reduce((sum, address) => sum + (address.launches_24h ?? 0), 0) ?? 0;
+  const tokenAddress = d.pulled?.addresses.find((row) => row.role === "token")?.address
+    ?? d.pulled?.addresses[0]?.address
+    ?? null;
   return {
     slug: d.slug,
     name: d.name,
@@ -440,7 +469,14 @@ function toDirectoryEntry(
         ? "liquidity"
         : "tvl",
     summary: d.summary,
+    tldr: d.tldr,
     officialLinks: d.links,
+    announcementAt: d.feed[0]?.date ?? d.changelog[0]?.date ?? d.review.reviewed_at,
+    announcementUrl: d.links[0]?.url ?? null,
+    sourceLinks: {
+      market: dexScreenerSearchUrl(d.symbol ?? d.name),
+      holders: tokenAddress ? explorerTokenUrl(site.chain.explorer, tokenAddress) : null,
+    },
     dependencyIds: d.dependencies,
     reviewedAt: d.review.reviewed_at,
     derived: d.derived,
@@ -553,15 +589,22 @@ export function notListedCount(
   return Math.max(0, factoryLaunches - listedToday);
 }
 
+// README rule 3: Announced needs a confirmed official surface, nothing on chain, and something to
+// say about it. A name with no TL;DR yet still qualifies when its research summary can supply one,
+// which is what `tldrLine` does; a name with neither is not ready to hold a slot.
 export function announcedNow(entries: DirectoryEntry[]): DirectoryEntry[] {
   return entries
     .filter(
       (entry) =>
         entry.kpis.status === "announced" &&
         entry.officialConfirmed &&
-        entry.summary.trim().length > 0,
+        entry.summary.trim().length > 0 &&
+        tldrLine(entry).length > 0,
     )
-    .sort((a, b) => b.reviewedAt.localeCompare(a.reviewedAt) || a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      if (Boolean(a.tldr) !== Boolean(b.tldr)) return a.tldr ? -1 : 1;
+      return b.announcementAt.localeCompare(a.announcementAt) || a.name.localeCompare(b.name);
+    });
 }
 
 export function sectionLeaders(section: SectionDef, entries: DirectoryEntry[]): SectionLeader[] {
@@ -582,37 +625,65 @@ export function sectionLeaders(section: SectionDef, entries: DirectoryEntry[]): 
   return [...ranked, ...announced];
 }
 
-export function latestFromIcarus(
-  changelog: ChangelogEntry[],
-  feed: LatestFeedItem[],
-  n = 4,
-): LatestIcarusItem[] {
-  const updates: LatestIcarusItem[] = changelog.map((entry) => ({
-    kind: "icarus",
-    date: entry.date,
-    slug: entry.slug,
-    who: "Icarus",
-    title: entry.title,
-    body: entry.detail,
-    sourceUrl: null,
-  }));
-  const posts: LatestIcarusItem[] = feed.map(({ name, item }) => ({
-    kind: "post",
-    date: item.date,
-    slug: name.slug,
-    who: item.account ?? (item.kind === "onchain" ? "on-chain" : (name.symbol ?? name.name)),
-    title: item.title,
-    body: item.body,
-    sourceUrl: item.sourceUrl ?? null,
-  }));
-  return [...updates, ...posts]
-    .sort(
-      (a, b) =>
-        b.date.localeCompare(a.date) ||
-        a.slug.localeCompare(b.slug) ||
-        a.title.localeCompare(b.title),
-    )
-    .slice(0, Math.max(0, n));
+const FEED_TO_WIRE = {
+  company: "announcement",
+  ct: "talk",
+  onchain: "onchain",
+  risk: "note",
+} as const;
+
+function wireHeadline(value: string): string {
+  const clean = readerCopy(value).trim();
+  return clean.length <= 80 ? clean : `${clean.slice(0, 79).trimEnd()}…`;
+}
+
+// The one wire boundary. Feed receipts become the four public kinds; only material findings,
+// risks and corrections cross over from the change record. Review and scoring bookkeeping stays
+// private even if somebody accidentally marks it Material later.
+export function wireItems(bundle: {
+  entries: Array<Pick<DirectoryEntry, "slug" | "symbol" | "name">>;
+  feed: LatestFeedItem[];
+  changelog: ChangelogEntry[];
+}): WireItem[] {
+  const names = new Map(
+    bundle.entries.map((entry) => [
+      entry.slug,
+      { slug: entry.slug, symbol: entry.symbol, name: entry.name },
+    ]),
+  );
+  const posts = bundle.feed.flatMap(({ name, item }) => {
+    if (!item.sourceUrl) return [];
+    return [{
+      id: `feed-${name.slug}-${item.id}`,
+      kind: FEED_TO_WIRE[item.kind],
+      headline: wireHeadline(item.title),
+      gist: readerCopy(item.body),
+      url: item.sourceUrl,
+      slug: name.slug,
+      name,
+      ...(item.kind === "ct" && item.account ? { account: item.account } : {}),
+      at: item.date,
+    } satisfies WireItem];
+  });
+  const notes = bundle.changelog.flatMap((entry) => {
+    const name = names.get(entry.slug);
+    const material = entry.severity === "Material" || entry.severity === "Risk";
+    const newsworthy = entry.type === "risk" || entry.type === "finding" || entry.type === "correction";
+    if (!name || !material || !newsworthy) return [];
+    return [{
+      id: `note-${entry.slug}-${entry.date}-${entry.title}`,
+      kind: "note",
+      headline: wireHeadline(entry.title),
+      gist: readerCopy(entry.detail),
+      url: `/n/${entry.slug}#commentary`,
+      slug: entry.slug,
+      name,
+      at: entry.date,
+    } satisfies WireItem];
+  });
+  return [...posts, ...notes].sort(
+    (a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id),
+  );
 }
 
 function parseDailySeries(raw: string | undefined): Record<string, Array<{ at: string; value: number }>> {
@@ -682,7 +753,8 @@ function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | nu
     volume24h: market?.volume_h24 ?? null,
     trades24h: trades,
     priceChange24h: market?.price_change_h24 ?? null,
-    fdv: market?.fdv ?? null,
+    marketCap: market?.market_cap_usd ?? null,
+    fdv: market?.fdv_usd ?? market?.fdv ?? null,
     holders,
     holdersDelta7d: deltaFrom(history, "holders", 7),
     launches24h: activity?.launches_24h ?? null,
@@ -752,6 +824,7 @@ function sourceLinksFor(dossier: Dossier, site: SiteConfig): DossierBundle["rela
     volume24h: market,
     trades24h: market,
     priceChange24h: market,
+    marketCap: market,
     fdv: market,
     ...(explorer ? { holders: explorer, holdersDelta7d: explorer, launches24h: explorer, txnsTotal: explorer } : {}),
     ...(llama ? { tvl: llama } : {}),
@@ -798,13 +871,10 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
     site: content.site,
     sections: content.sections,
     entries: content.dossiers.map((d) =>
-      toDirectoryEntry(d, content.treeBySlug, content.censusBySlug),
+      toDirectoryEntry(d, content.treeBySlug, content.censusBySlug, content.site),
     ),
     histories: content.histories,
-    changelog: content.changelog,
-    feed: content.dossiers.flatMap((d) =>
-      d.feed.map((item) => ({ name: { slug: d.slug, symbol: d.symbol, name: d.name }, item })),
-    ),
+    wire: content.wire,
     dependencies: Object.values(content.dependencies)
       .map((c) => ({ id: c.id, name: c.name, kind: c.kind }))
       .sort((a, b) => a.name.localeCompare(b.name)),

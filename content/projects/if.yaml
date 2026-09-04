@@ -112,3 +112,9 @@ findings:
     - text: "Is @WhatlFonHOOD (lowercase L) still presenting the IF CA, and does the site or @WhatIFonHOOD name it? Next: re-read both bios; do not treat the lookalike as official"
     - text: "Does GeckoTerminal still list this token after the 429 this pass? Next: retry Gecko when the first GET is 200; do not mix Blockscout token volume_24h 595253 with the DexScreener pair slice"
   unresolved: []
+risks:
+  - LaunchLocker owner and factory owner are the same EOA, and protocolFeeShare is 100, so collected LP fees currently route to a protocol recipient. [claim S12]
+  - "@WhatIFonHOOD bio does not embed the CA. [claim S12]"
+  - A lookalike handle and a third-party claim portal reuse the address. [claim S12]
+tldr: A one-billion-supply ERC-20 cloned into a Uniswap v3 pool quoted against WETH.
+tldr_source: derived

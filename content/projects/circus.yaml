@@ -101,3 +101,13 @@ findings:
     - text: "Is Fair Open / Doppler airlock 0xeb7C…0862 in production on circus.trade create, or only Classic Curve through 0xb7fA…cb00? Next: trace a Fair Open create tx if the UI exposes that lane"
   unresolved:
     - text: product.mechanism remains unresolved (CON-1).
+tldr: Circus is a Robinhood Chain token launchpad at circus.trade.
+tldr_source: derived
+why_people_care:
+  - Emerson's 30-day labeled set still has a Circus row (597 tokens, one factory) while most DEX volume sits on other pads. [claim S13 S14]
+  - OKX reconstructs about $46.2M lifetime DEX volume on the circus.trade label, with a large RWA share on few traded tokens. [claim S13 S14]
+  - The pad is not a census row. [claim S13 S14]
+risks:
+  - The live factory is an upgradeable ERC1967 proxy. owner() is one externally owned account with no code and no pending owner. [verified S8 S9] [claim S2 S12]
+  - JS names a timelock, but getMinDelay() reverted and the proxy owner is still that EOA. [verified S8 S9] [claim S2 S12]
+  - Home copy and how-it-works disagree on Uniswap v3 versus v4 at graduation. [verified S8 S9] [claim S2 S12]

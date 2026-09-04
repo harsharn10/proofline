@@ -129,3 +129,13 @@ findings:
     - text: "Why does Gecko CLIPPY/MSFT reserve_in_usd 598073.91 diverge from DexScreener liquidity.usd 431378.9 on the same pool? Next: re-read both aggregators on the same pool id and note which side of the MSFT book each counts"
     - text: "Do the netlify.app/claim URLs that embed CA 0x85856…1E18 persist, and does @ClippyMSFT or clippyrh.com ever link them? Next: flag copypasta-pattern only; do not treat as official"
   unresolved: []
+tldr: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against MSFT.
+tldr_source: derived
+why_people_care:
+  - The CLIPPY/MSFT Uniswap v4 book printed about $955k of 24h volume on Gecko at collection (DexScreener $977k), with the quote token the Microsoft Robinhood Token. [claim S19]
+  - "@BlockCap posted Clippy as the top MSFT memecoin. [claim S19]"
+  - GET /rhj/assets has one MSFT row at 0xe932…2e74, so the pair leg is a Stock Token rail rather than this subject. [claim S19]
+risks:
+  - USD liquidity figures on the CLIPPY/MSFT book count both sides, and the quote side is MSFT, not USDG. [claim S19]
+  - Gecko pool reserve ($598k) and DexScreener liquidity ($431k) already diverge on the same pool. [claim S19]
+  - Several other robinhood CLIPPY tickers exist at different CAs. [claim S19]

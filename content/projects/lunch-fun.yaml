@@ -167,3 +167,13 @@ findings:
     - text: "Is there an audit whose scope includes the four launchers, V4 hooks, and lockers as deployed on 4663? Next: ask the project in public and record any report URL as a claim"
     - text: "Does GitHub org lunchdotfun ever publish source, and will lunch.fun link it? Next: re-check the org and the site footer on a later pass"
   unresolved: []
+tldr: A free one-click memecoin launchpad on Robinhood Chain.
+tldr_source: derived
+why_people_care:
+  - This is a Robinhood-native pad that quotes new memes against stock tokens and a custom HOOD pair without using LONG's Doppler Airlock or PAIR's multipool baskets. [claim S1]
+  - "@RHDaily__ listed @lunchdotfun sixth on a 1 Sep 24h volume board at $2.8M. [claim S1]"
+  - GET /api/launches counted 2,226 coins on 3 Sep. [claim S1]
+risks:
+  - The four launchers, V4 pair hook and V4 pair locker are ERC1967 proxies whose owner() is one EOA with no code; this pass did not find a timelock. [claim S1]
+  - A lunch HOOD pair is HoodLighterShare, not a Robinhood Stock Token, so a HOOD ticker is not a registry match. [claim S1]
+  - Docs publish four launchers and no contract labeled factory. [claim S1]
