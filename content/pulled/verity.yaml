@@ -1,5 +1,5 @@
 slug: verity
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 52952791
     created_at: 2026-09-02T23:15:11.000Z
-    holders: 764
+    holders: 787
     errors: []
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory (token launchFactory())
@@ -29,9 +29,14 @@ addresses:
       type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
@@ -43,7 +48,7 @@ addresses:
     source_verified: true
     contract_name: PonsV2LaunchDeployer
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
     owner: null
@@ -52,13 +57,7 @@ addresses:
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
   - address: "0x1D86D5b3c28e4837F365b54300d437ceD6Bf0be6"
     label: Pons v2 bonding curve (token curve())
     role: other
@@ -91,7 +90,7 @@ addresses:
     safe: null
     created_block: 48275
     created_at: 2026-06-10T15:24:59.000Z
-    holders: 46787
+    holders: 46798
     errors: []
   - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
     label: V2LaunchLocker (post-graduation locked tokens)
@@ -100,40 +99,39 @@ addresses:
     source_verified: true
     contract_name: V2LaunchLocker
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841845
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
 metrics: []
 market:
   token_address: "0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6"
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T16:22:34.904Z
   pairs:
     - dex: uniswap
       pair_address: "0x4711ddd41dcc198823fed7e52eb8bc1a270134f0fa129c77f35965216ab3b49b"
       quote_symbol: MSFT
-      price_usd: 0.0002853
-      liquidity_usd: 43470.64
-      volume_h24: 1316563.7
-      volume_h6: 89715.45
+      price_usd: 0.0004103
+      liquidity_usd: 51917.37
+      volume_h24: 1331290.11
+      volume_h6: 112883.58
       txns_h24:
-        buys: 3120
-        sells: 2832
-      price_change_h24: 150
-      market_cap: 285349
-      fdv: 285349
+        buys: 3099
+        sells: 2802
+      price_change_h24: 177
+      market_cap: 410338
+      fdv: 410338
       created_at: 2026-09-02T23:34:22.000Z
     - dex: uniswap
       pair_address: "0x92f5fcbab693478a319753cb18c4a14710ab8544da9f914c772a5097af549a2d"
@@ -205,19 +203,19 @@ market:
       market_cap: 169694
       fdv: 169694
       created_at: 2026-09-02T23:19:09.000Z
-  liquidity_usd: 43674.05
-  volume_h24: 1319221.65
-  trades_h24: 6326
-  price_usd: 0.0002853
-  price_change_h24: 150
-  market_cap_usd: 285349
-  fdv_usd: 285349
-  fdv: 285349
+  liquidity_usd: 52120.78
+  volume_h24: 1333948.06
+  trades_h24: 6275
+  price_usd: 0.0004103
+  price_change_h24: 177
+  market_cap_usd: 410338
+  fdv_usd: 410338
+  fdv: 410338
   first_pair_at: 2026-09-02T23:19:09.000Z
-  top10_share: 0.3334156780280368
-  top10_share_ex_pools: 0.2077501184062886
+  top10_share: 0.3219096459205735
+  top10_share_ex_pools: 0.2078815546668454
   burned_share: 0
-  top10_as_of: 2026-09-04T11:23:39.609Z
+  top10_as_of: 2026-09-04T16:22:34.904Z
   launchpad:
     slug: pons
     via: creator
@@ -236,7 +234,7 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T16:22:34.904Z
   mint: no-mint-function
   renounced: null
   lp:
@@ -268,16 +266,16 @@ structure:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T16:22:34.904Z
   addresses:
     - address: "0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6"
       label: VERITY token (PonsV2LauncherToken)
       role: token
       transactions_count: 0
       token_transfers_count: 0
-      last_tx_at: 2026-09-04T13:25:32.000Z
-      last_method: transfer
-      txns_24h: 894
+      last_tx_at: 2026-09-04T17:16:55.000Z
+      last_method: approve
+      txns_24h: 892
       launches_24h: null
       errors: []
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
@@ -285,10 +283,10 @@ activity:
       role: factory
       transactions_count: 76659
       token_transfers_count: 6719
-      last_tx_at: 2026-09-04T11:24:53.000Z
+      last_tx_at: 2026-09-04T16:23:54.000Z
       last_method: transferCreatorFeeRecipient
       txns_24h: 2000
-      launches_24h: 805
+      launches_24h: 859
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -317,7 +315,7 @@ activity:
       role: token
       transactions_count: 19820
       token_transfers_count: 60
-      last_tx_at: 2026-09-04T12:34:22.000Z
+      last_tx_at: 2026-09-04T17:23:23.000Z
       last_method: approve
       txns_24h: 2000
       launches_24h: null
@@ -334,7 +332,7 @@ activity:
       txns_24h: 0
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T13:25:32.000Z
-  txns_24h: 4894
-  launches_24h: 805
+  last_activity_at: 2026-09-04T17:23:23.000Z
+  txns_24h: 4892
+  launches_24h: 859
 errors: []
