@@ -219,7 +219,7 @@ export function readerGrade(item) {
   return !RAW_GIST_RE.test(text) && String(item.gist ?? "").trim().length >= 20;
 }
 
-export function selectWireItems(content, shareBar, { since = null, all = false, state = null, kinds = TELEGRAM_WIRE_KINDS, perName = 1, plain = true } = {}) {
+export function selectWireItems(content, shareBar, { since = null, all = false, state = null, kinds = TELEGRAM_WIRE_KINDS, tags = null, perName = 1, plain = true } = {}) {
   const sent = new Set(all ? [] : (state?.sent_keys ?? []));
   const above = (slug) => shareBar?.[slug] === true;
   const nameOf = (slug) => content.projects?.get(slug)?.name ?? slug;
@@ -237,6 +237,7 @@ export function selectWireItems(content, shareBar, { since = null, all = false, 
         slug,
         name: nameOf(slug),
         ...(item.kind === "ct" && item.account ? { account: item.account } : {}),
+        ...(item.tag ? { tag: item.tag } : {}),
         at: item.date,
       });
     }
@@ -260,7 +261,7 @@ export function selectWireItems(content, shareBar, { since = null, all = false, 
   const perNameCount = new Map();
   return items
     .filter((item) => (!since || item.at >= since) && !sent.has(wireKey(item)))
-    .filter((item) => kinds.has(item.kind) && (!plain || readerGrade(item)))
+    .filter((item) => kinds.has(item.kind) && (!tags || tags.has(item.tag)) && (!plain || readerGrade(item)))
     .sort((a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id))
     .filter((item) => {
       // One item per name per run: the channel is a digest, not a firehose.
@@ -298,6 +299,141 @@ export function buildWireMessages(
     ...items.map((item) => formatWireItem(item, { siteUrl, profilePath })),
   ].join("\n\n");
   return chunkMessage(text);
+}
+
+const SIGNAL_KICKERS = {
+  "new-launch": "NEW LAUNCH",
+  breakout: "MOVING",
+  "leader-change": "LEADER",
+  "control-change": "RISK ALERT",
+  distribution: "LISTED",
+  "coming-up": "COMING UP",
+};
+
+function sourceAnchor(label, url) {
+  return url ? `<a href="${escapeHtml(url)}">${escapeHtml(label)}</a>` : escapeHtml(label);
+}
+
+/** One action-changing signal: kicker, facts, TL;DR, then card and receipt links last. */
+export function formatSignalAlert(signal, {
+  name = signal.slug,
+  tldr = null,
+  siteUrl = "",
+  profilePath = "/n/",
+  disclaimer = DISCLAIMER,
+} = {}) {
+  const n = signal.numbers ?? {};
+  let facts;
+  if (signal.kind === "breakout") {
+    const pieces = [];
+    if (n.volume_24h_usd != null) pieces.push(`${formatUsd(n.volume_24h_usd)} volume 24h${n.volume_change_pct != null ? ` · ${formatPct(n.volume_change_pct)}` : ""}`);
+    if (n.liquidity_usd != null) pieces.push(`${formatUsd(n.liquidity_usd)} liquidity`);
+    if (n.holder_change_pct != null && n.holder_change_pct >= 20) pieces.push(`holders ${formatPct(n.holder_change_pct)}`);
+    if (n.distinct_accounts >= 3) pieces.push(`${n.distinct_accounts} accounts posting today`);
+    facts = pieces.join(" · ");
+  } else if (signal.kind === "leader-change") {
+    facts = `Now #${signal.rank} in ${signal.section} · held for two reads`;
+  } else if (signal.kind === "control-change") {
+    const grouped = new Map();
+    for (const change of signal.changes) {
+      const key = `${change.field}|${String(change.before).toLowerCase()}|${String(change.after).toLowerCase()}`;
+      const prior = grouped.get(key) ?? { ...change, count: 0 };
+      grouped.set(key, { ...prior, count: prior.count + 1 });
+    }
+    facts = [...grouped.values()].map((change) => {
+      const count = change.count > 1 ? ` on ${change.count} contracts` : "";
+      if (["owner", "proxy implementation"].includes(change.field)) {
+        const transition = change.after == null ? "removed" : change.before == null ? "set" : "changed";
+        return `${change.field}: ${transition}${count}`;
+      }
+      if (change.after == null || change.before == null) return `${change.field}: ${change.after == null ? "removed" : "set"}${count}`;
+      return `${change.field}: ${displayValue(change.before)} → ${displayValue(change.after)}${count}`;
+    }).join(" · ");
+  } else if (signal.kind === "distribution") {
+    facts = `${signal.tag}: ${signal.title}`;
+  } else if (signal.kind === "coming-up") {
+    facts = `${signal.tag} · ${signal.date} · ${signal.title}`;
+  } else {
+    facts = signal.headline ?? signal.title ?? "New market signal";
+  }
+  const base = siteUrl.replace(/\/$/, "");
+  const card = base ? `<a href="${escapeHtml(`${base}${profilePath}${signal.slug}`)}">Card</a>` : null;
+  const source = signal.sourceUrl ? `<a href="${escapeHtml(signal.sourceUrl)}">Source</a>` : null;
+  return [
+    `<b>${SIGNAL_KICKERS[signal.kind] ?? "ICARUS ALERT"} · ${escapeHtml(String(name).toUpperCase())}</b>`,
+    sourceAnchor(facts, signal.sourceUrl),
+    tldr ? escapeHtml(tldr) : null,
+    `<i>${escapeHtml(disclaimer)}</i>`,
+    [card, source].filter(Boolean).join(" · ") || null,
+  ].filter(Boolean).join("\n\n");
+}
+
+function displayValue(value) {
+  if (value === null || value === undefined) return "not checked";
+  if (typeof value === "number" && value >= 0 && value <= 1) return `${(value * 100).toFixed(1)}%`;
+  return String(value);
+}
+
+function formatUsd(value) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 }).format(Number(value));
+}
+
+function formatPct(value) {
+  const number = Number(value);
+  return `${number >= 0 ? "+" : ""}${number.toFixed(1)}%`;
+}
+
+/** The 09:00 ET brief. Inputs are normalized first so this stays pure and fixture-friendly. */
+export function buildDailyBrief(brief, { disclaimer = DISCLAIMER } = {}) {
+  if (brief.dayWord === "quiet") {
+    return `<b>ICARUS DAILY · ${escapeHtml(brief.date)} · QUIET</b> — Nothing changed what a reader would do.`;
+  }
+  const blocks = [`<b>ICARUS DAILY · ${escapeHtml(brief.date)} · BUSY</b>`];
+  if (brief.activity) {
+    const launchRows = (brief.activity.launchpads ?? [])
+      .map((row) => `${escapeHtml(row.name)} ${sourceAnchor(`${Number(row.launches24h).toLocaleString("en-US")} launches`, row.sourceUrl)}`);
+    const volume = brief.activity.chainVolumeUsd == null
+      ? null
+      : sourceAnchor(`${formatUsd(brief.activity.chainVolumeUsd)} chain volume`, brief.activity.chainVolumeSourceUrl);
+    blocks.push([...launchRows, volume].filter(Boolean).join(" · "));
+  }
+  if (brief.top?.length) blocks.push([
+    "<b>Top volume</b>",
+    ...brief.top.map((row, index) => `${index + 1}. ${escapeHtml(row.name)} · ${sourceAnchor(`${formatUsd(row.volume24hUsd)}${row.changePct == null ? "" : ` · ${formatPct(row.changePct)}`}`, row.sourceUrl)}`),
+  ].join("\n"));
+  if (brief.newlyCleared?.length) blocks.push([
+    "<b>Under the radar · newly above the bar</b>",
+    ...brief.newlyCleared.map((row) => `• <b>${sourceAnchor(row.name, row.sourceUrl)}</b> — ${escapeHtml(row.tldr ?? "No TL;DR yet")}${row.why ? `\n  ${escapeHtml(row.why)}` : ""}`),
+  ].join("\n"));
+  if (brief.movers?.up || brief.movers?.down) blocks.push([
+    "<b>Biggest movers</b>",
+    brief.movers.up ? `Up: ${escapeHtml(brief.movers.up.name)} ${sourceAnchor(formatPct(brief.movers.up.changePct), brief.movers.up.sourceUrl)}` : null,
+    brief.movers.down ? `Down: ${escapeHtml(brief.movers.down.name)} ${sourceAnchor(formatPct(brief.movers.down.changePct), brief.movers.down.sourceUrl)}` : null,
+  ].filter(Boolean).join("\n"));
+  if (brief.distribution?.length) blocks.push([
+    "<b>Listings and distribution</b>",
+    ...brief.distribution.slice(0, 3).map((row) => `• ${sourceAnchor(row.title, row.sourceUrl)} · ${escapeHtml(row.name)}`),
+  ].join("\n"));
+  if (brief.note) blocks.push(`<b>Icarus note</b>\n${sourceAnchor(brief.note.title, brief.note.sourceUrl)} · ${escapeHtml(brief.note.name)}`);
+  blocks.push(`<i>${escapeHtml(disclaimer)}</i>`);
+  return blocks.join("\n\n");
+}
+
+export function buildWeeklyWrap(wrap, { disclaimer = DISCLAIMER } = {}) {
+  const blocks = [`<b>ICARUS WEEKLY · ${escapeHtml(wrap.week)}</b>`];
+  if (wrap.leaders?.length) blocks.push([
+    "<b>Section leaders</b>",
+    ...wrap.leaders.map((row) => `• ${escapeHtml(row.section)} — ${escapeHtml(row.name)}${row.value == null ? "" : ` · ${sourceAnchor(row.value, row.sourceUrl)}`}`),
+  ].join("\n"));
+  if (wrap.newNames?.length) blocks.push(`<b>New this week</b>\n${wrap.newNames.map((row) => escapeHtml(row.name)).join(" · ")}`);
+  if (wrap.quietNames?.length) blocks.push(`<b>Went quiet</b>\n${wrap.quietNames.map((row) => escapeHtml(row.name)).join(" · ")}`);
+  if (wrap.controlChanges?.length) blocks.push(`<b>Control changes</b>\n${wrap.controlChanges.map((row) => `• ${escapeHtml(row.name)} — ${escapeHtml(row.summary)}`).join("\n")}`);
+  if (wrap.distribution?.length) blocks.push([
+    "<b>Listings and distribution</b>",
+    ...wrap.distribution.map((row) => `• ${sourceAnchor(row.title, row.sourceUrl)} · ${escapeHtml(row.name)}`),
+  ].join("\n"));
+  blocks.push(`<i>${escapeHtml(disclaimer)}</i>`);
+  return blocks.join("\n\n");
 }
 
 /** Split on blank lines so no message exceeds Telegram's 4096-char limit. */

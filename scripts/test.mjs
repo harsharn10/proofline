@@ -21,7 +21,19 @@ import {
   readDotEnv,
   selectWireItems,
   buildWireMessages,
+  formatSignalAlert,
+  buildDailyBrief,
+  buildWeeklyWrap,
 } from "./lib/telegram.mjs";
+import {
+  breakoutSignal,
+  leaderChangeSignal,
+  controlChangeSignal,
+  distributionSignal,
+  comingUpSignal,
+  selectDailyAlerts,
+} from "./lib/signals.mjs";
+import { compile as compilePacket, parsePacket } from "./lib/packet.mjs";
 import { validateContent, ownWordSet, filterOwnWords } from "./lib/validate-content.mjs";
 import { computeTrending, countsForTrending } from "./lib/trending.mjs";
 import { voiceWarnings, conductWarnings } from "./lib/voice.mjs";
@@ -742,6 +754,123 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     );
     console.log("ok   telegram publications");
   } catch (err) { failures++; console.error(`FAIL telegram publications: ${err.message}`); }
+}
+
+// Telegram's five action-changing signals are pure, deterministic reads of committed snapshots/feed.
+{
+  const byVolume = breakoutSignal({
+    slug: "pons",
+    current: { volume24hUsd: 200_000, liquidityUsd: 50_000, holders: 100 },
+    previous: { volume24hUsd: 100_000, holders: 100 },
+  });
+  const byHolders = breakoutSignal({ slug: "alpha", current: { holders: 121 }, previous: { holders: 100 } });
+  const byDiscussion = breakoutSignal({ slug: "beta", current: {}, previous: {}, distinctAccounts: 3 });
+  const noBreakout = breakoutSignal({
+    slug: "quiet",
+    current: { volume24hUsd: 199_999, liquidityUsd: 50_000, holders: 119 },
+    previous: { volume24hUsd: 100_000, holders: 100 },
+    distinctAccounts: 2,
+  });
+  const rankBaseline = leaderChangeSignal({ slug: "pons", section: "launchpads", rank: 4 });
+  const rankCandidate = leaderChangeSignal({ slug: "pons", section: "launchpads", rank: 1 }, rankBaseline.next);
+  const rankHeld = leaderChangeSignal({ slug: "pons", section: "launchpads", rank: 1 }, rankCandidate.next);
+  const control = controlChangeSignal("pons", {
+    addresses: [{ address: "0x0000000000000000000000000000000000000001", owner: "0x0000000000000000000000000000000000000002", owner_type: "eoa", safe: null, proxy: { implementation: null } }],
+    structure: { mint: "open", lp: [{ pair: "0x0000000000000000000000000000000000000003", locked_share: 0.5 }] },
+  }, {
+    addresses: [{ address: "0x0000000000000000000000000000000000000001", owner: "0x0000000000000000000000000000000000000004", owner_type: "safe", safe: { threshold: 2 }, proxy: { implementation: "0x0000000000000000000000000000000000000005" } }],
+    structure: { mint: "closed", lp: [{ pair: "0x0000000000000000000000000000000000000003", locked_share: 0.75 }] },
+  });
+  const failedControlRead = controlChangeSignal("pons", {
+    addresses: [{ address: "0x0000000000000000000000000000000000000001", owner: "0x0000000000000000000000000000000000000002" }],
+  }, {
+    addresses: [{ address: "0x0000000000000000000000000000000000000001", owner: null, errors: [{ step: "rpc", message: "challenge" }] }],
+  });
+  const project = { official_links: [{ kind: "x", url: "https://x.com/ponsdotfamily" }] };
+  const ownPost = distributionSignal({ slug: "pons", project, item: { tag: "listing", title: "Listed", sourceUrl: "https://x.com/ponsdotfamily/status/1", date: "2026-09-04" } });
+  const externalListing = distributionSignal({ slug: "pons", project, item: { tag: "listing", title: "Exchange listing", sourceUrl: "https://exchange.example/listing", date: "2026-09-04" } });
+  const coming = comingUpSignal({
+    slug: "alpha",
+    project: { lifecycle: "announced", tldr: "A new market." },
+    item: { tag: "launch-date", title: "Launch", date: "2026-09-10", sourceUrl: "https://alpha.example/launch" },
+    now: Date.parse("2026-09-04T12:00:00Z"),
+  });
+  const tooLate = comingUpSignal({
+    slug: "alpha",
+    project: { lifecycle: "announced" },
+    item: { tag: "mint", title: "Mint", date: "2026-09-12", sourceUrl: "https://alpha.example/mint" },
+    now: Date.parse("2026-09-04T12:00:00Z"),
+  });
+  const budget = selectDailyAlerts([
+    { kind: "breakout", slug: "pons" },
+    { kind: "distribution", slug: "pons" },
+    { kind: "leader-change", slug: "alpha" },
+    { kind: "coming-up", slug: "beta" },
+    { kind: "control-change", slug: "gamma" },
+  ], {}, "2026-09-04");
+  try {
+    assert.ok(byVolume?.reasons.includes("volume doubled"), "volume doubles above the liquidity floor");
+    assert.ok(byHolders?.reasons.includes("holders rose at least 20%"), "holder growth can fire independently");
+    assert.ok(byDiscussion?.reasons.includes("3 distinct accounts posted today"), "three distinct accounts can fire independently");
+    assert.equal(noBreakout, null, "sub-threshold movement stays quiet");
+    assert.equal(rankCandidate.signal, null, "a rank change waits for its second read");
+    assert.equal(rankHeld.signal?.kind, "leader-change", "a held rank change fires on its second read");
+    assert.deepEqual(control?.changes.map((row) => row.field).sort(), ["LP locked share", "Safe threshold", "mint control", "owner", "owner type", "proxy implementation"].sort());
+    assert.equal(failedControlRead, null, "a failed read is not mistaken for a control change");
+    assert.equal(ownPost, null, "a project's own X post is not an external distribution receipt");
+    assert.equal(externalListing?.kind, "distribution", "an external listing receipt qualifies");
+    assert.equal(coming?.kind, "coming-up", "an announced event in the next seven days qualifies");
+    assert.equal(tooLate, null, "an event beyond seven days does not qualify");
+    assert.equal(budget.selected.length, 3, "daily alert budget is three");
+    assert.equal(budget.selected.filter((row) => row.slug === "pons").length, 1, "one name cannot consume two daily slots");
+    console.log("ok   telegram signals");
+  } catch (err) { failures++; console.error(`FAIL telegram signals: ${err.message}`); }
+}
+
+// Alert, daily and weekly cards preserve link-last/source-linked output; packet tags survive compile.
+{
+  const alert = formatSignalAlert({
+    kind: "breakout", slug: "pons", sourceUrl: "https://market.example/pons",
+    numbers: { volume_24h_usd: 200_000, volume_change_pct: 100, liquidity_usd: 50_000, distinct_accounts: 3 },
+  }, { name: "Pons", tldr: "A launchpad.", siteUrl: "https://icarus.example" });
+  const busy = buildDailyBrief({
+    date: "2026-09-04", dayWord: "busy",
+    activity: {
+      launchpads: [{ name: "Pons", launches24h: 24, sourceUrl: "https://explorer.example/factory" }],
+      chainVolumeUsd: 5_700_000, chainVolumeSourceUrl: "https://analytics.example/volume",
+    },
+    top: [{ name: "Pons", volume24hUsd: 1_000_000, changePct: 25, sourceUrl: "https://market.example/pons" }],
+    newlyCleared: [{ name: "Alpha", tldr: "A new market.", why: "New product access.", sourceUrl: "https://icarus.example/n/alpha" }],
+    movers: { up: { name: "Pons", changePct: 25, sourceUrl: "https://market.example/pons" }, down: null },
+    distribution: [{ name: "Pons", title: "Exchange listing", sourceUrl: "https://exchange.example/listing" }],
+    note: null,
+  });
+  const quiet = buildDailyBrief({ date: "2026-09-04", dayWord: "quiet" });
+  const weekly = buildWeeklyWrap({
+    week: "2026-08-30",
+    leaders: [{ section: "Launchpads", name: "Pons", value: "#1 by volume", sourceUrl: "https://icarus.example/n/pons" }],
+    newNames: [{ name: "Alpha" }], quietNames: [], controlChanges: [], distribution: [],
+  });
+  const packet = parsePacket(await readFile(new URL("../fixtures/compile-packet/new-seed.md", import.meta.url), "utf8"));
+  packet.frontmatter.events[0].tag = "listing";
+  packet.frontmatter.events[0].channel_recommendation = "none";
+  const compiled = compilePacket(packet);
+  const badPacket = structuredClone(packet.frontmatter);
+  badPacket.events[0].tag = "promotion";
+  try {
+    assert.ok(alert.includes("<b>MOVING · PONS</b>"), "breakout alert has its kicker");
+    assert.ok(alert.endsWith("Source</a>"), "alert links are last");
+    assert.ok(!alert.includes("000000000000"), "alerts never expose wallet addresses");
+    assert.ok(busy.includes('<a href="https://explorer.example/factory">24 launches</a>'), "launch count links to its source");
+    assert.ok(busy.includes('<a href="https://analytics.example/volume">$5.7M chain volume</a>'), "chain volume links to its source");
+    assert.equal(quiet.split("\n").length, 1, "a quiet brief is one line");
+    assert.ok(weekly.includes("ICARUS WEEKLY"), "weekly wrap renders");
+    assert.deepEqual(validateAgainst("packet", packet.frontmatter), [], "a packet event accepts a signal tag");
+    assert.ok(validateAgainst("packet", badPacket).length > 0, "unknown packet tags are rejected");
+    assert.equal(compiled.feed.items[0].tag, "listing", "compile carries event tag into the feed");
+    assert.deepEqual(validateAgainst("feed", compiled.feed), [], "the tagged compiled feed validates");
+    console.log("ok   telegram signal messages and event tags");
+  } catch (err) { failures++; console.error(`FAIL telegram signal messages and event tags: ${err.message}`); }
 }
 
 // Task 2 / Task 5 — computeTrending: distinct counting accounts with `kind: ct` items dated inside the window.
