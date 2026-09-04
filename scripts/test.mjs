@@ -1353,5 +1353,35 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   }
 }
 
+
+// Telegram wire gate: only plain-language announcements and talk travel, one per name per run.
+{
+  try {
+    const content = {
+      projects: new Map([["pons", { name: "Pons" }], ["ai", { name: "Artificial Inu" }]]),
+      feed: new Map([
+        ["pons", { items: [
+          { id: "a1", kind: "company", title: "New stock tokens listed for pairing", body: "@ponsdotfamily posted new pair assets live: LLY, WYFI, TSM, RBLX.", sourceUrl: "https://x.com/p/1", date: "2026-09-04" },
+          { id: "a2", kind: "company", title: "Second post the same day", body: "@ponsdotfamily posted that creator payouts crossed twenty million dollars.", sourceUrl: "https://x.com/p/2", date: "2026-09-03" },
+          { id: "o1", kind: "onchain", title: "Gecko PONS/WETH 24h volume $5M", body: "Gecko pool 0x10cc…26ba volume_usd.h24 5103019 reserve_in_usd 1008373.", sourceUrl: "https://api.geckoterminal.com/x", date: "2026-09-04" },
+          { id: "c1", kind: "ct", title: "Raw dump in a talk item", body: "RPC launchCreationEnabled() on 0xe64A…F297 returned false at block 53107240.", sourceUrl: "https://x.com/p/3", date: "2026-09-04" },
+        ] }],
+        ["ai", { items: [
+          { id: "t1", kind: "ct", title: "@0xSammy on the NVDA vault", body: "@0xSammy posted that the vault now holds two million dollars of tokenized NVDA.", account: "@0xSammy", sourceUrl: "https://x.com/s/1", date: "2026-09-04" },
+        ] }],
+      ]),
+      changelog: [{ slug: "pons", type: "risk", severity: "Risk", title: "Owner changed a fee recipient", detail: "The Safe changed the creator fee recipient.", date: "2026-09-04" }],
+    };
+    const picked = selectWireItems(content, { pons: true, ai: true }, { state: { sent_keys: [] } });
+    assert.deepEqual(picked.map((i) => i.id), ["feed-pons-a1", "feed-ai-t1"], "one plain announcement per name and the plain talk item; data reads, raw talk and notes stay on the site");
+    const both = selectWireItems(content, { pons: true, ai: true }, { state: { sent_keys: [] }, perName: 2 });
+    assert.deepEqual(both.map((i) => i.id), ["feed-pons-a1", "feed-ai-t1", "feed-pons-a2"], "perName lifts the cap");
+    console.log("ok   telegram wire gate");
+  } catch (err) {
+    failures++;
+    console.error(`FAIL telegram wire gate: ${err.message}`);
+  }
+}
+
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }
 console.log("all scoring tests passed");

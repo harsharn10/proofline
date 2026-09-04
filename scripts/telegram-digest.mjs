@@ -17,7 +17,7 @@ const opt = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : nu
 const dryRun = flag("--dry-run"), all = flag("--all"), since = opt("--since"), limit = Number(opt("--limit") ?? 0);
 const testOnly = flag("--test"), markSent = flag("--mark-sent");
 // How many wire items one run posts when --limit is not given.
-const WIRE_PER_RUN = 10;
+const WIRE_PER_RUN = 3;
 
 let env = { ...process.env };
 try { env = { ...readDotEnv(await readFile(".env.local", "utf8")), ...env }; } catch { /* no .env.local */ }
