@@ -1,0 +1,17 @@
+{
+  "$schema": "../site/node_modules/wrangler/config-schema.json",
+  "name": "icarus-pulse",
+  "main": "src/index.mjs",
+  "compatibility_date": "2026-08-03",
+  "workers_dev": true,
+  "triggers": {
+    "crons": ["*/10 * * * *"]
+  },
+  "kv_namespaces": [
+    { "binding": "PULSE_STATE" }
+  ],
+  "vars": {
+    "PULSE_DRY_RUN": "true"
+  }
+}
+
