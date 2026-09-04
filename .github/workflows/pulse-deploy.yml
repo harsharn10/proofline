@@ -1,0 +1,45 @@
+name: Deploy Icarus pulse
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pulse/**"
+      - "scripts/lib/signals.mjs"
+      - ".github/workflows/pulse-deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: icarus-pulse-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install the repository Wrangler version
+        run: npm ci --prefix site
+
+      - name: Require Cloudflare deploy credentials
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "missing CLOUDFLARE_API_TOKEN"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "missing CLOUDFLARE_ACCOUNT_ID"; exit 1; }
+
+      - name: Verify the Worker bundle
+        run: site/node_modules/.bin/wrangler deploy --dry-run --config pulse/wrangler.jsonc
+
+      - name: Deploy the pulse Worker
+        run: site/node_modules/.bin/wrangler deploy --config pulse/wrangler.jsonc
+
