@@ -392,6 +392,8 @@ function MetricsAndChart({ dossier, site, section, token, window }: Pick<NameCar
   const [active, setActive] = useState(series[0]?.key ?? "");
   const explorer = explorerHref(dossier, site);
   const llama = dossier.pulled?.metrics.find((metric) => metric.source_url.includes("defillama"))?.source_url ?? dossier.sources.find((source) => source.url.includes("defillama"))?.url;
+  const rialto = dossier.pulled?.market?.rialto ?? null;
+  const disagreement = dossier.pulled?.market?.volume_disagreement ?? null;
   return (
     <section className="card-metrics">
       <div className="card-metric-grid">
@@ -412,7 +414,25 @@ function MetricsAndChart({ dossier, site, section, token, window }: Pick<NameCar
       {series.length > 0 ? <GrowthChart series={series} window={window} active={active} onChange={setActive} /> : <p className="card-empty">No snapshots yet.</p>}
       <div className="card-source-line">
         {dossier.card.top10Share !== null && explorer ? <a href={explorer}>Top 10 hold {(dossier.card.top10Share * 100).toFixed(1)}%</a> : null}
-        <a href={dexScreenerSearchUrl(dossier.symbol ?? dossier.name)} target="_blank" rel="noreferrer"><Icon name="ext" /> DexScreener</a>
+        {/* A disagreement is only useful if the reader can check it, so the row carries both 24h
+            figures on their own links instead of an unclickable "sources disagree". */}
+        {disagreement && rialto ? (
+          <span className="card-source-disagree">
+            24h volume disagrees:{" "}
+            <a href={dexScreenerSearchUrl(dossier.symbol ?? dossier.name)} target="_blank" rel="noreferrer">
+              <Icon name="ext" /> DexScreener {formatUsd(disagreement.dexscreener_usd)}
+            </a>{" "}
+            vs{" "}
+            <a href={rialto.source_url} target="_blank" rel="noreferrer">
+              <Icon name="ext" /> Rialto {formatUsd(disagreement.rialto_usd)}
+            </a>
+          </span>
+        ) : (
+          <>
+            <a href={dexScreenerSearchUrl(dossier.symbol ?? dossier.name)} target="_blank" rel="noreferrer"><Icon name="ext" /> DexScreener</a>
+            {rialto ? <a href={rialto.source_url} target="_blank" rel="noreferrer"><Icon name="ext" /> Rialto</a> : null}
+          </>
+        )}
         {llama ? <a href={llama} target="_blank" rel="noreferrer"><Icon name="ext" /> DefiLlama</a> : null}
         {explorer ? <a href={explorer} target="_blank" rel="noreferrer"><Icon name="ext" /> Explorer</a> : null}
       </div>

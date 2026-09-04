@@ -179,6 +179,35 @@ export type PulledMarket = {
     address: string;
     shared?: boolean;
   } | null;
+  rialto?: {
+    pairs: Array<{
+      pool_id: string | null;
+      base: string;
+      target: string;
+      last_price: number | null;
+      base_volume_24h: number | null;
+      target_volume_24h: number | null;
+      volume_24h_usd: number | null;
+    }>;
+    // Rialto's own published 24h USD volume for the whole token, the only figure comparable with
+    // volume_h24 above. The per-pair figures are partial detail and never sum to it.
+    volume_24h_usd: number | null;
+    volume_note: string | null;
+    as_of: string;
+    source_url: string;
+  } | null;
+  pair_asset?: {
+    ticker: string;
+    name: string;
+    address: string | null;
+    category: string | null;
+    tokenized_value_usd: number | null;
+    // The asset explorer's share count (value / price). A size, not a count of holders.
+    tokenized_shares: number | null;
+    change_7d: number | null;
+    source_url: string;
+  } | null;
+  volume_disagreement?: { dexscreener_usd: number; rialto_usd: number } | null;
   errors: Array<{ step: string; message: string }>;
 };
 export type PulledStructure = {
@@ -224,6 +253,16 @@ export type PulledFile = {
   structure?: PulledStructure | null;
   activity?: PulledActivity | null;
   errors: Array<{ step: string; message: string }>;
+};
+
+export type ChainStats = {
+  pulledAt: string;
+  tvlUsd: number | null;
+  tvlSourceUrl: string;
+  feeRevenueLatestDayUsd: number | null;
+  feeRevenueDay: string | null;
+  economicsSourceUrl: string;
+  tvlByCategory: Array<{ category: string; tvlUsd: number }>;
 };
 
 // Activity status, computed server-side from the pulled reads (never asserted by a person):
@@ -545,6 +584,7 @@ export type DirectoryBundle = {
   changelog: ChangelogEntry[];
   feed: LatestFeedItem[];
   dependencies: DependencyListing[];
+  chainStats: ChainStats | null;
   generatedAt: string; // build/derived.json generated_at — when scores were last computed
   now: number; // build time (ms epoch) for relative "2 min ago" wording
 };

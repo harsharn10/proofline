@@ -1,9 +1,9 @@
 slug: arrows
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-03T23:56:17.131Z # chain head 53819262 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e"
-    label: ARROWS token
+    label: ARROWS token (PonsV2LauncherToken)
     role: token
     is_contract: true
     source_verified: true
@@ -17,84 +17,332 @@ addresses:
     safe: null
     created_block: 37184280
     created_at: 2026-08-15T14:24:54.000Z
-    holders: 1056
+    holders: 1042
+    errors: []
+  - address: "0x410C428d7602EcB5B8C3255030e9852C2791445C"
+    label: Config
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: Config
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x9f89de65cab0ec1bd4b0931d891101f6bd525365"
+    owner_type: eoa
+    safe: null
+    created_block: 50802517
+    created_at: 2026-08-31T10:44:32.000Z
+    holders: null
+    errors: []
+  - address: "0xD03c98E93DF68BB5ADc9C27B3dD57863542A9D8f"
+    label: SeriesFactory
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: SeriesFactory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x9f89de65cab0ec1bd4b0931d891101f6bd525365"
+    owner_type: eoa
+    safe: null
+    created_block: 50802541
+    created_at: 2026-08-31T10:44:35.000Z
+    holders: null
+    errors: []
+  - address: "0x9Af7485f5B8427C628E5F967aD9AA0f9289d015D"
+    label: OptionToken
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: OptionToken
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x9f89de65cab0ec1bd4b0931d891101f6bd525365"
+    owner_type: eoa
+    safe: null
+    created_block: 50802564
+    created_at: 2026-08-31T10:44:37.000Z
+    holders: 4
+    errors: []
+  - address: "0xd334f914544b570A5fd03b6956f997107dE9C840"
+    label: CollateralVault
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: CollateralVault
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 50802574
+    created_at: 2026-08-31T10:44:38.000Z
+    holders: null
+    errors: []
+  - address: "0x09D965dD46Cc65fEbeea720295a18B798B4dF0ba"
+    label: VaultRouter
+    role: router
+    is_contract: true
+    source_verified: true
+    contract_name: VaultRouter
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x9f89de65cab0ec1bd4b0931d891101f6bd525365"
+    owner_type: eoa
+    safe: null
+    created_block: 50802587
+    created_at: 2026-08-31T10:44:40.000Z
+    holders: null
+    errors: []
+  - address: "0xf5B9330931E5941e287d40237aDE0Bd6eacb8edc"
+    label: FeeSplitter
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: FeeSplitter
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x9f89de65cab0ec1bd4b0931d891101f6bd525365"
+    owner_type: eoa
+    safe: null
+    created_block: 37441605
+    created_at: 2026-08-15T21:34:47.000Z
+    holders: null
+    errors: []
+  - address: "0xFCda38304cF81E03ADeF0cb5BB26C171A93168b6"
+    label: TokenStake
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: TokenStake
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x9f89de65cab0ec1bd4b0931d891101f6bd525365"
+    owner_type: eoa
+    safe: null
+    created_block: 37441609
+    created_at: 2026-08-15T21:34:47.000Z
+    holders: null
+    errors: []
+  - address: "0x277Ba3F49d550E031bD10E66E2deD624B20db2B4"
+    label: ETH MaturityCallVault
+    role: vault
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 50803317
+    created_at: 2026-08-31T10:45:53.000Z
+    holders: null
+    errors: []
+  - address: "0x37D30B87050d65c28E67A97AE02e02c8Da2A0C3a"
+    label: ETH MaturityPutVault
+    role: vault
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 50803340
+    created_at: 2026-08-31T10:45:56.000Z
+    holders: null
     errors: []
 metrics: []
 market:
   token_address: "0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-03T23:56:17.131Z
   pairs:
     - dex: uniswap
       pair_address: "0x2bb787a885bee4c1e61e2525aec976e1f8ec255976f7c64e7955c1f0d787d7d8"
       quote_symbol: ETH
-      price_usd: 0.000181
-      liquidity_usd: 38474.84
-      volume_h24: 77314.01
-      volume_h6: 9739.54
+      price_usd: 0.0003689
+      liquidity_usd: 56361.63
+      volume_h24: 69546.83
+      volume_h6: 11522.01
       txns_h24:
-        buys: 288
-        sells: 242
-      price_change_h24: -27.54
-      fdv: 181082
+        buys: 166
+        sells: 153
+      price_change_h24: 124
+      fdv: 368976
       created_at: 2026-08-15T19:11:19.000Z
     - dex: uniswap
       pair_address: "0x807ef8acb099906a684be5158f080d4977deeae924107797492673a0d40abbe4"
       quote_symbol: USDG
-      price_usd: 0.00019
-      liquidity_usd: 5.63
-      volume_h24: 0.89
+      price_usd: 0.0003207
+      liquidity_usd: 23.13
+      volume_h24: 14.55
       volume_h6: 0
       txns_h24:
-        buys: 1
-        sells: 0
-      price_change_h24: null
-      fdv: 190034
+        buys: 4
+        sells: 2
+      price_change_h24: 222218
+      fdv: 320779
       created_at: 2026-08-16T00:52:36.000Z
-  liquidity_usd: 38480.47
-  volume_h24: 77314.9
-  trades_h24: 531
-  price_usd: 0.000181
-  price_change_h24: -27.54
-  fdv: 181082
+  liquidity_usd: 56384.76
+  volume_h24: 69561.38
+  trades_h24: 325
+  price_usd: 0.0003689
+  price_change_h24: 124
+  fdv: 368976
   first_pair_at: 2026-08-15T19:11:19.000Z
-  top10_share: 0.5610545485935058
-  top10_share_ex_pools: 0.4794218955322813
-  top10_as_of: 2026-09-02T22:38:55.976Z
+  top10_share: 0.540048873269881
+  top10_share_ex_pools: 0.4103325651613609
+  burned_share: 0
+  top10_as_of: 2026-09-03T23:56:17.131Z
   launchpad:
     slug: pons
     via: creator
     address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-03T23:56:17.131Z
   mint: no-mint-function
   renounced: null
   lp:
     - pair: "0x2bb787a885bee4c1e61e2525aec976e1f8ec255976f7c64e7955c1f0d787d7d8"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x807ef8acb099906a684be5158f080d4977deeae924107797492673a0d40abbe4"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-03T23:56:17.131Z
   addresses:
     - address: "0xD71b7b4e1dc16BD6938D3F235A68aa8ab1CF4F0e"
-      label: ARROWS token
+      label: ARROWS token (PonsV2LauncherToken)
       role: token
       transactions_count: 2922
       token_transfers_count: 13
-      last_tx_at: 2026-09-02T22:34:15.000Z
-      last_method: transfer
-      txns_24h: 130
+      last_tx_at: 2026-09-04T00:01:44.000Z
+      last_method: approve
+      txns_24h: 81
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T22:34:15.000Z
-  txns_24h: 130
-  launches_24h: null
+    - address: "0x410C428d7602EcB5B8C3255030e9852C2791445C"
+      label: Config
+      role: other
+      transactions_count: 27
+      token_transfers_count: 0
+      last_tx_at: 2026-08-31T10:46:03.000Z
+      last_method: setMintsPaused
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xD03c98E93DF68BB5ADc9C27B3dD57863542A9D8f"
+      label: SeriesFactory
+      role: factory
+      transactions_count: 824
+      token_transfers_count: 0
+      last_tx_at: 2026-08-31T12:54:26.000Z
+      last_method: createSeries
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0x9Af7485f5B8427C628E5F967aD9AA0f9289d015D"
+      label: OptionToken
+      role: token
+      transactions_count: 10
+      token_transfers_count: 0
+      last_tx_at: 2026-08-31T17:48:33.000Z
+      last_method: setApprovalForAll
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xd334f914544b570A5fd03b6956f997107dE9C840"
+      label: CollateralVault
+      role: vault
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-31T10:44:38.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x09D965dD46Cc65fEbeea720295a18B798B4dF0ba"
+      label: VaultRouter
+      role: router
+      transactions_count: 95
+      token_transfers_count: 0
+      last_tx_at: 2026-09-03T19:12:43.000Z
+      last_method: sell
+      txns_24h: 79
+      launches_24h: null
+      errors: []
+    - address: "0xf5B9330931E5941e287d40237aDE0Bd6eacb8edc"
+      label: FeeSplitter
+      role: other
+      transactions_count: 5
+      token_transfers_count: 222
+      last_tx_at: 2026-08-31T10:44:30.000Z
+      last_method: transferOwnership
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xFCda38304cF81E03ADeF0cb5BB26C171A93168b6"
+      label: TokenStake
+      role: other
+      transactions_count: 110
+      token_transfers_count: 66
+      last_tx_at: 2026-09-03T23:08:21.000Z
+      last_method: stake
+      txns_24h: 5
+      launches_24h: null
+      errors: []
+    - address: "0x277Ba3F49d550E031bD10E66E2deD624B20db2B4"
+      label: ETH MaturityCallVault
+      role: vault
+      transactions_count: 4
+      token_transfers_count: 0
+      last_tx_at: 2026-08-31T12:16:57.000Z
+      last_method: deposit
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x37D30B87050d65c28E67A97AE02e02c8Da2A0C3a"
+      label: ETH MaturityPutVault
+      role: vault
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-31T13:09:00.000Z
+      last_method: deposit
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T00:01:44.000Z
+  txns_24h: 165
+  launches_24h: 0
 errors: []

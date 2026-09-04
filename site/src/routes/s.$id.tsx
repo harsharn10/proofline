@@ -23,6 +23,15 @@ const FILTERS: Array<{ value: Filter; label: string }> = [
   { value: "watchlist", label: "Watchlist" },
 ];
 const STATUS_ORDER = { live: 0, quiet: 1, dormant: 2, announced: 3, testnet: 4 } as const;
+// Taxonomy sections only map where Rialto publishes a directly comparable TVL category. Sections
+// without one stay silent rather than borrowing a nearby total (for example, launchpads != all DEXs).
+const RIALTO_TVL_CATEGORY: Partial<Record<string, string>> = {
+  trading: "DEX",
+  credit: "Lending",
+  yield: "Yield",
+  "rwa-products": "RWA Credit",
+  markets: "Derivatives",
+};
 
 export const Route = createFileRoute("/s/$id")({
   validateSearch: (search: Record<string, unknown>): { f?: Filter } =>
@@ -65,7 +74,7 @@ function CategoryPage() {
   const { f: searchFilter } = Route.useSearch();
   const f = searchFilter ?? "all";
   const navigate = useNavigate({ from: Route.fullPath }) as any;
-  const { sections, entries, dependencies, now } = Route.useLoaderData() as Awaited<
+  const { sections, entries, dependencies, chainStats, now } = Route.useLoaderData() as Awaited<
     ReturnType<typeof getContent>
   >;
   const section = sections.find((item) => item.id === id);
@@ -88,6 +97,10 @@ function CategoryPage() {
   const dormant = sectionEntries.filter((entry) => entry.kpis.status === "dormant").length;
   const launches = sectionEntries.reduce((sum, entry) => sum + entry.factoryLaunches24h, 0);
   const volume = sectionEntries.reduce((sum, entry) => sum + (entry.kpis.volume24h ?? 0), 0);
+  const rialtoCategory = RIALTO_TVL_CATEGORY[section.id];
+  const categoryTvl = rialtoCategory
+    ? chainStats?.tvlByCategory.find((row) => row.category === rialtoCategory) ?? null
+    : null;
   const dependencyById = new Map(dependencies.map((dependency) => [dependency.id, dependency]));
   const rails = [
     ...sectionEntries
@@ -141,6 +154,18 @@ function CategoryPage() {
               volume 24h
             </a>
           </div>
+          {/* Every figure above is this section's own. This one is the whole chain's category TVL,
+              most of it protocols the census does not carry, so it sits on its own line and says so
+              in its label rather than passing as a section total. */}
+          {categoryTvl && chainStats ? (
+            <a
+              href={chainStats.tvlSourceUrl}
+              className="mt-2.5 block border-t-[0.5px] border-[var(--line)] pt-2.5 hover:text-[var(--acc)]"
+            >
+              <b className="block text-base font-semibold text-[var(--t1)]">{formatUsd(categoryTvl.tvlUsd)}</b>
+              chain {rialtoCategory} TVL · Rialto Analytics
+            </a>
+          ) : null}
           <div className="mt-2 text-[11px] text-[var(--t3)]">
             Rails these run on: {rails.length ? rails.join(" · ") : "not checked"}
           </div>

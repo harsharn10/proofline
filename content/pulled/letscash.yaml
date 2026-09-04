@@ -1,0 +1,165 @@
+slug: letscash
+pulled_at: 2026-09-04T01:45:12.896Z # chain head 53883984 at read time
+chain: robinhood-chain
+addresses:
+  - address: "0x5bd1Fbe78a78fe8236fa00CF48fbEBA74ae34661"
+    label: Factory (UUPS ERC1967 proxy)
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: ERC1967Proxy
+    proxy:
+      type: eip1967
+      implementation: "0x40250b4c73fc30f8f6ad077744b0124b3f111c28"
+      admin: null
+    owner: "0xd2defbd13aff22d6989e8c14b4517ec308079e91"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1f3a1ce8605642d5a6248c72fe11de9c928742ff"
+        - "0x05c4abf806e192b01d67a9175da24fad9dde7d66"
+        - "0x0679f72dcc42d8fbeb19fc2e0215be8e7c090881"
+    created_block: 6112086
+    created_at: 2026-07-10T13:22:29.000Z
+    holders: null
+    errors: []
+  - address: "0x40250b4C73FC30f8F6ad077744B0124B3f111C28"
+    label: Factory implementation (current ERC1967 slot)
+    role: implementation
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x0000000000000000000000000000000000000000"
+    owner_type: none
+    safe: null
+    created_block: 48863220
+    created_at: 2026-08-29T04:18:18.000Z
+    holders: null
+    errors: []
+  - address: "0x75A54357D9C78a2Db19004a5FDc76c50F9242AEC"
+    label: Hook (CashCatHookV2)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: CashCatHookV2
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0xd2defbd13aff22d6989e8c14b4517ec308079e91"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1f3a1ce8605642d5a6248c72fe11de9c928742ff"
+        - "0x05c4abf806e192b01d67a9175da24fad9dde7d66"
+        - "0x0679f72dcc42d8fbeb19fc2e0215be8e7c090881"
+    created_block: 28872652
+    created_at: 2026-08-05T23:13:30.000Z
+    holders: null
+    errors: []
+  - address: "0xD2DeFbd13aFF22D6989E8C14B4517Ec308079E91"
+    label: Factory and hook owner (SafeProxy)
+    role: multisig
+    is_contract: true
+    source_verified: true
+    contract_name: SafeProxy
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 6101623
+    created_at: 2026-07-10T13:05:01.000Z
+    holders: null
+    errors: []
+metrics:
+  - kind: fees_24h
+    value: 69572
+    as_of: 2026-09-04T01:45:12.896Z
+    source_url: https://api.llama.fi/summary/fees/letscash?dataType=dailyFees
+  - kind: revenue_24h
+    value: 7183
+    as_of: 2026-09-04T01:45:12.896Z
+    source_url: https://api.llama.fi/summary/fees/letscash?dataType=dailyRevenue
+  - kind: volume_24h
+    value: 1725973
+    as_of: 2026-09-04T01:45:12.896Z
+    source_url: https://api.llama.fi/summary/dexs/letscash?dataType=dailyVolume
+market:
+  token_address: null
+  pulled_at: 2026-09-04T01:45:12.896Z
+  pairs: []
+  liquidity_usd: null
+  volume_h24: null
+  trades_h24: null
+  price_usd: null
+  price_change_h24: null
+  fdv: null
+  first_pair_at: null
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
+  errors:
+    - step: no token address
+      message: no robinhood-chain deployment with role token
+structure: null
+activity:
+  pulled_at: 2026-09-04T01:45:12.896Z
+  addresses:
+    - address: "0x5bd1Fbe78a78fe8236fa00CF48fbEBA74ae34661"
+      label: Factory (UUPS ERC1967 proxy)
+      role: factory
+      transactions_count: 9885
+      token_transfers_count: 19774
+      last_tx_at: 2026-09-04T01:57:55.000Z
+      last_method: "0xa80ac0c2"
+      txns_24h: 103
+      launches_24h: 0
+      errors: []
+    - address: "0x40250b4C73FC30f8F6ad077744B0124B3f111C28"
+      label: Factory implementation (current ERC1967 slot)
+      role: implementation
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-29T04:18:18.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x75A54357D9C78a2Db19004a5FDc76c50F9242AEC"
+      label: Hook (CashCatHookV2)
+      role: other
+      transactions_count: 7602
+      token_transfers_count: 497
+      last_tx_at: 2026-09-04T01:59:44.000Z
+      last_method: claim
+      txns_24h: 104
+      launches_24h: null
+      errors: []
+    - address: "0xD2DeFbd13aFF22D6989E8C14B4517Ec308079E91"
+      label: Factory and hook owner (SafeProxy)
+      role: multisig
+      transactions_count: 16
+      token_transfers_count: 0
+      last_tx_at: 2026-08-29T04:43:39.000Z
+      last_method: execTransaction
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T01:59:44.000Z
+  txns_24h: 207
+  launches_24h: 0
+errors: []
