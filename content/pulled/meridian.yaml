@@ -1,15 +1,126 @@
 slug: meridian
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T01:45:12.896Z # chain head 53883984 at read time
 chain: robinhood-chain
-addresses: []
+addresses:
+  - address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
+    label: Meridian Liquidity Provider (MLP share vault)
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: AccountableAsyncRedeemVault
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 22051004
+    created_at: 2026-07-29T01:15:03.000Z
+    holders: 616
+    errors: []
+  - address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
+    label: AccountableYield strategy (ERC1967 proxy; app manageUrl)
+    role: proxy
+    is_contract: true
+    source_verified: true
+    contract_name: ERC1967Proxy
+    proxy:
+      type: eip1967
+      implementation: "0x2639da0923abffe46a753b765e0856cc3e121710"
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 22051004
+    created_at: 2026-07-29T01:15:03.000Z
+    holders: null
+    errors: []
+  - address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
+    label: AccountableYield implementation
+    role: implementation
+    is_contract: true
+    source_verified: true
+    contract_name: AccountableYield
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 16386002
+    created_at: 2026-07-22T11:22:45.000Z
+    holders: null
+    errors: []
+  - address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
+    label: YieldStrategyFactory (Accountable)
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: YieldStrategyFactory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x4b07aaa370189e5603df56c84f59c5a59181bfb1"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x25e170e369e7fe7c5da84357663d4caf93228db7"
+        - "0x66415e41ac9f9b3c099204e7c2ba4f5cab4917a9"
+        - "0xfcb0cbc1977eb6b68ed8bf31884921abb513d7bd"
+    created_block: 16386224
+    created_at: 2026-07-22T11:23:07.000Z
+    holders: null
+    errors: []
+  - address: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
+    label: YieldStrategyFactory owner Safe
+    role: multisig
+    is_contract: true
+    source_verified: true
+    contract_name: SafeProxy
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 16362733
+    created_at: 2026-07-22T10:43:52.000Z
+    holders: null
+    errors: []
+  - address: "0xE42847eE3feE1B29065F14D39EcF664A04d70475"
+    label: ConditionalTokensConditionResolver (app robinhood-mainnet map)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: ConditionalTokensConditionResolver
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x99a8e932b40ed10dd03ce11e424030efa997212c"
+    owner_type: safe
+    safe:
+      threshold: 1
+      signers:
+        - "0x5aa9815d01b6ebb8647baf7354e8cf0cd9040a44"
+        - "0xdb5af497a73620d881561edb508012a5f84e9ba2"
+    created_block: 203471
+    created_at: 2026-06-25T18:41:27.000Z
+    holders: null
+    errors: []
 metrics:
   - kind: tvl
-    value: 2506049
-    as_of: 2026-09-02T21:13:23.000Z
+    value: 2510525
+    as_of: 2026-09-04T00:14:23.000Z
     source_url: https://api.llama.fi/protocol/meridian-perps
 market:
   token_address: null
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T01:45:12.896Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -20,18 +131,82 @@ market:
   first_pair_at: null
   top10_share: null
   top10_share_ex_pools: null
+  burned_share: null
   top10_as_of: null
   launchpad: null
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors:
     - step: no token address
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
-  addresses: []
-  last_activity_at: null
-  txns_24h: null
-  launches_24h: null
+  pulled_at: 2026-09-04T01:45:12.896Z
+  addresses:
+    - address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
+      label: Meridian Liquidity Provider (MLP share vault)
+      role: vault
+      transactions_count: 970
+      token_transfers_count: 1025
+      last_tx_at: 2026-09-03T18:28:59.000Z
+      last_method: deposit
+      txns_24h: 7
+      launches_24h: null
+      errors: []
+    - address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
+      label: AccountableYield strategy (ERC1967 proxy; app manageUrl)
+      role: proxy
+      transactions_count: 81
+      token_transfers_count: 2
+      last_tx_at: 2026-09-03T22:33:14.000Z
+      last_method: accrueAndProcess
+      txns_24h: 3
+      launches_24h: null
+      errors: []
+    - address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
+      label: AccountableYield implementation
+      role: implementation
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: null
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
+      label: YieldStrategyFactory (Accountable)
+      role: factory
+      transactions_count: 5
+      token_transfers_count: 1
+      last_tx_at: 2026-08-18T17:28:42.000Z
+      last_method: createYieldStrategy
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
+      label: YieldStrategyFactory owner Safe
+      role: multisig
+      transactions_count: 7
+      token_transfers_count: 2
+      last_tx_at: 2026-08-18T17:53:44.000Z
+      last_method: execTransaction
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xE42847eE3feE1B29065F14D39EcF664A04d70475"
+      label: ConditionalTokensConditionResolver (app robinhood-mainnet map)
+      role: other
+      transactions_count: 4
+      token_transfers_count: 1
+      last_tx_at: 2026-06-30T18:33:26.000Z
+      last_method: transferOwnership
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-03T22:33:14.000Z
+  txns_24h: 10
+  launches_24h: 0
 errors:
   - step: llama
     message: "fees_24h meridian-perps: HTTP 400: Fees for meridian-perps not found, please visit /overview/fees to see available protocols"
@@ -39,3 +214,5 @@ errors:
     message: "revenue_24h meridian-perps: HTTP 400: Fees for meridian-perps not found, please visit /overview/fees to see available protocols"
   - step: llama
     message: "volume_24h meridian-perps: HTTP 400: Dexs for meridian-perps not found, please visit /overview/dexs to see available protocols"
+  - step: llama
+    message: "revenue_daily meridian: the read returned no daily points, so no series file was written"

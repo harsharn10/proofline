@@ -1,0 +1,312 @@
+slug: yolo
+pulled_at: 2026-09-03T23:56:17.131Z # chain head 53819262 at read time
+chain: robinhood-chain
+addresses:
+  - address: "0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA"
+    label: YOLO token (PonsLauncherToken)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: PonsLauncherToken
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 10204613
+    created_at: 2026-07-15T07:15:15.000Z
+    holders: 11839
+    errors: []
+  - address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+    label: PonsLaunchFactory (token creator / launchFactory())
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: PonsLaunchFactory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
+    created_block: 8991118
+    created_at: 2026-07-13T21:29:03.000Z
+    holders: null
+    errors: []
+  - address: "0x52FcB1D83191E06ef2d2D9f460609CA22a923558"
+    label: YOLO/WETH Uniswap v3 pool (canonical liquidityPool)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: UniswapV3Pool
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 10204613
+    created_at: 2026-07-15T07:15:15.000Z
+    holders: null
+    errors: []
+  - address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    label: WETH (pairToken / quote)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: TransparentUpgradeableProxy
+    proxy:
+      type: eip1967
+      implementation: "0xc6b81b429797e0f555440b70cd99e032d7ae947e"
+      admin: "0xa3acd31afb851b4eb9dad00f5204c01d924267df"
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 2
+    created_at: 2026-04-30T16:52:11.000Z
+    holders: 527459
+    errors: []
+  - address: "0x736D76699C26D0d966744cAe304C000d471f7F35"
+    label: PonsLaunchLocker (UNI-V3-POS 129850)
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: PonsLaunchLocker
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
+    created_block: 8991102
+    created_at: 2026-07-13T21:29:02.000Z
+    holders: null
+    errors: []
+metrics: []
+market:
+  token_address: "0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA"
+  pulled_at: 2026-09-03T23:56:17.131Z
+  pairs:
+    - dex: uniswap
+      pair_address: "0x52FcB1D83191E06ef2d2D9f460609CA22a923558"
+      quote_symbol: WETH
+      price_usd: 0.01432
+      liquidity_usd: 515294.88
+      volume_h24: 1255311.75
+      volume_h6: 383934.17
+      txns_h24:
+        buys: 1264
+        sells: 1023
+      price_change_h24: -5.03
+      fdv: 13895555
+      created_at: 2026-07-15T07:15:15.000Z
+    - dex: uniswap
+      pair_address: "0x977a1ab226bba4bc21951a54e56addfad6f22968fd4a8ae2889ba26e6bfeaea2"
+      quote_symbol: USDG
+      price_usd: 0.01457
+      liquidity_usd: 128576.88
+      volume_h24: 170178.11
+      volume_h6: 33674.17
+      txns_h24:
+        buys: 259
+        sells: 129
+      price_change_h24: -2.05
+      fdv: 14133020
+      created_at: 2026-07-30T17:13:07.000Z
+    - dex: uniswap
+      pair_address: "0x590f5cdcadc06b4942d7c40ac81d43e33d700832102bea9f15e5736235fe44a6"
+      quote_symbol: ETH
+      price_usd: 0.01434
+      liquidity_usd: 21671.46
+      volume_h24: 133097
+      volume_h6: 33611.39
+      txns_h24:
+        buys: 427
+        sells: 279
+      price_change_h24: -5.22
+      fdv: 13915764
+      created_at: 2026-08-30T12:13:27.000Z
+    - dex: uniswap
+      pair_address: "0x7775ea9e8e329be084fe8ed55af01e31af14d6ab8da2179966f2b8b3b0acacb5"
+      quote_symbol: USDG
+      price_usd: 0.01448
+      liquidity_usd: 8375.01
+      volume_h24: 86870.74
+      volume_h6: 24622.78
+      txns_h24:
+        buys: 759
+        sells: 767
+      price_change_h24: -3.26
+      fdv: 14053427
+      created_at: 2026-07-22T01:22:22.000Z
+    - dex: uniswap
+      pair_address: "0xd89117fd0791d1241b41366110631098da3c704379f29e87c3c9efe7493a895d"
+      quote_symbol: ETH
+      price_usd: 0.01455
+      liquidity_usd: 36.73
+      volume_h24: 12.09
+      volume_h6: 2.28
+      txns_h24:
+        buys: 7
+        sells: 7
+      price_change_h24: -10.42
+      fdv: 14117183
+      created_at: 2026-08-30T22:32:45.000Z
+    - dex: uniswap
+      pair_address: "0x45abc85f618164223301921dee13d94ea1437d8738140b6a4e908fda20dbb9bc"
+      quote_symbol: ETH
+      price_usd: 0.0122
+      liquidity_usd: 8.4
+      volume_h24: 0.8
+      volume_h6: 0.21
+      txns_h24:
+        buys: 3
+        sells: 2
+      price_change_h24: -17.24
+      fdv: 11839449
+      created_at: 2026-07-19T15:17:13.000Z
+    - dex: uniswap
+      pair_address: "0xa0966bb46a5b22b157f1b43fe6279a11ac4391f9807a7984cd118131e0228e9e"
+      quote_symbol: YOLO
+      price_usd: 0.000003266
+      liquidity_usd: 3266.26
+      volume_h24: 3.36
+      volume_h6: 0
+      txns_h24:
+        buys: 1
+        sells: 0
+      price_change_h24: null
+      fdv: 3266
+      created_at: 2026-09-03T04:16:15.000Z
+  liquidity_usd: 677229.62
+  volume_h24: 1645473.85
+  trades_h24: 4927
+  price_usd: 0.01432
+  price_change_h24: -5.03
+  fdv: 13895555
+  first_pair_at: 2026-07-15T07:15:15.000Z
+  top10_share: 0.1929928970728984
+  top10_share_ex_pools: 0.1872962404085866
+  burned_share: 0.0300000065834114
+  top10_as_of: 2026-09-03T23:56:17.131Z
+  launchpad:
+    slug: pons
+    via: factory
+    address: "0xa5aab3f0c6eeadf30ef1d3eb997108e976351feb"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
+  errors: []
+structure:
+  pulled_at: 2026-09-03T23:56:17.131Z
+  mint: no-mint-function
+  renounced: null
+  lp:
+    - pair: "0x52FcB1D83191E06ef2d2D9f460609CA22a923558"
+      locked_share: null
+      holder_kind: null
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
+    - pair: "0x977a1ab226bba4bc21951a54e56addfad6f22968fd4a8ae2889ba26e6bfeaea2"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x590f5cdcadc06b4942d7c40ac81d43e33d700832102bea9f15e5736235fe44a6"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x7775ea9e8e329be084fe8ed55af01e31af14d6ab8da2179966f2b8b3b0acacb5"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xd89117fd0791d1241b41366110631098da3c704379f29e87c3c9efe7493a895d"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x45abc85f618164223301921dee13d94ea1437d8738140b6a4e908fda20dbb9bc"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xa0966bb46a5b22b157f1b43fe6279a11ac4391f9807a7984cd118131e0228e9e"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+  errors:
+    - step: renounced
+      message: owner() was not present or could not be read
+activity:
+  pulled_at: 2026-09-03T23:56:17.131Z
+  addresses:
+    - address: "0x62C71cd34a52c30d894419CBcc55Db2aFA8032eA"
+      label: YOLO token (PonsLauncherToken)
+      role: token
+      transactions_count: 59138
+      token_transfers_count: 69
+      last_tx_at: 2026-09-04T01:29:04.000Z
+      last_method: approve
+      txns_24h: 600
+      launches_24h: null
+      errors: []
+    - address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+      label: PonsLaunchFactory (token creator / launchFactory())
+      role: factory
+      transactions_count: 266144
+      token_transfers_count: 1065034
+      last_tx_at: 2026-09-03T12:03:07.000Z
+      last_method: launchToken
+      txns_24h: 8
+      launches_24h: 4
+      errors: []
+    - address: "0x52FcB1D83191E06ef2d2D9f460609CA22a923558"
+      label: YOLO/WETH Uniswap v3 pool (canonical liquidityPool)
+      role: other
+      transactions_count: 2
+      token_transfers_count: 233160
+      last_tx_at: 2026-08-27T02:12:56.000Z
+      last_method: increaseObservationCardinalityNext
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+      label: WETH (pairToken / quote)
+      role: token
+      transactions_count: 1973059
+      token_transfers_count: 318
+      last_tx_at: 2026-09-04T01:01:15.000Z
+      last_method: deposit
+      txns_24h: 2000
+      launches_24h: null
+      errors:
+        - step: txns_24h capped
+          message: stopped after 40 pages; count is a floor
+    - address: "0x736D76699C26D0d966744cAe304C000d471f7F35"
+      label: PonsLaunchLocker (UNI-V3-POS 129850)
+      role: vault
+      transactions_count: 903584
+      token_transfers_count: 3416081
+      last_tx_at: 2026-09-03T23:57:06.000Z
+      last_method: collectFees
+      txns_24h: 2000
+      launches_24h: null
+      errors:
+        - step: txns_24h capped
+          message: stopped after 40 pages; count is a floor
+  last_activity_at: 2026-09-04T01:29:04.000Z
+  txns_24h: 4608
+  launches_24h: 4
+errors: []

@@ -1,0 +1,195 @@
+slug: op
+pulled_at: 2026-09-03T23:56:17.131Z # chain head 53819262 at read time
+chain: robinhood-chain
+addresses:
+  - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+    label: OP token (PonsV2LauncherToken)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: Sandisk Optimus
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 51169078
+    created_at: 2026-08-31T21:02:01.000Z
+    holders: 418
+    errors: []
+  - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    label: PonsV2LaunchFactory
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: PonsV2LaunchFactory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
+    created_block: 26841846
+    created_at: 2026-08-03T14:41:19.000Z
+    holders: null
+    errors: []
+  - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    label: V2LaunchLocker (locked graduation position)
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: V2LaunchLocker
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
+    created_block: 26841845
+    created_at: 2026-08-03T14:41:19.000Z
+    holders: null
+    errors: []
+  - address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+    label: SNDK quote (pairToken / Robinhood Stock Token rail)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: BeaconProxy
+    proxy:
+      type: unknown
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 48293
+    created_at: 2026-06-10T15:27:03.000Z
+    holders: 24565
+    errors:
+      - step: rpc
+        message: "eth_getCode 0xB90A19fF0Af67f7779afF50A882A9CfF42446400: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0xB90A19fF0Af67f7779afF50A882A9CfF42446400: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+      - step: rpc
+        message: "eth_getStorageAt admin 0xB90A19fF0Af67f7779afF50A882A9CfF42446400: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+metrics: []
+market:
+  token_address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+  pulled_at: 2026-09-03T23:56:17.131Z
+  pairs:
+    - dex: uniswap
+      pair_address: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
+      quote_symbol: SNDK
+      price_usd: 0.00007512
+      liquidity_usd: 25412.6
+      volume_h24: 286126.14
+      volume_h6: 62408.13
+      txns_h24:
+        buys: 698
+        sells: 637
+      price_change_h24: -70.56
+      fdv: 75123
+      created_at: 2026-08-31T21:02:46.000Z
+  liquidity_usd: 25412.6
+  volume_h24: 286126.14
+  trades_h24: 1335
+  price_usd: 0.00007512
+  price_change_h24: -70.56
+  fdv: 75123
+  first_pair_at: 2026-08-31T21:02:46.000Z
+  top10_share: 0.4461440055448072
+  top10_share_ex_pools: 0.2259353999524069
+  burned_share: 0
+  top10_as_of: 2026-09-03T23:56:17.131Z
+  launchpad:
+    slug: pons
+    via: creator
+    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
+  rialto: null
+  pair_asset:
+    ticker: SNDK
+    name: Sandisk Corporation
+    address: "0xb90a19ff0af67f7779aff50a882a9cff42446400"
+    category: stock
+    tokenized_value_usd: 1702002.9
+    holders_proxy: 1095.6630000000002
+    change_7d: 66046.57
+    source_url: https://analytics.rialto.xyz/tokenization
+  volume_disagreement: null
+  errors: []
+structure:
+  pulled_at: 2026-09-03T23:56:17.131Z
+  mint: no-mint-function
+  renounced: null
+  lp:
+    - pair: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+  errors:
+    - step: renounced
+      message: owner() was not present or could not be read
+activity:
+  pulled_at: 2026-09-03T23:56:17.131Z
+  addresses:
+    - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+      label: OP token (PonsV2LauncherToken)
+      role: token
+      transactions_count: 1476
+      token_transfers_count: 0
+      last_tx_at: 2026-09-04T00:47:35.000Z
+      last_method: transfer
+      txns_24h: 220
+      launches_24h: null
+      errors: []
+    - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      label: PonsV2LaunchFactory
+      role: factory
+      transactions_count: 76659
+      token_transfers_count: 6719
+      last_tx_at: 2026-09-03T23:57:53.000Z
+      last_method: launchToken
+      txns_24h: 2000
+      launches_24h: 1070
+      errors:
+        - step: txns_24h capped
+          message: stopped after 40 pages; count is a floor
+    - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+      label: V2LaunchLocker (locked graduation position)
+      role: vault
+      transactions_count: 13
+      token_transfers_count: 7471
+      last_tx_at: 2026-08-30T15:18:53.000Z
+      last_method: "0xa480ca79"
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+      label: SNDK quote (pairToken / Robinhood Stock Token rail)
+      role: token
+      transactions_count: 6510
+      token_transfers_count: 39
+      last_tx_at: 2026-09-04T01:03:16.000Z
+      last_method: approve
+      txns_24h: 716
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T01:03:16.000Z
+  txns_24h: 2936
+  launches_24h: 1070
+errors: []

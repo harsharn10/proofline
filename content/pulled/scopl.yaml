@@ -1,9 +1,9 @@
 slug: scopl
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T01:45:12.896Z # chain head 53883984 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xaA40e79E987517f7462bF79315B8A118799B04E3"
-    label: SCOPL token (account bio; SpyWolf audit for chain 4663)
+    label: SCOPL token (PonsV2LauncherToken; name scopl.live)
     role: token
     is_contract: true
     source_verified: true
@@ -19,167 +19,442 @@ addresses:
     created_at: 2026-08-16T13:00:02.000Z
     holders: 1336
     errors: []
+  - address: "0xf4badBc5bea19E94f61084172f7b68383166CDd7"
+    label: ScoplLimitOrderManager V3 (API and guide current live)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: ScoplLimitOrderManager
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7f4a8ff98b2b2996dc96d95a358ecf9f7473b397"
+    owner_type: eoa
+    safe: null
+    created_block: 35475114
+    created_at: 2026-08-13T14:49:54.000Z
+    holders: null
+    errors: []
+  - address: "0xcdD1E3BC873e5Ff7cA974b7212D6031fe853Cd42"
+    label: ScoplV4LimitOrderManager (API and guide current live)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: ScoplV4LimitOrderManager
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7f4a8ff98b2b2996dc96d95a358ecf9f7473b397"
+    owner_type: eoa
+    safe: null
+    created_block: 36245099
+    created_at: 2026-08-14T12:15:42.000Z
+    holders: null
+    errors: []
+  - address: "0x7d3ea31b89804d7Dd755781d56eab7128A8b4D48"
+    label: ScoplFeeRouter
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: ScoplFeeRouter
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7f4a8ff98b2b2996dc96d95a358ecf9f7473b397"
+    owner_type: eoa
+    safe: null
+    created_block: 33201634
+    created_at: 2026-08-10T23:41:00.000Z
+    holders: null
+    errors: []
+  - address: "0x4eE310BCB577afB4beEcDA9422764B7A8E4e04a3"
+    label: ScoplReferralRewards
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: ScoplReferralRewards
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7f4a8ff98b2b2996dc96d95a358ecf9f7473b397"
+    owner_type: eoa
+    safe: null
+    created_block: 33197551
+    created_at: 2026-08-10T23:34:12.000Z
+    holders: null
+    errors: []
+  - address: "0x0A552810F73892216Ae755A027D4AD3efdE3Ca87"
+    label: ScoplRevenueDistributor
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: ScoplRevenueDistributor
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7f4a8ff98b2b2996dc96d95a358ecf9f7473b397"
+    owner_type: eoa
+    safe: null
+    created_block: 33197653
+    created_at: 2026-08-10T23:34:22.000Z
+    holders: null
+    errors: []
+  - address: "0x885C479cD30d02f7a7a09dC785b577B23ee27a00"
+    label: ScoplBuybackVault
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: ScoplBuybackVault
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7f4a8ff98b2b2996dc96d95a358ecf9f7473b397"
+    owner_type: eoa
+    safe: null
+    created_block: 38094573
+    created_at: 2026-08-16T15:47:17.000Z
+    holders: null
+    errors: []
+  - address: "0x168567e09A4835D80589BCDE3F1dA5c930D5d9e7"
+    label: ScoplRouterSwapAdapter
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: ScoplRouterSwapAdapter
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 38094618
+    created_at: 2026-08-16T15:47:22.000Z
+    holders: null
+    errors: []
+  - address: "0x34BE29754d2538B31B556A7d2253a98917468c49"
+    label: ScoplZapRouter
+    role: router
+    is_contract: true
+    source_verified: true
+    contract_name: ScoplZapRouter
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7f4a8ff98b2b2996dc96d95a358ecf9f7473b397"
+    owner_type: eoa
+    safe: null
+    created_block: 35530159
+    created_at: 2026-08-13T16:21:52.000Z
+    holders: null
+    errors: []
+  - address: "0xfA7a06b158eCf40232A4e1c976160be592391646"
+    label: ScoplOrderPolicy (verified on 4663; omitted from the eight-contract guide)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: ScoplOrderPolicy
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7f4a8ff98b2b2996dc96d95a358ecf9f7473b397"
+    owner_type: eoa
+    safe: null
+    created_block: 45858071
+    created_at: 2026-08-25T16:05:23.000Z
+    holders: null
+    errors: []
 metrics: []
 market:
   token_address: "0xaA40e79E987517f7462bF79315B8A118799B04E3"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T01:45:12.896Z
   pairs:
     - dex: uniswap
       pair_address: "0x8651473123a804b0967bf2f9d1ad24c5d7078f6946e19c77f060503695201328"
       quote_symbol: ETH
-      price_usd: 0.0007581
-      liquidity_usd: 124519.24
-      volume_h24: 225755.38
-      volume_h6: 52792.06
+      price_usd: 0.0008861
+      liquidity_usd: 140742.45
+      volume_h24: 151356.47
+      volume_h6: 58682.94
       txns_h24:
-        buys: 490
-        sells: 661
-      price_change_h24: -0.08
-      fdv: 736391
+        buys: 285
+        sells: 375
+      price_change_h24: 0.23
+      fdv: 860686
       created_at: 2026-08-18T08:48:00.000Z
     - dex: uniswap
       pair_address: "0xfa305cb8e3f8a65c81dffb433f3e2fdc42b49a01d0781a56b728db81a2332c0b"
       quote_symbol: ETH
-      price_usd: 0.0007581
-      liquidity_usd: 24564.56
-      volume_h24: 26349.95
-      volume_h6: 4956.92
+      price_usd: 0.0008867
+      liquidity_usd: 27954.21
+      volume_h24: 33429.58
+      volume_h6: 11896.99
       txns_h24:
-        buys: 206
-        sells: 190
-      price_change_h24: -0.37
-      fdv: 736314
+        buys: 220
+        sells: 155
+      price_change_h24: 5.31
+      fdv: 861274
       created_at: 2026-08-18T09:56:08.000Z
     - dex: uniswap
       pair_address: "0x63358bf5ae88f31750ca7e197154e82ac3855fad69ff18a781236424f3982c68"
       quote_symbol: USDG
-      price_usd: 0.0007718
-      liquidity_usd: 1360.99
-      volume_h24: 3270.74
-      volume_h6: 465.8
+      price_usd: 0.0008558
+      liquidity_usd: 1396.23
+      volume_h24: 1317.07
+      volume_h6: 584.27
       txns_h24:
-        buys: 33
-        sells: 31
-      price_change_h24: 6.77
-      fdv: 749707
+        buys: 29
+        sells: 19
+      price_change_h24: -5.6
+      fdv: 831201
       created_at: 2026-08-24T14:09:55.000Z
     - dex: uniswap
       pair_address: "0x9d89451529993d914960AACbD9673e912adfd887"
       quote_symbol: USDG
-      price_usd: 0.0008104
-      liquidity_usd: 138.32
-      volume_h24: 10.2
-      volume_h6: 2.56
+      price_usd: 0.0007913
+      liquidity_usd: 158.25
+      volume_h24: 8.86
+      volume_h6: 4.22
       txns_h24:
-        buys: 8
+        buys: 9
         sells: 5
-      price_change_h24: 17.04
-      fdv: 787188
+      price_change_h24: -7.25
+      fdv: 768590
       created_at: 2026-08-18T09:52:12.000Z
     - dex: uniswap
       pair_address: "0x1b2f673aa67359d845839e659036fe4829b63c495fef81d41da608553e2aabee"
       quote_symbol: ETH
-      price_usd: 0.0008064
-      liquidity_usd: 109.5
-      volume_h24: 31.88
-      volume_h6: 7.77
+      price_usd: 0.0008463
+      liquidity_usd: 114.98
+      volume_h24: 43.56
+      volume_h6: 20.23
       txns_h24:
-        buys: 5
-        sells: 6
-      price_change_h24: 7.19
-      fdv: 783220
+        buys: 4
+        sells: 8
+      price_change_h24: -9.24
+      fdv: 822052
       created_at: 2026-08-31T08:57:34.000Z
+    - dex: uniswap
+      pair_address: "0xd875fb23fd072f57ba7c80173438d570dd03ae11e78ab30af4a04f643a54095d"
+      quote_symbol: USDG
+      price_usd: 0.0009425
+      liquidity_usd: 651.38
+      volume_h24: 347.87
+      volume_h6: 260.4
+      txns_h24:
+        buys: 3
+        sells: 8
+      price_change_h24: -16.75
+      fdv: 915458
+      created_at: 2026-08-27T01:02:57.000Z
     - dex: uniswap
       pair_address: "0x00dfc023361294956cedeb134741c587f10a254fb122e0d0be8a22977133310f"
       quote_symbol: USDG
-      price_usd: 0.0006602
-      liquidity_usd: 34.11
-      volume_h24: 14.76
-      volume_h6: 3.1
+      price_usd: 0.0009163
+      liquidity_usd: 40.03
+      volume_h24: 10.64
+      volume_h6: 1.02
       txns_h24:
-        buys: 3
-        sells: 5
-      price_change_h24: -14.21
-      fdv: 641226
+        buys: 2
+        sells: 3
+      price_change_h24: -16.25
+      fdv: 890028
       created_at: 2026-08-21T05:02:27.000Z
     - dex: uniswap
       pair_address: "0x9744c5c89b99d619efbcf84ef7c98b561dc1277030d3ce06957f3f1f99a3f94e"
       quote_symbol: SCOPL
-      price_usd: 0.009926
-      liquidity_usd: 138.74
-      volume_h24: 44.89
-      volume_h6: 6.11
+      price_usd: 0.01192
+      liquidity_usd: 167.33
+      volume_h24: 66.31
+      volume_h6: 14.24
       txns_h24:
         buys: 5
         sells: 3
-      price_change_h24: -12.44
-      fdv: 9927
+      price_change_h24: -13.36
+      fdv: 11921
       created_at: 2026-08-21T12:43:52.000Z
-  liquidity_usd: 150865.46
-  volume_h24: 255477.8
-  trades_h24: 1651
-  price_usd: 0.0007581
-  price_change_h24: -0.08
-  fdv: 736391
+  liquidity_usd: 171224.86
+  volume_h24: 186580.36
+  trades_h24: 1133
+  price_usd: 0.0008861
+  price_change_h24: 0.23
+  fdv: 860686
   first_pair_at: 2026-08-18T08:48:00.000Z
-  top10_share: 0.3877129809859848
-  top10_share_ex_pools: 0.3060803279247603
-  top10_as_of: 2026-09-02T22:38:55.976Z
+  top10_share: 0.3769546071102908
+  top10_share_ex_pools: 0.1765292974028922
+  burned_share: 0.0287468082538613
+  top10_as_of: 2026-09-04T01:45:12.896Z
   launchpad:
     slug: pons
     via: creator
     address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T01:45:12.896Z
   mint: no-mint-function
   renounced: null
   lp:
     - pair: "0x8651473123a804b0967bf2f9d1ad24c5d7078f6946e19c77f060503695201328"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xfa305cb8e3f8a65c81dffb433f3e2fdc42b49a01d0781a56b728db81a2332c0b"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x63358bf5ae88f31750ca7e197154e82ac3855fad69ff18a781236424f3982c68"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x9d89451529993d914960AACbD9673e912adfd887"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
     - pair: "0x1b2f673aa67359d845839e659036fe4829b63c495fef81d41da608553e2aabee"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xd875fb23fd072f57ba7c80173438d570dd03ae11e78ab30af4a04f643a54095d"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x00dfc023361294956cedeb134741c587f10a254fb122e0d0be8a22977133310f"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x9744c5c89b99d619efbcf84ef7c98b561dc1277030d3ce06957f3f1f99a3f94e"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T01:45:12.896Z
   addresses:
     - address: "0xaA40e79E987517f7462bF79315B8A118799B04E3"
-      label: SCOPL token (account bio; SpyWolf audit for chain 4663)
+      label: SCOPL token (PonsV2LauncherToken; name scopl.live)
       role: token
       transactions_count: 3790
       token_transfers_count: 8
-      last_tx_at: 2026-09-02T22:42:44.000Z
+      last_tx_at: 2026-09-04T01:50:02.000Z
       last_method: approve
-      txns_24h: 192
+      txns_24h: 146
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T22:42:44.000Z
-  txns_24h: 192
+    - address: "0xf4badBc5bea19E94f61084172f7b68383166CDd7"
+      label: ScoplLimitOrderManager V3 (API and guide current live)
+      role: other
+      transactions_count: 8102
+      token_transfers_count: 10568
+      last_tx_at: 2026-09-03T22:31:17.000Z
+      last_method: createOrder
+      txns_24h: 24
+      launches_24h: null
+      errors: []
+    - address: "0xcdD1E3BC873e5Ff7cA974b7212D6031fe853Cd42"
+      label: ScoplV4LimitOrderManager (API and guide current live)
+      role: other
+      transactions_count: 1644
+      token_transfers_count: 1930
+      last_tx_at: 2026-09-04T01:10:47.000Z
+      last_method: createOrder
+      txns_24h: 49
+      launches_24h: null
+      errors: []
+    - address: "0x7d3ea31b89804d7Dd755781d56eab7128A8b4D48"
+      label: ScoplFeeRouter
+      role: other
+      transactions_count: 403
+      token_transfers_count: 1629
+      last_tx_at: 2026-09-04T02:00:58.000Z
+      last_method: removeV4
+      txns_24h: 145
+      launches_24h: null
+      errors: []
+    - address: "0x4eE310BCB577afB4beEcDA9422764B7A8E4e04a3"
+      label: ScoplReferralRewards
+      role: other
+      transactions_count: 66
+      token_transfers_count: 1636
+      last_tx_at: 2026-09-02T21:04:17.000Z
+      last_method: bindReferrer
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x0A552810F73892216Ae755A027D4AD3efdE3Ca87"
+      label: ScoplRevenueDistributor
+      role: other
+      transactions_count: 18
+      token_transfers_count: 8741
+      last_tx_at: 2026-08-16T15:47:45.000Z
+      last_method: setDestinations
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x885C479cD30d02f7a7a09dC785b577B23ee27a00"
+      label: ScoplBuybackVault
+      role: vault
+      transactions_count: 73
+      token_transfers_count: 2743
+      last_tx_at: 2026-09-03T16:16:43.000Z
+      last_method: executeSwap
+      txns_24h: 13
+      launches_24h: null
+      errors: []
+    - address: "0x168567e09A4835D80589BCDE3F1dA5c930D5d9e7"
+      label: ScoplRouterSwapAdapter
+      role: other
+      transactions_count: 0
+      token_transfers_count: 229
+      last_tx_at: 2026-08-16T15:47:22.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x34BE29754d2538B31B556A7d2253a98917468c49"
+      label: ScoplZapRouter
+      role: router
+      transactions_count: 247
+      token_transfers_count: 692
+      last_tx_at: 2026-09-04T01:45:04.000Z
+      last_method: mintV4
+      txns_24h: 176
+      launches_24h: null
+      errors: []
+    - address: "0xfA7a06b158eCf40232A4e1c976160be592391646"
+      label: ScoplOrderPolicy (verified on 4663; omitted from the eight-contract guide)
+      role: other
+      transactions_count: 2
+      token_transfers_count: 0
+      last_tx_at: 2026-08-25T17:27:38.000Z
+      last_method: setManager
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T02:00:58.000Z
+  txns_24h: 553
   launches_24h: null
-errors: []
+errors:
+  - step: llama
+    message: "protocol/scopl: HTTP 400: Protocol not found"
+  - step: llama
+    message: "fees_24h scopl: HTTP 400: Fees for scopl not found, please visit /overview/fees to see available protocols"
+  - step: llama
+    message: "revenue_24h scopl: HTTP 400: Fees for scopl not found, please visit /overview/fees to see available protocols"
+  - step: llama
+    message: "volume_24h scopl: HTTP 400: Dexs for scopl not found, please visit /overview/dexs to see available protocols"
+  - step: llama
+    message: "revenue_daily scopl: the read returned no daily points, so no series file was written"
