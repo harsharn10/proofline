@@ -736,6 +736,16 @@ if (review.channel_enabled !== true && !dryRun) {
   process.exit(0);
 }
 
+// `wire_enabled` is the flag the owner actually set to false on 2026-09-04 to stop automatic sends,
+// and it is the same predicate the pulse Worker's deploy derives (channel_enabled && wire_enabled),
+// so one repository flag governs both senders. Approval-gated publications are unaffected: they are
+// still individually reviewed, and selectApproved gates them on channel_enabled alone.
+const AUTOMATIC_MODES = new Set(["alerts", "brief", "weekly"]);
+if (review.wire_enabled === false && !dryRun && modes.some((mode) => AUTOMATIC_MODES.has(mode))) {
+  console.log("Icarus automatic sends are paused in ops/telegram-review.json (wire_enabled) — nothing sent.");
+  process.exit(0);
+}
+
 // Each message carries the state edit that records it. Nothing is written into `state` before its own
 // send succeeds, so a Telegram 429 on the second of three alerts cannot leave the first unrecorded and
 // re-sent on the next run.

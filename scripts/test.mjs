@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import { parse, stringify } from "yaml";
 import assert from "node:assert/strict";
 import { mkdtemp, mkdir, cp, rm, writeFile, appendFile, readdir } from "node:fs/promises";
@@ -27,10 +28,14 @@ import {
 } from "./lib/telegram.mjs";
 import {
   breakoutSignal,
+  confirmControlChanges,
+  distinctTalkAccounts,
+  dropMassNullTransitions,
   leaderChangeSignal,
   controlChangeSignal,
   distributionSignal,
   comingUpSignal,
+  rankSignals,
   selectDailyAlerts,
 } from "./lib/signals.mjs";
 import { compile as compilePacket, parsePacket } from "./lib/packet.mjs";
@@ -758,19 +763,76 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 
 // Telegram's five action-changing signals are pure, deterministic reads of committed snapshots/feed.
 {
-  const byVolume = breakoutSignal({
+  // The market leg is necessary but never sufficient: it must be joined by holder growth, qualifying
+  // Talk, or the scale leg. The owner paused the channel over messages that had only one of these.
+  const byVolumeAndHolders = breakoutSignal({
+    slug: "pons",
+    current: { volume24hUsd: 200_000, liquidityUsd: 50_000, holders: 130 },
+    previous: { volume24hUsd: 100_000, holders: 100 },
+  });
+  const volumeOnly = breakoutSignal({
     slug: "pons",
     current: { volume24hUsd: 200_000, liquidityUsd: 50_000, holders: 100 },
     previous: { volume24hUsd: 100_000, holders: 100 },
   });
-  const byHolders = breakoutSignal({ slug: "alpha", current: { holders: 121 }, previous: { holders: 100 } });
-  const byDiscussion = breakoutSignal({ slug: "beta", current: {}, previous: {}, distinctAccounts: 3 });
+  const holdersOnly = breakoutSignal({ slug: "alpha", current: { liquidityUsd: 60_000, holders: 121 }, previous: { holders: 100 } });
+  const talkOnly = breakoutSignal({ slug: "beta", current: { liquidityUsd: 60_000 }, previous: {}, distinctAccounts: 3 });
+  // The exact GMERALD message the reviewer's replay produced: below the floor and falling.
+  const belowFloor = breakoutSignal({
+    slug: "gmerald",
+    current: { volume24hUsd: 783_800, liquidityUsd: 49_700, holders: 138 },
+    previous: { volume24hUsd: 1_519_000, holders: 100 },
+    distinctAccounts: 3,
+  });
+  const fallingHeadline = breakoutSignal({
+    slug: "gmerald",
+    current: { volume24hUsd: 783_800, liquidityUsd: 500_000, holders: 138 },
+    previous: { volume24hUsd: 1_519_000, holders: 100 },
+    distinctAccounts: 3,
+  });
+  // HOOKR on 2026-09-04: doubled on real liquidity, holders +13.6%, no top-tier Talk. The scale leg.
+  const byScale = breakoutSignal({
+    slug: "hookr",
+    current: { volume24hUsd: 7_038_875, liquidityUsd: 1_325_023, holders: 6152 },
+    previous: { volume24hUsd: 3_343_392, holders: 5416 },
+  });
+  const smallDoubling = breakoutSignal({
+    slug: "tiny",
+    current: { volume24hUsd: 120_000, liquidityUsd: 60_000, holders: 100 },
+    previous: { volume24hUsd: 50_000, holders: 100 },
+  });
+  // An unread previous volume is missing data, not a doubling from zero.
+  const unreadPrevious = breakoutSignal({
+    slug: "up",
+    current: { volume24hUsd: 3_550_614, liquidityUsd: 4_170_703, holders: 9088 },
+    previous: { volume24hUsd: null, holders: null },
+  });
   const noBreakout = breakoutSignal({
     slug: "quiet",
     current: { volume24hUsd: 199_999, liquidityUsd: 50_000, holders: 119 },
     previous: { volume24hUsd: 100_000, holders: 100 },
     distinctAccounts: 2,
   });
+  // Talk counts only tier-top or 100K+ follower accounts.
+  const accounts = [
+    { handle: "@top1", tier: "top", role: "alpha" },
+    { handle: "@top2", tier: "top", role: "kol" },
+    { handle: "@whale", tier: "watch", role: "kol", followers: 250_000 },
+    { handle: "@small", tier: "watch", role: "kol", followers: 900 },
+    { handle: "@project", tier: "top", role: "project" },
+  ];
+  const feedItems = [
+    { kind: "ct", account: "@top1", date: "2026-09-04" },
+    { kind: "ct", account: "@top2", date: "2026-09-04" },
+    { kind: "ct", account: "@whale", date: "2026-09-04" },
+    { kind: "ct", account: "@small", date: "2026-09-04" },
+    { kind: "ct", account: "@project", date: "2026-09-04" },
+    { kind: "ct", account: "@unlisted", date: "2026-09-04" },
+    { kind: "ct", account: "@top1", date: "2026-09-03" },
+    { kind: "company", account: "@top2", date: "2026-09-04" },
+  ];
+  const talkToday = distinctTalkAccounts(feedItems, accounts, "2026-09-04");
+  const talkOtherDay = distinctTalkAccounts(feedItems, accounts, "2026-09-01");
   const rankBaseline = leaderChangeSignal({ slug: "pons", section: "launchpads", rank: 4 });
   const rankCandidate = leaderChangeSignal({ slug: "pons", section: "launchpads", rank: 1 }, rankBaseline.next);
   const rankHeld = leaderChangeSignal({ slug: "pons", section: "launchpads", rank: 1 }, rankCandidate.next);
@@ -786,43 +848,139 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
   }, {
     addresses: [{ address: "0x0000000000000000000000000000000000000001", owner: null, errors: [{ step: "rpc", message: "challenge" }] }],
   });
-  const project = { official_links: [{ kind: "x", url: "https://x.com/ponsdotfamily" }] };
+  // A read that fails on the PRIOR side is just as blind as one that fails on the new side.
+  const failedPriorRead = controlChangeSignal("pons", {
+    addresses: [{ address: "0x0000000000000000000000000000000000000001", owner: null, errors: [{ step: "rpc", message: "challenge" }] }],
+  }, {
+    addresses: [{ address: "0x0000000000000000000000000000000000000001", owner: "0x0000000000000000000000000000000000000002", errors: [] }],
+  });
+  // The 2026-09-04 CHILLZ and RIPE messages: 0.35 and 0.7 percentage points, both under RISK ALERT.
+  const lpRow = (locked) => ({ addresses: [], structure: { mint: "no-mint-function", lp: [{ pair: "0x0000000000000000000000000000000000000003", locked_share: locked }] } });
+  const tinyLpMove = controlChangeSignal("chillz", lpRow(0.9995), lpRow(1));
+  const tinyLpDrop = controlChangeSignal("ripe", lpRow(0.596), lpRow(0.589));
+  const bigLpMove = controlChangeSignal("alpha", lpRow(0.9), lpRow(0.7));
+  const lpCrossing = controlChangeSignal("alpha", lpRow(0.52), lpRow(0.48));
+  // Mint is only ever reported from a verified ABI read on both sides.
+  const mintFromUnknown = controlChangeSignal("alpha",
+    { addresses: [], structure: { mint: "unknown", errors: [{ step: "mint", message: "verified ABI unavailable" }] } },
+    { addresses: [], structure: { mint: "owner-can-mint" } });
+  const mintVerified = controlChangeSignal("alpha",
+    { addresses: [], structure: { mint: "no-mint-function" } },
+    { addresses: [], structure: { mint: "owner-can-mint" } });
+  // The Pons false renounce: owner, owner type and the Safe block nulled in one clean-looking read.
+  const ponsBefore = { addresses: [{ address: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e", owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd", owner_type: "safe", safe: { threshold: 2 }, errors: [] }] };
+  const ponsNulled = { addresses: [{ address: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e", owner: null, owner_type: "none", safe: null, errors: [] }] };
+  const ponsNullTransition = controlChangeSignal("pons", ponsBefore, ponsNulled);
+  const reverted = confirmControlChanges(
+    ponsNullTransition.changes.map((change) => ({ slug: "pons", ...change })),
+    [],
+    new Map([["pons", ponsBefore]]),
+  );
+  const persisted = confirmControlChanges(
+    ponsNullTransition.changes.map((change) => ({ slug: "pons", ...change })),
+    [],
+    new Map([["pons", ponsNulled]]),
+  );
+  // Thirty-five names losing the same field in one pull is a degraded read, not a chain-wide renounce.
+  const massNull = dropMassNullTransitions(Array.from({ length: 8 }, (_, index) => ({
+    kind: "control-change", slug: `n${index}`, severity: "risk",
+    changes: [{ address: "0x1", field: "owner", before: "0x2", after: null, severity: "risk", nullTransition: true }],
+  })));
+  const isolatedNull = dropMassNullTransitions([{
+    kind: "control-change", slug: "solo", severity: "risk",
+    changes: [{ address: "0x1", field: "owner", before: "0x2", after: null, severity: "risk", nullTransition: true }],
+  }]);
+  const project = { official_links: [{ kind: "x", url: "https://x.com/ponsdotfamily" }, { kind: "site", url: "https://pons.family/docs" }] };
   const ownPost = distributionSignal({ slug: "pons", project, item: { tag: "listing", title: "Listed", sourceUrl: "https://x.com/ponsdotfamily/status/1", date: "2026-09-04" } });
+  const ownBlog = distributionSignal({ slug: "pons", project, item: { tag: "partnership", title: "Partnership", sourceUrl: "https://pons.family/blog/deal", date: "2026-09-04" } });
   const externalListing = distributionSignal({ slug: "pons", project, item: { tag: "listing", title: "Exchange listing", sourceUrl: "https://exchange.example/listing", date: "2026-09-04" } });
+  const untagged = distributionSignal({ slug: "pons", project, item: { title: "A post", sourceUrl: "https://exchange.example/listing", date: "2026-09-04" } });
   const coming = comingUpSignal({
     slug: "alpha",
     project: { lifecycle: "announced", tldr: "A new market." },
-    item: { tag: "launch-date", title: "Launch", date: "2026-09-10", sourceUrl: "https://alpha.example/launch" },
+    item: { tag: "launch-date", title: "Launch", date: "2026-09-10", sourceUrl: "https://coverage.example/launch" },
+    now: Date.parse("2026-09-04T12:00:00Z"),
+  });
+  const comingNoTldr = comingUpSignal({
+    slug: "alpha",
+    project: { lifecycle: "announced" },
+    item: { tag: "launch-date", title: "Launch", date: "2026-09-10", sourceUrl: "https://coverage.example/launch" },
+    now: Date.parse("2026-09-04T12:00:00Z"),
+  });
+  const comingOwnPost = comingUpSignal({
+    slug: "alpha",
+    project: { lifecycle: "announced", tldr: "A new market.", official_links: [{ url: "https://x.com/alphadotfun" }] },
+    item: { tag: "launch-date", title: "Launch", date: "2026-09-10", sourceUrl: "https://x.com/alphadotfun/status/9" },
     now: Date.parse("2026-09-04T12:00:00Z"),
   });
   const tooLate = comingUpSignal({
     slug: "alpha",
-    project: { lifecycle: "announced" },
-    item: { tag: "mint", title: "Mint", date: "2026-09-12", sourceUrl: "https://alpha.example/mint" },
+    project: { lifecycle: "announced", tldr: "A new market." },
+    item: { tag: "mint", title: "Mint", date: "2026-09-12", sourceUrl: "https://coverage.example/mint" },
     now: Date.parse("2026-09-04T12:00:00Z"),
   });
   const budget = selectDailyAlerts([
-    { kind: "breakout", slug: "pons" },
+    { kind: "breakout", slug: "pons", numbers: { volume_24h_usd: 1_000 } },
     { kind: "distribution", slug: "pons" },
     { kind: "leader-change", slug: "alpha" },
     { kind: "coming-up", slug: "beta" },
-    { kind: "control-change", slug: "gamma" },
+    { kind: "control-change", slug: "gamma", severity: "risk", changes: [{ field: "owner" }] },
+  ], {}, "2026-09-04");
+  // Three control changes can no longer eat the whole day and bury both real market moves.
+  const starvation = selectDailyAlerts([
+    { kind: "control-change", slug: "chillz", severity: "control", changes: [{ field: "LP locked share" }] },
+    { kind: "control-change", slug: "pons", severity: "risk", changes: [{ field: "owner" }] },
+    { kind: "control-change", slug: "ripe", severity: "control", changes: [{ field: "LP locked share" }] },
+    { kind: "breakout", slug: "hookr", numbers: { volume_24h_usd: 7_038_875 } },
+    { kind: "breakout", slug: "o1-exchange", numbers: { volume_24h_usd: 15_928_775 } },
   ], {}, "2026-09-04");
   try {
-    assert.ok(byVolume?.reasons.includes("volume doubled"), "volume doubles above the liquidity floor");
-    assert.ok(byHolders?.reasons.includes("holders rose at least 20%"), "holder growth can fire independently");
-    assert.ok(byDiscussion?.reasons.includes("3 distinct accounts posted today"), "three distinct accounts can fire independently");
+    assert.ok(byVolumeAndHolders?.reasons.includes("24h volume at least doubled"), "the market leg plus holder growth fires");
+    assert.equal(volumeOnly, null, "a doubling alone is not enough below the scale leg");
+    assert.equal(holdersOnly, null, "holder growth alone can no longer fire");
+    assert.equal(talkOnly, null, "three accounts posting alone can no longer fire");
+    assert.equal(belowFloor, null, "a name below the $50K liquidity floor never fires");
+    assert.equal(fallingHeadline, null, "MOVING never carries a falling headline number");
+    assert.ok(byScale?.numbers.volume_24h_usd > 0, "a seven-figure doubling with holders rising fires");
+    assert.equal(smallDoubling, null, "a small doubling with no corroboration stays quiet");
+    assert.equal(unreadPrevious, null, "an unread previous volume is missing data, not a doubling");
     assert.equal(noBreakout, null, "sub-threshold movement stays quiet");
+    assert.equal(byScale.numbers.liquidity_usd, 1_325_023, "the alert carries the liquidity it cleared");
+    assert.equal(Math.round(byScale.numbers.volume_change_pct), 111, "and the change that produced it");
+    assert.equal(talkToday, 3, "only tier-top and 100K+ follower accounts count as Talk");
+    assert.equal(talkOtherDay, 0, "Talk is counted on the day the numbers moved, not any day");
     assert.equal(rankCandidate.signal, null, "a rank change waits for its second read");
     assert.equal(rankHeld.signal?.kind, "leader-change", "a held rank change fires on its second read");
     assert.deepEqual(control?.changes.map((row) => row.field).sort(), ["LP locked share", "Safe threshold", "mint control", "owner", "owner type", "proxy implementation"].sort());
+    assert.equal(control.severity, "risk", "an owner move is a risk-severity control change");
     assert.equal(failedControlRead, null, "a failed read is not mistaken for a control change");
+    assert.equal(failedPriorRead, null, "a failed prior read is not mistaken for a control change either");
+    assert.equal(tinyLpMove, null, "a 0.35-point LP move is not a message");
+    assert.equal(tinyLpDrop, null, "and neither is a 0.7-point drop");
+    assert.equal(bigLpMove?.changes[0].field, "LP locked share", "a twenty-point LP move is");
+    assert.equal(bigLpMove.severity, "control", "an LP move is not a RISK ALERT");
+    assert.equal(lpCrossing?.changes[0].field, "LP locked share", "and so is a move across half the supply");
+    assert.equal(mintFromUnknown, null, "mint is never reported from an unverified ABI read");
+    assert.equal(mintVerified?.changes[0].field, "mint control", "a verified mint change is reported");
+    assert.equal(reverted.confirmed.length, 0, "a control change that reverted on the next pull is never sent");
+    assert.equal(reverted.dropped.length, ponsNullTransition.changes.length, "and it is dropped, not carried");
+    assert.equal(persisted.confirmed[0]?.slug, "pons", "a change the next pull still reads is sent");
+    assert.equal(massNull.length, 0, "one pull nulling the same field on eight names publishes nothing");
+    assert.equal(isolatedNull.length, 1, "an isolated null transition survives to the confirmation stage");
     assert.equal(ownPost, null, "a project's own X post is not an external distribution receipt");
+    assert.equal(ownBlog, null, "and neither is its own blog");
     assert.equal(externalListing?.kind, "distribution", "an external listing receipt qualifies");
+    assert.equal(untagged, null, "an untagged project post never reaches the channel");
     assert.equal(coming?.kind, "coming-up", "an announced event in the next seven days qualifies");
+    assert.equal(coming.daysAway, 6, "and it carries how far away it is");
+    assert.equal(comingNoTldr, null, "an alert without the name's TL;DR is not sent");
+    assert.equal(comingOwnPost, null, "a project announcing its own launch date is not a receipt");
     assert.equal(tooLate, null, "an event beyond seven days does not qualify");
     assert.equal(budget.selected.length, 3, "daily alert budget is three");
+    assert.equal(budget.selected[0].kind, "control-change", "a confirmed owner change leads the day");
     assert.equal(budget.selected.filter((row) => row.slug === "pons").length, 1, "one name cannot consume two daily slots");
+    assert.deepEqual(starvation.selected.map((row) => row.slug), ["pons", "o1-exchange", "hookr"],
+      "one control change, then the two largest breakouts by volume");
     console.log("ok   telegram signals");
   } catch (err) { failures++; console.error(`FAIL telegram signals: ${err.message}`); }
 }
@@ -846,11 +1004,41 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     note: null,
   });
   const quiet = buildDailyBrief({ date: "2026-09-04", dayWord: "quiet" });
+  // A day on which a name doubled to $15.9M is never summarised as "nothing changed what a reader
+  // would do", however quiet the chain-wide numbers were.
+  const led = buildDailyBrief({
+    date: "2026-09-04", dayWord: "quiet",
+    lead: { kicker: "TODAY'S BIGGEST", name: "O1.exchange", text: "$15.9M volume 24h · +107.1%", sourceUrl: "https://market.example/o1" },
+  });
   const weekly = buildWeeklyWrap({
     week: "2026-08-30",
     leaders: [{ section: "Launchpads", name: "Pons", value: "#1 by volume", sourceUrl: "https://icarus.example/n/pons" }],
     newNames: [{ name: "Alpha" }], quietNames: [], controlChanges: [], distribution: [],
   });
+  // Forty names above the bar overnight must not produce a message Telegram rejects with a 400.
+  const flood = buildDailyBrief({
+    date: "2026-09-04", dayWord: "busy",
+    newlyCleared: Array.from({ length: 40 }, (_, index) => ({
+      name: `Name ${index}`, tldr: "A very long TL;DR sentence about this project. ".repeat(12), why: "Because.", sourceUrl: "https://icarus.example/n/x",
+    })),
+  });
+  const floodWrap = buildWeeklyWrap({
+    week: "2026-08-30",
+    leaders: [], newNames: Array.from({ length: 60 }, (_, index) => ({ name: `Name ${index}` })),
+    quietNames: [], controlChanges: [], distribution: [],
+  });
+  // A Safe threshold is a signer count; only a locked share renders as a percentage.
+  const safeAlert = formatSignalAlert({
+    kind: "control-change", slug: "pons", severity: "risk", sourceUrl: "https://explorer.example/a",
+    changes: [{ address: "0xabc", field: "Safe threshold", before: 2, after: 1, severity: "risk" }],
+  }, { name: "Pons" });
+  const lpAlert = formatSignalAlert({
+    kind: "control-change", slug: "alpha", severity: "control", sourceUrl: "https://explorer.example/a",
+    changes: [{ address: "0xabc", field: "LP locked share", before: 0.9, after: 0.7, severity: "control" }],
+  }, { name: "Alpha" });
+  const quotedUrl = formatSignalAlert({
+    kind: "distribution", slug: "pons", tag: "listing", title: "Listed", sourceUrl: 'https://exchange.example/a"onmouseover=x',
+  }, { name: "Pons" });
   const packet = parsePacket(await readFile(new URL("../fixtures/compile-packet/new-seed.md", import.meta.url), "utf8"));
   packet.frontmatter.events[0].tag = "listing";
   packet.frontmatter.events[0].channel_recommendation = "none";
@@ -861,10 +1049,24 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.ok(alert.includes("<b>MOVING · PONS</b>"), "breakout alert has its kicker");
     assert.ok(alert.endsWith("Source</a>"), "alert links are last");
     assert.ok(!alert.includes("000000000000"), "alerts never expose wallet addresses");
-    assert.ok(busy.includes('<a href="https://explorer.example/factory">24 launches</a>'), "launch count links to its source");
-    assert.ok(busy.includes('<a href="https://analytics.example/volume">$5.7M chain volume</a>'), "chain volume links to its source");
-    assert.equal(quiet.split("\n").length, 1, "a quiet brief is one line");
-    assert.ok(weekly.includes("ICARUS WEEKLY"), "weekly wrap renders");
+    assert.ok(alert.includes("$200K volume 24h · +100.0% · $50K liquidity"), "a breakout carries volume, change and liquidity");
+    assert.ok(alert.includes('<a href="https://market.example/pons">$200K volume 24h'), "market numbers link to the pair, not a search");
+    assert.equal(busy.length, 1, "a normal brief is one Telegram message");
+    assert.ok(busy[0].includes('<a href="https://explorer.example/factory">24 launches</a>'), "launch count links to its source");
+    assert.ok(busy[0].includes('<a href="https://analytics.example/volume">$5.7M chain volume</a>'), "chain volume links to its source");
+    assert.equal(quiet[0].split("\n").length, 1, "a quiet brief is one line");
+    assert.equal(quiet.length, 1, "and one message");
+    assert.ok(led[0].startsWith("<b>ICARUS DAILY · 2026-09-04 · TODAY</b>"), "a brief with a lead is not a quiet one-liner");
+    assert.ok(led[0].split("\n\n")[1].includes("TODAY'S BIGGEST · O1.EXCHANGE"), "the brief opens with the most material item");
+    assert.ok(flood.every((part) => part.length <= 4096), "an unbounded brief is chunked, never rejected");
+    assert.ok(flood[0].includes("…and 35 more on the site."), "and says how many it left out");
+    assert.ok(floodWrap.every((part) => part.length <= 4096), "the wrap is bounded the same way");
+    assert.ok(safeAlert.includes("Safe threshold: 2 → 1"), "a Safe threshold is a signer count, not a percentage");
+    assert.ok(safeAlert.includes("<b>RISK ALERT · PONS</b>"), "who controls the contract is a RISK ALERT");
+    assert.ok(lpAlert.includes("LP locked share: 90.0% → 70.0%"), "a locked share is a percentage");
+    assert.ok(lpAlert.includes("<b>CONTROL CHANGE · ALPHA</b>"), "an LP move does not borrow the severest kicker");
+    assert.ok(quotedUrl.includes("&quot;"), "a quote in a source URL is escaped, not left to break the anchor");
+    assert.ok(weekly[0].includes("ICARUS WEEKLY"), "weekly wrap renders");
     assert.deepEqual(validateAgainst("packet", packet.frontmatter), [], "a packet event accepts a signal tag");
     assert.ok(validateAgainst("packet", badPacket).length > 0, "unknown packet tags are rejected");
     assert.equal(compiled.feed.items[0].tag, "listing", "compile carries event tag into the feed");
@@ -1512,6 +1714,41 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     failures++;
     console.error(`FAIL telegram wire gate: ${err.message}`);
   }
+}
+
+// The pause gate, end to end on the real script. Telegram credentials are deliberately absent: if a
+// mode ever slipped past the gate the run would fail on the missing token instead of exiting 0, so a
+// green assertion here means nothing was even attempted.
+{
+  const tmp = await mkdtemp(join(tmpdir(), "proofline-pause-"));
+  const digest = new URL("./telegram-digest.mjs", import.meta.url).pathname;
+  await cp("content", join(tmp, "content"), { recursive: true });
+  await cp("build", join(tmp, "build"), { recursive: true });
+  await mkdir(join(tmp, "ops"), { recursive: true });
+  const runDigest = (review, extra = []) => new Promise((resolveRun) => {
+    writeFile(join(tmp, "ops/telegram-review.json"), JSON.stringify(review)).then(() => {
+      execFile("node", [digest, ...extra], { cwd: tmp, env: { ...process.env, TELEGRAM_BOT_TOKEN: "", TELEGRAM_CHAT_ID: "" } },
+        (error, stdout, stderr) => resolveRun({ code: error?.code ?? 0, stdout, stderr }));
+    });
+  });
+  const paused = await runDigest({ version: 2, channel_enabled: false, decisions: {} }, ["--alerts"]);
+  const pausedBrief = await runDigest({ version: 2, channel_enabled: false, decisions: {} }, ["--brief"]);
+  const pausedWeekly = await runDigest({ version: 2, channel_enabled: false, decisions: {} }, ["--weekly"]);
+  const wirePaused = await runDigest({ version: 2, channel_enabled: true, wire_enabled: false, decisions: {} }, ["--alerts"]);
+  const previewed = await runDigest({ version: 2, channel_enabled: false, decisions: {} }, ["--dry-run", "--brief"]);
+  try {
+    for (const [name, run] of [["alerts", paused], ["brief", pausedBrief], ["weekly", pausedWeekly]]) {
+      assert.equal(run.code, 0, `a paused channel exits cleanly for ${name}`);
+      assert.ok(run.stdout.includes("Icarus channel delivery is paused"), `${name} consults channel_enabled`);
+    }
+    assert.equal(wirePaused.code, 0, "wire_enabled: false stops automatic sends");
+    assert.ok(wirePaused.stdout.includes("automatic sends are paused"), "and says which flag stopped them");
+    assert.equal(previewed.code, 0, "a dry run still previews while the channel is paused");
+    assert.ok(!previewed.stdout.includes("delivery is paused"), "and is not short-circuited by the gate");
+    assert.ok(previewed.stdout.includes("ICARUS DAILY"), "printing the brief it would have sent");
+    console.log("ok   telegram pause gate");
+  } catch (err) { failures++; console.error(`FAIL telegram pause gate: ${err.message}`); }
+  await rm(tmp, { recursive: true, force: true });
 }
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }
