@@ -9,6 +9,8 @@ import {
   requestJson,
   isRetryableStatus,
   backoffMs,
+  challengeDelayMs,
+  isBotChallenge,
   looksLikeHtml,
   mapWithConcurrency,
 } from "./lib/pull/http.mjs";
@@ -32,6 +34,11 @@ import {
   parseTransactionResponse,
   toInt,
   createBlockscoutClient,
+  resolveBlockscoutConfig,
+  createBlockscoutTracker,
+  blockscoutChallengeGate,
+  BLOCKSCOUT_PUBLIC_REST_BASE,
+  BLOCKSCOUT_PRO_REST_BASE,
   readAddress as readBlockscout,
 } from "./lib/pull/blockscout.mjs";
 import { findLlamaSlug, latestChainTvl, chainTotal24h, readProtocol } from "./lib/pull/llama.mjs";
@@ -296,20 +303,75 @@ test("one failing address does not stop the others in the same slug", async () =
   assert.equal(rows[1].errors[0].message, "boom");
 });
 
-test("a Cloudflare challenge page is an error, not a crash, and leaves the RPC row intact", async () => {
+test("a Cloudflare challenge is retried once, classified, and leaves the RPC row intact", async () => {
+  const log = [];
+  const waits = [];
+  const tracker = createBlockscoutTracker();
   const fetchImpl = stubFetch({
     "/api/v2/addresses/": { status: 403, body: "<!doctype html><html>Just a moment...</html>", contentType: "text/html" },
-  });
-  const client = createBlockscoutClient({ deps: { fetchImpl, sleepImpl: async () => {}, attempts: 1 } });
+  }, log);
+  const client = createBlockscoutClient({ deps: {
+    fetchImpl,
+    sleepImpl: async (ms) => void waits.push(ms),
+    attempts: 1,
+    randomImpl: () => 0.25,
+    onRequest: tracker.recordRequest,
+    onChallenge: tracker.recordChallenge,
+  } });
   const out = await readBlockscout(client, "0x1111111111111111111111111111111111111111");
 
   assert.equal(out.source_verified, null);
   assert.equal(out.contract_name, null);
   assert.equal(out.errors.length, 1);
   assert.equal(out.errors[0].step, "blockscout");
-  assert.match(out.errors[0].message, /HTML, not JSON/);
+  assert.match(out.errors[0].message, /explorer served a bot challenge/);
+  assert.equal(log.length, 2, "one challenge retry, even when ordinary attempts is one");
+  assert.deepEqual(waits, [750]);
+  assert.deepEqual(tracker.snapshot(), { credits: 2, challenges: 2 });
+  assert.equal(isBotChallenge("<html><title>Just a moment...</title></html>"), true);
+  assert.equal(isBotChallenge('{"a":1}', "application/json"), false);
+  assert.equal(challengeDelayMs(() => 0.25), 750);
   assert.equal(looksLikeHtml("<!doctype html>", ""), true);
   assert.equal(looksLikeHtml('{"a":1}', "application/json"), false);
+});
+
+test("Blockscout selects PRO bearer auth with a key and the public browser fallback without it", async () => {
+  const proLog = [];
+  const pro = createBlockscoutClient({
+    env: { BLOCKSCOUT_API_KEY: "proapi_test" },
+    deps: { fetchImpl: stubFetch({ "/addresses/": { body: {} } }, proLog), attempts: 1 },
+  });
+  await pro.address("0x1111111111111111111111111111111111111111");
+  assert.ok(proLog[0].url.startsWith(`${BLOCKSCOUT_PRO_REST_BASE}/addresses/`));
+  assert.equal(proLog[0].headers.Authorization, "Bearer proapi_test");
+  assert.equal(pro.config.addressConcurrency, 4);
+  assert.equal(pro.config.requestsPerSecond, 5);
+
+  const publicLog = [];
+  const fallback = createBlockscoutClient({
+    env: {},
+    deps: { fetchImpl: stubFetch({ "/addresses/": { body: {} } }, publicLog), attempts: 1 },
+  });
+  await fallback.address("0x1111111111111111111111111111111111111111");
+  assert.ok(publicLog[0].url.startsWith(`${BLOCKSCOUT_PUBLIC_REST_BASE}/addresses/`));
+  assert.match(publicLog[0].headers["User-Agent"], /Mozilla/);
+  assert.equal(publicLog[0].headers.Authorization, undefined);
+  assert.equal(fallback.config.addressConcurrency, 2);
+
+  const overridden = resolveBlockscoutConfig({
+    env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: "https://example.test/4663" },
+  });
+  assert.equal(overridden.restBase, "https://example.test/4663/api/v2");
+});
+
+test("a majority of explorer challenge responses makes the run gate nonzero", () => {
+  assert.deepEqual(blockscoutChallengeGate({ credits: 3, challenges: 2 }), {
+    failed: true,
+    exitCode: 1,
+    summary: "explorer bot wall: 2/3 Blockscout requests served a challenge",
+  });
+  assert.equal(blockscoutChallengeGate({ credits: 4, challenges: 2 }).exitCode, 0, "exactly half is allowed");
+  assert.equal(blockscoutChallengeGate({ credits: 0, challenges: 0 }).exitCode, 0);
 });
 
 // --- retry and backoff ----------------------------------------------------
