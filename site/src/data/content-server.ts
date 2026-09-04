@@ -610,9 +610,11 @@ function wireHeadline(value: string): string {
 // The one wire boundary. Feed receipts become the four public kinds; only material findings,
 // risks and corrections cross over from the change record. Review and scoring bookkeeping stays
 // private even if somebody accidentally marks it Material later.
-export function wireItems(
-  bundle: Pick<DirectoryBundle, "entries" | "feed" | "changelog">,
-): WireItem[] {
+export function wireItems(bundle: {
+  entries: Array<Pick<DirectoryEntry, "slug" | "symbol" | "name">>;
+  feed: LatestFeedItem[];
+  changelog: ChangelogEntry[];
+}): WireItem[] {
   const names = new Map(
     bundle.entries.map((entry) => [
       entry.slug,
@@ -843,10 +845,6 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
     ),
     histories: content.histories,
     wire: content.wire,
-    changelog: content.changelog,
-    feed: content.dossiers.flatMap((d) =>
-      d.feed.map((item) => ({ name: { slug: d.slug, symbol: d.symbol, name: d.name }, item })),
-    ),
     dependencies: Object.values(content.dependencies)
       .map((c) => ({ id: c.id, name: c.name, kind: c.kind }))
       .sort((a, b) => a.name.localeCompare(b.name)),

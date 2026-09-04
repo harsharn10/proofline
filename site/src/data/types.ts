@@ -560,11 +560,10 @@ export type DirectoryBundle = {
   sections: SectionDef[];
   entries: DirectoryEntry[];
   // The whole wire, built once on the server. Home, /feed and each category slice it; nothing
-  // rebuilds it per render.
+  // rebuilds it per render, and the raw feed bodies and change record it was built from stay on
+  // the server rather than riding along in the loader payload.
   wire: WireItem[];
   histories: Record<string, HistoryPoint[]>;
-  changelog: ChangelogEntry[];
-  feed: LatestFeedItem[];
   dependencies: DependencyListing[];
   generatedAt: string; // build/derived.json generated_at — when scores were last computed
   now: number; // build time (ms epoch) for relative "2 min ago" wording
