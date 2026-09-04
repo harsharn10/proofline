@@ -107,7 +107,7 @@ export function Wire({
                 </span>
                 <time className="mt-1 block text-[10.5px] text-[var(--t3)]">{relativeTime(item.at, now)}</time>
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 [overflow-wrap:anywhere]">
                 <div className="flex flex-wrap items-baseline gap-1.5">
                   <b className="text-[12.5px] font-medium">{item.headline}</b>
                   {item.account ? <span className="text-[11px] text-[var(--t3)]">{item.account}</span> : null}
