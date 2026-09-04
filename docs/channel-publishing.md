@@ -1,8 +1,9 @@
 # Channel publishing
 
-The changelog is Icarus's complete research record. The Telegram channel is a selective retail
-publication, so a research change reaches the private review queue only when its changelog entry
-contains a structured `channel` object.
+The changelog is Icarus's complete research record. The Telegram channel has two deliberately
+separate paths: controller-approved editorial publications and automated, data-derived signals.
+A research change reaches the private review queue only when its changelog entry contains a
+structured `channel` object. Feed items are not sent on every push.
 
 ## Editorial flow
 
@@ -31,6 +32,35 @@ fingerprints and fails closed.
 
 Documentation passes, source additions that change no conclusion, internal review metadata, wording
 changes and routine coverage stubs stay site-only.
+
+## Automated signals and recaps
+
+The signal path asks whether a committed change would alter what a reader does. It runs after a
+successful `Pull chain facts` workflow and can send at most three alerts per UTC day, never more
+than one for the same name that day:
+
+| Signal | Trigger | Kicker |
+| --- | --- | --- |
+| Breakout | Six-hour volume is at least twice the prior snapshot with at least $50K liquidity; holders rise at least 20%; or three distinct feed accounts discuss the name that day | `MOVING` |
+| Leader change | A name reaches number one or enters the top three in its section and holds that position for two reads | `LEADER` |
+| Control change | Owner, owner type, Safe threshold, proxy implementation, LP locked share or mint control changes | `RISK ALERT` |
+| Distribution | An externally receipted listing, integration, partnership or audit—not merely the project's own X post | `LISTED` |
+| Coming up | An eligible announced name has a launch date, whitelist or mint event in the next seven days | `COMING UP` |
+
+The daily brief runs at 13:00 UTC. Busy days include top volume, new names above the bar, movers,
+external distribution receipts and one material Icarus note. Its activity label compares the
+latest chain volume and launchpad launch counts with their seven-day averages. Quiet days collapse
+to a single line. The Sunday wrap runs at 14:00 UTC and summarizes section leaders, new and newly
+quiet names, control changes and distribution for the prior week.
+
+`ops/telegram-state.json` stores the daily alert budget, rank holds, prior eligibility/status,
+weekly rollup rows and sent fingerprints. All Telegram modes use the existing serialized workflow
+and three-attempt rebase/push loop, so a successful send is recorded before another delivery can
+reuse its budget. Missing Telegram secrets skip delivery without failing forks or CI.
+
+Feed `tag` values drive the distribution and coming-up selectors: `listing`, `integration`,
+`partnership`, `audit`, `launch-date`, `whitelist`, `mint`, `milestone`, or `other`. The tag is
+optional; older feed items remain valid.
 
 ## Publication object
 
