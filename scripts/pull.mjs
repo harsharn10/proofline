@@ -24,15 +24,23 @@
 // complete one by its errors[] rather than by a missing field. `--rpc-only` skips Blockscout
 // entirely. One blocked address never fails the run.
 //
-// The Rialto refresh. A full run walks Blockscout for every address and takes about an hour and
-// three-quarters at 179 names. Rialto's own reads take under a minute, so `--source rialto` refreshes
+// The Rialto refresh. A full run walks Blockscout for every address whose change signal moved, and
+// is bounded by a credit cap and a wall-clock deadline rather than by how long the registry is.
+// Rialto's own reads take under a minute, so `--source rialto` refreshes
 // only what Rialto produces — chain.yaml, series/chain.json, discovery.yaml, and each name's
 // market.rialto, market.pair_asset and market.volume_disagreement — against the file already on
 // disk, with one DexScreener read per Rialto-matched name so both sides of the volume comparison
 // come from the same minute. It appends no history line: a snapshot is only ever taken from a whole
 // read, and this mode does not have one.
 //
-// Usage: node scripts/pull.mjs [--slug <slug>] [--only <slug,slug>] [--rpc-only]
+// The budget. The explorer is the only paid source, so every read is decided by a one-credit change
+// signal — page one of the address's inbound transaction list, which is also page one of the 24-hour
+// walk — and bounded by a per-run credit cap, a per-UTC-day cap and a wall-clock deadline. Reaching
+// any of them defers the remaining explorer reads, keeps the committed facts with their stale dates,
+// and exits zero. See docs/integrations/pull.md.
+//
+// Usage: node scripts/pull.mjs [--slug <slug>] [--only <slug,slug>] [--rpc-only] [--full]
+//                              [--tier hot|live|quiet|dormant] [--shard INDEX/TOTAL]
 //                              [--source rialto | --rialto-only] [--dry]
 
 import { readFile, readdir, writeFile } from "node:fs/promises";
@@ -193,11 +201,17 @@ export const EMPTY_READ_MESSAGE = "read returned empty where a value existed; ke
  * returning the zero address, which is a value and passes straight through. An empty answer is
  * written only when the very next pull reads it empty again, so one bad minute cannot rewrite a fact.
  */
+export function emptyReadMessage(field) {
+  return `${field}: ${EMPTY_READ_MESSAGE}`;
+}
+
 export function carryOwnershipFacts(fresh, previous, { unread = {}, previousErrors = [] } = {}) {
   const out = { ...fresh };
   const errors = [...(out.errors ?? [])];
-  const confirmedBefore = (step) =>
-    previousErrors.some((error) => error?.step === step && error?.message === EMPTY_READ_MESSAGE);
+  // An address row names the producer that ran the read, not the field that came back empty (see
+  // schema/pulled.schema.json), so the field leads the message instead.
+  const confirmedBefore = (field) =>
+    previousErrors.some((error) => error?.message === emptyReadMessage(field));
   const keepOwner = () => {
     out.owner = previous.owner;
     out.owner_type = previous.owner_type ?? "unknown";
@@ -208,13 +222,13 @@ export function carryOwnershipFacts(fresh, previous, { unread = {}, previousErro
     if (unread.owner) keepOwner(); // the probe failed and recorded why; the recorded error explains it
     else if (!confirmedBefore("owner")) {
       keepOwner();
-      errors.push({ step: "owner", message: EMPTY_READ_MESSAGE });
+      errors.push({ step: "rpc", message: emptyReadMessage("owner") });
     }
   } else if (previous?.safe != null && out.safe == null && out.owner === previous.owner) {
     if (unread.safe) out.safe = previous.safe;
     else if (!confirmedBefore("safe")) {
       out.safe = previous.safe;
-      errors.push({ step: "safe", message: EMPTY_READ_MESSAGE });
+      errors.push({ step: "rpc", message: emptyReadMessage("safe") });
     }
   }
 
@@ -223,7 +237,7 @@ export function carryOwnershipFacts(fresh, previous, { unread = {}, previousErro
     if (unread.proxy) out.proxy = priorProxy;
     else if (!confirmedBefore("proxy")) {
       out.proxy = priorProxy;
-      errors.push({ step: "proxy", message: EMPTY_READ_MESSAGE });
+      errors.push({ step: "rpc", message: emptyReadMessage("proxy") });
     }
   }
 
@@ -575,6 +589,8 @@ async function main() {
 
   const pace = createPacer(250);
   const deps = { pace };
+  const deadlineMinutes = Number(process.env.PULL_DEADLINE_MINUTES);
+  const deadlineMs = (Number.isFinite(deadlineMinutes) && deadlineMinutes > 0 ? deadlineMinutes : 45) * 60 * 1000;
   const explorerConfig = resolveBlockscoutConfig();
   const budgetState = await readJson("ops/pull-budget.json", {});
   const creditBudget = createCreditBudget({ state: budgetState, now: Date.parse(pulledAt) });
@@ -695,12 +711,21 @@ async function main() {
   const errorCounts = new Map();
   const completedSlugs = [];
   const deferredReads = [];
+  const deferredNames = [];
   // Measured, not assumed: what this run actually spent per tier is what the projection is built on.
   const tierSpend = { hot: 0, live: 0, quiet: 0, dormant: 0 };
   const tierRead = { hot: 0, live: 0, quiet: 0, dormant: 0 };
   let walksSkipped = 0;
 
   for (const target of targets) {
+    // Credits are not the only budget. A run is latency-bound long before it is pace-bound — the
+    // explorer answers in a second or two and the RPC has its own pacer — so a job can reach its
+    // timeout with credits to spare, be killed, and lose every name it had already written. The
+    // deadline stops the loop while there is still time to validate, commit and push what was read.
+    if (Date.now() - started > deadlineMs) {
+      deferredNames.push(target.slug);
+      continue;
+    }
     const slugStarted = Date.now();
     // Names are processed one at a time, so the run counter's movement across a name is that name's
     // spend exactly — the concurrency is inside a name, and each of those reads has its own scope.
@@ -817,6 +842,17 @@ async function main() {
 
       if (!decision.changed) {
         walksSkipped++;
+        // An EOA's signal is its nonce, so there is no page in hand and buying one would spend a
+        // credit the nonce was chosen to avoid. Its window carries.
+        if (firstPage === null) {
+          return {
+            row: carriedRow(), creator: null, activity: carriedActivity(signalError ? [signalError] : []), changed: false, codeHash,
+            records: [
+              explorerReadRecord({ kind: "address", address: entry.address, status: "unchanged", reason: decision.reason, signalValue, signal: currentSignal ?? priorSignal, codeHash, checkedAt: pulledAt, previous: previousAddressRead, credits: signalCredits }),
+              explorerReadRecord({ kind: "activity", address: entry.address, status: "unchanged", reason: `${decision.reason}; 24h walk skipped`, signalValue, signal: currentSignal ?? priorSignal, codeHash, checkedAt: pulledAt, previous: previousActivityRead, credits: 0 }),
+            ],
+          };
+        }
         // Page one is already paid for, so the window is recounted from it for free. When it reaches
         // past the 24-hour cutoff the count is exact and fresh — a quiet address falls to zero here
         // instead of reporting yesterday's number for ever. When it does not, the committed figure is
@@ -847,9 +883,10 @@ async function main() {
       // Changed. The holder count moves with every transfer and is bought now; the metadata behind
       // it — verified source, contract name, creator, creation block — cannot move while the
       // bytecode is the same, so it is bought on a first read and afterwards only on a code change.
+      const metadataRead = codeChanged || previousAddress?.created_at == null || previousAddress?.source_verified == null;
       const addressRead = await creditBudget.withCredits(label, () => readBlockscout(blockscout, entry.address, {
         isToken: entry.role === "token",
-        metadata: codeChanged || previousAddress?.created_at == null || previousAddress?.source_verified == null,
+        metadata: metadataRead,
         holders: true,
       }));
       const bsResult = addressRead.value;
@@ -876,7 +913,7 @@ async function main() {
       const activityDeferred = hasBudgetDeferral(activity.errors) || hasBudgetDeferral(signalError ? [signalError] : []);
       if (addressDeferred || activityDeferred) deferredReads.push(label);
       return {
-        row, creator: bsResult.creator ?? null, activity, changed: true, codeChanged, codeHash,
+        row, creator: bsResult.creator ?? null, activity, changed: true, codeChanged, codeHash, metadataRead,
         records: [
           explorerReadRecord({ kind: "address", address: entry.address, status: addressDeferred ? "deferred" : "read", reason: addressDeferred ? "budget exhausted; prior non-null facts retained" : codeChanged ? decision.reason : `${decision.reason}; code hash unchanged, metadata not re-read`, signalValue, signal: currentSignal ?? priorSignal, codeHash, checkedAt: pulledAt, previous: previousAddressRead, credits: signalCredits + addressCredits }),
           explorerReadRecord({ kind: "activity", address: entry.address, status: activityDeferred ? "deferred" : "read", reason: activityDeferred ? "budget exhausted; prior non-null activity retained" : `${decision.reason}; 24h walk refreshed`, signalValue, signal: currentSignal ?? priorSignal, codeHash, checkedAt: pulledAt, previous: previousActivityRead, credits: activityCredits }),
@@ -919,7 +956,9 @@ async function main() {
         const top10Deferred = hasBudgetDeferral(top10.errors);
         const creator = creators.get(tokenAddress.toLowerCase()) ?? null;
         const launchpad = creator ? attributeCreator(creator, launchpads) : priorMarket?.launchpad ?? null;
-        if (!creator && !launchpad) {
+        if (!creator && !launchpad && tokenRead.metadataRead === false) {
+          market.errors.push({ step: "launchpad", message: `contract code hash unchanged, so addresses/${tokenAddress} was not re-read for its creator, and no launchpad was previously attributed` });
+        } else if (!creator && !launchpad) {
           market.errors.push({ step: "launchpad", message: `addresses/${tokenAddress} did not return creator_address_hash` });
         } else if (!launchpad) {
           market.errors.push({ step: "launchpad", message: `creator ${creator} did not match a launchpad factory, curve or known launcher deployer` });
@@ -954,7 +993,7 @@ async function main() {
           lp: locks.lp, errors: [...ownership.errors, ...locks.errors],
         }, priorStructure);
         readRecords.push(
-          explorerReadRecord({ kind: "structure", address: tokenAddress, status: structureDeferred ? "deferred" : abiIsStale ? "read" : "unchanged", reason: structureDeferred ? "budget exhausted; prior mint facts retained" : abiIsStale ? "token change signal changed" : "contract code hash unchanged; verified ABI not re-read", signalValue: market.trades_h24, codeHash: tokenRead.row?.code_hash ?? null, checkedAt: pulledAt, previous: priorStructureRead, credits: ownershipCredits }),
+          explorerReadRecord({ kind: "structure", address: tokenAddress, status: structureDeferred ? "deferred" : abiIsStale ? "read" : "unchanged", reason: structureDeferred ? "budget exhausted; prior mint facts retained" : abiIsStale ? "token change signal changed" : "contract code hash unchanged; verified ABI not re-read", signalValue: market.trades_h24, codeHash: tokenRead.codeHash ?? null, checkedAt: pulledAt, previous: priorStructureRead, credits: ownershipCredits }),
           explorerReadRecord({ kind: "lp", address: tokenAddress, status: lpDeferred ? "deferred" : "read", reason: lpDeferred ? "budget exhausted; prior LP facts retained" : "token change signal changed", signalValue: market.trades_h24, checkedAt: pulledAt, previous: priorLpRead, credits: lpCredits }),
         );
         if (structureDeferred || lpDeferred) deferredReads.push(`${target.slug}:structure`);
@@ -1186,6 +1225,13 @@ async function main() {
     if (deferredReads.length) {
       console.log(`\n${deferredReads.length} reads deferred to the next run, by name and address`);
       for (const label of [...new Set(deferredReads)]) console.log(`  ${label}`);
+    }
+    if (deferredNames.length) {
+      console.log(
+        `\n${deferredNames.length} names not reached before the ${deadlineMs / 60000}-minute deadline ` +
+        "and deferred to the next run",
+      );
+      for (const slug of deferredNames) console.log(`  ${slug}`);
     }
     if (!args.dry) {
       await writeFile("ops/pull-budget.json", `${JSON.stringify(creditBudget.finish(), null, 2)}\n`);

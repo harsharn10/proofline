@@ -129,7 +129,7 @@ import {
 import {
   addressesFor, activityWindow, carryActivityFacts, carryAddressFacts, carryOwnershipFacts,
   explorerReadRecord, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey,
-  memoizeClient, parseArgs, refreshedMarket, EMPTY_READ_MESSAGE,
+  memoizeClient, parseArgs, refreshedMarket, EMPTY_READ_MESSAGE, emptyReadMessage,
 } from "./pull.mjs";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -1974,8 +1974,8 @@ test("a null where a value existed is a failed read, not a renouncement", () => 
   const previous = {
     owner: "0x39dbed3a2bd333467115de45665cc57f813c4571",
     owner_type: "safe",
-    safe: { threshold: 3, signers: ["0xaaa"] },
-    proxy: { type: "eip1967", implementation: "0xbbb", admin: null },
+    safe: { threshold: 3, signers: ["0x30e4b6dc3139e28b5c5e493d395a0aca4f1cddba"] },
+    proxy: { type: "eip1967", implementation: "0x8366a39cc670b4001a1121b8f6a443a643e40951", admin: null },
     errors: [],
   };
   const emptied = {
@@ -1991,10 +1991,12 @@ test("a null where a value existed is a failed read, not a renouncement", () => 
   assert.equal(first.owner_type, "safe");
   assert.deepEqual(first.safe, previous.safe);
   assert.deepEqual(first.proxy, previous.proxy);
+  // The step names the producer that ran the read, per the pulled schema; the field leads the message.
   assert.deepEqual(first.errors, [
-    { step: "owner", message: EMPTY_READ_MESSAGE },
-    { step: "proxy", message: EMPTY_READ_MESSAGE },
+    { step: "rpc", message: emptyReadMessage("owner") },
+    { step: "rpc", message: emptyReadMessage("proxy") },
   ]);
+  assert.equal(emptyReadMessage("owner"), `owner: ${EMPTY_READ_MESSAGE}`);
 
   // A probe that failed and said so needs no second error: the recorded failure already explains it.
   const explained = carryOwnershipFacts(
@@ -2016,10 +2018,22 @@ test("a null where a value existed is a failed read, not a renouncement", () => 
   assert.equal(renounced.owner_type, "none");
   assert.deepEqual(renounced.errors, []);
 
+  // The error has to survive the schema, or the guard sinks the document it was meant to protect.
+  const guarded = orderDocument({
+    slug: "guarded", pulled_at: "2026-09-04T18:31:19.978Z", chain: "robinhood-chain",
+    addresses: [mergeAddress(
+      { address: "0x39dBED3a2bd333467115dE45665cC57F813C4571", label: null, role: "token" },
+      { is_contract: true, proxy: previous.proxy, owner: previous.owner, owner_type: "safe", safe: previous.safe, errors: first.errors },
+      null,
+    )],
+    metrics: [], market: null, structure: null, activity: null, errors: [],
+  });
+  assert.deepEqual(createValidator()(guarded), []);
+
   // And an empty answer that repeats on the very next pull is finally believed.
   const confirmed = carryOwnershipFacts(emptied, previous, {
     unread: {},
-    previousErrors: [{ step: "owner", message: EMPTY_READ_MESSAGE }, { step: "proxy", message: EMPTY_READ_MESSAGE }],
+    previousErrors: [{ step: "rpc", message: emptyReadMessage("owner") }, { step: "rpc", message: emptyReadMessage("proxy") }],
   });
   assert.equal(confirmed.owner, null);
   assert.equal(confirmed.owner_type, "none");
