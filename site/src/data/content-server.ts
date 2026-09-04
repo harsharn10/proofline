@@ -15,6 +15,7 @@ import {
 // @ts-expect-error The repository-level helper is intentionally plain ESM.
 import { locatedOnChain as locatedOnChainCore, meetsShareBar as meetsShareBarCore, officialSurfaceConfirmed as officialSurfaceConfirmedCore } from "../../../scripts/lib/share-bar.mjs";
 import type {
+  ChainStats,
   ChangelogEntry,
   Deployment,
   DependencyCard,
@@ -143,6 +144,16 @@ type PulledCardFields = {
   } | null;
 };
 
+type PulledChainFile = {
+  pulled_at: string;
+  tvl: {
+    total_tracked_usd: number | null;
+    by_category: Array<{ category: string; tvl_usd: number }>;
+    source_url: string;
+  };
+  economics: { latest_day: string | null; source_url: string };
+};
+
 type DerivedFile = {
   generated_at: string;
   methodology_version: string;
@@ -236,6 +247,7 @@ type ServerContent = {
   treeBySlug: Record<string, TreeRef>;
   histories: Record<string, HistoryPoint[]>;
   wire: WireItem[];
+  chainStats: ChainStats | null;
   generatedAt: string;
   now: number;
 };
@@ -264,6 +276,23 @@ function loadContent(): ServerContent {
   const taxonomy = parseJson<TaxonomyFile>(rawContent.taxonomy);
   const buildNow = Date.now();
   const sections: SectionDef[] = taxonomy.sections.map(({ id, label, description }) => ({ id, label, description }));
+  const pulledChain = readYamlOrWarn<PulledChainFile | null>(
+    rawContent.pulled["chain.yaml"],
+    "pulled/chain.yaml",
+    "chain",
+    null,
+  );
+  const chainDaily = parseDailySeries(pulledSeries["chain.json"]);
+  const latestFeeRevenue = chainDaily.fee_revenue_daily?.at(-1) ?? null;
+  const chainStats: ChainStats | null = pulledChain ? {
+    pulledAt: pulledChain.pulled_at,
+    tvlUsd: pulledChain.tvl.total_tracked_usd,
+    tvlSourceUrl: pulledChain.tvl.source_url,
+    feeRevenueLatestDayUsd: latestFeeRevenue?.value ?? null,
+    feeRevenueDay: latestFeeRevenue?.at ?? pulledChain.economics.latest_day,
+    economicsSourceUrl: pulledChain.economics.source_url,
+    tvlByCategory: pulledChain.tvl.by_category.map((row) => ({ category: row.category, tvlUsd: row.tvl_usd })),
+  } : null;
 
   // tree.primary ("launch/bonding-curve") -> { domain, leaf, label, sectionId }: the home sections,
   // the dossier eyebrow and the peer set all key off this placement.
@@ -389,6 +418,7 @@ function loadContent(): ServerContent {
       }),
     ),
     wire: compiledWire,
+    chainStats,
     generatedAt: derivedFile.generated_at,
     now: buildNow,
   };
@@ -848,6 +878,7 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
     dependencies: Object.values(content.dependencies)
       .map((c) => ({ id: c.id, name: c.name, kind: c.kind }))
       .sort((a, b) => a.name.localeCompare(b.name)),
+    chainStats: content.chainStats,
     generatedAt: content.generatedAt,
     now: content.now,
   };

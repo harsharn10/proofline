@@ -79,6 +79,11 @@ import {
 import {
   orderDocument,
   createValidator,
+  orderChainDocument,
+  createChainValidator,
+  createDiscoveryValidator,
+  writeChainSeries,
+  readChainSeries,
   toYaml,
   appendHistory,
   readHistory,
@@ -86,8 +91,18 @@ import {
   snapshotFrom,
   parseHistory,
 } from "./lib/pull/write.mjs";
-import { addressesFor, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey } from "./pull.mjs";
-import { mkdtempSync, rmSync } from "node:fs";
+import {
+  createRialtoClient,
+  readRialto,
+  rialtoMarketFor,
+  volumeDisagreement,
+  pairAssetFor,
+  discoveryCandidates,
+  readAllAssets,
+  RIALTO_PAGES,
+} from "./lib/pull/rialto.mjs";
+import { addressesFor, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey, memoizeClient, parseArgs, refreshedMarket } from "./pull.mjs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -101,7 +116,7 @@ const addressWord = (addr) => `0x${word(addr)}`;
 /** Minimal fetch stub: `routes` maps a URL substring to { status, body, contentType } or a function. */
 function stubFetch(routes, log = []) {
   return async (url, options = {}) => {
-    log.push({ url, body: options.body ? JSON.parse(options.body) : null });
+    log.push({ url, body: options.body ? JSON.parse(options.body) : null, headers: options.headers ?? {} });
     const key = Object.keys(routes).find((k) => url.includes(k));
     const route = key ? routes[key] : { status: 404, body: JSON.stringify({ message: "not found" }) };
     const resolved = typeof route === "function" ? await route(log.length, options) : route;
@@ -130,6 +145,32 @@ function stubRpc(handlers, log = []) {
     },
     log,
   );
+}
+
+const RIALTO_FIXTURE = JSON.parse(readFileSync(new URL("./fixtures/rialto.json", import.meta.url), "utf8"));
+
+function rialtoRoutes() {
+  return {
+    "/api/router/tickers": { body: RIALTO_FIXTURE.tickers },
+    "/api/router/tokens": { body: RIALTO_FIXTURE.tokens },
+    "/api/market/robinhood-symbols": { body: RIALTO_FIXTURE.symbols },
+    "/api/stats/assets/explorer": { body: RIALTO_FIXTURE.assets },
+    "/api/stats/tvl/kpis": { body: RIALTO_FIXTURE.tvlKpis },
+    "/api/stats/tvl/tvl-by-category-over-time": { body: RIALTO_FIXTURE.categoryTvlDaily },
+    "/api/stats/tvl/tvl-by-category": { body: RIALTO_FIXTURE.tvlByCategory },
+    "/api/stats/tvl/protocol-tvl-over-time": { body: RIALTO_FIXTURE.protocolTvlDaily },
+    "/api/stats/tvl/protocol-tvl": { body: RIALTO_FIXTURE.protocolTvl },
+    "/api/stats/onchain-economics/kpis": { body: RIALTO_FIXTURE.economicsKpis },
+    "/api/stats/onchain-economics/daily-metrics": { body: RIALTO_FIXTURE.economicsDaily },
+    "/api/stats/metrics/overview": { body: RIALTO_FIXTURE.activityDaily },
+    "/api/stats/metrics/top-assets": { body: RIALTO_FIXTURE.topAssets },
+    "/api/stats/metrics/volume-by-asset": { body: RIALTO_FIXTURE.volumeByAsset },
+    "/api/stats/tokenization/stats": { body: RIALTO_FIXTURE.tokenization },
+    "/api/stats/tokenization/total-value-tokenized-over-time": { body: RIALTO_FIXTURE.tokenizationDaily },
+    "/api/stats/transfers/headline-stats": { body: RIALTO_FIXTURE.transfers },
+    "/api/stats/mintburn/stats": { body: RIALTO_FIXTURE.mintburn },
+    "/api/liquidity/spreads": { body: RIALTO_FIXTURE.liquidity },
+  };
 }
 
 // --- owner() decode -------------------------------------------------------
@@ -447,6 +488,256 @@ test("a shorter or empty read never replaces a committed revenue series", async 
   }
 });
 
+// --- Rialto Analytics: typed readers, rollups and joins -------------------
+
+test("Rialto readers normalize every endpoint, cache URLs and send browser headers", async () => {
+  const log = [];
+  const client = createRialtoClient({
+    base: "https://rialto.test",
+    deps: { fetchImpl: stubFetch(rialtoRoutes(), log), sleepImpl: async () => {}, attempts: 1 },
+  });
+
+  assert.equal((await client.tickers()).length, 3);
+  assert.equal((await client.tokens()).length, 6);
+  assert.equal((await client.symbols())[0].ticker, "NVDA");
+  assert.equal((await client.assetsPage()).data[0].value, 5000);
+  assert.equal((await client.tvlKpis()).total_tracked_usd, 1000);
+  assert.equal((await client.tvlByCategory()).length, 2);
+  assert.equal((await client.protocolTvl())[0].share, 0.7);
+  assert.equal((await client.protocolTvlDaily())[0].date, "2026-09-02");
+  assert.equal((await client.categoryTvlDaily()).length, 2);
+  assert.equal((await client.economicsKpis()).latest_day, "2026-09-02");
+  assert.equal((await client.economicsDaily()).at(-1).fee_revenue_usd, 20);
+  assert.equal((await client.activityDaily()).at(-1).active_wallets, 4);
+  assert.equal((await client.topAssets())[0].volume_usd, 100);
+  assert.equal((await client.volumeByAsset())[0].assets[0].token_symbol, "AI");
+  assert.equal((await client.tokenization()).net_minting, true);
+  assert.equal((await client.tokenizationDaily())[0].value_usd, 9000);
+  assert.equal((await client.transfers()).all_time_transfers, 1000);
+  assert.equal((await client.mintburn()).cumulative_net_usd, 60);
+  assert.equal((await client.liquidity()).prices[0].price_usd, 2500);
+  assert.equal((await client.liquidity()).prices[0].volume_24h_usd, 12000, "the published per-token 24h USD volume is kept");
+
+  await client.tickers();
+  assert.equal(log.filter((entry) => entry.url.endsWith("/api/router/tickers")).length, 1, "the second read is cached");
+  const tickerRequest = log.find((entry) => entry.url.endsWith("/api/router/tickers"));
+  assert.equal(tickerRequest.headers.Accept, "application/json, text/plain, */*");
+  assert.equal(tickerRequest.headers.Referer, "https://rialto.test/markets");
+  assert.match(tickerRequest.headers["User-Agent"], /Chrome/);
+});
+
+test("Rialto builds nullable chain blocks, 7d and 30d sums, and guarded daily series", async () => {
+  const client = createRialtoClient({
+    base: "https://rialto.test",
+    deps: { fetchImpl: stubFetch(rialtoRoutes()), sleepImpl: async () => {}, attempts: 1 },
+  });
+  const out = await readRialto(client, { pulledAt: "2026-09-03T04:00:00.000Z" });
+  assert.equal(out.chain.tvl.total_tracked_usd, 1000);
+  assert.equal(out.chain.activity.daily_volume_usd.latest, 40);
+  assert.equal(out.chain.activity.daily_volume_usd.sum_7d, 70);
+  assert.equal(out.chain.activity.daily_volume_usd.sum_30d, 70);
+  assert.deepEqual(out.series.volume_daily, [["2026-09-01", 30], ["2026-09-02", 40]]);
+  assert.deepEqual(out.series.fee_revenue_daily, [["2026-09-01", 10], ["2026-09-02", 20]]);
+  assert.deepEqual(createChainValidator()(orderChainDocument(out.chain)), []);
+
+  const dir = mkdtempSync(join(tmpdir(), "rialto-series-"));
+  const path = join(dir, "chain.json");
+  try {
+    await writeChainSeries(out.series, { path });
+    const shorter = await writeChainSeries({ ...out.series, volume_daily: [["2026-09-02", 40]] }, { path });
+    assert.deepEqual(shorter.kept, [{ key: "volume_daily", incoming: 1, existing: 2 }]);
+    assert.deepEqual((await readChainSeries({ path })).volume_daily, out.series.volume_daily);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("a failed Rialto endpoint leaves nulls and a block-local reason", async () => {
+  const routes = rialtoRoutes();
+  routes["/api/stats/tvl/kpis"] = { status: 403, body: "forbidden" };
+  const client = createRialtoClient({
+    base: "https://rialto.test",
+    deps: { fetchImpl: stubFetch(routes), sleepImpl: async () => {}, attempts: 1 },
+  });
+  const out = await readRialto(client, { pulledAt: "2026-09-03T04:00:00.000Z" });
+  assert.equal(out.chain.tvl.total_tracked_usd, null);
+  assert.equal(out.chain.tvl.stablecoin_usd, null);
+  assert.match(out.chain.tvl.errors.map((error) => error.message).join("\n"), /HTTP 403/);
+  assert.deepEqual(createChainValidator()(orderChainDocument(out.chain)), []);
+});
+
+test("a failed asset-explorer page keeps the pages already read", async () => {
+  const routes = { "explorer?page=2": { status: 500, body: "boom" }, ...rialtoRoutes() };
+  routes["/api/stats/assets/explorer"] = { body: { ...RIALTO_FIXTURE.assets, nextPage: 2 } };
+  const client = createRialtoClient({
+    base: "https://rialto.test",
+    deps: { fetchImpl: stubFetch(routes), sleepImpl: async () => {} },
+  });
+  const errors = [];
+  const assets = await readAllAssets(client, { errors });
+  assert.equal(assets.length, 3, "page 1 survives page 2 failing");
+  assert.equal(errors.length, 1);
+  assert.match(errors[0].message, /^page 2: /);
+});
+
+test("Rialto cross-checks volume conservatively and resolves a stock-paired asset", async () => {
+  const client = createRialtoClient({
+    base: "https://rialto.test",
+    deps: { fetchImpl: stubFetch(rialtoRoutes()), sleepImpl: async () => {}, attempts: 1 },
+  });
+  const { reference } = await readRialto(client, { pulledAt: "2026-09-03T04:00:00.000Z" });
+  const market = rialtoMarketFor("0x3333333333333333333333333333333333333333", reference, { asOf: "2026-09-03T04:00:00.000Z" });
+  assert.equal(market.volume_24h_usd, 7500, "the published per-token figure, not the sum of the priced legs");
+  assert.equal(market.volume_note, null);
+  assert.equal(market.pairs[0].volume_24h_usd, 5000, "the priced leg stays as detail: 2 WETH at the sourced $2,500");
+  assert.deepEqual(volumeDisagreement(2000, 5000), { dexscreener_usd: 2000, rialto_usd: 5000 });
+  assert.equal(volumeDisagreement(2501, 5000), null, "the threshold is more than 2x, not 2x or less");
+
+  // A token Rialto does not publish a 24h figure for is never compared against one that is.
+  const unpriced = rialtoMarketFor("0x1111111111111111111111111111111111111111", reference);
+  assert.equal(unpriced.volume_24h_usd, null);
+  assert.match(unpriced.volume_note, /liquidity\/spreads has no price row/);
+  assert.equal(volumeDisagreement(500000, unpriced.volume_24h_usd), null, "an absence is not a disagreement");
+
+  const asset = pairAssetFor(
+    { themes: ["stock-paired:nvda"] },
+    { tree: { primary: "rwa-products/stock-paired-token" } },
+    { token_address: "0x1111111111111111111111111111111111111111", pairs: [{ quote_symbol: "NVDA" }] },
+    null,
+    reference,
+  );
+  assert.equal(asset.ticker, "NVDA");
+  assert.equal(asset.tokenized_value_usd, 5000);
+  assert.equal(asset.tokenized_shares, 50);
+  assert.equal(asset.source_url, RIALTO_PAGES.tokenization);
+});
+
+test("a pair quoted in WETH, ETH or USDG is not a tokenized pair asset", async () => {
+  const client = createRialtoClient({
+    base: "https://rialto.test",
+    deps: { fetchImpl: stubFetch(rialtoRoutes()), sleepImpl: async () => {} },
+  });
+  const { reference } = await readRialto(client, { pulledAt: "2026-09-03T04:00:00.000Z" });
+  const census = { tree: { primary: "rwa-products/stock-paired-token" } };
+  for (const quote of ["WETH", "ETH", "USDG"]) {
+    assert.equal(
+      pairAssetFor({}, census, { token_address: "0x3333333333333333333333333333333333333333", pairs: [{ quote_symbol: quote }] }, null, reference),
+      null,
+      `${quote} is listed as a token, not as a tokenized stock`,
+    );
+  }
+  // The Rialto counter-asset route is filtered the same way: an ETH leg resolves to nothing.
+  assert.equal(
+    pairAssetFor({}, census, { token_address: "0x6666666666666666666666666666666666666666" },
+      { pairs: [{ base: "0x6666666666666666666666666666666666666666", target: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" }] }, reference),
+    null,
+  );
+  assert.equal(
+    pairAssetFor({}, census, { token_address: "0x1111111111111111111111111111111111111111", pairs: [{ quote_symbol: "NVDA" }] }, null, reference).ticker,
+    "NVDA",
+    "a real tokenized stock still resolves without a theme",
+  );
+});
+
+test("Rialto discovery excludes census names, stocks and stables and keeps first_seen", async () => {
+  const client = createRialtoClient({
+    base: "https://rialto.test",
+    deps: { fetchImpl: stubFetch(rialtoRoutes()), sleepImpl: async () => {}, attempts: 1 },
+  });
+  const { reference } = await readRialto(client, { pulledAt: "2026-09-03T04:00:00.000Z" });
+  const projects = new Map([["artificial-inu", {
+    name: "Artificial Inu", symbol: "AI",
+    deployments: [{ address: "0x1111111111111111111111111111111111111111" }],
+  }]]);
+  const candidates = discoveryCandidates({
+    reference,
+    census: [{ slug: "artificial-inu" }],
+    projects,
+    existing: [{ address: "0x3333333333333333333333333333333333333333", first_seen: "2026-09-01T00:00:00.000Z" }],
+    pulledAt: "2026-09-03T04:00:00.000Z",
+  });
+  assert.equal(candidates.some((row) => row.symbol === "AI"), false, "a census name");
+  assert.equal(candidates.some((row) => row.symbol === "NVDA"), false, "a tokenized stock");
+  assert.equal(candidates.some((row) => row.symbol === "USDG"), false, "a stablecoin");
+  // The explorer's own vocabulary, which says neither "stock" nor "etf" for either of these.
+  assert.equal(candidates.some((row) => row.symbol === "SHY"), false, "US Treasuries is a tokenized RWA");
+  assert.equal(candidates.some((row) => row.symbol === "GLD"), false, "Commodities is a tokenized RWA");
+  assert.equal(candidates.some((row) => row.address === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"), false, "native ETH is a sentinel, not a token");
+  // robinhood-symbols lists plain tokens too; being listed there is not being a tokenized stock.
+  const hoodrat = candidates.find((row) => row.symbol === "HOODRAT");
+  assert.ok(hoodrat, "a category-token symbol still reaches discovery");
+  assert.equal(hoodrat.rialto_volume_24h_usd, 3300);
+  const discovered = candidates.find((row) => row.symbol === "NEW");
+  assert.equal(discovered.first_seen, "2026-09-01T00:00:00.000Z");
+  assert.equal(discovered.rialto_volume_24h_usd, 7500, "Rialto's published figure, not a router leg");
+  assert.deepEqual(createDiscoveryValidator()({
+    pulled_at: "2026-09-03T04:00:00.000Z", candidates, errors: [],
+  }), []);
+});
+
+test("--source rialto asks for the fast refresh, and only for a source that exists", () => {
+  assert.equal(parseArgs(["--source", "rialto"]).rialtoOnly, true);
+  assert.equal(parseArgs(["--source=rialto"]).rialtoOnly, true);
+  assert.equal(parseArgs(["--rialto-only"]).rialtoOnly, true);
+  assert.equal(parseArgs([]).rialtoOnly, false);
+  assert.throws(() => parseArgs(["--source", "blockscout"]), /--source takes one of: rialto/);
+  assert.throws(() => parseArgs(["--rpc-only", "--rialto-only"]), /opposite runs/);
+});
+
+test("the Rialto refresh replaces its own two sources and carries the rest of the file through", async () => {
+  const client = createRialtoClient({
+    base: "https://rialto.test",
+    deps: { fetchImpl: stubFetch(rialtoRoutes()), sleepImpl: async () => {} },
+  });
+  const { reference } = await readRialto(client, { pulledAt: "2026-09-04T04:00:00.000Z" });
+  const previous = {
+    token_address: "0x3333333333333333333333333333333333333333",
+    pulled_at: "2026-09-01T00:00:00.000Z",
+    pairs: [{ dex: "uniswap", quote_symbol: "WETH" }],
+    volume_h24: 11, liquidity_usd: 1, trades_h24: 2, price_usd: 3, price_change_h24: 4, fdv: 5,
+    first_pair_at: null,
+    top10_share: 0.31, top10_share_ex_pools: 0.2, burned_share: 0.1, top10_as_of: "2026-09-01T00:00:00.000Z",
+    launchpad: { slug: "foxpad", via: "factory", address: "0x9999999999999999999999999999999999999999" },
+    rialto: null, pair_asset: null, volume_disagreement: null,
+    errors: [
+      { step: "launchpad", message: "creator did not match a launchpad factory" },
+      { step: "dexscreener", message: "stale" },
+      { step: "rialto", message: "stale" },
+    ],
+  };
+  const rialtoMarket = rialtoMarketFor(previous.token_address, reference, { asOf: "2026-09-04T04:00:00.000Z" });
+  const market = refreshedMarket(previous, {
+    fresh: { ...previous, pulled_at: "2026-09-04T04:00:00.000Z", volume_h24: 4000, errors: [] },
+    rialtoMarket,
+    project: {},
+    censusRow: { tree: { primary: "trading/dex" } },
+    reference,
+    rialtoErrors: [],
+  });
+
+  assert.equal(market.top10_share, 0.31, "the Blockscout walk is not part of this read");
+  assert.equal(market.launchpad.slug, "foxpad");
+  assert.equal(market.top10_as_of, "2026-09-01T00:00:00.000Z", "and keeps its own as-of");
+  assert.equal(market.volume_h24, 4000);
+  assert.equal(market.rialto.volume_24h_usd, 7500);
+  assert.equal(market.pair_asset, null, "a trading name has no tokenized pair asset");
+  assert.deepEqual(market.volume_disagreement, null, "4,000 against 7,500 is under 2x");
+  assert.deepEqual(
+    market.errors.map((error) => error.step),
+    ["launchpad"],
+    "the stale reasons from both refreshed sources are dropped, the rest kept",
+  );
+
+  // A name Rialto does not carry gets no DexScreener read, so its figures stay as they were.
+  const untouched = refreshedMarket(previous, {
+    fresh: null, rialtoMarket: null, project: {}, censusRow: {}, reference, rialtoErrors: [],
+  });
+  assert.equal(untouched.volume_h24, 11);
+  assert.equal(untouched.pulled_at, "2026-09-01T00:00:00.000Z");
+  assert.equal(untouched.rialto, null);
+  assert.deepEqual(untouched.errors.map((error) => error.step), ["launchpad", "dexscreener"]);
+});
+
 // --- token concentration, attribution and structure ----------------------
 
 test("computes top-10 supply share and excludes pools and lockers", async () => {
@@ -717,6 +1008,22 @@ test("selects only real Robinhood Chain addresses, deduplicated", () => {
   });
   assert.equal(rows.length, 1);
   assert.equal(rows[0].label, "token");
+});
+
+test("a pull shares duplicate client reads, including mixed-case addresses", async () => {
+  let calls = 0;
+  const client = memoizeClient({
+    lookup: async (tokenAddress) => ({ tokenAddress, call: ++calls }),
+  });
+  const upper = "0xAAA1111111111111111111111111111111111111";
+  const lower = upper.toLowerCase();
+  const [first, same] = await Promise.all([client.lookup(upper), client.lookup(lower)]);
+  assert.equal(first, same, "concurrent duplicates share the same promise result");
+  assert.equal((await client.lookup(upper)).call, 1);
+  assert.equal((await client.lookup("0xBBB2222222222222222222222222222222222222")).call, 2);
+  assert.equal(calls, 2);
+  const urls = memoizeClient({ url: (slug) => `https://example.com/${slug}` });
+  assert.equal(urls.url("pons"), "https://example.com/pons", "synchronous URL builders stay synchronous");
 });
 
 test("a sample document validates against schema/pulled.schema.json", () => {
@@ -1181,7 +1488,8 @@ test("a document carrying both new blocks validates and keeps its key order", ()
   assert.deepEqual(Object.keys(doc.market), [
     "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
     "price_usd", "price_change_h24", "market_cap_usd", "fdv_usd", "fdv", "first_pair_at", "top10_share",
-    "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad", "errors",
+    "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad", "rialto",
+    "pair_asset", "volume_disagreement", "errors",
   ]);
   assert.equal(countErrors(doc), 2);
   assert.match(summaryLine("pons", doc), /2 pairs · top-10 · 1 LP reads · 2000 txns\/24h · 2 errors/);

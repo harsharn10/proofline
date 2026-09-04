@@ -1,9 +1,9 @@
 slug: sinjoh
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T01:45:12.896Z # chain head 53883984 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D"
-    label: INJOH token (account bio)
+    label: INJOH token (PonsLauncherToken)
     role: token
     is_contract: true
     source_verified: true
@@ -17,237 +17,412 @@ addresses:
     safe: null
     created_block: 23753682
     created_at: 2026-07-31T00:40:38.000Z
-    holders: 2295
+    holders: 2542
+    errors: []
+  - address: "0xB09fa4f04032b9d9e690ac4a1d29523b5f9A72DC"
+    label: INJOH/WETH Uniswap v3 pair
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: UniswapV3Pool
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 23753682
+    created_at: 2026-07-31T00:40:38.000Z
+    holders: null
+    errors: []
+  - address: "0x7E97EadeA120321c65CC09B6FDECc6Eb15D55b2f"
+    label: INJOH SinjohFeeRouter clone
+    role: router
+    is_contract: true
+    source_verified: true
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 23753609
+    created_at: 2026-07-31T00:40:30.000Z
+    holders: null
+    errors: []
+  - address: "0x17c76Ff58b7Da12E116bb22ebDcc7F31Cadf9B64"
+    label: SinjohFeeRouter implementation
+    role: implementation
+    is_contract: true
+    source_verified: true
+    contract_name: SinjohFeeRouter
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 23491737
+    created_at: 2026-07-30T17:23:10.000Z
+    holders: null
+    errors: []
+  - address: "0xFA51E67f799699A237D558F5FbE7B170F8c5584d"
+    label: SinjohFeeRouterFactory
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: SinjohFeeRouterFactory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 23491737
+    created_at: 2026-07-30T17:23:10.000Z
+    holders: null
+    errors: []
+  - address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+    label: PonsLaunchFactory (INJOH creator)
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: PonsLaunchFactory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
+    created_block: 8991118
+    created_at: 2026-07-13T21:29:03.000Z
+    holders: null
+    errors: []
+  - address: "0x5Bb7582557F5be30b62c335Ad3ccf4bA79E138c5"
+    label: SinjohRevenueCollector
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: SinjohRevenueCollector
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x39e2f5efdfd808f26b98979a06ba11ea82e1c85f"
+    owner_type: eoa
+    safe: null
+    created_block: 23491477
+    created_at: 2026-07-30T17:22:44.000Z
+    holders: null
+    errors: []
+  - address: "0x39E2f5eFdFd808F26B98979a06BA11ea82E1C85f"
+    label: Revenue-collector owner / GitHub governance key
+    role: admin
+    is_contract: false
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
     errors: []
 metrics: []
 market:
   token_address: "0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T01:45:12.896Z
   pairs:
     - dex: uniswap
       pair_address: "0xB09fa4f04032b9d9e690ac4a1d29523b5f9A72DC"
       quote_symbol: WETH
-      price_usd: 0.002594
-      liquidity_usd: 203366.76
-      volume_h24: 933094.87
-      volume_h6: 270812.78
+      price_usd: 0.00314
+      liquidity_usd: 229047.54
+      volume_h24: 1166883.13
+      volume_h6: 275285.43
       txns_h24:
-        buys: 1263
-        sells: 1070
-      price_change_h24: -14.24
-      fdv: 2472348
+        buys: 1531
+        sells: 1114
+      price_change_h24: 0.01
+      fdv: 2991182
       created_at: 2026-07-31T00:40:38.000Z
     - dex: uniswap
       pair_address: "0xe1f933a0c400979caadc5f6a66d184b526b2823552e9c362721242180bfa320f"
       quote_symbol: USDG
-      price_usd: 0.002651
-      liquidity_usd: 6043.74
-      volume_h24: 51296.95
-      volume_h6: 12935.93
+      price_usd: 0.003109
+      liquidity_usd: 25891.85
+      volume_h24: 79484.03
+      volume_h6: 31745.9
       txns_h24:
-        buys: 267
-        sells: 215
-      price_change_h24: -12.62
-      fdv: 2528425
+        buys: 322
+        sells: 239
+      price_change_h24: 1
+      fdv: 2961954
       created_at: 2026-08-30T06:50:56.000Z
     - dex: ramses
       pair_address: "0x882c7C5B9176DA92a65fF671bFf8D359690219a8"
       quote_symbol: USDG
-      price_usd: 0.002774
-      liquidity_usd: 6791.08
-      volume_h24: 28570.19
-      volume_h6: 0
+      price_usd: 0.003035
+      liquidity_usd: 8522.28
+      volume_h24: 62851.13
+      volume_h6: 12449.41
       txns_h24:
-        buys: 124
-        sells: 126
-      price_change_h24: -7.47
-      fdv: 2644133
+        buys: 217
+        sells: 206
+      price_change_h24: -4.45
+      fdv: 2891424
       created_at: 2026-08-30T04:53:29.000Z
+    - dex: uniswap
+      pair_address: "0x562023346966357176bd3e88666a9de32a46ece24aacf754f506c567ad7bb94f"
+      quote_symbol: Index
+      price_usd: 0.003149
+      liquidity_usd: 1264.53
+      volume_h24: 6691.01
+      volume_h6: 866.37
+      txns_h24:
+        buys: 84
+        sells: 80
+      price_change_h24: -3.15
+      fdv: 2999624
+      created_at: 2026-09-02T23:49:01.000Z
     - dex: uniswap
       pair_address: "0x4ca37ce6e404dc3342faf905655050ad3ef31b97e7457a47e8e352a597391e6a"
       quote_symbol: ETH
-      price_usd: 0.002632
-      liquidity_usd: 1918.61
-      volume_h24: 7802
-      volume_h6: 2499.03
+      price_usd: 0.003059
+      liquidity_usd: 2113.81
+      volume_h24: 9263.78
+      volume_h6: 2052.02
       txns_h24:
-        buys: 140
-        sells: 103
-      price_change_h24: -13.26
-      fdv: 2510093
+        buys: 171
+        sells: 107
+      price_change_h24: -3.7
+      fdv: 2914522
       created_at: 2026-08-13T12:44:15.000Z
     - dex: uniswap
       pair_address: "0xa8d2f8ad9a82734730e1a7f775a4854c548c32f52f7c5ff6f2f7713fdad0beee"
       quote_symbol: PROLOGUE
-      price_usd: 0.002589
-      liquidity_usd: 1666.82
-      volume_h24: 4651.07
-      volume_h6: 1981.68
+      price_usd: 0.002849
+      liquidity_usd: 1887.28
+      volume_h24: 9388.79
+      volume_h6: 3409.73
       txns_h24:
-        buys: 63
-        sells: 93
-      price_change_h24: -16.09
-      fdv: 2469480
+        buys: 104
+        sells: 109
+      price_change_h24: -11.25
+      fdv: 2714521
       created_at: 2026-09-01T05:41:01.000Z
     - dex: uniswap
-      pair_address: "0x68e2efa59438144be64a7d19fe86ca099d158e8b98f09667d90c4e20c8940000"
-      quote_symbol: MAST
-      price_usd: 0.002363
-      liquidity_usd: 218.11
-      volume_h24: 441.46
-      volume_h6: 133.55
-      txns_h24:
-        buys: 11
-        sells: 19
-      price_change_h24: -34.51
-      fdv: 2253946
-      created_at: 2026-09-02T10:17:31.000Z
-    - dex: uniswap
-      pair_address: "0x64358e05cb845c1b2806a1000ecfcc3ee585d0c45d91f6f79fe78f26c7599c52"
-      quote_symbol: BACKED
-      price_usd: 0.002441
-      liquidity_usd: 522.26
-      volume_h24: 2302.28
-      volume_h6: 426.74
-      txns_h24:
-        buys: 42
-        sells: 43
-      price_change_h24: -12.68
-      fdv: 2328243
-      created_at: 2026-08-31T10:36:01.000Z
-    - dex: uniswap
-      pair_address: "0x979c723bb25ec3b77883f8a5ea4658169fce7ca19995e668ad1550fd3ebe0f15"
+      pair_address: "0x88087d7be87bfb3276602611b164af70715d8ade34db27567b236f550e49c24c"
       quote_symbol: RADIO
-      price_usd: 0.002765
-      liquidity_usd: 340.71
-      volume_h24: 497.24
-      volume_h6: 0
+      price_usd: 0.002952
+      liquidity_usd: 386.09
+      volume_h24: 938.79
+      volume_h6: 914.3
       txns_h24:
-        buys: 17
-        sells: 12
-      price_change_h24: -5.12
-      fdv: 2637410
-      created_at: 2026-08-31T20:01:12.000Z
+        buys: 19
+        sells: 21
+      price_change_h24: -22.56
+      fdv: 2812383
+      created_at: 2026-09-03T18:39:29.000Z
     - dex: uniswap
-      pair_address: "0xb0315934572e9236f542a26b75dd7548ab0dcc3ba056c761ee447ccb2c7bc3f5"
-      quote_symbol: VLR
-      price_usd: 0.0009126
-      liquidity_usd: 91.42
-      volume_h24: 150.52
-      volume_h6: 0
+      pair_address: "0x844d25503dabbc93358353cfbb60b4d9b18af93bd3f9b664b0d37e0e00b4e496"
+      quote_symbol: OBS
+      price_usd: 0.003185
+      liquidity_usd: 320.4
+      volume_h24: 526.13
+      volume_h6: 459
       txns_h24:
-        buys: 8
-        sells: 1
-      price_change_h24: -70.18
-      fdv: 870245
-      created_at: 2026-09-01T20:53:58.000Z
+        buys: 10
+        sells: 21
+      price_change_h24: -13.63
+      fdv: 3033746
+      created_at: 2026-09-03T18:21:58.000Z
     - dex: uniswap
       pair_address: "0x3095e74341493afa11d84ea388568edb1490c207de279e0bca57685c207c76df"
       quote_symbol: INJOH
-      price_usd: 0.01316
-      liquidity_usd: 2723.47
-      volume_h24: 17010.41
-      volume_h6: 4688.18
-      txns_h24:
-        buys: 131
-        sells: 131
-      price_change_h24: -23.49
-      fdv: 12509062
-      created_at: 2026-09-01T19:22:39.000Z
-    - dex: uniswap
-      pair_address: "0x6e2f10348fab013c28a2704c5ffc7a58ecc923cfb5ade7c09d6fa59820c7b69c"
-      quote_symbol: INJOH
-      price_usd: 0.01769
-      liquidity_usd: 616.75
-      volume_h24: 568.93
+      price_usd: 0.01252
+      liquidity_usd: 1712.36
+      volume_h24: 6292.41
       volume_h6: 0
       txns_h24:
-        buys: 6
-        sells: 10
-      price_change_h24: -21.2
-      fdv: 1402232
-      created_at: 2026-09-02T02:14:19.000Z
-  liquidity_usd: 224299.73
-  volume_h24: 1046385.92
-  trades_h24: 3895
-  price_usd: 0.002594
-  price_change_h24: -14.24
-  fdv: 2472348
+        buys: 53
+        sells: 51
+      price_change_h24: 27.93
+      fdv: 11903131
+      created_at: 2026-09-01T19:22:39.000Z
+  liquidity_usd: 271146.14
+  volume_h24: 1342319.2
+  trades_h24: 4459
+  price_usd: 0.00314
+  price_change_h24: 0.01
+  fdv: 2991182
   first_pair_at: 2026-07-31T00:40:38.000Z
-  top10_share: 0.2767204666969429
-  top10_share_ex_pools: 0.2359151512998966
-  top10_as_of: 2026-09-02T22:38:55.976Z
+  top10_share: 0.2569705214946405
+  top10_share_ex_pools: 0.2313173423422893
+  burned_share: 0.0475350699604811
+  top10_as_of: 2026-09-04T01:45:12.896Z
   launchpad:
     slug: pons
     via: factory
     address: "0xa5aab3f0c6eeadf30ef1d3eb997108e976351feb"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T01:45:12.896Z
   mint: no-mint-function
   renounced: null
   lp:
     - pair: "0xB09fa4f04032b9d9e690ac4a1d29523b5f9A72DC"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
     - pair: "0xe1f933a0c400979caadc5f6a66d184b526b2823552e9c362721242180bfa320f"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x882c7C5B9176DA92a65fF671bFf8D359690219a8"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
+    - pair: "0x562023346966357176bd3e88666a9de32a46ece24aacf754f506c567ad7bb94f"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x4ca37ce6e404dc3342faf905655050ad3ef31b97e7457a47e8e352a597391e6a"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xa8d2f8ad9a82734730e1a7f775a4854c548c32f52f7c5ff6f2f7713fdad0beee"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x68e2efa59438144be64a7d19fe86ca099d158e8b98f09667d90c4e20c8940000"
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x88087d7be87bfb3276602611b164af70715d8ade34db27567b236f550e49c24c"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x64358e05cb845c1b2806a1000ecfcc3ee585d0c45d91f6f79fe78f26c7599c52"
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x844d25503dabbc93358353cfbb60b4d9b18af93bd3f9b664b0d37e0e00b4e496"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x979c723bb25ec3b77883f8a5ea4658169fce7ca19995e668ad1550fd3ebe0f15"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0xb0315934572e9236f542a26b75dd7548ab0dcc3ba056c761ee447ccb2c7bc3f5"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x3095e74341493afa11d84ea388568edb1490c207de279e0bca57685c207c76df"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x6e2f10348fab013c28a2704c5ffc7a58ecc923cfb5ade7c09d6fa59820c7b69c"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T01:45:12.896Z
   addresses:
     - address: "0x2cC0FAC44B8252f6B10208B091aFf2c94B4da77D"
-      label: INJOH token (account bio)
+      label: INJOH token (PonsLauncherToken)
       role: token
       transactions_count: 6701
       token_transfers_count: 19
-      last_tx_at: 2026-09-02T22:51:46.000Z
+      last_tx_at: 2026-09-04T01:49:50.000Z
       last_method: approve
-      txns_24h: 297
+      txns_24h: 399
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T22:51:46.000Z
-  txns_24h: 297
-  launches_24h: null
-errors: []
+    - address: "0xB09fa4f04032b9d9e690ac4a1d29523b5f9A72DC"
+      label: INJOH/WETH Uniswap v3 pair
+      role: other
+      transactions_count: 0
+      token_transfers_count: 57230
+      last_tx_at: null
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x7E97EadeA120321c65CC09B6FDECc6Eb15D55b2f"
+      label: INJOH SinjohFeeRouter clone
+      role: router
+      transactions_count: 15712
+      token_transfers_count: 18303
+      last_tx_at: 2026-09-03T20:30:08.000Z
+      last_method: fundSink
+      txns_24h: 130
+      launches_24h: null
+      errors: []
+    - address: "0x17c76Ff58b7Da12E116bb22ebDcc7F31Cadf9B64"
+      label: SinjohFeeRouter implementation
+      role: implementation
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-07-30T17:23:10.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xFA51E67f799699A237D558F5FbE7B170F8c5584d"
+      label: SinjohFeeRouterFactory
+      role: factory
+      transactions_count: 25
+      token_transfers_count: 0
+      last_tx_at: 2026-08-12T15:13:10.000Z
+      last_method: deployPons
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
+      label: PonsLaunchFactory (INJOH creator)
+      role: factory
+      transactions_count: 266144
+      token_transfers_count: 1065034
+      last_tx_at: 2026-09-03T12:03:07.000Z
+      last_method: launchToken
+      txns_24h: 4
+      launches_24h: 4
+      errors: []
+    - address: "0x5Bb7582557F5be30b62c335Ad3ccf4bA79E138c5"
+      label: SinjohRevenueCollector
+      role: other
+      transactions_count: 5663
+      token_transfers_count: 12419
+      last_tx_at: 2026-09-03T20:22:46.000Z
+      last_method: forwardAll
+      txns_24h: 35
+      launches_24h: null
+      errors: []
+    - address: "0x39E2f5eFdFd808F26B98979a06BA11ea82E1C85f"
+      label: Revenue-collector owner / GitHub governance key
+      role: admin
+      transactions_count: 398
+      token_transfers_count: 6047
+      last_tx_at: 2026-09-02T01:31:30.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T01:49:50.000Z
+  txns_24h: 568
+  launches_24h: 4
+errors:
+  - step: llama
+    message: "protocol/sinjoh: HTTP 400: Protocol not found"
+  - step: llama
+    message: "fees_24h sinjoh: HTTP 400: Fees for sinjoh not found, please visit /overview/fees to see available protocols"
+  - step: llama
+    message: "revenue_24h sinjoh: HTTP 400: Fees for sinjoh not found, please visit /overview/fees to see available protocols"
+  - step: llama
+    message: "volume_24h sinjoh: HTTP 400: Dexs for sinjoh not found, please visit /overview/dexs to see available protocols"
+  - step: llama
+    message: "revenue_daily sinjoh: the read returned no daily points, so no series file was written"

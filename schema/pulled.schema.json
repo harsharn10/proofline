@@ -137,7 +137,8 @@
       "required": [
         "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
         "price_usd", "price_change_h24", "fdv", "first_pair_at", "top10_share",
-        "top10_share_ex_pools", "top10_as_of", "launchpad", "errors"
+        "top10_share_ex_pools", "top10_as_of", "launchpad", "rialto", "pair_asset",
+        "volume_disagreement", "errors"
       ],
       "properties": {
         "token_address": { "oneOf": [{ "$ref": "shared#/$defs/address" }, { "type": "null" }] },
@@ -182,7 +183,68 @@
             { "type": "null" }
           ]
         },
+        "rialto": {
+          "oneOf": [{ "$ref": "#/$defs/rialtoMarket" }, { "type": "null" }]
+        },
+        "pair_asset": {
+          "oneOf": [{ "$ref": "#/$defs/pairAsset" }, { "type": "null" }]
+        },
+        "volume_disagreement": {
+          "oneOf": [{ "$ref": "#/$defs/volumeDisagreement" }, { "type": "null" }]
+        },
         "errors": { "type": "array", "items": { "$ref": "#/$defs/pullStepError" } }
+      }
+    },
+    "rialtoPair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pool_id", "base", "target", "last_price", "base_volume_24h", "target_volume_24h", "volume_24h_usd"],
+      "properties": {
+        "pool_id": { "type": ["string", "null"] },
+        "base": { "$ref": "shared#/$defs/address" },
+        "target": { "$ref": "shared#/$defs/address" },
+        "last_price": { "type": ["number", "null"] },
+        "base_volume_24h": { "type": ["number", "null"], "minimum": 0 },
+        "target_volume_24h": { "type": ["number", "null"], "minimum": 0 },
+        "volume_24h_usd": { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "rialtoMarket": {
+      "$comment": "Rialto ticker cross-check. volume_24h_usd is Rialto's own published 24h USD volume for the whole token, read from liquidity/spreads, and is the only figure comparable with the DexScreener total in volume_h24. The per-pair volume_24h_usd figures under pairs[] are supporting detail: the router indexes only some of a token's pools and prices only those legs whose counter-asset is stable, ETH or WETH, so they never sum to the token's day. When Rialto publishes no figure, volume_24h_usd is null, volume_note says so, and volume_disagreement stays null.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pairs", "volume_24h_usd", "volume_note", "as_of", "source_url"],
+      "properties": {
+        "pairs": { "type": "array", "items": { "$ref": "#/$defs/rialtoPair" } },
+        "volume_24h_usd": { "type": ["number", "null"], "minimum": 0 },
+        "volume_note": { "type": ["string", "null"] },
+        "as_of": { "type": "string", "format": "date-time" },
+        "source_url": { "type": "string", "format": "uri" }
+      }
+    },
+    "pairAsset": {
+      "$comment": "The tokenized stock or ETF a name is paired with. tokenized_shares is the asset explorer's own share count (value / price) — a size, not a holder count.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ticker", "name", "address", "category", "tokenized_value_usd", "tokenized_shares", "change_7d", "source_url"],
+      "properties": {
+        "ticker": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "address": { "oneOf": [{ "$ref": "shared#/$defs/address" }, { "type": "null" }] },
+        "category": { "type": ["string", "null"] },
+        "tokenized_value_usd": { "type": ["number", "null"], "minimum": 0 },
+        "tokenized_shares": { "type": ["number", "null"], "minimum": 0 },
+        "change_7d": { "type": ["number", "null"] },
+        "source_url": { "type": "string", "format": "uri" }
+      }
+    },
+    "volumeDisagreement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dexscreener_usd", "rialto_usd"],
+      "properties": {
+        "dexscreener_usd": { "type": "number", "minimum": 0 },
+        "rialto_usd": { "type": "number", "minimum": 0 }
       }
     },
     "lpLock": {

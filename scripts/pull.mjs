@@ -24,7 +24,16 @@
 // complete one by its errors[] rather than by a missing field. `--rpc-only` skips Blockscout
 // entirely. One blocked address never fails the run.
 //
-// Usage: node scripts/pull.mjs [--slug <slug>] [--only <slug,slug>] [--rpc-only] [--dry]
+// The Rialto refresh. A full run walks Blockscout for every address and takes about an hour and
+// three-quarters at 179 names. Rialto's own reads take under a minute, so `--source rialto` refreshes
+// only what Rialto produces — chain.yaml, series/chain.json, discovery.yaml, and each name's
+// market.rialto, market.pair_asset and market.volume_disagreement — against the file already on
+// disk, with one DexScreener read per Rialto-matched name so both sides of the volume comparison
+// come from the same minute. It appends no history line: a snapshot is only ever taken from a whole
+// read, and this mode does not have one.
+//
+// Usage: node scripts/pull.mjs [--slug <slug>] [--only <slug,slug>] [--rpc-only]
+//                              [--source rialto | --rialto-only] [--dry]
 
 import { readFile, readdir } from "node:fs/promises";
 import { join, basename } from "node:path";
@@ -46,7 +55,15 @@ import {
   aggregateActivity,
   emptyActivity,
 } from "./lib/pull/activity.mjs";
-import { writePulled, createValidator, appendHistory, snapshotFrom } from "./lib/pull/write.mjs";
+import {
+  writePulled,
+  createValidator,
+  appendHistory,
+  snapshotFrom,
+  writeChainPulled,
+  writeChainSeries,
+  writeDiscovery,
+} from "./lib/pull/write.mjs";
 import {
   buildLaunchpadIndex,
   excludedHolderAddresses,
@@ -55,6 +72,15 @@ import {
 } from "./lib/pull/attribution.mjs";
 import { readTop10, readMintAndRenounce, readLpLocks } from "./lib/pull/token.mjs";
 import { writeSeries, seriesReplacement } from "./lib/pull/series.mjs";
+import {
+  createRialtoClient,
+  readRialto,
+  rialtoMarketFor,
+  volumeDisagreement,
+  pairAssetFor,
+  discoveryCandidates,
+  RIALTO_BASE,
+} from "./lib/pull/rialto.mjs";
 
 const CHAIN = "robinhood-chain";
 const CONCURRENCY = 4;
@@ -63,8 +89,15 @@ const CONCURRENCY = 4;
 const BLOCKSCOUT_CONCURRENCY = 2;
 const NOT_VERIFIED = "not-verified";
 
-function parseArgs(argv) {
-  const args = { only: null, rpcOnly: false, dry: false };
+const SOURCES = new Set(["rialto"]);
+
+export function parseArgs(argv) {
+  const args = { only: null, rpcOnly: false, rialtoOnly: false, dry: false };
+  const source = (value) => {
+    const name = String(value ?? "").trim().toLowerCase();
+    if (!SOURCES.has(name)) throw new Error(`--source takes one of: ${[...SOURCES].join(", ")}`);
+    args.rialtoOnly = true;
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--slug") args.only = [argv[++i] ?? ""];
@@ -72,6 +105,9 @@ function parseArgs(argv) {
     else if (a === "--only") args.only = String(argv[++i] ?? "").split(",");
     else if (a.startsWith("--only=")) args.only = a.slice(7).split(",");
     else if (a === "--rpc-only") args.rpcOnly = true;
+    else if (a === "--rialto-only") args.rialtoOnly = true;
+    else if (a === "--source") source(argv[++i]);
+    else if (a.startsWith("--source=")) source(a.slice(9));
     else if (a === "--dry" || a === "--dry-run") args.dry = true;
     else throw new Error(`unknown argument ${a}`);
   }
@@ -79,10 +115,35 @@ function parseArgs(argv) {
     args.only = [...new Set(args.only.map((slug) => slug.trim()).filter(Boolean))];
     if (args.only.length === 0) throw new Error("--only requires one or more comma-separated slugs");
   }
+  if (args.rpcOnly && args.rialtoOnly) throw new Error("--rpc-only and --source rialto ask for opposite runs");
   return args;
 }
 
 const readYaml = async (path) => parse(await readFile(path, "utf8"));
+
+/**
+ * Keeps one promise for each client method/argument tuple during a pull. The census can point many
+ * names at the same contracts; sharing those reads makes every name use the same snapshot and keeps
+ * a full run bounded without changing the source clients or their retry behavior.
+ */
+export function memoizeClient(client) {
+  const cache = new Map();
+  return new Proxy(client, {
+    get(target, property, receiver) {
+      const method = Reflect.get(target, property, receiver);
+      if (typeof method !== "function") return method;
+      return (...args) => {
+        const normalized = JSON.stringify(args, (_key, value) =>
+          typeof value === "string" && /^0x[0-9a-fA-F]{40}$/.test(value) ? value.toLowerCase() : value);
+        const key = `${String(property)}:${normalized}`;
+        // Some clients expose synchronous URL builders alongside asynchronous reads. Preserve the
+        // original return type while still sharing in-flight promises from network methods.
+        if (!cache.has(key)) cache.set(key, method.apply(target, args));
+        return cache.get(key);
+      };
+    },
+  });
+}
 
 /** One row per address to pull, deduplicated within a slug, first label and role winning. */
 export function addressesFor(project) {
@@ -162,6 +223,94 @@ export function summaryLine(slug, doc) {
   return `${slug.padEnd(24)} ${parts.join(" · ")}`;
 }
 
+/**
+ * Rebuilds one name's market block from the file already on disk. Only the two sources this mode
+ * reads are replaced: the Rialto joins always, and the DexScreener figures when Rialto matched the
+ * token, so the two 24h volumes being compared are read minutes apart at worst. Everything the
+ * Blockscout walk produced — the top-10 concentration, the launchpad attribution, the burned share —
+ * is carried through untouched and keeps its own top10_as_of.
+ */
+export function refreshedMarket(previous, { fresh, rialtoMarket, project, censusRow, reference, rialtoErrors }) {
+  const market = { ...previous, ...(fresh ?? {}) };
+  market.errors = [
+    ...(previous.errors ?? []).filter((error) => error.step !== "rialto" && !(fresh && error.step === "dexscreener")),
+    ...(fresh?.errors ?? []),
+    ...rialtoErrors,
+  ];
+  market.rialto = rialtoMarket;
+  market.pair_asset = reference ? pairAssetFor(project, censusRow, market, rialtoMarket, reference) : null;
+  market.volume_disagreement = volumeDisagreement(market.volume_h24 ?? null, rialtoMarket?.volume_24h_usd ?? null);
+  return market;
+}
+
+/**
+ * `--source rialto` / `--rialto-only`. Rewrites the Rialto-derived parts of every committed pulled
+ * file and nothing else. No RPC, no Blockscout, no DefiLlama, and — deliberately — no history line:
+ * content/pulled/history/*.jsonl is append-only and a snapshot must come from a whole read.
+ */
+async function refreshRialtoNames({ args, targets, rialto, rialtoFailure, discoveryCount, pulledAt, dexscreener, runErrors, started, validate }) {
+  const rialtoErrors = rialto
+    ? rialto.errors.map((error) => ({ step: "rialto", message: `${error.step}: ${error.message}` }))
+    : rialtoFailure ? [{ step: "rialto", message: rialtoFailure }] : [];
+  console.log(
+    `rialto refresh · ${targets.length} slugs · ${RIALTO_BASE}` +
+      `${rialto ? ` · ${discoveryCount} discovery candidates` : " unavailable"}` +
+      ` · dexscreener ${DEXSCREENER_BASE}${args.dry ? " · dry run" : ""}`,
+  );
+
+  const totals = { files: 0, rialto: 0, pairAssets: 0, disagreements: 0 };
+  const skipped = [];
+  const failures = [];
+  for (const target of targets) {
+    const path = join("content/pulled", `${target.slug}.yaml`);
+    const raw = await readFile(path, "utf8").catch(() => null);
+    const doc = raw ? parse(raw) : null;
+    if (!doc?.market) {
+      skipped.push({ slug: target.slug, reason: raw ? "no market block; run a full pull first" : "no committed file; run a full pull first" });
+      continue;
+    }
+    const tokenAddress = doc.market.token_address ?? null;
+    const rialtoMarket = rialto && tokenAddress ? rialtoMarketFor(tokenAddress, rialto.reference, { asOf: pulledAt }) : null;
+    // One DexScreener read per matched name, and only for matched names: an unmatched name has
+    // nothing to compare against, so re-reading it would cost a request and change nothing.
+    const fresh = rialtoMarket ? await readMarket(dexscreener, tokenAddress, { pulledAt }) : null;
+    doc.market = refreshedMarket(doc.market, {
+      fresh,
+      rialtoMarket,
+      project: target.project,
+      censusRow: target.census,
+      reference: rialto?.reference ?? null,
+      rialtoErrors,
+    });
+    // The RPC facts in this file were read at that head and are untouched, so the annotation stays.
+    const head = raw.match(/^pulled_at:.*# chain head (\d+) at read time/m)?.[1];
+    try {
+      const { written } = await writePulled(doc, {
+        blockNumber: head ? Number(head) : null, dry: args.dry, validate,
+      });
+      if (written) totals.files++;
+    } catch (error) {
+      failures.push({ slug: target.slug, message: error.message });
+      console.error(`${target.slug.padEnd(24)} NOT WRITTEN: ${error.message}`);
+      continue;
+    }
+    if (doc.market.rialto) totals.rialto++;
+    if (doc.market.pair_asset) totals.pairAssets++;
+    if (doc.market.volume_disagreement) totals.disagreements++;
+  }
+
+  const seconds = ((Date.now() - started) / 1000).toFixed(1);
+  console.log(
+    `\n${totals.files} files · ${totals.rialto} Rialto matches · ${totals.pairAssets} pair assets · ` +
+      `${totals.disagreements} volume disagreements · ${discoveryCount} discovery candidates · ` +
+      `${skipped.length} skipped · ${failures.length} not written · no history lines · ${seconds}s`,
+  );
+  for (const row of skipped) console.log(`  skipped ${row.slug.padEnd(20)} ${row.reason}`);
+  for (const row of failures) console.log(`  failed  ${row.slug.padEnd(20)} ${row.message}`);
+  // Rialto is the whole point of this run, so a Rialto failure is the run failing.
+  if (runErrors.some((error) => error.step === "rialto") && !args.dry) process.exit(1);
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const started = Date.now();
@@ -184,7 +333,7 @@ async function main() {
     const ledger = await readYaml(join("content/sources", `${row.slug}.yaml`)).catch(() => null);
     const hasLlama = Boolean(findLlamaSlug(ledger?.sources ?? []));
     if (addresses.length === 0 && !hasLlama) continue;
-    targets.push({ slug: row.slug, addresses, llamaSlug: hasLlama ? findLlamaSlug(ledger?.sources ?? []) : null });
+    targets.push({ slug: row.slug, addresses, project, census: row, llamaSlug: hasLlama ? findLlamaSlug(ledger?.sources ?? []) : null });
   }
   if (wanted) {
     const found = new Set(targets.map((target) => target.slug));
@@ -201,15 +350,82 @@ async function main() {
 
   const pace = createPacer(250);
   const deps = { pace };
-  const rpc = createRpcClient({ deps });
-  const blockscout = createBlockscoutClient({ deps });
-  const llama = createLlamaClient({ deps });
-  const dexscreener = createDexscreenerClient({ deps });
-  const activityClient = createActivityClient({ deps });
+  const rpc = memoizeClient(createRpcClient({ deps }));
+  const blockscout = memoizeClient(createBlockscoutClient({ deps }));
+  const llama = memoizeClient(createLlamaClient({ deps }));
+  const dexscreener = memoizeClient(createDexscreenerClient({ deps }));
+  const activityClient = memoizeClient(createActivityClient({ deps }));
   const validate = createValidator();
 
-  let blockNumber = null;
+  // Rialto is a chain-wide read: each endpoint is fetched once, cached for the run and paced at one
+  // request per second. It is completed before per-name writes so every name sees the same snapshot.
+  // `read` is what came back from the API; `rialto` is non-null only once chain.yaml has actually
+  // landed, so a schema failure there cannot leave the banner reporting a healthy source while the
+  // committed file stays stale. Discovery is still written from what was read either way.
   const runErrors = [];
+  let read = null;
+  let rialto = null;
+  let discoveryCount = 0;
+  let rialtoFailure = null;
+  const rialtoFailed = (message) => {
+    rialtoFailure = message;
+    runErrors.push({ step: "rialto", message });
+    console.error(message);
+  };
+  if (!args.rpcOnly) {
+    // No attempts override: Rialto gets the standard retry policy, because a single transient 503
+    // would otherwise null a whole chain block until the next six-hourly run.
+    const rialtoClient = createRialtoClient({ deps: { pace: createPacer(1000) } });
+    try {
+      read = await readRialto(rialtoClient, { pulledAt });
+    } catch (error) {
+      rialtoFailed(`Rialto not read: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  if (read) {
+    try {
+      const chainSeries = await writeChainSeries(read.series, { dry: args.dry });
+      for (const kept of chainSeries.kept) {
+        read.chain[kept.key === "fee_revenue_daily" ? "economics" : kept.key === "tvl_by_category_daily" ? "tvl" : "activity"]
+          .errors.push({ step: kept.key, message: `read returned ${kept.incoming} points; kept ${kept.existing} committed points` });
+      }
+      await writeChainPulled(read.chain, { dry: args.dry });
+      rialto = read;
+    } catch (error) {
+      rialtoFailed(`content/pulled/chain.yaml not written: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    try {
+      const existingDiscovery = await readYaml("content/pulled/discovery.yaml").catch(() => ({ candidates: [] }));
+      const candidates = discoveryCandidates({
+        reference: read.reference,
+        census,
+        projects,
+        existing: existingDiscovery?.candidates ?? [],
+        pulledAt,
+      });
+      const discoveryErrors = [...read.errors];
+      // Newest candidates lead and at most forty receive the optional DexScreener depth check.
+      for (const candidate of candidates.slice(0, 40)) {
+        const result = await readMarket(dexscreener, candidate.address, { pulledAt });
+        candidate.dexscreener_liquidity_usd = result.liquidity_usd;
+        for (const error of result.errors) {
+          discoveryErrors.push({ step: "dexscreener", message: `${candidate.address}: ${error.message}` });
+        }
+      }
+      await writeDiscovery({ pulled_at: pulledAt, candidates, errors: discoveryErrors }, { dry: args.dry });
+      discoveryCount = candidates.length;
+    } catch (error) {
+      rialtoFailed(`content/pulled/discovery.yaml not written: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  if (args.rialtoOnly) {
+    return refreshRialtoNames({
+      args, targets, rialto, rialtoFailure, discoveryCount, pulledAt, dexscreener, runErrors, started, validate,
+    });
+  }
+
+  let blockNumber = null;
   try {
     const hex = await rpc.blockNumber();
     blockNumber = hex ? Number(BigInt(hex)) : null;
@@ -220,6 +436,7 @@ async function main() {
   console.log(
     `pull ${targets.length} slugs · rpc ${RPC_URL}` +
       `${args.rpcOnly ? " · blockscout and dexscreener skipped (--rpc-only)" : ` · blockscout ${BLOCKSCOUT_BASE} · dexscreener ${DEXSCREENER_BASE}`}` +
+      `${args.rpcOnly ? "" : ` · rialto ${RIALTO_BASE}${rialto ? ` · ${discoveryCount} discovery candidates` : " unavailable"}`}` +
       `${blockNumber ? ` · head ${blockNumber}` : ""}${args.dry ? " · dry run" : ""}`,
   );
 
@@ -227,6 +444,7 @@ async function main() {
     addresses: 0, owners: 0, safes: 0, proxies: 0, holders: 0, metrics: 0,
     pairs: 0, markets: 0, top10: 0, top10ExPools: 0, launchpads: 0, mint: 0, renounced: 0,
     lp: 0, revenue24h: 0, revenueSeries: 0, seriesKept: 0, txns24h: 0, launches24h: 0, capped: 0,
+    rialto: 0, pairAssets: 0, disagreements: 0,
     errors: 0, files: 0, snapshots: 0,
   };
   const failures = [];
@@ -287,6 +505,21 @@ async function main() {
           market.errors.push({ step: "launchpad", message: `creator ${creator} did not match a launchpad factory, curve or known launcher deployer` });
         }
         market = { ...market, ...top10, launchpad, errors: [...market.errors, ...top10.errors] };
+
+        if (rialto) {
+          const rialtoMarket = rialtoMarketFor(tokenAddress, rialto.reference, { asOf: pulledAt });
+          market.rialto = rialtoMarket;
+          market.volume_disagreement = volumeDisagreement(market.volume_h24, rialtoMarket?.volume_24h_usd ?? null);
+          market.pair_asset = pairAssetFor(target.project, target.census, market, rialtoMarket, rialto.reference);
+          for (const error of rialto.errors) {
+            market.errors.push({ step: "rialto", message: `${error.step}: ${error.message}` });
+          }
+        } else {
+          market.rialto = null;
+          market.pair_asset = null;
+          market.volume_disagreement = null;
+          if (rialtoFailure) market.errors.push({ step: "rialto", message: rialtoFailure });
+        }
 
         const tokenRow = addresses.find((row) => row.address.toLowerCase() === tokenAddress.toLowerCase());
         const ownership = await readMintAndRenounce(blockscout, tokenAddress, tokenRow?.owner ?? null);
@@ -367,6 +600,9 @@ async function main() {
       totals.pairs += market.pairs.length;
       if (market.pairs.length > 0) totals.markets++;
       else if (tokenAddress) noPairs.push({ slug: target.slug, address: tokenAddress });
+      if (market.rialto) totals.rialto++;
+      if (market.pair_asset) totals.pairAssets++;
+      if (market.volume_disagreement) totals.disagreements++;
       marketRows.push({
         slug: target.slug,
         pairs: market.pairs.length,
@@ -400,14 +636,16 @@ async function main() {
       `${totals.owners} owners · ${totals.safes} safes · ${totals.proxies} proxies · ` +
       `${totals.holders} holder counts · ${totals.metrics} metrics · ${totals.markets} markets · ` +
       `${totals.pairs} pairs · ${totals.txns24h} txns/24h · ${totals.launches24h} launches/24h · ` +
-      `${totals.errors} errors · ${seconds}s`,
+      `${totals.rialto} Rialto matches · ${totals.pairAssets} pair assets · ${totals.disagreements} volume disagreements · ` +
+      `${discoveryCount} discovery candidates · ${totals.errors} errors · ${seconds}s`,
   );
   console.log(
     `coverage of ${targets.length} located names · top10 ${totals.top10}/${targets.length} · ` +
       `top10 ex pools ${totals.top10ExPools}/${targets.length} · launchpad ${totals.launchpads}/${targets.length} · ` +
       `mint ${totals.mint}/${targets.length} · renounced ${totals.renounced}/${targets.length} · ` +
       `LP reads ${totals.lp} · revenue 24h ${totals.revenue24h}/${targets.length} · ` +
-      `revenue series ${totals.revenueSeries}/${targets.length} · ${totals.seriesKept} series kept`,
+      `revenue series ${totals.revenueSeries}/${targets.length} · ${totals.seriesKept} series kept · ` +
+      `Rialto ${totals.rialto}/${targets.length} · pair asset ${totals.pairAssets}/${targets.length}`,
   );
   for (const f of safeThresholdOne) {
     console.log(`1-of-${f.signers ?? "?"} Safe owns ${f.slug} ${f.address} (owner ${f.owner})`);
