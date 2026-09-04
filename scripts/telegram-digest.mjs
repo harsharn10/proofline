@@ -62,7 +62,9 @@ let entries = selectShareBar(
 if (limit > 0) entries = entries.slice(0, limit);
 // The second message kind: the wire itself, for the same names the share bar already cleared.
 // Gated on the same channel switch as the publications, so pausing delivery pauses everything.
-let wire = review.channel_enabled === true
+// Wire items travel only when the review file opts in (wire_enabled: true). Paused on 2026-09-04:
+// the owner judged the automatic sends thin; the signals and the daily brief replace them.
+let wire = review.channel_enabled === true && review.wire_enabled === true
   ? selectWireItems(content, derivedFile.shareBar, { since, all, state })
   : [];
 // A first run has months of backlog behind it. Send the newest WIRE_PER_RUN and leave the rest
