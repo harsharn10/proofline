@@ -283,9 +283,9 @@ export function distinctTalkAccounts(items = [], accounts = [], date = null) {
 /**
  * Six-hour pull signal. Two independent legs, both required: the market leg (24h volume at least
  * doubled against the previous snapshot, on a pair holding at least $50K of liquidity) AND a
- * corroborating leg (holders up 20% or three qualifying accounts posting that day). A name below the
- * liquidity floor never fires, and the headline number — the 24h volume — must be up, so a "MOVING"
- * alert can never carry a falling number.
+ * corroborating leg (holders up 20%, three qualifying accounts posting that day, or the scale leg —
+ * see BREAKOUT_RULES.minMaterialVolumeUsd). A name below the liquidity floor never fires, and the
+ * headline number — the 24h volume — must be up, so a "MOVING" alert can never carry a falling number.
  */
 export function breakoutSignal({ slug, current = {}, previous = {}, distinctAccounts = 0 } = {}) {
   const liquidity = finite(current.liquidityUsd);
