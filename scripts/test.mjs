@@ -1220,6 +1220,8 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
         ],
       },
       { pons: true, "artificial-inu": true },
+      // kind parity with the site: lift the channel's own gate (announcement/talk, plain language, one per name)
+      { kinds: new Set(["announcement", "talk", "onchain", "note"]), perName: 99, plain: false },
     );
     assert.deepEqual(telegramWire.map((item) => item.kind), wire.map((item) => item.kind), "Telegram reads the site's wire kinds");
     assert.deepEqual(telegramWire.map((item) => item.at), wire.map((item) => item.at), "and in the same order");
@@ -1373,9 +1375,9 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
       changelog: [{ slug: "pons", type: "risk", severity: "Risk", title: "Owner changed a fee recipient", detail: "The Safe changed the creator fee recipient.", date: "2026-09-04" }],
     };
     const picked = selectWireItems(content, { pons: true, ai: true }, { state: { sent_keys: [] } });
-    assert.deepEqual(picked.map((i) => i.id), ["feed-pons-a1", "feed-ai-t1"], "one plain announcement per name and the plain talk item; data reads, raw talk and notes stay on the site");
+    assert.deepEqual(picked.map((i) => i.id), ["feed-ai-t1", "feed-pons-a1"], "one plain announcement per name and the plain talk item; data reads, raw talk and notes stay on the site");
     const both = selectWireItems(content, { pons: true, ai: true }, { state: { sent_keys: [] }, perName: 2 });
-    assert.deepEqual(both.map((i) => i.id), ["feed-pons-a1", "feed-ai-t1", "feed-pons-a2"], "perName lifts the cap");
+    assert.deepEqual(both.map((i) => i.id), ["feed-ai-t1", "feed-pons-a1", "feed-pons-a2"], "perName lifts the cap");
     console.log("ok   telegram wire gate");
   } catch (err) {
     failures++;

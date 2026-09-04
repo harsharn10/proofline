@@ -219,7 +219,7 @@ export function readerGrade(item) {
   return !RAW_GIST_RE.test(text) && String(item.gist ?? "").trim().length >= 20;
 }
 
-export function selectWireItems(content, shareBar, { since = null, all = false, state = null, kinds = TELEGRAM_WIRE_KINDS, perName = 1 } = {}) {
+export function selectWireItems(content, shareBar, { since = null, all = false, state = null, kinds = TELEGRAM_WIRE_KINDS, perName = 1, plain = true } = {}) {
   const sent = new Set(all ? [] : (state?.sent_keys ?? []));
   const above = (slug) => shareBar?.[slug] === true;
   const nameOf = (slug) => content.projects?.get(slug)?.name ?? slug;
@@ -260,7 +260,7 @@ export function selectWireItems(content, shareBar, { since = null, all = false, 
   const perNameCount = new Map();
   return items
     .filter((item) => (!since || item.at >= since) && !sent.has(wireKey(item)))
-    .filter((item) => kinds.has(item.kind) && readerGrade(item))
+    .filter((item) => kinds.has(item.kind) && (!plain || readerGrade(item)))
     .sort((a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id))
     .filter((item) => {
       // One item per name per run: the channel is a digest, not a firehose.
