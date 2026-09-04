@@ -1,5 +1,5 @@
 slug: op
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 51169078
     created_at: 2026-08-31T21:02:01.000Z
-    holders: 439
+    holders: 420
     errors: []
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory
@@ -29,9 +29,14 @@ addresses:
       type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
@@ -43,22 +48,21 @@ addresses:
     source_verified: true
     contract_name: V2LaunchLocker
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841845
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
   - address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
     label: SNDK quote (pairToken / Robinhood Stock Token rail)
     role: token
@@ -74,26 +78,26 @@ addresses:
     safe: null
     created_block: 48293
     created_at: 2026-06-10T15:27:03.000Z
-    holders: 24550
+    holders: 24558
     errors: []
 metrics: []
 market:
   token_address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T16:22:34.904Z
   pairs:
     - dex: uniswap
       pair_address: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
       quote_symbol: SNDK
-      price_usd: 0.00008608
-      liquidity_usd: 27307.23
-      volume_h24: 189701.84
-      volume_h6: 45208.07
+      price_usd: 0.00008013
+      liquidity_usd: 26762.19
+      volume_h24: 160790.94
+      volume_h6: 16639.65
       txns_h24:
-        buys: 556
-        sells: 426
-      price_change_h24: -42.92
-      market_cap: 86090
-      fdv: 86090
+        buys: 461
+        sells: 366
+      price_change_h24: -44.1
+      market_cap: 80139
+      fdv: 80139
       created_at: 2026-08-31T21:02:46.000Z
     - dex: uniswap
       pair_address: "0x0ce46e76a7f9227ef31fbe8737dbd91dbc2aeb72e8888e1c3accc3e5094fad20"
@@ -109,19 +113,19 @@ market:
       market_cap: 24732
       fdv: 24732
       created_at: 2026-09-03T18:38:32.000Z
-  liquidity_usd: 27309.19
-  volume_h24: 189703.04
-  trades_h24: 983
-  price_usd: 0.00008608
-  price_change_h24: -42.92
-  market_cap_usd: 86090
-  fdv_usd: 86090
-  fdv: 86090
+  liquidity_usd: 26764.15
+  volume_h24: 160792.14
+  trades_h24: 828
+  price_usd: 0.00008013
+  price_change_h24: -44.1
+  market_cap_usd: 80139
+  fdv_usd: 80139
+  fdv: 80139
   first_pair_at: 2026-08-31T21:02:46.000Z
-  top10_share: 0.4540425901279719
-  top10_share_ex_pools: 0.2504287615472057
+  top10_share: 0.450429872692119
+  top10_share_ex_pools: 0.2335709443897627
   burned_share: 0
-  top10_as_of: 2026-09-04T11:23:39.609Z
+  top10_as_of: 2026-09-04T16:22:34.904Z
   launchpad:
     slug: pons
     via: creator
@@ -140,7 +144,7 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T16:22:34.904Z
   mint: no-mint-function
   renounced: null
   lp:
@@ -156,16 +160,16 @@ structure:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T16:22:34.904Z
   addresses:
     - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
       label: OP token (PonsV2LauncherToken)
       role: token
       transactions_count: 1476
       token_transfers_count: 0
-      last_tx_at: 2026-09-04T12:36:26.000Z
+      last_tx_at: 2026-09-04T17:19:38.000Z
       last_method: approve
-      txns_24h: 170
+      txns_24h: 148
       launches_24h: null
       errors: []
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
@@ -173,10 +177,10 @@ activity:
       role: factory
       transactions_count: 76659
       token_transfers_count: 6719
-      last_tx_at: 2026-09-04T11:24:53.000Z
+      last_tx_at: 2026-09-04T16:23:54.000Z
       last_method: transferCreatorFeeRecipient
       txns_24h: 2000
-      launches_24h: 805
+      launches_24h: 859
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -195,12 +199,12 @@ activity:
       role: token
       transactions_count: 6510
       token_transfers_count: 39
-      last_tx_at: 2026-09-04T12:26:07.000Z
-      last_method: transfer
-      txns_24h: 624
+      last_tx_at: 2026-09-04T17:18:28.000Z
+      last_method: approve
+      txns_24h: 713
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T12:36:26.000Z
-  txns_24h: 2794
-  launches_24h: 805
+  last_activity_at: 2026-09-04T17:19:38.000Z
+  txns_24h: 2861
+  launches_24h: 859
 errors: []
