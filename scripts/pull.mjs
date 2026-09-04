@@ -58,7 +58,8 @@ import {
 import {
   createActivityClient,
   readAddressActivity,
-  parseCounters,
+  parseTransactionsPage,
+  newestInbound,
   aggregateActivity,
   emptyActivity,
 } from "./lib/pull/activity.mjs";
@@ -78,7 +79,7 @@ import {
   attributeCreator,
   launchpadSlugsFrom,
 } from "./lib/pull/attribution.mjs";
-import { readTop10, readMintAndRenounce, readLpLocks } from "./lib/pull/token.mjs";
+import { readTop10, readMintAndRenounce, readLpLocks, renouncedFromOwner } from "./lib/pull/token.mjs";
 import { writeSeries, seriesReplacement } from "./lib/pull/series.mjs";
 import {
   createRialtoClient,
@@ -93,11 +94,14 @@ import { createCreditBudget } from "./lib/pull/budget.mjs";
 import {
   consumeQueue,
   explorerChangeDecision,
+  needsExplorerSignal,
   parseShard,
   projectDailyCredits,
+  scaleTierMix,
   shardFor,
   tierFor,
   tierIsDue,
+  TIER_DAILY_READS,
 } from "./lib/pull/tiers.mjs";
 import { locatedOnChain, meetsShareBar, officialSurfaceConfirmed } from "./lib/share-bar.mjs";
 
@@ -166,10 +170,100 @@ export function carryAddressFacts(fresh, previous) {
   return carry(fresh, previous, ["is_contract", "source_verified", "contract_name", "created_block", "created_at", "holders"]);
 }
 
+/**
+ * The lifetime facts of an address's activity. Each of these only ever goes stale — a transaction
+ * that happened stays happened — so carrying the committed value under a new read is honest.
+ * Deliberately not here: `txns_24h` and `launches_24h`, which are measurements of a window and mean
+ * nothing without the window they were measured over. See `activityWindow`.
+ */
 export function carryActivityFacts(fresh, previous) {
-  return carry(fresh, previous, [
-    "transactions_count", "token_transfers_count", "last_tx_at", "last_method", "txns_24h", "launches_24h",
-  ]);
+  return carry(fresh, previous, ["transactions_count", "token_transfers_count", "last_tx_at", "last_method"]);
+}
+
+export const EMPTY_READ_MESSAGE = "read returned empty where a value existed; kept previous";
+
+/**
+ * Ownership and proxy classification, guarded against a read that came back empty.
+ *
+ * On 2026-09-04 a run whose explorer and node reads were being refused published `owner: null`,
+ * `owner_type: none` and `safe: null` on 82 address rows, 35 of them with `errors: []`, and the
+ * signals feed downstream read that as "Pons renounced ownership". A null where the committed
+ * snapshot held a value is a failed read until proven otherwise: keep the previous value, date it,
+ * and say so. A genuine renouncement does not arrive as an absence — it arrives as `owner()`
+ * returning the zero address, which is a value and passes straight through. An empty answer is
+ * written only when the very next pull reads it empty again, so one bad minute cannot rewrite a fact.
+ */
+export function carryOwnershipFacts(fresh, previous, { unread = {}, previousErrors = [] } = {}) {
+  const out = { ...fresh };
+  const errors = [...(out.errors ?? [])];
+  const confirmedBefore = (step) =>
+    previousErrors.some((error) => error?.step === step && error?.message === EMPTY_READ_MESSAGE);
+  const keepOwner = () => {
+    out.owner = previous.owner;
+    out.owner_type = previous.owner_type ?? "unknown";
+    out.safe = previous.safe ?? null;
+  };
+
+  if (previous?.owner != null && out.owner == null) {
+    if (unread.owner) keepOwner(); // the probe failed and recorded why; the recorded error explains it
+    else if (!confirmedBefore("owner")) {
+      keepOwner();
+      errors.push({ step: "owner", message: EMPTY_READ_MESSAGE });
+    }
+  } else if (previous?.safe != null && out.safe == null && out.owner === previous.owner) {
+    if (unread.safe) out.safe = previous.safe;
+    else if (!confirmedBefore("safe")) {
+      out.safe = previous.safe;
+      errors.push({ step: "safe", message: EMPTY_READ_MESSAGE });
+    }
+  }
+
+  const priorProxy = previous?.proxy ?? null;
+  if (priorProxy && priorProxy.type !== "unknown" && out.proxy?.type === "unknown") {
+    if (unread.proxy) out.proxy = priorProxy;
+    else if (!confirmedBefore("proxy")) {
+      out.proxy = priorProxy;
+      errors.push({ step: "proxy", message: EMPTY_READ_MESSAGE });
+    }
+  }
+
+  out.errors = errors;
+  return out;
+}
+
+/**
+ * The 24-hour window on one address row.
+ *
+ * `txns_24h` and `launches_24h` are not facts, they are measurements of the day before the read. A
+ * run that did not walk cannot restate them under its own `pulled_at` without redefining the window
+ * it claims to have measured — a factory that launched 24 tokens yesterday and nothing since would
+ * report 24 launches in the last 24 hours for ever. So a carried figure keeps the timestamp of the
+ * run that actually measured it (`window_as_of`), carries `stale_since`, and keeps the errors that
+ * qualified it — above all the "count is a floor" caveat a page-capped walk leaves behind, which is
+ * the difference between a measured 2,000 and a lower bound that could be 50,000.
+ */
+export function activityWindow(fresh, previous, { measured, pulledAt, previousAsOf = null }) {
+  if (measured) {
+    return {
+      ...fresh,
+      window_as_of: pulledAt,
+      stale_since: null,
+    };
+  }
+  const asOf = previous?.window_as_of ?? previousAsOf ?? null;
+  const carried = previous?.txns_24h != null || previous?.launches_24h != null;
+  return {
+    ...fresh,
+    txns_24h: carried ? previous?.txns_24h ?? null : null,
+    launches_24h: carried ? previous?.launches_24h ?? null : null,
+    window_as_of: carried ? asOf : null,
+    stale_since: carried ? previous?.stale_since ?? asOf : null,
+    errors: [
+      ...(fresh.errors ?? []),
+      // The caveat travels with the number it qualifies, or the floor reads as a count.
+      ...(carried ? (previous?.errors ?? []).filter((error) => error?.step === "txns_24h capped") : []),
+    ],
+  };
 }
 
 export function carryMarketFacts(fresh, previous) {
@@ -182,13 +276,21 @@ export function carryStructureFacts(fresh, previous) {
   return carry(fresh, previous, ["mint", "renounced", "lp"]);
 }
 
-export function explorerReadRecord({ kind, address = null, status, reason, signalValue = null, checkedAt, previous = null, credits = 0 }) {
+export function explorerReadRecord({
+  kind, address = null, status, reason, signalValue = null, signal = null, codeHash = null,
+  checkedAt, previous = null, credits = 0,
+}) {
   return {
     kind,
     address,
     status,
     reason,
     signal_value: Number.isInteger(signalValue) && signalValue >= 0 ? signalValue : null,
+    // The signal that decided this read. For a contract it is the hash of the newest transaction to
+    // the address, which is what the next run compares against; `signal_value` stays the integer
+    // form for the RPC nonce and the DexScreener trade count.
+    signal: typeof signal === "string" && signal.length > 0 ? signal : null,
+    code_hash: typeof codeHash === "string" && codeHash.length > 0 ? codeHash : null,
     checked_at: checkedAt,
     stale_since: status === "read" ? null : previous?.stale_since ?? previous?.checked_at ?? null,
     credits,
@@ -480,7 +582,10 @@ async function main() {
   const explorerDeps = {
     pace: createPacer(1000 / explorerConfig.requestsPerSecond),
     defaultHeaders: explorerConfig.headers,
-    beforeRequest: (url) => creditBudget.claim(url),
+    // The label is the read's scope — "<slug>:<address>" — never the URL. A deferral label is
+    // written into the committed document, where a full request URL is both unreadable and the wrong
+    // place for anything a query-string API key could one day end up in.
+    beforeRequest: () => creditBudget.claim("explorer read"),
     onRequest: explorerTracker.recordRequest,
     onChallenge: explorerTracker.recordChallenge,
   };
@@ -590,10 +695,16 @@ async function main() {
   const errorCounts = new Map();
   const completedSlugs = [];
   const deferredReads = [];
+  // Measured, not assumed: what this run actually spent per tier is what the projection is built on.
+  const tierSpend = { hot: 0, live: 0, quiet: 0, dormant: 0 };
+  const tierRead = { hot: 0, live: 0, quiet: 0, dormant: 0 };
   let walksSkipped = 0;
 
   for (const target of targets) {
     const slugStarted = Date.now();
+    // Names are processed one at a time, so the run counter's movement across a name is that name's
+    // spend exactly — the concurrency is inside a name, and each of those reads has its own scope.
+    const slugCreditsStart = creditBudget.snapshot().run_credits;
     // Free sources lead. DexScreener's trade counter is the token change signal, so an unchanged
     // token never spends explorer credits merely to learn that its holder/ABI facts are unchanged.
     const tokenAddress = tokenAddressFor(target.addresses);
@@ -604,6 +715,7 @@ async function main() {
         : emptyMarket(pulledAt, [{ step: "no token address", message: `no ${CHAIN} deployment with role token` }]);
     }
 
+    const previousActivityAt = target.previous?.activity?.pulled_at ?? null;
     const reads = await mapWithConcurrency(
       target.addresses,
       args.rpcOnly ? CONCURRENCY : explorerConfig.addressConcurrency,
@@ -615,32 +727,83 @@ async function main() {
       const previousActivity = priorActivityFor(target.previous, entry.address);
       const previousAddressRead = priorReadFor(target.previous, "address", entry.address) ?? { checked_at: target.previous?.pulled_at ?? null };
       const previousActivityRead = priorReadFor(target.previous, "activity", entry.address) ?? { checked_at: target.previous?.pulled_at ?? null };
+      const first = !previousAddress;
+      const label = `${target.slug}:${entry.address}`;
+      const now = Date.parse(pulledAt);
+
+      // The RPC already read the bytecode, so its digest is free. Everything the explorer knows about
+      // a contract's source — verified flag, contract name, ABI — is a function of that bytecode, so
+      // an unchanged hash is a proof that re-reading it would return what is already committed.
+      const priorCodeHash = previousAddressRead?.code_hash ?? null;
+      const codeHash = rpcResult.code_hash ?? null;
+      const codeChanged = codeHash === null || priorCodeHash === null || codeHash !== priorCodeHash;
+
+      // A static role that has not transacted in a week is not worth a credit to ask again.
+      const gate = needsExplorerSignal({
+        role: entry.role, full: args.full, first, lastTxAt: previousActivity?.last_tx_at, now,
+      });
+
+      const carriedRow = () => carryOwnershipFacts(
+        carryAddressFacts(mergeAddress(entry, rpcResult, null), previousAddress),
+        previousAddress,
+        { unread: rpcResult.unread, previousErrors: previousAddress?.errors ?? [] },
+      );
+      const carriedActivity = (errors = []) => activityWindow(
+        carryActivityFacts({
+          address: entry.address, label: entry.label, role: entry.role,
+          transactions_count: null, token_transfers_count: null, last_tx_at: null,
+          last_method: null, txns_24h: null, launches_24h: null, errors,
+        }, previousActivity),
+        previousActivity,
+        { measured: false, pulledAt, previousAsOf: previousActivityAt },
+      );
+
+      if (!gate.signal) {
+        walksSkipped++;
+        return {
+          row: carriedRow(), creator: null, activity: carriedActivity(), changed: false, codeHash,
+          records: [
+            explorerReadRecord({ kind: "address", address: entry.address, status: "unchanged", reason: gate.reason, signal: previousAddressRead?.signal ?? null, codeHash, checkedAt: pulledAt, previous: previousAddressRead, credits: 0 }),
+            explorerReadRecord({ kind: "activity", address: entry.address, status: "unchanged", reason: gate.reason, signal: previousAddressRead?.signal ?? null, codeHash, checkedAt: pulledAt, previous: previousActivityRead, credits: 0 }),
+          ],
+        };
+      }
+
+      // The change signal. For an EOA it is the free RPC nonce. For a contract it is the newest
+      // transaction *to* the address, taken as page one of the walk this run may need anyway — one
+      // credit, and unlike /counters it is live. For a token DexScreener's trade count is a
+      // pre-filter that can force a read (a router swap never touches the token contract directly),
+      // never a reason on its own to skip one.
       let currentSignal = null;
       let priorSignal = null;
-      let preloadedCounters;
+      let signalValue = null;
       let signalError = null;
-      const signalStart = creditBudget.snapshot().run_credits;
+      let firstPage = null;
+      const isEoa = rpcResult.is_contract === false;
+      const preFilterChanged = entry.role === "token" && !first &&
+        (market?.trades_h24 ?? null) !== (target.previous?.market?.trades_h24 ?? null);
 
-      if (entry.role === "token") {
-        currentSignal = market?.trades_h24 ?? null;
-        priorSignal = target.previous?.market?.trades_h24 ?? null;
-      } else if (rpcResult.is_contract === false) {
-        priorSignal = previousAddressRead?.signal_value ?? null;
-        try {
-          const nonce = await rpc.transactionCount(entry.address);
-          currentSignal = typeof nonce === "string" ? Number(BigInt(nonce)) : null;
-        } catch (error) {
-          signalError = { step: "rpc", message: `eth_getTransactionCount ${entry.address}: ${error.message}` };
+      const signalRead = await creditBudget.withCredits(label, async () => {
+        if (isEoa) {
+          priorSignal = previousAddressRead?.signal ?? previousAddressRead?.signal_value ?? null;
+          try {
+            const nonce = await rpc.transactionCount(entry.address);
+            signalValue = typeof nonce === "string" ? Number(BigInt(nonce)) : null;
+            currentSignal = signalValue === null ? null : String(signalValue);
+          } catch (error) {
+            signalError = { step: "rpc", message: `eth_getTransactionCount ${entry.address}: ${error.message}` };
+          }
+          return;
         }
-      } else {
-        priorSignal = previousActivity?.transactions_count ?? previousActivityRead?.signal_value ?? null;
+        priorSignal = previousAddressRead?.signal ?? null;
         try {
-          preloadedCounters = parseCounters(await activityClient.counters(entry.address));
-          currentSignal = preloadedCounters.transactions_count;
+          firstPage = parseTransactionsPage(await activityClient.transactions(entry.address, null));
+          currentSignal = newestInbound(firstPage).hash;
         } catch (error) {
-          signalError = { step: "blockscout", message: `counters/${entry.address}: ${error.message}` };
+          signalError = { step: "blockscout", message: `transactions?filter=to/${entry.address}: ${error.message}` };
         }
-      }
+      });
+      const signalCredits = signalRead.credits;
 
       const decision = explorerChangeDecision({
         role: entry.role,
@@ -648,46 +811,75 @@ async function main() {
         previous: previousAddress,
         priorSignal,
         currentSignal,
+        preFilterChanged,
+        preFilterName: "DexScreener trade count",
       });
-      const signalCredits = creditBudget.snapshot().run_credits - signalStart;
+
       if (!decision.changed) {
         walksSkipped++;
-        const row = carryAddressFacts(mergeAddress(entry, rpcResult, null), previousAddress);
-        const activity = carryActivityFacts({
-          address: entry.address, label: entry.label, role: entry.role,
-          transactions_count: currentSignal, token_transfers_count: null, last_tx_at: null,
-          last_method: null, txns_24h: null, launches_24h: null, errors: signalError ? [signalError] : [],
+        // Page one is already paid for, so the window is recounted from it for free. When it reaches
+        // past the 24-hour cutoff the count is exact and fresh — a quiet address falls to zero here
+        // instead of reporting yesterday's number for ever. When it does not, the committed figure is
+        // carried with the timestamp of the run that measured it.
+        const walk = await readAddressActivity(activityClient, entry, {
+          now, firstPage, readCounters: false, allowPaging: false,
+        });
+        const measured = walk.txns_24h !== null;
+        const fresh = carryActivityFacts({
+          ...walk,
+          errors: [...walk.errors, ...(signalError ? [signalError] : [])],
         }, previousActivity);
+        delete fresh.window_complete;
+        delete fresh.pages;
+        const activity = activityWindow(fresh, previousActivity, { measured, pulledAt, previousAsOf: previousActivityAt });
+        const reason = measured
+          ? `${decision.reason}; 24h window recounted from the signal page`
+          : `${decision.reason}; 24h walk skipped`;
         return {
-          row, creator: null, activity, changed: false,
+          row: carriedRow(), creator: null, activity, changed: false, codeHash,
           records: [
-            explorerReadRecord({ kind: "address", address: entry.address, status: "unchanged", reason: decision.reason, signalValue: currentSignal, checkedAt: pulledAt, previous: previousAddressRead, credits: 0 }),
-            explorerReadRecord({ kind: "activity", address: entry.address, status: "unchanged", reason: "24h walk skipped; change signal unchanged", signalValue: currentSignal, checkedAt: pulledAt, previous: previousActivityRead, credits: signalCredits }),
+            explorerReadRecord({ kind: "address", address: entry.address, status: "unchanged", reason: decision.reason, signalValue, signal: currentSignal ?? priorSignal, codeHash, checkedAt: pulledAt, previous: previousAddressRead, credits: signalCredits }),
+            explorerReadRecord({ kind: "activity", address: entry.address, status: "unchanged", reason, signalValue, signal: currentSignal ?? priorSignal, codeHash, checkedAt: pulledAt, previous: previousActivityRead, credits: 0 }),
           ],
         };
       }
 
-      const addressStart = creditBudget.snapshot().run_credits;
-      const bsResult = await readBlockscout(blockscout, entry.address, { isToken: entry.role === "token" });
-      const addressCredits = creditBudget.snapshot().run_credits - addressStart;
+      // Changed. The holder count moves with every transfer and is bought now; the metadata behind
+      // it — verified source, contract name, creator, creation block — cannot move while the
+      // bytecode is the same, so it is bought on a first read and afterwards only on a code change.
+      const addressRead = await creditBudget.withCredits(label, () => readBlockscout(blockscout, entry.address, {
+        isToken: entry.role === "token",
+        metadata: codeChanged || previousAddress?.created_at == null || previousAddress?.source_verified == null,
+        holders: true,
+      }));
+      const bsResult = addressRead.value;
+      const addressCredits = addressRead.credits;
       const addressDeferred = hasBudgetDeferral(bsResult.errors);
       const freshRow = mergeAddress(entry, rpcResult, bsResult);
       if (signalError) freshRow.errors.push(signalError);
-      const row = carryAddressFacts(freshRow, previousAddress);
+      const row = carryOwnershipFacts(
+        carryAddressFacts(freshRow, previousAddress),
+        previousAddress,
+        { unread: rpcResult.unread, previousErrors: previousAddress?.errors ?? [] },
+      );
 
-      const activityStart = creditBudget.snapshot().run_credits;
-      let activity = await readAddressActivity(activityClient, entry, {
-        now: Date.parse(pulledAt), preloadedCounters,
-      });
-      const activityCredits = signalCredits + creditBudget.snapshot().run_credits - activityStart;
-      activity = carryActivityFacts(activity, previousActivity);
+      const activityRead = await creditBudget.withCredits(label, () => readAddressActivity(activityClient, entry, {
+        now, firstPage,
+      }));
+      const walk = activityRead.value;
+      const activityCredits = activityRead.credits;
+      const measured = walk.txns_24h !== null;
+      const fresh = carryActivityFacts(walk, previousActivity);
+      delete fresh.window_complete;
+      delete fresh.pages;
+      const activity = activityWindow(fresh, previousActivity, { measured, pulledAt, previousAsOf: previousActivityAt });
       const activityDeferred = hasBudgetDeferral(activity.errors) || hasBudgetDeferral(signalError ? [signalError] : []);
-      if (addressDeferred || activityDeferred) deferredReads.push(`${target.slug}:${entry.address}`);
+      if (addressDeferred || activityDeferred) deferredReads.push(label);
       return {
-        row, creator: bsResult.creator ?? null, activity, changed: true,
+        row, creator: bsResult.creator ?? null, activity, changed: true, codeChanged, codeHash,
         records: [
-          explorerReadRecord({ kind: "address", address: entry.address, status: addressDeferred ? "deferred" : "read", reason: addressDeferred ? "budget exhausted; prior non-null facts retained" : decision.reason, signalValue: currentSignal, checkedAt: pulledAt, previous: previousAddressRead, credits: addressCredits }),
-          explorerReadRecord({ kind: "activity", address: entry.address, status: activityDeferred ? "deferred" : "read", reason: activityDeferred ? "budget exhausted; prior non-null activity retained" : `${decision.reason}; 24h walk refreshed`, signalValue: currentSignal, checkedAt: pulledAt, previous: previousActivityRead, credits: activityCredits }),
+          explorerReadRecord({ kind: "address", address: entry.address, status: addressDeferred ? "deferred" : "read", reason: addressDeferred ? "budget exhausted; prior non-null facts retained" : codeChanged ? decision.reason : `${decision.reason}; code hash unchanged, metadata not re-read`, signalValue, signal: currentSignal ?? priorSignal, codeHash, checkedAt: pulledAt, previous: previousAddressRead, credits: signalCredits + addressCredits }),
+          explorerReadRecord({ kind: "activity", address: entry.address, status: activityDeferred ? "deferred" : "read", reason: activityDeferred ? "budget exhausted; prior non-null activity retained" : `${decision.reason}; 24h walk refreshed`, signalValue, signal: currentSignal ?? priorSignal, codeHash, checkedAt: pulledAt, previous: previousActivityRead, credits: activityCredits }),
         ],
       };
     });
@@ -716,13 +908,14 @@ async function main() {
         const priorLpRead = priorReadFor(target.previous, "lp", tokenAddress) ?? { checked_at: target.previous?.pulled_at ?? null };
 
       if (tokenRead?.changed) {
-        const top10Start = creditBudget.snapshot().run_credits;
-        const top10 = await readTop10(blockscout, tokenAddress, {
+        const tokenLabel = `${target.slug}:${tokenAddress}`;
+        const top10Read = await creditBudget.withCredits(tokenLabel, () => readTop10(blockscout, tokenAddress, {
           pulledAt,
           excluded: holderExclusions,
           pairAddresses: market.pairs.map((pair) => pair.pair_address),
-        });
-        const top10Credits = creditBudget.snapshot().run_credits - top10Start;
+        }));
+        const top10 = top10Read.value;
+        const top10Credits = top10Read.credits;
         const top10Deferred = hasBudgetDeferral(top10.errors);
         const creator = creators.get(tokenAddress.toLowerCase()) ?? null;
         const launchpad = creator ? attributeCreator(creator, launchpads) : priorMarket?.launchpad ?? null;
@@ -739,21 +932,29 @@ async function main() {
         }));
         if (top10Deferred) deferredReads.push(`${target.slug}:top10`);
 
-        const ownershipStart = creditBudget.snapshot().run_credits;
+        // The verified ABI is a function of the deployed bytecode. Re-reading it while the free RPC
+        // code hash is unchanged buys a byte-identical answer, so it is read on a code change and on
+        // a first read, and the committed mint classification is kept otherwise.
         const tokenRow = addresses.find((row) => row.address.toLowerCase() === tokenAddress.toLowerCase());
-        const ownership = await readMintAndRenounce(blockscout, tokenAddress, tokenRow?.owner ?? null);
-        const ownershipCredits = creditBudget.snapshot().run_credits - ownershipStart;
+        const abiIsStale = tokenRead.codeChanged !== false || priorStructure?.mint == null || priorStructure?.mint === "unknown";
+        let ownership = { mint: priorStructure?.mint ?? "unknown", renounced: renouncedFromOwner(tokenRow?.owner ?? null), errors: [] };
+        let ownershipCredits = 0;
+        if (abiIsStale) {
+          const ownershipRead = await creditBudget.withCredits(tokenLabel, () => readMintAndRenounce(blockscout, tokenAddress, tokenRow?.owner ?? null));
+          ownership = ownershipRead.value;
+          ownershipCredits = ownershipRead.credits;
+        }
         const structureDeferred = hasBudgetDeferral(ownership.errors);
-        const locksStart = creditBudget.snapshot().run_credits;
-        const locks = await readLpLocks(blockscout, market.pairs, { lockers: holderExclusions });
-        const lpCredits = creditBudget.snapshot().run_credits - locksStart;
+        const lpRead = await creditBudget.withCredits(tokenLabel, () => readLpLocks(blockscout, market.pairs, { lockers: holderExclusions }));
+        const locks = lpRead.value;
+        const lpCredits = lpRead.credits;
         const lpDeferred = hasBudgetDeferral(locks.errors);
         structure = carryStructureFacts({
           pulled_at: pulledAt, mint: ownership.mint, renounced: ownership.renounced,
           lp: locks.lp, errors: [...ownership.errors, ...locks.errors],
         }, priorStructure);
         readRecords.push(
-          explorerReadRecord({ kind: "structure", address: tokenAddress, status: structureDeferred ? "deferred" : "read", reason: structureDeferred ? "budget exhausted; prior mint facts retained" : "token change signal changed", signalValue: market.trades_h24, checkedAt: pulledAt, previous: priorStructureRead, credits: ownershipCredits }),
+          explorerReadRecord({ kind: "structure", address: tokenAddress, status: structureDeferred ? "deferred" : abiIsStale ? "read" : "unchanged", reason: structureDeferred ? "budget exhausted; prior mint facts retained" : abiIsStale ? "token change signal changed" : "contract code hash unchanged; verified ABI not re-read", signalValue: market.trades_h24, codeHash: tokenRead.row?.code_hash ?? null, checkedAt: pulledAt, previous: priorStructureRead, credits: ownershipCredits }),
           explorerReadRecord({ kind: "lp", address: tokenAddress, status: lpDeferred ? "deferred" : "read", reason: lpDeferred ? "budget exhausted; prior LP facts retained" : "token change signal changed", signalValue: market.trades_h24, checkedAt: pulledAt, previous: priorLpRead, credits: lpCredits }),
         );
         if (structureDeferred || lpDeferred) deferredReads.push(`${target.slug}:structure`);
@@ -819,7 +1020,14 @@ async function main() {
       }
       if (seriesPlan && !seriesPlan.write && seriesPlan.existing > 0) totals.seriesKept++;
       const elapsed = ((Date.now() - slugStarted) / 1000).toFixed(1);
-      console.log(`${summaryLine(target.slug, doc)} · ${elapsed}s${args.dry ? `  (would write ${path})` : ""}`);
+      const slugCredits = creditBudget.snapshot().run_credits - slugCreditsStart;
+      tierSpend[target.tier] = (tierSpend[target.tier] ?? 0) + slugCredits;
+      tierRead[target.tier] = (tierRead[target.tier] ?? 0) + 1;
+      console.log(`${summaryLine(target.slug, doc)} · ${slugCredits} credits · ${elapsed}s${args.dry ? `  (would write ${path})` : ""}`);
+      // The day counter is flushed as the run goes, not only at the end. A job killed by its timeout
+      // has still spent every credit it claimed, and a spend nobody recorded is a per-day cap that
+      // does not hold.
+      if (!args.dry) await writeFile("ops/pull-budget.json", `${JSON.stringify(creditBudget.finish(), null, 2)}\n`);
     } catch (e) {
       failures.push({ slug: target.slug, message: e.message });
       console.error(`${target.slug.padEnd(24)} NOT WRITTEN: ${e.message}`);
@@ -948,13 +1156,40 @@ async function main() {
       `${budget.credits_used}/${budget.day_cap} UTC day · ${walksSkipped} unchanged walks skipped · ` +
       `${deferredReads.length} reads deferred · challenge responses: ${explorerStats.challenges}`,
     );
+
+    // The cost table is the receipt the projection is built from. Every figure below was counted by
+    // this run: a tier nobody read this time contributes no measurement and says so.
+    const measured = {};
+    console.log("\ncredits per due name, measured this run");
+    for (const tier of ["hot", "live", "quiet", "dormant"]) {
+      if (!tierRead[tier]) {
+        console.log(`  ${tier.padEnd(8)} ${String(tierCounts[tier]).padStart(4)} in registry · none due this run`);
+        continue;
+      }
+      measured[tier] = tierSpend[tier] / tierRead[tier];
+      console.log(
+        `  ${tier.padEnd(8)} ${String(tierCounts[tier]).padStart(4)} in registry · ${String(tierRead[tier]).padStart(4)} read · ` +
+        `${String(tierSpend[tier]).padStart(5)} credits · ${measured[tier].toFixed(1)} per name`,
+      );
+    }
+    const projection = (names) => Math.ceil(projectDailyCredits(scaleTierMix(tierCounts, names), measured));
+    const registry = Object.values(tierCounts).reduce((sum, count) => sum + count, 0);
     console.log(
-      `tier population: hot ${tierCounts.hot} · live ${tierCounts.live} · quiet ${tierCounts.quiet} · ` +
-      `dormant ${tierCounts.dormant} · projected ${Math.ceil(projectDailyCredits(tierCounts)).toLocaleString("en-US")} credits/day`,
+      `tier population: hot ${tierCounts.hot} · live ${tierCounts.live} · quiet ${tierCounts.quiet} · dormant ${tierCounts.dormant} · ` +
+      `reads/day ${Object.entries(TIER_DAILY_READS).map(([tier, reads]) => `${tier} ${reads}`).join(" · ")}`,
     );
+    console.log(
+      `projected credits/day at today's mix — ${registry} names ${projection(registry).toLocaleString("en-US")} · ` +
+      `200 ${projection(200).toLocaleString("en-US")} · 500 ${projection(500).toLocaleString("en-US")} · ` +
+      `1,000 ${projection(1000).toLocaleString("en-US")} against a ${budget.day_cap.toLocaleString("en-US")} cap`,
+    );
+    if (deferredReads.length) {
+      console.log(`\n${deferredReads.length} reads deferred to the next run, by name and address`);
+      for (const label of [...new Set(deferredReads)]) console.log(`  ${label}`);
+    }
     if (!args.dry) {
       await writeFile("ops/pull-budget.json", `${JSON.stringify(creditBudget.finish(), null, 2)}\n`);
-      const remainingQueue = consumeQueue(Array.isArray(queueEntries) ? queueEntries : [], completedSlugs);
+      const remainingQueue = consumeQueue(Array.isArray(queueEntries) ? queueEntries : [], completedSlugs, { now: Date.parse(pulledAt) });
       await writeFile("ops/pull-queue.json", `${JSON.stringify(remainingQueue, null, 2)}\n`);
     }
   }

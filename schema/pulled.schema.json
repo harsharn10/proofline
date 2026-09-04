@@ -57,6 +57,8 @@
               "status": { "enum": ["read", "unchanged", "deferred"] },
               "reason": { "type": "string", "minLength": 1 },
               "signal_value": { "type": ["integer", "null"], "minimum": 0 },
+              "signal": { "type": ["string", "null"], "minLength": 1, "$comment": "The signal the next run compares against: for a contract the hash of the newest transaction to the address, read as page one of the 24h walk. signal_value keeps the integer form used by the RPC nonce and the DexScreener trade count. Optional: files written before the signal moved to a hash have none." },
+              "code_hash": { "type": ["string", "null"], "minLength": 1, "$comment": "Digest of the deployed bytecode from the eth_getCode the run already makes. An unchanged hash is why the verified source, the contract name and the ABI were not bought again." },
               "checked_at": { "type": "string", "format": "date-time" },
               "stale_since": { "type": ["string", "null"], "format": "date-time" },
               "credits": { "type": "integer", "minimum": 0 }
@@ -300,7 +302,7 @@
       }
     },
     "activityAddress": {
-      "$comment": "txns_24h counts transactions TO the address in the last 24 hours, walked newest-first and capped at 40 pages. launches_24h is the subset whose method name starts with launch/create/deploy/mint, and is null for any address the census does not call a factory.",
+      "$comment": "txns_24h counts transactions TO the address in the last 24 hours, walked newest-first and capped at 40 pages. launches_24h is the subset whose method name starts with launch/create/deploy/mint, and is null for any address the census does not call a factory. Both are measurements of a window, not facts: window_as_of is the run that measured them and stale_since the date they stopped being refreshed, so a carried figure is never restated under a newer pulled_at. Both are optional; a file written before the window was dated has neither.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -317,10 +319,13 @@
         "last_method": { "type": ["string", "null"] },
         "txns_24h": { "type": ["integer", "null"], "minimum": 0 },
         "launches_24h": { "type": ["integer", "null"], "minimum": 0 },
+        "window_as_of": { "type": ["string", "null"], "format": "date-time" },
+        "stale_since": { "type": ["string", "null"], "format": "date-time" },
         "errors": { "type": "array", "items": { "$ref": "#/$defs/pullStepError" } }
       }
     },
     "pulledActivity": {
+      "$comment": "window_as_of on the block is the earliest window any contributing address row was measured over, and stale_since the earliest date one of them stopped being refreshed: a sum of windows is only as fresh as its oldest term.",
       "type": "object",
       "additionalProperties": false,
       "required": ["pulled_at", "addresses", "last_activity_at", "txns_24h", "launches_24h"],
@@ -329,7 +334,9 @@
         "addresses": { "type": "array", "items": { "$ref": "#/$defs/activityAddress" } },
         "last_activity_at": { "type": ["string", "null"], "format": "date-time" },
         "txns_24h": { "type": ["integer", "null"], "minimum": 0 },
-        "launches_24h": { "type": ["integer", "null"], "minimum": 0 }
+        "launches_24h": { "type": ["integer", "null"], "minimum": 0 },
+        "window_as_of": { "type": ["string", "null"], "format": "date-time" },
+        "stale_since": { "type": ["string", "null"], "format": "date-time" }
       }
     }
   }

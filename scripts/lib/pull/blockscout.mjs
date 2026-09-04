@@ -125,20 +125,29 @@ export function createBlockscoutClient({ base = null, apiKey = null, env = proce
 /**
  * Reads every Blockscout fact for one address. Never throws. A 403 or HTML challenge lands in
  * `errors` with step "blockscout" and the caller keeps the RPC-only result.
+ *
+ * The two halves are bought separately because they age at different speeds. `metadata` is
+ * `/addresses/<a>` plus the creation transaction: the verified-source flag, the contract name, the
+ * creator and the creation block. None of those can move while the deployed bytecode is the same, so
+ * the caller buys them on a first read and afterwards only when the free RPC code hash changed.
+ * `holders` is `/tokens/<a>`, which moves on every transfer and is bought whenever the change signal
+ * moved. What is not read comes back null and the caller keeps the committed value.
  */
-export async function readAddress(client, address, { isToken = false } = {}) {
+export async function readAddress(client, address, { isToken = false, metadata = true, holders: wantHolders = true } = {}) {
   const errors = [];
   const record = (message) => errors.push({ step: "blockscout", message });
 
   let core = { is_contract: null, source_verified: null, contract_name: null, creation_tx: null, creator: null, is_token: false };
-  try {
-    core = parseAddressResponse(await client.address(address));
-  } catch (e) {
-    record(`addresses/${address}: ${e.message}`);
+  if (metadata) {
+    try {
+      core = parseAddressResponse(await client.address(address));
+    } catch (e) {
+      record(`addresses/${address}: ${e.message}`);
+    }
   }
 
   let holders = null;
-  if (isToken || core.is_token) {
+  if (wantHolders && (isToken || core.is_token)) {
     try {
       holders = parseTokenResponse(await client.token(address));
     } catch (e) {

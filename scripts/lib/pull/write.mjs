@@ -31,10 +31,10 @@ const PAIR_KEYS = [
 const TXNS_KEYS = ["buys", "sells"];
 const STRUCTURE_KEYS = ["pulled_at", "mint", "renounced", "lp", "errors"];
 const LP_KEYS = ["pair", "locked_share", "holder_kind", "reason"];
-const ACTIVITY_KEYS = ["pulled_at", "addresses", "last_activity_at", "txns_24h", "launches_24h"];
+const ACTIVITY_KEYS = ["pulled_at", "addresses", "last_activity_at", "txns_24h", "launches_24h", "window_as_of", "stale_since"];
 const ACTIVITY_ADDRESS_KEYS = [
   "address", "label", "role", "transactions_count", "token_transfers_count",
-  "last_tx_at", "last_method", "txns_24h", "launches_24h", "errors",
+  "last_tx_at", "last_method", "txns_24h", "launches_24h", "window_as_of", "stale_since", "errors",
 ];
 const RIALTO_KEYS = ["pairs", "volume_24h_usd", "volume_note", "as_of", "source_url"];
 const RIALTO_PAIR_KEYS = [
@@ -45,7 +45,7 @@ const PAIR_ASSET_KEYS = [
 ];
 const VOLUME_DISAGREEMENT_KEYS = ["dexscreener_usd", "rialto_usd"];
 const READ_KEYS = ["tier", "explorer"];
-const EXPLORER_READ_KEYS = ["kind", "address", "status", "reason", "signal_value", "checked_at", "stale_since", "credits"];
+const EXPLORER_READ_KEYS = ["kind", "address", "status", "reason", "signal_value", "signal", "code_hash", "checked_at", "stale_since", "credits"];
 
 /** Snapshot column order. One JSON line per run in content/pulled/history/<slug>.jsonl. */
 export const HISTORY_KEYS = [
@@ -324,7 +324,15 @@ export function tokenHolders(doc) {
   return counts.length ? Math.max(...counts) : null;
 }
 
-/** Reduces one pulled document to the snapshot row. Every field may legitimately be null. */
+/**
+ * Reduces one pulled document to the snapshot row. Every field may legitimately be null.
+ *
+ * `txns_total` sums the explorer's lifetime `transactions_count` per address and nothing else. The
+ * history file is the one output a later run cannot correct, so the field has to keep meaning the
+ * same thing on every line: a run that did not buy the counters carries the committed value forward
+ * rather than substituting a different measurement — an EOA nonce, a DexScreener trade count — that
+ * happens to be at hand. Two runs of the same unchanged address therefore write the same number.
+ */
 export function snapshotFrom(doc) {
   const market = doc?.market ?? null;
   const activity = doc?.activity ?? null;

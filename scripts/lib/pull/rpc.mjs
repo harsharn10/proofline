@@ -1,9 +1,25 @@
 // JSON-RPC reads against the Robinhood Chain node. Decoders are pure so scripts/test-pull.mjs can
 // exercise them without a network; the client takes its transport by argument for the same reason.
 
+import { createHash } from "node:crypto";
+
 import { requestJson } from "./http.mjs";
 
 export const RPC_URL = "https://rpc.mainnet.chain.robinhood.com";
+
+/**
+ * The node answered, and its answer was an error: `owner()` reverted, the method is not there.
+ * That is a fact about the contract. A transport failure — a timeout, a 429, an HTML error page —
+ * is not, and it must never be mistaken for one: reading "this contract has no owner" out of a
+ * failed request is how a whole run publishes `owner: null` for eighty addresses and a downstream
+ * reader concludes the project renounced ownership.
+ */
+export class RpcCallError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "RpcCallError";
+  }
+}
 
 /** EIP-1967: keccak256("eip1967.proxy.implementation") - 1, and the matching admin slot. */
 export const EIP1967_IMPLEMENTATION_SLOT =
@@ -80,6 +96,17 @@ export function hasCode(code) {
 }
 
 /**
+ * A short digest of the deployed bytecode, from the eth_getCode the run already makes. It costs no
+ * request and no explorer credit, and it is the honest answer to "can the verified source, the ABI
+ * or the contract name have changed since the last run" — they cannot without the code changing.
+ */
+export function codeHash(code) {
+  const raw = strip(code);
+  if (raw.length === 0) return null;
+  return createHash("sha256").update(raw.toLowerCase()).digest("hex").slice(0, 16);
+}
+
+/**
  * Classifies proxy storage: an implementation word that is set means EIP-1967, both words clear
  * means no proxy, and a failed read means unknown.
  */
@@ -89,8 +116,13 @@ export function classifyProxy({ implementation, admin, failed = false }) {
   return { type: "none", implementation: null, admin: admin ?? null };
 }
 
-/** Classifies an owner from the three probes. `safe` is non-null only when both Safe reads decoded. */
-export function classifyOwner({ owner, ownerHasCode, threshold, signers }) {
+/**
+ * Classifies an owner from the three probes. `safe` is non-null only when both Safe reads decoded.
+ * `unread` means the probe never got an answer: that is "unknown", never "none". The difference
+ * matters — "none" reads as renounced ownership.
+ */
+export function classifyOwner({ owner, ownerHasCode, threshold, signers, unread = false }) {
+  if (unread) return { owner: null, owner_type: "unknown", safe: null };
   if (owner === null) return { owner: null, owner_type: "none", safe: null };
   if (isZeroAddress(owner)) return { owner, owner_type: "none", safe: null }; // renounced
   if (ownerHasCode === null || ownerHasCode === undefined) return { owner, owner_type: "unknown", safe: null };
@@ -111,7 +143,7 @@ export function createRpcClient({ url = RPC_URL, deps = {} } = {}) {
       { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) },
       deps,
     );
-    if (body?.error) throw new Error(`${method}: ${body.error.message ?? JSON.stringify(body.error)}`);
+    if (body?.error) throw new RpcCallError(`${method}: ${body.error.message ?? JSON.stringify(body.error)}`);
     return body?.result ?? null;
   }
 
@@ -134,8 +166,11 @@ export async function readAddress(client, address) {
   const record = (message) => errors.push({ step: "rpc", message });
 
   let isContract = null;
+  let hash = null;
   try {
-    isContract = hasCode(await client.getCode(address));
+    const code = await client.getCode(address);
+    isContract = hasCode(code);
+    hash = isContract ? codeHash(code) : null;
   } catch (e) {
     record(`eth_getCode ${address}: ${e.message}`);
   }
@@ -157,17 +192,25 @@ export async function readAddress(client, address) {
   }
 
   let owner = null;
+  let ownerUnread = false;
   if (isContract) {
     try {
       owner = decodeAddress(await client.ethCall(address, SELECTOR.owner));
-    } catch {
-      owner = null; // a revert means the contract has no owner(); that is a fact, not an error
+    } catch (e) {
+      // A node-reported error is the contract answering "there is no owner()": a fact. Anything
+      // else is the request never arriving, and an unread probe must stay unknown.
+      if (e instanceof RpcCallError) owner = null;
+      else {
+        ownerUnread = true;
+        record(`eth_call owner() ${address}: ${e.message}`);
+      }
     }
   }
 
   let ownerHasCode = null;
   let threshold = null;
   let signers = null;
+  let safeUnread = false;
   if (owner && !isZeroAddress(owner)) {
     try {
       ownerHasCode = hasCode(await client.getCode(owner));
@@ -177,21 +220,33 @@ export async function readAddress(client, address) {
     if (ownerHasCode) {
       try {
         threshold = decodeUint(await client.ethCall(owner, SELECTOR.getThreshold));
-      } catch {
+      } catch (e) {
         threshold = null; // not a Safe
+        if (!(e instanceof RpcCallError)) {
+          safeUnread = true;
+          record(`eth_call getThreshold() ${owner}: ${e.message}`);
+        }
       }
       try {
         signers = decodeAddressArray(await client.ethCall(owner, SELECTOR.getOwners));
-      } catch {
+      } catch (e) {
         signers = null;
+        if (!(e instanceof RpcCallError)) {
+          safeUnread = true;
+          record(`eth_call getOwners() ${owner}: ${e.message}`);
+        }
       }
     }
   }
 
   return {
     is_contract: isContract,
+    code_hash: hash,
     proxy: classifyProxy({ implementation, admin, failed: slotsFailed }),
-    ...classifyOwner({ owner, ownerHasCode, threshold, signers }),
+    ...classifyOwner({ owner, ownerHasCode, threshold, signers, unread: ownerUnread }),
+    // What the run could not read, as opposed to what it read as absent. The caller keeps the
+    // committed value for an unread probe instead of publishing a null it did not observe.
+    unread: { owner: ownerUnread, safe: ownerUnread || safeUnread, proxy: slotsFailed, code: isContract === null },
     errors,
   };
 }
