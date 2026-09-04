@@ -1,5 +1,5 @@
 slug: shrub
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T17:18:32.632Z # chain head 54437466 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x5d9144d2d017386519a7134Fcc7f1E4bA22f920c"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 50229145
     created_at: 2026-08-30T18:39:01.000Z
-    holders: 6380
+    holders: 6401
     errors: []
   - address: "0x4a6A85252A6F6B383A5f747259EE157e65fF1307"
     label: Uniswap v2 SHRUB/WETH pair
@@ -85,40 +85,40 @@ addresses:
     safe: null
     created_block: 2
     created_at: 2026-04-30T16:52:11.000Z
-    holders: 527999
+    holders: 528554
     errors: []
 metrics: []
 market:
   token_address: "0x5d9144d2d017386519a7134Fcc7f1E4bA22f920c"
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T17:18:32.632Z
   pairs:
     - dex: uniswap
       pair_address: "0x4a6A85252A6F6B383A5f747259EE157e65fF1307"
       quote_symbol: WETH
-      price_usd: 0.09711
-      liquidity_usd: 574416.02
-      volume_h24: 8753452.3
-      volume_h6: 1977865.89
+      price_usd: 0.09108
+      liquidity_usd: 560874.18
+      volume_h24: 7764520.47
+      volume_h6: 1768149.91
       txns_h24:
-        buys: 3871
-        sells: 1128
-      price_change_h24: 132
-      market_cap: 97112968
-      fdv: 97112968
+        buys: 3280
+        sells: 935
+      price_change_h24: 76.73
+      market_cap: 91086944
+      fdv: 91086944
       created_at: 2026-08-30T18:41:45.000Z
-  liquidity_usd: 574416.02
-  volume_h24: 8753452.3
-  trades_h24: 4999
-  price_usd: 0.09711
-  price_change_h24: 132
-  market_cap_usd: 97112968
-  fdv_usd: 97112968
-  fdv: 97112968
+  liquidity_usd: 560874.18
+  volume_h24: 7764520.47
+  trades_h24: 4215
+  price_usd: 0.09108
+  price_change_h24: 76.73
+  market_cap_usd: 91086944
+  fdv_usd: 91086944
+  fdv: 91086944
   first_pair_at: 2026-08-30T18:41:45.000Z
-  top10_share: 0.7706224088842013
+  top10_share: 0.7707437779917542
   top10_share_ex_pools: 0.7694570814161421
   burned_share: 0
-  top10_as_of: 2026-09-04T11:23:39.609Z
+  top10_as_of: 2026-09-04T17:18:32.632Z
   launchpad: null
   rialto: null
   pair_asset: null
@@ -127,7 +127,7 @@ market:
     - step: launchpad
       message: creator 0x2451B20Ed4ca06f5e294CFcA540da9240257C08B did not match a launchpad factory, curve or known launcher deployer
 structure:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T17:18:32.632Z
   mint: no-mint-function
   renounced: true
   lp:
@@ -137,18 +137,20 @@ structure:
       reason: null
   errors: []
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T17:18:32.632Z
   addresses:
     - address: "0x5d9144d2d017386519a7134Fcc7f1E4bA22f920c"
       label: SHRUB token (Lil' Shrub ERC-20)
       role: token
       transactions_count: 7891
       token_transfers_count: 0
-      last_tx_at: 2026-09-04T13:01:09.000Z
+      last_tx_at: 2026-09-04T16:32:24.000Z
       last_method: approve
-      txns_24h: 623
+      txns_24h: 250
       launches_24h: null
-      errors: []
+      errors:
+        - step: txns_24h capped
+          message: stopped after 5 pages; count is a floor
     - address: "0x4a6A85252A6F6B383A5f747259EE157e65fF1307"
       label: Uniswap v2 SHRUB/WETH pair
       role: other
@@ -178,22 +180,127 @@ activity:
       last_method: swapExactTokensForETHSupportingFeeOnTransferTokens
       txns_24h: 2000
       launches_24h: null
-      errors:
-        - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
+      errors: []
     - address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
       label: WETH (pair quote)
       role: token
       transactions_count: 1973059
       token_transfers_count: 318
-      last_tx_at: 2026-09-04T12:24:18.000Z
-      last_method: approve
-      txns_24h: 2000
+      last_tx_at: 2026-09-04T17:25:11.000Z
+      last_method: deposit
+      txns_24h: 250
       launches_24h: null
       errors:
         - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
-  last_activity_at: 2026-09-04T13:06:48.000Z
-  txns_24h: 4626
+          message: stopped after 5 pages; count is a floor
+  last_activity_at: 2026-09-04T17:25:11.000Z
+  txns_24h: 2503
   launches_24h: 3
+reads:
+  tier: hot
+  explorer:
+    - kind: address
+      address: "0x5d9144d2d017386519a7134Fcc7f1E4bA22f920c"
+      status: read
+      reason: token signal changed
+      signal_value: 4215
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: null
+      credits: 5
+    - kind: activity
+      address: "0x5d9144d2d017386519a7134Fcc7f1E4bA22f920c"
+      status: read
+      reason: token signal changed; 24h walk refreshed
+      signal_value: 4215
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: null
+      credits: 6
+    - kind: address
+      address: "0x4a6A85252A6F6B383A5f747259EE157e65fF1307"
+      status: unchanged
+      reason: other signal unchanged
+      signal_value: 1
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: 2026-09-04T11:23:39.609Z
+      credits: 0
+    - kind: activity
+      address: "0x4a6A85252A6F6B383A5f747259EE157e65fF1307"
+      status: unchanged
+      reason: 24h walk skipped; change signal unchanged
+      signal_value: 1
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: 2026-09-04T11:23:39.609Z
+      credits: 1
+    - kind: address
+      address: "0x8bcEaA40B9AcdfAedF85AdF4FF01F5Ad6517937f"
+      status: unchanged
+      reason: factory signal unchanged
+      signal_value: 1353
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: 2026-09-04T11:23:39.609Z
+      credits: 0
+    - kind: activity
+      address: "0x8bcEaA40B9AcdfAedF85AdF4FF01F5Ad6517937f"
+      status: unchanged
+      reason: 24h walk skipped; change signal unchanged
+      signal_value: 1353
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: 2026-09-04T11:23:39.609Z
+      credits: 0
+    - kind: address
+      address: "0x89e5DB8B5aA49aA85AC63f691524311AEB649eba"
+      status: unchanged
+      reason: router signal unchanged
+      signal_value: 4599736
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: 2026-09-04T11:23:39.609Z
+      credits: 0
+    - kind: activity
+      address: "0x89e5DB8B5aA49aA85AC63f691524311AEB649eba"
+      status: unchanged
+      reason: 24h walk skipped; change signal unchanged
+      signal_value: 4599736
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: 2026-09-04T11:23:39.609Z
+      credits: 1
+    - kind: address
+      address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+      status: read
+      reason: token signal changed
+      signal_value: 4215
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+      status: read
+      reason: token signal changed; 24h walk refreshed
+      signal_value: 4215
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: null
+      credits: 0
+    - kind: top10
+      address: "0x5d9144d2d017386519a7134Fcc7f1E4bA22f920c"
+      status: read
+      reason: token change signal changed
+      signal_value: 4215
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: null
+      credits: 1
+    - kind: structure
+      address: "0x5d9144d2d017386519a7134Fcc7f1E4bA22f920c"
+      status: read
+      reason: token change signal changed
+      signal_value: 4215
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0x5d9144d2d017386519a7134Fcc7f1E4bA22f920c"
+      status: read
+      reason: token change signal changed
+      signal_value: 4215
+      checked_at: 2026-09-04T17:18:32.632Z
+      stale_since: null
+      credits: 2
 errors: []
