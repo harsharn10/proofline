@@ -20,10 +20,12 @@ import {
   decodeUint,
   decodeAddressArray,
   hasCode,
+  codeHash,
   classifyProxy,
   classifyOwner,
   createRpcClient,
   readAddress as readRpc,
+  RpcCallError,
   SELECTOR,
   EIP1967_IMPLEMENTATION_SLOT,
   ZERO_ADDRESS,
@@ -78,21 +80,26 @@ import {
   parseCounters,
   parseTransactionsPage,
   countRecentInbound,
+  newestInbound,
   isLaunchMethod,
   readAddressActivity,
   aggregateActivity,
   pageCapForRole,
   toQuery,
 } from "./lib/pull/activity.mjs";
-import { createCreditBudget, normalizeBudgetState } from "./lib/pull/budget.mjs";
+import { createCreditBudget, normalizeBudgetState, BudgetDeferredError } from "./lib/pull/budget.mjs";
 import {
   consumeQueue,
   explorerChangeDecision,
+  needsExplorerSignal,
   parseShard,
   projectDailyCredits,
+  scaleTierMix,
   shardFor,
   tierFor,
   tierIsDue,
+  MEASURED_CREDITS_PER_NAME,
+  TIER_DAILY_READS,
 } from "./lib/pull/tiers.mjs";
 import {
   orderDocument,
@@ -120,10 +127,11 @@ import {
   RIALTO_PAGES,
 } from "./lib/pull/rialto.mjs";
 import {
-  addressesFor, carryActivityFacts, carryAddressFacts, explorerReadRecord, mergeAddress,
-  summaryLine, tokenAddressFor, countErrors, errorKey, memoizeClient, parseArgs, refreshedMarket,
+  addressesFor, activityWindow, carryActivityFacts, carryAddressFacts, carryOwnershipFacts,
+  explorerReadRecord, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey,
+  memoizeClient, parseArgs, refreshedMarket, EMPTY_READ_MESSAGE,
 } from "./pull.mjs";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -1370,7 +1378,9 @@ test("launch methods are matched by verb prefix, and only for factories", async 
   assert.equal(agg.txns_24h, 2);
   assert.equal(agg.launches_24h, 1);
   assert.equal(agg.last_activity_at, "2026-09-02T11:00:00.000Z");
-  assert.deepEqual(aggregateActivity([]), { last_activity_at: null, txns_24h: null, launches_24h: null });
+  assert.deepEqual(aggregateActivity([]), {
+    last_activity_at: null, txns_24h: null, launches_24h: null, window_as_of: null, stale_since: null,
+  });
 });
 
 test("a blocked counters call still leaves the 24h walk, and vice versa", async () => {
@@ -1593,8 +1603,13 @@ test("tier cadence, pulse queue and two-way shards are deterministic", () => {
   assert.equal(tierFor({ lastActivityAt: "2026-09-01T12:00:00.000Z", now }), "live");
   assert.equal(tierFor({ lastActivityAt: "2026-08-15T12:00:00.000Z", now }), "quiet");
   assert.equal(tierFor({ lastActivityAt: "2026-07-01T12:00:00.000Z", now }), "dormant");
-  assert.equal(tierIsDue("live", "2026-09-04T01:00:00.000Z", { now }), false);
-  assert.equal(tierIsDue("live", "2026-09-03T23:00:00.000Z", { now }), true);
+  // Cadence is compared with half a cron period of tolerance. Without it a name read at 17:17:09 is
+  // eleven seconds short of twelve hours when the 05:17 run asks, slips a whole slot, and "every
+  // second run" silently becomes every third — an 18-hour live cadence the docs never claimed.
+  assert.equal(tierIsDue("live", "2026-09-04T00:10:00.000Z", { now }), true, "11h50m into a 12h tier is due");
+  assert.equal(tierIsDue("live", "2026-09-04T04:00:00.000Z", { now }), false, "8h into a 12h tier is not");
+  assert.equal(tierIsDue("quiet", "2026-09-03T12:10:00.000Z", { now }), true);
+  assert.equal(tierIsDue("quiet", "2026-09-03T20:00:00.000Z", { now }), false);
   assert.equal(tierIsDue("quiet", "2026-09-04T11:59:00.000Z", { now, force: true }), true);
   assert.deepEqual(parseShard("1/2"), { index: 1, total: 2 });
   assert.throws(() => parseShard("0/3"), /one or two/);
@@ -1644,9 +1659,11 @@ test("deferred reads retain prior non-null facts and set stale_since", () => {
   assert.equal(address.source_verified, true);
   assert.equal(address.contract_name, "Token");
   assert.equal(address.holders, 99);
+  // Lifetime facts carry. A 24-hour window does not carry silently: it keeps the timestamp of the
+  // run that measured it and the caveat that qualified it.
   const activity = carryActivityFacts({ transactions_count: null, txns_24h: null }, { transactions_count: 8, txns_24h: 2 });
   assert.equal(activity.transactions_count, 8);
-  assert.equal(activity.txns_24h, 2);
+  assert.equal(activity.txns_24h, null, "txns_24h is a measurement, not a fact that carries itself");
   const record = explorerReadRecord({
     kind: "address", address: "0x39dBED3a2bd333467115dE45665cC57F813C4571", status: "deferred",
     reason: "budget exhausted", checkedAt: "2026-09-04T12:00:00.000Z",
@@ -1667,10 +1684,35 @@ test("read summary validates and conservative projections stay under the daily c
     }] }, errors: [],
   });
   assert.deepEqual(validate(doc), []);
+
+  // The one number the owner's constraint depends on, tested against the mix that actually ships.
+  // The previous version of this assertion used 10% hot against an observed 34.1% and left the cost
+  // at an unvalidated default of 10 credits per name, so it computed 14,286 against a 60,000 cap —
+  // a margin no plausible regression could ever close, on a population nobody will run.
+  const OBSERVED_MIX = { hot: 61, live: 115, quiet: 0, dormant: 3 };
+  assert.equal(
+    Math.round((OBSERVED_MIX.hot / 179) * 1000) / 10, 34.1,
+    "the documented mix is 34.1% hot; a projection over 10% hot is not this registry",
+  );
+  const scaled = scaleTierMix(OBSERVED_MIX, 1000);
+  assert.ok(Math.abs(scaled.hot - 340.8) < 0.2, `hot at 1,000 names: ${scaled.hot}`);
   for (const names of [200, 500, 1000]) {
-    const projected = projectDailyCredits({ hot: names * 0.1, live: names * 0.3, quiet: names * 0.4, dormant: names * 0.2 });
-    assert.ok(projected < 60_000, `${names}: ${projected}`);
+    const projected = projectDailyCredits(scaleTierMix(OBSERVED_MIX, names), MEASURED_CREDITS_PER_NAME);
+    assert.ok(projected < 60_000, `${names} names projects ${Math.ceil(projected)} credits/day`);
   }
+  // A run cap of 6,000 has to hold too: the heaviest scheduled run reads every hot name and half the
+  // live ones, and a projection that only clears the day cap would defer on every single run.
+  const heaviest = scaleTierMix(OBSERVED_MIX, 1000);
+  const perRun = heaviest.hot * MEASURED_CREDITS_PER_NAME.hot + (heaviest.live / 2) * MEASURED_CREDITS_PER_NAME.live;
+  assert.ok(perRun < 6_000, `heaviest run at 1,000 names: ${Math.ceil(perRun)} credits`);
+
+  // And the constant itself is not free to drift: these are measurements from a real run, so a
+  // change to them is a claim that a new run measured something else.
+  assert.deepEqual(Object.keys(MEASURED_CREDITS_PER_NAME).sort(), ["dormant", "hot", "live", "quiet"]);
+  for (const [tier, cost] of Object.entries(MEASURED_CREDITS_PER_NAME)) {
+    assert.ok(cost > 0 && cost < 60, `${tier}: ${cost}`);
+  }
+  assert.deepEqual(TIER_DAILY_READS, { hot: 4, live: 2, quiet: 1, dormant: 1 / 7 });
 });
 
 test("pull CLI accepts only/full/tier/shard overrides", () => {
@@ -1679,6 +1721,349 @@ test("pull CLI accepts only/full/tier/shard overrides", () => {
   assert.equal(args.full, true);
   assert.equal(args.tier, "hot");
   assert.deepEqual(args.shard, { index: 0, total: 2 });
+});
+
+test("a cached counter that has not moved never hides a transaction page that has", async () => {
+  // Live on 2026-09-04: the PONS locker's /counters transactions_count read 903584 at 11:23 and
+  // still read 903584 at 17:49 and again at 18:00, while /transactions?filter=to had moved from
+  // 11:24:10 to 17:55:47. A signal that cannot move classifies a busy contract "unchanged" for ever.
+  const STALE_COUNTER = { transactions_count: "903584", token_transfers_count: "3416081" };
+  const before = {
+    items: [{ timestamp: "2026-09-04T11:24:10.000000Z", method: "collectFees", hash: "0xaaa1" }],
+    next_page_params: { block_number: 1 },
+  };
+  const after = {
+    items: [{ timestamp: "2026-09-04T17:55:47.000000Z", method: "collectFees", hash: "0xbbb2" }],
+    next_page_params: { block_number: 2 },
+  };
+
+  assert.equal(parseCounters(STALE_COUNTER).transactions_count, 903584);
+  assert.deepEqual(
+    explorerChangeDecision({ role: "vault", previous: {}, priorSignal: 903584, currentSignal: 903584 }),
+    { changed: false, reason: "vault signal unchanged" },
+    "the counter says nothing moved",
+  );
+
+  const priorHash = newestInbound(parseTransactionsPage(before)).hash;
+  const freshHash = newestInbound(parseTransactionsPage(after)).hash;
+  assert.equal(priorHash, "0xaaa1");
+  assert.equal(freshHash, "0xbbb2");
+  assert.equal(newestInbound(parseTransactionsPage(after)).at, "2026-09-04T17:55:47.000Z");
+  assert.equal(
+    explorerChangeDecision({ role: "vault", previous: {}, priorSignal: priorHash, currentSignal: freshHash }).changed,
+    true,
+    "the transactions page says it did",
+  );
+  assert.equal(
+    explorerChangeDecision({ role: "vault", previous: {}, priorSignal: freshHash, currentSignal: freshHash }).changed,
+    false,
+    "and says so honestly when it really has not",
+  );
+
+  // A token's DexScreener trade count is a pre-filter, never a reason on its own to skip: a router
+  // swap is a transaction to the router, so the token's own inbound list can sit still while the
+  // holder set churns.
+  assert.equal(
+    explorerChangeDecision({ role: "token", previous: {}, priorSignal: freshHash, currentSignal: freshHash, preFilterChanged: true }).changed,
+    true,
+  );
+  assert.equal(
+    explorerChangeDecision({ role: "token", previous: {}, priorSignal: freshHash, currentSignal: freshHash, preFilterChanged: false }).changed,
+    false,
+  );
+});
+
+test("the signal page is page one of the walk, so an unchanged address still recounts its window", async () => {
+  const now = Date.parse("2026-09-04T12:00:00.000Z");
+  // Yesterday this address was called twice. Nothing since, and the page reaches past the window,
+  // so the count is exact, free, and falls to zero instead of repeating yesterday's two for ever.
+  const quietPage = parseTransactionsPage({
+    items: [
+      { timestamp: "2026-09-03T09:00:00.000000Z", method: "swap", hash: "0xold" },
+      { timestamp: "2026-09-02T09:00:00.000000Z", method: "swap", hash: "0xolder" },
+    ],
+    next_page_params: null,
+  });
+  let pagesFetched = 0;
+  const client = {
+    counters: async () => ({ transactions_count: "10" }),
+    transactions: async () => { pagesFetched++; return { items: [], next_page_params: null }; },
+  };
+  const quiet = await readAddressActivity(client, { address: "0xq", label: null, role: "vault" }, {
+    now, firstPage: quietPage, readCounters: false, allowPaging: false,
+  });
+  assert.equal(pagesFetched, 0, "page one was already bought as the signal");
+  assert.equal(quiet.txns_24h, 0, "a quiet address measures zero rather than carrying yesterday");
+  assert.equal(quiet.window_complete, true);
+  assert.equal(quiet.transactions_count, null, "the lifetime counter was not bought; the caller carries it");
+  assert.deepEqual(quiet.errors, []);
+
+  // A page that is entirely inside the window cannot finish the count, and stopping there is not a
+  // capped walk — nothing was measured, so nothing is published as a measurement.
+  const busyPage = parseTransactionsPage({
+    items: [{ timestamp: "2026-09-04T11:59:00.000000Z", method: "collectFees", hash: "0xnew" }],
+    next_page_params: { block_number: 9 },
+  });
+  const busy = await readAddressActivity(client, { address: "0xb", label: null, role: "vault" }, {
+    now, firstPage: busyPage, readCounters: false, allowPaging: false,
+  });
+  assert.equal(busy.txns_24h, null);
+  assert.equal(busy.window_complete, false);
+  assert.deepEqual(busy.errors, [], "a deliberate stop is not a floor and must not be reported as one");
+});
+
+test("a carried 24-hour window keeps its own as-of, its stale date and its capped caveat", () => {
+  const pulledAt = "2026-09-04T17:18:32.632Z";
+  const previous = {
+    address: "0x736D76699C26D0d966744cAe304C000d471f7F35",
+    txns_24h: 2000,
+    launches_24h: null,
+    window_as_of: "2026-09-04T11:23:39.609Z",
+    stale_since: null,
+    errors: [{ step: "txns_24h capped", message: "stopped after 40 pages; count is a floor" }],
+  };
+  const fresh = { address: previous.address, txns_24h: null, launches_24h: null, errors: [] };
+
+  const carried = activityWindow(fresh, previous, { measured: false, pulledAt });
+  assert.equal(carried.txns_24h, 2000);
+  assert.equal(carried.window_as_of, "2026-09-04T11:23:39.609Z", "never restated under a newer pulled_at");
+  assert.equal(carried.stale_since, "2026-09-04T11:23:39.609Z");
+  assert.deepEqual(
+    carried.errors,
+    [{ step: "txns_24h capped", message: "stopped after 40 pages; count is a floor" }],
+    "the floor caveat travels with the number it qualifies",
+  );
+
+  // A run that walked owns the window outright: fresh date, no stale date, its own caveats.
+  const measured = activityWindow({ ...fresh, txns_24h: 250, errors: [] }, previous, { measured: true, pulledAt });
+  assert.equal(measured.txns_24h, 250);
+  assert.equal(measured.window_as_of, pulledAt);
+  assert.equal(measured.stale_since, null);
+  assert.deepEqual(measured.errors, []);
+
+  // Nothing committed and nothing measured is null, not a zero nobody observed.
+  const nothing = activityWindow(fresh, null, { measured: false, pulledAt });
+  assert.equal(nothing.txns_24h, null);
+  assert.equal(nothing.window_as_of, null);
+
+  // A first carry has no window_as_of of its own and falls back to the run that wrote the value.
+  const legacy = activityWindow(fresh, { txns_24h: 7, errors: [] }, {
+    measured: false, pulledAt, previousAsOf: "2026-09-03T11:23:39.609Z",
+  });
+  assert.equal(legacy.txns_24h, 7);
+  assert.equal(legacy.window_as_of, "2026-09-03T11:23:39.609Z");
+
+  // And the slug-level roll-up is only as fresh as its oldest term.
+  const rolled = aggregateActivity([
+    { role: "factory", txns_24h: 24, launches_24h: 24, last_tx_at: "2026-09-04T10:15:06.000Z", window_as_of: pulledAt, stale_since: null },
+    { role: "vault", txns_24h: 2000, launches_24h: null, last_tx_at: "2026-09-04T11:24:10.000Z", window_as_of: "2026-09-04T11:23:39.609Z", stale_since: "2026-09-04T11:23:39.609Z" },
+  ]);
+  assert.equal(rolled.txns_24h, 2024);
+  assert.equal(rolled.window_as_of, "2026-09-04T11:23:39.609Z");
+  assert.equal(rolled.stale_since, "2026-09-04T11:23:39.609Z");
+});
+
+test("a second run on an unchanged signal writes the same txns_total, never a nonce", () => {
+  const dir = mkdtempSync(join(tmpdir(), "pull-history-"));
+  try {
+    const address = "0x30e4b6dc3139e28b5c5e493d395a0aca4f1cddba";
+    // Live on 2026-09-04: this address's RPC nonce is 62,966 and Blockscout's lifetime counter is
+    // 62,855. They are different measurements of different things, and the history column means the
+    // second one on every line ever written.
+    const NONCE = 62_966;
+    const EXPLORER_LIFETIME = 62_855;
+    const firstRun = {
+      address, role: "other", transactions_count: EXPLORER_LIFETIME, token_transfers_count: 4,
+      txns_24h: 3, launches_24h: null, errors: [],
+    };
+
+    // The second run's signal did not move, so it bought no counters at all.
+    const secondRun = carryActivityFacts(
+      { address, role: "other", transactions_count: null, token_transfers_count: null, last_tx_at: null, last_method: null, errors: [] },
+      firstRun,
+    );
+    assert.equal(secondRun.transactions_count, EXPLORER_LIFETIME);
+    assert.notEqual(secondRun.transactions_count, NONCE);
+
+    const docFor = (row, at) => ({
+      slug: "nonce-check", pulled_at: at, chain: "robinhood-chain", addresses: [], metrics: [],
+      market: null, structure: null,
+      activity: { pulled_at: at, addresses: [row], last_activity_at: null, txns_24h: null, launches_24h: null },
+      errors: [],
+    });
+    appendHistory("nonce-check", snapshotFrom(docFor(firstRun, "2026-09-04T11:00:00.000Z")), { dir });
+    appendHistory("nonce-check", snapshotFrom(docFor(secondRun, "2026-09-04T17:00:00.000Z")), { dir });
+
+    const rows = readHistory("nonce-check", { dir });
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0].txns_total, EXPLORER_LIFETIME);
+    assert.equal(rows[1].txns_total, EXPLORER_LIFETIME, "an unchanged signal writes the same lifetime count");
+    assert.ok(rows.every((row) => row.txns_total !== NONCE), "the append-only file never receives a nonce");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("budget exhaustion defers, keeps prior facts, names what it deferred and still records the day", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "pull-budget-"));
+  try {
+    const now = Date.parse("2026-09-04T12:00:00.000Z");
+    const budget = createCreditBudget({ state: { date: "2026-09-04", credits_used: 10, runs: 1 }, now, perRun: 3, perDay: 1000 });
+    const bodies = {
+      "/addresses/": { is_contract: true, is_verified: true, name: "Token", creation_transaction_hash: null, token: {} },
+      "/tokens/": { holders_count: "42" },
+    };
+    const fetchImpl = async (url) => {
+      const key = Object.keys(bodies).find((path) => url.includes(path));
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => "application/json" },
+        text: async () => JSON.stringify(bodies[key] ?? {}),
+      };
+    };
+    const deps = { fetchImpl, sleepImpl: async () => {}, beforeRequest: () => budget.claim("explorer read") };
+    const client = createBlockscoutClient({ base: "https://example.test/api/v2", deps });
+
+    const addresses = [
+      "0x1111111111111111111111111111111111111111",
+      "0x2222222222222222222222222222222222222222",
+      "0x3333333333333333333333333333333333333333",
+    ];
+    const previous = { is_contract: true, source_verified: true, contract_name: "Token", holders: 41 };
+    const rows = [];
+    for (const address of addresses) {
+      const label = `pons:${address}`;
+      // The read never throws: a cap reached mid-run is a recorded deferral, not a crashed job.
+      const read = await budget.withCredits(label, () => readBlockscout(client, address, { isToken: true }));
+      const deferred = read.value.errors.some((error) => /deferred: budget/.test(error.message));
+      rows.push({ label, deferred, row: deferred ? carryAddressFacts(read.value, previous) : read.value });
+    }
+
+    assert.equal(rows[0].deferred, false);
+    assert.equal(rows[0].row.holders, 42, "the first address was read before the cap");
+    assert.ok(rows.slice(1).every((row) => row.deferred), "the cap was reached mid-run");
+    for (const row of rows.slice(1)) {
+      assert.equal(row.row.holders, 41, "a deferred read keeps the committed value");
+      assert.equal(row.row.source_verified, true);
+    }
+
+    const snapshot = budget.snapshot();
+    assert.equal(snapshot.run_credits, 3);
+    assert.deepEqual(snapshot.deferred, [
+      "pons:0x2222222222222222222222222222222222222222",
+      "pons:0x3333333333333333333333333333333333333333",
+    ], "the deferred list is readable, by name and address");
+    for (const label of snapshot.deferred) {
+      assert.ok(!/https?:\/\//.test(label), `a deferral label is never a request URL: ${label}`);
+    }
+
+    // And the day counter reaches disk even though the run stopped short of what it wanted.
+    const path = join(dir, "pull-budget.json");
+    writeFileSync(path, `${JSON.stringify(budget.finish(), null, 2)}\n`);
+    assert.deepEqual(JSON.parse(readFileSync(path, "utf8")), { date: "2026-09-04", credits_used: 13, runs: 2 });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("a null where a value existed is a failed read, not a renouncement", () => {
+  // 2026-09-04, 13:27 UTC: one run nulled owner, owner_type and safe on 82 address rows, 35 of them
+  // with errors: [], because a failed eth_call was being read as "this contract has no owner()".
+  // The signals feed published that as Pons renouncing ownership.
+  const previous = {
+    owner: "0x39dbed3a2bd333467115de45665cc57f813c4571",
+    owner_type: "safe",
+    safe: { threshold: 3, signers: ["0xaaa"] },
+    proxy: { type: "eip1967", implementation: "0xbbb", admin: null },
+    errors: [],
+  };
+  const emptied = {
+    owner: null,
+    owner_type: "none",
+    safe: null,
+    proxy: { type: "unknown", implementation: null, admin: null },
+    errors: [],
+  };
+
+  const first = carryOwnershipFacts(emptied, previous, { unread: {}, previousErrors: [] });
+  assert.equal(first.owner, previous.owner, "the committed owner is kept");
+  assert.equal(first.owner_type, "safe");
+  assert.deepEqual(first.safe, previous.safe);
+  assert.deepEqual(first.proxy, previous.proxy);
+  assert.deepEqual(first.errors, [
+    { step: "owner", message: EMPTY_READ_MESSAGE },
+    { step: "proxy", message: EMPTY_READ_MESSAGE },
+  ]);
+
+  // A probe that failed and said so needs no second error: the recorded failure already explains it.
+  const explained = carryOwnershipFacts(
+    { ...emptied, owner_type: "unknown", errors: [{ step: "rpc", message: "eth_call owner() 0x…: HTTP 503" }] },
+    previous,
+    { unread: { owner: true, safe: true, proxy: true }, previousErrors: [] },
+  );
+  assert.equal(explained.owner, previous.owner);
+  assert.equal(explained.errors.length, 1);
+
+  // A real renouncement is not an absence. It arrives as owner() returning the zero address, which
+  // is a value, and passes through on the first read that carries it.
+  const renounced = carryOwnershipFacts(
+    { owner: ZERO_ADDRESS, owner_type: "none", safe: null, proxy: previous.proxy, errors: [] },
+    previous,
+    { unread: {}, previousErrors: [] },
+  );
+  assert.equal(renounced.owner, ZERO_ADDRESS);
+  assert.equal(renounced.owner_type, "none");
+  assert.deepEqual(renounced.errors, []);
+
+  // And an empty answer that repeats on the very next pull is finally believed.
+  const confirmed = carryOwnershipFacts(emptied, previous, {
+    unread: {},
+    previousErrors: [{ step: "owner", message: EMPTY_READ_MESSAGE }, { step: "proxy", message: EMPTY_READ_MESSAGE }],
+  });
+  assert.equal(confirmed.owner, null);
+  assert.equal(confirmed.owner_type, "none");
+  assert.deepEqual(confirmed.errors, []);
+});
+
+test("a node-reported revert is a fact; a transport failure is not", async () => {
+  const clientThrowing = (error) => ({
+    getCode: async () => "0x60006000",
+    getStorageAt: async () => `0x${"0".repeat(64)}`,
+    ethCall: async () => { throw error; },
+  });
+  const address = "0x39dBED3a2bd333467115dE45665cC57F813C4571";
+
+  const reverted = await readRpc(clientThrowing(new RpcCallError("eth_call: execution reverted")), address);
+  assert.equal(reverted.owner, null);
+  assert.equal(reverted.owner_type, "none", "the contract answered: it has no owner()");
+  assert.deepEqual(reverted.errors, []);
+  assert.equal(reverted.unread.owner, false);
+
+  const blocked = await readRpc(clientThrowing(new Error("HTTP 503 after 3 attempts")), address);
+  assert.equal(blocked.owner, null);
+  assert.equal(blocked.owner_type, "unknown", "an unread probe is unknown, never none");
+  assert.equal(blocked.unread.owner, true);
+  assert.match(blocked.errors[0].message, /eth_call owner\(\)/);
+
+  // The bytecode digest comes out of the eth_getCode the run already makes, so it costs nothing.
+  assert.equal(reverted.code_hash, codeHash("0x60006000"));
+  assert.equal(codeHash("0x"), null);
+  assert.notEqual(codeHash("0x60006000"), codeHash("0x60006001"));
+});
+
+test("a static, quiet role is not worth a credit; an active one is", () => {
+  const now = Date.parse("2026-09-04T12:00:00.000Z");
+  for (const role of ["token", "factory", "curve", "router", "vault", "multisig"]) {
+    assert.equal(needsExplorerSignal({ role, now }).signal, true, role);
+  }
+  for (const role of ["admin", "proxy", "implementation", "timelock", "other"]) {
+    assert.equal(needsExplorerSignal({ role, now }).signal, false, role);
+    assert.equal(needsExplorerSignal({ role, now, lastTxAt: "2026-09-01T12:00:00.000Z" }).signal, true, `${role} active`);
+    assert.equal(needsExplorerSignal({ role, now, lastTxAt: "2026-07-01T12:00:00.000Z" }).signal, false, `${role} long quiet`);
+    assert.equal(needsExplorerSignal({ role, now, first: true }).signal, true, `${role} first read`);
+    assert.equal(needsExplorerSignal({ role, now, full: true }).signal, true, `${role} --full`);
+  }
 });
 
 // --- runner ---------------------------------------------------------------
