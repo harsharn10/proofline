@@ -112,5 +112,12 @@ findings:
     - text: other remains unresolved (CON-1).
     - text: identity.repository remains unresolved (CON-2).
 risks:
+  - The V5 launchpad is an EIP-1967 UUPS proxy. owner() is an unverified contract that can take upgrade and fee-withdraw paths named in the implementation ABI, with no timelock in that ABI. [claim S1]
   - The PAIR token source is not verified on the explorer. [claim S1]
   - Official all-time volume figures are posts, not a reproduced chain slice. [claim S1]
+tldr: A multipool stock-paired launchpad on Robinhood Chain.
+tldr_source: derived
+why_people_care:
+  - PAIR is a stock-paired factory that can quote a new token against a basket of Robinhood stock tokens in one launch, not a single stock. [claim S1]
+  - LONG quotes one stock per create; Pons is a bonding-curve pad. [claim S1]
+  - The PAIR token itself is a live PAIR/SPY Uniswap v4 book. [claim S1]

@@ -79,6 +79,12 @@ findings:
     - text: "Are Tempo and Hook Labs live on chain 4663, or only on Ethereum / Arc as the docs table states? Next: do not use the Ethereum Hook Labs factory addresses on Robinhood Chain"
   unresolved: []
 risks:
-  - "`platformController()` is one externally owned account with no code. [verified S10 S12] [claim S20]"
-  - Verified source lets that address swap the hook, pause `deployCoin`, and withdraw ETH/WETH fees. [verified S10 S12] [claim S20]
+  - platformController() is one externally owned account with no code. [verified S10 S12] [claim S20]
+  - Verified source lets that address swap the hook, pause deployCoin, and withdraw ETH/WETH fees. [verified S10 S12] [claim S20]
   - There is no timelock. [verified S10 S12] [claim S20]
+tldr: "Klik is a permissionless token launchpad. Docs: Ethereum, Base, Robinhood Chain, and Arc."
+tldr_source: derived
+why_people_care:
+  - The RH factory is still taking deployCoin calls on 2026-09-03, with tokenCount() 5923. [claim S2 S10 S15]
+  - That is a live Uni v4 hook pad on this chain, not a bonding-curve name. [claim S2 S10 S15]
+  - Llama has no protocol/klik row this pass. [claim S2 S10 S15]

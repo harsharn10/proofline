@@ -112,5 +112,12 @@ findings:
     - text: "Is there a Robinhood Chain TVL/fees adapter, given Llama protocol/doppler 400? Next: do not invent an all-chains figure; record any later chain-slice adapter"
   unresolved: []
 risks:
-  - Airlock `owner()` is a 3-of-6 Safe. [verified S13 S18] [claim S1 S4]
+  - Airlock owner() is a 3-of-6 Safe. [verified S13 S18] [claim S1 S4]
   - Docs do not name a timelock on that Safe. [verified S13 S18] [claim S1 S4]
+  - Factory nonce 115600 means a large set of EIP-1167 clones share DopplerERC20V1 bytecode; a factory or implementation mistake would be wide. [verified S13 S18] [claim S1 S4]
+tldr: Doppler is an onchain token-launch protocol.
+tldr_source: derived
+why_people_care:
+  - LONG, Bankr, STATICS, and EARN all sit on this Airlock and DopplerERC20V1 factory, so a control change here moves those products. [claim S3 S11 S23]
+  - RH Daily posted $2.2M of 24h launchpad volume for @dopplerprotocol on 1 Sep 2026. [claim S3 S11 S23]
+  - Docs list Robinhood Mainnet beside Base, Ethereum, Monad, and Arbitrum. [claim S3 S11 S23]

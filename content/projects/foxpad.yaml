@@ -142,3 +142,13 @@ metrics:
     class: claim
     sources:
       - S15
+tldr: Bonding-curve launchpad on Robinhood Chain.
+tldr_source: derived
+why_people_care:
+  - The pad is a native Robinhood Chain launch venue whose fee split is named against $FOX, a culture token that itself launched on NOXA. [claim S6]
+  - Factory 0xF8A5…F22C has taken 9 createLaunch calls. [claim S6]
+  - FOX still trades on Uniswap v3; that book is the mascot token, not pad TVL. [claim S6]
+risks:
+  - Pad contract source is unverified and owner() reverts, so the withdraw path on the fee vault is unread. [claim S6]
+  - The revenue page says FOX buybacks are manual. [claim S6]
+  - Nine createLaunch transactions produced eight TokenLaunched logs. [claim S6]

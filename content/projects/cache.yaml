@@ -126,3 +126,9 @@ risks:
   - USD liquidity figures on the CACHE/SNDK book count both sides, and the quote side is SNDK, not USDG. [claim S10]
   - Gecko token total_reserve_in_usd was 0.0 and the pool endpoint returned 429, so aggregator reserve is not reproduced on Gecko this pass. [claim S10]
   - No official handle was located, so comms surfaces stay unconfirmed-official. [claim S10]
+tldr: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against SNDK.
+tldr_source: derived
+why_people_care:
+  - The CACHE/SNDK Uniswap v4 book printed about $2.92M of 24h volume on DexScreener at collection, with liquidity about $518k. [claim S10]
+  - GET /rhj/assets has an SNDK row at 0xB90A…6400, so the pair leg is the Sandisk Corporation • Robinhood Token rather than a third-party TokenizedStock. [claim S10]
+  - A second SNDK book, OP/SNDK (Sandisk Optimus 0xF25C…3214), is a different token. [claim S10]

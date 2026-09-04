@@ -121,3 +121,9 @@ risks:
   - USD liquidity figures on the OOF/RBLX book count both sides, and the quote side is RBLX, not USDG. [claim S12]
   - Gecko labels the pool Bankr; the create target is LongLauncher. [claim S12]
   - Other contracts on this chain reuse the OOF ticker. [claim S12]
+tldr: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against RBLX. LongLauncher deploys OOF in one create call and seeds the OOF/RBLX book.
+tldr_source: derived
+why_people_care:
+  - The OOF/RBLX Uniswap v4 book printed about $1.26M of 24h volume on Gecko at collection, with the quote token using the Roblox Nasdaq ticker via Robinhood's stock-token registry. [claim S12]
+  - GET /rhj/assets has an RBLX row at 0xF0C4…1bE8. [claim S12]
+  - A separate in-flight name, ROBLOXIANS, also quotes that rail. [claim S12]

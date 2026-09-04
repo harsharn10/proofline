@@ -107,3 +107,13 @@ findings:
     - text: "Does the promised whitepaper publish a CA, handle, or audit URL? Next: re-read that account on 2026-09-04"
     - text: "Which Gecko field produced the assignment lead of liq ~$123,842 / vol ~$1,976,160? Next: archive the pair JSON if the lead figures return"
   unresolved: []
+tldr: A stock-paired launchpad that mints autocompounding ERC-20s into Uniswap v4 pools quoted against Robinhood stock tokens.
+tldr_source: derived
+why_people_care:
+  - The STACKS/SPY Uniswap v4 book printed about $1.92M of 24h volume on Gecko at collection, with the quote token the SPY Robinhood Token rail at 0x117c…4C0C. [claim S14]
+  - That is a different token and pool from packed PAIR/SPY and from STRATTON/SPY. [claim S14]
+  - Site JS describes a 12M → 1.2B autocompound curve and a 100+ stock launch set. [claim S14]
+risks:
+  - USD liquidity figures on the STACKS/SPY book count both sides, and the quote side is SPY, not USDG. [claim S14]
+  - Gecko names the pool SPY / STACKS 3% with SPY as base, so pool fdv_usd is not the STACKS fdv. [claim S14]
+  - Factory and token source are unverified. [claim S14]

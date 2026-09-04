@@ -122,3 +122,12 @@ findings:
 themes:
   - launchpad
   - memecoin
+tldr: "Uniswap v3 pool launchpad on Robinhood Chain: one transaction deploys a 1 billion-supply ERC-20, creates a 1% Uniswap v3 pool, and opens trading with 2%…"
+tldr_source: derived
+why_people_care:
+  - "Safehood is a native Uniswap v3 launch surface: tokens are tradeable from the first block without a bonding-curve graduation. [claim S28]"
+  - Census still lists the row as announced; the factory, TokenFactory and five createToken calls are on chain 4663. [claim S28]
+  - The pad is a different product from hood.fun and from Uniswap Labs' pools.trade. [claim S28]
+risks:
+  - LIQUIDITY_MANAGER_ROLE can decreaseLiquidity on the protocol-held Uniswap v3 NFT and send the proceeds to Treasury. [claim S28]
+  - Verified ProtocolConfig on 0xe893 pays the 1% trade fee entirely to the creator; a later @_safehood post and the current GitHub ProtocolConfig say 80/20. safehood.fun returned 404 on… [claim S28]

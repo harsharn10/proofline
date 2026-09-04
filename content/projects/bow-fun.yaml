@@ -120,3 +120,13 @@ findings:
     - text: "What is github.com/bowdotfun/bowdotfun relative to the on-chain factories — unofficial toolkit, leftover Pons README, or a source mirror? Next: do not treat that repo as factory source; record any later commit that names 0x229Faa91… or 0xC70E510E…"
     - text: "Can Emerson 30d 33 tokens / $250k and OKX lifetime $62.3M be reproduced on a live query? Next: retry Dune API or a CSV export; do not equate API total 8333 with the 30d 33-token window"
   unresolved: []
+tldr: bow.fun is a token launchpad on Robinhood Chain.
+tldr_source: derived
+why_people_care:
+  - This is a documented Robinhood Chain pad with two reproduced factories and an official board of 8333 tokens, not a census row. [claim S17 S18] [verified S8 S10]
+  - Emerson's 30d labeled board (harvest capture) put bow.fun at 33 tokens / $250k DEX against a lifetime OKX figure of $62.3M; the live Dune table was not in the HTML… [claim S17 S18] [verified S8 S10]
+  - Distinct from the in-flight BOW/SPY token (slug bow / Longbow) and from Pons. [claim S17 S18] [verified S8 S10]
+risks:
+  - FactoryHub is an upgradeable ERC1967 proxy. owner() on the hub and on the legacy factory is one externally owned account with no code. [verified S9 S10] [claim S2 S15]
+  - The hub implementation is unverified this pass. [verified S9 S10] [claim S2 S15]
+  - The legacy factory still returns launchEnabled true, so an integrator that posts only to 0xC70E51…ab79 or only to the hub can land on a different generation than the… [verified S9 S10] [claim S2 S15]

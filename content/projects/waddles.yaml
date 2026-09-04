@@ -137,3 +137,13 @@ findings:
     - text: "Should the other robinhood WADDLES 0xbc49…1e18 / AMZN book get its own packet? Next: only if an assignment names that address"
     - text: "Which aggregator should a card use when Gecko token fdv is $1.48M and DexScreener fdv is $833k on the same pool? Next: keep both figures labeled; do not collapse"
   unresolved: []
+tldr: A one-billion-supply ERC-20 launched on Pons v2 and graduated into a Uniswap v4 pool quoted against Amazon • Robinhood Token (AMZN).
+tldr_source: derived
+why_people_care:
+  - The WADDLES/AMZN Uniswap v4 book printed about $776.4k of 24h volume on Gecko at collection, with DexScreener on the same pair at $590.6k volume and $70.8k liquidity. [claim S11]
+  - GET /rhj/assets has an AMZN Stock Token row at 0x12f1…bF54, so the pair leg is the Robinhood AMZN rail. [claim S11]
+  - This is a Pons v2 graduation, distinct from in-flight SENDER/AMZN (LongLauncher / Doppler at 0x4d41…1e18). [claim S11]
+risks:
+  - USD liquidity figures on the WADDLES/AMZN book count both sides, and the quote side is AMZN, not USDG. [claim S11]
+  - Gecko and DexScreener disagree on reserve and fdv for the same pool; Gecko's pool fdv is AMZN-as-base. [claim S11]
+  - DexScreener lists waddles.website and @WaddlesAMZN as a community-claim profile, but those surfaces do not embed the CA this pass, so comms stay unconfirmed-official. [claim S11]

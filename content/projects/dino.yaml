@@ -110,3 +110,13 @@ findings:
     - text: "What is unverified helper 0x4266b4a7…EDcb that called the graduation tx? Next: eth_getCode and read V2GraduationExecutor path from factory source"
     - text: "Is there an official Telegram, site, or GitHub after a later DexScreener profile claim? Next: re-fetch DexScreener token profile and Gecko token attributes"
   unresolved: []
+tldr: A one-billion-supply ERC-20 launched through Pons v2 against GOOGL.
+tldr_source: derived
+why_people_care:
+  - The DINO/GOOGL Uniswap v4 book printed about $4.86M of 24h volume on Gecko at collection, with the quote token the Alphabet Class A Robinhood Token. [claim S12]
+  - GET /rhj/assets lists GOOGL at 0x2e08…4FE3 as ASSET_STATUS_ACTIVE, so the pair leg is a rail rather than a third-party TokenizedStock. [claim S12]
+  - A second Chrome Dino / DINO at 0x1b0e…3E74 trades DINO/WETH. [claim S12]
+risks:
+  - USD liquidity figures on the DINO/GOOGL book count both sides, and the quote side is GOOGL, not USDG. [claim S12]
+  - Same-name Chrome Dino / DINO at 0x1b0e…3E74 is a ca-collision. [claim S12]
+  - DexScreener lists @dinogooglerh with no bidirectional CA link this pass; flag unconfirmed-official. [claim S12]

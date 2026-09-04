@@ -214,3 +214,10 @@ metrics:
 risks:
   - The position NFT is only as safe as the manager's approval and execute/cancel path. [claim S7]
   - A user who follows a third-party "holder portal" URL that wraps the official token address is leaving the scopl.live origin. [claim S7]
+  - Owner-set fee tiers, pause flags and V4 hook allowlists can change order economics or block execution without a timelock on the verified source read this pass. [claim S7]
+tldr: "SCOPL is a non-custodial Uniswap V3/V4 one-tick limit-order layer: a user sets a target price, the order is minted as a concentrated-liquidity position NFT…"
+tldr_source: derived
+why_people_care:
+  - Robinhood Chain tokenised-stock and meme pools still clear as Uniswap concentrated liquidity. [claim S7]
+  - SCOPL turns a resting limit into that same inventory, so a USDG→SPCX or ETH→meme target can earn pool fees while it waits instead of sitting in an off-chain book. [claim S7]
+  - The live V3 and V4 managers already show thousands of transactions, which means fills, cancels and keeper execution sit in the swap path of whatever pool the user picked… [claim S7]

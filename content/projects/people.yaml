@@ -133,3 +133,9 @@ findings:
     - text: "Does factory Ownable / fee recipient 0x263ed295…019Dd retain a path after graduation? Next: eth_call factory owner() and read executeCreatorFeeRecipientChange timelock"
     - text: "Which Gecko window printed people/WETH vol ~$1,523,087 / liq ~$30,202? Next: archive a Gecko pool screenshot if the ~$1.52M window returns"
   unresolved: []
+tldr: A one-billion-supply ERC-20 cloned onto a Pons v2 bonding curve quoted against native ETH, then graduated into a Uniswap v4 people/ETH pool. peoplemust.work…
+tldr_source: derived
+risks:
+  - USD liquidity on the people/ETH book counts both sides of a native-ETH pool, not WETH 0x0Bd7…AD73. [claim S12]
+  - Same-ticker people tokens (0xCDAdB6…b7dF, 0x9f1B29…6Cd2) share the name. [claim S12]
+  - A Netlify vote URL circulated off the official domain. [claim S12]

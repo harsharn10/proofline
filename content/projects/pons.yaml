@@ -542,4 +542,12 @@ themes:
   - stock-paired
   - hook
 risks:
+  - The v1 and v2 factories' owner() is a 2-of-3 Safe with no timelock in that call path, so documented owner actions on fees, pairing assets, launch configs and graduation… [verified S47] [claim S36]
   - v2 is deployed and its own docs tell integrators to treat it as unaudited until three named reviews close; public creates stay on an allowlist. [claim S36]
+  - A launch paired against a tokenised stock or other approved asset carries that asset's price and transfer behaviour on top of the launch token, and graduation only records that the… [claim S35 S36]
+tldr: The chain's dominant launchpad.
+tldr_source: derived
+why_people_care:
+  - Pons is a live launchpad on chain 4663 with documented v1 and v2 factories, lockers and a Uniswap v4 hook, and with the PONS token trading in a Uniswap V3 WETH pool. [verified S35 S36 S41 S43]
+  - v2 launches can be quoted in owner-approved ERC-20s, including tokenised stocks, so pairing-asset risk sits in the launch path rather than only in later trading. [claim S36 S38]
+  - Official posts on 1–2 Sep 2026 give lifetime volume in the billions; DefiLlama's Robinhood Chain adapter for the same day gives about $94.2M of 24h volume and about… [claim S37 S40] [verified S44]
