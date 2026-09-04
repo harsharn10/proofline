@@ -85,8 +85,10 @@ function CategoryPage() {
   const sectionEntries = entries.filter((entry) => entry.tree?.sectionId === section.id);
   const sectionSlugs = new Set(sectionEntries.map((entry) => entry.slug));
   const sectionWire = bundle.wire.filter((item) => sectionSlugs.has(item.slug)).slice(0, 4);
-  const showsMarketCap = section.id === "tokens" || section.id === "launchpads";
   const keys = SECTION_KPIS[section.id] ?? ["volume24h", "liquidityUsd", "holders", "trades24h"];
+  // Tokens carry market cap inside SECTION_KPIS, so the standalone column is only for the sections
+  // that do not — otherwise the table would print the same figure twice.
+  const showsMarketCap = (section.id === "tokens" || section.id === "launchpads") && !keys.includes("marketCap");
   const rows = rankRows(sectionEntries, keys[0]!).filter((entry) => rowMatches(entry, f));
   const live = sectionEntries.filter((entry) => entry.kpis.status === "live").length;
   const dormant = sectionEntries.filter((entry) => entry.kpis.status === "dormant").length;
