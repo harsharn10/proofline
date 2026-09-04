@@ -1,0 +1,56 @@
+# Census proposals only — not a write to content/census.yaml.
+# Inbox YAML parse only (scripts/lib/inbox.mjs). Human reviews before filing.
+# 2026-09-04 grok-bot follow-up on grok/2026-09-04 / PR #82.
+# Slug `arc` matches round-22 / account-desk, not `arc-liquidity`.
+# Floor is off census but already has a seed packet this PR; not re-proposed here.
+
+candidates:
+  - slug: arc
+    name: Arc
+    category: Isolated lending market
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: site, url: "https://arcliquidity.capital" }
+      - { kind: app, url: "https://arcliquidity.capital/app/" }
+      - { kind: docs, url: "https://arcliquidity.capital/docs" }
+      - { kind: x, url: "https://x.com/ArcLiquidity" }
+    discovery_source: "Grok field desk 2026-09-04 follow-up, packet WORK-20260904-grok-bot-arc, signed-in X scout intake"
+    handle: "@ArcLiquidity"
+    tree: { primary: credit/isolated-money-market, secondary: [credit/rwa-lending] }
+    token:
+      value: "0xce845443428867d271929bd739148B85524B536a"
+      chain: robinhood-chain
+      source: docs
+      seen: 2026-09-04
+      exists_on_4663: true
+      explorer_source_verified: true
+    qualifying:
+      deployed_on_chain: { value: true, note: "RPC+Blockscout 2026-09-04: ARC token and Arc-named core set including ArcLendingPool 0x618389d2048ee7e4c823cec121c5d07edd95d0de on chain 4663; lending balances not independently decoded", verified: false }
+      native_play: { value: true, note: "USDG borrow against CL positions on Robinhood Chain; not a Stock Token issuer and not Arrow CDP", verified: false }
+      citable: { value: true, note: "Official site arcliquidity.capital and X @ArcLiquidity", verified: false }
+      research_story: { value: true, note: "Isolated money market that values LP as USDG collateral; distinct from census arrow", verified: false }
+
+  - slug: sluice
+    name: Sluice
+    category: Liquidity manager
+    lifecycle: announced
+    coverage: stub
+    official_links:
+      - { kind: site, url: "https://sluice.live" }
+      - { kind: x, url: "https://x.com/sluice_rh" }
+    discovery_source: "Grok field desk 2026-09-04 follow-up, inbox note research/inbox/2026-09-04-sluice.md, signed-in X scout intake"
+    handle: "@sluice_rh"
+    tree: { primary: yield/lp-manager }
+    token:
+      value: "0xb48d34dd8b53324cb8525461c8e548522db885ec"
+      chain: robinhood-chain
+      source: third-party
+      seen: 2026-09-04
+      exists_on_4663: true
+      explorer_source_verified: true
+    qualifying:
+      deployed_on_chain: { value: true, note: "RPC+Blockscout 2026-09-04: token 0xb48d34dd8b53324cb8525461c8e548522db885ec name Sluice symbol SLUICE, PonsV2LauncherToken fully verified; site HTML this round did not print the CA; site header still showed 0 pools", verified: false }
+      native_play: { value: true, note: "Uniswap v3 vault on Pons pools on Robinhood Chain; not census ram / Ramses", verified: false }
+      citable: { value: true, note: "Official site sluice.live and X @sluice_rh", verified: false }
+      research_story: { value: true, note: "LP vault compounding fees on existing Pons v3 pools, with a v4 hook described as being built; keep distinct from RamsesX", verified: false }

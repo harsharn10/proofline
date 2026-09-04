@@ -117,6 +117,7 @@ claims:
   - { id: CLM-22, field: "account.@Floor_fi.slug", value: floor, class: claim, observed_at: 2026-09-04T13:30:00Z, receipt_ids: [R-1], reproduction_ids: [], supersedes: null }
   - { id: CLM-23, field: "account.@Floor_fi.conflict", value: team, class: claim, observed_at: 2026-09-04T13:30:00Z, receipt_ids: [R-1], reproduction_ids: [], supersedes: null }
   - { id: CLM-24, field: communications.status, value: "X Latest for @Floor_fi and the follow-list handles (@graildoteth, @0xSammy, @OGDfarmer, @MEADGod, plus official project handles) was not readable this round: x.com returned HTTP 200 with no post bodies; jina.ai 403 (AbuseAlleviationError until 2026-09-04 14:09:56Z); syndication.twitter.com 429. No tweet ids, dates, or claims were filed. Handle is taken from the official site, DexScreener socials, and content/accounts.yaml.", class: unknown, observed_at: 2026-09-04T13:31:00Z, receipt_ids: [], reproduction_ids: [], supersedes: null }
+  - { id: CLM-25, field: product.mechanism, value: "Signed-in X scout intake, 2026-08-24 https://x.com/Floor_fi/status/2092127246320328809: trade fees route to tokenized-stock rewards (NVDA, AAPL, GLD named); CASHCAT and PONS pools; site https://floorfi.app. This environment's X path still returned no post bodies. Does not change the RPC reproductions in REP-1–REP-3.", class: claim, observed_at: 2026-09-04T14:04:00Z, receipt_ids: [R-13], reproduction_ids: [], supersedes: null }
 conflicts:
   - id: CON-1
     field: product.mechanism
@@ -170,6 +171,19 @@ events:
     site_recommendation: profile
     channel_recommendation: none
     receipt_ids: [R-1]
+  - id: EVT-4
+    type: company
+    title: "Floor_fi: fees to tokenized-stock rewards"
+    summary: "Signed-in X scout intake of https://x.com/Floor_fi/status/2092127246320328809 (2026-08-24): fees route to tokenized-stock rewards; NVDA, AAPL, and GLD named; CASHCAT and PONS pools; URL https://floorfi.app. This environment did not recover the post body. Strengthens the site mechanism in CLM-1 without changing RPC findings."
+    account: "@Floor_fi"
+    occurred_at: 2026-08-24T00:00:00Z
+    observed_at: 2026-09-04T14:04:00Z
+    affected_fields: [product.mechanism]
+    evidence_state: claim
+    impact: material
+    site_recommendation: feed
+    channel_recommendation: none
+    receipt_ids: [R-13]
 receipts:
   - { id: R-1, publisher: Floor, title: "Official site floorfi.app", url: "https://floorfi.app", published_at: null, accessed_at: 2026-09-04T13:30:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-2, CLM-3, CLM-4, CLM-5, CLM-7, CLM-8, CLM-11, CLM-14, CLM-15, CLM-16, CLM-17, CLM-19, CLM-20, CLM-21, CLM-22, CLM-23, EVT-1, EVT-2, EVT-3], excerpt: "Every trade on $FLR sends its creator fees to a treasury that buys tokenized equities on-chain. Half is set aside for holders, half becomes a floor under the token. Contract 0x8aD25c65587979533fa1cA0d2194A76D5bAE305d. FLOOR Vault 0xEf9Cb10585F7641c89AFb5Ab97559749CB7B1b71. FLOOR Distributor 0xc2f799fF3c16DBE4801A8bF9c9b47177BcFD2479. Chain Robinhood Chain · 4663." }
   - { id: R-2, publisher: Floor, title: "floorfi.app/docs", url: "https://floorfi.app/docs", published_at: null, accessed_at: 2026-09-04T13:40:00Z, kind: docs, authority: primary, authenticity: confirmed, supports: [CLM-1], excerpt: "HTTP 200. Same Floor SPA as the homepage; contracts, Pons v2 launch copy, and basket tables are served from this origin. No separate GitHub path was listed." }
@@ -183,10 +197,11 @@ receipts:
   - { id: R-10, publisher: RPC, title: "Index token collision check on chain 4663", url: "https://robinhoodchain.blockscout.com/address/0x56910D4409F3a0C78C64DD8D0545FF0705389870", published_at: null, accessed_at: 2026-09-04T13:33:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-14], excerpt: "RPC name() The Index, symbol() Index, owner() 0x02d9e763154977e2aae47a3a61d940ffe0238fd0, code 5554 hex chars. Distinct from Floor token 0x8aD25c65587979533fa1cA0d2194A76D5bAE305d." }
   - { id: R-11, publisher: "X", title: "Follow-list Latest attempt", url: "https://x.com/graildoteth", published_at: null, accessed_at: 2026-09-04T13:31:00Z, kind: social, authority: social, authenticity: unconfirmed, supports: [CLM-7], excerpt: "x.com/graildoteth, x.com/0xSammy, x.com/OGDfarmer, x.com/MEADGod, x.com/ArcLiquidity, x.com/sluice_rh, x.com/HoodedDotMeme, x.com/ArrowFinanceio, x.com/MancerXYZ each HTTP 200 with no post bodies recovered." }
   - { id: R-12, publisher: "Robinhood Chain RPC", title: "eth_getCode / eth_call on chain 4663", url: "https://rpc.mainnet.chain.robinhood.com", published_at: null, accessed_at: 2026-09-04T13:32:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-3, CLM-4, CLM-5, CLM-6, EVT-1, EVT-2], excerpt: "JSON-RPC eth_blockNumber 0x33c98b3 (54302899). eth_getCode non-empty on FLR token, FLOOR Vault, and FLOOR Distributor. name/symbol/totalSupply and vault token() as recorded in REP-1 REP-2 REP-3." }
+  - { id: R-13, publisher: "@Floor_fi", title: "status/2092127246320328809 fees to tokenized-stock rewards", url: "https://x.com/Floor_fi/status/2092127246320328809", published_at: 2026-08-24, accessed_at: 2026-09-04T14:04:00Z, kind: social, authority: social, authenticity: unconfirmed, supports: [CLM-25, EVT-4], excerpt: "Signed-in X scout intake 2026-09-04. This environment HTTP 200 with no post body. Paraphrase: fees route to tokenized-stock rewards; NVDA, AAPL, GLD named; CASHCAT and PONS pools; https://floorfi.app. Does not rewrite RPC findings in REP-1–REP-3." }
 gaps:
   - { priority: P0, question: "Can owner() on the vault and distributor change the basket, keeper, or payout path without a timelock?", checked: "owner() returned a single EOA on vault and distributor; token owner() reverted; explorer source flag unread because API v2 was 403, 2026-09-04", next: "Read verified source if it appears, or eth_call the basket/keeper setters and record the access modifier" }
   - { priority: P0, question: "Which on-page basket table matches balances held by the treasury contracts?", checked: "Homepage weights and the 25 August 2026 Supported assets table disagree; RPC this round did not read treasury balances per asset", next: "eth_call balances of the listed NVDA/AAPL/… addresses on the vault or treasury holder and compare to both tables" }
-  - { priority: P1, question: "X Latest from @Floor_fi and the accounts.yaml follow list this window?", checked: "x.com HTTP 200 without post bodies; jina 403; syndication 429. No tweet ids filed.", next: "Re-run Latest on @Floor_fi, @graildoteth, @0xSammy, @OGDfarmer, @MEADGod when X is readable" }
+  - { priority: P1, question: "X Latest from @Floor_fi and the accounts.yaml follow list this window?", checked: "This environment: x.com HTTP 200 without post bodies; jina 403; syndication 429. Signed-in scout intake added one dated post 2026-08-24 status/2092127246320328809 as R-13/CLM-25. Other Latest still unread here.", next: "Re-run Latest on @Floor_fi, @graildoteth, @0xSammy, @OGDfarmer, @MEADGod when this environment can read post bodies" }
   - { priority: P1, question: "Is the timed-lock vault live, unused, or only documentation?", checked: "Homepage says no lockup; later section describes 7/15/30 day locks; vault contract exists and token() returns FLR", next: "Read vault lock/unstake selectors and any staked supply" }
   - { priority: P2, question: "Is there a DefiLlama protocol row or GitHub org still missing?", checked: "api.llama.fi/protocols 2026-09-04 no Floor row; site listed no GitHub path", next: "Watch Llama listings and any repository link the official pages add" }
 ---
@@ -214,3 +229,4 @@ TL;DR: Pons-graduated $FLR on chain 4663: a 2% trade tax is stated to buy tokeni
 ## Operations log
 
 - 2026-09-04: grok-bot field desk. Gap hunted: Floor / `@Floor_fi` (on accounts, off census). X Latest closed (no post bodies; jina 403; syndication 429). Official site + /docs + RPC `https://rpc.mainnet.chain.robinhood.com` + Blockscout HTML (API v2 403) + DefiLlama chains/protocols + DexScreener token-pairs. Standing hunts not re-opened on X. Candidate slug `floor` proposed for compiler census intake. Did not write `content/census.yaml` or `content/accounts.yaml`.
+- 2026-09-04 follow-up (same branch): additive R-13 / CLM-25 / EVT-4 from signed-in scout post 2026-08-24 `https://x.com/Floor_fi/status/2092127246320328809` (fees to tokenized-stock rewards; NVDA/AAPL/GLD; CASHCAT and PONS pools). RPC reproductions unchanged. Arc seed packet filed at `research/inbox/packets/arc/WORK-20260904-grok-bot-arc.md`.
