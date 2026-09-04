@@ -41,7 +41,13 @@ import { parse } from "yaml";
 
 import { createPacer, mapWithConcurrency } from "./lib/pull/http.mjs";
 import { createRpcClient, readAddress as readRpc, RPC_URL } from "./lib/pull/rpc.mjs";
-import { createBlockscoutClient, readAddress as readBlockscout, BLOCKSCOUT_BASE } from "./lib/pull/blockscout.mjs";
+import {
+  createBlockscoutClient,
+  readAddress as readBlockscout,
+  resolveBlockscoutConfig,
+  createBlockscoutTracker,
+  blockscoutChallengeGate,
+} from "./lib/pull/blockscout.mjs";
 import { createLlamaClient, findLlamaSlug, readProtocol } from "./lib/pull/llama.mjs";
 import {
   createDexscreenerClient,
@@ -350,11 +356,19 @@ async function main() {
 
   const pace = createPacer(250);
   const deps = { pace };
+  const explorerConfig = resolveBlockscoutConfig();
+  const explorerTracker = createBlockscoutTracker();
+  const explorerDeps = {
+    pace: createPacer(1000 / explorerConfig.requestsPerSecond),
+    defaultHeaders: explorerConfig.headers,
+    onRequest: explorerTracker.recordRequest,
+    onChallenge: explorerTracker.recordChallenge,
+  };
   const rpc = memoizeClient(createRpcClient({ deps }));
-  const blockscout = memoizeClient(createBlockscoutClient({ deps }));
+  const blockscout = memoizeClient(createBlockscoutClient({ config: explorerConfig, deps: explorerDeps }));
   const llama = memoizeClient(createLlamaClient({ deps }));
   const dexscreener = memoizeClient(createDexscreenerClient({ deps }));
-  const activityClient = memoizeClient(createActivityClient({ deps }));
+  const activityClient = memoizeClient(createActivityClient({ base: explorerConfig.apiRoot, deps: explorerDeps }));
   const validate = createValidator();
 
   // Rialto is a chain-wide read: each endpoint is fetched once, cached for the run and paced at one
@@ -435,7 +449,7 @@ async function main() {
 
   console.log(
     `pull ${targets.length} slugs · rpc ${RPC_URL}` +
-      `${args.rpcOnly ? " · blockscout and dexscreener skipped (--rpc-only)" : ` · blockscout ${BLOCKSCOUT_BASE} · dexscreener ${DEXSCREENER_BASE}`}` +
+      `${args.rpcOnly ? " · blockscout and dexscreener skipped (--rpc-only)" : ` · blockscout ${explorerConfig.restBase}${explorerConfig.isPro ? " (PRO)" : " (public)"} · dexscreener ${DEXSCREENER_BASE}`}` +
       `${args.rpcOnly ? "" : ` · rialto ${RIALTO_BASE}${rialto ? ` · ${discoveryCount} discovery candidates` : " unavailable"}`}` +
       `${blockNumber ? ` · head ${blockNumber}` : ""}${args.dry ? " · dry run" : ""}`,
   );
@@ -473,7 +487,7 @@ async function main() {
     // factory's 24h walk cannot starve the rest of the slug.
     let activity = null;
     if (!args.rpcOnly) {
-      const rows = await mapWithConcurrency(target.addresses, BLOCKSCOUT_CONCURRENCY, (entry) =>
+      const rows = await mapWithConcurrency(target.addresses, explorerConfig.isPro ? explorerConfig.addressConcurrency : BLOCKSCOUT_CONCURRENCY, (entry) =>
         readAddressActivity(activityClient, entry, { now: Date.parse(pulledAt) }),
       );
       activity = { ...emptyActivity(pulledAt, rows), ...aggregateActivity(rows) };
@@ -689,8 +703,18 @@ async function main() {
     for (const f of failures) console.log(`  ${f.slug.padEnd(20)} ${f.message}`);
   }
 
+  const explorerStats = explorerTracker.snapshot();
+  if (!args.rpcOnly) {
+    console.log(`Blockscout credits: ${explorerStats.credits} · challenge responses: ${explorerStats.challenges}`);
+  }
+  const challengeGate = blockscoutChallengeGate(explorerStats);
+  if (challengeGate.failed) {
+    console.error(challengeGate.summary);
+    process.exitCode = challengeGate.exitCode;
+  }
+
   // Fails only when nothing at all could be produced; one bad address never sinks the run.
-  if (targets.length > 0 && totals.files === 0 && !args.dry) process.exit(1);
+  if (targets.length > 0 && totals.files === 0 && !args.dry) process.exitCode = 1;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

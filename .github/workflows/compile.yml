@@ -48,6 +48,8 @@ jobs:
       REPO: ${{ github.repository }}
       # Never interpolated into a shell line — a branch name is attacker-controlled text.
       BRANCH_INPUT: ${{ inputs.branch }}
+      # Available to any compile-time pull validation; absent keeps the public explorer fallback.
+      BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}
     steps:
       # fetch-depth: 0 plus the full refspec below: the compiler diffs producer branches against main, so
       # it needs every remote head, not just the one checkout would fetch.
