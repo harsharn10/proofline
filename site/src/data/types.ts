@@ -414,12 +414,37 @@ export type PulseAlert = {
   numbers: Record<string, number | string | null>;
   links: PulseLinks;
 };
+export type TrenchLinks = {
+  source: string;
+  dexscreener: string | null;
+  explorer: string | null;
+  transaction: string | null;
+};
+export type TrenchFill = {
+  id: string;
+  at: string;
+  side: "buy" | "sell";
+  symbol: string;
+  name: string;
+  token: string;
+  pair: string | null;
+  usd: number;
+  liquidityUsd: number | null;
+  trader: string;
+  firstBuy: boolean;
+  stock: boolean;
+  links: TrenchLinks;
+};
 export type PulseSnapshot = {
   at: string;
   ticks: number;
   alerts: PulseAlert[];
   hot: PulseHot[];
   launches_10m: number | null;
+};
+export type DirectoryTrenchFill = TrenchFill & {
+  ageMinutes: number;
+  slug: string;
 };
 export type DirectoryPulse = {
   at: string;
@@ -644,6 +669,7 @@ export type DirectoryBundle = {
   site: SiteConfig;
   sections: SectionDef[];
   entries: DirectoryEntry[];
+  trenches: DirectoryTrenchFill[];
   // The whole wire, built once on the server. Home, /feed and each category slice it; nothing
   // rebuilds it per render, and the raw feed bodies and change record it was built from stay on
   // the server rather than riding along in the loader payload.

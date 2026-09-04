@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CategoryCards } from "@/components/home/category-cards";
 import { RightNow } from "@/components/home/right-now";
 import { StatBox } from "@/components/home/stat-box";
+import { TrenchesStream } from "@/components/home/trenches-stream";
 import { Wire } from "@/components/wire/wire";
 import {
   announcedNow,
@@ -31,7 +32,7 @@ function chainReadLabel(iso: string | undefined): string {
 }
 
 function Home() {
-  const { site, sections, entries, histories, wire, now } = Route.useLoaderData();
+  const { site, sections, entries, trenches, histories, wire, now } = Route.useLoaderData();
   const live = entries.filter((entry) => entry.kpis.status === "live").length;
   const launchesToday = entries.reduce((sum, entry) => sum + entry.factoryLaunches24h, 0);
   const volume24h = entries.reduce((sum, entry) => sum + (entry.kpis.volume24h ?? 0), 0);
@@ -78,6 +79,19 @@ function Home() {
           </a>
         ))}
       </nav>
+
+      {trenches.length ? (
+        <section id="trenches" className="mt-[26px]">
+          <div className="mb-2 flex flex-wrap items-baseline justify-between gap-3 px-0.5">
+            <h2 className="m-0 text-sm font-semibold">In the trenches</h2>
+            <span className="text-[11px] text-[var(--t3)]">
+              recent activity in names Icarus covers · 10-minute snapshots ·{" "}
+              <a href="https://robinhoodtrenches.com/" target="_blank" rel="noreferrer" className="text-[var(--acc)]">via Robinhood Trenches</a>
+            </span>
+          </div>
+          <TrenchesStream fills={trenches} />
+        </section>
+      ) : null}
 
       <section id="right-now" className="mt-[26px]">
         <div className="mb-2 flex flex-wrap items-baseline justify-between gap-3 px-0.5">

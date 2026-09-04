@@ -17,7 +17,7 @@
     "cloudflare:dry": "site/node_modules/.bin/wrangler deploy --dry-run --config wrangler.jsonc",
     "cloudflare:test": "npm run cloudflare:dry && npm --prefix site run cloudflare:smoke",
     "seed": "node scripts/seed-stubs.mjs",
-    "test": "node scripts/validate.mjs && node scripts/test.mjs && node scripts/test-pipeline.mjs && node scripts/test-packet.mjs && node scripts/test-compile.mjs && node scripts/test-compile-inbox.mjs && node scripts/test-pull.mjs && npm run test:signals",
+    "test": "node scripts/validate.mjs && node scripts/test.mjs && node scripts/test-pipeline.mjs && node scripts/test-packet.mjs && node scripts/test-compile.mjs && node scripts/test-compile-inbox.mjs && node scripts/test-pull.mjs && npm run test:signals && npm run test:trenches",
     "telegram": "node scripts/telegram-digest.mjs",
     "telegram:dry": "node scripts/telegram-digest.mjs --dry-run",
     "telegram:chat-id": "node scripts/telegram-chat-id.mjs",
@@ -28,7 +28,8 @@
     "pull": "node scripts/pull.mjs",
     "pull:dry": "node scripts/pull.mjs --dry",
     "test:pull": "node scripts/test-pull.mjs",
-    "test:signals": "node scripts/test-signals.mjs && node --test pulse/test/*.test.mjs"
+    "test:signals": "node scripts/test-signals.mjs && node --test pulse/test/*.test.mjs",
+    "test:trenches": "node scripts/test-trenches.mjs"
   },
   "dependencies": {
     "ajv": "^8.17.1",

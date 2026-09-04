@@ -14,6 +14,9 @@ import {
 // Shared with scripts/score.mjs so site and Telegram eligibility cannot drift.
 // @ts-expect-error The repository-level helper is intentionally plain ESM.
 import { locatedOnChain as locatedOnChainCore, meetsShareBar as meetsShareBarCore, officialSurfaceConfirmed as officialSurfaceConfirmedCore } from "../../../scripts/lib/share-bar.mjs";
+// @ts-expect-error The repository-level normalizer is intentionally plain ESM so root tests and the
+// server use exactly the same third-party boundary.
+import { matchCoveredTrenchTape, normalizeTrenchTape, TRENCHES_TAPE_URL } from "../../../scripts/lib/trenches.mjs";
 import type {
   ChainStats,
   ChangelogEntry,
@@ -22,6 +25,7 @@ import type {
   DependencyRef,
   DirectoryBundle,
   DirectoryEntry,
+  DirectoryTrenchFill,
   Dossier,
   DossierBundle,
   Findings,
@@ -43,6 +47,7 @@ import type {
   SourceEntry,
   TreeRef,
   TrendingEntry,
+  TrenchFill,
   WireItem,
 } from "./types";
 
@@ -503,6 +508,7 @@ function withPulledMetrics(derived: Derived, pulled: PulledFile | null): Derived
 
 const DAY = 86_400_000;
 const PULSE_CACHE_MS = 10 * 60_000;
+const TRENCH_CACHE_MS = 10 * 60_000;
 let pulseCache: { readAt: number; value: PulseSnapshot | null } | null = null;
 
 function validPulse(value: unknown): value is PulseSnapshot {
@@ -545,6 +551,35 @@ async function loadPulse(now = Date.now()): Promise<PulseSnapshot | null> {
   if (pulseInflight) return pulseInflight;
   pulseInflight = fetchPulse(configured, now).finally(() => { pulseInflight = null; });
   return pulseInflight;
+}
+
+let trenchCache: { readAt: number; value: TrenchFill[] } | null = null;
+let trenchInflight: Promise<TrenchFill[]> | null = null;
+
+async function fetchTrenchTape(now: number): Promise<TrenchFill[]> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 2_000);
+  try {
+    const configured = process.env.TRENCHES_API_URL?.trim() || TRENCHES_TAPE_URL;
+    const response = await fetch(configured, { signal: controller.signal, headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const value = normalizeTrenchTape(await response.json(), { now }) as TrenchFill[];
+    trenchCache = { readAt: now, value };
+    return value;
+  } catch (error) {
+    console.warn(`[content-server] Trenches tape unavailable — ${error instanceof Error ? error.message : String(error)}`);
+    trenchCache = { readAt: now, value: trenchCache?.value ?? [] };
+    return trenchCache.value;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function loadTrenchTape(now = Date.now()): Promise<TrenchFill[]> {
+  if (trenchCache && now - trenchCache.readAt < TRENCH_CACHE_MS) return trenchCache.value;
+  if (trenchInflight) return trenchInflight;
+  trenchInflight = fetchTrenchTape(now).finally(() => { trenchInflight = null; });
+  return trenchInflight;
 }
 
 // Token address only. `hot` is arbitrary live pools, most of them untracked, and matching by ticker
@@ -939,7 +974,11 @@ function relatedFor(
 export const getContent = createServerFn({ method: "GET" }).handler(async (): Promise<DirectoryBundle> => {
   const content = getCachedContent();
   const readAt = Date.now();
-  const pulse = await loadPulse(readAt);
+  const [pulse, trenchTape] = await Promise.all([loadPulse(readAt), loadTrenchTape(readAt)]);
+  const tokenSlugs = new Map(content.dossiers.flatMap((d) => {
+    const token = d.pulled?.addresses.find((row) => row.role === "token")?.address;
+    return token ? [[token.toLowerCase(), d.slug] as const] : [];
+  }));
   return {
     site: content.site,
     sections: content.sections,
@@ -954,6 +993,7 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
         readAt,
       );
     }),
+    trenches: matchCoveredTrenchTape(trenchTape, tokenSlugs, { now: readAt }) as DirectoryTrenchFill[],
     histories: content.histories,
     wire: content.wire,
     dependencies: Object.values(content.dependencies)
