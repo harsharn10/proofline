@@ -641,10 +641,12 @@ async function runBacktest(days) {
         for (const signal of backtestBreakouts(snapshot, pullAt)) events.push({ at: pullAt, signal });
       }
       if (i === 0) continue;
+      for (const signal of backtestFeedSignals(snapshot, snapshot.at)) events.push({ at: snapshot.at, signal });
       // A control change observed between i-1 and i is sent only when snapshot i+1 still reads it.
-      const fresh = backtestControl(snapshots[i - 1], snapshot);
+      // The last snapshot has no confirming pull yet, so its changes are pending, not sent.
       const confirmer = snapshots[i + 1];
       if (!confirmer) continue;
+      const fresh = backtestControl(snapshots[i - 1], snapshot);
       const pending = fresh.flatMap((row) => row.changes.map((change) => ({ slug: row.slug, ...change })));
       const { confirmed } = confirmControlChanges(pending, [], confirmer.pulled, Date.parse(confirmer.at));
       for (const row of confirmed) {
@@ -659,7 +661,6 @@ async function runBacktest(days) {
           },
         });
       }
-      for (const signal of backtestFeedSignals(snapshot, snapshot.at)) events.push({ at: snapshot.at, signal });
     }
 
     events.sort((a, b) => String(a.at).localeCompare(String(b.at)));
