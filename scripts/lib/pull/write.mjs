@@ -36,12 +36,12 @@ const ACTIVITY_ADDRESS_KEYS = [
   "address", "label", "role", "transactions_count", "token_transfers_count",
   "last_tx_at", "last_method", "txns_24h", "launches_24h", "errors",
 ];
-const RIALTO_KEYS = ["pairs", "volume_24h_usd", "as_of", "source_url"];
+const RIALTO_KEYS = ["pairs", "volume_24h_usd", "volume_note", "as_of", "source_url"];
 const RIALTO_PAIR_KEYS = [
   "pool_id", "base", "target", "last_price", "base_volume_24h", "target_volume_24h", "volume_24h_usd",
 ];
 const PAIR_ASSET_KEYS = [
-  "ticker", "name", "address", "category", "tokenized_value_usd", "holders_proxy", "change_7d", "source_url",
+  "ticker", "name", "address", "category", "tokenized_value_usd", "tokenized_shares", "change_7d", "source_url",
 ];
 const VOLUME_DISAGREEMENT_KEYS = ["dexscreener_usd", "rialto_usd"];
 

@@ -275,21 +275,42 @@ export function parseMintburn(body) {
 export function parseLiquidity(body) {
   return {
     spreads: Array.isArray(body?.spreads) ? body.spreads : [],
+    // prices[] is the only place Rialto publishes a per-token 24h USD volume. Keeping it is what
+    // makes the DexScreener cross-check like-for-like: both sides are then one token's whole day.
     prices: Array.isArray(body?.prices) ? body.prices.flatMap((row) => {
       const tokenAddress = address(row?.address);
       if (!tokenAddress) return [];
-      return [{ address: tokenAddress, symbol: text(row?.symbol), price_usd: finite(row?.price) }];
+      return [{
+        address: tokenAddress,
+        symbol: text(row?.symbol),
+        price_usd: finite(row?.price),
+        volume_24h_usd: finite(row?.volume_24h_usd),
+      }];
     }) : [],
   };
 }
 
-export async function readAllAssets(client) {
+/**
+ * Pages the asset explorer. A page that fails keeps the pages already read and records which page
+ * was lost: an explorer of 202 assets always runs two pages, and losing the second one must not
+ * empty every pair_asset row and the explorer leg of discovery.
+ */
+export async function readAllAssets(client, { errors = [] } = {}) {
   const all = [];
   let page = 1;
   const seen = new Set();
   while (page && !seen.has(page) && seen.size < 10) {
     seen.add(page);
-    const result = await client.assetsPage(page);
+    let result;
+    try {
+      result = await client.assetsPage(page);
+    } catch (error) {
+      errors.push({
+        step: "stats/assets/explorer",
+        message: `page ${page}: ${error instanceof Error ? error.message : String(error)}`,
+      });
+      break;
+    }
     all.push(...result.data);
     page = result.nextPage;
   }
@@ -338,7 +359,7 @@ export async function readRialto(client, { pulledAt } = {}) {
     safe(() => client.tickers(), "router/tickers", referenceErrors, []),
     safe(() => client.tokens(), "router/tokens", referenceErrors, []),
     safe(() => client.symbols(), "market/robinhood-symbols", referenceErrors, []),
-    safe(() => readAllAssets(client), "stats/assets/explorer", referenceErrors, []),
+    safe(() => readAllAssets(client, { errors: referenceErrors }), "stats/assets/explorer", referenceErrors, []),
     safe(() => client.liquidity(), "liquidity/spreads", referenceErrors, { spreads: [], prices: [] }),
     safe(() => client.tvlKpis(), "stats/tvl/kpis", tvlErrors, parseTvlKpis(null)),
     safe(() => client.tvlByCategory(), "stats/tvl/tvl-by-category", tvlErrors, []),
@@ -387,12 +408,49 @@ export async function readRialto(client, { pulledAt } = {}) {
   };
 }
 
+const identity = (value) => text(value)?.toLowerCase() ?? null;
+
+// Three Rialto endpoints name tokenized real-world assets, each in its own vocabulary, and none of
+// the three uses the words the others use. Enumerate them rather than pattern-matching: a regex over
+// "stock|etf" silently admits `US Treasuries` and `Commodities`, and silently excludes nothing at
+// all from `market/robinhood-symbols`, whose largest category is plain `token`.
+//   router/tokens            category: crypto | stock | etf        type: stable | non_stable
+//   market/robinhood-symbols category: stock | etf | token         (older reads capitalised these)
+//   stats/assets/explorer    category: Commodities | ETFs | Stocks | US Treasuries
+const STOCK_CATEGORIES = new Set(["stock", "stocks", "etf", "etfs"]);
+const TOKENIZED_CATEGORIES = new Set([
+  ...STOCK_CATEGORIES, "commodities", "commodity", "us treasuries", "treasuries", "stable", "stables",
+]);
+/** A tokenized stock or ETF: the only thing a name can have as a pair asset. */
+const isStockCategory = (category) => STOCK_CATEGORIES.has(identity(category) ?? "");
+/** Any Robinhood-listed real-world asset or stablecoin: never a discovery candidate. */
+const isTokenizedCategory = (category) => TOKENIZED_CATEGORIES.has(identity(category) ?? "");
+// The ERC-20 stand-in for native ETH. It is a sentinel, not a deployed token, so it is never a name.
+const NATIVE_SENTINEL = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+
 function tokenIndexes(reference) {
   const tokens = new Map(reference.tokens.map((row) => [row.address, row]));
   const prices = new Map(reference.liquidity.prices.map((row) => [row.address, row]));
   return { tokens, prices };
 }
 
+/**
+ * Rialto's own published 24h USD volume for one token, from liquidity/spreads. This is the whole
+ * token's day across everything Rialto indexes — the only Rialto figure comparable with a
+ * DexScreener per-token total. Null when Rialto does not price the token.
+ */
+export function publishedVolume24hUsd(tokenAddress, reference) {
+  const normalized = address(tokenAddress);
+  if (!normalized) return null;
+  const row = (reference?.liquidity?.prices ?? []).find((price) => price.address === normalized);
+  return typeof row?.volume_24h_usd === "number" ? row.volume_24h_usd : null;
+}
+
+/**
+ * One pool leg's 24h volume in USD, priced off the counter-asset. This is per-leg detail only: the
+ * router indexes some of a token's pools and can price only some of those legs, so summing it
+ * produces a partial figure that must never be set beside a whole-token total from another source.
+ */
 function counterUsdVolume(pair, tokenAddress, indexes) {
   const isBase = pair.base_currency === tokenAddress;
   const counter = isBase ? pair.target_currency : pair.base_currency;
@@ -422,15 +480,26 @@ export function rialtoMarketFor(tokenAddress, reference, { asOf } = {}) {
       volume_24h_usd: counterUsdVolume(row, normalized, indexes),
     }));
   if (pairs.length === 0) return null;
-  const usable = pairs.map((row) => row.volume_24h_usd).filter((value) => typeof value === "number");
+  const published = publishedVolume24hUsd(normalized, reference);
+  const priced = pairs.filter((row) => typeof row.volume_24h_usd === "number").length;
   return {
     pairs,
-    volume_24h_usd: usable.length ? usable.reduce((sum, value) => sum + value, 0) : null,
+    volume_24h_usd: published,
+    volume_note: published === null
+      ? `Rialto publishes no 24h USD volume for this token: liquidity/spreads has no price row for it. ` +
+        `The ${priced} of ${pairs.length} pool legs below that could be priced sum to a partial figure, ` +
+        `which is not comparable with another source's whole-token total.`
+      : null,
     as_of: asOf,
     source_url: RIALTO_PAGES.markets,
   };
 }
 
+/**
+ * Both sides must be the same measure: one token's whole 24h volume. Anything else — a missing
+ * figure on either side, or a partial sum — is not a disagreement, it is an absence, and returns
+ * null. When Rialto's side is missing, market.rialto.volume_note says why.
+ */
 export function volumeDisagreement(dexscreenerUsd, rialtoUsd) {
   if (typeof dexscreenerUsd !== "number" || typeof rialtoUsd !== "number") return null;
   if (dexscreenerUsd === 0 && rialtoUsd === 0) return null;
@@ -444,19 +513,22 @@ export function volumeDisagreement(dexscreenerUsd, rialtoUsd) {
 function candidatePairTicker(project, market, rialto, reference) {
   const themed = (project?.themes ?? []).find((value) => /^stock-paired:/i.test(value));
   if (themed) return themed.split(":").slice(1).join(":").trim().toUpperCase();
-  const symbols = new Set(reference.symbols.map((row) => row.ticker.toUpperCase()));
+  // Only tokenized stocks and ETFs are candidates. robinhood-symbols also lists 56 plain tokens
+  // (ETH, WETH, USDG among them), and quoting a pool in WETH does not make WETH a tokenized stock.
+  const stocks = reference.symbols.filter((row) => isStockCategory(row.category));
+  const tickers = new Set(stocks.map((row) => row.ticker.toUpperCase()));
   for (const deployment of project?.deployments ?? []) {
     const ticker = text(deployment?.ticker)?.toUpperCase();
-    if (ticker && symbols.has(ticker)) return ticker;
+    if (ticker && tickers.has(ticker)) return ticker;
   }
   for (const pair of market?.pairs ?? []) {
     const symbol = text(pair?.quote_symbol)?.toUpperCase();
-    if (symbol && symbols.has(symbol)) return symbol;
+    if (symbol && tickers.has(symbol)) return symbol;
   }
   const own = address(market?.token_address);
   for (const pair of rialto?.pairs ?? []) {
     const counter = pair.base === own ? pair.target : pair.base;
-    const found = reference.symbols.find((row) => row.address === counter);
+    const found = stocks.find((row) => row.address === counter);
     if (found) return found.ticker.toUpperCase();
   }
   return null;
@@ -467,7 +539,10 @@ export function pairAssetFor(project, censusRow, market, rialto, reference) {
   if (primary !== "rwa-products/stock-paired-token" && !primary.startsWith("rwa-products/")) return null;
   const ticker = candidatePairTicker(project, market, rialto, reference);
   if (!ticker) return null;
-  const symbol = reference.symbols.find((row) => row.ticker.toUpperCase() === ticker) ?? null;
+  // The explorer only ever lists tokenized real-world assets, so a row there is proof on its own;
+  // a robinhood-symbols row has to name a stock or an ETF. A project theme naming something else
+  // (a quote token, say) resolves to neither and leaves pair_asset null rather than mislabelling it.
+  const symbol = reference.symbols.find((row) => row.ticker.toUpperCase() === ticker && isStockCategory(row.category)) ?? null;
   const asset = reference.assets.find((row) => row.symbol?.toUpperCase() === ticker || (symbol?.address && row.address === symbol.address)) ?? null;
   if (!symbol && !asset) return null;
   return {
@@ -476,38 +551,46 @@ export function pairAssetFor(project, censusRow, market, rialto, reference) {
     address: symbol?.address ?? asset?.address ?? null,
     category: symbol?.category ?? asset?.category ?? null,
     tokenized_value_usd: asset?.value ?? null,
-    holders_proxy: asset?.shares ?? null,
+    // shares, not holders: the explorer's own value / price. Named for what it is.
+    tokenized_shares: asset?.shares ?? null,
     change_7d: asset?.change_7d ?? null,
     source_url: RIALTO_PAGES.tokenization,
   };
 }
 
-const identity = (value) => text(value)?.toLowerCase() ?? null;
-
+/**
+ * Every address Rialto knows that is neither a census name nor a Robinhood-listed real-world asset.
+ * One exclusion set is built first and applied to all three sources: an address rejected as an ETF
+ * by the router-tokens leg must not walk back in through the tickers leg.
+ */
 export function discoveryCandidates({ reference, census = [], projects = new Map(), existing = [], pulledAt }) {
-  const knownAddresses = new Set();
   const knownNames = new Set();
+  const excluded = new Set([NATIVE_SENTINEL]);
   for (const row of census) {
     const project = projects.get(row.slug);
     for (const deployment of project?.deployments ?? []) {
       const found = address(deployment?.address);
-      if (found) knownAddresses.add(found);
+      if (found) excluded.add(found);
     }
     for (const value of [row.slug, project?.name, project?.symbol]) {
       const found = identity(value);
       if (found) knownNames.add(found);
     }
   }
-  const stockAddresses = new Set([
-    ...reference.symbols.map((row) => row.address).filter(Boolean),
-    ...reference.assets.filter((row) => /stock|etf/i.test(row.category ?? "")).map((row) => row.address),
-  ]);
-  const stableAddresses = new Set(reference.tokens.filter((row) => row.type?.toLowerCase() === "stable").map((row) => row.address));
+  for (const row of reference.tokens) {
+    if (isTokenizedCategory(row.category) || identity(row.type) === "stable") excluded.add(row.address);
+  }
+  for (const row of reference.symbols) {
+    if (row.address && isTokenizedCategory(row.category)) excluded.add(row.address);
+  }
+  for (const row of reference.assets) {
+    if (isTokenizedCategory(row.category)) excluded.add(row.address);
+  }
   const prior = new Map(existing.map((row) => [address(row?.address), row?.first_seen]).filter(([key]) => key));
   const candidates = new Map();
-  const add = (tokenAddress, symbol, name, source, excluded = false) => {
+  const add = (tokenAddress, symbol, name, source) => {
     const normalized = address(tokenAddress);
-    if (!normalized || excluded || knownAddresses.has(normalized) || stockAddresses.has(normalized) || stableAddresses.has(normalized)) return;
+    if (!normalized || excluded.has(normalized)) return;
     if ([symbol, name].map(identity).some((value) => value && knownNames.has(value))) return;
     const current = candidates.get(normalized) ?? {
       address: normalized, symbol: text(symbol), name: text(name), first_seen: prior.get(normalized) ?? pulledAt,
@@ -519,20 +602,23 @@ export function discoveryCandidates({ reference, census = [], projects = new Map
     candidates.set(normalized, current);
   };
   for (const token of reference.tokens) {
-    add(token.address, token.symbol, token.name, RIALTO_PAGES.markets, /^(?:stable)$/i.test(token.type ?? "") || /stock|etf/i.test(token.category ?? ""));
+    add(token.address, token.symbol, token.name, RIALTO_PAGES.markets);
   }
   for (const asset of reference.assets) {
-    add(asset.address, asset.symbol, asset.name, RIALTO_PAGES.tokenization, /stock|etf|stable/i.test(asset.category ?? ""));
+    add(asset.address, asset.symbol, asset.name, RIALTO_PAGES.tokenization);
   }
   const tokenByAddress = new Map(reference.tokens.map((row) => [row.address, row]));
+  const priceByAddress = new Map(reference.liquidity.prices.map((row) => [row.address, row]));
   for (const ticker of reference.tickers) {
     for (const tokenAddress of [ticker.base_currency, ticker.target_currency]) {
-      const token = tokenByAddress.get(tokenAddress);
+      const token = tokenByAddress.get(tokenAddress) ?? priceByAddress.get(tokenAddress);
       add(tokenAddress, token?.symbol, token?.name, RIALTO_PAGES.markets);
     }
   }
   for (const row of candidates.values()) {
-    row.rialto_volume_24h_usd = rialtoMarketFor(row.address, reference, { asOf: pulledAt })?.volume_24h_usd ?? null;
+    // Rialto's own published figure, so a candidate that trades outside the router's own pools is
+    // still sized. A token Rialto does not price stays null rather than being sized from one leg.
+    row.rialto_volume_24h_usd = publishedVolume24hUsd(row.address, reference);
   }
   return [...candidates.values()].sort((a, b) =>
     String(b.first_seen).localeCompare(String(a.first_seen)) ||

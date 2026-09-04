@@ -19,6 +19,15 @@
       "last_price": "0.01",
       "base_volume": "1000",
       "target_volume": "2"
+    },
+    {
+      "ticker_id": "HOODRAT_ETH",
+      "base_currency": "0x6666666666666666666666666666666666666666",
+      "target_currency": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "pool_id": "0xpool3",
+      "last_price": "0.002",
+      "base_volume": "500",
+      "target_volume": "1"
     }
   ],
   "tokens": {
@@ -28,22 +37,29 @@
       { "name": "Nvidia", "symbol": "NVDA", "address": "0x2222222222222222222222222222222222222222", "decimals": 18, "source": "robinhood", "type": "non_stable", "category": "stock", "liquid": true, "can_buy": true, "can_sell": true },
       { "name": "New Token", "symbol": "NEW", "address": "0x3333333333333333333333333333333333333333", "decimals": 18, "source": "router", "type": "non_stable", "category": "crypto", "liquid": true, "can_buy": true, "can_sell": true },
       { "name": "Wrapped Ether", "symbol": "WETH", "address": "0x4444444444444444444444444444444444444444", "decimals": 18, "source": "router", "type": "non_stable", "category": "crypto", "liquid": true, "can_buy": true, "can_sell": true },
-      { "name": "Global Dollar", "symbol": "USDG", "address": "0x5555555555555555555555555555555555555555", "decimals": 6, "source": "router", "type": "stable", "category": "crypto", "liquid": true, "can_buy": true, "can_sell": true }
+      { "name": "Global Dollar", "symbol": "USDG", "address": "0x5555555555555555555555555555555555555555", "decimals": 6, "source": "router", "type": "stable", "category": "crypto", "liquid": true, "can_buy": true, "can_sell": true },
+      { "name": "Hoodrat", "symbol": "HOODRAT", "address": "0x6666666666666666666666666666666666666666", "decimals": 18, "source": "router", "type": "non_stable", "category": "crypto", "liquid": true, "can_buy": true, "can_sell": true }
     ]
   },
   "assets": {
     "data": [
-      { "symbol": "NVDA", "name": "Nvidia", "category": "Stocks", "address": "0x2222222222222222222222222222222222222222", "price": 100, "shares": 50, "value": 5000, "pct_total": 2, "change_1d": 1, "change_7d": 3, "change_30d": 4 }
+      { "symbol": "NVDA", "name": "Nvidia", "category": "Stocks", "address": "0x2222222222222222222222222222222222222222", "price": 100, "shares": 50, "value": 5000, "pct_total": 2, "change_1d": 1, "change_7d": 3, "change_30d": 4 },
+      { "symbol": "SHY", "name": "iShares 1-3 Year Treasury Bond ETF", "category": "US Treasuries", "address": "0x7777777777777777777777777777777777777777", "price": 81.71, "shares": 328.3, "value": 26825.8, "pct_total": 0.1, "change_1d": 0, "change_7d": 0, "change_30d": 0 },
+      { "symbol": "GLD", "name": "SPDR Gold Shares", "category": "Commodities", "address": "0x8888888888888888888888888888888888888888", "price": 300, "shares": 10, "value": 3000, "pct_total": 0.1, "change_1d": 0, "change_7d": 0, "change_30d": 0 }
     ],
-    "categories": ["Stocks"],
+    "categories": ["Commodities", "ETFs", "Stocks", "US Treasuries"],
     "nextPage": null,
-    "totalAssets": 1
+    "totalAssets": 3
   },
   "symbols": {
     "cached_at": "2026-09-03T00:00:00Z",
-    "count": 1,
+    "count": 5,
     "symbols": [
-      { "ticker": "NVDA", "name": "Nvidia", "address": "0x2222222222222222222222222222222222222222", "category": "Stocks", "logo_url": null, "website": "https://example.com", "twitter": null, "linkedin": null, "listed_at_fe": "2026-07-01" }
+      { "ticker": "NVDA", "name": "Nvidia", "address": "0x2222222222222222222222222222222222222222", "category": "stock", "logo_url": null, "website": "https://example.com", "twitter": null, "linkedin": null, "listed_at_fe": "2026-07-01" },
+      { "ticker": "WETH", "name": "Wrapped Ether", "address": "0x4444444444444444444444444444444444444444", "category": "token", "logo_url": null, "website": null, "twitter": null, "linkedin": null, "listed_at_fe": true },
+      { "ticker": "ETH", "name": "Ethereum", "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "category": "token", "logo_url": null, "website": null, "twitter": null, "linkedin": null, "listed_at_fe": true },
+      { "ticker": "USDG", "name": "Global Dollar", "address": "0x5555555555555555555555555555555555555555", "category": "token", "logo_url": null, "website": null, "twitter": null, "linkedin": null, "listed_at_fe": true },
+      { "ticker": "HOODRAT", "name": "Hoodrat", "address": "0x6666666666666666666666666666666666666666", "category": "token", "logo_url": null, "website": null, "twitter": null, "linkedin": null, "listed_at_fe": true }
     ]
   },
   "tvlKpis": { "data": { "total_tracked_tvl": 1000, "total_stablecoin_usd": 400, "total_asset_supply_usd": 600 }, "last_updated": "2026-09-03T00:00:00Z" },
@@ -60,5 +76,12 @@
   "tokenizationDaily": { "data": [{ "date": "2026-09-02", "value": 9000 }] },
   "transfers": { "data": { "d1_volume_usd": 12, "d7_volume_usd": 70, "all_time_transfers": 1000 } },
   "mintburn": { "cumulative_mint_usd": 100, "cumulative_burn_usd": 40, "cumulative_net_usd": 60, "mint_24h_usd": 5 },
-  "liquidity": { "spreads": [], "prices": [{ "symbol": "WETH", "address": "0x4444444444444444444444444444444444444444", "price": "2500" }] }
+  "liquidity": {
+    "spreads": [],
+    "prices": [
+      { "symbol": "WETH", "address": "0x4444444444444444444444444444444444444444", "price": "2500", "volume_24h_usd": "12000" },
+      { "symbol": "NEW", "address": "0x3333333333333333333333333333333333333333", "price": "0.01", "volume_24h_usd": "7500" },
+      { "symbol": "HOODRAT", "address": "0x6666666666666666666666666666666666666666", "price": "0.002", "volume_24h_usd": "3300" }
+    ]
+  }
 }

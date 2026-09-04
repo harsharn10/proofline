@@ -207,28 +207,30 @@
       }
     },
     "rialtoMarket": {
-      "$comment": "Rialto ticker cross-check. USD volume is only present when the counter-asset is stable, ETH or WETH; no other asset price is inferred.",
+      "$comment": "Rialto ticker cross-check. volume_24h_usd is Rialto's own published 24h USD volume for the whole token, read from liquidity/spreads, and is the only figure comparable with the DexScreener total in volume_h24. The per-pair volume_24h_usd figures under pairs[] are supporting detail: the router indexes only some of a token's pools and prices only those legs whose counter-asset is stable, ETH or WETH, so they never sum to the token's day. When Rialto publishes no figure, volume_24h_usd is null, volume_note says so, and volume_disagreement stays null.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["pairs", "volume_24h_usd", "as_of", "source_url"],
+      "required": ["pairs", "volume_24h_usd", "volume_note", "as_of", "source_url"],
       "properties": {
         "pairs": { "type": "array", "items": { "$ref": "#/$defs/rialtoPair" } },
         "volume_24h_usd": { "type": ["number", "null"], "minimum": 0 },
+        "volume_note": { "type": ["string", "null"] },
         "as_of": { "type": "string", "format": "date-time" },
         "source_url": { "type": "string", "format": "uri" }
       }
     },
     "pairAsset": {
+      "$comment": "The tokenized stock or ETF a name is paired with. tokenized_shares is the asset explorer's own share count (value / price) — a size, not a holder count.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["ticker", "name", "address", "category", "tokenized_value_usd", "holders_proxy", "change_7d", "source_url"],
+      "required": ["ticker", "name", "address", "category", "tokenized_value_usd", "tokenized_shares", "change_7d", "source_url"],
       "properties": {
         "ticker": { "type": "string", "minLength": 1 },
         "name": { "type": "string", "minLength": 1 },
         "address": { "oneOf": [{ "$ref": "shared#/$defs/address" }, { "type": "null" }] },
         "category": { "type": ["string", "null"] },
         "tokenized_value_usd": { "type": ["number", "null"], "minimum": 0 },
-        "holders_proxy": { "type": ["number", "null"], "minimum": 0 },
+        "tokenized_shares": { "type": ["number", "null"], "minimum": 0 },
         "change_7d": { "type": ["number", "null"] },
         "source_url": { "type": "string", "format": "uri" }
       }
