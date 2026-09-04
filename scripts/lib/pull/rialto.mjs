@@ -586,34 +586,41 @@ export function discoveryCandidates({ reference, census = [], projects = new Map
   for (const row of reference.assets) {
     if (isTokenizedCategory(row.category)) excluded.add(row.address);
   }
+  // Ticker legs are bare addresses, and the token a researcher most wants to hear about is often
+  // named only in market/robinhood-symbols. Resolve every label up front, so the census-name check
+  // below sees the best name available rather than whichever endpoint happened to reach add() first.
+  const labels = new Map();
+  const label = (tokenAddress, symbol, name) => {
+    if (!tokenAddress) return;
+    const current = labels.get(tokenAddress) ?? { symbol: null, name: null };
+    current.symbol ??= text(symbol);
+    current.name ??= text(name);
+    labels.set(tokenAddress, current);
+  };
+  for (const row of reference.tokens) label(row.address, row.symbol, row.name);
+  for (const row of reference.symbols) label(row.address, row.ticker, row.name);
+  for (const row of reference.assets) label(row.address, row.symbol, row.name);
+  for (const row of reference.liquidity.prices) label(row.address, row.symbol, null);
+
   const prior = new Map(existing.map((row) => [address(row?.address), row?.first_seen]).filter(([key]) => key));
   const candidates = new Map();
-  const add = (tokenAddress, symbol, name, source) => {
+  const add = (tokenAddress, source) => {
     const normalized = address(tokenAddress);
     if (!normalized || excluded.has(normalized)) return;
+    const { symbol = null, name = null } = labels.get(normalized) ?? {};
     if ([symbol, name].map(identity).some((value) => value && knownNames.has(value))) return;
     const current = candidates.get(normalized) ?? {
-      address: normalized, symbol: text(symbol), name: text(name), first_seen: prior.get(normalized) ?? pulledAt,
+      address: normalized, symbol, name, first_seen: prior.get(normalized) ?? pulledAt,
       rialto_volume_24h_usd: null, dexscreener_liquidity_usd: null, source_urls: [],
     };
-    if (!current.symbol) current.symbol = text(symbol);
-    if (!current.name) current.name = text(name);
     if (!current.source_urls.includes(source)) current.source_urls.push(source);
     candidates.set(normalized, current);
   };
-  for (const token of reference.tokens) {
-    add(token.address, token.symbol, token.name, RIALTO_PAGES.markets);
-  }
-  for (const asset of reference.assets) {
-    add(asset.address, asset.symbol, asset.name, RIALTO_PAGES.tokenization);
-  }
-  const tokenByAddress = new Map(reference.tokens.map((row) => [row.address, row]));
-  const priceByAddress = new Map(reference.liquidity.prices.map((row) => [row.address, row]));
+  for (const token of reference.tokens) add(token.address, RIALTO_PAGES.markets);
+  for (const asset of reference.assets) add(asset.address, RIALTO_PAGES.tokenization);
   for (const ticker of reference.tickers) {
-    for (const tokenAddress of [ticker.base_currency, ticker.target_currency]) {
-      const token = tokenByAddress.get(tokenAddress) ?? priceByAddress.get(tokenAddress);
-      add(tokenAddress, token?.symbol, token?.name, RIALTO_PAGES.markets);
-    }
+    add(ticker.base_currency, RIALTO_PAGES.markets);
+    add(ticker.target_currency, RIALTO_PAGES.markets);
   }
   for (const row of candidates.values()) {
     // Rialto's own published figure, so a candidate that trades outside the router's own pools is

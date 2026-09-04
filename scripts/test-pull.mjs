@@ -101,7 +101,7 @@ import {
   readAllAssets,
   RIALTO_PAGES,
 } from "./lib/pull/rialto.mjs";
-import { addressesFor, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey, memoizeClient } from "./pull.mjs";
+import { addressesFor, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey, memoizeClient, parseArgs, refreshedMarket } from "./pull.mjs";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -673,6 +673,69 @@ test("Rialto discovery excludes census names, stocks and stables and keeps first
   assert.deepEqual(createDiscoveryValidator()({
     pulled_at: "2026-09-03T04:00:00.000Z", candidates, errors: [],
   }), []);
+});
+
+test("--source rialto asks for the fast refresh, and only for a source that exists", () => {
+  assert.equal(parseArgs(["--source", "rialto"]).rialtoOnly, true);
+  assert.equal(parseArgs(["--source=rialto"]).rialtoOnly, true);
+  assert.equal(parseArgs(["--rialto-only"]).rialtoOnly, true);
+  assert.equal(parseArgs([]).rialtoOnly, false);
+  assert.throws(() => parseArgs(["--source", "blockscout"]), /--source takes one of: rialto/);
+  assert.throws(() => parseArgs(["--rpc-only", "--rialto-only"]), /opposite runs/);
+});
+
+test("the Rialto refresh replaces its own two sources and carries the rest of the file through", async () => {
+  const client = createRialtoClient({
+    base: "https://rialto.test",
+    deps: { fetchImpl: stubFetch(rialtoRoutes()), sleepImpl: async () => {} },
+  });
+  const { reference } = await readRialto(client, { pulledAt: "2026-09-04T04:00:00.000Z" });
+  const previous = {
+    token_address: "0x3333333333333333333333333333333333333333",
+    pulled_at: "2026-09-01T00:00:00.000Z",
+    pairs: [{ dex: "uniswap", quote_symbol: "WETH" }],
+    volume_h24: 11, liquidity_usd: 1, trades_h24: 2, price_usd: 3, price_change_h24: 4, fdv: 5,
+    first_pair_at: null,
+    top10_share: 0.31, top10_share_ex_pools: 0.2, burned_share: 0.1, top10_as_of: "2026-09-01T00:00:00.000Z",
+    launchpad: { slug: "foxpad", via: "factory", address: "0x9999999999999999999999999999999999999999" },
+    rialto: null, pair_asset: null, volume_disagreement: null,
+    errors: [
+      { step: "launchpad", message: "creator did not match a launchpad factory" },
+      { step: "dexscreener", message: "stale" },
+      { step: "rialto", message: "stale" },
+    ],
+  };
+  const rialtoMarket = rialtoMarketFor(previous.token_address, reference, { asOf: "2026-09-04T04:00:00.000Z" });
+  const market = refreshedMarket(previous, {
+    fresh: { ...previous, pulled_at: "2026-09-04T04:00:00.000Z", volume_h24: 4000, errors: [] },
+    rialtoMarket,
+    project: {},
+    censusRow: { tree: { primary: "trading/dex" } },
+    reference,
+    rialtoErrors: [],
+  });
+
+  assert.equal(market.top10_share, 0.31, "the Blockscout walk is not part of this read");
+  assert.equal(market.launchpad.slug, "foxpad");
+  assert.equal(market.top10_as_of, "2026-09-01T00:00:00.000Z", "and keeps its own as-of");
+  assert.equal(market.volume_h24, 4000);
+  assert.equal(market.rialto.volume_24h_usd, 7500);
+  assert.equal(market.pair_asset, null, "a trading name has no tokenized pair asset");
+  assert.deepEqual(market.volume_disagreement, null, "4,000 against 7,500 is under 2x");
+  assert.deepEqual(
+    market.errors.map((error) => error.step),
+    ["launchpad"],
+    "the stale reasons from both refreshed sources are dropped, the rest kept",
+  );
+
+  // A name Rialto does not carry gets no DexScreener read, so its figures stay as they were.
+  const untouched = refreshedMarket(previous, {
+    fresh: null, rialtoMarket: null, project: {}, censusRow: {}, reference, rialtoErrors: [],
+  });
+  assert.equal(untouched.volume_h24, 11);
+  assert.equal(untouched.pulled_at, "2026-09-01T00:00:00.000Z");
+  assert.equal(untouched.rialto, null);
+  assert.deepEqual(untouched.errors.map((error) => error.step), ["launchpad", "dexscreener"]);
 });
 
 // --- token concentration, attribution and structure ----------------------
