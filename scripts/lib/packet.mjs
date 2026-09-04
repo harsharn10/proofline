@@ -10,7 +10,7 @@ import { parse } from "yaml";
 import { validateAgainst } from "./schemas.mjs";
 import { mainnetReceiptFromPulled, deploymentReceiptFromPulled } from "./checks.mjs";
 import { leafLabel } from "./taxonomy.mjs";
-import { conductWarnings } from "./voice.mjs";
+import { conductWarnings, voiceWarnings } from "./voice.mjs";
 import { REQUIRED_HEADINGS, PENDING_LINE } from "./research-md.mjs";
 import { reviewKeyFor } from "./telegram.mjs";
 
@@ -647,6 +647,25 @@ function taggedSentences(body, heading) {
   });
 }
 
+/**
+ * Sentences of already-tagged paragraphs, one round per paragraph: the first sentence of every
+ * paragraph, then the second of every paragraph, and so on. A section written as one long paragraph
+ * still fills three slots, and a two-paragraph section never spends both on the first paragraph.
+ */
+function roundRobinSentences(entries) {
+  const lanes = entries.map((entry) => {
+    const match = entry.match(PACKET_TAGS_END_RE);
+    const tags = match?.[0]?.trim() ?? "";
+    const prose = match ? entry.slice(0, entry.length - match[0].length) : entry;
+    return sentencesOf(prose).map((sentence) => `${sentence}${tags ? ` ${tags}` : ""}`);
+  });
+  const deepest = Math.max(0, ...lanes.map((lane) => lane.length));
+  const out = [];
+  for (let round = 0; round < deepest; round++)
+    for (const lane of lanes) if (lane[round]) out.push(lane[round]);
+  return out;
+}
+
 /** Paragraphs of a section as single candidates, tags kept at the end. */
 function taggedParagraphs(body, heading) {
   return paragraphs(unfencedSectionLines(body, heading).join("\n")).flatMap((paragraph) => {
@@ -691,7 +710,13 @@ function v3FieldsFromBody(frontmatter, body, receiptToSource, notice) {
   let rawWhy = sectionBullets(body, "Why it matters");
   let whyDerived = false;
   if (!rawWhy.length) {
-    const sentences = taggedSentences(body, "Why it matters");
+    // Machine-chosen prose still has to pass the site's voice rules, so a sentence carrying a banned
+    // word is stepped over rather than published as a reason and failing validate afterwards.
+    const sentences = taggedSentences(body, "Why it matters").filter((sentence) => {
+      if (!voiceWarnings(sentence, "why").length) return true;
+      notice(`why_people_care: stepped over a derived sentence for its wording - "${sentence.slice(0, 60)}"`);
+      return false;
+    });
     if (sentences.length >= 3) {
       rawWhy = sentences.slice(0, 3);
       whyDerived = true;
@@ -713,8 +738,14 @@ function v3FieldsFromBody(frontmatter, body, receiptToSource, notice) {
   const riskBullets = sectionBullets(body, "What could go wrong");
   let candidates = riskBullets;
   if (!riskBullets.length) {
-    candidates = taggedParagraphs(body, "What could go wrong");
-    if (candidates.length) notice(`risks: no bullets found; read the section's ${candidates.length} paragraphs as bullets`);
+    const paras = taggedParagraphs(body, "What could go wrong");
+    if (paras.length) notice(`risks: no bullets found; read the section's ${paras.length} paragraphs as bullets`);
+    candidates = paras.length >= 3 ? paras : roundRobinSentences(paras);
+    candidates = candidates.filter((paragraph) => {
+      if (!voiceWarnings(paragraph, "risks").length) return true;
+      notice(`risks: stepped over a derived paragraph for its wording - "${paragraph.slice(0, 60)}"`);
+      return false;
+    });
   }
   // Fill three slots from the candidates in order. A long candidate is trimmed, never skipped, so
   // the first risk the researcher wrote is always the first risk the card shows.

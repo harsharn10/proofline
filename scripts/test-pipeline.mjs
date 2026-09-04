@@ -512,8 +512,9 @@ await test("compile maps TL;DR, three sourced reasons and paragraph risks", asyn
     "Explorer links let readers verify contract activity. [verified S3]",
   ]);
   assert.deepEqual(result.project.risks, [
-    "Indexer delays can hide a recent update. Readers should check the linked source before acting. [claim S4]",
-  ]);
+    "Indexer delays can hide a recent update. [claim S4]",
+    "Readers should check the linked source before acting. [claim S4]",
+  ], "a one-paragraph section still fills more than one slot");
   assert.equal(result.project.tldr_source, undefined, "a real TL;DR line is not tagged as derived");
   assert.ok(result.notices.some((notice) => notice.includes("read the section's 1 paragraphs as bullets")), result.notices.join("\n"));
   assert.deepEqual(validateAgainst("project", result.project), []);
