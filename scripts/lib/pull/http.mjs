@@ -25,12 +25,30 @@ export function challengeDelayMs(random = Math.random, min = 500, max = 1500) {
   return Math.round(min + Math.max(0, Math.min(1, random())) * (max - min));
 }
 
-/** Cloudflare's managed challenge is HTML even when the requested endpoint is JSON. */
+/**
+ * The fingerprints Cloudflare's managed challenge leaves in the page it serves: the interstitial
+ * title, the `cf-chl-*` element ids, the /cdn-cgi/challenge-platform script, and the `_cf_chl_opt`
+ * options object the loader is configured with. A gateway's own error page carries none of them.
+ */
+export const CHALLENGE_MARKERS = [
+  /<title[^>]*>\s*Just a moment(?:\.{3}|…)?\s*<\/title>/i,
+  /\bJust a moment(?:\.{3}|…)?\b/i,
+  /cf-chl/i,
+  /challenge-platform/i,
+  /_cf_chl_opt/i,
+];
+
+/**
+ * Cloudflare's managed challenge is HTML even when the requested endpoint is JSON — but so is a
+ * 502 from a gateway in front of it. An HTML body alone is therefore not enough: a challenge has to
+ * carry one of Cloudflare's own markers. Everything else stays an ordinary transport error, retried
+ * by the normal 5xx policy and recorded as the error it is, so a gateway blip is never reported as
+ * a bot wall or counted toward the >50% challenge gate.
+ */
 export function isBotChallenge(body, contentType = "") {
   const value = String(body ?? "");
-  return /^\s*<!doctype html/i.test(value) ||
-    /<title[^>]*>\s*Just a moment(?:\.{3}|…)?\s*<\/title>/i.test(value) ||
-    (/text\/html/i.test(contentType) && /\bJust a moment(?:\.{3}|…)?\b/i.test(value));
+  if (!looksLikeHtml(value, contentType)) return false;
+  return CHALLENGE_MARKERS.some((marker) => marker.test(value));
 }
 
 /**

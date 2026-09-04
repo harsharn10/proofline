@@ -45,11 +45,15 @@ physical request count as Blockscout credits, including retries, so the schedule
 budget receipt. At four full six-hourly runs per day, a run should remain under 25,000 credits to fit
 the free allocation.
 
-Cloudflare managed-challenge HTML is never parsed as API data. A `<!DOCTYPE html` response or a page
-titled `Just a moment` is classified as a bot challenge, retried once after a 0.5–1.5 second jitter,
-then recorded as `explorer served a bot challenge` with nullable fields. If challenge responses are
-more than half of all physical explorer requests, the pull exits nonzero with a one-line bot-wall
-summary instead of silently publishing a mostly empty explorer snapshot.
+Cloudflare managed-challenge HTML is never parsed as API data. A challenge is an HTML body carrying
+one of Cloudflare's own markers — a `Just a moment` title, a `cf-chl` element, the
+`/cdn-cgi/challenge-platform` loader, or the `_cf_chl_opt` script — and it is retried once after a
+0.5–1.5 second jitter, then recorded as `explorer served a bot challenge` with nullable fields. HTML
+alone is not a challenge: a 404, 502 or 504 error page carries no marker, so it stays an ordinary
+transport error, retried by the 429/5xx policy and recorded as `HTTP <status> returned HTML, not
+JSON`. Only real challenges count toward the gate: if they are more than half of all physical
+explorer requests, the pull exits nonzero with a one-line bot-wall summary instead of silently
+publishing a mostly empty explorer snapshot. A gateway blip can no longer be reported as a bot wall.
 
 ## Rialto Analytics
 
