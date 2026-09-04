@@ -1428,6 +1428,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
       id: feedIdentity({ slug: frontmatter.slug, workId: frontmatter.work_id, eventId: event.id }),
       date,
       kind: eventFeedKind(event, receipt, frontmatter.identity.official_handle),
+      ...(event.tag ? { tag: event.tag } : {}),
       title,
       body: normalizeText(event.summary ?? receipt.excerpt ?? "Update recorded from the cited source."),
       ...(account && /^@[A-Za-z0-9_]{1,32}$/.test(account) ? { account } : {}),

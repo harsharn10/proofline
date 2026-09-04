@@ -106,7 +106,8 @@ Dossier blocks:
 - `conflicts[]` `CON-n` {field, claim_ids[], material_effect, status (`open | resolved`), resolution
   {winning_claim_ids[], reproduction_ids[], rationale, resolver, resolved_at} left empty by collectors
   and verifiers}.
-- `events[]` `EVT-n` {type (`company | ct | onchain | risk`), occurred_at, observed_at,
+- `events[]` `EVT-n` {type (`company | ct | onchain | risk`), optional tag (`listing | integration |
+  partnership | audit | launch-date | whitelist | mint | milestone | other`), occurred_at, observed_at,
   affected_fields[], evidence_state (`verified | claim | disputed | unknown`), impact (`routine |
   material | urgent`), site_recommendation (`feed | profile | both | none`), channel_recommendation
   (`none | review`), receipt_ids[]}.
@@ -327,7 +328,11 @@ the project's official handle is `company`; another account is `ct`; an explorer
 is `onchain`; and a flagged event is `risk`. Existing items merge by id, so compiling twice is a no-op.
 The public wire labels those four stored kinds as `company` → **Announcements**, `ct` → **Talk**,
 `onchain` → **On-chain**, and `risk` → **Icarus notes**. The stored event summary is the wire gist
-verbatim apart from whitespace normalization; titles are limited to 80 characters.
+verbatim apart from whitespace normalization; titles are limited to 80 characters. The optional event
+tag is carried through unchanged. Tags are facts about the event, not an instruction to publish:
+`listing`, `integration`, `partnership`, `audit`, `launch-date`, `whitelist`, `mint`, `milestone`, or
+`other`. Distribution signals use the first four only with a receipt outside the project's own X
+account; coming-up signals use `launch-date`, `whitelist`, and `mint` dated within seven days.
 
 ## 9. Retired
 

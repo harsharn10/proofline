@@ -1,8 +1,9 @@
 # Channel publishing
 
-The changelog is Icarus's complete research record. The Telegram channel is a selective retail
-publication, so a research change reaches the private review queue only when its changelog entry
-contains a structured `channel` object.
+The changelog is Icarus's complete research record. The Telegram channel has two deliberately
+separate paths: controller-approved editorial publications and automated, data-derived signals.
+A research change reaches the private review queue only when its changelog entry contains a
+structured `channel` object. Feed items are not sent on every push.
 
 ## Editorial flow
 
@@ -31,6 +32,85 @@ fingerprints and fails closed.
 
 Documentation passes, source additions that change no conclusion, internal review metadata, wording
 changes and routine coverage stubs stay site-only.
+
+## Automated signals and recaps
+
+The signal path asks whether a committed change would alter what a reader does. The standard every
+message has to pass is the owner's: *would a subscriber who follows Robinhood Chain act on this or be
+surprised by it*. Fewer messages is always the safer failure.
+
+It runs after a successful `Pull chain facts` workflow and can send at most three alerts per UTC day,
+never more than one for the same name that day:
+
+| Signal | Trigger | Daily cap | Kicker |
+| --- | --- | --- | --- |
+| Breakout | 24h volume at least twice the previous snapshot on at least $50K of liquidity, **and** a second signal: holders up 20%, three qualifying accounts posting that day, or a seven-figure book with holders not falling. The headline number must be up. | 2 | `MOVING` |
+| Leader change | A name reaches number one or enters the top three in its section and holds that position for two reads | 1 | `LEADER` |
+| Control change | Owner, owner type, Safe threshold or proxy implementation changed | 1 | `RISK ALERT` |
+| Control change | LP locked share moved at least ten points or across half the supply, or mint control changed on a verified ABI read | 1 (shared) | `CONTROL CHANGE` |
+| Distribution | An externally receipted listing, integration, partnership or audit—not the project's own X post, blog or docs host | 1 | `LISTED` |
+| Coming up | An eligible announced name with a TL;DR has a launch date, whitelist or mint event in the next seven days, on an external receipt | 1 | `COMING UP` |
+
+Three gates apply to every control change before it can be sent:
+
+1. **Both reads succeeded.** A field is compared only when the address row carries `errors: []` on
+   both sides. A failed read is missing data, never a governance event.
+2. **No mass null.** When one pull moves the same field to null on more than five names, that is a
+   degraded read and every one of those transitions is dropped. On 2026-09-04 a single pull nulled 35
+   owner rows with empty error arrays; without this gate the channel would have announced that the
+   chain's busiest launchpad had renounced ownership.
+3. **Confirmed over two pulls.** A change is held in `signal_state.pending_control` and sent only when
+   the next pull still reads the new value cleanly. A value that reverted is dropped silently.
+
+Talk counts only accounts recorded in `content/accounts.yaml` at `tier: top` with an `alpha` or `kol`
+role, or with at least 100,000 followers on the record, and only on the day the name's numbers moved.
+An untagged project post never reaches the channel.
+
+Alerts are ranked by materiality, not by kind: a confirmed change to who controls a contract first,
+then the largest breakout by 24h volume. Per-rule caps stop one rule consuming the whole day.
+
+The daily brief runs at 13:00 UTC (09:00 ET under daylight time, 08:00 ET under standard time). It
+opens with the single most material item of the day, taken from the same ranked list the alerts come
+from, then top volume, new names above the bar, movers, external distribution receipts and one
+material Icarus note. Its activity label compares the latest chain volume and launchpad launch counts
+with their seven-day averages, both sides measured the same way. A day with nothing material collapses
+to a single line. The Sunday wrap runs at 14:00 UTC and summarizes section leaders, new and newly
+quiet names, control changes and distribution for the prior week. Both are bounded and chunked, so no
+list can grow into a message Telegram rejects.
+
+`ops/telegram-state.json` stores the daily alert budget, rank holds, pending control changes, prior
+eligibility/status, weekly rollup rows and sent fingerprints. Each message's state is recorded
+immediately after its own send succeeds, and the file is written in a `finally` block, so a failure
+part-way through a run cannot cause the delivered messages to be sent again. All Telegram modes use
+the existing serialized workflow and three-attempt rebase/push loop. Missing Telegram secrets skip
+delivery without failing forks or CI.
+
+Feed `tag` values drive the distribution and coming-up selectors: `listing`, `integration`,
+`partnership`, `audit`, `launch-date`, `whitelist`, `mint`, `milestone`, or `other`. The tag is
+optional; older feed items remain valid.
+
+## The pause switch
+
+`ops/telegram-review.json` holds two flags and both are checked before anything is sent:
+
+- `channel_enabled: false` stops **every** mode — publications, alerts, the brief and the wrap.
+- `wire_enabled: false` stops the three automatic modes (alerts, brief, wrap) while leaving
+  individually approved publications available. This is the same predicate the pulse Worker's deploy
+  derives (`channel_enabled && wire_enabled`), so one repository flag governs both senders.
+
+`--dry-run` always previews regardless of either flag: pausing the channel must never hide what would
+have gone out.
+
+## Backtesting a rule change
+
+    node scripts/telegram-digest.mjs --backtest 7
+
+replays the rules over the committed record — every commit that touched `content/pulled`, the history
+series each pull appended, the feed and project records as they stood, and the share bar recomputed
+from that day's content — and prints every message that would have been sent, day by day, with the
+rule that produced it. It writes nothing and sends nothing. Run it before changing a threshold, and
+paste the output into the pull request: a rule that produces a message the owner would not have wanted
+is tightened until it does not.
 
 ## Publication object
 
