@@ -217,14 +217,19 @@ export function selectPulseDeliveries(signals, state = {}, now = Date.now(), rul
 }
 
 export function formatUsd(value) {
+  // Hand-rolled rather than Intl compact notation: ICU versions differ between Node 20 (CI) and Node 24
+  // ("$3.0M" vs "$3M"), and the tests and Telegram copy must not depend on the runtime.
   const number = Number(value);
   if (!Number.isFinite(number)) return "not checked";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    notation: number >= 10_000 ? "compact" : "standard",
-    maximumFractionDigits: number >= 1_000 ? 1 : 0,
-  }).format(number);
+  const sign = number < 0 ? "-" : "";
+  const abs = Math.abs(number);
+  const compact = (v, suffix) => `${sign}$${v.toFixed(1).replace(/\.0$/, "")}${suffix}`;
+  if (abs >= 1e9) return compact(abs / 1e9, "B");
+  if (abs >= 1e6) return compact(abs / 1e6, "M");
+  if (abs >= 1e4) return compact(abs / 1e3, "K");
+  const fixed = abs >= 1000 ? abs.toFixed(1).replace(/\.0$/, "") : String(Math.round(abs));
+  const [int, dec] = fixed.split(".");
+  return `${sign}$${int.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}${dec ? "." + dec : ""}`;
 }
 
 const percent = (current, previous) => {
