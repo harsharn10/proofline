@@ -15,6 +15,7 @@
     "market": { "oneOf": [{ "$ref": "#/$defs/pulledMarket" }, { "type": "null" }] },
     "structure": { "oneOf": [{ "$ref": "#/$defs/pulledStructure" }, { "type": "null" }] },
     "activity": { "oneOf": [{ "$ref": "#/$defs/pulledActivity" }, { "type": "null" }] },
+    "reads": { "$ref": "#/$defs/readSummary" },
     "errors": { "type": "array", "items": { "$ref": "#/$defs/pullError" } }
   },
   "$defs": {
@@ -35,6 +36,33 @@
       "properties": {
         "step": { "type": "string", "minLength": 1 },
         "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "readSummary": {
+      "$comment": "Why an explorer fact was refreshed, carried forward, or deferred. Older pulled files predate this optional block and remain valid.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier", "explorer"],
+      "properties": {
+        "tier": { "enum": ["hot", "live", "quiet", "dormant"] },
+        "explorer": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "address", "status", "reason", "signal_value", "checked_at", "stale_since", "credits"],
+            "properties": {
+              "kind": { "enum": ["address", "activity", "top10", "structure", "lp"] },
+              "address": { "oneOf": [{ "$ref": "shared#/$defs/address" }, { "type": "null" }] },
+              "status": { "enum": ["read", "unchanged", "deferred"] },
+              "reason": { "type": "string", "minLength": 1 },
+              "signal_value": { "type": ["integer", "null"], "minimum": 0 },
+              "checked_at": { "type": "string", "format": "date-time" },
+              "stale_since": { "type": ["string", "null"], "format": "date-time" },
+              "credits": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
       }
     },
     "pulledAddress": {

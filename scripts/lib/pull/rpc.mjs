@@ -118,6 +118,7 @@ export function createRpcClient({ url = RPC_URL, deps = {} } = {}) {
   return {
     call,
     blockNumber: () => call("eth_blockNumber", []),
+    transactionCount: (address) => call("eth_getTransactionCount", [address, "latest"]),
     getCode: (address) => call("eth_getCode", [address, "latest"]),
     getStorageAt: (address, slot) => call("eth_getStorageAt", [address, slot, "latest"]),
     ethCall: (to, data) => call("eth_call", [{ to, data }, "latest"]),

@@ -9,7 +9,7 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { Document } from "yaml";
 
-const DOC_KEYS = ["slug", "pulled_at", "chain", "addresses", "metrics", "market", "structure", "activity", "errors"];
+const DOC_KEYS = ["slug", "pulled_at", "chain", "addresses", "metrics", "market", "structure", "activity", "reads", "errors"];
 const ADDRESS_KEYS = [
   "address", "label", "role", "is_contract", "source_verified", "contract_name",
   "proxy", "owner", "owner_type", "safe", "created_block", "created_at", "holders", "errors",
@@ -44,6 +44,8 @@ const PAIR_ASSET_KEYS = [
   "ticker", "name", "address", "category", "tokenized_value_usd", "tokenized_shares", "change_7d", "source_url",
 ];
 const VOLUME_DISAGREEMENT_KEYS = ["dexscreener_usd", "rialto_usd"];
+const READ_KEYS = ["tier", "explorer"];
+const EXPLORER_READ_KEYS = ["kind", "address", "status", "reason", "signal_value", "checked_at", "stale_since", "credits"];
 
 /** Snapshot column order. One JSON line per run in content/pulled/history/<slug>.jsonl. */
 export const HISTORY_KEYS = [
@@ -75,6 +77,9 @@ export function orderDocument(doc) {
   ordered.market = orderMarket(doc.market);
   ordered.structure = orderStructure(doc.structure);
   ordered.activity = orderActivity(doc.activity);
+  if (doc.reads) ordered.reads = pick(doc.reads, READ_KEYS);
+  else delete ordered.reads;
+  if (ordered.reads) ordered.reads.explorer = (doc.reads.explorer ?? []).map((row) => pick(row, EXPLORER_READ_KEYS));
   ordered.errors = orderErrors(doc.errors);
   return ordered;
 }

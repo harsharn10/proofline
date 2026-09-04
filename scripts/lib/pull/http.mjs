@@ -66,6 +66,7 @@ export async function requestWithRetry(url, options = {}, deps = {}) {
     pace = null,
     backoff = backoffMs,
     defaultHeaders = null,
+    beforeRequest = null,
     onRequest = null,
     onChallenge = null,
     challengeRetries = 1,
@@ -76,6 +77,9 @@ export async function requestWithRetry(url, options = {}, deps = {}) {
   let attempt = 1;
   let challengeRetriesUsed = 0;
   while (attempt <= attempts) {
+    // Budget reservation happens before pacing and before the physical request. A budget error is
+    // deliberately not retried; the caller records a deferred read and continues keyless work.
+    beforeRequest?.(url);
     if (pace) await pace(hostOf(url));
     onRequest?.(url);
     const controller = new AbortController();

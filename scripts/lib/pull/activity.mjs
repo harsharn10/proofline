@@ -5,7 +5,8 @@
 // the last day" endpoint, so the only honest answer is to page the inbound transaction list, which
 // comes back newest-first, and stop at the first item older than the window. That is why the paging
 // here is bounded at 40 pages (2,000 transactions): a launchpad factory on a busy day would
-// otherwise page forever, and a partial count with a recorded cap is more useful than a run that
+// otherwise page forever. Deep infrastructure gets 40 pages; other roles get 5, and a partial count
+// with a recorded cap is more useful than a run that
 // never finishes. A capped address keeps the count it reached and carries the cap in its errors, so
 // a reader can tell "quiet" from "too busy to finish counting".
 //
@@ -27,6 +28,12 @@ const HEADERS = { "User-Agent": BROWSER_UA, Accept: "application/json" };
 
 /** 50 items per page × 40 pages = 2,000 inbound transactions before a count is declared capped. */
 export const MAX_PAGES = 40;
+export const STANDARD_MAX_PAGES = 5;
+export const DEEP_WALK_ROLES = new Set(["factory", "curve", "router"]);
+
+export function pageCapForRole(role) {
+  return DEEP_WALK_ROLES.has(role) ? MAX_PAGES : STANDARD_MAX_PAGES;
+}
 
 export const WINDOW_MS = 24 * 60 * 60 * 1000;
 
@@ -157,15 +164,23 @@ export function createActivityClient({ base = BLOCKSCOUT_BASE, deps = {} } = {})
  * Reads every activity fact for one address. Never throws: a blocked counters call still leaves the
  * 24h walk to run, and a blocked walk still leaves the lifetime counters.
  */
-export async function readAddressActivity(client, entry, { now = Date.now(), maxPages = MAX_PAGES } = {}) {
+export async function readAddressActivity(client, entry, {
+  now = Date.now(),
+  maxPages = pageCapForRole(entry?.role),
+  preloadedCounters = undefined,
+} = {}) {
   const errors = [];
   const isFactory = entry?.role === "factory";
 
   let counters = { transactions_count: null, token_transfers_count: null, gas_usage_count: null };
-  try {
-    counters = parseCounters(await client.counters(entry.address));
-  } catch (e) {
-    errors.push({ step: "blockscout", message: `counters/${entry.address}: ${e.message}` });
+  if (preloadedCounters !== undefined) {
+    counters = preloadedCounters;
+  } else {
+    try {
+      counters = parseCounters(await client.counters(entry.address));
+    } catch (e) {
+      errors.push({ step: "blockscout", message: `counters/${entry.address}: ${e.message}` });
+    }
   }
 
   const recent = await countRecentInbound((params) => client.transactions(entry.address, params), {

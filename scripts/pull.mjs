@@ -35,7 +35,7 @@
 // Usage: node scripts/pull.mjs [--slug <slug>] [--only <slug,slug>] [--rpc-only]
 //                              [--source rialto | --rialto-only] [--dry]
 
-import { readFile, readdir } from "node:fs/promises";
+import { readFile, readdir, writeFile } from "node:fs/promises";
 import { join, basename } from "node:path";
 import { parse } from "yaml";
 
@@ -58,6 +58,7 @@ import {
 import {
   createActivityClient,
   readAddressActivity,
+  parseCounters,
   aggregateActivity,
   emptyActivity,
 } from "./lib/pull/activity.mjs";
@@ -65,6 +66,7 @@ import {
   writePulled,
   createValidator,
   appendHistory,
+  readHistory,
   snapshotFrom,
   writeChainPulled,
   writeChainSeries,
@@ -87,18 +89,26 @@ import {
   discoveryCandidates,
   RIALTO_BASE,
 } from "./lib/pull/rialto.mjs";
+import { createCreditBudget } from "./lib/pull/budget.mjs";
+import {
+  consumeQueue,
+  explorerChangeDecision,
+  parseShard,
+  projectDailyCredits,
+  shardFor,
+  tierFor,
+  tierIsDue,
+} from "./lib/pull/tiers.mjs";
+import { locatedOnChain, meetsShareBar, officialSurfaceConfirmed } from "./lib/share-bar.mjs";
 
 const CHAIN = "robinhood-chain";
 const CONCURRENCY = 4;
-// Blockscout's 24h walk can run dozens of pages per address. Two in flight keeps the pacer fed
-// without letting one busy factory monopolise the only connection the explorer gives us.
-const BLOCKSCOUT_CONCURRENCY = 2;
 const NOT_VERIFIED = "not-verified";
 
 const SOURCES = new Set(["rialto"]);
 
 export function parseArgs(argv) {
-  const args = { only: null, rpcOnly: false, rialtoOnly: false, dry: false };
+  const args = { only: null, rpcOnly: false, rialtoOnly: false, dry: false, full: false, tier: null, shard: null };
   const source = (value) => {
     const name = String(value ?? "").trim().toLowerCase();
     if (!SOURCES.has(name)) throw new Error(`--source takes one of: ${[...SOURCES].join(", ")}`);
@@ -112,10 +122,18 @@ export function parseArgs(argv) {
     else if (a.startsWith("--only=")) args.only = a.slice(7).split(",");
     else if (a === "--rpc-only") args.rpcOnly = true;
     else if (a === "--rialto-only") args.rialtoOnly = true;
+    else if (a === "--full") args.full = true;
+    else if (a === "--tier") args.tier = String(argv[++i] ?? "").trim().toLowerCase();
+    else if (a.startsWith("--tier=")) args.tier = a.slice(7).trim().toLowerCase();
+    else if (a === "--shard") args.shard = parseShard(argv[++i]);
+    else if (a.startsWith("--shard=")) args.shard = parseShard(a.slice(8));
     else if (a === "--source") source(argv[++i]);
     else if (a.startsWith("--source=")) source(a.slice(9));
     else if (a === "--dry" || a === "--dry-run") args.dry = true;
     else throw new Error(`unknown argument ${a}`);
+  }
+  if (args.tier && !["hot", "live", "quiet", "dormant"].includes(args.tier)) {
+    throw new Error("--tier takes one of: hot, live, quiet, dormant");
   }
   if (args.only) {
     args.only = [...new Set(args.only.map((slug) => slug.trim()).filter(Boolean))];
@@ -126,6 +144,67 @@ export function parseArgs(argv) {
 }
 
 const readYaml = async (path) => parse(await readFile(path, "utf8"));
+const readJson = async (path, fallback) => {
+  try { return JSON.parse(await readFile(path, "utf8")); } catch { return fallback; }
+};
+
+const priorAddressFor = (doc, address) => (doc?.addresses ?? [])
+  .find((row) => row.address?.toLowerCase() === address.toLowerCase()) ?? null;
+const priorActivityFor = (doc, address) => (doc?.activity?.addresses ?? [])
+  .find((row) => row.address?.toLowerCase() === address.toLowerCase()) ?? null;
+const priorReadFor = (doc, kind, address) => (doc?.reads?.explorer ?? [])
+  .find((row) => row.kind === kind && String(row.address ?? "").toLowerCase() === String(address ?? "").toLowerCase()) ?? null;
+
+const hasBudgetDeferral = (errors = []) => errors.some((error) => /deferred: budget/i.test(error?.message ?? ""));
+const carry = (fresh, previous, keys) => {
+  const out = { ...fresh };
+  for (const key of keys) if (out[key] == null && previous?.[key] != null) out[key] = previous[key];
+  return out;
+};
+
+export function carryAddressFacts(fresh, previous) {
+  return carry(fresh, previous, ["is_contract", "source_verified", "contract_name", "created_block", "created_at", "holders"]);
+}
+
+export function carryActivityFacts(fresh, previous) {
+  return carry(fresh, previous, [
+    "transactions_count", "token_transfers_count", "last_tx_at", "last_method", "txns_24h", "launches_24h",
+  ]);
+}
+
+export function carryMarketFacts(fresh, previous) {
+  return carry(fresh, previous, [
+    "top10_share", "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad",
+  ]);
+}
+
+export function carryStructureFacts(fresh, previous) {
+  return carry(fresh, previous, ["mint", "renounced", "lp"]);
+}
+
+export function explorerReadRecord({ kind, address = null, status, reason, signalValue = null, checkedAt, previous = null, credits = 0 }) {
+  return {
+    kind,
+    address,
+    status,
+    reason,
+    signal_value: Number.isInteger(signalValue) && signalValue >= 0 ? signalValue : null,
+    checked_at: checkedAt,
+    stale_since: status === "read" ? null : previous?.stale_since ?? previous?.checked_at ?? null,
+    credits,
+  };
+}
+
+function aboveShareBar(census, pulled) {
+  const tvl = pulled?.metrics?.find((metric) => metric.kind === "tvl")?.value ?? null;
+  const usesLiquidity = census?.identity?.entity_kind === "token" || census?.tree?.primary?.startsWith("launch/");
+  return meetsShareBar({
+    officialConfirmed: officialSurfaceConfirmed(census),
+    hasContractOn4663: locatedOnChain(pulled),
+    shareBarMetric: usesLiquidity ? "liquidity" : "tvl",
+    kpis: { liquidityUsd: pulled?.market?.liquidity_usd ?? null, tvl },
+  });
+}
 
 /**
  * Keeps one promise for each client method/argument tuple during a pull. The census can point many
@@ -327,7 +406,14 @@ async function main() {
   const projects = new Map();
   for (const f of projectFiles) projects.set(basename(f, ".yaml"), await readYaml(join("content/projects", f)));
 
-  const targets = [];
+  const queueEntries = await readJson("ops/pull-queue.json", []);
+  const queueBySlug = new Map();
+  for (const entry of Array.isArray(queueEntries) ? queueEntries : []) {
+    if (!entry?.slug) continue;
+    const prior = queueBySlug.get(entry.slug);
+    if (!prior || String(entry.at).localeCompare(String(prior.at)) > 0) queueBySlug.set(entry.slug, entry);
+  }
+  const allTargets = [];
   const wanted = args.only ? new Set(args.only) : null;
   for (const row of census) {
     if (wanted && !wanted.has(row.slug)) continue;
@@ -339,13 +425,44 @@ async function main() {
     const ledger = await readYaml(join("content/sources", `${row.slug}.yaml`)).catch(() => null);
     const hasLlama = Boolean(findLlamaSlug(ledger?.sources ?? []));
     if (addresses.length === 0 && !hasLlama) continue;
-    targets.push({ slug: row.slug, addresses, project, census: row, llamaSlug: hasLlama ? findLlamaSlug(ledger?.sources ?? []) : null });
+    const previous = await readYaml(join("content/pulled", `${row.slug}.yaml`)).catch(() => null);
+    const lastSnapshot = readHistory(row.slug).at(-1) ?? null;
+    const tier = tierFor({
+      aboveShareBar: aboveShareBar(row, previous),
+      queuedAt: queueBySlug.get(row.slug)?.at ?? null,
+      lastActivityAt: previous?.activity?.last_activity_at ?? null,
+      now: Date.parse(pulledAt),
+    });
+    allTargets.push({
+      slug: row.slug,
+      addresses,
+      project,
+      census: row,
+      llamaSlug: hasLlama ? findLlamaSlug(ledger?.sources ?? []) : null,
+      previous,
+      lastSnapshot,
+      tier,
+      queued: queueBySlug.has(row.slug),
+    });
   }
   if (wanted) {
-    const found = new Set(targets.map((target) => target.slug));
+    const found = new Set(allTargets.map((target) => target.slug));
     const missing = [...wanted].filter((slug) => !found.has(slug));
     if (missing.length) throw new Error(`no census slug with a ${CHAIN} address or DefiLlama receipt: ${missing.join(", ")}`);
   }
+  const forceCadence = Boolean(args.only || args.full || args.rialtoOnly);
+  const targets = allTargets.filter((target) => {
+    if (args.shard && shardFor(target.slug, args.shard.total) !== args.shard.index) return false;
+    if (args.tier && target.tier !== args.tier) return false;
+    return tierIsDue(target.tier, target.lastSnapshot?.at ?? target.previous?.pulled_at, {
+      now: Date.parse(pulledAt),
+      force: forceCadence,
+    });
+  });
+  const tierCounts = Object.fromEntries(["hot", "live", "quiet", "dormant"].map((tier) => [
+    tier,
+    allTargets.filter((target) => target.tier === tier).length,
+  ]));
 
   // Attribution and the holder exclusions are joins over the census and the project files, not over
   // this directory's last output: reading content/pulled/*.yaml would make each run inherit the
@@ -357,10 +474,13 @@ async function main() {
   const pace = createPacer(250);
   const deps = { pace };
   const explorerConfig = resolveBlockscoutConfig();
+  const budgetState = await readJson("ops/pull-budget.json", {});
+  const creditBudget = createCreditBudget({ state: budgetState, now: Date.parse(pulledAt) });
   const explorerTracker = createBlockscoutTracker();
   const explorerDeps = {
     pace: createPacer(1000 / explorerConfig.requestsPerSecond),
     defaultHeaders: explorerConfig.headers,
+    beforeRequest: (url) => creditBudget.claim(url),
     onRequest: explorerTracker.recordRequest,
     onChallenge: explorerTracker.recordChallenge,
   };
@@ -468,57 +588,182 @@ async function main() {
   const launchRows = [];
   const cappedRows = [];
   const errorCounts = new Map();
+  const completedSlugs = [];
+  const deferredReads = [];
+  let walksSkipped = 0;
 
   for (const target of targets) {
     const slugStarted = Date.now();
-    const reads = await mapWithConcurrency(target.addresses, CONCURRENCY, async (entry) => {
+    // Free sources lead. DexScreener's trade counter is the token change signal, so an unchanged
+    // token never spends explorer credits merely to learn that its holder/ABI facts are unchanged.
+    const tokenAddress = tokenAddressFor(target.addresses);
+    let market = null;
+    if (!args.rpcOnly) {
+      market = tokenAddress
+        ? await readMarket(dexscreener, tokenAddress, { pulledAt })
+        : emptyMarket(pulledAt, [{ step: "no token address", message: `no ${CHAIN} deployment with role token` }]);
+    }
+
+    const reads = await mapWithConcurrency(
+      target.addresses,
+      args.rpcOnly ? CONCURRENCY : explorerConfig.addressConcurrency,
+      async (entry) => {
       const rpcResult = await readRpc(rpc, entry.address);
-      const bsResult = args.rpcOnly
-        ? null
-        : await readBlockscout(blockscout, entry.address, { isToken: entry.role === "token" });
-      return { row: mergeAddress(entry, rpcResult, bsResult), creator: bsResult?.creator ?? null };
+      if (args.rpcOnly) return { row: mergeAddress(entry, rpcResult, null), creator: null, activity: null, changed: true, records: [] };
+
+      const previousAddress = priorAddressFor(target.previous, entry.address);
+      const previousActivity = priorActivityFor(target.previous, entry.address);
+      const previousAddressRead = priorReadFor(target.previous, "address", entry.address) ?? { checked_at: target.previous?.pulled_at ?? null };
+      const previousActivityRead = priorReadFor(target.previous, "activity", entry.address) ?? { checked_at: target.previous?.pulled_at ?? null };
+      let currentSignal = null;
+      let priorSignal = null;
+      let preloadedCounters;
+      let signalError = null;
+      const signalStart = creditBudget.snapshot().run_credits;
+
+      if (entry.role === "token") {
+        currentSignal = market?.trades_h24 ?? null;
+        priorSignal = target.previous?.market?.trades_h24 ?? null;
+      } else if (rpcResult.is_contract === false) {
+        priorSignal = previousAddressRead?.signal_value ?? null;
+        try {
+          const nonce = await rpc.transactionCount(entry.address);
+          currentSignal = typeof nonce === "string" ? Number(BigInt(nonce)) : null;
+        } catch (error) {
+          signalError = { step: "rpc", message: `eth_getTransactionCount ${entry.address}: ${error.message}` };
+        }
+      } else {
+        priorSignal = previousActivity?.transactions_count ?? previousActivityRead?.signal_value ?? null;
+        try {
+          preloadedCounters = parseCounters(await activityClient.counters(entry.address));
+          currentSignal = preloadedCounters.transactions_count;
+        } catch (error) {
+          signalError = { step: "blockscout", message: `counters/${entry.address}: ${error.message}` };
+        }
+      }
+
+      const decision = explorerChangeDecision({
+        role: entry.role,
+        full: args.full,
+        previous: previousAddress,
+        priorSignal,
+        currentSignal,
+      });
+      const signalCredits = creditBudget.snapshot().run_credits - signalStart;
+      if (!decision.changed) {
+        walksSkipped++;
+        const row = carryAddressFacts(mergeAddress(entry, rpcResult, null), previousAddress);
+        const activity = carryActivityFacts({
+          address: entry.address, label: entry.label, role: entry.role,
+          transactions_count: currentSignal, token_transfers_count: null, last_tx_at: null,
+          last_method: null, txns_24h: null, launches_24h: null, errors: signalError ? [signalError] : [],
+        }, previousActivity);
+        return {
+          row, creator: null, activity, changed: false,
+          records: [
+            explorerReadRecord({ kind: "address", address: entry.address, status: "unchanged", reason: decision.reason, signalValue: currentSignal, checkedAt: pulledAt, previous: previousAddressRead, credits: 0 }),
+            explorerReadRecord({ kind: "activity", address: entry.address, status: "unchanged", reason: "24h walk skipped; change signal unchanged", signalValue: currentSignal, checkedAt: pulledAt, previous: previousActivityRead, credits: signalCredits }),
+          ],
+        };
+      }
+
+      const addressStart = creditBudget.snapshot().run_credits;
+      const bsResult = await readBlockscout(blockscout, entry.address, { isToken: entry.role === "token" });
+      const addressCredits = creditBudget.snapshot().run_credits - addressStart;
+      const addressDeferred = hasBudgetDeferral(bsResult.errors);
+      const freshRow = mergeAddress(entry, rpcResult, bsResult);
+      if (signalError) freshRow.errors.push(signalError);
+      const row = carryAddressFacts(freshRow, previousAddress);
+
+      const activityStart = creditBudget.snapshot().run_credits;
+      let activity = await readAddressActivity(activityClient, entry, {
+        now: Date.parse(pulledAt), preloadedCounters,
+      });
+      const activityCredits = signalCredits + creditBudget.snapshot().run_credits - activityStart;
+      activity = carryActivityFacts(activity, previousActivity);
+      const activityDeferred = hasBudgetDeferral(activity.errors) || hasBudgetDeferral(signalError ? [signalError] : []);
+      if (addressDeferred || activityDeferred) deferredReads.push(`${target.slug}:${entry.address}`);
+      return {
+        row, creator: bsResult.creator ?? null, activity, changed: true,
+        records: [
+          explorerReadRecord({ kind: "address", address: entry.address, status: addressDeferred ? "deferred" : "read", reason: addressDeferred ? "budget exhausted; prior non-null facts retained" : decision.reason, signalValue: currentSignal, checkedAt: pulledAt, previous: previousAddressRead, credits: addressCredits }),
+          explorerReadRecord({ kind: "activity", address: entry.address, status: activityDeferred ? "deferred" : "read", reason: activityDeferred ? "budget exhausted; prior non-null activity retained" : `${decision.reason}; 24h walk refreshed`, signalValue: currentSignal, checkedAt: pulledAt, previous: previousActivityRead, credits: activityCredits }),
+        ],
+      };
     });
     const addresses = reads.map((read) => read.row);
+    const readRecords = reads.flatMap((read) => read.records);
     // /addresses/<addr> already answered with the creator; attribution reuses it rather than asking
     // the explorer the same question a second time.
     const creators = new Map(reads.map((read) => [read.row.address.toLowerCase(), read.creator]));
 
     // Who is still calling these contracts. One pass per address, capped at two in flight so a busy
     // factory's 24h walk cannot starve the rest of the slug.
-    let activity = null;
-    if (!args.rpcOnly) {
-      const rows = await mapWithConcurrency(target.addresses, explorerConfig.isPro ? explorerConfig.addressConcurrency : BLOCKSCOUT_CONCURRENCY, (entry) =>
-        readAddressActivity(activityClient, entry, { now: Date.parse(pulledAt) }),
-      );
-      activity = { ...emptyActivity(pulledAt, rows), ...aggregateActivity(rows) };
-    }
+    let activity = args.rpcOnly ? null : {
+      ...emptyActivity(pulledAt, reads.map((read) => read.activity)),
+      ...aggregateActivity(reads.map((read) => read.activity)),
+    };
 
     // What the project's own token trades at. A slug with no token deployment records why, rather
     // than leaving a reader to guess whether the lookup ran.
-    const tokenAddress = tokenAddressFor(target.addresses);
-    let market = null;
     let structure = null;
-    if (!args.rpcOnly) {
-      market = tokenAddress
-        ? await readMarket(dexscreener, tokenAddress, { pulledAt })
-        : emptyMarket(pulledAt, [
-            { step: "no token address", message: `no ${CHAIN} deployment with role token` },
-          ]);
+    if (!args.rpcOnly && tokenAddress) {
+        const tokenRead = reads.find((read) => read.row.address.toLowerCase() === tokenAddress.toLowerCase());
+        const priorMarket = target.previous?.market ?? null;
+        const priorStructure = target.previous?.structure ?? null;
+        const priorTop10Read = priorReadFor(target.previous, "top10", tokenAddress) ?? { checked_at: target.previous?.pulled_at ?? null };
+        const priorStructureRead = priorReadFor(target.previous, "structure", tokenAddress) ?? { checked_at: target.previous?.pulled_at ?? null };
+        const priorLpRead = priorReadFor(target.previous, "lp", tokenAddress) ?? { checked_at: target.previous?.pulled_at ?? null };
 
-      if (tokenAddress) {
+      if (tokenRead?.changed) {
+        const top10Start = creditBudget.snapshot().run_credits;
         const top10 = await readTop10(blockscout, tokenAddress, {
           pulledAt,
           excluded: holderExclusions,
           pairAddresses: market.pairs.map((pair) => pair.pair_address),
         });
+        const top10Credits = creditBudget.snapshot().run_credits - top10Start;
+        const top10Deferred = hasBudgetDeferral(top10.errors);
         const creator = creators.get(tokenAddress.toLowerCase()) ?? null;
-        const launchpad = attributeCreator(creator, launchpads);
-        if (!creator) {
+        const launchpad = creator ? attributeCreator(creator, launchpads) : priorMarket?.launchpad ?? null;
+        if (!creator && !launchpad) {
           market.errors.push({ step: "launchpad", message: `addresses/${tokenAddress} did not return creator_address_hash` });
         } else if (!launchpad) {
           market.errors.push({ step: "launchpad", message: `creator ${creator} did not match a launchpad factory, curve or known launcher deployer` });
         }
-        market = { ...market, ...top10, launchpad, errors: [...market.errors, ...top10.errors] };
+        market = carryMarketFacts({ ...market, ...top10, launchpad, errors: [...market.errors, ...top10.errors] }, priorMarket);
+        readRecords.push(explorerReadRecord({
+          kind: "top10", address: tokenAddress, status: top10Deferred ? "deferred" : "read",
+          reason: top10Deferred ? "budget exhausted; prior concentration retained" : "token change signal changed",
+          signalValue: market.trades_h24, checkedAt: pulledAt, previous: priorTop10Read, credits: top10Credits,
+        }));
+        if (top10Deferred) deferredReads.push(`${target.slug}:top10`);
+
+        const ownershipStart = creditBudget.snapshot().run_credits;
+        const tokenRow = addresses.find((row) => row.address.toLowerCase() === tokenAddress.toLowerCase());
+        const ownership = await readMintAndRenounce(blockscout, tokenAddress, tokenRow?.owner ?? null);
+        const ownershipCredits = creditBudget.snapshot().run_credits - ownershipStart;
+        const structureDeferred = hasBudgetDeferral(ownership.errors);
+        const locksStart = creditBudget.snapshot().run_credits;
+        const locks = await readLpLocks(blockscout, market.pairs, { lockers: holderExclusions });
+        const lpCredits = creditBudget.snapshot().run_credits - locksStart;
+        const lpDeferred = hasBudgetDeferral(locks.errors);
+        structure = carryStructureFacts({
+          pulled_at: pulledAt, mint: ownership.mint, renounced: ownership.renounced,
+          lp: locks.lp, errors: [...ownership.errors, ...locks.errors],
+        }, priorStructure);
+        readRecords.push(
+          explorerReadRecord({ kind: "structure", address: tokenAddress, status: structureDeferred ? "deferred" : "read", reason: structureDeferred ? "budget exhausted; prior mint facts retained" : "token change signal changed", signalValue: market.trades_h24, checkedAt: pulledAt, previous: priorStructureRead, credits: ownershipCredits }),
+          explorerReadRecord({ kind: "lp", address: tokenAddress, status: lpDeferred ? "deferred" : "read", reason: lpDeferred ? "budget exhausted; prior LP facts retained" : "token change signal changed", signalValue: market.trades_h24, checkedAt: pulledAt, previous: priorLpRead, credits: lpCredits }),
+        );
+        if (structureDeferred || lpDeferred) deferredReads.push(`${target.slug}:structure`);
+      } else {
+        market = carryMarketFacts(market, priorMarket);
+        structure = priorStructure ? { ...priorStructure, pulled_at: pulledAt, errors: [] } : null;
+        for (const [kind, previous] of [["top10", priorTop10Read], ["structure", priorStructureRead], ["lp", priorLpRead]]) {
+          readRecords.push(explorerReadRecord({ kind, address: tokenAddress, status: "unchanged", reason: "token trade count unchanged; explorer read skipped", signalValue: market.trades_h24, checkedAt: pulledAt, previous, credits: 0 }));
+        }
+      }
 
         if (rialto) {
           const rialtoMarket = rialtoMarketFor(tokenAddress, rialto.reference, { asOf: pulledAt });
@@ -535,17 +780,6 @@ async function main() {
           if (rialtoFailure) market.errors.push({ step: "rialto", message: rialtoFailure });
         }
 
-        const tokenRow = addresses.find((row) => row.address.toLowerCase() === tokenAddress.toLowerCase());
-        const ownership = await readMintAndRenounce(blockscout, tokenAddress, tokenRow?.owner ?? null);
-        const locks = await readLpLocks(blockscout, market.pairs, { lockers: holderExclusions });
-        structure = {
-          pulled_at: pulledAt,
-          mint: ownership.mint,
-          renounced: ownership.renounced,
-          lp: locks.lp,
-          errors: [...ownership.errors, ...locks.errors],
-        };
-      }
     }
 
     const sourceLedger = await readYaml(join("content/sources", `${target.slug}.yaml`)).catch(() => null);
@@ -567,13 +801,16 @@ async function main() {
 
     const doc = {
       slug: target.slug, pulled_at: pulledAt, chain: CHAIN,
-      addresses, metrics, market, structure, activity, errors: slugErrors,
+      addresses, metrics, market, structure, activity,
+      reads: args.rpcOnly ? undefined : { tier: target.tier, explorer: readRecords },
+      errors: slugErrors,
     };
 
     try {
       const { path, written } = await writePulled(doc, { blockNumber, dry: args.dry, validate });
       if (written) {
         totals.files++;
+        completedSlugs.push(target.slug);
         // The snapshot is appended only after the YAML lands, so the series never claims a run that
         // failed validation actually happened.
         appendHistory(target.slug, snapshotFrom(doc));
@@ -689,7 +926,7 @@ async function main() {
     }
   }
   if (cappedRows.length) {
-    console.log(`\n${cappedRows.length} addresses hit the 40-page cap (count is a floor)`);
+    console.log(`\n${cappedRows.length} addresses hit their role-based page cap (count is a floor)`);
     for (const r of cappedRows) console.log(`  ${r.slug.padEnd(20)} ${r.address}  >= ${r.txns} txns/24h`);
   }
   if (errorCounts.size) {
@@ -705,7 +942,21 @@ async function main() {
 
   const explorerStats = explorerTracker.snapshot();
   if (!args.rpcOnly) {
-    console.log(`Blockscout credits: ${explorerStats.credits} · challenge responses: ${explorerStats.challenges}`);
+    const budget = creditBudget.snapshot();
+    console.log(
+      `Blockscout credits: ${budget.run_credits}/${budget.run_cap} this run · ` +
+      `${budget.credits_used}/${budget.day_cap} UTC day · ${walksSkipped} unchanged walks skipped · ` +
+      `${deferredReads.length} reads deferred · challenge responses: ${explorerStats.challenges}`,
+    );
+    console.log(
+      `tier population: hot ${tierCounts.hot} · live ${tierCounts.live} · quiet ${tierCounts.quiet} · ` +
+      `dormant ${tierCounts.dormant} · projected ${Math.ceil(projectDailyCredits(tierCounts)).toLocaleString("en-US")} credits/day`,
+    );
+    if (!args.dry) {
+      await writeFile("ops/pull-budget.json", `${JSON.stringify(creditBudget.finish(), null, 2)}\n`);
+      const remainingQueue = consumeQueue(Array.isArray(queueEntries) ? queueEntries : [], completedSlugs);
+      await writeFile("ops/pull-queue.json", `${JSON.stringify(remainingQueue, null, 2)}\n`);
+    }
   }
   const challengeGate = blockscoutChallengeGate(explorerStats);
   if (challengeGate.failed) {

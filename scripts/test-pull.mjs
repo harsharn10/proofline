@@ -81,8 +81,19 @@ import {
   isLaunchMethod,
   readAddressActivity,
   aggregateActivity,
+  pageCapForRole,
   toQuery,
 } from "./lib/pull/activity.mjs";
+import { createCreditBudget, normalizeBudgetState } from "./lib/pull/budget.mjs";
+import {
+  consumeQueue,
+  explorerChangeDecision,
+  parseShard,
+  projectDailyCredits,
+  shardFor,
+  tierFor,
+  tierIsDue,
+} from "./lib/pull/tiers.mjs";
 import {
   orderDocument,
   createValidator,
@@ -108,7 +119,10 @@ import {
   readAllAssets,
   RIALTO_PAGES,
 } from "./lib/pull/rialto.mjs";
-import { addressesFor, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey, memoizeClient, parseArgs, refreshedMarket } from "./pull.mjs";
+import {
+  addressesFor, carryActivityFacts, carryAddressFacts, explorerReadRecord, mergeAddress,
+  summaryLine, tokenAddressFor, countErrors, errorKey, memoizeClient, parseArgs, refreshedMarket,
+} from "./pull.mjs";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -527,6 +541,10 @@ test("a shorter or empty read never replaces a committed revenue series", async 
     assert.equal((await seriesReplacement("pons", long, { dir })).write, true);
     await writeSeries("pons", long, { dir });
     assert.deepEqual(await readSeries("pons", { dir }), long);
+
+    const sameDay = await seriesReplacement("pons", [["2026-08-30", 9], ["2026-08-31", 9], ["2026-09-01", 9]], { dir });
+    assert.equal(sameDay.write, false);
+    assert.equal(sameDay.reason, "latest daily point already committed");
 
     const shorter = await seriesReplacement("pons", [["2026-09-01", 3]], { dir });
     assert.equal(shorter.write, false);
@@ -1566,6 +1584,101 @@ test("a document carrying both new blocks validates and keeps its key order", ()
   assert.equal(older.activity, null);
   assert.deepEqual(validate(older), []);
   assert.equal(errorKey({ step: "rpc", message: "eth_getCode 0xA5aAb3F0c6EeadF30Ef: boom" }), "rpc: eth_getCode <hex>: boom");
+});
+
+test("tier cadence, pulse queue and two-way shards are deterministic", () => {
+  const now = Date.parse("2026-09-04T12:00:00.000Z");
+  assert.equal(tierFor({ aboveShareBar: true, now }), "hot");
+  assert.equal(tierFor({ queuedAt: "2026-09-04T11:00:00.000Z", now }), "hot");
+  assert.equal(tierFor({ lastActivityAt: "2026-09-01T12:00:00.000Z", now }), "live");
+  assert.equal(tierFor({ lastActivityAt: "2026-08-15T12:00:00.000Z", now }), "quiet");
+  assert.equal(tierFor({ lastActivityAt: "2026-07-01T12:00:00.000Z", now }), "dormant");
+  assert.equal(tierIsDue("live", "2026-09-04T01:00:00.000Z", { now }), false);
+  assert.equal(tierIsDue("live", "2026-09-03T23:00:00.000Z", { now }), true);
+  assert.equal(tierIsDue("quiet", "2026-09-04T11:59:00.000Z", { now, force: true }), true);
+  assert.deepEqual(parseShard("1/2"), { index: 1, total: 2 });
+  assert.throws(() => parseShard("0/3"), /one or two/);
+  assert.equal(shardFor("pons", 2), shardFor("pons", 2));
+  assert.ok([0, 1].includes(shardFor("pons", 2)));
+});
+
+test("change detector skips equal signals and full overrides every signal", () => {
+  assert.deepEqual(
+    explorerChangeDecision({ role: "factory", previous: {}, priorSignal: 12, currentSignal: 12 }),
+    { changed: false, reason: "factory signal unchanged" },
+  );
+  assert.equal(explorerChangeDecision({ role: "token", previous: {}, priorSignal: 12, currentSignal: 13 }).changed, true);
+  assert.equal(explorerChangeDecision({ role: "token", previous: null, priorSignal: 12, currentSignal: 12 }).changed, true);
+  assert.equal(explorerChangeDecision({ role: "token", full: true, previous: {}, priorSignal: 12, currentSignal: 12 }).changed, true);
+});
+
+test("credit ledger hard-defers before a request and resets on a new UTC day", () => {
+  const now = Date.parse("2026-09-04T12:00:00.000Z");
+  const budget = createCreditBudget({ state: { date: "2026-09-04", credits_used: 4, runs: 2 }, now, perRun: 2, perDay: 6 });
+  budget.claim("one");
+  budget.claim("two");
+  assert.throws(() => budget.claim("three"), /deferred: budget \(run cap reached\)/);
+  assert.equal(budget.snapshot().run_credits, 2);
+  assert.deepEqual(budget.finish(), { date: "2026-09-04", credits_used: 6, runs: 3 });
+  assert.deepEqual(normalizeBudgetState({ date: "2026-09-03", credits_used: 99, runs: 4 }, now), {
+    date: "2026-09-04", credits_used: 0, runs: 0,
+  });
+});
+
+test("completed pulse queue entries clear while deferred names stay queued", () => {
+  const queue = [{ slug: "pons", at: "2026-09-04T10:00:00Z" }, { slug: "noxa", at: "2026-09-04T11:00:00Z" }];
+  assert.deepEqual(consumeQueue(queue, ["pons"]), [queue[1]]);
+});
+
+test("page caps reserve deep walks for factories, curves and routers", () => {
+  assert.equal(pageCapForRole("factory"), 40);
+  assert.equal(pageCapForRole("curve"), 40);
+  assert.equal(pageCapForRole("router"), 40);
+  assert.equal(pageCapForRole("token"), 5);
+  assert.equal(pageCapForRole("other"), 5);
+});
+
+test("deferred reads retain prior non-null facts and set stale_since", () => {
+  const priorAddress = { is_contract: true, source_verified: true, contract_name: "Token", holders: 99 };
+  const address = carryAddressFacts({ is_contract: true, source_verified: null, contract_name: null, holders: null }, priorAddress);
+  assert.equal(address.source_verified, true);
+  assert.equal(address.contract_name, "Token");
+  assert.equal(address.holders, 99);
+  const activity = carryActivityFacts({ transactions_count: null, txns_24h: null }, { transactions_count: 8, txns_24h: 2 });
+  assert.equal(activity.transactions_count, 8);
+  assert.equal(activity.txns_24h, 2);
+  const record = explorerReadRecord({
+    kind: "address", address: "0x39dBED3a2bd333467115dE45665cC57F813C4571", status: "deferred",
+    reason: "budget exhausted", checkedAt: "2026-09-04T12:00:00.000Z",
+    previous: { checked_at: "2026-09-03T12:00:00.000Z" }, credits: 0,
+  });
+  assert.equal(record.stale_since, "2026-09-03T12:00:00.000Z");
+});
+
+test("read summary validates and conservative projections stay under the daily cap", () => {
+  const validate = createValidator();
+  const doc = orderDocument({
+    slug: "pons", pulled_at: "2026-09-04T12:00:00.000Z", chain: "robinhood-chain",
+    addresses: [], metrics: [], market: null, structure: null, activity: null,
+    reads: { tier: "hot", explorer: [{
+      kind: "top10", address: "0x39dBED3a2bd333467115dE45665cC57F813C4571",
+      status: "unchanged", reason: "trade count unchanged", signal_value: 14,
+      checked_at: "2026-09-04T12:00:00.000Z", stale_since: "2026-09-03T12:00:00.000Z", credits: 0,
+    }] }, errors: [],
+  });
+  assert.deepEqual(validate(doc), []);
+  for (const names of [200, 500, 1000]) {
+    const projected = projectDailyCredits({ hot: names * 0.1, live: names * 0.3, quiet: names * 0.4, dormant: names * 0.2 });
+    assert.ok(projected < 60_000, `${names}: ${projected}`);
+  }
+});
+
+test("pull CLI accepts only/full/tier/shard overrides", () => {
+  const args = parseArgs(["--only", "pons,noxa", "--full", "--tier", "hot", "--shard", "0/2"]);
+  assert.deepEqual(args.only, ["pons", "noxa"]);
+  assert.equal(args.full, true);
+  assert.equal(args.tier, "hot");
+  assert.deepEqual(args.shard, { index: 0, total: 2 });
 });
 
 // --- runner ---------------------------------------------------------------

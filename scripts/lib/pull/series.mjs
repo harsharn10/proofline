@@ -91,6 +91,15 @@ export async function seriesReplacement(slug, series, { dir = SERIES_DIR } = {})
       },
     };
   }
+  if (existing?.at(-1)?.[0] && next.at(-1)?.[0] === existing.at(-1)[0]) {
+    return {
+      write: false,
+      next: next.length,
+      existing: existing.length,
+      error: null,
+      reason: "latest daily point already committed",
+    };
+  }
   return { write: true, next: next.length, existing: existing?.length ?? 0, error: null };
 }
 
