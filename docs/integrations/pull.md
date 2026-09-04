@@ -74,15 +74,15 @@ Planning allowance by explorer read kind (a changed name can own several address
 | Verified ABI | 1/token | Token signal changed |
 | LP check | 0–2/pair | Token signal changed; v3/v4 pool ids cost zero |
 
-For capacity planning we allow **10 credits per due name** after change skips. The observed 178-name
-mix on 2026-09-04 was 61 hot, 115 live, 0 quiet and 2 dormant: 34.3% / 64.6% / 0% / 1.1%.
+For capacity planning we allow **10 credits per due name** after change skips. The observed 179-name
+mix on 2026-09-04 was 61 hot, 115 live, 0 quiet and 3 dormant: 34.1% / 64.2% / 0% / 1.7%.
 Holding that mix constant gives:
 
 | Names | Credits/day | Headroom below the 60,000 cap |
 | ---: | ---: | ---: |
-| 200 | 5,330 | 54,670 |
-| 500 | 13,325 | 46,675 |
-| 1,000 | 26,650 | 33,350 |
+| 200 | 5,301 | 54,699 |
+| 500 | 13,252 | 46,748 |
+| 1,000 | 26,504 | 33,496 |
 
 The workflow uses two stable shards, never more, serialized through `main-bots`. Each starts from
 current `main`, has 45 minutes, commits pulled data plus both ops state files, and retains the
