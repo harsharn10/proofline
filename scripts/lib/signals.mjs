@@ -12,7 +12,10 @@ export const PULSE_RULES = Object.freeze({
   dailyCap: 12,
 });
 
+// Number(null) is 0 and Number("") is 0, so an unread metric would otherwise arrive as a real zero —
+// which is how a name whose previous volume was never read looked like a doubling from nothing.
 const finite = (value) => {
+  if (value === null || value === undefined || value === "") return null;
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
 };
@@ -163,6 +166,13 @@ export const BREAKOUT_RULES = Object.freeze({
   volumeMultiple: 2,
   holderGrowthPct: 20,
   minDistinctAccounts: 3,
+  // The scale leg. Holder growth and qualifying Talk are the two corroborating signals the assignment
+  // names, but both are absent from the two moves the owner said he wanted: HOOKR doubled to $7M with
+  // holders +13.6%, O1.EXCHANGE doubled to $15.9M with holders +3.1%, and neither had three top-tier
+  // accounts posting. Size is the third independent measurement — a doubling of a seven-figure book on
+  // a name a reader already follows is not a micro-cap going from $200 to $400 — and it only counts
+  // while the holder count is not falling, so a doubling on the way out never qualifies.
+  minMaterialVolumeUsd: 1_000_000,
 });
 
 /** An account's post counts as Talk only when the desk records it as top tier (scripts/lib/trending.mjs
@@ -217,7 +227,9 @@ export function breakoutSignal({ slug, current = {}, previous = {}, distinctAcco
   const holderChangePct = percent(current.holders, previous.holders);
   const holderLeg = holderChangePct !== null && holderChangePct >= BREAKOUT_RULES.holderGrowthPct;
   const talkLeg = Number(distinctAccounts) >= BREAKOUT_RULES.minDistinctAccounts;
-  if (!holderLeg && !talkLeg) return null;
+  const scaleLeg = volumeNow >= BREAKOUT_RULES.minMaterialVolumeUsd &&
+    (holderChangePct === null || holderChangePct >= 0);
+  if (!holderLeg && !talkLeg && !scaleLeg) return null;
 
   return {
     kind: "breakout",
@@ -226,6 +238,7 @@ export function breakoutSignal({ slug, current = {}, previous = {}, distinctAcco
       volumeBefore > 0 ? "24h volume at least doubled" : "24h volume started from nothing",
       holderLeg ? "holders rose at least 20%" : null,
       talkLeg ? `${distinctAccounts} qualifying accounts posted today` : null,
+      !holderLeg && !talkLeg && scaleLeg ? "on a seven-figure book with holders not falling" : null,
     ].filter(Boolean),
     numbers: {
       volume_24h_usd: volumeNow,

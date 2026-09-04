@@ -98,8 +98,10 @@ export function selectApproved(entries, state, review, { since = null, all = fal
     });
 }
 
+// The double quote matters: every href below is an attribute value, and a source URL carrying a
+// quote would otherwise break the anchor and make Telegram reject the whole message with a 400.
 export function escapeHtml(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function icarusView(derived) {
@@ -310,6 +312,13 @@ const SIGNAL_KICKERS = {
   "coming-up": "COMING UP",
 };
 
+/** RISK ALERT is reserved for who controls the contract. A locked-share or mint move is a control
+ * change, and saying so plainly keeps the severe kicker meaning something. */
+function signalKicker(signal) {
+  if (signal.kind === "control-change" && signal.severity && signal.severity !== "risk") return "CONTROL CHANGE";
+  return SIGNAL_KICKERS[signal.kind] ?? "ICARUS ALERT";
+}
+
 function sourceAnchor(label, url) {
   return url ? `<a href="${escapeHtml(url)}">${escapeHtml(label)}</a>` : escapeHtml(label);
 }
@@ -323,14 +332,24 @@ export function formatSignalAlert(signal, {
   disclaimer = DISCLAIMER,
 } = {}) {
   const n = signal.numbers ?? {};
+  const base = siteUrl.replace(/\/$/, "");
+  const cardHref = base ? `${base}${profilePath}${signal.slug}` : null;
   let facts;
+  let factsLinked = false;
   if (signal.kind === "breakout") {
+    // Each number is anchored to the surface it came from: market numbers to the pair, holder growth
+    // to the card that records the holder read. One blanket anchor would attribute both to one source.
     const pieces = [];
-    if (n.volume_24h_usd != null) pieces.push(`${formatUsd(n.volume_24h_usd)} volume 24h${n.volume_change_pct != null ? ` · ${formatPct(n.volume_change_pct)}` : ""}`);
-    if (n.liquidity_usd != null) pieces.push(`${formatUsd(n.liquidity_usd)} liquidity`);
-    if (n.holder_change_pct != null && n.holder_change_pct >= 20) pieces.push(`holders ${formatPct(n.holder_change_pct)}`);
-    if (n.distinct_accounts >= 3) pieces.push(`${n.distinct_accounts} accounts posting today`);
+    const market = [
+      n.volume_24h_usd != null ? `${formatUsd(n.volume_24h_usd)} volume 24h` : null,
+      n.volume_change_pct != null ? formatPct(n.volume_change_pct) : null,
+      n.liquidity_usd != null ? `${formatUsd(n.liquidity_usd)} liquidity` : null,
+    ].filter(Boolean).join(" · ");
+    if (market) pieces.push(sourceAnchor(market, signal.sourceUrl));
+    if (n.holder_change_pct != null && n.holder_change_pct >= 20) pieces.push(sourceAnchor(`holders ${formatPct(n.holder_change_pct)}`, cardHref));
+    if (n.distinct_accounts >= 3) pieces.push(sourceAnchor(`${n.distinct_accounts} qualifying accounts posting today`, cardHref));
     facts = pieces.join(" · ");
+    factsLinked = true;
   } else if (signal.kind === "leader-change") {
     facts = `Now #${signal.rank} in ${signal.section} · held for two reads`;
   } else if (signal.kind === "control-change") {
@@ -347,30 +366,38 @@ export function formatSignalAlert(signal, {
         return `${change.field}: ${transition}${count}`;
       }
       if (change.after == null || change.before == null) return `${change.field}: ${change.after == null ? "removed" : "set"}${count}`;
-      return `${change.field}: ${displayValue(change.before)} → ${displayValue(change.after)}${count}`;
+      return `${change.field}: ${displayValue(change.before, change.field)} → ${displayValue(change.after, change.field)}${count}`;
     }).join(" · ");
   } else if (signal.kind === "distribution") {
     facts = `${signal.tag}: ${signal.title}`;
   } else if (signal.kind === "coming-up") {
-    facts = `${signal.tag} · ${signal.date} · ${signal.title}`;
+    const away = signal.daysAway == null
+      ? signal.date
+      : signal.daysAway === 0 ? "today" : `in ${signal.daysAway} day${signal.daysAway === 1 ? "" : "s"} · ${signal.date}`;
+    facts = `${signal.tag} · ${away} · ${signal.title}`;
   } else {
     facts = signal.headline ?? signal.title ?? "New market signal";
   }
-  const base = siteUrl.replace(/\/$/, "");
-  const card = base ? `<a href="${escapeHtml(`${base}${profilePath}${signal.slug}`)}">Card</a>` : null;
+  const card = cardHref ? `<a href="${escapeHtml(cardHref)}">Card</a>` : null;
   const source = signal.sourceUrl ? `<a href="${escapeHtml(signal.sourceUrl)}">Source</a>` : null;
   return [
-    `<b>${SIGNAL_KICKERS[signal.kind] ?? "ICARUS ALERT"} · ${escapeHtml(String(name).toUpperCase())}</b>`,
-    sourceAnchor(facts, signal.sourceUrl),
+    `<b>${signalKicker(signal)} · ${escapeHtml(String(name).toUpperCase())}</b>`,
+    factsLinked ? facts : sourceAnchor(facts, signal.sourceUrl),
     tldr ? escapeHtml(tldr) : null,
     `<i>${escapeHtml(disclaimer)}</i>`,
     [card, source].filter(Boolean).join(" · ") || null,
   ].filter(Boolean).join("\n\n");
 }
 
-function displayValue(value) {
+// A Safe threshold is a count of signers, not a share. Formatting 1 as "100.0%" would turn a
+// 2-of-3 Safe dropping to 1-of-3 — a real and serious change — into nonsense.
+const SHARE_FIELDS = new Set(["LP locked share"]);
+
+function displayValue(value, field = null) {
   if (value === null || value === undefined) return "not checked";
-  if (typeof value === "number" && value >= 0 && value <= 1) return `${(value * 100).toFixed(1)}%`;
+  if (typeof value === "number" && (field === null || SHARE_FIELDS.has(field)) && value >= 0 && value <= 1) {
+    return `${(value * 100).toFixed(1)}%`;
+  }
   return String(value);
 }
 
@@ -383,12 +410,28 @@ function formatPct(value) {
   return `${number >= 0 ? "+" : ""}${number.toFixed(1)}%`;
 }
 
-/** The 09:00 ET brief. Inputs are normalized first so this stays pure and fixture-friendly. */
+// Every list in the brief and the wrap is bounded. A scoring change that admits forty names to the
+// share bar overnight must not produce a message Telegram rejects with a 400 at 13:00 every day.
+export const BRIEF_LIMITS = Object.freeze({ top: 5, newlyCleared: 5, distribution: 3 });
+export const WRAP_LIMITS = Object.freeze({ leaders: 12, names: 20, controlChanges: 10, distribution: 10 });
+
+const overflow = (rows, limit) => (rows.length > limit ? `\n…and ${rows.length - limit} more on the site.` : "");
+
+/**
+ * The 13:00 UTC brief (09:00 ET under daylight time, 08:00 ET under standard time). Inputs are
+ * normalized first so this stays pure and fixture-friendly. It opens with the single most material
+ * thing that happened that day, and collapses to one line when nothing did. Returns Telegram-sized
+ * chunks, like every other builder in this file.
+ */
 export function buildDailyBrief(brief, { disclaimer = DISCLAIMER } = {}) {
-  if (brief.dayWord === "quiet") {
-    return `<b>ICARUS DAILY · ${escapeHtml(brief.date)} · QUIET</b> — Nothing changed what a reader would do.`;
+  const lead = brief.lead
+    ? `<b>${escapeHtml(brief.lead.kicker)} · ${escapeHtml(String(brief.lead.name).toUpperCase())}</b>\n${sourceAnchor(brief.lead.text, brief.lead.sourceUrl)}`
+    : null;
+  if (!lead && brief.dayWord === "quiet") {
+    return [`<b>ICARUS DAILY · ${escapeHtml(brief.date)} · QUIET</b> — Nothing changed what a reader would do.`];
   }
-  const blocks = [`<b>ICARUS DAILY · ${escapeHtml(brief.date)} · BUSY</b>`];
+  const blocks = [`<b>ICARUS DAILY · ${escapeHtml(brief.date)} · ${lead ? "TODAY" : "BUSY"}</b>`];
+  if (lead) blocks.push(lead);
   if (brief.activity) {
     const launchRows = (brief.activity.launchpads ?? [])
       .map((row) => `${escapeHtml(row.name)} ${sourceAnchor(`${Number(row.launches24h).toLocaleString("en-US")} launches`, row.sourceUrl)}`);
@@ -399,12 +442,13 @@ export function buildDailyBrief(brief, { disclaimer = DISCLAIMER } = {}) {
   }
   if (brief.top?.length) blocks.push([
     "<b>Top volume</b>",
-    ...brief.top.map((row, index) => `${index + 1}. ${escapeHtml(row.name)} · ${sourceAnchor(`${formatUsd(row.volume24hUsd)}${row.changePct == null ? "" : ` · ${formatPct(row.changePct)}`}`, row.sourceUrl)}`),
+    ...brief.top.slice(0, BRIEF_LIMITS.top).map((row, index) => `${index + 1}. ${escapeHtml(row.name)} · ${sourceAnchor(`${formatUsd(row.volume24hUsd)}${row.changePct == null ? "" : ` · ${formatPct(row.changePct)}`}`, row.sourceUrl)}`),
   ].join("\n"));
   if (brief.newlyCleared?.length) blocks.push([
     "<b>Under the radar · newly above the bar</b>",
-    ...brief.newlyCleared.map((row) => `• <b>${sourceAnchor(row.name, row.sourceUrl)}</b> — ${escapeHtml(row.tldr ?? "No TL;DR yet")}${row.why ? `\n  ${escapeHtml(row.why)}` : ""}`),
-  ].join("\n"));
+    ...brief.newlyCleared.slice(0, BRIEF_LIMITS.newlyCleared)
+      .map((row) => `• <b>${sourceAnchor(row.name, row.sourceUrl)}</b> — ${escapeHtml(row.tldr ?? "No TL;DR yet")}${row.why ? `\n  ${escapeHtml(row.why)}` : ""}`),
+  ].join("\n") + overflow(brief.newlyCleared, BRIEF_LIMITS.newlyCleared));
   if (brief.movers?.up || brief.movers?.down) blocks.push([
     "<b>Biggest movers</b>",
     brief.movers.up ? `Up: ${escapeHtml(brief.movers.up.name)} ${sourceAnchor(formatPct(brief.movers.up.changePct), brief.movers.up.sourceUrl)}` : null,
@@ -412,28 +456,31 @@ export function buildDailyBrief(brief, { disclaimer = DISCLAIMER } = {}) {
   ].filter(Boolean).join("\n"));
   if (brief.distribution?.length) blocks.push([
     "<b>Listings and distribution</b>",
-    ...brief.distribution.slice(0, 3).map((row) => `• ${sourceAnchor(row.title, row.sourceUrl)} · ${escapeHtml(row.name)}`),
-  ].join("\n"));
+    ...brief.distribution.slice(0, BRIEF_LIMITS.distribution).map((row) => `• ${sourceAnchor(row.title, row.sourceUrl)} · ${escapeHtml(row.name)}`),
+  ].join("\n") + overflow(brief.distribution, BRIEF_LIMITS.distribution));
   if (brief.note) blocks.push(`<b>Icarus note</b>\n${sourceAnchor(brief.note.title, brief.note.sourceUrl)} · ${escapeHtml(brief.note.name)}`);
   blocks.push(`<i>${escapeHtml(disclaimer)}</i>`);
-  return blocks.join("\n\n");
+  return chunkMessage(blocks.join("\n\n"));
 }
 
+/** The Sunday 14:00 UTC wrap. Bounded like the brief, and chunked for the same reason. */
 export function buildWeeklyWrap(wrap, { disclaimer = DISCLAIMER } = {}) {
+  const names = (rows) => rows.slice(0, WRAP_LIMITS.names).map((row) => escapeHtml(row.name)).join(" · ") + overflow(rows, WRAP_LIMITS.names);
   const blocks = [`<b>ICARUS WEEKLY · ${escapeHtml(wrap.week)}</b>`];
   if (wrap.leaders?.length) blocks.push([
     "<b>Section leaders</b>",
-    ...wrap.leaders.map((row) => `• ${escapeHtml(row.section)} — ${escapeHtml(row.name)}${row.value == null ? "" : ` · ${sourceAnchor(row.value, row.sourceUrl)}`}`),
-  ].join("\n"));
-  if (wrap.newNames?.length) blocks.push(`<b>New this week</b>\n${wrap.newNames.map((row) => escapeHtml(row.name)).join(" · ")}`);
-  if (wrap.quietNames?.length) blocks.push(`<b>Went quiet</b>\n${wrap.quietNames.map((row) => escapeHtml(row.name)).join(" · ")}`);
-  if (wrap.controlChanges?.length) blocks.push(`<b>Control changes</b>\n${wrap.controlChanges.map((row) => `• ${escapeHtml(row.name)} — ${escapeHtml(row.summary)}`).join("\n")}`);
+    ...wrap.leaders.slice(0, WRAP_LIMITS.leaders)
+      .map((row) => `• ${escapeHtml(row.section)} — ${escapeHtml(row.name)}${row.value == null ? "" : ` · ${sourceAnchor(row.value, row.sourceUrl)}`}`),
+  ].join("\n") + overflow(wrap.leaders, WRAP_LIMITS.leaders));
+  if (wrap.newNames?.length) blocks.push(`<b>New this week</b>\n${names(wrap.newNames)}`);
+  if (wrap.quietNames?.length) blocks.push(`<b>Went quiet</b>\n${names(wrap.quietNames)}`);
+  if (wrap.controlChanges?.length) blocks.push(`<b>Control changes</b>\n${wrap.controlChanges.slice(0, WRAP_LIMITS.controlChanges).map((row) => `• ${escapeHtml(row.name)} — ${escapeHtml(row.summary)}`).join("\n")}${overflow(wrap.controlChanges, WRAP_LIMITS.controlChanges)}`);
   if (wrap.distribution?.length) blocks.push([
     "<b>Listings and distribution</b>",
-    ...wrap.distribution.map((row) => `• ${sourceAnchor(row.title, row.sourceUrl)} · ${escapeHtml(row.name)}`),
-  ].join("\n"));
+    ...wrap.distribution.slice(0, WRAP_LIMITS.distribution).map((row) => `• ${sourceAnchor(row.title, row.sourceUrl)} · ${escapeHtml(row.name)}`),
+  ].join("\n") + overflow(wrap.distribution, WRAP_LIMITS.distribution));
   blocks.push(`<i>${escapeHtml(disclaimer)}</i>`);
-  return blocks.join("\n\n");
+  return chunkMessage(blocks.join("\n\n"));
 }
 
 /** Split on blank lines so no message exceeds Telegram's 4096-char limit. */
