@@ -1,5 +1,5 @@
 slug: golden
-pulled_at: 2026-09-03T23:56:17.131Z # chain head 53819262 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xdFee8e117DfEF700D7C41170f67c4A591445217a"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 53026208
     created_at: 2026-09-03T01:20:52.000Z
-    holders: 135
+    holders: 130
     errors: []
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory
@@ -29,14 +29,9 @@ addresses:
       type: none
       implementation: null
       admin: null
-    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
-    owner_type: safe
-    safe:
-      threshold: 2
-      signers:
-        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
-        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
-        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
+    owner: null
+    owner_type: none
+    safe: null
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
@@ -48,21 +43,22 @@ addresses:
     source_verified: true
     contract_name: V2LaunchLocker
     proxy:
-      type: none
+      type: unknown
       implementation: null
       admin: null
-    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
-    owner_type: safe
-    safe:
-      threshold: 2
-      signers:
-        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
-        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
-        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
+    owner: null
+    owner_type: none
+    safe: null
     created_block: 26841845
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getCode 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+      - step: rpc
+        message: "eth_getStorageAt admin 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
   - address: "0x1D11f0496982706C5e14A514D4E79F2e6BdE4516"
     label: DJT Robinhood Stock Token (pair quote / rail)
     role: token
@@ -78,76 +74,68 @@ addresses:
     safe: null
     created_block: 20946859
     created_at: 2026-07-27T18:29:21.000Z
-    holders: 23031
+    holders: 22905
     errors: []
 metrics: []
 market:
   token_address: "0xdFee8e117DfEF700D7C41170f67c4A591445217a"
-  pulled_at: 2026-09-03T23:56:17.131Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs:
     - dex: uniswap
       pair_address: "0xf978e084d88bd7044db28347b820ef5e73cc2ec148e8342718a77d78213d45b3"
       quote_symbol: DJT
-      price_usd: 0.000004463
-      liquidity_usd: 5559.25
-      volume_h24: 322210.44
-      volume_h6: 11648.54
+      price_usd: 0.000004092
+      liquidity_usd: 5323.76
+      volume_h24: 12812.47
+      volume_h6: 24.55
       txns_h24:
-        buys: 1502
-        sells: 1606
-      price_change_h24: -89.24
-      fdv: 4463
+        buys: 56
+        sells: 72
+      price_change_h24: 33.21
+      market_cap: 4093
+      fdv: 4093
       created_at: 2026-09-03T01:21:19.000Z
     - dex: uniswap
       pair_address: "0x4ec5c97076925b4962ba9a7ef2001679e89eed073466613883b9892be48e3dab"
       quote_symbol: ETH
       price_usd: 0.00001716
       liquidity_usd: 2.12
-      volume_h24: 0.48
+      volume_h24: 0.08
       volume_h6: 0
       txns_h24:
         buys: 0
-        sells: 3
-      price_change_h24: -38.76
+        sells: 1
+      price_change_h24: null
+      market_cap: 17166
       fdv: 17166
       created_at: 2026-09-03T01:35:31.000Z
     - dex: uniswap
-      pair_address: "0x01b2c9530f74e13c7774cd8bee6a5973f98977eb532f9b291c58a4828a1cd42b"
-      quote_symbol: ETH
-      price_usd: 0.00001497
-      liquidity_usd: 3.68
-      volume_h24: 3.11
-      volume_h6: 0
-      txns_h24:
-        buys: 2
-        sells: 1
-      price_change_h24: -25.77
-      fdv: 14976
-      created_at: 2026-09-03T01:33:34.000Z
-    - dex: uniswap
       pair_address: "0xa6a79b246ea88e5912f86f11acbab7a5d885f041fd8451f65513349b2c2da222"
       quote_symbol: ETH
-      price_usd: 0.000005613
-      liquidity_usd: 15.82
-      volume_h24: 124.95
-      volume_h6: 18.85
+      price_usd: 0.0000047
+      liquidity_usd: 14.47
+      volume_h24: 19.52
+      volume_h6: 0
       txns_h24:
-        buys: 20
-        sells: 24
-      price_change_h24: -93.93
-      fdv: 5613
+        buys: 5
+        sells: 5
+      price_change_h24: 5.59
+      market_cap: 4701
+      fdv: 4701
       created_at: 2026-09-03T01:26:52.000Z
-  liquidity_usd: 5580.87
-  volume_h24: 322338.98
-  trades_h24: 3158
-  price_usd: 0.000004463
-  price_change_h24: -89.24
-  fdv: 4463
+  liquidity_usd: 5340.35
+  volume_h24: 12832.07
+  trades_h24: 139
+  price_usd: 0.000004092
+  price_change_h24: 33.21
+  market_cap_usd: 4093
+  fdv_usd: 4093
+  fdv: 4093
   first_pair_at: 2026-09-03T01:21:19.000Z
-  top10_share: 0.8965802263791687
-  top10_share_ex_pools: 0.2105440824007132
+  top10_share: 0.9132742624751992
+  top10_share_ex_pools: 0.1990273955894782
   burned_share: 0
-  top10_as_of: 2026-09-03T23:56:17.131Z
+  top10_as_of: 2026-09-04T11:23:39.609Z
   launchpad:
     slug: pons
     via: creator
@@ -166,7 +154,7 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-03T23:56:17.131Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: no-mint-function
   renounced: null
   lp:
@@ -178,10 +166,6 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x01b2c9530f74e13c7774cd8bee6a5973f98977eb532f9b291c58a4828a1cd42b"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xa6a79b246ea88e5912f86f11acbab7a5d885f041fd8451f65513349b2c2da222"
       locked_share: null
       holder_kind: null
@@ -190,16 +174,16 @@ structure:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-03T23:56:17.131Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
     - address: "0xdFee8e117DfEF700D7C41170f67c4A591445217a"
       label: GOLDEN token (PonsV2LauncherToken)
       role: token
       transactions_count: 0
       token_transfers_count: 0
-      last_tx_at: 2026-09-03T19:47:32.000Z
+      last_tx_at: 2026-09-04T08:59:58.000Z
       last_method: approve
-      txns_24h: 760
+      txns_24h: 49
       launches_24h: null
       errors: []
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
@@ -207,10 +191,10 @@ activity:
       role: factory
       transactions_count: 76659
       token_transfers_count: 6719
-      last_tx_at: 2026-09-03T23:57:53.000Z
-      last_method: launchToken
+      last_tx_at: 2026-09-04T11:24:53.000Z
+      last_method: transferCreatorFeeRecipient
       txns_24h: 2000
-      launches_24h: 1070
+      launches_24h: 805
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -229,14 +213,14 @@ activity:
       role: token
       transactions_count: 9487
       token_transfers_count: 24
-      last_tx_at: 2026-09-04T00:49:23.000Z
-      last_method: transfer
+      last_tx_at: 2026-09-04T12:05:11.000Z
+      last_method: approve
       txns_24h: 2000
       launches_24h: null
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
-  last_activity_at: 2026-09-04T00:49:23.000Z
-  txns_24h: 4760
-  launches_24h: 1070
+  last_activity_at: 2026-09-04T12:05:11.000Z
+  txns_24h: 4049
+  launches_24h: 805
 errors: []

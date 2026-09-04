@@ -1,5 +1,5 @@
 slug: md
-pulled_at: 2026-09-03T23:56:17.131Z # chain head 53819262 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x3abb8d686dF6e538bb0887917d14f04f705f1e18"
@@ -15,9 +15,9 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: null
-    created_at: null
-    holders: 347
+    created_block: 48518279
+    created_at: 2026-08-28T18:37:52.000Z
+    holders: 406
     errors: []
   - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
     label: DopplerERC20V1 implementation
@@ -110,64 +110,59 @@ addresses:
     safe: null
     created_block: 48278
     created_at: 2026-06-10T15:25:09.000Z
-    holders: 36423
+    holders: 37310
     errors: []
 metrics: []
 market:
   token_address: "0x3abb8d686dF6e538bb0887917d14f04f705f1e18"
-  pulled_at: 2026-09-03T23:56:17.131Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs:
     - dex: uniswap
       pair_address: "0x197db3e35d66549592bdf1a77172eedbca36a864e185145796412ab8e3cb9655"
       quote_symbol: AMD
-      price_usd: 0.0001473
-      liquidity_usd: 91428.2
-      volume_h24: 145803.71
-      volume_h6: 38005.48
+      price_usd: 0.0002082
+      liquidity_usd: 113087.96
+      volume_h24: 241166.95
+      volume_h6: 52166.77
       txns_h24:
-        buys: 713
-        sells: 733
-      price_change_h24: -43.36
-      fdv: 147322
+        buys: 1259
+        sells: 1375
+      price_change_h24: -18.08
+      market_cap: 208269
+      fdv: 208269
       created_at: 2026-08-28T18:37:52.000Z
-    - dex: uniswap
-      pair_address: "0xa6da2232a8ffbe03bd555cc75e8ffbeadb1e52539b1a285fc045464062898018"
-      quote_symbol: ETH
-      price_usd: 0.0001551
-      liquidity_usd: 5.38
-      volume_h24: 6.36
-      volume_h6: 0
-      txns_h24:
-        buys: 2
-        sells: 0
-      price_change_h24: 157
-      fdv: 155115
-      created_at: 2026-09-03T02:22:47.000Z
     - dex: uniswap
       pair_address: "0x935a063bbcd5b184a3f1157b20d7a92e5eb798dfe68f12c6356b61e0c6d8387a"
       quote_symbol: USDG
-      price_usd: 0.0002224
-      liquidity_usd: 21.14
-      volume_h24: 4.43
-      volume_h6: 1.37
+      price_usd: 0.0002276
+      liquidity_usd: 21.4
+      volume_h24: 2.08
+      volume_h6: 0
       txns_h24:
         buys: 1
         sells: 2
-      price_change_h24: -28.35
-      fdv: 222498
+      price_change_h24: -19.84
+      market_cap: 227647
+      fdv: 227647
       created_at: 2026-09-02T04:25:13.000Z
-  liquidity_usd: 91454.72
-  volume_h24: 145814.5
-  trades_h24: 1451
-  price_usd: 0.0001473
-  price_change_h24: -43.36
-  fdv: 147322
+  liquidity_usd: 113109.36
+  volume_h24: 241169.03
+  trades_h24: 2637
+  price_usd: 0.0002082
+  price_change_h24: -18.08
+  market_cap_usd: 208269
+  fdv_usd: 208269
+  fdv: 208269
   first_pair_at: 2026-08-28T18:37:52.000Z
-  top10_share: 0.5953604730209192
-  top10_share_ex_pools: 0.2316821106590666
+  top10_share: 0.5412863686848185
+  top10_share_ex_pools: 0.2360062635036673
   burned_share: 0
-  top10_as_of: 2026-09-03T23:56:17.131Z
-  launchpad: null
+  top10_as_of: 2026-09-04T11:23:39.609Z
+  launchpad:
+    slug: doppler
+    via: factory
+    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
+    shared: false
   rialto: null
   pair_asset:
     ticker: AMD
@@ -179,19 +174,13 @@ market:
     change_7d: -88645.12
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors:
-    - step: launchpad
-      message: addresses/0x3abb8d686dF6e538bb0887917d14f04f705f1e18 did not return creator_address_hash
+  errors: []
 structure:
-  pulled_at: 2026-09-03T23:56:17.131Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: unknown
   renounced: false
   lp:
     - pair: "0x197db3e35d66549592bdf1a77172eedbca36a864e185145796412ab8e3cb9655"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0xa6da2232a8ffbe03bd555cc75e8ffbeadb1e52539b1a285fc045464062898018"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
@@ -203,16 +192,16 @@ structure:
     - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-03T23:56:17.131Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
     - address: "0x3abb8d686dF6e538bb0887917d14f04f705f1e18"
       label: MD token (EIP-1167 DopplerERC20V1 clone)
       role: token
       transactions_count: 571
       token_transfers_count: 0
-      last_tx_at: 2026-09-04T01:22:24.000Z
+      last_tx_at: 2026-09-04T12:30:50.000Z
       last_method: "0x095ea7b3"
-      txns_24h: 118
+      txns_24h: 188
       launches_24h: null
       errors: []
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
@@ -240,10 +229,10 @@ activity:
       role: factory
       transactions_count: 13369
       token_transfers_count: 4
-      last_tx_at: 2026-09-04T00:01:34.000Z
+      last_tx_at: 2026-09-04T11:27:33.000Z
       last_method: create
       txns_24h: 2000
-      launches_24h: 1998
+      launches_24h: 1997
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -252,9 +241,9 @@ activity:
       role: other
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-03T23:58:10.000Z
+      last_tx_at: 2026-09-04T11:11:59.000Z
       last_method: create
-      txns_24h: 136
+      txns_24h: 166
       launches_24h: null
       errors: []
     - address: "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC"
@@ -262,12 +251,12 @@ activity:
       role: token
       transactions_count: 24892
       token_transfers_count: 63
-      last_tx_at: 2026-09-04T00:59:08.000Z
+      last_tx_at: 2026-09-04T12:20:41.000Z
       last_method: approve
-      txns_24h: 603
+      txns_24h: 1374
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T01:22:24.000Z
-  txns_24h: 2857
-  launches_24h: 1998
+  last_activity_at: 2026-09-04T12:30:50.000Z
+  txns_24h: 3728
+  launches_24h: 1997
 errors: []
