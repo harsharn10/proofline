@@ -1,0 +1,152 @@
+slug: snoo
+name: SNOO
+symbol: SNOO
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 SNOO/RDDT pool. Traders buy and sell SNOO against Reddit • Robinhood Token. Token owner() is Airlock; no official site or handle bidirectionally linked 0x939C… this pass.
+themes:
+  - memecoin
+  - stock-paired:rddt
+  - rwa
+official_links:
+  - kind: other
+    url: https://www.reddit.com/r/Snoo/s/OhgwH7HcbL
+dependencies: []
+deployments:
+  - label: SNOO token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x939CA34ce2Dc5845f4BFf8079Fc6cCD6aB641E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S13
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S4
+      - S13
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S12
+  - label: LongLauncher (create tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S10
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: factory
+    verified: false
+    sources:
+      - S4
+      - S11
+  - label: DopplerHookInitializer
+    chain: robinhood-chain
+    address: "0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S14
+  - label: RDDT Stock Token (pair quote / launch numeraire; rail, not this subject)
+    chain: robinhood-chain
+    address: "0x05b37Fb53A299a1b874A619e1c4C404D52C36F4C"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S8
+      - S9
+  - label: SNOOFI collision (Snoofi / Snoofi, not this row)
+    chain: robinhood-chain
+    address: "0xa614C13b18B5C754B34fF51E4775Ab19568e0536"
+    role: token
+    verified: false
+    sources:
+      - S15
+      - S27
+  - label: SNOO ticker collision (PonsV2LauncherToken, not this row)
+    chain: robinhood-chain
+    address: "0x52B566dF34d709aea103f541cba1b341Ddc04687"
+    role: token
+    verified: false
+    sources:
+      - S16
+      - S24
+  - label: SNOO ticker collision (Reddit's mascot / SNOO, not this row)
+    chain: robinhood-chain
+    address: "0x2ebe1C527691bf3497b6905bd351FD5161792215"
+    role: token
+    verified: false
+    sources:
+      - S17
+      - S25
+metrics:
+  - kind: volume_24h
+    value: 142438.44
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+  - kind: tvl
+    value: 141052.03
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+  - kind: market_cap
+    value: 270332
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S5
+  - kind: holders
+    value: 617
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/LongLauncher/Airlock/hook/RDDT and the create tx, RPC name/symbol/owner/getCode, DexScreener tokens and search, Gecko pool/token (first GET 200), /rhj/assets, Reddit preview, and the X posts and profiles above were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-5 R-8] - Numbers: 142438.44 is the DexScreener SNOO/RDDT pair 24h volume, not the 136029.37 Gecko token all-pools figure. Liquidity 141052.03 is that pair. Gecko reserve 147791.11 is the same pool, different aggregator. [claim R-5 R-6 R-7] - Adversarial: the strongest contrary reading is that @snoo_robinhood or @snoocoinRH is this token's official handle, or that SNOOFI is the same asset. Those bios pin 0x52B566…, 0x2ebe1C…, and 0xa614C13…; bytecode lengths differ; SNOOFI's top book is WETH."
+      class: inference
+      sources:
+        - S16
+        - S17
+        - S24
+        - S25
+        - S26
+    - text: Same-ticker SNOO contracts 0x52B566… (Pons, 4 holders) and 0x2ebe1C… (Reddit's mascot) plus SNOOFI 0xa614C13… (WETH book) are live on 4663. [verified R-15 R-16 R-17] - Pool USD reserve is SNOO plus RDDT, not a USDG or WETH backstop. [claim R-5 R-6] - No official handle or domain this pass; Reddit share and netlify vote/claim URLs are third-party-link / copypasta-pattern. [claim R-19 R-22] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x939C…1E18? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed 0x939C… and a handle that links back"
+    - text: "What does constructor IPFS bafkreiafp27fdkesqeabrtsf4z4tvtorgljl7pktk5ztebsnssqtowbcuq publish as image or socials? Next: retry a public IPFS gateway or Blockscout token metadata if the URI is indexed"
+    - text: "Does verified DopplerHookInitializer source leave a privileged path on the 5%/95% Lock beneficiaries after durationSeconds 10? Next: read Lock and fee-split modifiers in src/initializers/DopplerHookInitializer.sol on the explorer"
+    - text: "Should aggregators treat Gecko dex id bankr-robinhood as the venue versus Uniswap v4 PoolManager 0x8366…0951? Next: keep the on-chain PoolManager as venue; do not file Bankr as this token's pad"
+  unresolved: []

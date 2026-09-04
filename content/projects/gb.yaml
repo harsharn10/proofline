@@ -1,0 +1,116 @@
+slug: gb
+name: GB
+symbol: GB
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched on Pons v2 and graduated into a Uniswap v4 pool quoted against AMD. PonsV2LaunchFactory.launchToken from 0x35EC…16a2 minted Gigabyte (GB) on 2026-09-01T22:16:40Z onto a bonding curve, then swept into the GB/AMD book ~48 seconds later. Traders buy and sell GB on Uniswap v4. AMD is the quote rail, not this token. gigabyte.click/script.js embeds this CA. No bidirectional official handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:amd
+  - rwa
+  - pons-graduation
+official_links:
+  - kind: site
+    url: https://www.gigabyte.click/
+  - kind: x
+    url: https://x.com/gigabyteRH
+dependencies: []
+deployments:
+  - label: GB token (Pons v2 launcher token)
+    chain: robinhood-chain
+    address: "0xD78650f3A96e55e0710282c4f459AC556ef3517E"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S5
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S6
+  - label: GB bonding curve (token curve)
+    chain: robinhood-chain
+    address: "0x535eDdD8088533e98C7372dB2F64063c6B2B4Dd7"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S16
+  - label: AMD • Robinhood Token (pair quote rail)
+    chain: robinhood-chain
+    address: "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S17
+  - label: V2MemeHook (Uniswap v4 pool hooks)
+    chain: robinhood-chain
+    address: "0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044"
+    role: other
+    verified: false
+    sources:
+      - S16
+      - S22
+metrics:
+  - kind: volume_24h
+    value: 809601.07
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 57071.87
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 202008
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 922
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/curve/AMD, launchToken 0x4e8d…f62f, CurveCompleted 0xe8b8…3f3c, RPC name/symbol/deployer/launchFactory/curve/socials, DexScreener, Gecko pool/token/info, /rhj/assets, gigabyte.click HTML and script.js, @gigabyteRH, @JayceBryce, and the Netlify vote posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 809601.07 is the DexScreener GB/AMD 24h volume, not the Gecko token all-pools 796115.24. Reserve 57071.87 is the Gecko AMD/GB pool. DexScreener liquidity 35896.73 is the same pair, different aggregator. Gecko pool fdv 1.71M is AMD-as-base. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that GB is the AMD hardware-issuer product or the same token as CHIP/MD/MEOW. GET /rhj/assets names AMD • Robinhood Token at 0x8692…3fdC as a separate asset; CHIP/MD/MEOW are different addresses; gigabyte.click is not gigabyte.com."
+      class: inference
+      sources:
+        - S12
+        - S19
+        - S13
+    - text: Quote token AMD 0x8692…3fdC is a Robinhood Stock Token rail; GB is not AMD. [verified R-12 R-17] - Pool USD reserve is GB plus AMD, not a USDG or WETH backstop. [claim R-7 R-8] - No bidirectional official handle this pass; @gigabyteRH is unconfirmed-official. [claim R-7 R-18] - Same-name Gigabyte copycats exist, one with 86 holders. [verified R-21] - GB token source unverified; no audit report URL this pass. [unknown] - Netlify "Top 100" vote URLs are third-party-link / copypasta-pattern.
+      class: claim
+      sources:
+        - S24
+  missing:
+    - text: "Does @gigabyteRH bio or a pinned post bidirectionally name gigabyte.click? Next: re-read the bio after a site pin; treat handle as official only with that cross-link"
+    - text: "Why is Blockscout is_contract false for curve 0x535e…4Dd7 despite 10229 B of code? Next: re-fetch the address after indexer catch-up; compare bytecode to verified PonsV2BondingCurve 0x05690b…b0E0"
+    - text: "Why do DexScreener GB/AMD fdv (~$202k) and Gecko token fdv (~$441k) disagree by ~2x? Next: compare Gecko token price source pool vs the AMD book; do not collapse the two fdv figures"
+    - text: "What does launch image ipfs://bafkreicg5fx4phz7gulbiydsyklb5a5kij2nsae7xldi3emhsrg2vqhmoa contain? Next: fetch the CID once for social_links / image without treating it as official"
+  unresolved: []

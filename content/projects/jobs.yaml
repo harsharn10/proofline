@@ -1,0 +1,116 @@
+slug: jobs
+name: Jobscoin
+symbol: JOBS
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched on Pons v2 and graduated into a Uniswap v4 pool quoted against Apple • Robinhood Token (AAPL). PonsV2LaunchFactory.launchToken on 2026-08-31 minted Jobscoin (JOBS) onto a bonding curve, then CurveCompleted seeded the JOBS/AAPL book. Traders buy and sell JOBS against AAPL. jobscoinpons.com and @Jobscoinpons pin this contract.
+themes:
+  - memecoin
+  - stock-paired:aapl
+  - rwa
+official_links:
+  - kind: site
+    url: https://jobscoinpons.com/
+  - kind: x
+    url: https://x.com/Jobscoinpons
+  - kind: app
+    url: https://www.ponsfamily.com/launchpad/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453
+dependencies: []
+deployments:
+  - label: JOBS token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S6
+  - label: PonsV2LaunchFactory
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S6
+  - label: PonsV2LaunchDeployer (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: other
+    verified: false
+    sources:
+      - S1
+      - S16
+  - label: PonsV2BondingCurve (JOBS launch curve)
+    chain: robinhood-chain
+    address: "0x4E943DDd1fc47f69d56bc8Ed84948398c1cfbcF1"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S17
+  - label: V2LaunchLocker (site-linked liquidity locker)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: other
+    verified: false
+    sources:
+      - S12
+      - S19
+metrics:
+  - kind: volume_24h
+    value: 261709.83
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 23501.15
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 83730
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 570
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/deployer/curve/AAPL/locker and both launch and graduation txs, RPC name/symbol/owner/curve.token, DexScreener tokens and search, Gecko token (GET 200) and pool (GET 200), /rhj/assets, jobscoinpons.com, @Jobscoinpons profile and website post, and Latest X posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-11 R-12] - Numbers: 261709.83 is the DexScreener JOBS/AAPL top-pair 24h volume, not the 290731.53 Gecko token all-pools figure. Reserve 22811.53 is the Gecko pool; DexScreener liquidity 23501.15 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this is packed ICOIN, AP/AAPL, packed AAPLCAT, packed AAPLDOG, or an official Apple product. ICOIN is 0x5d6EF…1e18 / @iCoinRH; AP is 0x69c68e4C…1e18; AAPLCAT is 0x73A9999f…1e18 / @AAPLCAT_; AAPLDOG is 0x06e52E5f…1e18 / @AppleDogRH; AAPL in /rhj/assets is the quote rail 0xaF3D…93f9; JOBS is a Pons v2 token at 0x88952E52…6453."
+      class: inference
+      sources:
+        - S4
+        - S11
+        - S20
+    - text: Quote token AAPL 0xaF3D…93f9 is the Robinhood Stock Token rail; JOBS is not in GET /rhj/assets. [verified R-11 R-18] - Pool USD reserve is JOBS plus AAPL, not a USDG or WETH backstop. [claim R-7 R-9] - Same-ticker JOBS tokens trade on Robinhood at 0x404D3091…1E18 and 0x6f055C4c…1E18. [claim R-20] - Holder fee share is a site claim; Pons V2 is described as unaudited. [claim R-12] - Netlify vote page is a third-party-link.
+      class: claim
+      sources:
+        - S15
+  missing:
+    - text: "Does a verified hook actually route 1.7% of JOBS/AAPL trades to holders in AAPL, and which contract holds the pot? Next: read V2FeeEscrow and the Uniswap v4 hook on the explorer and match a payday transfer"
+    - text: "Is @jobcoinpons (1 follower, bio Welcome to your new job) operated with @Jobscoinpons or a separate handle? Next: re-read both profiles for a CA pin"
+    - text: "Can Pons v2 factory owner setters reach this live JOBS/AAPL book after graduation? Next: read access modifiers on PonsV2LaunchFactory post-graduation in verified source"
+    - text: "Which Gecko/DexScreener window printed the assignment lead of ~$30,316 liq / ~$271,330 vol? Next: archive the pair if those prints return"
+  unresolved: []

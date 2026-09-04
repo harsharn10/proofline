@@ -1,0 +1,127 @@
+slug: koli
+name: KOLI
+symbol: KOLI
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against NVIDIA • Robinhood Token (NVDA). LongLauncher.create on 2026-09-01 minted KOLI and seeded the KOLI/NVDA book. Traders buy and sell KOLI against NVDA. NVDA is the quote rail, not the subject. www.koli.top reprints this CA. No official handle was confirmed this pass.
+themes:
+  - memecoin
+  - stock-paired:nvda
+  - rwa
+official_links:
+  - kind: site
+    url: https://www.koli.top
+  - kind: x
+    url: https://x.com/KoliAI_
+  - kind: other
+    url: https://github.com/calixeth/agentServer
+dependencies: []
+deployments:
+  - label: KOLI token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S6
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+      - S6
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S15
+  - label: NVIDIA • Robinhood Token (pair quote rail)
+    chain: robinhood-chain
+    address: "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S7
+      - S12
+      - S17
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S16
+metrics:
+  - kind: volume_24h
+    value: 1168551.64
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 44179.83
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 47163
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 1164
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/NVDA and the create tx, RPC name/symbol/owner/getAssetData, DexScreener token + RIPE search, Gecko pool/token/info, /rhj/assets, koli.top, @KoliAI_ profile and posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-5 R-8 R-12 R-13] - Numbers: 1170302.07 is the Gecko KOLI/NVDA pool 24h volume, not the 1186791.87 token all-pools figure. Reserve 45352.52 is that pool. DexScreener 1168551.64 / 44179.83 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this is packed $AI, microduck, ORBIO, or RIPE, or the NVDA stock token. $AI is 0x2E8c…1e18; microduck is 0xD5f1…E725; ORBIO is 0xAa07…28A3; RIPE is 0x4D3f…883b Uniswap v2; NVDA in /rhj/assets is the quote rail 0xd060…9EEC; this CA is 0xb8D9…1e18 / pool 0x1d67…1aa4."
+      class: inference
+      sources:
+        - S4
+        - S12
+        - S19
+    - text: Quote token NVDA 0xd060…9EEC is the Robinhood Stock Token rail in GET /rhj/assets; KOLI is not. [verified R-12 R-17] - Pool USD reserve is KOLI plus NVDA, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko reserve 45352.52 vs DexScreener liquidity 44179.83 on the same pool. [claim R-7 R-8] - Same-name KOLI tickers on 4663 (KOLIAI 0x55bC…1e18, KOLIONE, lowercase koli). Flag ca-collision. [verified R-20] - No official handle confirmed this pass; github.com/calixeth/agentServer is a third-party-link. [claim R-13 R-14] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @KoliAI_ later pin CA 0xb8D9…1e18 in the bio or a post, making the handle bidirectional? Next: re-read the @KoliAI_ profile website field and any post that embeds 0xb8D9…1e18"
+    - text: "Should KOLI/KOLIAI 0x55bC…1e18 or KOLIONE 0xAe38…1E18 get their own packets? Next: only if an assignment names those CAs; keep this packet on 0xb8D9…1e18"
+    - text: "Does verified LongLauncher / Airlock source leave a privileged path after owner() is Airlock? Next: read Lock beneficiaries and any LongFeeVaultFactory deployVault for this token"
+    - text: "Does docs.koli.top resolve and pin this CA? Next: retry docs.koli.top and search the HTML for 0xb8d9"
+    - text: "Which Gecko vs DexScreener window explains reserve 45352 vs liquidity 44180 on the same pool? Next: treat the pool slice as canonical; do not mix token all-pools reserve"
+  unresolved: []

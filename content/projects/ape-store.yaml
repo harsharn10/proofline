@@ -1,0 +1,89 @@
+slug: ape-store
+name: Ape Store
+symbol: null
+category: Bonding-curve launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Ape Store is a token launchpad on Robinhood Chain. A creator deploys from ape.store without seeding liquidity. Gitbook describes a bonding curve that lists on Uniswap near a 69k market cap; the official handle posted that the Robinhood path has no bonding curve and tokens go live on Uniswap. The live V30 router is 0x6e4910ea…87C1. The handle is @apedotstore.
+themes:
+  - launchpad
+  - memecoin
+official_links:
+  - kind: app
+    url: https://ape.store
+  - kind: docs
+    url: https://ape-store.gitbook.io/ape.store-docs
+  - kind: x
+    url: https://x.com/apedotstore
+  - kind: telegram
+    url: https://t.me/apestorelounge
+  - kind: telegram
+    url: https://t.me/apedotstore
+  - kind: other
+    url: https://ape.store/api/config
+  - kind: other
+    url: https://ape-store.gitbook.io/ape.store-docs/links.md
+dependencies: []
+deployments:
+  - label: Robinhood ApeV30 router
+    chain: robinhood-chain
+    address: "0x6e4910ea5A04376032F6564da9a9E4E88B7a87C1"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S14
+      - S15
+      - S25
+  - label: Robinhood ApeStoreRouterV3
+    chain: robinhood-chain
+    address: "0x2211C504DBbD87D4401f3533933E46bDd0E3F32c"
+    role: router
+    verified: true
+    sources:
+      - S2
+      - S16
+      - S17
+  - label: Robinhood ApeProxy
+    chain: robinhood-chain
+    address: "0x789b3D92147C26b701bD95614D5662dB9d4Cc1f6"
+    role: other
+    verified: true
+    sources:
+      - S2
+      - S16
+  - label: V30 router and proxy owner()
+    chain: robinhood-chain
+    address: "0x996C14b1D85841F789dfe32532Ba43B9E97c626c"
+    role: admin
+    verified: true
+    sources:
+      - S14
+      - S16
+      - S18
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: ape.store, /api/config, gitbook markdown pages, X profile and posts, t.co expand, Llama protocol/fees, GitHub users, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. Dune returned Cloudflare 403; Emerson figures are from HARVEST.md via the discovery packet. [verified R-1 R-2 R-14 R-20] - Numbers: Llama TVL and fees are Ethereum/Base, not Robinhood Chain. Bytecode lengths, nonces, and owner() are chain 4663 RPC. Token page math is the official tokens API with chain=4663. Emerson 137 is a 30d third-party window. [verified R-14 R-19] [claim R-20 R-22] - Adversarial: strongest contrary reading is that 0x6e4910ea…87C1 is a leftover V3.0 router and new launches use a different factory, or that Robinhood already abandoned the bonding curve as the 15 Jul post states. Config still sets ApeV30Routers to this address with Active true; RPC shows 12528-byte code and nonce 4227; tokens API RH rows are protocol 30. Packed pads Pons, hood.fun and Coinbarrel are different products."
+      class: inference
+      sources:
+        - S2
+        - S9
+        - S14
+    - text: V30 router source is not verified on Blockscout this pass. [verified R-15] - owner is one EOA with no code on the three RH contracts in config. [verified R-16 R-18] - Gitbook bonding-curve listing path conflicts with the official Robinhood no-bonding-curve post. [claim R-4 R-9] - Llama has no Robinhood Chain TVL or fee slice. [claim R-20 R-21] - No audit report URL.
+      class: unknown
+  missing:
+    - text: "Is V30 router 0x6e4910ea…87C1 a bonding-curve factory or a Uniswap-direct launcher, and can its source be verified? Next: decode V30 ABI or wait for source; sample a recent token's creator_address_hash versus 0x6e4910ea and 0x2211C504"
+    - text: "Does owner 0x996C14b1…626c sit behind a Safe, timelock, or other contract on any chain? Next: do not treat the EOA as a timelock; record any Safe on another chain if one appears"
+    - text: "Is there an audit report whose scope matches 0x6e4910ea…87C1 or ApeStoreRouterV3 0x2211C504…F32c? Next: record any published report as a claim with the exact scope"
+    - text: "Does ape.store HTML name @apedotstore, or does the handle stay gitbook-only? Next: keep flag unconfirmed-official until the site names the handle"
+    - text: "What is the exact RH lifetime token count versus Emerson 30d 137? Next: walk every nonempty page or find a count endpoint; do not treat 48000 as the inventory"
+    - text: "Will Llama add a Robinhood Chain slice for ape.store, and is Base/ETH TVL mixable with RH activity? Next: do not use Llama TVL or fees as a Robinhood Chain figure"
+  unresolved:
+    - text: product.mechanism remains unresolved (CON-1).

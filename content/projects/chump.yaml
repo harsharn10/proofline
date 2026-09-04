@@ -1,0 +1,130 @@
+slug: chump
+name: CHUMP
+symbol: CHUMP
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 with verified ChumpCoin.sol on Robinhood Chain. The constructor seeds a Uniswap v3 CHUMP/WETH 1% pool. Traders buy and sell CHUMP against WETH (and a thin USDG book). Official site cc21b.meme and handle @ChumpCoinX cross-link the contract address.
+themes:
+  - memecoin
+  - amm:weth
+  - graduation
+official_links:
+  - kind: site
+    url: https://cc21b.meme
+  - kind: x
+    url: https://x.com/ChumpCoinX
+  - kind: telegram
+    url: https://t.me/CHUMPCOIN21B
+  - kind: other
+    url: https://x.com/i/communities/2020660935854014618/
+  - kind: other
+    url: https://www.team.finance/view-coin/0x0e0d2c89a5a019fe1cf762e5e33187631dacc21b?name=Chump%20Coin&symbol=CHUMP&chainid=0x1237
+dependencies: []
+deployments:
+  - label: CHUMP token (ChumpCoin.sol)
+    chain: robinhood-chain
+    address: "0x0E0d2C89a5a019FE1cF762e5e33187631DACC21B"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: Uniswap v3 CHUMP/WETH 1% pool (mainPool)
+    chain: robinhood-chain
+    address: "0x714442e9A611f8561A7dF108D6d925132937cFb8"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S8
+      - S16
+  - label: UniswapV3Factory (token V3_FACTORY)
+    chain: robinhood-chain
+    address: "0x1f7d7550B1b028f7571E69A784071F0205FD2EfA"
+    role: factory
+    verified: false
+    sources:
+      - S2
+      - S16
+  - label: NonfungiblePositionManager (constructor _positionManager)
+    chain: robinhood-chain
+    address: "0x73991a25C818Bf1f1128dEAaB1492D45638DE0D3"
+    role: other
+    verified: false
+    sources:
+      - S2
+      - S6
+      - S16
+  - label: Team.finance lockNFT proxy
+    chain: robinhood-chain
+    address: "0x3A7De5F29557405f5d9Fd06B570a53B966a78E8e"
+    role: other
+    verified: false
+    sources:
+      - S6
+      - S16
+  - label: WETH9 (token constant / pair quote)
+    chain: robinhood-chain
+    address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    role: token
+    verified: false
+    sources:
+      - S2
+      - S5
+      - S7
+metrics:
+  - kind: volume_24h
+    value: 5566773.13
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 1100985.3
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 37562528.95
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 4486
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/source/create/renounce/lockNFT/pool/factory/NPM/locker/collision, RPC name/symbol/owner/limits/mainPool, DexScreener token and search, Gecko pool/token/trending, cc21b.meme, @ChumpCoinX profile, Telegram preview, @cryptocom, @bubblemaps, crypto.news, and the GO-LIVE trending capture were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-10] - Numbers: 5566773.13 is the Gecko CHUMP/WETH 1% pool 24h volume, not the 5583718.82 token all-pools figure. Reserve 1100985.30 is that pool. DexScreener 5605964.08 / 1106038.37 is the same pair, different aggregator. Holders 4486 is Blockscout, not the collision token's 9059. [claim R-1 R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that CHUMP is a stock-paired pad token or that the $4.54M CHUMP/WETH book on 0xEc0a…278a is the same asset. Canonical CA is custom ChumpCoin.sol paired to WETH/USDG, not a stock token; the high-liq low-vol book is a different DropERC20 clone."
+      class: inference
+      sources:
+        - S7
+        - S16
+        - S19
+    - text: lockNFT unlockTime is 2026-09-17T15:40:01Z while site copy says forever; withdrawal address is the deployer EOA. [verified R-6 R-10] - Same-ticker DropERC20 clone 0xEc0a…278a and Pons-v2 CHUMP books exist. Flag ca-collision. [verified R-16 R-19] - Other X handles post the canonical CA. Flag handle-collision. [claim R-18] - No CertiK report URL this pass. [unknown] - @bubblemaps posted an 80% bundled claim that was not reproduced on a holder map this pass.
+      class: claim
+      sources:
+        - S12
+  missing:
+    - text: "Does lockNFT tokenId 518773 still hold the Uniswap v3 CHUMP/WETH NFT, and what happens at unlockTime 2026-09-17T15:40:01Z? Next: read LockToken implementation 0x2A2E…E81B and the NFT ownerOf(518773) after 2026-09-17"
+    - text: "Is there a published CertiK report URL, or does the pending label stay on cc21b.meme? Next: search skynet.certik.com for ChumpCoin / 0x0E0d…C21B"
+    - text: "Does @bubblemaps 80% bundled claim reproduce on a holder or LP map for 0x0E0d…C21B? Next: open the Bubblemaps Robinhood CHUMP graph and copy cluster percents"
+    - text: "Are t.me/CHUMPCOIN21B and TikTok @chumpcoin linked from the @ChumpCoinX profile, or only from DexScreener / the site? Next: re-read the X profile website/links row if a TG field is added"
+  unresolved:
+    - text: other remains unresolved (CON-1).

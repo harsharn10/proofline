@@ -1,0 +1,114 @@
+slug: aapldog
+name: Apple Dog
+symbol: AAPLDOG
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against Apple • Robinhood Token (AAPL). LongLauncher.create on 2026-09-01 minted Apple Dog (AAPLDOG) and seeded the AAPLDOG/AAPL book. Traders buy and sell AAPLDOG against AAPL. AAPL is the quote rail, not the subject. @AppleDogRH posted this CA; no project domain was located this pass.
+themes:
+  - memecoin
+  - stock-paired:aapl
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/AppleDogRH
+  - kind: other
+    url: https://www.tiktok.com/@nexinoff
+dependencies: []
+deployments:
+  - label: AAPLDOG token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x06e52E5fdDF0D8A6d10B963c753A8eF3E1161e18"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S6
+  - label: DopplerERC20V1Factory (token factory in create calldata)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S13
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S4
+      - S6
+      - S13
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S14
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+metrics:
+  - kind: volume_24h
+    value: 639979.73
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: tvl
+    value: 122498.56
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: market_cap
+    value: 228834
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: holders
+    value: 622
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S4
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/AAPL and the create tx, RPC name/symbol/owner/getAssetData, DexScreener token + search, Gecko pool/token/info, /rhj/assets, @AppleDogRH profile and CA post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-6 R-8 R-11] - Numbers: 657305.78 is the Gecko AAPLDOG/AAPL pool 24h volume, not the 659162.69 token all-pools figure. Reserve 106008.03 is that pool. DexScreener 639979.73 / 122498.56 is the same pair, different aggregator. Assignment lead of ~$99,549 liq / ~$646,907 vol was not reproduced at this as_of; live DexScreener liq is $122,498.56. [claim R-1 R-2 R-3] - Adversarial: the strongest contrary reading is that this is packed ICOIN, packed AAPLCAT, AP/AAPL, or an official Apple product. ICOIN is 0x5d6EF…1e18 / @iCoinRH; AAPLCAT is 0x73A9999f…1e18 / @AAPLCAT_; AP is 0x69c68e4C…1e18; AAPL in /rhj/assets is the quote rail 0xaF3D…93f9; AAPLDOG is a LongLauncher memecoin at 0x06e52E5f…1e18."
+      class: inference
+      sources:
+        - S4
+        - S11
+        - S16
+    - text: Quote token AAPL 0xaF3D…93f9 is the Robinhood Stock Token rail in GET /rhj/assets; AAPLDOG is not. [verified R-11 R-12] - Pool USD reserve is AAPLDOG plus AAPL, not a USDG or WETH backstop. [claim R-1 R-2] - Gecko reserve 106008.03 vs DexScreener liquidity 122498.56 on the same pool. [claim R-1 R-2] - Same-ticker clones and colliding handle @Apple_Dog_RH. [claim R-8 R-16] - TikTok and netlify vote/claim URLs are third-party-links; no project domain this pass. [claim R-1 R-17 R-18] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @AppleDogRH add the CA to its bio or a website field that bidirectionally matches DexScreener? Next: re-read the @AppleDogRH profile website/bio after a Claim Profile"
+    - text: "Does tiktok.com/@nexinoff pin CA 0x06e52E5f…1e18 or a handle that cross-links? Next: open the TikTok profile if it becomes readable without a login wall"
+    - text: "Do Lock beneficiaries 0xdF86…B57A (95%) and 0x21E2…7A66 (5%) still control AAPL-side fees after graduation? Next: read Doppler lock / fee collector state and any LongFeeVaultFactory deployVault for this token"
+    - text: "Should any of the other robinhood AAPLDOG tickers (0x9F58…, 0xC7ee…, 0x85d9…) get their own packets? Next: only if an assignment names those CAs"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

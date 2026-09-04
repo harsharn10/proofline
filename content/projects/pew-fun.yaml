@@ -1,0 +1,95 @@
+slug: pew-fun
+name: pew.fun
+symbol: null
+category: Uniswap-pool launchpad
+lifecycle: mainnet
+coverage: stub
+summary: Pew.fun launches tokens straight into a locked SushiSwap or Uniswap v3 pool on Robinhood Chain. There is no bonding curve and no graduation; the token is tradeable from block one. The Emerson-mapped factory is 0xC9182C…9D8c. The site also lists later instant factories, stock-quote factories, and fixed-price launch parties. The handle is @pewdotfun; the site is pew.fun. The X bio currently reads (former) Robinhood Launchpad.
+themes:
+  - launchpad
+  - stock-paired
+official_links:
+  - kind: site
+    url: https://pew.fun
+  - kind: app
+    url: https://pew.fun/create
+  - kind: docs
+    url: https://pew.fun/docs
+  - kind: x
+    url: https://x.com/pewdotfun
+  - kind: github
+    url: https://github.com/pewdotfun
+dependencies: []
+deployments:
+  - label: SushiSwap v3 launch factory
+    chain: robinhood-chain
+    address: "0xC9182C283a9b739FED26a8E7F55A4D2b09F39D8c"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S9
+      - S10
+      - S15
+  - label: Instant Uniswap v3 factory (VITE_INSTANT_FACTORY)
+    chain: robinhood-chain
+    address: "0x5A73772dbb25ce8738534A9e96932Aee5C4bDf42"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S10
+      - S20
+  - label: Instant factory (JS 4663 instantFactories[1])
+    chain: robinhood-chain
+    address: "0x3364e68A4454D18132D0a2ac538c966369828291"
+    role: factory
+    verified: false
+    sources:
+      - S2
+      - S10
+  - label: Sushi launch zap
+    chain: robinhood-chain
+    address: "0x16feDC5DB0e076d2ca08002537Db7353227Eb18b"
+    role: router
+    verified: false
+    sources:
+      - S2
+      - S10
+  - label: Factory owner() / deployer
+    chain: robinhood-chain
+    address: "0x80f8ddBcF7808fd7FBffbbd27106ec202A3460D0"
+    role: admin
+    verified: true
+    sources:
+      - S9
+      - S10
+      - S13
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: pew.fun HTML/JS/docs, X profile and 17 Jul / 31 Jul / 11 Aug posts, GitHub user/org, Emerson Dune factory map, OKX Dune 403, Llama 400, DexScreener SUSHICAT, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-9 R-10 R-15] - Numbers: bytecode lengths, nonces, and owner() are chain 4663 RPC. SUSHICAT holders 5163 is Blockscout. Pair liq/vol are DexScreener. OKX 555 / $11.8M is HARVEST.md, not a live table. Emerson 30d has no Pew.fun row. [verified R-10 R-11 R-17] - Adversarial: strongest contrary reading is that Pew is NOXA (the 09:32Z post) or that 0xC918…9D8c is idle leftover code. Same-day factory create + SUSHICAT PewToken + Sushi post, JS sushi.factories, Emerson map, and 31 Aug LpFeesCollected sit on this address. NOXA factory is 0xD9eC…FccB. Circus, Sentry and Klik factories do not match."
+      class: inference
+      sources:
+        - S2
+        - S5
+        - S9
+        - S15
+    - text: Sushi factory source is not verified on Blockscout this pass. [verified R-9] - owner() on multiple factories is one EOA with no code. [verified R-10 R-13] - 17 Jul morning post named Noxa; the reproduced factory is not the NOXA factory. [claim R-5] [verified R-9] - Handle bio is (former); Emerson 30d has no Pew.fun launches. [claim R-4 R-15] - OKX 555 / $11.8M was not reproduced this pass (Cloudflare 403). [claim R-16] - No audit report URL. [unknown] - DexScreener SUSHICAT twitter is @SushiCatBot, not @pewdotfun.
+      class: claim
+      sources:
+        - S17
+  missing:
+    - text: "Is factory 0xC9182C28…9D8c source-verified anywhere, and what is its source name? Next: read verified source if it lands; until then treat launch selectors 0xbc95ef4a / 0xa5e35baf as hex only"
+    - text: "Does Emerson 30d omit Pew.fun because launches stopped after early August, or because the labeled factory is not emitting TokenCreated in that window? Next: page Blockscout logs for a TokenCreated-type event after 2026-08-04"
+    - text: "What is the live new-launch factory: sushi 0xC918…9D8c, VITE_INSTANT_FACTORY 0x5A73772d…Df42 (nonce 5), or a stock canonical factory? Next: decode a recent successful launch calldata on each factory"
+    - text: "Is there an audit report whose scope matches factory 0xC918…9D8c? Next: record any published report as a claim with the exact scope"
+    - text: "Are Stable (988) instantFactories 0xee0665f2…10DB / 0x096b4622…9a07 live, and should chain_scope stay multichain? Next: eth_getCode those addresses on 988 before treating Stable as a reproduced venue"
+    - text: "Can the OKX lifetime 555 launched / $11.8M DEX figure be reproduced on a live query? Next: do not treat nonce 556 as 555 launches; retry the dashboard or a Dune API"
+  unresolved: []

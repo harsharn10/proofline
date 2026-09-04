@@ -1,0 +1,82 @@
+slug: likes-fun
+name: likes.fun
+symbol: LIKES
+category: Prediction market
+lifecycle: announced
+coverage: stub
+summary: "likes.fun is a fantasy-league pack product: a user rips a pack, picks three FOMO and Pump.fun traders, and wins if those traders profit. Season 0 and ETH deposits on Base or Robinhood Chain are marked soon. A Base Clanker token $LIKES at 0xbEDe…eb07 is live; no likes.fun contract was located on chain 4663. The handle is @likesdotfun; the site is likes.fun."
+themes:
+  - prediction
+official_links:
+  - kind: site
+    url: https://likes.fun
+  - kind: app
+    url: https://likes.fun/rip
+  - kind: x
+    url: https://x.com/likesdotfun
+  - kind: other
+    url: https://clanker.world/clanker/0xbEDe17c8B0535791d131F0D6B6094B99cf27Eb07
+  - kind: other
+    url: https://www.coingecko.com/en/coins/likes
+dependencies: []
+deployments:
+  - label: $LIKES token (ClankerToken on Base; no code on 4663)
+    chain: base
+    address: "0xbEDe17c8B0535791d131F0D6B6094B99cf27Eb07"
+    role: token
+    verified: false
+    sources:
+      - S1
+      - S10
+      - S11
+      - S12
+      - S13
+      - S14
+metrics:
+  - kind: market_cap
+    value: 196077
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S15
+  - kind: volume_24h
+    value: 7.97
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S14
+  - kind: holders
+    value: 6083
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S12
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: likes.fun, /rip, prize-pool, crash, pack/cabal APIs, X profile and posts, Sammy recap, CoinGecko, GitHub 404, Llama 400, Base and Robinhood RPC, Base and Robinhood Blockscout were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-2 R-10 R-12 R-14] - Numbers: CoinGecko and prize-pool figures are Base $LIKES, not a Robinhood Chain slice. Bytecode lengths are chain-specific RPC. [verified R-10 R-13 R-14] - Adversarial: strongest contrary reading is that likes.fun is a Clanker pad or a Peer clone, or that 0xbEDe…eb07 is already a 4663 factory. Site mechanics are packs not launches; PeerMarketV1 is a different address; RPC on 4663 for 0xbEDe…eb07 is empty. lunch.fun and pew.fun are token pads."
+      class: inference
+      sources:
+        - S1
+        - S2
+        - S10
+    - text: No likes.fun contract on chain 4663; Season 0 and RH ETH deposit are marked soon. [verified R-10] [claim R-2] - Footer $LIKES is a Base ClankerToken; flag wrong-chain. [verified R-10 R-12] - Home meta and crash API still describe the prior Base SocialFi surface. [claim R-1 R-18] - No audit report URL. [unknown] - CoinGecko and prize-pool market-cap figures differ (182260 vs 196077) and are Base, not 4663.
+      class: claim
+      sources:
+        - S14
+        - S15
+  missing:
+    - text: "Is any likes.fun factory, market, vault, or deposit contract deployed on chain 4663? Next: watch /rip and @likesdotfun for a published 4663 address; do not treat the Base ClankerToken as a Robinhood deployment"
+    - text: "How does Season 0 settle — on-chain options like Peer, off-chain whitelist scoring, or a later RH deposit contract? Next: record the first published settlement address or docs page as a claim with a reproduction"
+    - text: "What is the relationship between Base $LIKES 0xbEDe…eb07 and the Robinhood pack season — prize-pool unit, deposit asset, or leftover SocialFi token? Next: do not mix Base market-cap figures into a Robinhood Chain slice"
+    - text: "Is there an audit whose scope matches the Base ClankerToken or any future 4663 contracts? Next: record any published report with the exact scope"
+    - text: "Does the live crash / multiplier surface share custody or a prize pool with Season 0 packs? Next: keep crash metrics off the Robinhood card until a 4663 receipt exists"
+  unresolved: []

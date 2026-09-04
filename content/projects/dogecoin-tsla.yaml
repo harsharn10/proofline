@@ -1,0 +1,122 @@
+slug: dogecoin-tsla
+name: DOGECOIN
+symbol: DOGECOIN
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 pool quoted against TSLA, the Tesla Robinhood Stock Token at 0x322F…3b2d. Traders buy and sell DOGECOIN on that book. TSLA is the rail. This token is not Dogecoin the asset, not packed doggie, and not OPTIMUS/TSLA. No official project domain or handle was located this pass.
+themes:
+  - memecoin
+  - dog
+  - stock-paired:tsla
+  - rwa
+official_links:
+  - kind: app
+    url: https://app.long.xyz/tokens/0x51d3bbe1ab7467f71e06029e46ef9044bf551e18
+  - kind: x
+    url: https://x.com/dogeteslacoin
+dependencies: []
+deployments:
+  - label: DOGECOIN token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S4
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S4
+      - S6
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S5
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S8
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S4
+      - S9
+  - label: Tesla • Robinhood Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0x322F0929c4625eD5bAd873c95208D54E1c003b2d"
+    role: token
+    verified: true
+    sources:
+      - S3
+      - S10
+      - S14
+      - S15
+metrics:
+  - kind: volume_24h
+    value: 1359754.68
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S12
+  - kind: tvl
+    value: 99132.36
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S12
+  - kind: market_cap
+    value: 112882
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 840
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: Blockscout token/create/LongLauncher/factory/impl/Airlock/TSLA, RPC, DexScreener token and search, Gecko token/info/token-pools, /rhj/assets, and x.com/dogeteslacoin were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-3 R-4 R-7 R-14] - Numbers: 1366502 is the DexScreener DOGECOIN/TSLA pair 24h volume, not the 1472316.52 Gecko token all-pools figure. Reserve 99132.36 is the Gecko token/pools row; DexScreener liquidity.usd 79249.05 is the same pair, different aggregator. [claim R-7 R-11 R-12] - Adversarial: the strongest contrary reading is that this DOGECOIN is packed doggie, is packed optimus, is LONGDOG/TSLA, is ticker-collision 0x8903…, is Dogecoin the asset, or is the TSLA stock token. Different CAs, names, pair ids and (for TSLA) GET /rhj/assets argue against those."
+      class: verified
+      sources:
+        - S3
+        - S7
+        - S14
+        - S16
+  risk:
+    - text: Quote token TSLA 0x322F…3b2d is the Robinhood Stock Token rail in GET /rhj/assets; this memecoin is not that asset. [verified R-14 R-15] - Pool USD reserve is DOGECOIN plus TSLA, not a USDG or WETH backstop. Aggregators disagree on the dollar reserve. [claim R-7 R-12] - No official handle or domain this pass; DexScreener's listed X profile is suspended. [claim R-7 R-17] - Ticker DOGECOIN collides with 0x8903… and with packed doggie / optimus / LONGDOG at different CAs on the same TSLA rail. [verified R-16] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x51d3bBe1…1E18? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a live handle"
+    - text: "Does Airlock 0xeb7C…0862 hold remaining privileged paths on the DopplerERC20V1 clone (mint, pause, upgrade of the implementation)? Next: read DopplerERC20V1 verified source for mint/burn/pause and Airlock exit liquidity on the TSLA pool"
+    - text: "What dex id does Gecko assign to pool 0x4c02…86d8 (Uniswap v4 vs bankr-robinhood)? Next: one later Gecko pool GET; do not loop on 429"
+    - text: "Does ticker-collision DOGECOIN 0x8903FbCd…3B401 share a deployer or profile with 0x51d3bBe1…1E18? Next: open Blockscout creator on 0x8903 if the ticker keeps colliding in search"
+  unresolved: []

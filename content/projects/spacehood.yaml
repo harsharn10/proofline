@@ -1,0 +1,124 @@
+slug: spacehood
+name: SPACEHOOD
+symbol: SPACEHOOD
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 pool quoted against SPCX, the SpaceX Robinhood Stock Token at 0x4a0E…5eEa. Traders buy and sell SPACEHOOD on that book. It is not the SPCX stock token and is not DOGE-1, a separate SPCX-quoted token.
+themes:
+  - memecoin
+  - stock-paired:spcx
+official_links:
+  - kind: app
+    url: https://app.long.xyz/tokens/0xfe7e19cbce2f896c6c528bc355baf5a768291e18
+  - kind: x
+    url: https://x.com/spacehood420
+dependencies: []
+deployments:
+  - label: SPACEHOOD token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xFe7E19CbCe2f896C6C528BC355bAF5a768291E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S3
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S3
+      - S10
+  - label: DopplerERC20V1Factory (token creator_address_hash)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S1
+      - S12
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S4
+      - S11
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S3
+      - S13
+  - label: SPCX quote (create numeraire / pair quote)
+    chain: robinhood-chain
+    address: "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa"
+    role: token
+    verified: false
+    sources:
+      - S4
+      - S6
+      - S15
+metrics:
+  - kind: tvl
+    value: 2365159.04
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: volume_24h
+    value: 4835186.38
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 12587619
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: holders
+    value: 5097
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: Blockscout address/token/create tx/LongLauncher/factory/Airlock/implementation/SPCX/DOGE-1, RPC with Chrome UA, DexScreener token API and pair page, Gecko token/pool/info, LONG token page, @spacehood420, @longdotxyz, and @EARNONHOOD were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-3 R-4 R-6 R-7] - Numbers: $1,047,191.72 / $2,513,315.64 is the DexScreener SPACEHOOD/SPCX book, not Gecko token all-pools $4,835,186.38. Gecko pool fdv_usd 609.56 is SPCX-as-base, not SPACEHOOD market cap. Holders 5192 is Blockscout SPACEHOOD, not SPCX 70989. [claim R-6 R-7 R-8 R-2 R-15] - Adversarial: the strongest contrary reading is that SPACEHOOD is SPCX, is DOGE-1, is the LONG factory, or that 0x32eB…Db7 is the pair quote. Different CAs, names, create paths and empty code on 0x32eB…Db7 argue against those."
+      class: verified
+      sources:
+        - S3
+        - S4
+        - S14
+        - S17
+  risk:
+    - text: Quote is SPCX 0x4a0E…5eEa, a private-company Stock Token; SPACEHOOD is not that token and is not DOGE-1. [verified R-14 R-15 R-17] - Pool USD reserve mixes SPACEHOOD and SPCX; DexScreener and Gecko disagree on the figure. [verified R-6 R-7] - No bidirectional official handle or domain this pass. [claim R-6 R-9 R-16] - No audit report URL this pass. [unknown] - App-dossier SPCX 0x32eB…Db7 has empty code on 4663 this pass.
+      class: verified
+      sources:
+        - S3
+  missing:
+    - text: "Does any surface bidirectionally confirm @spacehood420 as the official handle for 0xFe7E19…1E18? Next: re-read DexScreener after a Claim Profile and any LONG post that tags a SPACEHOOD handle"
+    - text: "Who can claim the LONG token-page fee receiver 0x1Ae517…5305, and is that key the same as LongLauncher deployer? Next: eth_call the fee-claim path on verified LongLauncher / hook source"
+    - text: "Why does Gecko report ~2.3x the DexScreener SPACEHOOD/SPCX reserve and attribute the pool to bankr-robinhood? Next: compare pool-manager liquidity vs Gecko reserve formula used on AI/NVDA"
+    - text: "Is there an audit whose scope includes DopplerERC20V1 as used by LongLauncher on 4663? Next: auditor report index for Doppler / long.xyz and a matching commit"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).
+    - text: economics.metric remains unresolved (CON-3).

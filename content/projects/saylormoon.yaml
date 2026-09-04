@@ -1,0 +1,121 @@
+slug: saylormoon
+name: SAYLORMOON
+symbol: SAYLORMOON
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned through LongLauncher into a Uniswap v4 pool quoted against the MSTR Robinhood Stock Token. Traders buy and sell SAYLORMOON on the SAYLORMOON/MSTR book. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:mstr
+  - rwa
+official_links:
+  - kind: telegram
+    url: https://t.me/saylormooncto
+dependencies: []
+deployments:
+  - label: SAYLORMOON token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0xD18528b39dA6464B3662c331a52181ecB15b1E18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S4
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: LongLauncher (creation tx to)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S15
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: true
+    sources:
+      - S5
+      - S16
+  - label: Quote asset MSTR stock token
+    chain: robinhood-chain
+    address: "0xec262a75e413fAfD0dF80480274532C79D42da09"
+    role: other
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S17
+metrics:
+  - kind: tvl
+    value: 559259.2834
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: volume_24h
+    value: 2717860.03650023
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: market_cap
+    value: 2861029.22
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 5903
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/launcher/airlock/MSTR and create tx 0x8222…9c05, RPC name/symbol/owner/getCode, DexScreener, Gecko token/pools/info, /rhj/assets, Telegram preview, Elon 2021 post, and four Latest X posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 2087793.11 is the Gecko SAYLORMOON/MSTR pool 24h volume, not the 2717860.03 token all-pools figure. Reserve 559259.28 is that pool. DexScreener 2071122.9 / 537586.02 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that SAYLORMOON is the same name as NOSTRATEGY/MSTR or an official Strategy product. NOSTRATEGY is 0xEbDb…1e18 created 2026-09-02, and /rhj/assets lists MSTR 0xec26…da09 as the Stock Token, not this ERC-20."
+      class: inference
+      sources:
+        - S12
+        - S19
+    - text: Quote token MSTR 0xec26…da09 is a Robinhood Stock Token rail in GET /rhj/assets; SAYLORMOON is not that asset. [verified R-12 R-17] - Pool USD reserve is SAYLORMOON plus MSTR, not a USDG or WETH backstop. [claim R-7 R-8] - No official handle or domain this pass; Telegram is a third-party-link. [claim R-7 R-13] - Ticker SAYLORMOON is reused by other Blockscout tokens with far fewer holders. [verified R-24] - No audit report URL this pass. [unknown] - A netlify /claim URL posted the CA; flag copypasta-pattern.
+      class: claim
+      sources:
+        - S23
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0xD185…1E18? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA and a handle"
+    - text: "Why is Blockscout creator_address_hash null on 0xD185…1E18 when the mint tx is LongLauncher.create? Next: re-fetch the address API after indexer catch-up; compare with BONER 0x98096d…1E18 which does set creator to DopplerERC20V1Factory"
+    - text: "Does t.me/saylormooncto pin the CA 0xD185…1E18 or a site that cross-links? Next: open the join page / first messages if they become public without joining"
+    - text: "Why does Gecko map SAYLORMOON/MSTR dex to bankr-robinhood while DexScreener labels Uniswap v4 and the create tx is LongLauncher? Next: read Gecko dex metadata for bankr-robinhood and compare PoolManager hook 0x6f02…0F77"
+    - text: "Do any of the other Blockscout SAYLORMOON tickers have a book that could be confused with 0xD185…1E18? Next: DexScreener search each colliding CA if a second liquid SAYLORMOON/MSTR book appears"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

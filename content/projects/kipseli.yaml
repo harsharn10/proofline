@@ -1,0 +1,112 @@
+slug: kipseli
+name: Kipseli
+symbol: null
+category: Proprietary-liquidity AMM
+lifecycle: mainnet
+coverage: stub
+summary: Kipseli is a proprietary AMM. On Robinhood Chain a swap approves the PropAmm router, takes a signed quote, and settles against inventory in a reserve wallet quoted in USDG. There is no public bonding curve and no LP token. Docs also list Base and BNB Chain. The site is kipseli.capital. No official X handle was located.
+themes:
+  - amm
+  - orderbook
+  - prop-amm
+official_links:
+  - kind: site
+    url: https://kipseli.capital
+  - kind: docs
+    url: https://docs.kipseli.capital
+  - kind: github
+    url: https://github.com/KipseliCapital
+  - kind: other
+    url: https://docs.kipseli.capital/index.md
+dependencies: []
+deployments:
+  - label: Robinhood PropAmm router
+    chain: robinhood-chain
+    address: "0x4f1ce663bF2E5e3b4A4ba88F6D1BF227e5597402"
+    role: router
+    verified: true
+    sources:
+      - S2
+      - S4
+      - S5
+  - label: Robinhood QuoteLens helper
+    chain: robinhood-chain
+    address: "0xABa7C80918d8127C23BE2bef649832050a0Cf08a"
+    role: other
+    verified: true
+    sources:
+      - S2
+      - S6
+      - S7
+  - label: Robinhood reserve wallet
+    chain: robinhood-chain
+    address: "0xcA9bf993eB00f641F1d4EBf6f334f1Ff04074EF6"
+    role: other
+    verified: true
+    sources:
+      - S3
+      - S9
+  - label: Router owner() Safe
+    chain: robinhood-chain
+    address: "0x5053872f31edFB9b2aD4ddF701f72440cCfE1115"
+    role: admin
+    verified: true
+    sources:
+      - S4
+      - S8
+      - S20
+  - label: Docs EIP-712 verifier (no code on 4663)
+    chain: robinhood-chain
+    address: "0xCa369e97cc161c3c3a7368f9bC55A47F36a0A91E"
+    role: other
+    verified: false
+    sources:
+      - S2
+      - S18
+metrics:
+  - kind: tvl
+    value: 244673.15052
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S10
+  - kind: volume_24h
+    value: 1067596
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S11
+      - S22
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: kipseli.capital, docs index.md, GitHub org and landing-page, Llama protocol/volume/adapter/dimension adapter, X posts, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-2 R-5 R-11] - Numbers: TVL is the Robinhood Chain slice from api.llama.fi, not the all-chains total. Volume is labeled Ethereum-only. Bytecode lengths, owner(), Safe threshold, quote token, and listed tokens are chain 4663 RPC. [verified R-5 R-7 R-11] - Adversarial: strongest contrary reading is that 0x4f1ce663…7402 is an unused docs leftover and live flow uses another factory, or that Llama RH TVL is mis-attributed. Docs and the Llama adapter set this router and this QuoteLens/reserve pair; RPC owner, quote token, and 2026-09-01 logs argue it is live. The Ethereum volume adapter is a different router."
+      class: inference
+      sources:
+        - S2
+        - S3
+        - S4
+        - S21
+    - text: Router source is unverified; owner Safe threshold is 1. [verified R-6 R-9] - Docs EIP-712 verifier has no code on chain 4663. [verified R-20] - Llama DEX volume is Ethereum-only and must not be read as Robinhood Chain volume. [claim R-12 R-24] - No audit report URL. [unknown] - Base quoting-path incidents in April and August 2026 are the same product family, different chain.
+      class: claim
+      sources:
+        - S14
+        - S15
+  missing:
+    - text: "Is the EIP-712 verifier deployed on chain 4663 at a different address, or is on-chain quote() unused on Robinhood Chain? Next: read router bytecode or a verified source for the verifier slot; do not treat the docs address as live on 4663"
+    - text: "What does a 1-of-3 Safe owner() mean for swap verification, listed tokens, and reserve movement? Next: decode unverified router setters once source lands; eth_call any pending owner or whitelist admin"
+    - text: "Is there an audit whose scope matches RH router 0x4f1ce663…7402 and QuoteLens 0xABa7C809…f08a? Next: record any published report as a claim with exact scope; Base quoting-path history is not an RH audit"
+    - text: "What is Robinhood Chain swap volume, and does Llama plan to add a 4663 dimension? Next: do not use the Ethereum 24h volume as a Robinhood Chain figure; decode topic 0x97348197… on 4663 for an independent volume pass"
+    - text: "Are more tokens listed on QuoteLens than the single WETH address returned this pass? Next: re-call getListedTokens on a later block if coverage expands"
+    - text: "Does any official X handle exist that kipseli.capital will name? Next: record a handle only after the site or docs name it"
+  unresolved:
+    - text: deployment.address remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

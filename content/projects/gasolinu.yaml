@@ -1,0 +1,122 @@
+slug: gasolinu
+name: GASOLINU
+symbol: GASOLINU
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against USO. LongLauncher.create from 0x3505…3E52 minted Gasoline Inu (GASOLINU) on 2026-09-02T19:07:07Z into pool 0x0e83588f…afa8 via DopplerERC20V1Factory and Airlock. Traders buy and sell GASOLINU against the USO Stock Token rail. Site gasolinu.fun publishes the same CA. No bidirectional official handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:uso
+  - rwa
+  - inu
+  - graduation
+official_links:
+  - kind: site
+    url: https://gasolinu.fun/
+  - kind: x
+    url: https://x.com/gasolineinu
+dependencies: []
+deployments:
+  - label: GASOLINU token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x1e6EA1e89151cDc8443968Bf047cfa3177181e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S4
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: LongLauncher (create() target)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S13
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S6
+      - S14
+  - label: USO Stock Token rail (pair quote / numeraire)
+    chain: robinhood-chain
+    address: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
+    role: token
+    verified: true
+    sources:
+      - S11
+      - S12
+metrics:
+  - kind: volume_24h
+    value: 528789.72
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 111188.645
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 264292.68
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 310
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/LongLauncher/Airlock/USO/hook and create tx 0xc911…cda7, RPC name/symbol/owner/isPoolLocked/tokenURI, DexScreener, Gecko pool/token/HTML, /rhj/assets, IPFS tokenURI, gasolinu.fun, Bankr launches, and X posts with the CA were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-11 R-17] - Numbers: 528789.72 is the Gecko GASOLINU/USO pool 24h volume, not the 532636.65 token all-pools figure. Reserve 111188.645 is that pool. DexScreener 539352.57 / 133900.9 is the same pair, different aggregator. Holders 310 is Blockscout. [claim R-1 R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that GASOLINU is packed CRUDECAT, a Bankr-official mint, or the USO issuer. CRUDECAT is Circus 0xBD957…cF3e; create is LongLauncher; Bankr API latest 50 has no row; USO 0xa30FA3…D344 is the /rhj/assets rail."
+      class: inference
+      sources:
+        - S4
+        - S11
+        - S16
+        - S25
+    - text: Quote token USO 0xa30FA3…D344 is a Robinhood Stock Token rail in GET /rhj/assets; pool USD reserve is GASOLINU plus USO, not a USDG backstop. [verified R-11 R-12] - Gecko dex label bankr-robinhood can be read as a Bankr mint; the create tx is LongLauncher. [verified R-4 R-8 R-25] - No bidirectional official handle this pass; @gasolineinu is unconfirmed-official. [claim R-7 R-17 R-18] - Same-ticker clones including 0x0D4E…7301 (XOM book) and BSC GASOLINU. Flag ca-collision. [claim R-21] - DexScreener liquidity 133900.9 disagrees with Gecko reserve 111188.645. [claim R-7 R-8] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @gasolineinu exist and bidirectionally link to token 0x1e6EA1…1e18 or gasolinu.fun? Next: re-read the X profile if it becomes indexed; re-read DexScreener token profile after a Claim Profile"
+    - text: "Does the launcher EOA 0x3505…3E52 map to a public handle? Next: trace the EOA on Blockscout and any post that embeds 0x3505…3E52"
+    - text: "Should Gecko dex bankr-robinhood be treated as Bankr-minted or as Doppler-hook taxonomy? Next: compare hook 0x4e34…a544 against a known Bankr launch and a known LONG launch"
+    - text: "Which of the Blockscout GASOLINU-named tokens besides 0x1e6EA1…1e18 share the GASOLINU/USO book? Next: keep ca-collision on any new same-ticker 4663 deploy"
+  unresolved: []

@@ -1,0 +1,109 @@
+slug: stacks
+name: STACKS
+symbol: STACKS
+category: Stock-paired token factory
+lifecycle: mainnet
+coverage: stub
+summary: A stock-paired launchpad that mints autocompounding ERC-20s into Uniswap v4 pools quoted against Robinhood stock tokens. A user launches or trades on stacksapp.us; $STACKS itself is the protocol token in the STACKS/SPY book. Factory 0x13ae…0a36 is in the site bundle; no official handle was confirmed this pass.
+themes:
+  - launchpad
+  - stock-paired:spy
+  - rwa
+  - memecoin
+official_links:
+  - kind: docs
+    url: https://www.stacksapp.us/#how
+  - kind: x
+    url: https://x.com/StacksAppRH
+dependencies: []
+deployments:
+  - label: STACKS token
+    chain: robinhood-chain
+    address: "0xD998cEac55FEF3319B8bcDc4349C7A9CeBB1D94C"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S7
+  - label: STACKS launch factory (site JS M2)
+    chain: robinhood-chain
+    address: "0x13ae003F22E4A3A8009dCE9a53a500a40E3E0a36"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S6
+      - S21
+  - label: burnReserve / staking (token.burnReserve and site JS ITe)
+    chain: robinhood-chain
+    address: "0x73f9eb020BF091C8F6b42Eb8c6362D779478c650"
+    role: vault
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S21
+  - label: SPY Stock Token (pair quote / rhj rail)
+    chain: robinhood-chain
+    address: "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S16
+metrics:
+  - kind: volume_24h
+    value: 1917405.94
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 206080.85
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 1011951
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+      - S9
+  - kind: holders
+    value: 799
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/staking/SPY and launch/create txs, RPC name/symbol/isUncapped/burnReserve/launchOpen, DexScreener token + STRATTON/PAIR collide, Gecko pool/token, /rhj/assets, stacksapp.us + JS, @StacksAppRH posts, @leakmealpha were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 1917405.94 is the Gecko SPY/STACKS pool 24h volume, not the 1939691.25 token all-pools figure. Reserve 206080.85 is that pool. DexScreener 1999790.43 / 131986.04 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that STACKS is packed PAIR (same SPY rail) or STRATTON or the Stacks L1. PAIR is 0x6b1d…66be / 0xf224…c001 / pair.fun; STRATTON is 0xb7ea…8360 / 0xa2c4…9274; this CA is 0xD998…D94C / 0x77d0…5e32 / stacksapp.us."
+      class: inference
+      sources:
+        - S7
+        - S11
+        - S17
+    - text: Factory and token source unverified; owner() reverts but deployer txs include setAdminWallet on a related contract. [verified R-3 R-6] - Pool USD reserve is STACKS plus SPY, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko pool fdv_usd is not the STACKS fdv. [claim R-8 R-9] - Handle is unconfirmed-official. [claim R-7 R-13] - Second STACKS ticker 0xe7fC…1E18 (Stacks App / AI) and Stacks L1 STX are different names. [verified R-6 R-7] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is @StacksAppRH bidirectional with stacksapp.us (site string or handle URL)? Next: re-read the JS after a deploy; check a new bio URL"
+    - text: "What is the exact ABI of factory selector 0xca4fec1c, and was 0xD998…D94C CREATE2'd in that tx? Next: read unverified bytecode or wait for verification"
+    - text: "Does unverified factory/token leave an admin path despite owner() reverting? Next: decompile 0x13ae…0a36 and 0x6Dda…D168 if source stays unverified"
+    - text: "Does the promised whitepaper publish a CA, handle, or audit URL? Next: re-read that account on 2026-09-04"
+    - text: "Which Gecko field produced the assignment lead of liq ~$123,842 / vol ~$1,976,160? Next: archive the pair JSON if the lead figures return"
+  unresolved: []

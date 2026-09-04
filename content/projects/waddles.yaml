@@ -1,0 +1,139 @@
+slug: waddles
+name: WADDLES
+symbol: WADDLES
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched on Pons v2 and graduated into a Uniswap v4 pool quoted against Amazon • Robinhood Token (AMZN). PonsV2LaunchFactory.launchToken on 2026-08-29 minted Waddles (WADDLES) into a bonding curve, then createGraduatedPool seeded the WADDLES/AMZN book and locked leftover supply plus the LP NFT. Traders buy and sell WADDLES against AMZN. AMZN is the quote rail, not the subject. No bidirectional official handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:amzn
+  - rwa
+  - graduation:pons-v2
+official_links:
+  - kind: site
+    url: https://waddles.website/
+  - kind: x
+    url: https://x.com/WaddlesAMZN
+  - kind: telegram
+    url: https://t.me/waddlesRH
+  - kind: app
+    url: https://www.ponsfamily.com/launchpad/0xbB6Ee7aa6D56266CCEf3B1c0706bCCCE2F9a0CdD
+dependencies: []
+deployments:
+  - label: WADDLES token
+    chain: robinhood-chain
+    address: "0xbB6Ee7aa6D56266CCEf3B1c0706bCCCE2F9a0CdD"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S18
+  - label: PonsV2LaunchFactory
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S5
+      - S6
+  - label: Pons v2 bonding curve (TokenLaunched.curve)
+    chain: robinhood-chain
+    address: "0xeC4702Ef81Fe8d47708231B4E60E582372b21899"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S18
+      - S22
+  - label: V2LaunchLocker
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S15
+      - S19
+  - label: AMZN Amazon • Robinhood Token (pair quote / rail)
+    chain: robinhood-chain
+    address: "0x12f190a9F9d7D37a250758b26824B97CE941bF54"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S12
+      - S16
+  - label: V2GraduationExecutor
+    chain: robinhood-chain
+    address: "0xC7819B64A1dAECD7eC19856d026cb14EfBd89046"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S19
+  - label: V2MemeHook
+    chain: robinhood-chain
+    address: "0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S19
+metrics:
+  - kind: volume_24h
+    value: 776350.3
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 95900.24
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 1475465.23
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+      - S9
+  - kind: holders
+    value: 856
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/locker/AMZN, launchToken 0xf227bb99…7f91, createGraduatedPool 0x1db50ab0…6dd0, CurveCompleted 0xc9ebb465…bad2, RPC name/symbol/owner/getCode, DexScreener, Gecko pool/token, /rhj/assets, pons launchpad HTML, waddles.website, t.me/waddlesRH, and X Latest posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8 R-12] - Numbers: 776350.30 is the Gecko AMZN/WADDLES pool 24h volume, not the 799765.87 token all-pools figure. Reserve 95900.24 is that pool. DexScreener 590564.72 / 70812.33 is the same pair, different aggregator. Gecko pool fdv 1985978.61 is AMZN-as-base; WADDLES fdv is Gecko token 1475465.23 vs DexScreener 832658. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that WADDLES is an Amazon-issued product because AMZN is the quote and waddles.website / AWS mascot lore exist. /rhj/assets has AMZN as a Stock Token rail and no WADDLES row; launchToken is a Pons factory call from an EOA; the GitHub mascot repo predates the token and has no CA. Distinct from SENDER/AMZN."
+      class: inference
+      sources:
+        - S4
+        - S12
+        - S23
+    - text: Quote token AMZN 0x12f1…bF54 is the Robinhood Stock Token rail from GET /rhj/assets; WADDLES is not in that registry. [verified R-12 R-16] - Pool USD reserve is WADDLES plus AMZN, not a USDG or WETH backstop. [claim R-7 R-8] - No bidirectional official handle or domain this pass; DexScreener socials and Telegram are community-claim / third-party-link. [claim R-7 R-13] - Token source is not verified on Blockscout; no audit report URL this pass. [unknown] - Netlify claim URLs embedding this CA are copypasta-pattern. [claim R-17] - DexScreener search also lists a different WADDLES 0xbc49…1e18 / AMZN book.
+      class: claim
+      sources:
+        - S20
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0xbB6E…0CdD? Next: re-read DexScreener token profile after a Claim Profile; search new posts from @WaddlesAMZN that embed the CA"
+    - text: "Does any Amazon or AWS surface endorse this token, versus the pre-existing Waddles mascot site? Next: open the AWS builder article body if it renders without the SPA chrome; do not treat mascot lore as issuer identity"
+    - text: "Does verified PonsV2LaunchFactory source leave any privileged path on a graduated token despite token owner() reverting? Next: read createGraduatedPool and locker withdraw modifiers on the explorer"
+    - text: "Should the other robinhood WADDLES 0xbc49…1e18 / AMZN book get its own packet? Next: only if an assignment names that address"
+    - text: "Which aggregator should a card use when Gecko token fdv is $1.48M and DexScreener fdv is $833k on the same pool? Next: keep both figures labeled; do not collapse"
+  unresolved: []

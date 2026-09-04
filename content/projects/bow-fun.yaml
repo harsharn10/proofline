@@ -1,0 +1,122 @@
+slug: bow-fun
+name: bow.fun
+symbol: null
+category: Uniswap-pool launchpad
+lifecycle: mainnet
+coverage: stub
+summary: "bow.fun is a token launchpad on Robinhood Chain. A launch deploys a fixed-supply ERC-20 into a locked Uniswap pool from the creator's wallet: Standard is Uniswap V3 against WETH, IPO is Uniswap V4 with vesting and a whitelist, RWA is Uniswap V4 paired with a stock token. LP is locked by contract. Creators claim trade fees. Token addresses are mined to end in b03. The live launch entry in config.js is FactoryHub 0x229Faa91…7E29; a legacy V3 factory 0xC70E510E…ab79 remains deployed. The handle is @bowdotfun; the site is bow.fun."
+themes:
+  - launchpad
+  - stock-paired
+official_links:
+  - kind: app
+    url: https://bow.fun
+  - kind: other
+    url: https://bow.fun/config.js
+  - kind: other
+    url: https://portal.bow.fun
+  - kind: x
+    url: https://x.com/bowdotfun
+  - kind: github
+    url: https://github.com/bowdotfun/bowdotfun
+  - kind: telegram
+    url: https://t.me/bowbuy_bot
+  - kind: telegram
+    url: https://t.me/bowtrending_bot
+dependencies: []
+deployments:
+  - label: FactoryHub v3.0 UUPS proxy (current launch entry)
+    chain: robinhood-chain
+    address: "0x229Faa919ABf14279E2461Dba53F039c5B4C7E29"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S9
+      - S10
+  - label: FactoryHub implementation
+    chain: robinhood-chain
+    address: "0xda788f3CFcD27d145F4b16372f6B655F835FeCCb"
+    role: implementation
+    verified: false
+    sources:
+      - S10
+  - label: Legacy V3 launch factory
+    chain: robinhood-chain
+    address: "0xC70E510E14710Ea535CAB7b2414860aF63FEab79"
+    role: factory
+    verified: true
+    sources:
+      - S2
+      - S9
+      - S10
+  - label: Legacy V3 LP locker
+    chain: robinhood-chain
+    address: "0x904dCCB96d877E6db365282251Fa3dD156476660"
+    role: other
+    verified: false
+    sources:
+      - S2
+      - S9
+      - S10
+  - label: TokenCodeProvider
+    chain: robinhood-chain
+    address: "0xF53C1Be2088dD9345CCC74582e81e0c19F462F1b"
+    role: other
+    verified: false
+    sources:
+      - S2
+      - S9
+      - S10
+  - label: V4 sniper hook
+    chain: robinhood-chain
+    address: "0xAd3c0C6a079bECE5Cc89928eA986aA0584348080"
+    role: other
+    verified: false
+    sources:
+      - S2
+      - S9
+      - S10
+  - label: FactoryHub / legacy factory owner()
+    chain: robinhood-chain
+    address: "0x039485D0944E7274acECafa68702E1051dAEA28a"
+    role: admin
+    verified: true
+    sources:
+      - S9
+      - S10
+  - label: Sample Standard V3 token USELESS (vanity b03)
+    chain: robinhood-chain
+    address: "0x93a2011bE42Bc96836fD9E02f55859D48dCBcb03"
+    role: token
+    verified: true
+    sources:
+      - S8
+      - S16
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: bow.fun, config.js, portal.bow.fun, /api/tokens, X profile and posts, GitHub user/repo, Llama 400/200, Dune shell, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-2 R-8 R-9 R-10] - Numbers: 8333 is the official tokens API total, not Emerson 30d. launchCount 172 / 8193 and bytecode lengths are chain 4663 RPC. 33 / $250k and $62.3M are harvest captures. [verified R-8 R-10] [claim R-17] - Adversarial: strongest contrary reading is that bow.fun is Longbow/BOW-SPY, or Pons because the GitHub README says Pons, or that Emerson's 33-token row means the pad is idle while 8333 is some other indexer. Config.js names these factories; RPC owner and launchCount match; API tokens.factory is those two addresses; sampled token USELESS ends in b03 and decodes on 4663. Graduation-at-3.7-ETH is a board marker, not a bonding curve in the site copy."
+      class: inference
+      sources:
+        - S2
+        - S8
+        - S10
+    - text: FactoryHub is upgradeable; owner is one EOA with no code. [verified R-10] - Hub implementation source is not named or verified this pass. [verified R-9] - Legacy factory 0xC70E51…ab79 still has launchEnabled true and is not a new-launch-only path in config.js. [verified R-10] [claim R-2] - No audit report URL. [unknown] - GitHub README is Pons copy; do not treat it as factory source. [claim R-15] - Handle website is portal.bow.fun; site HTML does not name @bowdotfun. Flag unconfirmed-official. [claim R-1 R-4] - Emerson 33 / $250k and OKX $62.3M were not live-table reproduced this pass. [claim R-17 R-18] - Llama protocol/bow is Kujira, not this pad.
+      class: claim
+      sources:
+        - S19
+  missing:
+    - text: "Is FactoryHub implementation 0xda788f3C…eCCb source-verified anywhere, and what is its source name? Next: retry Blockscout api/v2 on the implementation; treat the hub as proxy-shell-only until source lands"
+    - text: "Which factory is the live new-launch path: hub 0x229Faa91…7E29, legacy 0xC70E510E…ab79 (launchEnabled still true), or both? Next: decode a 2026-09 launch calldata; do not treat Emerson's legacy-only factory map as the only live entry"
+    - text: "Is graduation at 3.7 ETH an on-chain state change or a board label, and why do some RWA tokens show graduated below 3.7 WETH? Next: eth_call migrated() and checkMigration on a graduated Standard token and an RWA token"
+    - text: "Is there an audit report whose scope matches FactoryHub 0x229Faa91…7E29 or legacy factory 0xC70E510E…ab79? Next: record any published report as a claim with the exact scope"
+    - text: "What is github.com/bowdotfun/bowdotfun relative to the on-chain factories — unofficial toolkit, leftover Pons README, or a source mirror? Next: do not treat that repo as factory source; record any later commit that names 0x229Faa91… or 0xC70E510E…"
+    - text: "Can Emerson 30d 33 tokens / $250k and OKX lifetime $62.3M be reproduced on a live query? Next: retry Dune API or a CSV export; do not equate API total 8333 with the 30d 33-token window"
+  unresolved: []

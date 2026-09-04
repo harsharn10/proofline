@@ -1,0 +1,116 @@
+slug: clarus
+name: The Dogcow
+symbol: CLARUS
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against Apple • Robinhood Token (AAPL). LongLauncher.create on 2026-08-28 minted The Dogcow (CLARUS) and seeded the CLARUS/AAPL book. Traders buy and sell CLARUS against AAPL. AAPL is the quote rail. clarus.lol and @Clarus_rh pin this contract.
+themes:
+  - memecoin
+  - stock-paired:aapl
+  - rwa
+official_links:
+  - kind: site
+    url: https://clarus.lol
+  - kind: x
+    url: https://x.com/Clarus_rh
+  - kind: app
+    url: https://app.uniswap.org/swap?outputCurrency=0x22ea949763dB855880264A8FB689E07021661e18&chain=robinhood
+  - kind: other
+    url: https://512pixels.net/dogcow/
+dependencies: []
+deployments:
+  - label: CLARUS token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x22ea949763dB855880264A8FB689E07021661e18"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S6
+  - label: DopplerERC20V1Factory (token creator)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S4
+      - S6
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S4
+      - S6
+      - S14
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S5
+      - S6
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: admin
+    verified: false
+    sources:
+      - S5
+      - S6
+metrics:
+  - kind: volume_24h
+    value: 191327.37
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: tvl
+    value: 167560.59
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: market_cap
+    value: 386981
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: holders
+    value: 569
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S4
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/create tx, RPC name/symbol/owner/getAssetData, DexScreener tokens, Gecko pool/token, /rhj/assets, clarus.lol, @Clarus_rh profile and posts, @trenchfundbot, @medonchain, @ClarusRH, and 512pixels were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-6 R-7 R-12] - Numbers: 203407.04 is the Gecko CLARUS/AAPL pool 24h volume, not the 232242.59 token all-pools figure. Reserve 165931.65 is that pool. DexScreener 191327.37 / 167560.59 is the same pair, different aggregator. [claim R-1 R-2 R-3] - Adversarial: the strongest contrary reading is that CLARUS is census LONG, Bankr, or one of the packed AAPL twins (ICOIN/AP/AAPLCAT/AAPLDOG/JOBS/Appleseed). Create tx is LongLauncher.create for this CA only; those packed tokens use other addresses; Gecko dex id bankr-robinhood is the Doppler book label, not the Bankr agent."
+      class: inference
+      sources:
+        - S5
+        - S7
+        - S12
+    - text: Quote token AAPL 0xaF3D…93f9 is the Robinhood Stock Token rail; pool USD reserve is CLARUS plus AAPL, not a USDG backstop. [verified R-12 R-13] - Token owner() is Airlock; 95% Lock beneficiary is the deployer EOA. [verified R-5 R-6] - Same-name CLARUS/AAPL clones exist at other addresses on DexScreener. [claim R-1] - @ClarusRH is a handle-collision with a different CA. [claim R-16] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Are same-name CLARUS/AAPL clones 0x36bcb89E…1e18 and 0x232DC489…1e18 still live books, and does any official surface link them? Next: read each clone create tx and see whether any later official post names them"
+    - text: "What chain is @ClarusRH bio CA 0x4Aceeee0…7777 on, and does that handle ever claim the 4663 token? Next: open that CA on explorers and record chain_scope if a later assignment needs a collision row"
+    - text: "Does verified DopplerERC20V1 / Airlock leave a privileged path beyond owner() Airlock? Next: read Airlock and DopplerHookInitializer source on the explorer for fee and LP-lock setters"
+    - text: "Is there an audit report? Next: ask in public if a report is published and record the URL as a claim"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

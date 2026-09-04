@@ -1,0 +1,118 @@
+slug: shrub
+name: SHRUB
+symbol: SHRUB
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: An EOA-deployed one-billion-supply ERC-20. enableTrading created a Uniswap v2 SHRUB/WETH pair and seeded liquidity. Traders buy and sell SHRUB against WETH. lilshrub.fun posts the contract; DexScreener lists @lilshrub_RH, whose bio is a FAN account.
+themes:
+  - memecoin
+  - hedgehog
+official_links:
+  - kind: site
+    url: https://www.lilshrub.fun
+  - kind: x
+    url: https://x.com/lilshrub_RH
+  - kind: other
+    url: https://x.com/shivon/status/2094128160669311355
+dependencies: []
+deployments:
+  - label: SHRUB token (Lil' Shrub ERC-20)
+    chain: robinhood-chain
+    address: "0x5d9144d2d017386519a7134Fcc7f1E4bA22f920c"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S4
+  - label: Uniswap v2 SHRUB/WETH pair
+    chain: robinhood-chain
+    address: "0x4a6A85252A6F6B383A5f747259EE157e65fF1307"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S12
+      - S13
+  - label: UniswapV2Factory (pair creator)
+    chain: robinhood-chain
+    address: "0x8bcEaA40B9AcdfAedF85AdF4FF01F5Ad6517937f"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S12
+      - S14
+  - label: Uniswap V2 router (enableTrading hardcoded)
+    chain: robinhood-chain
+    address: "0x89e5DB8B5aA49aA85AC63f691524311AEB649eba"
+    role: router
+    verified: true
+    sources:
+      - S3
+      - S5
+      - S13
+  - label: WETH (pair quote)
+    chain: robinhood-chain
+    address: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    role: token
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S18
+metrics:
+  - kind: volume_24h
+    value: 4437066.72
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: tvl
+    value: 162882.82
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+  - kind: market_cap
+    value: 9785921.318
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 4798
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/create/enableTrading/factory/WETH, RPC name/symbol/owner/token0/getPair/LP balances, DexScreener, Gecko pool/token/trending, lilshrub.fun, @lilshrub_RH, @shivon, @gimoquoi were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-6 R-7] - Numbers: 4410952.00 is the Gecko SHRUB/WETH pool 24h volume, not the 4439897.42 token figure or Blockscout 11149252.76. Reserve 164487.08 is that pool. DexScreener 4437066.72 / 162882.82 is the same pair, different aggregator. [claim R-6 R-7 R-8] - Adversarial: the strongest contrary reading is that this is a stock-paired LongLauncher SHRUB or the in-flight CHUMP/WETH book. Live DexScreener/Gecko quote WETH at 0x5d91…920c / 0x4a6A…1307; CHUMP is 0x7144…cfb8; TSLA-paired SHRUB clones are other CAs."
+      class: inference
+      sources:
+        - S6
+        - S9
+    - text: Quote token is WETH 0x0Bd7…AD73, not a Robinhood Stock Token. [verified R-6 R-18] - Deployer 0x2451…C08B holds nearly all UniswapV2Pair LP at block 53126178. [verified R-5] - @lilshrub_RH is unconfirmed-official (FAN bio). [claim R-11] - Verified source has onlyOwner addBlocked and a _taxWallet path. [verified R-3] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is @lilshrub_RH bidirectional-official despite the FAN display name and bio? Next: re-read the profile website field and any pinned post that links lilshrub.fun without the FAN label"
+    - text: "Does the deployer later burn or transfer the UniswapV2Pair LP that RPC still shows at 0x2451…C08B? Next: re-read pair balanceOf(0x2451…C08B) and 0xdead"
+    - text: "Is _taxWallet still 0x2451…C08B, and do manualSwap/manualSend remain callable? Next: trace a taxWallet-gated tx or read storage slot if a getter appears"
+    - text: "Which same-ticker LongLauncher SHRUB/TSLA or SHRUB/SPCX clones should stay collision-only? Next: leave them out of this slug unless a later assignment names one"
+    - text: "Which Gecko trending window printed SHRUB/WETH ~$6.78M vol / ~$147k liq? Next: cite the GO-LIVE capture only as history; do not treat $6.78M as live"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).
+    - text: control.privileged-role remains unresolved (CON-3).

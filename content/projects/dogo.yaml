@@ -1,0 +1,96 @@
+slug: dogo
+name: DogBull
+symbol: DOGO
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A 1.01-billion-supply ERC-20 named DogBull (ticker DOGO) on Robinhood Chain. An EOA deployed verified DogBull.sol and seeded a Uniswap v4 DOGO/ETH book. Holders trade DOGO against ETH. dogbull.xyz publishes contract 0x77b0AA38451ccDC1b42587E2f80B9879A7f82356. No live official handle was located this pass.
+themes:
+  - memecoin
+  - eth-paired
+  - native
+official_links:
+  - kind: site
+    url: https://dogbull.xyz/
+  - kind: x
+    url: https://x.com/dogbullxyz
+  - kind: telegram
+    url: https://t.me/dogbullonhood
+  - kind: other
+    url: https://www.geckoterminal.com/robinhood/pools/0xbe05adff5cf9a0bfd2f1eeb69458d5dda27e7075d6f49b0458db4b4c1967b6b1
+dependencies: []
+deployments:
+  - label: DOGO token (verified DogBull.sol)
+    chain: robinhood-chain
+    address: "0x77b0AA38451ccDC1b42587E2f80B9879A7f82356"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S4
+      - S16
+  - label: Uniswap v4 PoolManager (DOGO/ETH LP holder)
+    chain: robinhood-chain
+    address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
+    role: other
+    verified: true
+    sources:
+      - S15
+      - S5
+      - S7
+metrics:
+  - kind: volume_24h
+    value: 385442.45
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 988735.55
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 10021808.32
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S6
+      - S7
+  - kind: holders
+    value: 20555
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive:
+    - text: "Receipts: Blockscout token/address/create tx/holders/source, RPC name/symbol/dogoWallet/eth_getCode, DexScreener, Gecko token/pool/info, dogbull.xyz, t.me/dogbullonhood, x.com/dogbullxyz, GitHub search, @cmclistings, and @zazXBT were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-4 R-5 R-7 R-9] - Numbers: 385442.45 is the Gecko DOGO/WETH pool 24h volume, not the 0.0 token total_reserve. Reserve 988735.55 is that pool. DexScreener 385129.98 / 995249.75 is the same pair, different aggregator. Holders 20555 is Blockscout holders_count (Gecko info 20546). [claim R-1 R-5 R-6 R-7] - Adversarial: the strongest contrary reading is that this is packed doggie/doge-1/dogecoin-tsla, or that @dogo / @dogbullxyz is a live official handle. Different CAs, quotes (ETH vs TSLA/SPCX), and sites; @dogbullxyz is suspended and @dogo is unrelated."
+      class: verified
+      sources:
+        - S1
+        - S5
+        - S11
+  risk:
+    - text: Listed handle @dogbullxyz is suspended; no bidirectional live handle this pass. [verified R-11] - Site claims LP locked / contract renounced; Gecko locked_liquidity_percentage is null and the deployer still holds ~53.8M DOGO. [claim R-7 R-9 R-15] - Site how-to-buy is send-native-tokens, not the Uniswap v4 book. [claim R-9] - No audit report URL this pass. [unknown] - Distinct from packed doggie / doge-1 / dogecoin-tsla; ticker-family collision only.
+      class: verified
+      sources:
+        - S1
+        - S5
+  missing:
+    - text: "Does a replacement official X handle bidirectionally link to token 0x77b0…2356 after @dogbullxyz was suspended? Next: re-read dogbull.xyz and DexScreener token profile after a Claim Profile; search new posts that embed the CA and a live handle"
+    - text: "Is Uniswap v4 DOGO/ETH liquidity locked, and if so to which locker or 0xdead? Next: read PoolManager position NFT owner for pool 0xbe05…b6b1 and any locker contract"
+    - text: "Does t.me/dogbullonhood pin CA 0x77b0…2356 or a live handle? Next: open the join page / first messages if they become public without joining"
+    - text: "Is there an audit of DogBull.sol as deployed on 4663? Next: record any report URL if the site or a new handle publishes one"
+  unresolved: []

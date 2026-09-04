@@ -25,3 +25,88 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: d9b8a78d789ea13b
+- date: 2026-09-03
+  slug: safehood
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    lifecycle: announced
+    summary: Robinhood Chain launchpad that creates Uniswap v3 pools with no bonding curve; the official account has been quiet since 2026-07-16.
+    themes: null
+    deployments:
+      - label: Safehood pad token (candidate — from the safehood.fun token page URL)
+        chain: robinhood-chain
+        address: "0x262b60af42c46bd09c00069cd0dcb2ae0093034b"
+        role: token
+        verified: false
+        sources:
+          - S5
+          - S4
+      - &a1
+        label: Launch factory (rebuilt 15 Jul per the project)
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources: []
+  new:
+    lifecycle: mainnet
+    summary: "Uniswap v3 pool launchpad on Robinhood Chain: one transaction deploys a 1 billion-supply ERC-20, creates a 1% Uniswap v3 pool, and opens trading with 2% max-tx and max-wallet until a $40,000 market cap. @_safehood lists safehood.fun. The GitHub-claimed factory 0xe893… has non-empty code on chain 4663. Distinct from hood.fun's bonding-curve pad and Uniswap Labs' pools.trade."
+    themes:
+      - launchpad
+      - memecoin
+    deployments:
+      - label: Safehood.fun (SAFEHOOD) pad token
+        chain: robinhood-chain
+        address: "0x262b60Af42c46bD09c00069Cd0dCb2Ae0093034B"
+        role: token
+        verified: true
+        sources:
+          - S5
+          - S4
+          - S12
+          - S24
+          - S25
+      - *a1
+      - label: Launchpad
+        chain: robinhood-chain
+        address: "0xe893ca05D3F1235de22630504DcEa9e029294900"
+        role: factory
+        verified: true
+        sources:
+          - S7
+          - S15
+          - S17
+          - S21
+      - label: TokenFactory
+        chain: robinhood-chain
+        address: "0x5Cf777e19a6CD4B10c3Aa317a2B8E8bCC5F46364"
+        role: factory
+        verified: true
+        sources:
+          - S7
+          - S17
+          - S18
+      - label: FeeDistributor
+        chain: robinhood-chain
+        address: "0x8E0b175a36ee0854Cc2dC7AeC4B3f90857A059ca"
+        role: other
+        verified: true
+        sources:
+          - S7
+          - S17
+          - S19
+      - label: Treasury
+        chain: robinhood-chain
+        address: "0xD401Ed3C128eaE756323e7EAE27B40407c7d499B"
+        role: other
+        verified: true
+        sources:
+          - S7
+          - S17
+          - S20
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 75dbddcda6f88a27

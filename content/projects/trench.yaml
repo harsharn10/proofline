@@ -1,0 +1,131 @@
+slug: trench
+name: Trench
+symbol: null
+category: Bonding-curve launchpad
+lifecycle: mainnet
+coverage: stub
+summary: "Trench is a bonding-curve token launchpad at trench.today. A launch mints a fixed-supply ERC-20 onto a constant-product curve, then migrates automatically into a DEX pool when the curve fills. On Robinhood Chain the live factory is BondingCurveFactory 0x2ECFb98B…FbAA. Docs: new graduates go to Uniswap V4 with a Trench fee hook; older graduates stay on Uniswap V3. The handle is @TrenchToday01."
+themes:
+  - launchpad
+official_links:
+  - kind: site
+    url: https://trench.today
+  - kind: app
+    url: https://trench.today/create
+  - kind: docs
+    url: https://trench.today/docs
+  - kind: docs
+    url: https://trench.today/docs/how-it-works
+  - kind: docs
+    url: https://trench.today/docs/for-developers/contracts
+  - kind: docs
+    url: https://trench.today/docs/resources/links
+  - kind: x
+    url: https://x.com/TrenchToday01
+  - kind: telegram
+    url: https://t.me/axx_dot
+  - kind: other
+    url: https://dune.com/0x_emerson/robinhood-memecoin-launchpads-comparison-30d
+dependencies: []
+deployments:
+  - label: BondingCurveFactory (TransparentUpgradeableProxy)
+    chain: robinhood-chain
+    address: "0x2ECFb98BCe4f3616115E4a2A7a2379AF388DFbAA"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S8
+      - S9
+      - S13
+  - label: BondingCurveFactory implementation
+    chain: robinhood-chain
+    address: "0xDc4b9FAF72a071E2b5A7858bF91A894580D84a22"
+    role: implementation
+    verified: true
+    sources:
+      - S8
+      - S9
+      - S10
+  - label: TrenchManager proxy
+    chain: robinhood-chain
+    address: "0x77dC6f6361b7b99456FC3761ce5b7ddA80d83f9d"
+    role: router
+    verified: true
+    sources:
+      - S3
+      - S8
+      - S11
+  - label: Factory ProxyAdmin
+    chain: robinhood-chain
+    address: "0x4b25478f681832f65B7Bc69ebBb44c7Fc9cE5A96"
+    role: admin
+    verified: false
+    sources:
+      - S8
+      - S9
+      - S12
+  - label: Docs owner / deployer EOA
+    chain: robinhood-chain
+    address: "0xbeb76A70c82B09E30B2008eAFa7F987987EC9e0b"
+    role: admin
+    verified: true
+    sources:
+      - S3
+      - S8
+      - S12
+  - label: TrenchV4FeeHook
+    chain: robinhood-chain
+    address: "0x31200554eCA1EFf6d130dbeC7975aFA1234b60CC"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S8
+  - label: TrenchPositionLocker
+    chain: robinhood-chain
+    address: "0x1a3881e7013307Bc67b22b8793B93a2114aAe49E"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S8
+  - label: FeeVault
+    chain: robinhood-chain
+    address: "0x076e3Cd13E188e3646828e7cEBB766C7Dd6aDb8A"
+    role: other
+    verified: false
+    sources:
+      - S3
+      - S8
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: trench.today, docs (home, introduction, how-it-works, getting-started, contracts, links), X profile and posts, Emerson dashboard, Llama 404, GitHub 404, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-3 R-8 R-13] - Numbers: token counts and DEX volume are the Emerson 30d slice, not Llama. Bytecode lengths, nonce, and owner slots are chain 4663 RPC. [verified R-8 R-13] - Adversarial: strongest contrary reading is that 0x2ECFb98B…FbAA is an abandoned proxy and live launches use TrenchManager or another factory, or that Emerson's Trench / Trencher label mixes a second product. Docs set BondingCurveFactory to this address; factory nonce 146364 and Emerson last_launch 2026-09-03 argue it is still creating. Circus, Sentry, Klik, pew.fun, and Pons are different factories."
+      class: inference
+      sources:
+        - S3
+        - S8
+        - S13
+    - text: "Factory and manager are upgradeable; owner is one EOA with no code. [verified R-8 R-12] - Factory implementation source is not verified on Blockscout this pass. [verified R-9 R-10] - Getting Started names Uniswap V2; How-it-works names Uniswap V4 for new Robinhood graduates. [claim R-15 R-2] - Creator-fee strings disagree across July posts and current docs. [claim R-6 R-23 R-2] - No audit report URL. [unknown] - Handle-collision: @TrenchToday101."
+      class: claim
+      sources:
+        - S4
+        - S5
+        - S24
+  missing:
+    - text: "Is BondingCurveFactory implementation 0xDc4b9FAF…4a22 source-verified anywhere, and what is its source name? Next: read verified source if it lands; otherwise treat the proxy as shell-only"
+    - text: "Does TrenchPositionLocker 0x1a3881e7…e49E actually hold V4 PositionManager NFTs with a 1-year delay, and can the factory owner upgrade around it? Next: eth_call locker interface and a graduated token's position owner"
+    - text: "Which Getting Started Uniswap V2 sentence applies to Robinhood, and is any live RH graduate a V2 pair? Next: sample a recent TokenCreate and follow migrateToV4 vs migrateToV3"
+    - text: "Is there an audit report whose scope matches factory 0x2ECFb98B…FbAA and TrenchManager 0x77dC6f63…3f9d? Next: record any published report as a claim with the exact scope"
+    - text: "Are Ethereum, MegaETH, and Arc factories live, and should RH TVL ever include those venues? Next: do not use the Robinhood factory address on other chains; reproduce those venues in a later pass if coverage expands"
+    - text: "What is @TrenchToday101 relative to @TrenchToday01, and does trenchpad.trade / trench.icu share any contract? Next: open those domains only if a later assignment asks; keep the handle-collision flag"
+  unresolved:
+    - text: product.mechanism remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).

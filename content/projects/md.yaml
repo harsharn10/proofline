@@ -1,0 +1,118 @@
+slug: md
+name: MD
+symbol: MD
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against AMD. LongLauncher.create from 0xe5d5…b644 minted A Machine Duck (MD) on 2026-08-28T18:37:52Z into pool 0x197d…9655 via DopplerERC20V1Factory and Airlock. Traders buy and sell MD against the AMD Robinhood Token. AMD is the quote rail, not the subject. No official site was located this pass. DexScreener lists @AMachineDuck without a bidirectional official-crosslink.
+themes:
+  - memecoin
+  - stock-paired:amd
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/AMachineDuck
+dependencies: []
+deployments:
+  - label: MD token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x3abb8d686dF6e538bb0887917d14f04f705f1e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S5
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S2
+      - S5
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S4
+      - S5
+  - label: LongLauncher (create() target)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S13
+  - label: Airlock (token owner())
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+      - S14
+  - label: AMD • Robinhood Token (pair quote / numeraire / rail)
+    chain: robinhood-chain
+    address: "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC"
+    role: token
+    verified: true
+    sources:
+      - S11
+      - S12
+metrics:
+  - kind: volume_24h
+    value: 331097.89
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: tvl
+    value: 139439.43
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: market_cap
+    value: 308460.38
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S8
+  - kind: holders
+    value: 391
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/AMD and the create tx, RPC name/symbol/owner/isPoolLocked/pool/tokenURI, DexScreener, Gecko pool/token/info, /rhj/assets, Bankr launches, CHIP/MEOW/GB DexScreener rows, and the @AMachineDuck / @nvtcho / @ChrisL9696 / @ChudCrentis posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-11] - Numbers: 331097.89 is the Gecko MD/AMD pool 24h volume, not the 331827.23 token all-pools figure. Reserve 139439.43 is that pool. DexScreener 342194.33 / 143796.32 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that MD is CHIP, MEOW, or GB, or that Gecko's bankr-robinhood dex id means Bankr minted it. CHIP/MEOW/GB are different token addresses on AMD books. Create tx is LongLauncher; Bankr latest 50 has no MD."
+      class: inference
+      sources:
+        - S4
+        - S22
+        - S23
+    - text: Quote token AMD 0x8692…3fdC is a Robinhood Stock Token rail; MD is not AMD. [verified R-11 R-12] - Pool USD reserve is MD plus AMD, not a USDG or WETH backstop. [claim R-7 R-8] - No official handle or domain this pass; @AMachineDuck is unconfirmed-official. [claim R-7 R-19] - Same-name MD copycats exist with 0–1 holders. [verified R-21] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x3abb…1e18? Next: re-read DexScreener token profile after a Claim Profile; ask whether @AMachineDuck pins the LongLauncher create tx from a site"
+    - text: "Should Gecko dex bankr-robinhood be treated as Bankr-minted or as Doppler-hook taxonomy? Next: compare hook 0x4e34…a544 against a known Bankr launch and a known LONG launch"
+    - text: "Who is Lock beneficiary 0x36eF…4556 relative to create-from 0xe5d5…b644? Next: decode the EIP-7702 delegation target and check whether it is a LONG/Airlock fee splitter"
+    - text: "What does tokenURI ipfs://bafkreihufuqw7dtrq6gufwpa2gl5vn23x7nwkv6yrilpscq66dy4mmihbu contain? Next: fetch the CID once for social_links / image without treating it as official"
+  unresolved: []

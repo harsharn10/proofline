@@ -1,0 +1,127 @@
+slug: stratton
+name: STRATTON
+symbol: STRATTON
+category: Launchpad-graduated token
+lifecycle: mainnet
+coverage: stub
+summary: A Pons v2 ERC-20 that graduated into a Uniswap v4 STRATTON/SPY pool. Traders buy and sell STRATTON against the Robinhood SPY Stock Token on that book. Token metadata and stratton.market describe a penny-stock launchpad whose docs list other contracts, not this CA.
+themes:
+  - memecoin
+  - stock-paired:spy
+  - rwa
+  - launchpad
+official_links:
+  - kind: site
+    url: https://stratton.market
+  - kind: docs
+    url: https://stratton.market/docs
+  - kind: app
+    url: https://stratton.market/launchpad
+  - kind: x
+    url: https://x.com/strattonmrkt
+dependencies: []
+deployments:
+  - label: STRATTON token (PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0xb7eaeCc89d3e2f9Fd597D61726aE824900dB8360"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+  - label: PonsV2LaunchDeployer (token creator)
+    chain: robinhood-chain
+    address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+    role: factory
+    verified: false
+    sources:
+      - S3
+      - S5
+  - label: PonsV2LaunchFactory (token launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S15
+  - label: PonsV2BondingCurve
+    chain: robinhood-chain
+    address: "0x4f8Bf15566c084F7Fa473B67131Ae74fc71F4d0F"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S16
+  - label: PonsV2LaunchAndBuy (create tx to)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: false
+    sources:
+      - S4
+      - S15
+  - label: SPY Stock Token (pair quote / factory pairToken)
+    chain: robinhood-chain
+    address: "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C"
+    role: token
+    verified: true
+    sources:
+      - S7
+      - S12
+      - S17
+metrics:
+  - kind: volume_24h
+    value: 9576519.64
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 165727.93
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 3730588
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 2558
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/deployer/factory/launchAndBuy/curve/SPY and both launch/sweep txs, RPC name/symbol/socials/launchFactory/curve/deployer, DexScreener, Gecko pool/token, /rhj/assets, stratton.market and /docs, and the @strattonmrkt / CT posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-7 R-8 R-12 R-13] - Numbers: 9576519.64 is the DexScreener STRATTON/SPY pool 24h volume, not the 15174470.36 Gecko token all-pools figure. Reserve 165727.93 is DexScreener liquidity.usd; Gecko reserve 158595.87 is the same book, inverted base. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that this CA is the Stratton pad token and that STRATTON/SPY is the PAIR/SPY book. Docs Launchpad is 0xBa394F…07c9, PairLaunchpadV5 created PAIR 0x6b1d…66be, and DexScreener lists STACKS/BOW/NORMIE as other /SPY tokens."
+      class: inference
+      sources:
+        - S7
+        - S14
+        - S19
+    - text: Quote token SPY 0x117c…4C0C is the Robinhood Stock Token in GET /rhj/assets; pool USD reserve is STRATTON plus SPY. [verified R-12 R-17] - Gecko pool fdv is not the STRATTON token fdv. [claim R-8 R-9] - Site/docs list Launchpad 0xBa394F…07c9 and do not embed this CA; flag unconfirmed-official. [claim R-13 R-14] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Does @strattonmrkt or stratton.market/docs bidirectionally publish token CA 0xb7eae…8360? Next: re-read DexScreener token profile after a Claim Profile; search new posts that embed the CA"
+    - text: "Is STRATTON the Stratton pad token, or only a Pons graduation that points at that site? Next: read the docs Launchpad bytecode against create txs for TOONx and any STRATTON mention on /launchpad"
+    - text: "Do TOONx 0x5a6c05…AeDf / DSSx 0xe99d43…6eDa appear in GET /rhj/assets? Next: scan /rhj/assets for TOON, DSS, AIXI and compare to the docs table"
+    - text: "Who can mint/redeem the advertised TICKERx tokens versus this Pons STRATTON token? Next: read docs Launchpad / buyback source once verified"
+    - text: "Which Gecko window ranked this book near $9.57M vol / $167k liq? Next: keep the DexScreener pair slice as the STRATTON/SPY book; do not use Gecko pool fdv_usd 13.5M as STRATTON fdv"
+  unresolved: []

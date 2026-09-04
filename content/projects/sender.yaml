@@ -1,0 +1,120 @@
+slug: sender
+name: SENDER
+symbol: SENDER
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against Amazon • Robinhood Token (AMZN). LongLauncher.create on 2026-09-01 minted SENDER and seeded the SENDER/AMZN book. Traders buy and sell SENDER against AMZN. AMZN is the quote rail, not the subject. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:amzn
+  - rwa
+official_links: []
+dependencies: []
+deployments:
+  - label: SENDER token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x4d41CcAa0eeB95C6EBC56d53adf637198c901e18"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S6
+  - label: DopplerERC20V1Factory (create tokenFactory)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S13
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: true
+    sources:
+      - S1
+      - S6
+      - S13
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: true
+    sources:
+      - S5
+      - S6
+      - S14
+  - label: Amazon • Robinhood Token (pair quote rail)
+    chain: robinhood-chain
+    address: "0x12f190a9F9d7D37a250758b26824B97CE941bF54"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S11
+      - S12
+  - label: Airlock (token owner)
+    chain: robinhood-chain
+    address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    role: other
+    verified: false
+    sources:
+      - S5
+      - S6
+metrics:
+  - kind: volume_24h
+    value: 601149.31
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 146162.75
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 317124
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 1065
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/impl/factory/AMZN and create tx 0x0412c0bd…8183, RPC name/symbol/owner/getAssetData, DexScreener, Gecko pool/token, /rhj/assets, and X Latest posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-6 R-7 R-8 R-11] - Numbers: 591540.85 is the Gecko SENDER/AMZN pool 24h volume, not the 595110.55 token all-pools figure. Reserve 149128.77 is that pool. DexScreener 601149.31 / 146162.75 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that SENDER is an official Amazon or Robinhood product, or that Gecko dex id bankr-robinhood means Bankr launched it. /rhj/assets has no SENDER row, creation is LongLauncher.create, and no official handle or domain was located."
+      class: inference
+      sources:
+        - S5
+        - S11
+        - S18
+    - text: Quote token AMZN 0x12f1…bF54 is the Robinhood Stock Token rail from GET /rhj/assets; SENDER is not in that registry. [verified R-11 R-12] - Pool USD reserve is SENDER plus AMZN, not a USDG or WETH backstop. [claim R-7 R-8] - Gecko and DexScreener disagree on reserve and fdv for the same pool. [claim R-7 R-8] - No official handle or domain this pass; netlify claim/vote URLs are third-party-link / copypasta-pattern. [claim R-7 R-16 R-17] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally links to token 0x4d41…1e18? Next: re-read DexScreener token profile after a Claim Profile; fetch the IPFS CID on a non-Cloudflare gateway; search new posts that embed the CA and a handle"
+    - text: "Do Lock beneficiaries 0x8130…5F41 (95%) and 0x21E2…7A66 (5%) still control AMZN-side fees after graduation? Next: read Doppler lock / fee collector state and any LongFeeVaultFactory deployVault for this token"
+    - text: "What is in ipfs://bafkreih6qjdzxbpzziym3ejxevafzoenj2dt3wtivizddrxfxzkjwxdie from the create tokenFactory bytes? Next: retry via another gateway or Blockscout token metadata if indexed"
+    - text: "Should any of the thin SENDER/USDG or SENDER/VACCINU books get their own notes? Next: only if an assignment names those pool ids"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

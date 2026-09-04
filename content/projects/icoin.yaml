@@ -1,0 +1,112 @@
+slug: icoin
+name: iCoin
+symbol: ICOIN
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against Apple • Robinhood Token (AAPL). LongLauncher.create on 2026-07-22 minted iCoin (ICOIN) and seeded the ICOIN/AAPL book. Traders buy and sell ICOIN against AAPL. @iCoinRH is the project handle; the token page lives on app.long.xyz.
+themes:
+  - memecoin
+  - stock-paired:aapl
+official_links:
+  - kind: x
+    url: https://x.com/iCoinRH
+  - kind: app
+    url: https://app.long.xyz/tokens/0x5d6ef090a1461b11c9427ac319260122d1c61e18
+dependencies: []
+deployments:
+  - label: ICOIN token (EIP-1167 DopplerERC20V1 clone)
+    chain: robinhood-chain
+    address: "0x5d6EF090a1461B11c9427aC319260122D1C61e18"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S6
+  - label: DopplerERC20V1Factory (token creator)
+    chain: robinhood-chain
+    address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    role: factory
+    verified: false
+    sources:
+      - S4
+      - S6
+  - label: DopplerERC20V1 implementation
+    chain: robinhood-chain
+    address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    role: implementation
+    verified: false
+    sources:
+      - S4
+      - S6
+      - S17
+  - label: LongLauncher (create caller)
+    chain: robinhood-chain
+    address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+    role: factory
+    verified: false
+    sources:
+      - S5
+      - S6
+  - label: Community vault (LongFeeVaultFactory deployVault)
+    chain: robinhood-chain
+    address: "0x24c2410941B4603CF5504810d5dF841dB4d303ad"
+    role: vault
+    verified: true
+    sources:
+      - S11
+      - S13
+      - S14
+metrics:
+  - kind: volume_24h
+    value: 6035283.22
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: tvl
+    value: 508312.19
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: market_cap
+    value: 3457851
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+  - kind: holders
+    value: 2982
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S4
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: DexScreener token API, Gecko pool/token/pools, Blockscout token/create tx/vault/deployVault/AAPL/impl, RPC eth_getCode and eth_call, @iCoinRH profile and three posts, @0xSammy, and the LONG token URL 403 were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-2 R-4 R-5 R-6 R-8] - Numbers: 6198765.33 is the Gecko ICOIN/AAPL pool 24h volume, not the 6737936.26 token all-pools figure. Reserve 770912.07 is that pool. DexScreener 6035283.22 / 508312.19 is the same pair, different aggregator. [claim R-1 R-2 R-3] - Adversarial: the strongest contrary reading is that ICOIN is a Bankr agent launch because Gecko labels the pool bankr-robinhood. The create transaction calls LongLauncher.create from 0xd947…Ef4E, and @iCoinRH names @longdotxyz."
+      class: inference
+      sources:
+        - S2
+        - S5
+        - S9
+    - text: Quote token AAPL is a Robinhood Stock Token; pool USD reserve is ICOIN plus AAPL, not a USDG backstop. [verified R-2 R-15] - Gecko reserve and DexScreener liquidity for pool 0xc391…4188 disagree this pass. [claim R-1 R-2] - Community vault 0x24c2…03ad is unverified. [verified R-13] - @iCoinRH posts name a Solana mint in addition to the 4663 CA. [claim R-11] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "What does unverified LongFeeVaultFactory 0xbA85…319A / vault 0x24c2…03ad actually do with AAPL fees? Next: read deployVault calldata and any later verified source on the factory"
+    - text: "Is solana:9uT7rob8TKKnzvxqkD5nj9UMw16ZPJByEW37pMcHpump an X cashtag resolver for $iCoin or a second mint the handle operates? Next: open the Solana mint page and see whether it links back to @iCoinRH or 0x5d6EF…1e18"
+    - text: "What does the LONG token page show for Community Mode once Cloudflare is bypassed? Next: retry the token page or use a LONG API if one is published"
+    - text: "Did Gecko trending_pools list ICOIN/AAPL at the ~$789k / ~$6.2M capture named in the assignment? Next: archive a trending screenshot if the pool returns to that board"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

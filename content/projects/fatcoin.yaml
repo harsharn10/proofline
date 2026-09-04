@@ -1,0 +1,114 @@
+slug: fatcoin
+name: FATCOIN
+symbol: FATCOIN
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 created into a Uniswap v4 pool quoted against LLY. Historical RWAERC20LaunchpadFactory deploys FATCOIN in one createLaunch call and seeds the FATCOIN/LLY book. Traders buy and sell FATCOIN on Uniswap v4. LLY is the Robinhood stock-token rail, not the project. No official domain was located this pass; DexScreener lists x.com/FatcoinLLY without a CA in that profile bio.
+themes:
+  - memecoin
+  - stock-paired:lly
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/FatcoinLLY
+  - kind: other
+    url: https://x.com/i/communities/1939856297614352899
+  - kind: other
+    url: https://dexscreener.com/robinhood/0x46ba8216b5d05ff33427b976663836ec5b34b3e261f374f9a5e773d776d3af85
+  - kind: other
+    url: https://www.geckoterminal.com/robinhood/pools/0x46ba8216b5d05ff33427b976663836ec5b34b3e261f374f9a5e773d776d3af85
+dependencies: []
+deployments:
+  - label: FATCOIN token
+    chain: robinhood-chain
+    address: "0x12D5ee7917cA430073C3A638ee1e6f0648A98a01"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S2
+      - S5
+      - S18
+  - label: o1 historical RWAERC20LaunchpadFactory (createLaunch)
+    chain: robinhood-chain
+    address: "0xe64AC4113848BBC1a6dDE1A6D1da96720A36F297"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S4
+      - S5
+      - S6
+  - label: Historical LaunchHook (launch mint recipient)
+    chain: robinhood-chain
+    address: "0x778b0c4EeA7D35D66513B587bA87FC9084b0EaCC"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S6
+      - S16
+  - label: Eli Lilly Robinhood Token (pair quote)
+    chain: robinhood-chain
+    address: "0x8005d266423c7ea827372c9c864491e5786600ea"
+    role: token
+    verified: true
+    sources:
+      - S6
+      - S12
+      - S13
+metrics:
+  - kind: volume_24h
+    value: 2915859.5
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S9
+  - kind: tvl
+    value: 76140.78
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 413306
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 3437
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S1
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/factory/hook/LLY and the createLaunch tx plus logs, RPC name/symbol/factory/owner/hook/launchCreationEnabled, DexScreener, Gecko pool/token/pools, /rhj/assets, @FatcoinLLY profile, the Pons ticker collision, and the netlify vote posts were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-5 R-8 R-12] - Numbers: 1766901.39 is the Gecko FATCOIN/LLY pool 24h volume, not the 2915859.50 token all-pools figure. Reserve 68705.03 is that pool. DexScreener 1792589.86 / 76140.78 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that FATCOIN is PEPTIDES, the Pons FATCOIN, or an official Eli Lilly product. PEPTIDES is a different address and LongLauncher factory. The Pons clone has 11 holders. LLY is the /rhj/assets rail, not the project."
+      class: inference
+      sources:
+        - S12
+        - S13
+        - S15
+    - text: DexScreener and Gecko disagree on FATCOIN/LLY USD liquidity, volume, and FDV. [verified R-7 R-8] - Pool USD reserve is FATCOIN plus LLY, not a USDG or WETH backstop. [claim R-7 R-8] - No official handle or domain this pass; X is unconfirmed-official. [claim R-7 R-14] - Token source is_verified false; Blockscout creator fields null. [verified R-1] - A second FATCOIN ticker exists at 0xb68C…03Ba4 against LLY via Pons. [verified R-15] - No audit report URL this pass.
+      class: unknown
+  missing:
+    - text: "Is there an official X handle or site that bidirectionally embeds token 0x12D5ee79…8a01? Next: re-read the X profile website field and any pinned post that embeds the CA"
+    - text: "Which aggregator is right for FATCOIN/LLY USD liquidity, and why does Gecko FATCOIN/USDG reserve exceed the LLY book? Next: re-fetch both endpoints in the same minute and compare PoolManager reserves on RPC"
+    - text: "Does createLaunch metadata ipfs://bafkreihk4u72s5tdqrgcrusqxcrwbhjs43qbxnt7bn4mr3td26srn5r2ym name a domain or handle? Next: resolve the CID on another gateway and parse JSON for website/twitter"
+    - text: "Is FATCOIN bytecode verified anywhere, and does it match o1 launch-token bytecode at tokenDeployer 0x6544af35…615b? Next: compare bytecode hash to launchTokenBytecodeHash() on 0xe64A…F297"
+    - text: "Does the PonsV2 FATCOIN 0xb68C…03Ba4 share a team with this o1 launch? Next: read that create tx and any comms that cite 0xb68C…"
+    - text: "Is there an audit whose scope includes historical factory 0xe64A…F297 / LaunchHook 0x778b…EaCC as used on this clone? Next: match XORS reports named in the o1-exchange packet to 0xe64A…F297"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).

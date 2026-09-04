@@ -1,0 +1,107 @@
+slug: robloxians
+name: ROBLOXIANS
+symbol: ROBLOXIANS
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: ROBLOXIANS is a one-billion-supply ERC-20 launched on Pons v2 against the Roblox Robinhood Token (RBLX). PonsV2LaunchAndBuy.launchAndBuy created The Robloxians at 0xB528…c10D on 2026-09-02, pairing it to RBLX 0xF0C4…1bE8; the same transaction bought through the bonding curve past the graduation threshold into a Uniswap v4 ROBLOXIANS/RBLX pool. Traders buy and sell ROBLOXIANS on that book. No project site was located this pass.
+themes:
+  - memecoin
+  - stock-paired:rblx
+official_links:
+  - kind: x
+    url: https://x.com/RobloxiansPage
+  - kind: telegram
+    url: https://t.me/robloxianscult
+dependencies: []
+deployments:
+  - label: ROBLOXIANS token (The Robloxians)
+    chain: robinhood-chain
+    address: "0xB528a38eA684eD26ea0Eee9de5d222DA6228c10D"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S4
+  - label: Pons v2 launch factory (launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S6
+      - S15
+  - label: PonsV2LaunchAndBuy (launchAndBuy)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: true
+    sources:
+      - S4
+      - S5
+  - label: RBLX Roblox • Robinhood Token (pair quote)
+    chain: robinhood-chain
+    address: "0xF0C4BF4C582cb3836e98394b1d4e7B7281101bE8"
+    role: token
+    verified: true
+    sources:
+      - S10
+      - S11
+      - S4
+metrics:
+  - kind: volume_24h
+    value: 3080396.49
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 178744.82
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 3681072
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 1964
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/RBLX/factory/launchAndBuy tx, RPC name/symbol/launchFactory/getLaunchedToken/approvedPairTokens, DexScreener, Gecko pool/token, /rhj/assets, @ponsdotfamily, @RobloxiansPage, and Telegram preview were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-3 R-4 R-8 R-11] - Numbers: 2929575.47 is the Gecko ROBLOXIANS/RBLX pool 24h volume, not the 3263009.57 token all-pools figure. Reserve 162471.64 is that pool. DexScreener 3080396.49 / 178744.82 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that ROBLOXIANS is an official Roblox or Robinhood product, or that it should merge with census Pons. /rhj/assets lists RBLX as a Stock Token, not ROBLOXIANS; the token is a Pons v2 launch with its own handle; no official Roblox or Robinhood CA post was located."
+      class: inference
+      sources:
+        - S4
+        - S11
+        - S13
+    - text: Token source is not verified on Blockscout; creator_address_hash was null on the address API. [verified R-1] - Pool USD reserve is ROBLOXIANS plus RBLX, not a USDG backstop. [claim R-7 R-8] - Named handle @RobloxiansPage has not posted the CA this pass; flag unconfirmed-official. [claim R-13] - Pons v2 docs say treat v2 as unaudited until reports are published.
+      class: claim
+      sources:
+        - S16
+  missing:
+    - text: "Does @RobloxiansPage post CA 0xB528…c10D or a site that reverse-links to the token? Next: re-read the profile and new posts after a CA or site appears; treat the handle as unconfirmed-official until a reverse link exists"
+    - text: "When did PonsV2LaunchFactory.setPairTokenApproved(RBLX) flip true? Next: search factory txs for setPairTokenApproved around 2026-09-02 and record the tx hash"
+    - text: "Why is Blockscout creator_address_hash null, and does verified PonsV2LauncherToken source match this 3248-byte bytecode? Next: eth_getLogs Transfer from 0x0 / factory TokenLaunched already names the token; compare bytecode to current LaunchDeployer implementation"
+    - text: "Does t.me/robloxianscult pin the CA or a DexScreener link? Next: open the join page / first messages if they become public without joining"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

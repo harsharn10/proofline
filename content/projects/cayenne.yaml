@@ -1,0 +1,125 @@
+slug: cayenne
+name: CAYENNE
+symbol: CAYENNE
+category: Stock-paired token
+lifecycle: mainnet
+coverage: stub
+summary: A one-billion-supply ERC-20 launched on Pons v2 against the Invesco QQQ Robinhood Token. PonsV2LaunchAndBuy.launchAndBuy created CAYENNEcoin (CAYENNE) at 0xad66…56C9 on 2026-09-02, pairing it to QQQ 0xD5f3…de68; createGraduatedPool then seeded a Uniswap v4 CAYENNE/QQQ book. Traders buy and sell CAYENNE on that book. Stock QQQ is the pair rail, not the subject. No official site or handle was located this pass.
+themes:
+  - memecoin
+  - stock-paired:qqq
+  - rwa
+official_links:
+  - kind: x
+    url: https://x.com/CAYENNEcoin_RH
+  - kind: site
+    url: https://hntsam.com/
+dependencies: []
+deployments:
+  - label: CAYENNE token (CAYENNEcoin)
+    chain: robinhood-chain
+    address: "0xad6629157a774007E46945bb1B6013C79e7656C9"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S5
+  - label: Pons v2 launch factory (launchFactory)
+    chain: robinhood-chain
+    address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    role: factory
+    verified: true
+    sources:
+      - S3
+      - S6
+      - S16
+  - label: PonsV2LaunchAndBuy (launchAndBuy)
+    chain: robinhood-chain
+    address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+    role: router
+    verified: true
+    sources:
+      - S4
+      - S5
+  - label: QQQ Invesco QQQ • Robinhood Token (pair quote)
+    chain: robinhood-chain
+    address: "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68"
+    role: token
+    verified: true
+    sources:
+      - S10
+      - S12
+      - S3
+  - label: Pons v2 bonding curve for CAYENNE
+    chain: robinhood-chain
+    address: "0x2495573d25BDEf5D2609a0671c7868C95Ef058Fb"
+    role: other
+    verified: true
+    sources:
+      - S5
+      - S6
+  - label: V2LaunchLocker (token holder)
+    chain: robinhood-chain
+    address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    role: vault
+    verified: false
+    sources:
+      - S17
+      - S6
+metrics:
+  - kind: volume_24h
+    value: 6872571.53
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: tvl
+    value: 44046.45
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: market_cap
+    value: 287346
+    currency: USD
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S7
+  - kind: holders
+    value: 2361
+    as_of: 2026-09-03
+    class: claim
+    sources:
+      - S2
+review:
+  researcher: grok-heavy
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-03
+  published_at: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: Blockscout token/QQQ/factory/launchAndBuy/createGraduatedPool txs, RPC name/symbol/launchFactory/getLaunchedToken/approvedPairTokens, DexScreener, Gecko pool/token, /rhj/assets, hntsam.com, @CAYENNEcoin_RH, Llama protocols, and the claim-portal post were opened on 2026-09-03 and excerpts copied from the responses. [verified R-1 R-3 R-4 R-8 R-12] - Numbers: 6785081.72 is the Gecko CAYENNE/QQQ pool 24h volume, not the 8711317.77 token all-pools figure. Reserve 45306.86 is that pool. DexScreener 6872571.53 / 44046.45 is the same pair, different aggregator. [claim R-7 R-8 R-9] - Adversarial: the strongest contrary reading is that CAYENNE is an official Invesco or Robinhood product, a WTH/QQQ token, or that it should merge with census Pons. /rhj/assets lists QQQ as a Stock Token, not CAYENNE; What The Hook’s WTH is 0xb8Fa…fF79; the token is a Pons v2 launch with a one-way handle; hntsam.com has no CA."
+      class: inference
+      sources:
+        - S4
+        - S12
+        - S13
+        - S14
+    - text: Token source is not verified on Blockscout; creator_address_hash was null on the address API. [verified R-1] - Pool USD reserve is CAYENNE plus QQQ, not a USDG backstop. [claim R-7 R-8] - Named handle and website are one-way; hntsam.com is an Invesco property. Flags unconfirmed-official and third-party-link. [claim R-13 R-14] - Same-ticker CAYENNEcoin contracts and a netlify claim portal are copypasta-pattern, not this CA. [claim R-20 R-21] - Pons v2 docs say treat v2 as unaudited until reports are published.
+      class: claim
+      sources:
+        - S19
+  missing:
+    - text: "Does Invesco, Robinhood, or hntsam.com reverse-link to token 0xad66…56C9 or @CAYENNEcoin_RH? Next: re-read hntsam.com and any Invesco/Robinhood post that embeds the CA; keep official_handle and official_domain NULL until a reverse link exists"
+    - text: "When did PonsV2LaunchFactory.setPairTokenApproved(QQQ) flip true? Next: search factory txs for setPairTokenApproved around 2026-09-02 and record the tx hash"
+    - text: "Why is Blockscout creator_address_hash null, and does verified PonsV2LauncherToken source match this 3248-byte bytecode? Next: compare bytecode to current LaunchDeployer implementation; TokenLaunched already names the token"
+    - text: "Are the other CAYENNEcoin 56C9-suffix tokens Pons clones or unrelated vanity deploys? Next: eth_getCode and launchFactory() on each 56C9 CA; do not merge them with 0xad66…56C9"
+  unresolved:
+    - text: economics.metric remains unresolved (CON-1).
+    - text: economics.metric remains unresolved (CON-2).

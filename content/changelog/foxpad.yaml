@@ -25,3 +25,129 @@
   reviewer: harsharn10
   methodology_version: proofline-v1.0
   review_key: ea67ee0d8d6dac01
+- date: 2026-09-03
+  slug: foxpad
+  type: coverage
+  severity: Material
+  title: Initial research compiled
+  detail: Identity, evidence, deployments and open questions were compiled into an initial research record.
+  prior:
+    category: Launchpad · mechanism not classified
+    summary: "Launchpad attached to the FOX mascot token: pad fees split 50/50 between operations and a FOX vault, and graduated tokens auto-burn token-side Uniswap fees, per the project."
+    themes: null
+    official_links:
+      - kind: site
+        url: https://foxpad.app
+      - kind: x
+        url: https://x.com/fox_onrh
+    deployments:
+      - label: FOX token (the mascot token the pad's fee split buys)
+        chain: robinhood-chain
+        address: "0x2103faA9D1762e27a716C61718b3aCf3Ec1F9bf1"
+        role: token
+        verified: false
+        sources:
+          - S3
+          - S4
+      - &a1
+        label: FoxPad launch factory
+        chain: robinhood-chain
+        address: not-verified
+        role: factory
+        verified: false
+        sources: []
+    metrics: null
+  new:
+    category: Bonding-curve launchpad
+    summary: Bonding-curve launchpad on Robinhood Chain. A user deploys a 1 billion-supply ERC-20, sells 750 million on a public curve, and at 4.75 ETH the raise plus 250 million reserved tokens open a locked 1% Uniswap v3 pool. Token-side pool fees burn; the ETH side pays the creator. The interface is foxpad.app. @FoxPad_RH posted the mainnet live date. Half of protocol fees are labeled FOX Revenue Vault.
+    themes:
+      - launchpad
+      - memecoin
+    official_links:
+      - kind: site
+        url: https://foxpad.app
+      - kind: x
+        url: https://x.com/fox_onrh
+      - kind: app
+        url: https://foxpad.app/create
+      - kind: x
+        url: https://x.com/FoxPad_RH
+      - kind: telegram
+        url: https://t.me/fox_rh
+      - kind: other
+        url: https://robinhoodfox.com
+    deployments:
+      - label: FOX token (NOXA LaunchToken the pad fee split names)
+        chain: robinhood-chain
+        address: "0x2103faA9D1762e27a716C61718b3aCf3Ec1F9bf1"
+        role: token
+        verified: true
+        sources:
+          - S3
+          - S4
+          - S15
+          - S16
+          - S17
+          - S36
+      - *a1
+      - label: FoxPad factory
+        chain: robinhood-chain
+        address: "0xF8A56574a3FaF246F3ECB896193f5d5D6F87F22C"
+        role: factory
+        verified: true
+        sources:
+          - S8
+          - S10
+          - S11
+          - S13
+      - label: Protocol fee vault
+        chain: robinhood-chain
+        address: "0xbAC56372983e7269C8b5Fa83D8a6C5c6e0Bab390"
+        role: vault
+        verified: true
+        sources:
+          - S8
+          - S12
+          - S13
+      - label: Swap router
+        chain: robinhood-chain
+        address: "0x546a80f0bF76EDf37beA8BE7A074410565876ecE"
+        role: router
+        verified: true
+        sources:
+          - S8
+          - S13
+          - S30
+      - label: Token deployer
+        chain: robinhood-chain
+        address: "0x44f26F1f27dC7ad35e08c6F64Bed522C19685E81"
+        role: other
+        verified: true
+        sources:
+          - S8
+          - S13
+          - S14
+    metrics:
+      - kind: market_cap
+        value: 1379793
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S17
+      - kind: volume_24h
+        value: 250014.84
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S17
+      - kind: holders
+        value: 4490
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S15
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 3d64d89d35ca2ddf
