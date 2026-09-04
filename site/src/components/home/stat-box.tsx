@@ -10,10 +10,12 @@ export function StatBox({
   note: ReactNode;
 }) {
   const { chainStats } = useLoaderData({ from: "/" });
+  // The fee figure is one day's revenue, sitting beside a TVL that is a stock, so the label has to
+  // carry its period: chain.yaml separately holds a cumulative figure four times larger.
   const rialtoStats = chainStats ? [
     ...(chainStats.tvlUsd !== null ? [{ label: "chain TVL", value: formatUsd(chainStats.tvlUsd), href: chainStats.tvlSourceUrl }] : []),
     ...(chainStats.feeRevenueLatestDayUsd !== null ? [{
-      label: `fee revenue${chainStats.feeRevenueDay ? ` · ${chainStats.feeRevenueDay}` : ""}`,
+      label: `fee revenue, 24h${chainStats.feeRevenueDay ? ` · ${chainStats.feeRevenueDay}` : ""}`,
       value: formatUsd(chainStats.feeRevenueLatestDayUsd),
       href: chainStats.economicsSourceUrl,
     }] : []),
@@ -39,7 +41,8 @@ export function StatBox({
       </div>
       <div className="mt-2 text-[11px] text-[var(--t3)]">
         {note}
-        {chainStats ? <> · <a href={chainStats.tvlSourceUrl} className="text-[var(--acc)]">Rialto Analytics</a></> : null}
+        {/* Credit Rialto only when a Rialto figure actually rendered: a failed pull leaves both null. */}
+        {rialtoStats.length > 0 ? <> · <a href={chainStats!.tvlSourceUrl} className="text-[var(--acc)]">Rialto Analytics</a></> : null}
       </div>
     </aside>
   );

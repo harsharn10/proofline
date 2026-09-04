@@ -153,16 +153,21 @@ function CategoryPage() {
               <b className="block text-base font-semibold text-[var(--t1)]">{formatUsd(volume)}</b>
               volume 24h
             </a>
-            {categoryTvl && chainStats ? (
-              <a href={chainStats.tvlSourceUrl}>
-                <b className="block text-base font-semibold text-[var(--t1)]">{formatUsd(categoryTvl.tvlUsd)}</b>
-                {rialtoCategory} TVL
-              </a>
-            ) : null}
           </div>
+          {/* Every figure above is this section's own. This one is the whole chain's category TVL,
+              most of it protocols the census does not carry, so it sits on its own line and says so
+              in its label rather than passing as a section total. */}
+          {categoryTvl && chainStats ? (
+            <a
+              href={chainStats.tvlSourceUrl}
+              className="mt-2.5 block border-t-[0.5px] border-[var(--line)] pt-2.5 hover:text-[var(--acc)]"
+            >
+              <b className="block text-base font-semibold text-[var(--t1)]">{formatUsd(categoryTvl.tvlUsd)}</b>
+              chain {rialtoCategory} TVL · Rialto Analytics
+            </a>
+          ) : null}
           <div className="mt-2 text-[11px] text-[var(--t3)]">
             Rails these run on: {rails.length ? rails.join(" · ") : "not checked"}
-            {categoryTvl && chainStats ? <> · <a href={chainStats.tvlSourceUrl} className="text-[var(--acc)]">Rialto Analytics</a></> : null}
           </div>
         </aside>
       </section>

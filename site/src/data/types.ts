@@ -189,7 +189,10 @@ export type PulledMarket = {
       target_volume_24h: number | null;
       volume_24h_usd: number | null;
     }>;
+    // Rialto's own published 24h USD volume for the whole token, the only figure comparable with
+    // volume_h24 above. The per-pair figures are partial detail and never sum to it.
     volume_24h_usd: number | null;
+    volume_note: string | null;
     as_of: string;
     source_url: string;
   } | null;
@@ -199,7 +202,8 @@ export type PulledMarket = {
     address: string | null;
     category: string | null;
     tokenized_value_usd: number | null;
-    holders_proxy: number | null;
+    // The asset explorer's share count (value / price). A size, not a count of holders.
+    tokenized_shares: number | null;
     change_7d: number | null;
     source_url: string;
   } | null;
