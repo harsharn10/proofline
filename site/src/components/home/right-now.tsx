@@ -14,16 +14,17 @@ import {
 } from "@/data/types";
 import { sourcedLine } from "@/lib/dejargon";
 
-function Card({ title, subtitle, icon, children }: {
+function Card({ title, subtitle, icon, badge, children }: {
   title: string;
   subtitle: string;
   icon: "trend" | "rocket" | "bell";
+  badge?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <section className="rounded-xl border-[0.5px] border-[var(--line)] bg-[var(--s2)] p-3.5">
       <h3 className="m-0 flex items-center gap-1.5 text-[13px] font-semibold">
-        <Icon name={icon} />{title}
+        <Icon name={icon} />{title}{badge ? <span className="ml-auto">{badge}</span> : null}
       </h3>
       <p className="mb-1.5 mt-0 text-[11.5px] text-[var(--t3)]">{subtitle}</p>
       {children}
@@ -65,9 +66,21 @@ export function RightNow({ trending, launches, announced, notListed, now }: {
   notListed: number;
   now: number;
 }) {
+  const pulse = [...trending, ...launches.map((entry) => ({ entry, change24h: null }))]
+    .find(({ entry }) => entry.pulse)?.entry.pulse ?? null;
+  const pulseAgeMinutes = pulse ? Math.max(0, Math.floor((now - Date.parse(pulse.at)) / 60_000)) : null;
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-      <Card title="Trending" subtitle="most 24h volume, live names" icon="trend">
+      <Card
+        title="Trending"
+        subtitle="most 24h volume, live names"
+        icon="trend"
+        badge={pulseAgeMinutes === null ? null : (
+          <span className="rounded-full bg-[var(--good-bg)] px-1.5 py-0.5 text-[9.5px] font-medium text-[var(--good)]">
+            live · {pulseAgeMinutes < 1 ? "<1 min" : `${pulseAgeMinutes} min`} ago
+          </span>
+        )}
+      >
         <ol className="m-0 list-none p-0">
           {trending.map(({ entry, change24h }, index) => (
             <li key={entry.slug} className="border-t-[0.5px] border-[var(--line-soft)] py-2 first:border-0">
@@ -83,6 +96,11 @@ export function RightNow({ trending, launches, announced, notListed, now }: {
                 <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer">
                   vol {formatUsd(entry.kpis.volume24h!)}
                 </a>
+                {entry.pulse?.h1VolumeUsd === null || !entry.pulse?.links ? null : (
+                  <a href={entry.pulse.links.dexscreener} target="_blank" rel="noreferrer" className="text-[var(--good)]">
+                    h1 {formatUsd(entry.pulse.h1VolumeUsd)}
+                  </a>
+                )}
                 {change24h === null ? null : (
                   <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer" className={change24h >= 0 ? "text-[var(--good)]" : "text-[var(--bad)]"}>
                     {formatKpi("priceChange24h", change24h)}

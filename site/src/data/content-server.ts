@@ -32,6 +32,7 @@ import type {
   Link,
   Metric,
   PeerRef,
+  PulseSnapshot,
   PulledFile,
   Rank,
   Research,
@@ -501,6 +502,54 @@ function withPulledMetrics(derived: Derived, pulled: PulledFile | null): Derived
 }
 
 const DAY = 86_400_000;
+const PULSE_CACHE_MS = 10 * 60_000;
+let pulseCache: { readAt: number; value: PulseSnapshot | null } | null = null;
+
+function validPulse(value: unknown): value is PulseSnapshot {
+  if (!value || typeof value !== "object") return false;
+  const pulse = value as PulseSnapshot;
+  return typeof pulse.at === "string" && Number.isFinite(Date.parse(pulse.at)) &&
+    typeof pulse.ticks === "number" && Array.isArray(pulse.alerts) && Array.isArray(pulse.hot);
+}
+
+async function loadPulse(now = Date.now()): Promise<PulseSnapshot | null> {
+  const configured = process.env.PULSE_URL?.trim();
+  if (!configured) return null;
+  if (pulseCache && now - pulseCache.readAt < PULSE_CACHE_MS) return pulseCache.value;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 2_000);
+  try {
+    const url = configured.endsWith("/pulse.json") ? configured : `${configured.replace(/\/$/, "")}/pulse.json`;
+    const response = await fetch(url, { signal: controller.signal, headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const value: unknown = await response.json();
+    if (!validPulse(value)) throw new Error("invalid pulse document");
+    pulseCache = { readAt: now, value };
+    return value;
+  } catch (error) {
+    console.warn(`[content-server] pulse unavailable — ${error instanceof Error ? error.message : String(error)}`);
+    return pulseCache?.value ?? null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function withPulse(entry: DirectoryEntry, tokenAddress: string | null, pulse: PulseSnapshot | null): DirectoryEntry {
+  if (!pulse) return entry;
+  const hot = pulse.hot.find((row) =>
+    (tokenAddress && row.token.toLowerCase() === tokenAddress.toLowerCase()) ||
+    (entry.symbol && row.symbol.toUpperCase() === entry.symbol.toUpperCase()),
+  );
+  if (!hot) return entry;
+  return {
+    ...entry,
+    pulse: {
+      at: pulse.at,
+      h1VolumeUsd: hot.volume_h1_usd ?? null,
+      links: hot.links,
+    },
+  };
+}
 
 function parseHistory(raw: string | undefined): HistoryPoint[] {
   if (!raw) return [];
@@ -867,12 +916,20 @@ function relatedFor(
 // No research HTML, no source ledgers, no findings, no feeds.
 export const getContent = createServerFn({ method: "GET" }).handler(async (): Promise<DirectoryBundle> => {
   const content = getCachedContent();
+  const pulse = await loadPulse();
   return {
     site: content.site,
     sections: content.sections,
-    entries: content.dossiers.map((d) =>
-      toDirectoryEntry(d, content.treeBySlug, content.censusBySlug, content.site),
-    ),
+    entries: content.dossiers.map((d) => {
+      const tokenAddress = d.pulled?.addresses.find((row) => row.role === "token")?.address
+        ?? d.pulled?.addresses[0]?.address
+        ?? null;
+      return withPulse(
+        toDirectoryEntry(d, content.treeBySlug, content.censusBySlug, content.site),
+        tokenAddress,
+        pulse,
+      );
+    }),
     histories: content.histories,
     wire: content.wire,
     dependencies: Object.values(content.dependencies)
@@ -880,7 +937,7 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
       .sort((a, b) => a.name.localeCompare(b.name)),
     chainStats: content.chainStats,
     generatedAt: content.generatedAt,
-    now: content.now,
+    now: Date.now(),
   };
 });
 

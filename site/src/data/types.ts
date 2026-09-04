@@ -385,6 +385,48 @@ export type Derived = {
 // files under. The site never keeps its own label table.
 export type TreeRef = { domain: string; leaf: string; label: string; sectionId: string | null };
 
+export type PulseLinks = {
+  geckoterminal: string;
+  dexscreener: string;
+  explorer: string;
+  rialto: string;
+};
+export type PulseHot = {
+  symbol: string;
+  token: string;
+  pair: string;
+  launchpad: string | null;
+  volume_h1_usd: number | null;
+  volume_h24_usd: number | null;
+  rialto_volume_h24_usd: number | null;
+  liquidity_usd: number | null;
+  market_cap_usd: number | null;
+  fdv_usd: number | null;
+  links: PulseLinks;
+};
+export type PulseAlert = {
+  kind: "new-launch" | "breakout" | "stock-pair-spike";
+  symbol: string;
+  token: string;
+  pair: string;
+  launchpad: string | null;
+  headline: string;
+  numbers: Record<string, number | string | null>;
+  links: PulseLinks;
+};
+export type PulseSnapshot = {
+  at: string;
+  ticks: number;
+  alerts: PulseAlert[];
+  hot: PulseHot[];
+  launches_10m: number | null;
+};
+export type DirectoryPulse = {
+  at: string;
+  h1VolumeUsd: number | null;
+  links: PulseLinks | null;
+};
+
 // One reader-facing section (schema/taxonomy.json `sections`). Order is the home-page order; ids
 // are the home anchors (`/#launchpads`).
 export type SectionDef = { id: string; label: string; description: string };
@@ -418,6 +460,7 @@ export type DirectoryEntry = {
   tree: TreeRef | null;
   // Holder count of the project's token contract from content/pulled, when read. Chip figure of last resort.
   holders: number | null;
+  pulse?: DirectoryPulse;
   kpis: Kpis;
   factoryLaunches24h: number;
 };
