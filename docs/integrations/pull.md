@@ -25,6 +25,29 @@ why. It never guesses and never turns an unavailable read into zero.
 | `discovery.yaml` | Rialto router tokens and tickers plus the asset explorer; optional DexScreener liquidity for at most 40 newest candidates | Every pull (6 h) or `--source rialto` |
 | `history/<slug>.jsonl` | Snapshot of that pull: holders, market figures, transactions, launches, TVL, `revenue_24h`, `top10_share` | One append per successful full pull (6 h); never from `--source rialto` |
 
+## Blockscout PRO key
+
+Create a free key at [dev.blockscout.com](https://dev.blockscout.com), then add it to the repository
+as the Actions secret `BLOCKSCOUT_API_KEY`. The pull and compile workflows pass the secret only as an
+environment variable. It is optional: when absent, the puller keeps using
+`https://robinhoodchain.blockscout.com/api/v2` with the existing browser user agent. When present,
+every native REST route uses `https://api.blockscout.com/4663/api/v2` and sends
+`Authorization: Bearer <key>`. `BLOCKSCOUT_API_BASE` can override the REST root for local testing;
+both a host root and a root ending in `/api/v2` are accepted.
+
+The free PRO tier allows 5 requests per second and 100,000 credits per day. A PRO run starts at most
+four explorer reads concurrently and paces their physical requests to 5/s. Public fallback retains
+the previous two concurrent activity walks and 4/s pacing. The closing pull summary prints the
+physical request count as Blockscout credits, including retries, so the scheduled-run log is the
+budget receipt. At four full six-hourly runs per day, a run should remain under 25,000 credits to fit
+the free allocation.
+
+Cloudflare managed-challenge HTML is never parsed as API data. A `<!DOCTYPE html` response or a page
+titled `Just a moment` is classified as a bot challenge, retried once after a 0.5–1.5 second jitter,
+then recorded as `explorer served a bot challenge` with nullable fields. If challenge responses are
+more than half of all physical explorer requests, the pull exits nonzero with a one-line bot-wall
+summary instead of silently publishing a mostly empty explorer snapshot.
+
 ## Rialto Analytics
 
 Rialto Analytics is the chain-wide cross-check. Its keyless API rejects bare clients, so every call
@@ -226,6 +249,7 @@ Launchpad attribution and the locker set are joins over `content/census.yaml` an
 `content/pulled/`. A `--only` run therefore attributes against the same table a full run does,
 and a mistake in one run cannot be inherited by the next.
 
-Blockscout calls send a browser User-Agent, use the shared request pacer and retry 429/5xx replies.
+Public Blockscout calls send a browser User-Agent; PRO calls send the bearer key. Both use a request
+pacer and retry 429/5xx replies, with the separate managed-challenge behavior documented above.
 Explorer activity walks are capped at 40 pages and run at two addresses concurrently, keeping the
 scheduled full run inside its 60-minute workflow budget while making a capped count explicit.
