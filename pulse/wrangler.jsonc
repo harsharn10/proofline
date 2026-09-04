@@ -7,11 +7,16 @@
   "triggers": {
     "crons": ["*/10 * * * *"]
   },
+  // Create the namespace once with `wrangler kv namespace create PULSE_STATE` and paste its id here
+  // before the first deploy. Wrangler's auto-provisioning prompts, and the deploy job is not
+  // interactive. See docs/integrations/pulse.md.
   "kv_namespaces": [
     { "binding": "PULSE_STATE" }
   ],
   "vars": {
+    // Delivery is off until the deploy workflow overrides this from ops/telegram-review.json, so a
+    // hand-run `wrangler deploy` from a laptop cannot post to the channel by accident.
+    "TELEGRAM_ENABLED": "false",
     "PULSE_DRY_RUN": "true"
   }
 }
-

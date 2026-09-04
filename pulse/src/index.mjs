@@ -1,5 +1,8 @@
 import {
   evaluatePulse,
+  markFired,
+  pruneFiredAt,
+  PULSE_KINDS,
   PULSE_RULES,
   selectPulseDeliveries,
 } from "../../scripts/lib/signals.mjs";
@@ -32,6 +35,18 @@ async function json(url, init = {}, fetchImpl = fetch) {
   const contentType = response.headers?.get?.("content-type") ?? "";
   if (!/json/i.test(contentType)) throw new Error(`${url} did not return JSON`);
   return response.json();
+}
+
+// Rialto is a scraped endpoint behind browser headers and DexScreener indexes on its own schedule:
+// any of the four source reads can fail on any tick. One failure must cost that source's numbers for
+// the tick, never the whole tick — a 403 from Rialto used to throw before a single rule was evaluated.
+async function safeJson(label, url, init, fetchImpl, fallback) {
+  try {
+    return await json(url, init, fetchImpl);
+  } catch (error) {
+    console.warn(`[pulse] ${label} unavailable: ${error instanceof Error ? error.message : String(error)}`);
+    return fallback;
+  }
 }
 
 function geckoPools(body) {
@@ -78,12 +93,13 @@ function normalizeGecko(row) {
   };
 }
 
+// Only the row for this exact pair. DexScreener returns every pool for the token, and falling back
+// to another one attached an established pool's liquidity and volume to a fresh pair's address and
+// links — a number the reader could not check against the page it points at. With no match we keep
+// GeckoTerminal's numbers, which are the pair's own.
 function chooseDexPair(rows, pool) {
   if (!Array.isArray(rows)) return null;
-  return rows.find((row) => lower(row.pairAddress) === lower(pool.pair))
-    ?? rows.find((row) => lower(row.quoteToken?.address) === lower(pool.quoteToken))
-    ?? rows[0]
-    ?? null;
+  return rows.find((row) => lower(row.pairAddress) === lower(pool.pair)) ?? null;
 }
 
 function mergeDex(pool, dex) {
@@ -153,16 +169,31 @@ async function readState(kv) {
   };
 }
 
+const FAILED = Symbol("failed");
+
 async function sourceRows(state, now, fetchImpl) {
   const stockAge = now - Date.parse(state.stockAt ?? "");
-  const refreshStocks = !Number.isFinite(stockAge) || stockAge >= STOCK_CACHE_MS;
+  const wantStocks = !Number.isFinite(stockAge) || stockAge >= STOCK_CACHE_MS;
   const [trending, newest, tickers, stocks] = await Promise.all([
-    json(`${GECKO_BASE}/trending_pools?page=1`, {}, fetchImpl),
-    json(`${GECKO_BASE}/new_pools?page=1`, {}, fetchImpl),
-    json(RIALTO_TICKERS, { headers: RIALTO_HEADERS }, fetchImpl),
-    refreshStocks ? json(RIALTO_STOCKS, { headers: RIALTO_HEADERS }, fetchImpl) : null,
+    safeJson("GeckoTerminal trending_pools", `${GECKO_BASE}/trending_pools?page=1`, {}, fetchImpl, FAILED),
+    safeJson("GeckoTerminal new_pools", `${GECKO_BASE}/new_pools?page=1`, {}, fetchImpl, FAILED),
+    safeJson("Rialto router/tickers", RIALTO_TICKERS, { headers: RIALTO_HEADERS }, fetchImpl, []),
+    wantStocks
+      ? safeJson("Rialto robinhood-symbols", RIALTO_STOCKS, { headers: RIALTO_HEADERS }, fetchImpl, FAILED)
+      : null,
   ]);
-  return { trending, newest, tickers, stocks, refreshStocks };
+  return {
+    trending: trending === FAILED ? { data: [] } : trending,
+    newest: newest === FAILED ? { data: [] } : newest,
+    tickers,
+    stocks,
+    // A failed symbols read keeps the cached list and leaves stockAt alone, so the next tick retries
+    // instead of running the stock-pair rule against an empty table.
+    refreshStocks: wantStocks && stocks !== FAILED && stocks !== null,
+    // Both pool lists gone means there is nothing to evaluate. Say so rather than publishing an
+    // empty market.
+    geckoOk: trending !== FAILED || newest !== FAILED,
+  };
 }
 
 async function enrichPools(rows, fetchImpl) {
@@ -173,14 +204,8 @@ async function enrichPools(rows, fetchImpl) {
   }
   const pools = [...byPair.values()];
   const tokens = [...new Set(pools.map((pool) => lower(pool.token)).filter(Boolean))].slice(0, 30);
-  const dexResults = await Promise.all(tokens.map(async (token) => {
-    try {
-      return [token, await json(`${DEX_BASE}/${token}`, {}, fetchImpl)];
-    } catch (error) {
-      console.warn(`[pulse] DexScreener ${token}: ${error instanceof Error ? error.message : String(error)}`);
-      return [token, []];
-    }
-  }));
+  const dexResults = await Promise.all(tokens.map(async (token) =>
+    [token, await safeJson(`DexScreener ${token}`, `${DEX_BASE}/${token}`, {}, fetchImpl, [])]));
   const dexByToken = new Map(dexResults);
   return pools.map((pool) => mergeDex(pool, chooseDexPair(dexByToken.get(lower(pool.token)), pool)));
 }
@@ -216,6 +241,12 @@ function hotPair(pair) {
 
 const dryRun = (env) => !["0", "false", "off"].includes(lower(env.PULSE_DRY_RUN));
 
+// The one switch the repository owns. The deploy workflow sets this variable from
+// ops/telegram-review.json, so flipping the flag in the repo and pushing is what turns the Worker's
+// delivery on or off — see docs/integrations/pulse.md. Anything other than the exact string "true"
+// is paused, so a missing or misspelled value fails silent.
+const telegramEnabled = (env) => lower(env.TELEGRAM_ENABLED) === "true";
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -224,30 +255,63 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
+// An href is an attribute value, not a text node: a quote inside a source URL closes the attribute
+// and Telegram rejects the whole message with a 400. Anything that is not a plain http(s) URL is
+// dropped rather than linked.
+function anchor(url, label) {
+  const href = String(url ?? "");
+  if (!/^https?:\/\/[^\s]+$/i.test(href)) return null;
+  return `<a href="${escapeHtml(href)}">${escapeHtml(label)}</a>`;
+}
+
+// "sent" — it left. "logged" — the switch or the dry run held it, which still counts as handled, so
+// the same message is not reconsidered every ten minutes. "skipped" — not ours to send.
+// A thrown error means delivery genuinely failed and the signal stays eligible for the next tick.
 async function sendTelegram(item, env, fetchImpl) {
+  if (!PULSE_KINDS.includes(item.kind)) {
+    console.warn(`[pulse] not a pulse kind, leaving it to the digest: ${item.kind}`);
+    return "skipped";
+  }
+  if (!telegramEnabled(env)) {
+    console.log(`[pulse paused] ${item.headline}`);
+    return "logged";
+  }
   if (dryRun(env)) {
     console.log(`[pulse dry run] ${item.headline}`);
-    return false;
+    return "logged";
   }
   if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) throw new Error("Telegram secrets are not configured");
   const kicker = {
     "new-launch": "New launch",
     breakout: "Breakout",
     "stock-pair-spike": "Stock pair",
-  }[item.kind] ?? "Signal";
-  const text = `⚡ <b>Icarus pulse · ${escapeHtml(kicker)}</b>\n${escapeHtml(item.headline)}\n\n<a href="${item.links.dexscreener}">DexScreener</a> · <a href="${item.links.explorer}">Explorer</a>`;
+  }[item.kind];
+  const links = [
+    anchor(item.links?.dexscreener, "DexScreener"),
+    anchor(item.links?.explorer, "Explorer"),
+  ].filter(Boolean).join(" · ");
+  const text = `⚡ <b>Icarus pulse · ${escapeHtml(kicker)}</b>\n${escapeHtml(item.headline)}${links ? `\n\n${links}` : ""}`;
   const response = await fetchImpl(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text, parse_mode: "HTML", disable_web_page_preview: true }),
   });
   if (!response.ok) throw new Error(`Telegram returned HTTP ${response.status}`);
-  return true;
+  return "sent";
 }
 
 export async function runTick(env, { now = Date.now(), fetchImpl = fetch } = {}) {
+  const at = new Date(now).toISOString();
   const state = await readState(env.PULSE_STATE);
   const rows = await sourceRows(state, now, fetchImpl);
+  if (!rows.geckoOk) {
+    // Publishing an empty market would be a lie, and refreshing `at` would tell the site's live badge
+    // the reading is current. Leave the last document exactly where it is and let it visibly age.
+    console.error("[pulse] both GeckoTerminal reads failed; keeping the previous /pulse.json");
+    await env.PULSE_STATE.put(STATE_KEY, JSON.stringify({ ...state, lastSourceFailureAt: at }));
+    const stored = await env.PULSE_STATE.get(OUTPUT_KEY);
+    return stored ? JSON.parse(stored) : emptyOutput();
+  }
   const pairs = await enrichPools(rows, fetchImpl);
   const tickers = Array.isArray(rows.tickers) ? rows.tickers : [];
   for (const pair of pairs) pair.rialtoVolumeH24Usd = rialtoCrossCheck(pair, tickers);
@@ -263,27 +327,28 @@ export async function runTick(env, { now = Date.now(), fetchImpl = fetch } = {})
     stockTickers: stocks.stockTickers,
   });
   const selected = selectPulseDeliveries(candidates, state, now);
-  let delivered = 0;
+  let firedAt = selected.firedAt;
+  const deliveredAt = [];
   for (const item of selected.deliver) {
     try {
-      if (await sendTelegram(item, env, fetchImpl)) delivered++;
+      const result = await sendTelegram(item, env, fetchImpl);
+      if (result === "skipped") continue;
+      // Recorded per message, after that message was handled — a Telegram failure mid-batch leaves
+      // the rest of the tick's signals eligible instead of burning their cooldown.
+      firedAt = markFired(firedAt, item, now);
+      if (result === "sent") deliveredAt.push(at);
     } catch (error) {
       console.error(`[pulse] Telegram: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
-  const at = new Date(now).toISOString();
   const priorSent = (state.sentAt ?? []).filter((value) => now - Date.parse(value) < 24 * 60 * 60 * 1000);
-  const firedAt = Object.fromEntries(Object.entries(selected.firedAt).filter(([, value]) => {
-    const fired = Date.parse(value);
-    return Number.isFinite(fired) && now - fired < PULSE_RULES.cooldownMs;
-  }));
   const nextState = {
     ...state,
     ticks: (state.ticks ?? 0) + 1,
     historyByPair: trimHistory(state.historyByPair ?? {}, pairs, at),
-    firedAt,
-    sentAt: [...priorSent, ...Array(delivered).fill(at)],
+    firedAt: pruneFiredAt(firedAt, now, PULSE_RULES),
+    sentAt: [...priorSent, ...deliveredAt],
     stockTokens: stocks.stockTokens,
     stockTickers: stocks.stockTickers,
     stockAt: rows.refreshStocks ? at : state.stockAt,
@@ -327,6 +392,9 @@ export default {
   },
 
   async scheduled(_controller, env, ctx) {
-    ctx.waitUntil(runTick(env));
+    // waitUntil swallows a rejection, so a thrown tick would otherwise disappear entirely.
+    ctx.waitUntil(runTick(env).catch((error) => {
+      console.error(`[pulse] tick failed: ${error instanceof Error ? error.stack ?? error.message : String(error)}`);
+    }));
   },
 };
