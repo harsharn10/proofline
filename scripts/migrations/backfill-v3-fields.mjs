@@ -9,7 +9,7 @@ import { parse, stringify } from "yaml";
 import { compile, parsePacket } from "../lib/packet.mjs";
 
 export const BATCH_PACKET = "WORK-20260903-grok-heavy-icarus-research.md";
-const V3_FIELDS = ["tldr", "why_people_care", "risks"];
+const V3_FIELDS = ["tldr", "tldr_source", "why_people_care", "risks"];
 
 async function yaml(path, fallback = null) {
   try { return parse(await readFile(path, "utf8")); }
@@ -25,7 +25,7 @@ export async function backfillV3Fields({
   const censusBySlug = new Map((census ?? []).map((row) => [row.slug, row]));
   const slugs = (await readdir(packetRoot, { withFileTypes: true }))
     .filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
-  const stats = { packets: 0, projectsChanged: 0, feedsChanged: 0, tldr: 0, why_people_care: 0, risks: 0, notices: [] };
+  const stats = { packets: 0, projectsChanged: 0, feedsChanged: 0, tldr: 0, tldr_source: 0, why_people_care: 0, risks: 0, notices: [] };
 
   for (const slug of slugs) {
     const packetPath = join(packetRoot, slug, BATCH_PACKET);

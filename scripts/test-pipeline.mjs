@@ -491,7 +491,7 @@ await test("the feed carries reader-facing events under ids that survive an edit
   assert.equal(second.feed.items[0].title, retitled.frontmatter.events[0].title);
 });
 
-await test("compile maps TL;DR, three sourced reasons and sentence-split risks", async () => {
+await test("compile maps TL;DR, three sourced reasons and paragraph risks", async () => {
   const source = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
   const body = [
     "## What it is", "", "Icarus Fields tracks public chain changes.", "",
@@ -512,10 +512,10 @@ await test("compile maps TL;DR, three sourced reasons and sentence-split risks",
     "Explorer links let readers verify contract activity. [verified S3]",
   ]);
   assert.deepEqual(result.project.risks, [
-    "Indexer delays can hide a recent update. [claim S4]",
-    "Readers should check the linked source before acting. [claim S4]",
+    "Indexer delays can hide a recent update. Readers should check the linked source before acting. [claim S4]",
   ]);
-  assert.ok(result.notices.some((notice) => notice.includes("split the section into sentences")), result.notices.join("\n"));
+  assert.equal(result.project.tldr_source, undefined, "a real TL;DR line is not tagged as derived");
+  assert.ok(result.notices.some((notice) => notice.includes("read the section's 1 paragraphs as bullets")), result.notices.join("\n"));
   assert.deepEqual(validateAgainst("project", result.project), []);
 
   const tooFew = compile({ frontmatter: source.frontmatter, body: body.replace(/\n- Explorer links[^\n]+/, "") });
@@ -533,6 +533,59 @@ await test("compile maps TL;DR, three sourced reasons and sentence-split risks",
   assert.equal(protectedResult.project.tldr, protectedProject.tldr);
   assert.deepEqual(protectedResult.project.why_people_care, protectedProject.why_people_care);
   assert.deepEqual(protectedResult.project.risks, protectedProject.risks);
+});
+
+await test("compile derives the v3 fields a packet did not write, and never drops a risk for length", async () => {
+  const source = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
+  const long = (lead) =>
+    `${lead} the operator can change fees, pairing assets, launch configuration and the graduation ` +
+    "components on a live market, and every one of those calls lands as soon as the signers confirm it";
+  const body = [
+    "## What it is", "",
+    "Icarus Fields tracks public chain changes. It reads the explorer directly. A third sentence runs " +
+      "long enough that the TL;DR budget cannot hold it alongside the first two sentences of the summary.", "",
+    "Themes: chain-data, tooling", "",
+    "## Why it matters", "",
+    "It turns chain changes into a short reader update. Independent walkthroughs make the output easier " +
+      "to check. [claim R-1]", "",
+    "Explorer links let readers verify `contract()` activity. [verified R-3]", "",
+    "## What could go wrong", "",
+    `${long("There is no timelock, so")} [claim R-4]`, "",
+    "Indexer delays can hide a recent update. [claim R-4]", "",
+    "A third paragraph fills the last slot. [claim R-4]", "",
+    "A fourth paragraph is over the cap. [claim R-4]",
+  ].join("\n");
+  const result = compile({ frontmatter: source.frontmatter, body });
+
+  assert.equal(result.project.tldr, "Icarus Fields tracks public chain changes. It reads the explorer directly.");
+  assert.equal(result.project.tldr_source, "derived");
+  assert.ok(result.notices.includes("tldr derived from summary"), result.notices.join("\n"));
+
+  assert.equal(result.project.why_people_care.length, 3);
+  assert.equal(result.project.why_people_care[0], "It turns chain changes into a short reader update. [claim S1]");
+  assert.equal(
+    result.project.why_people_care[2],
+    "Explorer links let readers verify contract() activity. [verified S3]",
+    "backticks never reach the content record",
+  );
+  assert.ok(result.notices.includes("why_people_care derived from paragraphs"), result.notices.join("\n"));
+
+  assert.equal(result.project.risks.length, 3, "three slots stay filled");
+  assert.ok(result.project.risks[0].startsWith("There is no timelock,"), "the first risk written is the first risk kept");
+  assert.ok(result.project.risks[0].endsWith("[claim S4]"), "the source tag survives the trim");
+  assert.ok(result.project.risks[0].includes("…"), "an over-length risk is trimmed, not dropped");
+  assert.ok(result.project.risks.every((risk) => risk.length <= 200), result.project.risks.map((r) => r.length).join(","));
+  assert.equal(result.project.risks[1], "Indexer delays can hide a recent update. [claim S4]");
+  assert.deepEqual(validateAgainst("project", result.project), []);
+});
+
+await test("an empty Why it matters and an untitled summary are reported, not silently dropped", async () => {
+  const source = parsePacket(await readFile("fixtures/compile-packet/icarus-fields.md", "utf8"));
+  const body = ["## What it is", "", "Icarus Fields tracks public chain changes.", "", "Themes: chain-data", "",
+    "## Why it matters", "", "- Only one bullet here. [claim R-1]"].join("\n");
+  const result = compile({ frontmatter: source.frontmatter, body });
+  assert.equal(result.project.why_people_care, undefined);
+  assert.ok(result.notices.some((notice) => notice.includes("why_people_care: empty")), result.notices.join("\n"));
 });
 
 await test("v3 field validation warns on gaps and rejects unsourced reasons", () => {

@@ -566,48 +566,169 @@ function sectionBullets(body, heading) {
 const CANONICAL_SOURCE_TAG_RE = /\[(?:verified|claim|inference|disputed)\s+S[1-9][0-9]*(?:\s+S[1-9][0-9]*)*\]\s*$/i;
 const PACKET_TAGS_END_RE = /(?:\s*\[(?:verified|claim|inference|disputed|unknown)(?:\s+R-[1-9][0-9]*)*\])+\s*$/i;
 
+// Card budgets. The TL;DR is one line under the name; a bullet is one line in a list, so it gets more.
+const MAX_TLDR = 160;
+const MAX_BULLET = 200;
+
+/** Markdown inline-code marks are packet notation. The card renders reader copy, so they never survive. */
+function stripCodeMarks(value) {
+  return String(value ?? "").replace(/`+/g, "");
+}
+
+// Every consecutive closing tag, not just the last one: a paragraph often closes
+// "[verified S39] [claim S36]" and dropping the first group would drop a receipt.
+const CANONICAL_TAGS_END_RE = /(?:\s*\[(?:verified|claim|inference|disputed)\s+S[1-9][0-9]*(?:\s+S[1-9][0-9]*)*\])+\s*$/i;
+
+/** Split "prose [verified S1] [claim S3]" into its parts; an untagged bullet keeps an empty tag. */
+function splitTrailingTag(value) {
+  const text = String(value ?? "");
+  const match = CANONICAL_TAGS_END_RE.exec(text);
+  if (!match) return { prose: text.trim(), tag: "" };
+  return { prose: text.slice(0, match.index).trim(), tag: match[0].trim() };
+}
+
+// A sentence break needs a full stop and something that is not lowercase after it, so "cube.family
+// timed out" and "lunch.fun's launcher" stay whole while "... owner(). @RHDaily__ listed ..." splits.
+function sentencesOf(text) {
+  return String(text ?? "").split(/(?<=[.!?])\s+(?=[^a-z\s])/).map((part) => part.trim()).filter(Boolean);
+}
+
+/**
+ * Fit a bullet inside the card budget without ever losing it. First choice is the whole paragraph,
+ * then its first sentence, then the longest clause that fits, marked with an ellipsis so the reader
+ * can see it was cut. The source tag always survives — a bullet without its receipt is not publishable.
+ */
+function fitBullet(value, limit) {
+  const { prose, tag } = splitTrailingTag(value);
+  const withTag = (text) => (tag ? `${text} ${tag}` : text);
+  const budget = tag ? limit - tag.length - 1 : limit;
+  if (budget <= 0) return null;
+  if (prose.length <= budget) return withTag(prose);
+  const sentence = sentencesOf(prose)[0] ?? prose;
+  if (sentence.length && sentence.length <= budget) return withTag(sentence);
+  const head = prose.slice(0, budget - 1);
+  const clause = Math.max(...[", ", "; ", ": ", " — ", " – ", " - "].map((mark) => head.lastIndexOf(mark)));
+  const word = head.lastIndexOf(" ");
+  // A clause break reads better, but only when it is not throwing away most of the line; otherwise
+  // stop at the last whole word. Either way the reader sees an ellipsis where the sentence was cut.
+  const cut = clause >= budget * 0.85 ? clause : word;
+  const kept = (cut > 0 ? head.slice(0, cut) : head).replace(/[\s,;:—–-]+$/, "");
+  if (!kept) return null;
+  return withTag(`${kept}…`);
+}
+
+/** Whole sentences from the summary paragraph, as many as the TL;DR budget holds. Never mid-word. */
+function tldrFromSummary(body, limit = MAX_TLDR) {
+  const first = paragraphs(unfencedSectionLines(body, "What it is").join("\n"))[0];
+  if (!first) return "";
+  const prose = normalizeText(stripCodeMarks(String(first).replace(PACKET_TAGS_END_RE, "")));
+  if (!prose) return "";
+  const sentences = sentencesOf(prose);
+  let out = "";
+  for (const sentence of sentences) {
+    const candidate = out ? `${out} ${sentence}` : sentence;
+    if (candidate.length > limit) break;
+    out = candidate;
+  }
+  if (out) return out;
+  const head = prose.slice(0, limit - 1);
+  const cut = head.lastIndexOf(" ");
+  const kept = (cut > 0 ? head.slice(0, cut) : head).replace(/[\s,;:—–-]+$/, "");
+  return kept ? `${kept}…` : "";
+}
+
+/** Paragraphs of a section, each carrying its own trailing packet tags on every sentence it holds. */
+function taggedSentences(body, heading) {
+  return paragraphs(unfencedSectionLines(body, heading).join("\n")).flatMap((paragraph) => {
+    const match = paragraph.match(PACKET_TAGS_END_RE);
+    const tags = match?.[0]?.trim() ?? "";
+    const prose = normalizeText(match ? paragraph.slice(0, paragraph.length - match[0].length) : paragraph);
+    return sentencesOf(prose).map((sentence) => `${sentence}${tags ? ` ${tags}` : ""}`);
+  });
+}
+
+/** Paragraphs of a section as single candidates, tags kept at the end. */
+function taggedParagraphs(body, heading) {
+  return paragraphs(unfencedSectionLines(body, heading).join("\n")).flatMap((paragraph) => {
+    const match = paragraph.match(PACKET_TAGS_END_RE);
+    const tags = match?.[0]?.trim() ?? "";
+    const prose = normalizeText(match ? paragraph.slice(0, paragraph.length - match[0].length) : paragraph);
+    return prose ? [`${prose}${tags ? ` ${tags}` : ""}`] : [];
+  });
+}
+
 function v3FieldsFromBody(frontmatter, body, receiptToSource, notice) {
   const fallbackReceiptId = primaryOfficialReceiptId(frontmatter);
-  const shape = (value, label) => {
-    const mapped = normalizeText(mappedTag(value, receiptToSource));
-    if (mapped.length <= 160) return mapped;
-    notice(`${label}: skipped; ${mapped.length} characters exceeds the 160-character card limit`);
+  const shape = (value, label, limit = MAX_BULLET) => {
+    const mapped = normalizeText(stripCodeMarks(mappedTag(value, receiptToSource)));
+    if (mapped.length <= limit) return mapped;
+    notice(`${label}: skipped; ${mapped.length} characters exceeds the ${limit}-character card limit`);
     return null;
+  };
+  // Same mapping, but a long line is trimmed rather than dropped and an untagged line is closed with
+  // the packet's own receipt — used where the field is derived from prose the researcher did not
+  // write to a length limit or to the bullet contract.
+  const shapeFit = (value, limit = MAX_BULLET) => {
+    let mapped = normalizeText(stripCodeMarks(mappedTag(value, receiptToSource)));
+    if (!CANONICAL_SOURCE_TAG_RE.test(mapped))
+      mapped = `${mapped} ${derivedTag(frontmatter, value, receiptToSource, fallbackReceiptId)}`;
+    return fitBullet(mapped, limit);
   };
 
   const rawTldr = tldrFromBody(body);
-  const tldr = rawTldr ? shape(rawTldr, "tldr") : null;
+  let tldrSource = null;
+  let tldr = rawTldr ? shape(rawTldr, "tldr", MAX_TLDR) : null;
+  if (!tldr) {
+    const derived = tldrFromSummary(body);
+    if (derived) {
+      tldr = normalizeText(derived);
+      tldrSource = "derived";
+      notice("tldr derived from summary");
+    }
+  }
+  if (!tldr) notice("tldr: empty; the packet has no TL;DR line and no summary sentence to derive one from");
 
-  const rawWhy = sectionBullets(body, "Why it matters");
+  let rawWhy = sectionBullets(body, "Why it matters");
+  let whyDerived = false;
+  if (!rawWhy.length) {
+    const sentences = taggedSentences(body, "Why it matters");
+    if (sentences.length >= 3) {
+      rawWhy = sentences.slice(0, 3);
+      whyDerived = true;
+      notice("why_people_care derived from paragraphs");
+    }
+  }
   let whyPeopleCare = null;
   if (rawWhy.length && rawWhy.length !== 3)
     notice(`why_people_care: skipped; expected exactly 3 bullets and found ${rawWhy.length}`);
   else if (rawWhy.length === 3) {
-    const mapped = rawWhy.map((item, index) => shape(item, `why_people_care bullet ${index + 1}`));
+    const mapped = whyDerived
+      ? rawWhy.map((item) => shapeFit(item))
+      : rawWhy.map((item, index) => shape(item, `why_people_care bullet ${index + 1}`));
     if (mapped.every(Boolean) && mapped.every((item) => CANONICAL_SOURCE_TAG_RE.test(item))) whyPeopleCare = mapped;
     else notice("why_people_care: skipped; every bullet needs a source id in its closing evidence tag");
   }
+  if (!whyPeopleCare) notice("why_people_care: empty; the packet has no three sourced reasons to publish");
 
   const riskBullets = sectionBullets(body, "What could go wrong");
-  let rawRisks = riskBullets;
-  if (riskBullets.length > 3) notice(`risks: kept the first 3 of ${riskBullets.length} bullets`);
+  let candidates = riskBullets;
   if (!riskBullets.length) {
-    const section = unfencedSectionLines(body, "What could go wrong").join("\n");
-    const parts = paragraphs(section);
-    rawRisks = parts.flatMap((paragraph) => {
-      const tags = paragraph.match(PACKET_TAGS_END_RE)?.[0]?.trim() ?? "";
-      const prose = normalizeText(tags ? paragraph.slice(0, paragraph.length - paragraph.match(PACKET_TAGS_END_RE)[0].length) : paragraph);
-      return prose.split(/(?<=[.!?])\s+(?=[A-Z0-9])/).filter(Boolean).map((sentence) => `${sentence}${tags ? ` ${tags}` : ""}`);
-    });
-    if (rawRisks.length) notice(`risks: no bullets found; split the section into sentences and kept the first ${Math.min(3, rawRisks.length)}`);
+    candidates = taggedParagraphs(body, "What could go wrong");
+    if (candidates.length) notice(`risks: no bullets found; read the section's ${candidates.length} paragraphs as bullets`);
   }
-  const risks = rawRisks.slice(0, 3).map((item, index) => {
-    let mapped = normalizeText(mappedTag(item, receiptToSource));
+  // Fill three slots from the candidates in order. A long candidate is trimmed, never skipped, so
+  // the first risk the researcher wrote is always the first risk the card shows.
+  const risks = [];
+  for (const item of candidates) {
+    if (risks.length === 3) { notice(`risks: kept the first 3 of ${candidates.length} entries`); break; }
+    let mapped = normalizeText(stripCodeMarks(mappedTag(item, receiptToSource)));
     if (!CANONICAL_SOURCE_TAG_RE.test(mapped))
       mapped = `${mapped} ${derivedTag(frontmatter, item, receiptToSource, fallbackReceiptId)}`;
-    return shape(mapped, `risks bullet ${index + 1}`);
-  }).filter(Boolean);
-  return { tldr, whyPeopleCare, risks: risks.length ? risks : null };
+    const fitted = fitBullet(mapped, MAX_BULLET);
+    if (fitted) risks.push(fitted);
+    else notice(`risks: dropped one entry; nothing was left after its source tag`);
+  }
+  return { tldr, tldrSource, whyPeopleCare, risks: risks.length ? risks : null };
 }
 
 function themeErrors(themes) {
@@ -1229,6 +1350,11 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
   const themes = controllerEdited ? priorProject.themes : (compiledThemes.length ? compiledThemes : priorProject?.themes);
   const compiledV3 = v3FieldsFromBody(frontmatter, body, receiptToSource, notice);
   const tldr = controllerEdited ? priorProject?.tldr : (compiledV3.tldr ?? priorProject?.tldr);
+  // A derived TL;DR is a placeholder: the tag says so, and a real "TL;DR:" line in a later packet
+  // replaces it silently because the compiled value wins and the tag is dropped with it.
+  const tldrSource = controllerEdited
+    ? priorProject?.tldr_source
+    : (compiledV3.tldr ? compiledV3.tldrSource : priorProject?.tldr_source);
   const whyPeopleCare = controllerEdited ? priorProject?.why_people_care : (compiledV3.whyPeopleCare ?? priorProject?.why_people_care);
   const risks = controllerEdited ? priorProject?.risks : (compiledV3.risks ?? priorProject?.risks);
   const project = {
@@ -1241,6 +1367,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     coverage,
     summary,
     ...(tldr ? { tldr } : {}),
+    ...(tldr && tldrSource ? { tldr_source: tldrSource } : {}),
     ...(whyPeopleCare?.length ? { why_people_care: whyPeopleCare } : {}),
     ...(risks?.length ? { risks } : {}),
     ...(themes?.length ? { themes } : {}),
@@ -1251,6 +1378,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     review: priorProject?.review ?? { researcher: frontmatter.producer, approver: "pending", methodology_version: "proofline-v1.0", reviewed_at: frontmatter.as_of.slice(0, 10), published_at: null },
     findings: findingsFromBody(frontmatter, body, receiptToSource, priorProject, metricGaps),
   };
+  if (!(tldr && tldrSource)) delete project.tldr_source;
   const receiptsById = new Map((frontmatter.receipts ?? []).map((receipt) => [receipt.id, receipt]));
   const feedItems = (frontmatter.events ?? []).map((event) => {
     // site_recommendation "none" is the producer saying this event is not for readers. Honour it: the

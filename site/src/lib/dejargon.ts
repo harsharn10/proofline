@@ -46,7 +46,9 @@ const READER_WORDS: Array<[RegExp, string]> = [
 export function readerCopy(text: string): string {
   let out = dejargon(text);
   for (const [re, sub] of READER_WORDS) out = out.replace(re, sub);
-  return out;
+  // Markdown inline-code marks are packet notation. The compiler strips them, but a hand-edited
+  // content file can still carry them and a reader must never see `owner()` with its backticks.
+  return out.replace(/`+/g, "");
 }
 
 // Deployment labels carry internal parentheticals ("(workbook sheet 02)", "(posted by
