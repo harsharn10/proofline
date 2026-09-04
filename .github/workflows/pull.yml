@@ -5,9 +5,9 @@ name: Pull chain facts
 # content/pulled/** is machine-owned (docs/research-system.md §2): scripts/pull.mjs is its only
 # writer, the files are fully regenerated every run, and nobody hand-edits them. This workflow is
 # consequently the one job in the repository allowed to push to main directly — everything else goes
-# through a pull request. It earns that by writing nothing else: the commit is scoped to
-# content/pulled/**, and a failed `npm run validate` after the pull aborts before any commit, so a
-# bad pull cannot land on main.
+# through a pull request. It earns that by writing nothing else: the data commit is scoped to
+# content/pulled/**, and a failed `npm run validate` after the pull aborts before it, so a bad pull
+# cannot land on main.
 #
 # Every six hours at :17 past. The offset keeps the run off the hour, where scheduled jobs queue.
 on:
@@ -30,6 +30,11 @@ on:
         default: all
         type: choice
         options: [all, hot, live, quiet, dormant]
+      shard:
+        description: "Read one half of the registry only (INDEX/TOTAL, e.g. 0/2)"
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: write
@@ -42,24 +47,25 @@ concurrency:
 
 jobs:
   pull:
-    name: Pull and commit (${{ matrix.shard }})
+    name: Pull and commit
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        shard: ["0/2", "1/2"]
     env:
       # Optional: without it the puller retains the public explorer fallback.
       BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}
     # One bot on main at a time: the compile workflow shares this group.
+    #
+    # Deliberately one job and not a two-shard matrix. `cancel-in-progress: false` protects the job
+    # that is running, not the one that is queued behind it, so a compile run starting mid-pull would
+    # cancel a pending second shard outright — half the registry silently skipping a cycle while the
+    # workflow reports success, its queue entries never consumed and its spend never recorded. The
+    # per-run credit cap is what bounds this job now, and `--shard` remains available by dispatch.
     concurrency:
       group: main-bots
       cancel-in-progress: false
-    # The 24h transaction walk is the long pole: Blockscout answers in a second or two, at most two
-    # requests are in flight against it, and a busy factory can need forty pages. An hour is slack
-    # over the observed run, not the expected one.
-    timeout-minutes: 45
+    # The run cap is the real bound: 6,000 credits against an explorer pacer that serialises physical
+    # requests to five per second is twenty minutes of pacing, and the deferral path — defer, record,
+    # exit 0 — has to be reachable inside the timeout or it is decoration. An hour is slack over that.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -77,14 +83,15 @@ jobs:
           INPUT_ONLY: ${{ inputs.only }}
           INPUT_FULL: ${{ inputs.full }}
           INPUT_TIER: ${{ inputs.tier }}
-          PULL_SHARD: ${{ matrix.shard }}
+          INPUT_SHARD: ${{ inputs.shard }}
         run: |
           set -euo pipefail
-          args=(--shard "$PULL_SHARD")
+          args=()
           if [ -n "${INPUT_ONLY:-}" ]; then args+=(--only "$INPUT_ONLY"); fi
           if [ "${INPUT_FULL:-false}" = "true" ]; then args+=(--full); fi
           if [ -n "${INPUT_TIER:-}" ] && [ "$INPUT_TIER" != "all" ]; then args+=(--tier "$INPUT_TIER"); fi
-          npm run pull -- "${args[@]}"
+          if [ -n "${INPUT_SHARD:-}" ]; then args+=(--shard "$INPUT_SHARD"); fi
+          npm run pull -- ${args[@]+"${args[@]}"}
 
       # The gate. scripts/pull.mjs validates each document against schema/pulled.schema.json before
       # writing it, but this re-checks the whole corpus after the fact: a pulled file that breaks a
@@ -97,7 +104,7 @@ jobs:
           set -euo pipefail
           git add content/pulled ops/pull-budget.json ops/pull-queue.json
           if git diff --cached --quiet; then
-            echo "no change in content/pulled — nothing to commit"
+            echo "no change in the pulled facts or the ops state — nothing to commit"
             exit 0
           fi
           git -c user.name="proofline-bot" -c user.email="bot@proofline.local" \
@@ -112,3 +119,32 @@ jobs:
             sleep 20
           done
           echo "push failed after 3 attempts"; exit 1
+
+      # The credits are spent whether or not the run succeeded. A job that trips the bot-wall gate,
+      # or whose validation fails, still made every request it made — and if the day counter goes
+      # home with the runner, the next job starts from the same stale number and the 60,000/day cap
+      # stops existing: four crons of failing jobs would each be free to spend a full run cap.
+      # So the counter is committed on its own, always, and the working tree's uncommitted data is
+      # dropped rather than smuggled in behind a failed gate.
+      - name: Record the credit budget even when the run failed
+        if: always()
+        run: |
+          set -euo pipefail
+          git add ops/pull-budget.json ops/pull-queue.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "budget already recorded — nothing to commit"
+            exit 0
+          fi
+          git -c user.name="proofline-bot" -c user.email="bot@proofline.local" \
+            commit -m "pull: credit budget $(date -u '+%Y-%m-%dT%H:%M:%SZ')" -m "Producer: pull-bot"
+          git checkout -- . 2>/dev/null || true
+          git clean -fd content/pulled 2>/dev/null || true
+          git config user.name "proofline-bot"
+          git config user.email "bot@proofline.local"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep 20
+          done
+          echo "budget push failed after 3 attempts"; exit 1
