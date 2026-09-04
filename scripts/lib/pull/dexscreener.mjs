@@ -60,6 +60,7 @@ export function parsePair(raw) {
     volume_h6: toNumber(raw?.volume?.h6),
     txns_h24: { buys: toCount(raw?.txns?.h24?.buys), sells: toCount(raw?.txns?.h24?.sells) },
     price_change_h24: toNumber(raw?.priceChange?.h24),
+    market_cap: toNumber(raw?.marketCap),
     fdv: toNumber(raw?.fdv),
     created_at: msToIso(raw?.pairCreatedAt),
   };
@@ -122,6 +123,8 @@ export function aggregatePairs(pairs = []) {
     trades_h24: trades,
     price_usd: top?.price_usd ?? null,
     price_change_h24: top?.price_change_h24 ?? null,
+    market_cap_usd: top?.market_cap ?? null,
+    fdv_usd: top?.fdv ?? null,
     fdv: top?.fdv ?? null,
     first_pair_at: created.length ? created.reduce((a, b) => (Date.parse(a) <= Date.parse(b) ? a : b)) : null,
   };
@@ -146,6 +149,8 @@ export function emptyMarket(pulledAt, errors = []) {
     trades_h24: null,
     price_usd: null,
     price_change_h24: null,
+    market_cap_usd: null,
+    fdv_usd: null,
     fdv: null,
     first_pair_at: null,
     errors,

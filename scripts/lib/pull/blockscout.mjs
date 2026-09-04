@@ -6,8 +6,60 @@
 import { requestJson, BROWSER_UA } from "./http.mjs";
 
 export const BLOCKSCOUT_BASE = "https://robinhoodchain.blockscout.com";
+export const BLOCKSCOUT_PUBLIC_REST_BASE = `${BLOCKSCOUT_BASE}/api/v2`;
+export const BLOCKSCOUT_PRO_REST_BASE = "https://api.blockscout.com/4663/api/v2";
 
 const HEADERS = { "User-Agent": BROWSER_UA, Accept: "application/json" };
+
+const withoutTrailingSlash = (value) => String(value ?? "").replace(/\/+$/, "");
+
+/** Selects one REST root and its headers; secrets are read at runtime and never persisted. */
+export function resolveBlockscoutConfig({ env = process.env, base = null, apiKey = null } = {}) {
+  const key = String(apiKey ?? env.BLOCKSCOUT_API_KEY ?? "").trim() || null;
+  const override = String(base ?? env.BLOCKSCOUT_API_BASE ?? "").trim() || null;
+  let restBase = withoutTrailingSlash(override ?? (key ? BLOCKSCOUT_PRO_REST_BASE : BLOCKSCOUT_PUBLIC_REST_BASE));
+  if (!/\/api\/v2$/i.test(restBase)) {
+    if (/^https:\/\/api\.blockscout\.com$/i.test(restBase)) restBase += "/4663";
+    restBase += "/api/v2";
+  }
+  return {
+    restBase,
+    apiRoot: restBase.replace(/\/api\/v2$/i, ""),
+    apiKey: key,
+    isPro: Boolean(key),
+    requestsPerSecond: key ? 5 : 4,
+    addressConcurrency: key ? 4 : 2,
+    headers: key
+      ? { Accept: "application/json", Authorization: `Bearer ${key}` }
+      : { ...HEADERS },
+  };
+}
+
+export function buildBlockscoutUrl(restBase, path) {
+  return `${withoutTrailingSlash(restBase)}/${String(path).replace(/^\/+/, "")}`;
+}
+
+/** Physical requests equal free-tier credits, including retries. */
+export function createBlockscoutTracker() {
+  let credits = 0;
+  let challenges = 0;
+  return {
+    recordRequest: () => { credits++; },
+    recordChallenge: () => { challenges++; },
+    snapshot: () => ({ credits, challenges }),
+  };
+}
+
+export function blockscoutChallengeGate({ credits = 0, challenges = 0 } = {}) {
+  const failed = credits > 0 && challenges > credits / 2;
+  return {
+    failed,
+    exitCode: failed ? 1 : 0,
+    summary: failed
+      ? `explorer bot wall: ${challenges}/${credits} Blockscout requests served a challenge`
+      : null,
+  };
+}
 
 /** Blockscout returns counts as strings; anything unparseable becomes null rather than NaN. */
 export function toInt(value) {
@@ -57,14 +109,16 @@ export function parseTransactionResponse(body) {
   };
 }
 
-export function createBlockscoutClient({ base = BLOCKSCOUT_BASE, deps = {} } = {}) {
-  const get = (path) => requestJson(`${base}${path}`, { headers: HEADERS }, deps);
+export function createBlockscoutClient({ base = null, apiKey = null, env = process.env, deps = {}, config = null } = {}) {
+  const selected = config ?? resolveBlockscoutConfig({ env, base, apiKey });
+  const get = (path) => requestJson(buildBlockscoutUrl(selected.restBase, path), { headers: selected.headers }, deps);
   return {
-    address: (addr) => get(`/api/v2/addresses/${addr}`),
-    token: (addr) => get(`/api/v2/tokens/${addr}`),
-    tokenHolders: (addr) => get(`/api/v2/tokens/${addr}/holders`),
-    smartContract: (addr) => get(`/api/v2/smart-contracts/${addr}`),
-    transaction: (hash) => get(`/api/v2/transactions/${hash}`),
+    config: selected,
+    address: (addr) => get(`/addresses/${addr}`),
+    token: (addr) => get(`/tokens/${addr}`),
+    tokenHolders: (addr) => get(`/tokens/${addr}/holders`),
+    smartContract: (addr) => get(`/smart-contracts/${addr}`),
+    transaction: (hash) => get(`/transactions/${hash}`),
   };
 }
 

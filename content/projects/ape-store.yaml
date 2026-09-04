@@ -87,3 +87,13 @@ findings:
     - text: "Will Llama add a Robinhood Chain slice for ape.store, and is Base/ETH TVL mixable with RH activity? Next: do not use Llama TVL or fees as a Robinhood Chain figure"
   unresolved:
     - text: product.mechanism remains unresolved (CON-1).
+tldr: Ape Store is a token launchpad on Robinhood Chain. A creator deploys from ape.store without seeding liquidity.
+tldr_source: derived
+why_people_care:
+  - The pad is live on chain 4663 with a published factory in official config, not a census row. [claim S2 S4 S9 S22]
+  - Emerson 30d lists 137 tokens and about 154k USD DEX volume, smaller than packed pads on the same board. [claim S2 S4 S9 S22]
+  - Gitbook still documents a Base bonding-curve listing path while the handle describes a Robinhood Uniswap-direct path. [claim S2 S4 S9 S22]
+risks:
+  - owner() on the V30 router, the verified V3 router, and ApeProxy is one externally owned account with no code. [verified S14 S16] [claim S4 S9 S20]
+  - The V30 router that config uses for Robinhood is not source-verified. [verified S14 S16] [claim S4 S9 S20]
+  - Gitbook and the official handle disagree on whether Robinhood launches use a bonding curve. [verified S14 S16] [claim S4 S9 S20]

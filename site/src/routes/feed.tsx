@@ -1,118 +1,61 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { FeedStream, type FeedStreamItem } from "@/components/feed-stream";
-import { getChangelog, getFeed } from "@/data/content-server";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Wire } from "@/components/wire/wire";
+import { getContent } from "@/data/content-server";
+import { isWireKind, type WireKind } from "@/data/types";
+
+type FeedSearch = { kind?: WireKind; name?: string };
 
 export const Route = createFileRoute("/feed")({
-  validateSearch: (search: Record<string, unknown>): { kind?: Filter; name?: string } => ({
-    ...(FILTERS.some((filter) => filter.value === search.kind) && search.kind !== "all"
-      ? { kind: search.kind as Filter }
-      : {}),
-    ...(typeof search.name === "string" && search.name.trim() ? { name: search.name } : {}),
-  }),
-  loader: async () => {
-    const [feed, changes] = await Promise.all([getFeed(), getChangelog()]);
-    return { feed: feed.items, changes: changes.changelog, names: changes.names };
+  // The wire's filters are route state, not component state: `/feed?name=pons` has to arrive at the
+  // reader already narrowed, for a crawler and for a no-JS reader as much as for the deep link.
+  validateSearch: (search: Record<string, unknown>): FeedSearch => {
+    const name = search.name;
+    return {
+      ...(isWireKind(search.kind) ? { kind: search.kind } : {}),
+      ...(typeof name === "string" && /^[a-z0-9][a-z0-9-]*$/.test(name) ? { name } : {}),
+    };
   },
+  loader: () => getContent(),
   head: () => ({
     meta: [
-      { title: "Latest from Icarus" },
-      { name: "description", content: "Research updates, project posts and on-chain activity from Icarus." },
+      { title: "The wire · Icarus" },
+      { name: "description", content: "Announcements, talk, on-chain activity and material Icarus notes, newest first." },
     ],
   }),
   component: FeedPage,
 });
 
-type Filter = "all" | "icarus" | "posts" | "onchain";
-const FILTERS: Array<{ value: Filter; label: string }> = [
-  { value: "all", label: "All" },
-  { value: "icarus", label: "Icarus updates" },
-  { value: "posts", label: "Posts" },
-  { value: "onchain", label: "On-chain" },
-];
-
-// The full cross-name firehose home used to dump (IA brief §Pages 3): every item, newest
-// first, filterable by kind. Home keeps only the newest 5 and links here.
 function FeedPage() {
-  const { feed, changes, names } = Route.useLoaderData();
-  const { kind = "all", name } = Route.useSearch();
-  const namesBySlug = new Map(names.map((entry) => [entry.slug, entry]));
-  const items: FeedStreamItem[] = [
-    ...changes.flatMap((entry) => {
-      const itemName = namesBySlug.get(entry.slug);
-      return itemName
-        ? [{
-            id: `icarus-${entry.slug}-${entry.date}-${entry.title}`,
-            kind: "icarus" as const,
-            date: entry.date,
-            name: itemName,
-            who: "Icarus",
-            title: entry.title,
-            body: entry.detail,
-            sourceUrl: null,
-          }]
-        : [];
-    }),
-    ...feed.map(({ name: itemName, item }) => ({
-      id: `post-${itemName.slug}-${item.id}`,
-      kind: item.kind === "onchain" ? "onchain" as const : "post" as const,
-      date: item.date,
-      name: itemName,
-      who: item.account ?? (item.kind === "onchain" ? "On-chain" : (itemName.symbol ?? itemName.name)),
-      title: item.title,
-      body: item.body,
-      sourceUrl: item.sourceUrl ?? null,
-    })),
-  ].sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
-  const matchesKind = (item: FeedStreamItem, filter: Filter) =>
-    filter === "all" ||
-    (filter === "icarus" && item.kind === "icarus") ||
-    (filter === "posts" && item.kind === "post") ||
-    (filter === "onchain" && item.kind === "onchain");
-  // The pills count what the reader would actually see, so a name filter narrows them too.
-  const matchesName = (item: FeedStreamItem) => !name || item.name.slug === name;
-  const inScope = items.filter(matchesName);
-  const filtered = inScope.filter((item) => matchesKind(item, kind));
-  const selectedName = name ? namesBySlug.get(name) : null;
-
+  const bundle = Route.useLoaderData();
+  const { kind, name } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
   return (
     <main className="wrap narrow pb-10">
       <section className="hero">
         <p className="eyebrow">Feed</p>
-        <h1>Latest from Icarus</h1>
+        <h1>The wire</h1>
         <p className="desc">
-          Icarus updates, project posts and on-chain activity across every name on file, newest first.
+          Announcements, talk, on-chain activity and material Icarus notes across every name,
+          newest first. Filter by kind or name without losing your place.
         </p>
       </section>
-
-      <div className="chips">
-        {FILTERS.map((filter) => (
-          <Link
-            key={filter.value}
-            to="/feed"
-            search={{ ...(filter.value === "all" ? {} : { kind: filter.value }), ...(name ? { name } : {}) }}
-            className={kind === filter.value ? "on" : undefined}
-          >
-            {filter.label} · {inScope.filter((item) => matchesKind(item, filter.value)).length}
-          </Link>
-        ))}
-      </div>
-
-      {name ? (
-        <div className="mt-2 flex items-center gap-2 text-xs text-[var(--t2)]">
-          <span>Showing {selectedName?.name ?? name}</span>
-          <Link to="/feed" search={{ ...(kind === "all" ? {} : { kind }) }} className="rounded-full bg-[var(--s1)] px-2 py-0.5 text-[var(--acc)]">
-            Remove ×
-          </Link>
-        </div>
-      ) : null}
-
-      <div className="mt-2">
-        {filtered.length === 0 ? (
-          <p className="honest mt-4">No updates match these filters yet.</p>
-        ) : (
-          <FeedStream items={filtered} />
-        )}
-      </div>
+      <Wire
+        items={bundle.wire}
+        now={bundle.now}
+        allowNameFilter
+        kind={kind ?? "all"}
+        name={name ?? ""}
+        onFilter={(next) =>
+          navigate({
+            search: {
+              ...(next.kind === "all" ? {} : { kind: next.kind }),
+              ...(next.name ? { name: next.name } : {}),
+            },
+            replace: true,
+            resetScroll: false,
+          })
+        }
+      />
     </main>
   );
 }

@@ -1,9 +1,9 @@
 slug: safehood
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
-  - address: "0x262b60af42c46bd09c00069cd0dcb2ae0093034b"
-    label: Safehood pad token (candidate — from the safehood.fun token page URL)
+  - address: "0x262b60Af42c46bD09c00069Cd0dCb2Ae0093034B"
+    label: Safehood.fun (SAFEHOOD) pad token
     role: token
     is_contract: true
     source_verified: true
@@ -19,36 +19,110 @@ addresses:
     created_at: 2026-07-15T17:11:41.000Z
     holders: 60
     errors: []
+  - address: "0xe893ca05D3F1235de22630504DcEa9e029294900"
+    label: Launchpad
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: Launchpad
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 9680698
+    created_at: 2026-07-14T16:40:35.000Z
+    holders: null
+    errors: []
+  - address: "0x5Cf777e19a6CD4B10c3Aa317a2B8E8bCC5F46364"
+    label: TokenFactory
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: TokenFactory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 9680647
+    created_at: 2026-07-14T16:40:30.000Z
+    holders: null
+    errors: []
+  - address: "0x8E0b175a36ee0854Cc2dC7AeC4B3f90857A059ca"
+    label: FeeDistributor
+    role: other
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 9680681
+    created_at: 2026-07-14T16:40:34.000Z
+    holders: null
+    errors: []
+  - address: "0xD401Ed3C128eaE756323e7EAE27B40407c7d499B"
+    label: Treasury
+    role: other
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 9680664
+    created_at: 2026-07-14T16:40:32.000Z
+    holders: null
+    errors: []
 metrics: []
 market:
-  token_address: "0x262b60af42c46bd09c00069cd0dcb2ae0093034b"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  token_address: "0x262b60Af42c46bD09c00069Cd0dCb2Ae0093034B"
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
   trades_h24: null
   price_usd: null
   price_change_h24: null
+  market_cap_usd: null
+  fdv_usd: null
   fdv: null
   first_pair_at: null
-  top10_share: 0.7015234325752693
-  top10_share_ex_pools: 0.7015234325752693
-  top10_as_of: 2026-09-02T22:38:55.976Z
+  top10_share: 0.705391902470564
+  top10_share_ex_pools: 0.705391902470564
+  burned_share: 0.0054841427605643
+  top10_as_of: 2026-09-04T11:23:39.609Z
   launchpad: null
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors:
     - step: launchpad
-      message: creator 0xeADD8E92B6706583A955b076E394eA5c68F39cD4 did not match a known factory, curve or launcher deployer
+      message: creator 0xeADD8E92B6706583A955b076E394eA5c68F39cD4 did not match a launchpad factory, curve or known launcher deployer
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: no-mint-function
   renounced: true
   lp: []
   errors: []
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
-    - address: "0x262b60af42c46bd09c00069cd0dcb2ae0093034b"
-      label: Safehood pad token (candidate — from the safehood.fun token page URL)
+    - address: "0x262b60Af42c46bD09c00069Cd0dCb2Ae0093034B"
+      label: Safehood.fun (SAFEHOOD) pad token
       role: token
       transactions_count: 230
       token_transfers_count: 1
@@ -57,7 +131,47 @@ activity:
       txns_24h: 0
       launches_24h: null
       errors: []
+    - address: "0xe893ca05D3F1235de22630504DcEa9e029294900"
+      label: Launchpad
+      role: factory
+      transactions_count: 25
+      token_transfers_count: 20
+      last_tx_at: 2026-07-15T07:40:09.000Z
+      last_method: collectFees
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0x5Cf777e19a6CD4B10c3Aa317a2B8E8bCC5F46364"
+      label: TokenFactory
+      role: factory
+      transactions_count: 1
+      token_transfers_count: 0
+      last_tx_at: 2026-07-14T16:40:39.000Z
+      last_method: setLaunchpad
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0x8E0b175a36ee0854Cc2dC7AeC4B3f90857A059ca"
+      label: FeeDistributor
+      role: other
+      transactions_count: 3
+      token_transfers_count: 0
+      last_tx_at: 2026-07-14T16:40:54.000Z
+      last_method: renounceRole
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xD401Ed3C128eaE756323e7EAE27B40407c7d499B"
+      label: Treasury
+      role: other
+      transactions_count: 7
+      token_transfers_count: 23
+      last_tx_at: 2026-07-15T07:40:35.000Z
+      last_method: "0x01e33667"
+      txns_24h: 0
+      launches_24h: null
+      errors: []
   last_activity_at: 2026-08-31T22:59:12.000Z
   txns_24h: 0
-  launches_24h: null
+  launches_24h: 0
 errors: []

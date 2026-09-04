@@ -46,7 +46,9 @@ const READER_WORDS: Array<[RegExp, string]> = [
 export function readerCopy(text: string): string {
   let out = dejargon(text);
   for (const [re, sub] of READER_WORDS) out = out.replace(re, sub);
-  return out;
+  // Markdown inline-code marks are packet notation. The compiler strips them, but a hand-edited
+  // content file can still carry them and a reader must never see `owner()` with its backticks.
+  return out.replace(/`+/g, "");
 }
 
 // Deployment labels carry internal parentheticals ("(workbook sheet 02)", "(posted by
@@ -54,6 +56,19 @@ export function readerCopy(text: string): string {
 // instead (brief rule 1), so labels render without their trailing parenthetical.
 export function cleanLabel(label: string): string {
   return dejargon(label.replace(/\s*\([^)]*\)\s*$/, "")).trim();
+}
+
+// A content line ends in the evidence tags the compiler wrote: "… no timelock. [verified S47]".
+// Splitting them off is the one place that notation is understood — the text goes through
+// readerCopy, the ids become footnote superscripts. Every surface that prints a sourced field
+// (TL;DR, Why people care, What could go wrong, Checks) calls this instead of printing the tag.
+export function sourcedLine(value: string): { text: string; sources: string[] } {
+  const tagPattern = /\s*\[(?:verified|claim|inference|disputed)\s+((?:S\d+\s*)+)\]/gi;
+  const sources = Array.from(value.matchAll(tagPattern), (match) => match[1]!.trim().split(/\s+/)).flat();
+  return {
+    text: readerCopy(value.replace(tagPattern, "").trim()),
+    sources: [...new Set(sources)],
+  };
 }
 
 // "0x39dBED3a…C4571" — middle truncation for addresses; short strings pass through.

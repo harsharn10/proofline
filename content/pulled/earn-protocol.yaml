@@ -1,9 +1,9 @@
 slug: earn-protocol
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xa3b6aee90017b72c0812dc1e013de70eb2917ba3"
-    label: EARN token (account bio; workbook sheet 02)
+    label: EARN token (DopplerERC20V1 EIP-1167 clone)
     role: token
     is_contract: true
     source_verified: true
@@ -17,186 +17,578 @@ addresses:
     safe: null
     created_block: 17423811
     created_at: 2026-07-23T16:16:15.000Z
-    holders: 2022
+    holders: 2096
+    errors: []
+  - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    label: DopplerERC20V1 implementation
+    role: implementation
+    is_contract: true
+    source_verified: true
+    contract_name: DopplerERC20V1
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x0000000000000000000000000000000000000000"
+    owner_type: none
+    safe: null
+    created_block: 646841
+    created_at: 2026-06-30T22:03:14.000Z
+    holders: null
+    errors: []
+  - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    label: DopplerERC20V1Factory (token creator)
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: DopplerERC20V1Factory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 646841
+    created_at: 2026-06-30T22:03:14.000Z
+    holders: null
+    errors: []
+  - address: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
+    label: Airlock (token owner)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: Airlock
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x21e2ce70511e4fe542a97708e89520471daa7a66"
+    owner_type: safe
+    safe:
+      threshold: 3
+      signers:
+        - "0xf5b75474d006495c82dbbf010e230d5d2f86226f"
+        - "0x2c6c52b00d7360a8f82f3e8d27369f75c47306f9"
+        - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
+        - "0xdf95cc445469816234ad95f702c79d25bce401a7"
+        - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
+        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+    created_block: 646829
+    created_at: 2026-06-30T22:03:11.000Z
+    holders: null
+    errors: []
+  - address: "0x21E2ce70511e4FE542a97708e89520471DAa7A66"
+    label: Airlock owner Safe (SafeL2 proxy)
+    role: multisig
+    is_contract: true
+    source_verified: true
+    contract_name: SafeProxy
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 17517586
+    created_at: 2026-07-23T18:52:43.000Z
+    holders: null
+    errors: []
+  - address: "0x0059F82A76B1Cb261ad71fA117a36CC0BB3Dfd6e"
+    label: NVDA/USDG Uniswap v4 vault (NvdaUsdgV4VaultV6)
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: NvdaUsdgV4VaultV6
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x75741d131abdd3973d6ba00f09948c15d138059d"
+    owner_type: eoa
+    safe: null
+    created_block: 17248569
+    created_at: 2026-07-23T11:23:25.000Z
+    holders: 8
+    errors: []
+  - address: "0xD47D1187044B40DB1375ce60682AAC00a5356EFb"
+    label: NVDA/USDG single-token zap (NvdaUsdgV4ZapV6)
+    role: router
+    is_contract: true
+    source_verified: true
+    contract_name: NvdaUsdgV4ZapV6
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 17248751
+    created_at: 2026-07-23T11:23:44.000Z
+    holders: null
+    errors: []
+  - address: "0x2D26567eE8A4A24eaE17E8385380543E810Dd25a"
+    label: GME/USDG vault (GME-USDG Vault V6)
+    role: vault
+    is_contract: true
+    source_verified: false
+    contract_name: GME-USDG Vault V6
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x75741d131abdd3973d6ba00f09948c15d138059d"
+    owner_type: eoa
+    safe: null
+    created_block: 18015436
+    created_at: 2026-07-24T08:45:15.000Z
+    holders: 2
+    errors: []
+  - address: "0xb255934707e0796A8da4af7342002F8ef24d9f33"
+    label: GME/USDG single-token zap
+    role: router
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 18015488
+    created_at: 2026-07-24T08:45:20.000Z
+    holders: null
+    errors: []
+  - address: "0xeE7abf316E2824FbFB73aa3EA61217Dd600bD051"
+    label: EARN staking contract
+    role: vault
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x75741d131abdd3973d6ba00f09948c15d138059d"
+    owner_type: eoa
+    safe: null
+    created_block: 29352291
+    created_at: 2026-08-06T12:34:34.000Z
+    holders: null
+    errors: []
+  - address: "0x8046118a5B0D1BCBcbd4d5f2C9AA9eecC5bf771d"
+    label: EARN Morpho VaultV2 (EARNVAULT / USDG)
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: VaultV2
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x75741d131abdd3973d6ba00f09948c15d138059d"
+    owner_type: eoa
+    safe: null
+    created_block: 26651239
+    created_at: 2026-08-03T09:22:51.000Z
+    holders: 3
+    errors: []
+  - address: "0x57b9b90610a4b9205c57fab92080e9cfbe7229f6"
+    label: Steer SPCX/USDG Uniswap v4 vault (BeaconProxy)
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: BeaconProxy
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 40554138
+    created_at: 2026-08-19T12:20:45.000Z
+    holders: 13
+    errors: []
+  - address: "0x00e7B76d0C0F0370C28A07aA9d9fDF92736238A6"
+    label: STOCK MEMES Omnipool (MEMESTOCKS)
+    role: other
+    is_contract: true
+    source_verified: false
+    contract_name: STOCK MEMES
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: 1
+    errors: []
+  - address: "0x75741D131AbdD3973d6bA00f09948C15D138059d"
+    label: Protocol EOA (vault, stake and Morpho owner)
+    role: admin
+    is_contract: false
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
     errors: []
 metrics: []
 market:
   token_address: "0xa3b6aee90017b72c0812dc1e013de70eb2917ba3"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs:
     - dex: uniswap
       pair_address: "0x1fb9a45079b017a6661016ba7dea29e1c4864b0874c21f63e137a52e71c3395b"
       quote_symbol: SPY
-      price_usd: 0.00002643
-      liquidity_usd: 305946.78
-      volume_h24: 448189.14
-      volume_h6: 99189.91
+      price_usd: 0.00001707
+      liquidity_usd: 237315.75
+      volume_h24: 688984.15
+      volume_h6: 217022.85
       txns_h24:
-        buys: 1204
-        sells: 1838
-      price_change_h24: -25.54
-      fdv: 2643664
+        buys: 1287
+        sells: 2093
+      price_change_h24: -64.84
+      market_cap: 1707415
+      fdv: 1707415
       created_at: 2026-07-23T16:16:15.000Z
     - dex: uniswap
       pair_address: "0xc0fe3e27d73a8b80c3096b987e3127ffa703504548c97c18a9000c26f38df996"
       quote_symbol: ETH
-      price_usd: 0.00002679
-      liquidity_usd: 15911.33
-      volume_h24: 191233.52
-      volume_h6: 46437.61
+      price_usd: 0.00001648
+      liquidity_usd: 10226.63
+      volume_h24: 262357.49
+      volume_h6: 42231.59
       txns_h24:
-        buys: 875
-        sells: 757
-      price_change_h24: -27.37
-      fdv: 2679442
+        buys: 1113
+        sells: 928
+      price_change_h24: -66.59
+      market_cap: 1648280
+      fdv: 1648280
       created_at: 2026-08-03T13:16:17.000Z
     - dex: uniswap
       pair_address: "0xbb90be5000017cb62c8e07ade58cc11f0d2a2af41d193f46727f666694e72e1d"
       quote_symbol: USDG
-      price_usd: 0.00002742
-      liquidity_usd: 11485.52
-      volume_h24: 73763.69
-      volume_h6: 17743.27
+      price_usd: 0.00001709
+      liquidity_usd: 3889.11
+      volume_h24: 94243.62
+      volume_h6: 17553.88
       txns_h24:
-        buys: 181
-        sells: 200
-      price_change_h24: -24.53
-      fdv: 2742558
+        buys: 348
+        sells: 296
+      price_change_h24: -66.48
+      market_cap: 1709546
+      fdv: 1709546
       created_at: 2026-08-27T03:30:51.000Z
     - dex: uniswap
       pair_address: "0xce563fd82430ca812b3b096ca945017871213f7c36f49e63599aabe63ffc9dc1"
       quote_symbol: ETH
-      price_usd: 0.00002699
-      liquidity_usd: 310.82
-      volume_h24: 2117.57
-      volume_h6: 548.54
+      price_usd: 0.00002618
+      liquidity_usd: 305.5
+      volume_h24: 3723.98
+      volume_h6: 216.14
       txns_h24:
-        buys: 63
-        sells: 59
-      price_change_h24: -22.56
-      fdv: 2699722
+        buys: 68
+        sells: 74
+      price_change_h24: -44.01
+      market_cap: 2618641
+      fdv: 2618641
       created_at: 2026-09-01T19:54:57.000Z
     - dex: uniswap
       pair_address: "0xF9457579A34f0a4f9444793643AA2Ab0da40E7D1"
       quote_symbol: QVR
-      price_usd: 0.00002703
-      liquidity_usd: 988.28
-      volume_h24: 1055.27
-      volume_h6: 376.52
+      price_usd: 0.00001693
+      liquidity_usd: 822.85
+      volume_h24: 2100.25
+      volume_h6: 545.47
       txns_h24:
-        buys: 32
-        sells: 38
-      price_change_h24: -27.12
-      fdv: 2703942
+        buys: 52
+        sells: 57
+      price_change_h24: -66.46
+      market_cap: 1693277
+      fdv: 1693277
       created_at: 2026-08-30T19:11:47.000Z
     - dex: uniswap
       pair_address: "0x227c6de23b11bd98e7ce262eb1e76b9c2ee91d32854c6aee61d47adea64a8de6"
       quote_symbol: QVR
-      price_usd: 0.00002732
-      liquidity_usd: 514.58
-      volume_h24: 445.88
-      volume_h6: 142.17
+      price_usd: 0.00001649
+      liquidity_usd: 415.26
+      volume_h24: 914.18
+      volume_h6: 335.19
       txns_h24:
-        buys: 26
-        sells: 27
-      price_change_h24: -20.29
-      fdv: 2732358
+        buys: 42
+        sells: 48
+      price_change_h24: -66.56
+      market_cap: 1649932
+      fdv: 1649932
       created_at: 2026-08-30T21:41:45.000Z
     - dex: uniswap
       pair_address: "0x2037a7a1fc9ed5ed191a6c2d8e711e25b587f6bbfae937f4f6e7bc35beb0fe12"
       quote_symbol: ETH
-      price_usd: 0.00002236
-      liquidity_usd: 67.16
-      volume_h24: 25.45
-      volume_h6: 9.02
+      price_usd: 0.00001768
+      liquidity_usd: 61.49
+      volume_h24: 50.01
+      volume_h6: 17.79
       txns_h24:
-        buys: 5
-        sells: 5
-      price_change_h24: -44.93
-      fdv: 2236153
+        buys: 11
+        sells: 12
+      price_change_h24: -60.14
+      market_cap: 1768489
+      fdv: 1768489
       created_at: 2026-07-30T21:33:59.000Z
     - dex: uniswap
       pair_address: "0xde7723f25535a07dc5297976213ca2374e1d88a232b6e4938f513b2774968969"
       quote_symbol: SPY
-      price_usd: 0.00002813
-      liquidity_usd: 9.83
-      volume_h24: 7.19
-      volume_h6: 1.56
+      price_usd: 0.00001642
+      liquidity_usd: 7.31
+      volume_h24: 6.94
+      volume_h6: 1.45
       txns_h24:
-        buys: 4
-        sells: 8
-      price_change_h24: -30.14
-      fdv: 2813326
+        buys: 2
+        sells: 4
+      price_change_h24: -66.41
+      market_cap: 1642399
+      fdv: 1642399
       created_at: 2026-08-18T08:37:17.000Z
-  liquidity_usd: 335234.3
-  volume_h24: 716837.71
-  trades_h24: 5322
-  price_usd: 0.00002643
-  price_change_h24: -25.54
-  fdv: 2643664
+    - dex: uniswap
+      pair_address: "0x5538b6ffd4e6b576e35abaa8808b3269b098320ff6dda7b897013831528e9f73"
+      quote_symbol: ETH
+      price_usd: 0.00003258
+      liquidity_usd: 2.32
+      volume_h24: 0.09
+      volume_h6: 0.09
+      txns_h24:
+        buys: 0
+        sells: 1
+      price_change_h24: null
+      market_cap: 3258800
+      fdv: 3258800
+      created_at: 2026-07-30T21:32:30.000Z
+  liquidity_usd: 253046.22
+  volume_h24: 1052380.71
+  trades_h24: 6436
+  price_usd: 0.00001707
+  price_change_h24: -64.84
+  market_cap_usd: 1707415
+  fdv_usd: 1707415
+  fdv: 1707415
   first_pair_at: 2026-07-23T16:16:15.000Z
-  top10_share: 0.5610903643573405
-  top10_share_ex_pools: 0.5610903643573405
-  top10_as_of: 2026-09-02T22:38:55.976Z
+  top10_share: 0.5671871872193817
+  top10_share_ex_pools: 0.3507155214543239
+  burned_share: 0
+  top10_as_of: 2026-09-04T11:23:39.609Z
   launchpad:
-    slug: long
-    via: creator
+    slug: doppler
+    via: factory
     address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: unknown
   renounced: false
   lp:
     - pair: "0x1fb9a45079b017a6661016ba7dea29e1c4864b0874c21f63e137a52e71c3395b"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xc0fe3e27d73a8b80c3096b987e3127ffa703504548c97c18a9000c26f38df996"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xbb90be5000017cb62c8e07ade58cc11f0d2a2af41d193f46727f666694e72e1d"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xce563fd82430ca812b3b096ca945017871213f7c36f49e63599aabe63ffc9dc1"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xF9457579A34f0a4f9444793643AA2Ab0da40E7D1"
-      locked_share: 0
-      holder_kind: none
-      reason: null
+      locked_share: null
+      holder_kind: null
+      reason: no known locker or burn among top holders
     - pair: "0x227c6de23b11bd98e7ce262eb1e76b9c2ee91d32854c6aee61d47adea64a8de6"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x2037a7a1fc9ed5ed191a6c2d8e711e25b587f6bbfae937f4f6e7bc35beb0fe12"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xde7723f25535a07dc5297976213ca2374e1d88a232b6e4938f513b2774968969"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x5538b6ffd4e6b576e35abaa8808b3269b098320ff6dda7b897013831528e9f73"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
     - address: "0xa3b6aee90017b72c0812dc1e013de70eb2917ba3"
-      label: EARN token (account bio; workbook sheet 02)
+      label: EARN token (DopplerERC20V1 EIP-1167 clone)
       role: token
       transactions_count: 4635
       token_transfers_count: 21
-      last_tx_at: 2026-09-02T22:37:36.000Z
+      last_tx_at: 2026-09-04T11:42:12.000Z
       last_method: "0x095ea7b3"
-      txns_24h: 271
+      txns_24h: 280
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T22:37:36.000Z
-  txns_24h: 271
-  launches_24h: null
+    - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      label: DopplerERC20V1 implementation
+      role: implementation
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: null
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      label: DopplerERC20V1Factory (token creator)
+      role: factory
+      transactions_count: 0
+      token_transfers_count: 1
+      last_tx_at: null
+      last_method: null
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
+      label: Airlock (token owner)
+      role: other
+      transactions_count: 9126
+      token_transfers_count: 445362
+      last_tx_at: 2026-09-04T11:11:59.000Z
+      last_method: create
+      txns_24h: 166
+      launches_24h: null
+      errors: []
+    - address: "0x21E2ce70511e4FE542a97708e89520471DAa7A66"
+      label: Airlock owner Safe (SafeL2 proxy)
+      role: multisig
+      transactions_count: 2
+      token_transfers_count: 44
+      last_tx_at: 2026-08-20T15:04:33.000Z
+      last_method: execTransaction
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x0059F82A76B1Cb261ad71fA117a36CC0BB3Dfd6e"
+      label: NVDA/USDG Uniswap v4 vault (NvdaUsdgV4VaultV6)
+      role: vault
+      transactions_count: 7814
+      token_transfers_count: 765
+      last_tx_at: 2026-09-01T19:27:30.000Z
+      last_method: withdraw
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xD47D1187044B40DB1375ce60682AAC00a5356EFb"
+      label: NVDA/USDG single-token zap (NvdaUsdgV4ZapV6)
+      role: router
+      transactions_count: 47
+      token_transfers_count: 350
+      last_tx_at: 2026-08-29T06:07:48.000Z
+      last_method: depositSingleToken
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x2D26567eE8A4A24eaE17E8385380543E810Dd25a"
+      label: GME/USDG vault (GME-USDG Vault V6)
+      role: vault
+      transactions_count: 7914
+      token_transfers_count: 446
+      last_tx_at: 2026-09-01T19:27:49.000Z
+      last_method: withdraw
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xb255934707e0796A8da4af7342002F8ef24d9f33"
+      label: GME/USDG single-token zap
+      role: router
+      transactions_count: 26
+      token_transfers_count: 239
+      last_tx_at: 2026-08-04T15:32:05.000Z
+      last_method: depositSingleToken
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xeE7abf316E2824FbFB73aa3EA61217Dd600bD051"
+      label: EARN staking contract
+      role: vault
+      transactions_count: 438
+      token_transfers_count: 349
+      last_tx_at: 2026-09-04T11:31:32.000Z
+      last_method: "0xa694fc3a"
+      txns_24h: 21
+      launches_24h: null
+      errors: []
+    - address: "0x8046118a5B0D1BCBcbd4d5f2C9AA9eecC5bf771d"
+      label: EARN Morpho VaultV2 (EARNVAULT / USDG)
+      role: vault
+      transactions_count: 66
+      token_transfers_count: 70
+      last_tx_at: 2026-09-02T15:39:28.000Z
+      last_method: redeem
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x57b9b90610a4b9205c57fab92080e9cfbe7229f6"
+      label: Steer SPCX/USDG Uniswap v4 vault (BeaconProxy)
+      role: vault
+      transactions_count: 36
+      token_transfers_count: 54
+      last_tx_at: 2026-09-03T14:17:25.000Z
+      last_method: withdraw
+      txns_24h: 1
+      launches_24h: null
+      errors: []
+    - address: "0x00e7B76d0C0F0370C28A07aA9d9fDF92736238A6"
+      label: STOCK MEMES Omnipool (MEMESTOCKS)
+      role: other
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-09-03T13:43:23.000Z
+      last_method: "0x095ea7b3"
+      txns_24h: 1
+      launches_24h: null
+      errors: []
+    - address: "0x75741D131AbdD3973d6bA00f09948C15D138059d"
+      label: Protocol EOA (vault, stake and Morpho owner)
+      role: admin
+      transactions_count: 902
+      token_transfers_count: 1121
+      last_tx_at: 2026-09-02T20:58:16.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T11:42:12.000Z
+  txns_24h: 469
+  launches_24h: 0
 errors: []

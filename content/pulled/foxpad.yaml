@@ -1,9 +1,9 @@
 slug: foxpad
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x2103faA9D1762e27a716C61718b3aCf3Ec1F9bf1"
-    label: FOX token (the mascot token the pad's fee split buys)
+    label: FOX token (NOXA LaunchToken the pad fee split names)
     role: token
     is_contract: true
     source_verified: true
@@ -17,83 +17,291 @@ addresses:
     safe: null
     created_block: 6439983
     created_at: 2026-07-10T22:29:23.000Z
-    holders: 4486
+    holders: 4542
+    errors: []
+  - address: "0xF8A56574a3FaF246F3ECB896193f5d5D6F87F22C"
+    label: FoxPad factory
+    role: factory
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 26902099
+    created_at: 2026-08-03T16:21:53.000Z
+    holders: null
+    errors: []
+  - address: "0xbAC56372983e7269C8b5Fa83D8a6C5c6e0Bab390"
+    label: Protocol fee vault
+    role: vault
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 26902003
+    created_at: 2026-08-03T16:21:44.000Z
+    holders: null
+    errors: []
+  - address: "0x546a80f0bF76EDf37beA8BE7A074410565876ecE"
+    label: Swap router
+    role: router
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 26902123
+    created_at: 2026-08-03T16:21:56.000Z
+    holders: null
+    errors: []
+  - address: "0x44f26F1f27dC7ad35e08c6F64Bed522C19685E81"
+    label: Token deployer
+    role: other
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 26902027
+    created_at: 2026-08-03T16:21:46.000Z
+    holders: null
     errors: []
 metrics: []
 market:
   token_address: "0x2103faA9D1762e27a716C61718b3aCf3Ec1F9bf1"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs:
     - dex: uniswap
       pair_address: "0x9C49F21aDDa14AF527BC56C2a8fAb854F6248685"
       quote_symbol: WETH
-      price_usd: 0.001486
-      liquidity_usd: 183714.55
-      volume_h24: 258241.91
-      volume_h6: 55920.87
+      price_usd: 0.001638
+      liquidity_usd: 197346.95
+      volume_h24: 368909.87
+      volume_h6: 194022.87
       txns_h24:
-        buys: 610
-        sells: 623
-      price_change_h24: 3.4
-      fdv: 1386662
+        buys: 692
+        sells: 627
+      price_change_h24: 13.28
+      market_cap: 1528191
+      fdv: 1528191
       created_at: 2026-07-10T22:29:23.000Z
     - dex: uniswap
       pair_address: "0x7389a30f734d7d8b7f5e2b7e3e72a505f8f1f5be9af0b04456fe5f9b726eb57c"
       quote_symbol: USDG
-      price_usd: 0.001488
-      liquidity_usd: 7347.89
-      volume_h24: 6811.2
-      volume_h6: 646.4
+      price_usd: 0.001639
+      liquidity_usd: 41.92
+      volume_h24: 4826.78
+      volume_h6: 510.9
       txns_h24:
-        buys: 70
-        sells: 61
-      price_change_h24: 1.17
-      fdv: 1388423
+        buys: 42
+        sells: 39
+      price_change_h24: 13.68
+      market_cap: 1529248
+      fdv: 1529248
       created_at: 2026-07-14T15:26:46.000Z
-  liquidity_usd: 191062.44
-  volume_h24: 265053.11
-  trades_h24: 1364
-  price_usd: 0.001486
-  price_change_h24: 3.4
-  fdv: 1386662
+    - dex: uniswap
+      pair_address: "0xde5718e44e1e08e4570bd1f953520985e89a48402d4ca9ede34c2ccce3334b26"
+      quote_symbol: USDG
+      price_usd: 0.0008821
+      liquidity_usd: 22.87
+      volume_h24: 34.9
+      volume_h6: 11.46
+      txns_h24:
+        buys: 6
+        sells: 2
+      price_change_h24: 53.15
+      market_cap: 822616
+      fdv: 822616
+      created_at: 2026-07-13T01:05:59.000Z
+    - dex: uniswap
+      pair_address: "0xe43c1afd8ce014f5c43bd20191c552a7bf757c85a6bba9c8ff4910099fcd8705"
+      quote_symbol: USDG
+      price_usd: 0.001064
+      liquidity_usd: 7.02
+      volume_h24: 8.76
+      volume_h6: 2.69
+      txns_h24:
+        buys: 3
+        sells: 2
+      price_change_h24: 419
+      market_cap: 992551
+      fdv: 992551
+      created_at: 2026-08-02T21:59:21.000Z
+    - dex: uniswap
+      pair_address: "0xdb7fdee043c5f07660044ba71814a67b7a9f0b4f27a336b5204922fbccef2532"
+      quote_symbol: USDG
+      price_usd: 0.0005197
+      liquidity_usd: 9.57
+      volume_h24: 9.15
+      volume_h6: 6.89
+      txns_h24:
+        buys: 3
+        sells: 1
+      price_change_h24: 97.13
+      market_cap: 484651
+      fdv: 484651
+      created_at: 2026-07-12T04:04:12.000Z
+    - dex: uniswap
+      pair_address: "0x4abe3908cd0beab9fbafc146ec27b3616bfa55b55f387846f3688ed83b6cbf47"
+      quote_symbol: ETH
+      price_usd: 0.0004311
+      liquidity_usd: 0.57
+      volume_h24: 0.1
+      volume_h6: 0
+      txns_h24:
+        buys: 0
+        sells: 1
+      price_change_h24: null
+      market_cap: 402085
+      fdv: 402085
+      created_at: 2026-07-12T08:34:20.000Z
+    - dex: uniswap
+      pair_address: "0x7d48cdc2e87ca6617289ef4d78e956563ad3be60d2047ca8195c630c2b54f12b"
+      quote_symbol: FOX
+      price_usd: null
+      liquidity_usd: null
+      volume_h24: 0
+      volume_h6: 0
+      txns_h24:
+        buys: 1
+        sells: 0
+      price_change_h24: null
+      market_cap: null
+      fdv: null
+      created_at: 2026-07-16T10:13:41.000Z
+  liquidity_usd: 197428.9
+  volume_h24: 373789.56
+  trades_h24: 1419
+  price_usd: 0.001638
+  price_change_h24: 13.28
+  market_cap_usd: 1528191
+  fdv_usd: 1528191
+  fdv: 1528191
   first_pair_at: 2026-07-10T22:29:23.000Z
-  top10_share: 0.2728481561094202
-  top10_share_ex_pools: 0.2067830476557377
-  top10_as_of: 2026-09-02T22:38:55.976Z
-  launchpad: null
-  errors:
-    - step: launchpad
-      message: creator 0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB did not match a known factory, curve or launcher deployer
+  top10_share: 0.2286339260022922
+  top10_share_ex_pools: 0.1708098865480173
+  burned_share: 0.0674415211837901
+  top10_as_of: 2026-09-04T11:23:39.609Z
+  launchpad:
+    slug: noxa
+    via: factory
+    address: "0xd9ec2db5f3d1b236843925949fe5bd8a3836fccb"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
+  errors: []
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: no-mint-function
   renounced: null
   lp:
     - pair: "0x9C49F21aDDa14AF527BC56C2a8fAb854F6248685"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
     - pair: "0x7389a30f734d7d8b7f5e2b7e3e72a505f8f1f5be9af0b04456fe5f9b726eb57c"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xde5718e44e1e08e4570bd1f953520985e89a48402d4ca9ede34c2ccce3334b26"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xe43c1afd8ce014f5c43bd20191c552a7bf757c85a6bba9c8ff4910099fcd8705"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xdb7fdee043c5f07660044ba71814a67b7a9f0b4f27a336b5204922fbccef2532"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x4abe3908cd0beab9fbafc146ec27b3616bfa55b55f387846f3688ed83b6cbf47"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x7d48cdc2e87ca6617289ef4d78e956563ad3be60d2047ca8195c630c2b54f12b"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
     - address: "0x2103faA9D1762e27a716C61718b3aCf3Ec1F9bf1"
-      label: FOX token (the mascot token the pad's fee split buys)
+      label: FOX token (NOXA LaunchToken the pad fee split names)
       role: token
       transactions_count: 18145
       token_transfers_count: 66
-      last_tx_at: 2026-09-02T22:50:57.000Z
+      last_tx_at: 2026-09-04T11:46:13.000Z
       last_method: approve
-      txns_24h: 228
+      txns_24h: 236
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T22:50:57.000Z
-  txns_24h: 228
-  launches_24h: null
+    - address: "0xF8A56574a3FaF246F3ECB896193f5d5D6F87F22C"
+      label: FoxPad factory
+      role: factory
+      transactions_count: 7
+      token_transfers_count: 0
+      last_tx_at: 2026-08-12T08:37:52.000Z
+      last_method: "0x0bce1db2"
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0xbAC56372983e7269C8b5Fa83D8a6C5c6e0Bab390"
+      label: Protocol fee vault
+      role: vault
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-03T16:21:44.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x546a80f0bF76EDf37beA8BE7A074410565876ecE"
+      label: Swap router
+      role: router
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-03T16:21:56.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x44f26F1f27dC7ad35e08c6F64Bed522C19685E81"
+      label: Token deployer
+      role: other
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-03T16:21:46.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T11:46:13.000Z
+  txns_24h: 236
+  launches_24h: 0
 errors: []

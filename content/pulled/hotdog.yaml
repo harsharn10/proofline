@@ -1,0 +1,234 @@
+slug: hotdog
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+chain: robinhood-chain
+addresses:
+  - address: "0x45443A4a7b58ab26A4B4D72616cf36D5aAE7188C"
+    label: HOTDOG token (LunchTokenPlain)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: hotdog
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 22934274
+    created_at: 2026-07-30T01:51:05.000Z
+    holders: 230
+    errors: []
+  - address: "0x568E12B312751992DCfE387CFc8EC7D63E941103"
+    label: lunch Stock/USDG-pair launcher (V3)
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: ERC1967Proxy
+    proxy:
+      type: eip1967
+      implementation: "0x94fabf797ae357f6ab8b561cb54d6dfd693461c7"
+      admin: null
+    owner: "0x7b2daf7f696bb844c7786693062d6619d1858cc9"
+    owner_type: eoa
+    safe: null
+    created_block: 17319592
+    created_at: 2026-07-23T13:22:11.000Z
+    holders: null
+    errors: []
+  - address: "0x264ad13Bfc0585208b7d8b1712df51B096a5F55c"
+    label: Uniswap v3 HOTDOG/COST 1% pool
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: UniswapV3Pool
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 22934274
+    created_at: 2026-07-30T01:51:05.000Z
+    holders: null
+    errors: []
+  - address: "0x4EA005168D7F09a7A0Ba9D1DEf21a479950E44C2"
+    label: Costco • Robinhood Token (COST)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: BeaconProxy
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 48316
+    created_at: 2026-06-10T15:42:41.000Z
+    holders: 14054
+    errors: []
+  - address: "0x4b03CA54Be3d815453D37182E893a6E36B7d6781"
+    label: Launch caller (creator())
+    role: admin
+    is_contract: false
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
+    errors: []
+  - address: "0x46F1DdD98a51016804b5a42db71d6985E76c8326"
+    label: lunch V3 pair fee locker
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: ERC1967Proxy
+    proxy:
+      type: eip1967
+      implementation: "0x14d30e27212e7cc5e5cbcebf2cdbd44f33ba58e8"
+      admin: null
+    owner: "0xbc575ad327adb13dfaab0698a60dfdf084819947"
+    owner_type: contract
+    safe: null
+    created_block: 17319562
+    created_at: 2026-07-23T13:22:08.000Z
+    holders: null
+    errors: []
+metrics: []
+market:
+  token_address: "0x45443A4a7b58ab26A4B4D72616cf36D5aAE7188C"
+  pulled_at: 2026-09-04T11:23:39.609Z
+  pairs:
+    - dex: uniswap
+      pair_address: "0x264ad13Bfc0585208b7d8b1712df51B096a5F55c"
+      quote_symbol: COST
+      price_usd: 0.000402
+      liquidity_usd: 67759.14
+      volume_h24: 53015.29
+      volume_h6: 4589.35
+      txns_h24:
+        buys: 952
+        sells: 963
+      price_change_h24: -3.99
+      market_cap: 400729
+      fdv: 400729
+      created_at: 2026-07-30T01:51:05.000Z
+  liquidity_usd: 67759.14
+  volume_h24: 53015.29
+  trades_h24: 1915
+  price_usd: 0.000402
+  price_change_h24: -3.99
+  market_cap_usd: 400729
+  fdv_usd: 400729
+  fdv: 400729
+  first_pair_at: 2026-07-30T01:51:05.000Z
+  top10_share: 0.2479219346598282
+  top10_share_ex_pools: 0.1735627194017878
+  burned_share: 0
+  top10_as_of: 2026-09-04T11:23:39.609Z
+  launchpad:
+    slug: lunch-fun
+    via: factory
+    address: "0x568e12b312751992dcfe387cfc8ec7d63e941103"
+    shared: false
+  rialto: null
+  pair_asset:
+    ticker: COST
+    name: Costco
+    address: "0x4ea005168d7f09a7a0ba9d1def21a479950e44c2"
+    category: stock
+    tokenized_value_usd: 1556917.08
+    tokenized_shares: 1682.4078789100022
+    change_7d: -58211.31
+    source_url: https://analytics.rialto.xyz/tokenization
+  volume_disagreement: null
+  errors: []
+structure:
+  pulled_at: 2026-09-04T11:23:39.609Z
+  mint: no-mint-function
+  renounced: null
+  lp:
+    - pair: "0x264ad13Bfc0585208b7d8b1712df51B096a5F55c"
+      locked_share: null
+      holder_kind: null
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
+  errors:
+    - step: renounced
+      message: owner() was not present or could not be read
+activity:
+  pulled_at: 2026-09-04T11:23:39.609Z
+  addresses:
+    - address: "0x45443A4a7b58ab26A4B4D72616cf36D5aAE7188C"
+      label: HOTDOG token (LunchTokenPlain)
+      role: token
+      transactions_count: 2278
+      token_transfers_count: 7
+      last_tx_at: 2026-09-04T11:57:50.000Z
+      last_method: approve
+      txns_24h: 195
+      launches_24h: null
+      errors: []
+    - address: "0x568E12B312751992DCfE387CFc8EC7D63E941103"
+      label: lunch Stock/USDG-pair launcher (V3)
+      role: factory
+      transactions_count: 333
+      token_transfers_count: 737
+      last_tx_at: 2026-09-04T11:35:36.000Z
+      last_method: launchPairEthWithMetaRef
+      txns_24h: 18
+      launches_24h: 18
+      errors: []
+    - address: "0x264ad13Bfc0585208b7d8b1712df51B096a5F55c"
+      label: Uniswap v3 HOTDOG/COST 1% pool
+      role: other
+      transactions_count: 1
+      token_transfers_count: 30929
+      last_tx_at: 2026-08-17T23:08:18.000Z
+      last_method: increaseObservationCardinalityNext
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x4EA005168D7F09a7A0Ba9D1DEf21a479950E44C2"
+      label: Costco • Robinhood Token (COST)
+      role: token
+      transactions_count: 7385
+      token_transfers_count: 30
+      last_tx_at: 2026-09-04T12:02:14.000Z
+      last_method: approve
+      txns_24h: 1540
+      launches_24h: null
+      errors: []
+    - address: "0x4b03CA54Be3d815453D37182E893a6E36B7d6781"
+      label: Launch caller (creator())
+      role: admin
+      transactions_count: 18
+      token_transfers_count: 55
+      last_tx_at: 2026-07-30T01:29:59.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x46F1DdD98a51016804b5a42db71d6985E76c8326"
+      label: lunch V3 pair fee locker
+      role: other
+      transactions_count: 106
+      token_transfers_count: 1736
+      last_tx_at: 2026-09-03T21:02:21.000Z
+      last_method: setTokenCreator
+      txns_24h: 35
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T12:02:14.000Z
+  txns_24h: 1788
+  launches_24h: 18
+errors: []

@@ -1,9 +1,9 @@
 slug: quotrons
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
-    label: QUOTRON token (ERC-404 core)
+    label: QUOTRON V2 core (Quotron404V2)
     role: token
     is_contract: true
     source_verified: true
@@ -17,10 +17,10 @@ addresses:
     safe: null
     created_block: 35489899
     created_at: 2026-08-13T15:14:36.000Z
-    holders: 3650
+    holders: 3596
     errors: []
   - address: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
-    label: Router
+    label: Canonical router (QuotronWethRouter)
     role: router
     is_contract: true
     source_verified: true
@@ -37,7 +37,7 @@ addresses:
     holders: null
     errors: []
   - address: "0x62E200Cc8e4D95cf622f40Dd70f407C883EcB0cc"
-    label: Uniswap v4 hook
+    label: Canonical Uniswap v4 hook (QuotronWethHook)
     role: other
     is_contract: true
     source_verified: true
@@ -53,107 +53,252 @@ addresses:
     created_at: 2026-08-13T15:14:47.000Z
     holders: null
     errors: []
+  - address: "0x027ACa2794E44f24950D81227DcD516FfBB49d6e"
+    label: V2 ERC-721 mirror (QuotronMirrorV2)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: QuotronMirrorV2
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7171e64e979265aed6588577d1c6b60a701d7866"
+    owner_type: contract
+    safe: null
+    created_block: 35489899
+    created_at: 2026-08-13T15:14:36.000Z
+    holders: 879
+    errors: []
+  - address: "0xe04fba61FD54Ba78Dd450A30d8Af40167aF5d3Ec"
+    label: V2 reflections (QuotronReflectionsV2)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: QuotronReflectionsV2
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7171e64e979265aed6588577d1c6b60a701d7866"
+    owner_type: contract
+    safe: null
+    created_block: 35489966
+    created_at: 2026-08-13T15:14:43.000Z
+    holders: null
+    errors: []
+  - address: "0xb8960fdC8A0Be155d196C2795b75747763562df2"
+    label: View quoter (QuotronWethQuoter)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: QuotronWethQuoter
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 36304810
+    created_at: 2026-08-14T13:55:26.000Z
+    holders: null
+    errors: []
+  - address: "0x24e62Dd5C7058CC41ad9c5375C137460ea1Da2FE"
+    label: Epoch converter (QuotronEpochConverter)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: QuotronEpochConverter
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7171e64e979265aed6588577d1c6b60a701d7866"
+    owner_type: contract
+    safe: null
+    created_block: 35490030
+    created_at: 2026-08-13T15:14:49.000Z
+    holders: null
+    errors: []
+  - address: "0x15277aA1ecC13734d57C519a2DAA1cc4A748bA89"
+    label: Recovery Safe
+    role: multisig
+    is_contract: true
+    source_verified: true
+    contract_name: SafeProxy
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 35230175
+    created_at: 2026-08-13T08:00:14.000Z
+    holders: null
+    errors: []
+  - address: "0x7171E64E979265aeD6588577D1c6b60A701d7866"
+    label: Owner / blacklist guardian (EIP-7702)
+    role: admin
+    is_contract: true
+    source_verified: true
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
+    errors: []
+  - address: "0xb77e03DF4CAe1752aa1E2b52C46794026b46873E"
+    label: QUOTRON/USDG Uniswap v3 pair
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: UniswapV3Pool
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 49956820
+    created_at: 2026-08-30T10:59:33.000Z
+    holders: null
+    errors: []
+  - address: "0x40686524e56AfF0F1446958725dCF6e6dA5381E6"
+    label: V1 QUOTRON core (retired)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: Quotron404
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7171e64e979265aed6588577d1c6b60a701d7866"
+    owner_type: contract
+    safe: null
+    created_block: 34546612
+    created_at: 2026-08-12T12:58:37.000Z
+    holders: 527
+    errors: []
 metrics: []
 market:
   token_address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs:
     - dex: uniswap
       pair_address: "0x0b142aaf734f1b063355bfe854e282a13b26dcac86e2e564e74540f9b218d069"
       quote_symbol: WETH
-      price_usd: 5929.35
-      liquidity_usd: 408454.17
-      volume_h24: 986238.26
-      volume_h6: 173793.91
+      price_usd: 4935.086
+      liquidity_usd: 384993.09
+      volume_h24: 459704.67
+      volume_h6: 83522.73
       txns_h24:
-        buys: 550
-        sells: 287
-      price_change_h24: -0.67
-      fdv: 9795242
+        buys: 359
+        sells: 255
+      price_change_h24: -18.67
+      market_cap: 8113242
+      fdv: 8113242
       created_at: 2026-08-13T15:16:40.000Z
     - dex: uniswap
       pair_address: "0xb77e03DF4CAe1752aa1E2b52C46794026b46873E"
       quote_symbol: USDG
-      price_usd: 6166.47
-      liquidity_usd: 70370.88
-      volume_h24: 556341.68
-      volume_h6: 112324.09
+      price_usd: 4836.19
+      liquidity_usd: 74728.09
+      volume_h24: 621414.82
+      volume_h6: 97646.83
       txns_h24:
-        buys: 835
-        sells: 881
-      price_change_h24: -0.7
-      fdv: 10186962
+        buys: 594
+        sells: 832
+      price_change_h24: -20.91
+      market_cap: 7950662
+      fdv: 7950662
       created_at: 2026-08-30T10:59:33.000Z
     - dex: alandale
       pair_address: "0xB2b48A76a47d3626650Dae357219d9B3E591bC8D"
       quote_symbol: WETH
-      price_usd: 6143.57
-      liquidity_usd: 7306.83
-      volume_h24: 98702.9
-      volume_h6: 12731.17
+      price_usd: 4988.62
+      liquidity_usd: 6187.45
+      volume_h24: 26816.89
+      volume_h6: 192.36
       txns_h24:
-        buys: 542
-        sells: 434
-      price_change_h24: -0.7
-      fdv: 10149141
+        buys: 277
+        sells: 190
+      price_change_h24: -20
+      market_cap: 8201261
+      fdv: 8201261
       created_at: null
-  liquidity_usd: 486131.88
-  volume_h24: 1641282.84
-  trades_h24: 3529
-  price_usd: 5929.35
-  price_change_h24: -0.67
-  fdv: 9795242
+  liquidity_usd: 465908.63
+  volume_h24: 1107936.38
+  trades_h24: 2507
+  price_usd: 4935.086
+  price_change_h24: -18.67
+  market_cap_usd: 8113242
+  fdv_usd: 8113242
+  fdv: 8113242
   first_pair_at: 2026-08-13T15:16:40.000Z
-  top10_share: 0.3330168224056627
-  top10_share_ex_pools: 0.3330168224056627
-  top10_as_of: 2026-09-02T22:38:55.976Z
+  top10_share: 0.3401627722483206
+  top10_share_ex_pools: 0.3335269508989553
+  burned_share: 0
+  top10_as_of: 2026-09-04T11:23:39.609Z
   launchpad: null
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors:
     - step: launchpad
-      message: creator 0x7171E64E979265aeD6588577D1c6b60A701d7866 did not match a known factory, curve or launcher deployer
+      message: creator 0x7171E64E979265aeD6588577D1c6b60A701d7866 did not match a launchpad factory, curve or known launcher deployer
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: no-mint-function
   renounced: false
   lp:
     - pair: "0x0b142aaf734f1b063355bfe854e282a13b26dcac86e2e564e74540f9b218d069"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xb77e03DF4CAe1752aa1E2b52C46794026b46873E"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
     - pair: "0xB2b48A76a47d3626650Dae357219d9B3E591bC8D"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
   errors: []
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
     - address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
-      label: QUOTRON token (ERC-404 core)
+      label: QUOTRON V2 core (Quotron404V2)
       role: token
       transactions_count: 20010
       token_transfers_count: 14
-      last_tx_at: 2026-09-02T22:48:22.000Z
+      last_tx_at: 2026-09-04T11:43:21.000Z
       last_method: approve
-      txns_24h: 1768
+      txns_24h: 695
       launches_24h: null
       errors: []
     - address: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
-      label: Router
+      label: Canonical router (QuotronWethRouter)
       role: router
       transactions_count: 9137
       token_transfers_count: 94269
-      last_tx_at: 2026-09-02T22:45:22.000Z
+      last_tx_at: 2026-09-04T11:41:15.000Z
       last_method: sellExactQuotronForEth
-      txns_24h: 301
+      txns_24h: 153
       launches_24h: null
       errors: []
     - address: "0x62E200Cc8e4D95cf622f40Dd70f407C883EcB0cc"
-      label: Uniswap v4 hook
+      label: Canonical Uniswap v4 hook (QuotronWethHook)
       role: other
       transactions_count: 8
       token_transfers_count: 31298
@@ -162,7 +307,87 @@ activity:
       txns_24h: 0
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T22:48:22.000Z
-  txns_24h: 2069
+    - address: "0x027ACa2794E44f24950D81227DcD516FfBB49d6e"
+      label: V2 ERC-721 mirror (QuotronMirrorV2)
+      role: other
+      transactions_count: 2128
+      token_transfers_count: 10
+      last_tx_at: 2026-09-04T08:49:56.000Z
+      last_method: setApprovalForAll
+      txns_24h: 53
+      launches_24h: null
+      errors: []
+    - address: "0xe04fba61FD54Ba78Dd450A30d8Af40167aF5d3Ec"
+      label: V2 reflections (QuotronReflectionsV2)
+      role: other
+      transactions_count: 7272
+      token_transfers_count: 49824
+      last_tx_at: 2026-09-04T11:36:01.000Z
+      last_method: claim
+      txns_24h: 151
+      launches_24h: null
+      errors: []
+    - address: "0xb8960fdC8A0Be155d196C2795b75747763562df2"
+      label: View quoter (QuotronWethQuoter)
+      role: other
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-14T13:55:26.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x24e62Dd5C7058CC41ad9c5375C137460ea1Da2FE"
+      label: Epoch converter (QuotronEpochConverter)
+      role: other
+      transactions_count: 16441
+      token_transfers_count: 53132
+      last_tx_at: 2026-09-04T09:52:11.000Z
+      last_method: convertFloor
+      txns_24h: 396
+      launches_24h: null
+      errors: []
+    - address: "0x15277aA1ecC13734d57C519a2DAA1cc4A748bA89"
+      label: Recovery Safe
+      role: multisig
+      transactions_count: 1
+      token_transfers_count: 1133
+      last_tx_at: 2026-08-31T08:49:37.000Z
+      last_method: execTransaction
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x7171E64E979265aeD6588577D1c6b60A701d7866"
+      label: Owner / blacklist guardian (EIP-7702)
+      role: admin
+      transactions_count: 1336
+      token_transfers_count: 62002
+      last_tx_at: 2026-08-19T11:21:46.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xb77e03DF4CAe1752aa1E2b52C46794026b46873E"
+      label: QUOTRON/USDG Uniswap v3 pair
+      role: other
+      transactions_count: 0
+      token_transfers_count: 12799
+      last_tx_at: null
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x40686524e56AfF0F1446958725dCF6e6dA5381E6"
+      label: V1 QUOTRON core (retired)
+      role: token
+      transactions_count: 5987
+      token_transfers_count: 4
+      last_tx_at: 2026-09-04T06:26:14.000Z
+      last_method: approve
+      txns_24h: 5
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T11:43:21.000Z
+  txns_24h: 1453
   launches_24h: null
 errors: []

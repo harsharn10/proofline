@@ -121,3 +121,13 @@ findings:
     - text: "Should any of the thin PRIMED/USDG or PRIMED/ETH books get their own notes? Next: only if an assignment names those pool ids"
   unresolved:
     - text: economics.metric remains unresolved (CON-1).
+risks:
+  - USD liquidity figures on the PRIMED/AMZN book count both sides, and the quote side is AMZN, not USDG. [claim S11]
+  - Gecko names the pool AMZN / PRIMED, so pool fdv_usd 1.99M is the AMZN-as-base figure and is not a PRIMED fdv. [claim S11]
+  - Gecko and DexScreener disagree on reserve and fdv for the same pool. [claim S11]
+tldr: A one-billion-supply ERC-20 cloned by DopplerERC20V1Factory into a Uniswap v4 pool quoted against Amazon • Robinhood Token (AMZN).
+tldr_source: derived
+why_people_care:
+  - The PRIMED/AMZN Uniswap v4 book printed about $154.2k of 24h volume on Gecko at collection, with DexScreener on the same pair at $157.8k volume and $41.5k liquidity. [claim S11]
+  - "@TmsCrypto10 posted the CA as an Amazon runner. [claim S11]"
+  - GET /rhj/assets has an AMZN Stock Token row at 0x12f1…bF54, so the pair leg is the Robinhood AMZN rail rather than a lookalike quote. [claim S11]

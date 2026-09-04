@@ -49,6 +49,16 @@
     "lifecycle": { "enum": ["mainnet","beta","announced","inactive","testnet-only"] },
     "coverage": { "enum": ["full","stub"] },
     "summary": { "type": "string", "minLength": 1 },
+    "tldr": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "tldr_source": { "enum": ["derived"] },
+    "why_people_care": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "\\[(?:verified|claim|inference|disputed) S[1-9][0-9]*(?: S[1-9][0-9]*)*\\]$" }
+    },
+    "risks": {
+      "type": "array", "maxItems": 3,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "\\[(?:verified|claim|inference|disputed) S[1-9][0-9]*(?: S[1-9][0-9]*)*\\]$" }
+    },
     "themes": { "type": "array", "maxItems": 5, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9:-]*$" } },
     "controller_edited": { "type": "boolean" },
     "lifecycle_source": { "type": "string", "pattern": "^pulled 0x[0-9a-fA-F]{40} [^ ]+$" },

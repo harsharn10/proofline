@@ -120,3 +120,13 @@ findings:
     - text: "Does the site burn/payout copy match a live hook fee path, and why is RPC totalSupply 993.4M against a 1e9 mint? Next: eth_call remaining supply math and read DopplerERC20V1 burn/fee functions on the explorer"
     - text: "Which other robinhood SCHIFFY or SCHIFF tickers stay live besides 0x42aF…1E18? Next: re-run search if a second SCHIFFY book crosses the liquidity bar"
   unresolved: []
+risks:
+  - USD liquidity figures on the SCHIFFY/GLD book count both sides, and the quote side is GLD, not USDG. [claim S12]
+  - Gecko labels the pool Bankr; the create target is LongLauncher. [claim S12]
+  - Other contracts on this chain reuse SCHIFF or quote the same GLD rail. [claim S12]
+tldr: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against GLD. LongLauncher deploys SCHIFFY in one create call and seeds the SCHIFFY/GLD book.
+tldr_source: derived
+why_people_care:
+  - The SCHIFFY/GLD Uniswap v4 book showed about $903k of 24h volume on Gecko at collection, with the quote token using the GLD ticker via Robinhood's stock-token registry. [claim S12]
+  - GET /rhj/assets has a GLD row at 0xC9a9…FC4e. [claim S12]
+  - Separate live names, UBIK and CASHBIRD, also quote that rail. [claim S12]

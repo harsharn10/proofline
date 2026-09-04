@@ -116,3 +116,13 @@ findings:
     - text: economics.metric remains unresolved (CON-1).
     - text: economics.metric remains unresolved (CON-2).
     - text: control.privileged-role remains unresolved (CON-3).
+tldr: An EOA-deployed one-billion-supply ERC-20. enableTrading created a Uniswap v2 SHRUB/WETH pair and seeded liquidity.
+tldr_source: derived
+why_people_care:
+  - The SHRUB/WETH Uniswap v2 book is live on Gecko trending this pass (row 4) at about $4.41M of 24h volume and $164k reserve, versus a prior GO-LIVE capture near $6.78M / $147k. [claim S10]
+  - The quote is WETH, not a tokenized stock. [claim S10]
+  - CHUMP/WETH is a different trending pool. [claim S10]
+risks:
+  - USD liquidity on the SHRUB/WETH book counts both sides. lilshrub.fun says LP is burnt; RPC shows the deployer still holds nearly all UniswapV2Pair tokens. [claim S10]
+  - "@lilshrub_RH is a FAN-labelled handle. [claim S10]"
+  - The verified source keeps onlyOwner block lists and a _taxWallet path. [claim S10]

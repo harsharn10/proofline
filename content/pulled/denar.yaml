@@ -1,9 +1,9 @@
 slug: denar
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
-  - address: "0x3786728a2c49c4617bf4fe5bd82b90b6b0df5508"
-    label: DENAR token (posted by the project 30 Aug)
+  - address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
+    label: DENAR token (PonsV2LauncherToken)
     role: token
     is_contract: true
     source_verified: true
@@ -17,237 +17,420 @@ addresses:
     safe: null
     created_block: 50334878
     created_at: 2026-08-30T21:37:55.000Z
-    holders: 1373
+    holders: 1446
+    errors: []
+  - address: "0xf0A0a33729270586cDD66010B1cedE649745c3A5"
+    label: Denar Morpho Blue (equity lending core)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: Morpho
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0xdcb002787fb86873051b838582063517fdc47c6f"
+    owner_type: eoa
+    safe: null
+    created_block: 30436487
+    created_at: 2026-08-07T18:44:49.000Z
+    holders: null
+    errors: []
+  - address: "0x9316E7eDAB60eF0f489b1E4D11DDcDaa560aCbfD"
+    label: AdaptiveCurveIrm (Denar instance)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: AdaptiveCurveIrm
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 30436488
+    created_at: 2026-08-07T18:44:49.000Z
+    holders: null
+    errors: []
+  - address: "0xF0E6AD006080c48766ddb95b8c568D72bC059050"
+    label: Denar USDG Vault (dnUSDG, MetaMorphoV1_1)
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: MetaMorphoV1_1
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0xdcb002787fb86873051b838582063517fdc47c6f"
+    owner_type: eoa
+    safe: null
+    created_block: 30436959
+    created_at: 2026-08-07T18:45:37.000Z
+    holders: 20
+    errors: []
+  - address: "0x99a0bD825beDA579794F3f715ab3984310C7226E"
+    label: MetaMorphoV1_1Factory
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: MetaMorphoV1_1Factory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 30436959
+    created_at: 2026-08-07T18:45:37.000Z
+    holders: null
+    errors: []
+  - address: "0x4d61E8a7eF442eb077650D349781F2cc3Ebe42d1"
+    label: DenarLiquidator (equity)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: DenarLiquidator
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0xdcb002787fb86873051b838582063517fdc47c6f"
+    owner_type: eoa
+    safe: null
+    created_block: 30437312
+    created_at: 2026-08-07T18:46:12.000Z
+    holders: null
+    errors: []
+  - address: "0x338b2f252dae1deb00Afb700128e592a19F8918c"
+    label: Denar Frontier USDG (dnFRONT)
+    role: vault
+    is_contract: true
+    source_verified: false
+    contract_name: Denar Frontier USDG
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0xdcb002787fb86873051b838582063517fdc47c6f"
+    owner_type: eoa
+    safe: null
+    created_block: null
+    created_at: null
+    holders: 1
+    errors: []
+  - address: "0xdCB002787Fb86873051b838582063517FDc47c6F"
+    label: Protocol owner / deployer
+    role: admin
+    is_contract: false
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
+    errors: []
+  - address: "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010"
+    label: Morpho Blue (canonical; not Denar-owned)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: Morpho
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x060595638692de6ccd47ca04094f1772d3d39728"
+    owner_type: safe
+    safe:
+      threshold: 5
+      signers:
+        - "0xe0aeb6811d33df42a09066857cdafca16b506086"
+        - "0x84d3e4ee550dd5f99e76a548ac59a6be1c8dcf79"
+        - "0xc100c251bdd297a66795112f04356e6ba5f89d80"
+        - "0x264c86dbbd2e4165fbbf0c35b0ddf0e00aec6b31"
+        - "0x30e7c016fc702cde9a50720a469d418490b7b652"
+        - "0x8f02b4a44eacd9b8ee7739aa0ba58833dd45d002"
+        - "0xcf263cee139763114faafc5f52865135412f50ec"
+        - "0x69fcefde2b48503d675181448b3d4272128bca9c"
+        - "0x13ca8756e9470b71b8e998352c8741706217f963"
+    created_block: 286
+    created_at: 2026-05-11T08:55:04.000Z
+    holders: null
     errors: []
 metrics: []
 market:
-  token_address: "0x3786728a2c49c4617bf4fe5bd82b90b6b0df5508"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  token_address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs:
     - dex: uniswap
       pair_address: "0x8e1a7addeed794d59f04755f7bd1a8d47c1eb1c60f7891587d30cd8616699f3c"
       quote_symbol: ETH
-      price_usd: 0.000825
-      liquidity_usd: 82101.26
-      volume_h24: 633851.87
-      volume_h6: 75899.63
+      price_usd: 0.001362
+      liquidity_usd: 108592.77
+      volume_h24: 286297.93
+      volume_h6: 49390.05
       txns_h24:
-        buys: 932
-        sells: 816
-      price_change_h24: -39.96
-      fdv: 825002
+        buys: 544
+        sells: 453
+      price_change_h24: 21.43
+      market_cap: 1362227
+      fdv: 1362227
       created_at: 2026-08-30T21:37:58.000Z
-    - dex: uniswap
-      pair_address: "0xaaee8af96aa92f62650c479c2607a0699e5bc0190a218f8306fc4c81d4f5ad30"
-      quote_symbol: ETH
-      price_usd: 0.0008823
-      liquidity_usd: 4643.68
-      volume_h24: 8671.98
-      volume_h6: 4415.41
-      txns_h24:
-        buys: 48
-        sells: 27
-      price_change_h24: -8.76
-      fdv: 882377
-      created_at: 2026-09-02T15:42:06.000Z
-    - dex: uniswap
-      pair_address: "0x459741950a36019c742d5368899668214368a7da9fda160fa30059f7cc4ecabf"
-      quote_symbol: ETH
-      price_usd: 0.0009042
-      liquidity_usd: 2717.29
-      volume_h24: 9259.3
-      volume_h6: 0
-      txns_h24:
-        buys: 51
-        sells: 34
-      price_change_h24: -50.74
-      fdv: 904242
-      created_at: 2026-09-02T07:42:44.000Z
     - dex: uniswap
       pair_address: "0xfe0441319d330ade7b6f36ba98ace45bba229719a720dea9bee6b56d1a7e243e"
       quote_symbol: USDG
-      price_usd: 0.0008413
-      liquidity_usd: 9289.39
-      volume_h24: 106650.38
-      volume_h6: 1924.99
+      price_usd: 0.001336
+      liquidity_usd: 14306.59
+      volume_h24: 34441.67
+      volume_h6: 11141.14
       txns_h24:
-        buys: 362
-        sells: 349
-      price_change_h24: -38.93
-      fdv: 841312
+        buys: 179
+        sells: 188
+      price_change_h24: 20.67
+      market_cap: 1336610
+      fdv: 1336610
       created_at: 2026-08-31T03:13:10.000Z
     - dex: uniswap
-      pair_address: "0xd6cc3ab3ba4e0a311897c366720693fd5ed69645f7b47404f3595eccd009c384"
-      quote_symbol: HOOKR
-      price_usd: 0.0008848
-      liquidity_usd: 178.52
-      volume_h24: 688.23
-      volume_h6: 0
+      pair_address: "0x828d1868055b760374f6a9fcd627f8080f8b70cacda6fe24a0d26ac93df5c6cb"
+      quote_symbol: ETH
+      price_usd: 0.001321
+      liquidity_usd: 2002.18
+      volume_h24: 2408.66
+      volume_h6: 92.73
       txns_h24:
-        buys: 21
-        sells: 13
-      price_change_h24: -48.12
-      fdv: 884878
-      created_at: 2026-09-02T10:15:54.000Z
-    - dex: uniswap
-      pair_address: "0x385bbe907e8cea73895eae66d7c2b1c30601bf41833e91a287557ff1c977d6a6"
-      quote_symbol: USDG
-      price_usd: 0.001455
-      liquidity_usd: 932.07
-      volume_h24: 2531.98
-      volume_h6: 0
-      txns_h24:
-        buys: 30
-        sells: 28
-      price_change_h24: -35.4
-      fdv: 1455398
-      created_at: 2026-09-02T04:32:02.000Z
+        buys: 49
+        sells: 39
+      price_change_h24: 1.33
+      market_cap: 1321587
+      fdv: 1321587
+      created_at: 2026-09-03T03:17:34.000Z
     - dex: uniswap
       pair_address: "0x7957344debad2fbb5b69860d391116b771bc5a39c89c7c5ee79e7dcc6c758340"
       quote_symbol: USDG
-      price_usd: 0.000911
-      liquidity_usd: 737.12
-      volume_h24: 26826.89
-      volume_h6: 33.59
+      price_usd: 0.001397
+      liquidity_usd: 902.71
+      volume_h24: 524.7
+      volume_h6: 109.43
       txns_h24:
-        buys: 103
-        sells: 88
-      price_change_h24: -31.3
-      fdv: 911016
+        buys: 27
+        sells: 22
+      price_change_h24: 4.78
+      market_cap: 1397157
+      fdv: 1397157
       created_at: 2026-08-30T21:45:08.000Z
     - dex: uniswap
       pair_address: "0x750ae02f2522bdf00c817018940c264f2f7967a21868a70563113582f4c7ded5"
       quote_symbol: ETH
-      price_usd: 0.001446
-      liquidity_usd: 54.58
-      volume_h24: 206.17
+      price_usd: 0.001551
+      liquidity_usd: 58.53
+      volume_h24: 19.09
       volume_h6: 0
       txns_h24:
-        buys: 13
-        sells: 15
-      price_change_h24: -16.32
-      fdv: 1446925
+        buys: 1
+        sells: 2
+      price_change_h24: -11.55
+      market_cap: 1551792
+      fdv: 1551792
       created_at: 2026-08-31T14:06:50.000Z
     - dex: uniswap
-      pair_address: "0x0889c0691c48e93cdc3719f82175482c1627661dabff576874f0fc6b83086bb1"
-      quote_symbol: USDG
-      price_usd: 0.002311
-      liquidity_usd: 283.41
-      volume_h24: 279.54
+      pair_address: "0xfe1e91da96a1c2ecb12ec896edbfb718cce1cbb00f73a61a348e8192d3b4c010"
+      quote_symbol: ETH
+      price_usd: 0.0002831
+      liquidity_usd: 3.54
+      volume_h24: 1.39
       volume_h6: 0
       txns_h24:
-        buys: 10
-        sells: 8
-      price_change_h24: 33.71
-      fdv: 2311493
-      created_at: 2026-09-01T13:27:22.000Z
-    - dex: uniswap
-      pair_address: "0x36d2aa5d7b11f7d78af98db326673e6f129735d1f1a4a49ab56dd6aa4e4a5fd0"
-      quote_symbol: USDG
-      price_usd: 0.001231
-      liquidity_usd: 3.33
-      volume_h24: 1.81
-      volume_h6: 0
-      txns_h24:
-        buys: 2
-        sells: 1
-      price_change_h24: 127
-      fdv: 1231237
-      created_at: 2026-08-30T22:03:13.000Z
-    - dex: uniswap
-      pair_address: "0xcd009030a46b7b2d4e6584da39ab6d6bf918f896199c0ddd1c077920eab737a7"
-      quote_symbol: USDG
-      price_usd: 0.001268
-      liquidity_usd: 3.69
-      volume_h24: 0.56
-      volume_h6: 0
-      txns_h24:
-        buys: 0
-        sells: 1
+        buys: 1
+        sells: 0
       price_change_h24: null
-      fdv: 1268706
-      created_at: 2026-08-30T21:47:33.000Z
-  liquidity_usd: 100944.34
-  volume_h24: 788968.71
-  trades_h24: 2952
-  price_usd: 0.000825
-  price_change_h24: -39.96
-  fdv: 825002
+      market_cap: 283107
+      fdv: 283107
+      created_at: 2026-09-03T08:13:27.000Z
+    - dex: uniswap
+      pair_address: "0x64edb323c75122fbcb18334599b95e34646ba0a67b9893086ea9b30817195f2b"
+      quote_symbol: DENAR
+      price_usd: 0.00004001
+      liquidity_usd: 407.12
+      volume_h24: 305.15
+      volume_h6: 34.81
+      txns_h24:
+        buys: 6
+        sells: 8
+      price_change_h24: 3.64
+      market_cap: 40012
+      fdv: 40012
+      created_at: 2026-09-04T02:47:43.000Z
+  liquidity_usd: 126273.44
+  volume_h24: 323998.59
+  trades_h24: 1519
+  price_usd: 0.001362
+  price_change_h24: 21.43
+  market_cap_usd: 1362227
+  fdv_usd: 1362227
+  fdv: 1362227
   first_pair_at: 2026-08-30T21:37:58.000Z
-  top10_share: 0.2889954927617873
-  top10_share_ex_pools: 0.2073628397005628
-  top10_as_of: 2026-09-02T22:38:55.976Z
+  top10_share: 0.290802651564169
+  top10_share_ex_pools: 0.1774258956302312
+  burned_share: 0
+  top10_as_of: 2026-09-04T11:23:39.609Z
   launchpad:
     slug: pons
     via: creator
     address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: no-mint-function
   renounced: null
   lp:
     - pair: "0x8e1a7addeed794d59f04755f7bd1a8d47c1eb1c60f7891587d30cd8616699f3c"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0xaaee8af96aa92f62650c479c2607a0699e5bc0190a218f8306fc4c81d4f5ad30"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x459741950a36019c742d5368899668214368a7da9fda160fa30059f7cc4ecabf"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xfe0441319d330ade7b6f36ba98ace45bba229719a720dea9bee6b56d1a7e243e"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0xd6cc3ab3ba4e0a311897c366720693fd5ed69645f7b47404f3595eccd009c384"
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x828d1868055b760374f6a9fcd627f8080f8b70cacda6fe24a0d26ac93df5c6cb"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x385bbe907e8cea73895eae66d7c2b1c30601bf41833e91a287557ff1c977d6a6"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x7957344debad2fbb5b69860d391116b771bc5a39c89c7c5ee79e7dcc6c758340"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x750ae02f2522bdf00c817018940c264f2f7967a21868a70563113582f4c7ded5"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x0889c0691c48e93cdc3719f82175482c1627661dabff576874f0fc6b83086bb1"
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xfe1e91da96a1c2ecb12ec896edbfb718cce1cbb00f73a61a348e8192d3b4c010"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x36d2aa5d7b11f7d78af98db326673e6f129735d1f1a4a49ab56dd6aa4e4a5fd0"
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x64edb323c75122fbcb18334599b95e34646ba0a67b9893086ea9b30817195f2b"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0xcd009030a46b7b2d4e6584da39ab6d6bf918f896199c0ddd1c077920eab737a7"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
-    - address: "0x3786728a2c49c4617bf4fe5bd82b90b6b0df5508"
-      label: DENAR token (posted by the project 30 Aug)
+    - address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
+      label: DENAR token (PonsV2LauncherToken)
       role: token
       transactions_count: 4099
       token_transfers_count: 0
-      last_tx_at: 2026-09-02T22:44:08.000Z
+      last_tx_at: 2026-09-04T11:36:05.000Z
       last_method: approve
-      txns_24h: 365
+      txns_24h: 236
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T22:44:08.000Z
-  txns_24h: 365
-  launches_24h: null
-errors: []
+    - address: "0xf0A0a33729270586cDD66010B1cedE649745c3A5"
+      label: Denar Morpho Blue (equity lending core)
+      role: other
+      transactions_count: 68
+      token_transfers_count: 86
+      last_tx_at: 2026-09-04T08:33:31.000Z
+      last_method: borrow
+      txns_24h: 7
+      launches_24h: null
+      errors: []
+    - address: "0x9316E7eDAB60eF0f489b1E4D11DDcDaa560aCbfD"
+      label: AdaptiveCurveIrm (Denar instance)
+      role: other
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-07T18:44:49.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xF0E6AD006080c48766ddb95b8c568D72bC059050"
+      label: Denar USDG Vault (dnUSDG, MetaMorphoV1_1)
+      role: vault
+      transactions_count: 74
+      token_transfers_count: 64
+      last_tx_at: 2026-09-04T07:02:47.000Z
+      last_method: withdraw
+      txns_24h: 4
+      launches_24h: null
+      errors: []
+    - address: "0x99a0bD825beDA579794F3f715ab3984310C7226E"
+      label: MetaMorphoV1_1Factory
+      role: factory
+      transactions_count: 1
+      token_transfers_count: 0
+      last_tx_at: 2026-08-07T18:45:37.000Z
+      last_method: createMetaMorpho
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0x4d61E8a7eF442eb077650D349781F2cc3Ebe42d1"
+      label: DenarLiquidator (equity)
+      role: other
+      transactions_count: 1
+      token_transfers_count: 0
+      last_tx_at: 2026-08-07T18:46:12.000Z
+      last_method: setSwapTarget
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x338b2f252dae1deb00Afb700128e592a19F8918c"
+      label: Denar Frontier USDG (dnFRONT)
+      role: vault
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-09-02T19:48:09.000Z
+      last_method: "0xac9650d8"
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xdCB002787Fb86873051b838582063517FDc47c6F"
+      label: Protocol owner / deployer
+      role: admin
+      transactions_count: 67
+      token_transfers_count: 5
+      last_tx_at: 2026-08-07T17:39:34.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010"
+      label: Morpho Blue (canonical; not Denar-owned)
+      role: other
+      transactions_count: 2634
+      token_transfers_count: 363281
+      last_tx_at: 2026-09-04T11:36:59.000Z
+      last_method: setAuthorization
+      txns_24h: 135
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T11:36:59.000Z
+  txns_24h: 382
+  launches_24h: 0
+errors:
+  - step: llama
+    message: "protocol/denar: HTTP 400: Protocol not found"
+  - step: llama
+    message: "fees_24h denar: HTTP 400: Fees for denar not found, please visit /overview/fees to see available protocols"
+  - step: llama
+    message: "revenue_24h denar: HTTP 400: Fees for denar not found, please visit /overview/fees to see available protocols"
+  - step: llama
+    message: "volume_24h denar: HTTP 400: Dexs for denar not found, please visit /overview/dexs to see available protocols"
+  - step: llama
+    message: "revenue_daily denar: the read returned no daily points, so no series file was written"

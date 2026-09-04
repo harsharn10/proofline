@@ -1,44 +1,284 @@
 slug: sherwood
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
-addresses: []
+addresses:
+  - address: "0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736"
+    label: SherwoodVault (immutable mixer + shielded DEX)
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: SherwoodVault
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 21248162
+    created_at: 2026-07-28T02:52:54.000Z
+    holders: null
+    errors: []
+  - address: "0x52445Ae1B988CfDc668EB15628629ED7d0890C6A"
+    label: SwapLogic (UUPS proxy)
+    role: proxy
+    is_contract: true
+    source_verified: true
+    contract_name: ERC1967Proxy
+    proxy:
+      type: eip1967
+      implementation: "0x10562a98b0eb2bff853275da5f34bf498192d45b"
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 21248174
+    created_at: 2026-07-28T02:52:56.000Z
+    holders: null
+    errors: []
+  - address: "0x10562a98b0eB2BFF853275da5F34BF498192d45B"
+    label: SwapLogic implementation
+    role: implementation
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 27699897
+    created_at: 2026-08-04T14:34:44.000Z
+    holders: null
+    errors: []
+  - address: "0x3d7bEA6294BC033fAA7e0e06F2D94088106CDb79"
+    label: Verifier2 (Groth16)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: Verifier2
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 21248137
+    created_at: 2026-07-28T02:52:52.000Z
+    holders: null
+    errors: []
+  - address: "0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1"
+    label: SHERWOOD token (PonsV2LauncherToken)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: PonsV2LauncherToken
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 31341426
+    created_at: 2026-08-08T19:55:38.000Z
+    holders: 669
+    errors: []
+  - address: "0x93080bdF26050307d410d372640D4398397E0A6E"
+    label: Vault admin EOA
+    role: admin
+    is_contract: false
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
+    errors: []
+  - address: "0x6cEE2DC8A42A5AA3f28799ea8Ebd23Ea5e07cc08"
+    label: protocolFeeRecipient EOA
+    role: other
+    is_contract: false
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
+    errors: []
 metrics:
   - kind: tvl
-    value: 73053
-    as_of: 2026-09-02T19:19:11.000Z
+    value: 72529
+    as_of: 2026-09-04T08:26:11.000Z
     source_url: https://api.llama.fi/protocol/sherwood
   - kind: fees_24h
-    value: 14.64
-    as_of: 2026-09-02T22:38:55.976Z
+    value: 30.17
+    as_of: 2026-09-04T11:23:39.609Z
     source_url: https://api.llama.fi/summary/fees/sherwood?dataType=dailyFees
   - kind: revenue_24h
-    value: 14.64
-    as_of: 2026-09-02T22:38:55.976Z
+    value: 30.17
+    as_of: 2026-09-04T11:23:39.609Z
     source_url: https://api.llama.fi/summary/fees/sherwood?dataType=dailyRevenue
 market:
-  token_address: null
-  pulled_at: 2026-09-02T22:38:55.976Z
-  pairs: []
-  liquidity_usd: null
-  volume_h24: null
-  trades_h24: null
-  price_usd: null
-  price_change_h24: null
-  fdv: null
-  first_pair_at: null
-  top10_share: null
-  top10_share_ex_pools: null
-  top10_as_of: null
-  launchpad: null
+  token_address: "0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1"
+  pulled_at: 2026-09-04T11:23:39.609Z
+  pairs:
+    - dex: uniswap
+      pair_address: "0x2e03323ecfe5e6e4c287bdb731ea0f8857e5afbbded6612fdca4b8de20d0d874"
+      quote_symbol: ETH
+      price_usd: 0.0003792
+      liquidity_usd: 57275.93
+      volume_h24: 85898.55
+      volume_h6: 16314.15
+      txns_h24:
+        buys: 172
+        sells: 157
+      price_change_h24: 17.13
+      market_cap: 374311
+      fdv: 374311
+      created_at: 2026-08-10T13:57:58.000Z
+    - dex: uniswap
+      pair_address: "0x289be808be4fed2f4b09e88b0f1420958d4b1a0bafbf8da82095101aa7765556"
+      quote_symbol: ETH
+      price_usd: 0.0003836
+      liquidity_usd: 3176.86
+      volume_h24: 2797.94
+      volume_h6: 679.32
+      txns_h24:
+        buys: 41
+        sells: 27
+      price_change_h24: 30.73
+      market_cap: 378703
+      fdv: 378703
+      created_at: 2026-08-27T15:39:05.000Z
+  liquidity_usd: 60452.79
+  volume_h24: 88696.49
+  trades_h24: 397
+  price_usd: 0.0003792
+  price_change_h24: 17.13
+  market_cap_usd: 374311
+  fdv_usd: 374311
+  fdv: 374311
+  first_pair_at: 2026-08-10T13:57:58.000Z
+  top10_share: 0.4355967959854738
+  top10_share_ex_pools: 0.2328221747395085
+  burned_share: 0.012995852054963
+  top10_as_of: 2026-09-04T11:23:39.609Z
+  launchpad:
+    slug: pons
+    via: creator
+    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
+  errors: []
+structure:
+  pulled_at: 2026-09-04T11:23:39.609Z
+  mint: no-mint-function
+  renounced: null
+  lp:
+    - pair: "0x2e03323ecfe5e6e4c287bdb731ea0f8857e5afbbded6612fdca4b8de20d0d874"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x289be808be4fed2f4b09e88b0f1420958d4b1a0bafbf8da82095101aa7765556"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
-    - step: no token address
-      message: no robinhood-chain deployment with role token
-structure: null
+    - step: renounced
+      message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
-  addresses: []
-  last_activity_at: null
-  txns_24h: null
+  pulled_at: 2026-09-04T11:23:39.609Z
+  addresses:
+    - address: "0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736"
+      label: SherwoodVault (immutable mixer + shielded DEX)
+      role: vault
+      transactions_count: 796
+      token_transfers_count: 965
+      last_tx_at: 2026-09-04T10:06:47.000Z
+      last_method: executeSwap
+      txns_24h: 31
+      launches_24h: null
+      errors: []
+    - address: "0x52445Ae1B988CfDc668EB15628629ED7d0890C6A"
+      label: SwapLogic (UUPS proxy)
+      role: proxy
+      transactions_count: 2
+      token_transfers_count: 0
+      last_tx_at: 2026-08-04T14:34:49.000Z
+      last_method: "0x4f1ef286"
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x10562a98b0eB2BFF853275da5F34BF498192d45B"
+      label: SwapLogic implementation
+      role: implementation
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-04T14:34:44.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x3d7bEA6294BC033fAA7e0e06F2D94088106CDb79"
+      label: Verifier2 (Groth16)
+      role: other
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-07-28T02:52:52.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1"
+      label: SHERWOOD token (PonsV2LauncherToken)
+      role: token
+      transactions_count: 2306
+      token_transfers_count: 17
+      last_tx_at: 2026-09-04T10:29:32.000Z
+      last_method: transfer
+      txns_24h: 69
+      launches_24h: null
+      errors: []
+    - address: "0x93080bdF26050307d410d372640D4398397E0A6E"
+      label: Vault admin EOA
+      role: admin
+      transactions_count: 156
+      token_transfers_count: 37
+      last_tx_at: 2026-07-23T20:07:13.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x6cEE2DC8A42A5AA3f28799ea8Ebd23Ea5e07cc08"
+      label: protocolFeeRecipient EOA
+      role: other
+      transactions_count: 33
+      token_transfers_count: 86
+      last_tx_at: null
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T10:29:32.000Z
+  txns_24h: 100
   launches_24h: null
 errors:
   - step: llama

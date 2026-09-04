@@ -63,8 +63,13 @@ jobs:
             git commit -m "chore: update telegram state [skip ci]"
             # A controller may have committed another decision while this message was sending.
             # Preserve that newer decision, then place sent-state on top of it.
-            git pull --rebase origin main
-            git push
+            for attempt in 1 2 3; do
+              git fetch origin main
+              if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+              git rebase --abort 2>/dev/null || true
+              sleep 20
+            done
+            echo "telegram state push failed after 3 attempts"; exit 1
           else
             echo "No telegram state changes to commit."
           fi

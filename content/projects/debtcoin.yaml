@@ -125,3 +125,13 @@ findings:
     - text: "tvl is not published as a figure: the packet reported -355304.709249059"
   unresolved:
     - text: economics.metric remains unresolved (CON-1).
+risks:
+  - USD liquidity figures on the DEBTCOIN/SGOV book count both sides, and the quote side is SGOV, not USDG. [claim S10]
+  - Gecko reserve_in_usd was negative this pass, so that aggregator slice is not a USD reserve. [claim S10]
+  - No official handle was located, so comms surfaces stay unconfirmed-official. [claim S10]
+tldr: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against SGOV.
+tldr_source: derived
+why_people_care:
+  - The DEBTCOIN/SGOV Uniswap v4 book printed about $1.59M of 24h volume on DexScreener at collection, with the quote token the iShares 0-3 Month Treasury Bond • Robinhood Token. [claim S10]
+  - GET /rhj/assets lists that SGOV address. [claim S10]
+  - Distinct from the in-flight JOHNDOG/SGOV book on the same rail. [claim S10]

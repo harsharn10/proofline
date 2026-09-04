@@ -1,9 +1,9 @@
 slug: robindex
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
-    label: ROBINDEX token (About page and X bio per the dossier)
+    label: ROBINDEX token (PonsLauncherToken)
     role: token
     is_contract: true
     source_verified: true
@@ -17,67 +17,102 @@ addresses:
     safe: null
     created_block: 27657355
     created_at: 2026-08-04T13:23:42.000Z
-    holders: 238
+    holders: 228
+    errors: []
+  - address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
+    label: Uniswap v3 ROBINDEX/WETH pool
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: UniswapV3Pool
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 27657355
+    created_at: 2026-08-04T13:23:42.000Z
+    holders: null
     errors: []
 metrics: []
 market:
   token_address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs:
     - dex: uniswap
       pair_address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
       quote_symbol: WETH
-      price_usd: 0.00004594
-      liquidity_usd: 21174.46
-      volume_h24: 9526.56
-      volume_h6: 1224.38
+      price_usd: 0.0000326
+      liquidity_usd: 17801.53
+      volume_h24: 4053.99
+      volume_h6: 504.82
       txns_h24:
-        buys: 37
-        sells: 35
-      price_change_h24: 15.37
-      fdv: 45046
+        buys: 18
+        sells: 19
+      price_change_h24: -11.8
+      market_cap: 31963
+      fdv: 31963
       created_at: 2026-08-04T13:23:42.000Z
-  liquidity_usd: 21174.46
-  volume_h24: 9526.56
-  trades_h24: 72
-  price_usd: 0.00004594
-  price_change_h24: 15.37
-  fdv: 45046
+  liquidity_usd: 17801.53
+  volume_h24: 4053.99
+  trades_h24: 37
+  price_usd: 0.0000326
+  price_change_h24: -11.8
+  market_cap_usd: 31963
+  fdv_usd: 31963
+  fdv: 31963
   first_pair_at: 2026-08-04T13:23:42.000Z
-  top10_share: 0.559337688650997
-  top10_share_ex_pools: 0.2933525549082168
-  top10_as_of: 2026-09-02T22:38:55.976Z
+  top10_share: 0.6381601115364184
+  top10_share_ex_pools: 0.3323921772250811
+  burned_share: 0.0195515576409012
+  top10_as_of: 2026-09-04T11:23:39.609Z
   launchpad:
     slug: pons
     via: factory
     address: "0xa5aab3f0c6eeadf30ef1d3eb997108e976351feb"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: no-mint-function
   renounced: null
   lp:
     - pair: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
     - address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
-      label: ROBINDEX token (About page and X bio per the dossier)
+      label: ROBINDEX token (PonsLauncherToken)
       role: token
       transactions_count: 1270
       token_transfers_count: 7
-      last_tx_at: 2026-09-02T22:37:43.000Z
+      last_tx_at: 2026-09-04T11:39:41.000Z
       last_method: approve
-      txns_24h: 21
+      txns_24h: 12
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T22:37:43.000Z
-  txns_24h: 21
+    - address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
+      label: Uniswap v3 ROBINDEX/WETH pool
+      role: other
+      transactions_count: 0
+      token_transfers_count: 10278
+      last_tx_at: null
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T11:39:41.000Z
+  txns_24h: 12
   launches_24h: null
 errors: []

@@ -131,3 +131,13 @@ metrics:
     class: claim
     sources:
       - S18
+risks:
+  - The yield strategy is an ERC1967 proxy. [claim S8]
+  - Factory owner() is a 2-of-3 Safe on Accountable's factory, not an owner() on MLP. [claim S8]
+  - Vault totalAssets() is only idle USDe; a card that prints that figure as TVL would miss the ~$2.01M deployedAssets. [claim S8]
+tldr: USDe deposits mint MLP shares in an Accountable ERC-7540 async-redeem vault that lends into an upgradeable AccountableYield strategy; prediction markets run…
+tldr_source: derived
+why_people_care:
+  - This is the census perps-plus-predict name with a reproduced Robinhood Chain vault, not a Llama-only row. [claim S8]
+  - Idle USDe plus deployedAssets on the AccountableYield proxy match the ~$2.51M meridian-perps chain slice. [claim S8]
+  - Predict still has a Llama slice and August volume posts while the in-app Predict Vault flag is off and mPerps remains a dated launch post. [claim S8]

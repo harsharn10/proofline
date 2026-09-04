@@ -1,0 +1,208 @@
+slug: bigly
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+chain: robinhood-chain
+addresses:
+  - address: "0x73114aBD7dCF37000d90d8DE9fd1dE3957B17c04"
+    label: BIGLY token (PonsV2LauncherToken)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: PonsV2LauncherToken
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 37102874
+    created_at: 2026-08-15T12:08:51.000Z
+    holders: 1179
+    errors: []
+  - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    label: PonsV2LaunchFactory
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: PonsV2LaunchFactory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 26841846
+    created_at: 2026-08-03T14:41:19.000Z
+    holders: null
+    errors: []
+  - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    label: V2LaunchLocker (top holder / locked position)
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: V2LaunchLocker
+    proxy:
+      type: unknown
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 26841845
+    created_at: 2026-08-03T14:41:19.000Z
+    holders: null
+    errors:
+      - step: rpc
+        message: "eth_getCode 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+      - step: rpc
+        message: "eth_getStorageAt admin 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+  - address: "0x1D11f0496982706C5e14A514D4E79F2e6BdE4516"
+    label: DJT Robinhood Stock Token (pair quote / rail)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: BeaconProxy
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 20946859
+    created_at: 2026-07-27T18:29:21.000Z
+    holders: 22905
+    errors: []
+metrics: []
+market:
+  token_address: "0x73114aBD7dCF37000d90d8DE9fd1dE3957B17c04"
+  pulled_at: 2026-09-04T11:23:39.609Z
+  pairs:
+    - dex: uniswap
+      pair_address: "0x331ae7478e52c0450b149d7531dc2a51b8d1bdb20910d2bbbe24426484a1047d"
+      quote_symbol: DJT
+      price_usd: 0.0004712
+      liquidity_usd: 57128.15
+      volume_h24: 122279.11
+      volume_h6: 33698.8
+      txns_h24:
+        buys: 298
+        sells: 444
+      price_change_h24: -8.89
+      market_cap: 471296
+      fdv: 471296
+      created_at: 2026-08-15T13:58:20.000Z
+    - dex: uniswap
+      pair_address: "0x7e532578664691fdfaaddd434ce768e477a106abf2e68fb6a685953f297a1018"
+      quote_symbol: USDG
+      price_usd: 0.0005019
+      liquidity_usd: 162.96
+      volume_h24: 51.61
+      volume_h6: 19
+      txns_h24:
+        buys: 3
+        sells: 5
+      price_change_h24: 1.74
+      market_cap: 501979
+      fdv: 501979
+      created_at: 2026-08-21T13:05:51.000Z
+  liquidity_usd: 57291.11
+  volume_h24: 122330.72
+  trades_h24: 750
+  price_usd: 0.0004712
+  price_change_h24: -8.89
+  market_cap_usd: 471296
+  fdv_usd: 471296
+  fdv: 471296
+  first_pair_at: 2026-08-15T13:58:20.000Z
+  top10_share: 0.3304406508467437
+  top10_share_ex_pools: 0.2226481918721652
+  burned_share: 0
+  top10_as_of: 2026-09-04T11:23:39.609Z
+  launchpad:
+    slug: pons
+    via: creator
+    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
+  rialto: null
+  pair_asset:
+    ticker: DJT
+    name: Trump Media & Technology Group • Robinhood Token
+    address: "0x1d11f0496982706c5e14a514d4e79f2e6bde4516"
+    category: Stocks
+    tokenized_value_usd: 1645961.53
+    tokenized_shares: 180083.31799999985
+    change_7d: -28813.33
+    source_url: https://analytics.rialto.xyz/tokenization
+  volume_disagreement: null
+  errors: []
+structure:
+  pulled_at: 2026-09-04T11:23:39.609Z
+  mint: no-mint-function
+  renounced: null
+  lp:
+    - pair: "0x331ae7478e52c0450b149d7531dc2a51b8d1bdb20910d2bbbe24426484a1047d"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x7e532578664691fdfaaddd434ce768e477a106abf2e68fb6a685953f297a1018"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+  errors:
+    - step: renounced
+      message: owner() was not present or could not be read
+activity:
+  pulled_at: 2026-09-04T11:23:39.609Z
+  addresses:
+    - address: "0x73114aBD7dCF37000d90d8DE9fd1dE3957B17c04"
+      label: BIGLY token (PonsV2LauncherToken)
+      role: token
+      transactions_count: 3122
+      token_transfers_count: 4
+      last_tx_at: 2026-09-04T11:15:41.000Z
+      last_method: approve
+      txns_24h: 79
+      launches_24h: null
+      errors: []
+    - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      label: PonsV2LaunchFactory
+      role: factory
+      transactions_count: 76659
+      token_transfers_count: 6719
+      last_tx_at: 2026-09-04T11:24:53.000Z
+      last_method: transferCreatorFeeRecipient
+      txns_24h: 2000
+      launches_24h: 805
+      errors:
+        - step: txns_24h capped
+          message: stopped after 40 pages; count is a floor
+    - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+      label: V2LaunchLocker (top holder / locked position)
+      role: vault
+      transactions_count: 13
+      token_transfers_count: 7471
+      last_tx_at: 2026-08-30T15:18:53.000Z
+      last_method: "0xa480ca79"
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x1D11f0496982706C5e14A514D4E79F2e6BdE4516"
+      label: DJT Robinhood Stock Token (pair quote / rail)
+      role: token
+      transactions_count: 9487
+      token_transfers_count: 24
+      last_tx_at: 2026-09-04T12:05:11.000Z
+      last_method: approve
+      txns_24h: 2000
+      launches_24h: null
+      errors:
+        - step: txns_24h capped
+          message: stopped after 40 pages; count is a floor
+  last_activity_at: 2026-09-04T12:05:11.000Z
+  txns_24h: 4079
+  launches_24h: 805
+errors: []

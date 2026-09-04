@@ -178,3 +178,13 @@ metrics:
     class: claim
     sources:
       - S13
+risks:
+  - The bot parses tweets and signs from a handle-tied wallet; a parser miss or a missing router approval (posted 30 Aug as patched) can fill the wrong venue or fail a buy. [claim S6]
+  - The 1% protocol-fee treasury was not located on chain this pass. [claim S6]
+  - The bio lists perps as live while docs still say they unlock at launch. [claim S6]
+tldr: A command layer that turns an X, Telegram or web mention into an on-chain trade on Robinhood Chain.
+tldr_source: derived
+why_people_care:
+  - "Wire is a live execution surface on chain 4663: tweet-originated fills go through Uniswap's UniversalRouter and tweet-originated launches call Pons v2. [claim S6]"
+  - Census still says announced; a verified PonsLauncherToken and a Uniswap v3 WIRE/WETH book meet the mainnet bar. [claim S6]
+  - It is not Bankr (own factory) and not Lemon (per-coin pad accounts). [claim S6]

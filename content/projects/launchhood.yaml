@@ -123,3 +123,13 @@ findings:
     - text: "Is the pools.trade Instant Mode / Burner path still callable from launchhood.com, or is it only historical handle copy? Next: do not merge those fee tables; reproduce any remaining pools.trade frontend route if it still exists"
     - text: "Did Arc launches, swaps, or circleswap.app ever land with a factory on a non-4663 chain? Next: do not set chain_scope multichain until an Arc factory is reproduced"
   unresolved: []
+tldr: LaunchHood is a memecoin launchpad on Robinhood Chain at launchhood.com.
+tldr_source: derived
+why_people_care:
+  - This is a net-new pad row, not Uniswap Labs pools.trade. [claim S2 S7 S21]
+  - The current factory is a LaunchHood-owned Uniswap V3 launcher with a 1% fee and a 50/50 creator split, while the handle still advertises a historical pools.trade Instant Mode… [claim S2 S7 S21]
+  - The protocol token $Launch is a separate legacy-factory clone with a live Uniswap v4 book. [claim S2 S7 S21]
+risks:
+  - owner() and PROTOCOL_TREASURY() on the V3 factory are one EOA with no code. [verified S13 S14] [claim S3 S11]
+  - JS ABI lets that owner set the launch fee, whitelist launchers, and change dex/launch configs. [verified S13 S14] [claim S3 S11]
+  - The official indexer is stale, so activity counts from it are not usable. [verified S13 S14] [claim S3 S11]

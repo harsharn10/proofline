@@ -251,9 +251,11 @@ Three workflows under `.github/workflows/`:
   Telegram sender, skipped rather than failed when Telegram secrets are absent; commits
   `ops/telegram-state.json` back with `[skip ci]` only after an approved delivery.
 
-Required repo secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `SITE_URL` (all optional — absent
-means the digest step is skipped, not failed). `GITHUB_TOKEN` is automatic; `automerge-feed.yml` only
-needs `pull-requests: write` for its comments.
+Repository secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `SITE_URL`, and
+`BLOCKSCOUT_API_KEY` are optional. Absent Telegram values skip the digest; an absent Blockscout key
+keeps the public explorer fallback. Create the free Blockscout key at
+[dev.blockscout.com](https://dev.blockscout.com) and store it only as the Actions secret named above.
+`GITHUB_TOKEN` is automatic; `automerge-feed.yml` only needs `pull-requests: write` for its comments.
 
 Leave repository auto-merge disabled. Adding `validate.yml`'s job as a required status check in branch
 protection on `main` is still worth doing as a second line of defense.

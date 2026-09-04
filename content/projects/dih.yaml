@@ -125,3 +125,13 @@ findings:
     - text: "Does verified PonsV2LaunchFactory source leave any owner path that can reach this live curve or locked LP after graduation? Next: read createGraduatedPool and rescueSweptGraduation modifiers in src/v2/PonsV2LaunchFactory.sol on the explorer"
     - text: "Does CLIPPY/MSFT remain the larger MSFT book, and does LONG still treat @ClippyMSFT as an OG pair? Next: re-read CLIPPY packet when that slug is seeded"
   unresolved: []
+tldr: A one-billion-supply ERC-20 launched on Pons v2 against MSFT, then graduated into a Uniswap v4 DIH/MSFT pool.
+tldr_source: derived
+why_people_care:
+  - The DIH/MSFT Uniswap v4 book printed about $2.09M of 24h volume on Gecko at collection, with the quote token the Microsoft • Robinhood Token at 0xe932…2e74. [claim S11]
+  - GET /rhj/assets has that MSFT row, so the pair leg is a Robinhood Stock Token rail rather than a parody quote. [claim S11]
+  - The token is a Pons v2 graduation, distinct from CLIPPY 0x85856F…1E18 (DopplerERC20V1 / @ClippyMSFT) on the same MSFT rail, and from earlier DIH tickers (Pons v1 Dih 0x0c1e…9C74… [claim S11]
+risks:
+  - USD liquidity figures on the DIH/MSFT book count both sides, and the quote side is MSFT, not USDG. [claim S11]
+  - Gecko token volume_usd.h24 ($2.58M) sums all pools, not the MSFT book ($2.09M). [claim S11]
+  - DexScreener and on-chain socials list @dihpons / justdih.com while the site HTML and the X bio omit the CA. [claim S11]

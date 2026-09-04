@@ -1,9 +1,9 @@
 slug: vynex
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
-  - address: "0x8cf33e3026604bd85677e7bc6e04d256571b6653"
-    label: VYNEX token (cited by a third-party radar account, not the project)
+  - address: "0x8cF33E3026604Bd85677e7Bc6E04d256571b6653"
+    label: VYNEX token (PonsV2LauncherToken)
     role: token
     is_contract: true
     source_verified: true
@@ -17,220 +17,363 @@ addresses:
     safe: null
     created_block: 47485447
     created_at: 2026-08-27T13:40:19.000Z
-    holders: 2514
+    holders: 2591
+    errors: []
+  - address: "0x6d48643d2438EbB75BB80cc6683360C1B9fC4C7b"
+    label: VaultFactory (current registry)
+    role: factory
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x9c08276e5fa641dcebc05d650a1b0ced671eb208"
+    owner_type: eoa
+    safe: null
+    created_block: 51782168
+    created_at: 2026-09-01T14:13:26.000Z
+    holders: null
+    errors: []
+  - address: "0xF9e012791490e555Dc6Fe101D556dd5D618A79CE"
+    label: VaultFactory implementation
+    role: implementation
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x000000000000000000000000000000000000dead"
+    owner_type: eoa
+    safe: null
+    created_block: 51782142
+    created_at: 2026-09-01T14:13:23.000Z
+    holders: null
+    errors: []
+  - address: "0xee57E1B9B87Ca4318E046FAE2C45923f61d8D199"
+    label: VaultFactory revision 1 (legacyFactory)
+    role: factory
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x9c08276e5fa641dcebc05d650a1b0ced671eb208"
+    owner_type: eoa
+    safe: null
+    created_block: 46770950
+    created_at: 2026-08-26T17:38:11.000Z
+    holders: null
+    errors: []
+  - address: "0x01680B41D61253a61c4C55e897a05D10F280cD2A"
+    label: Routed ys-USDG (forwards into steakUSDG)
+    role: vault
+    is_contract: true
+    source_verified: false
+    contract_name: YieldShares USDG
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x9c08276e5fa641dcebc05d650a1b0ced671eb208"
+    owner_type: eoa
+    safe: null
+    created_block: 47468409
+    created_at: 2026-08-27T13:11:34.000Z
+    holders: 11
+    errors: []
+  - address: "0xf8670be5530f383ac7d8cf1b60d1814f0aa827ac"
+    label: YieldShares NVDA
+    role: vault
+    is_contract: true
+    source_verified: false
+    contract_name: YieldShares NVDA
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x9c08276e5fa641dcebc05d650a1b0ced671eb208"
+    owner_type: eoa
+    safe: null
+    created_block: 46771128
+    created_at: 2026-08-26T17:38:29.000Z
+    holders: 4
+    errors: []
+  - address: "0xcf29960266420A42f12061699ec2daBd7eEa8D6e"
+    label: NVDA/USDG Morpho oracle (from config.js)
+    role: other
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 50133848
+    created_at: 2026-08-30T15:58:26.000Z
+    holders: null
+    errors: []
+  - address: "0xDCAAA4973180094751D74Ac1B0D8A48EA1e0FacE"
+    label: StockZap (USDG in)
+    role: router
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 49116634
+    created_at: 2026-08-29T11:24:38.000Z
+    holders: null
+    errors: []
+  - address: "0x9c08276E5FA641DCEBC05d650a1b0Ced671EB208"
+    label: Factory / vault owner EOA
+    role: admin
+    is_contract: false
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
     errors: []
 metrics: []
 market:
-  token_address: "0x8cf33e3026604bd85677e7bc6e04d256571b6653"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  token_address: "0x8cF33E3026604Bd85677e7Bc6E04d256571b6653"
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs:
     - dex: uniswap
       pair_address: "0xcb30901873dfce397b8373413ce5e42f2246cca005a93f0bd9336c14269efec6"
       quote_symbol: ETH
-      price_usd: 0.0001384
-      liquidity_usd: 33630.63
-      volume_h24: 115037.08
-      volume_h6: 32160.7
+      price_usd: 0.0003354
+      liquidity_usd: 53889.22
+      volume_h24: 164308.28
+      volume_h6: 49402.38
       txns_h24:
-        buys: 402
-        sells: 326
-      price_change_h24: -40.8
-      fdv: 135937
+        buys: 451
+        sells: 381
+      price_change_h24: 118
+      market_cap: 329447
+      fdv: 329447
       created_at: 2026-08-27T14:16:14.000Z
-    - dex: uniswap
-      pair_address: "0x2990891dce791c76cff7593a9d74179307b563a0dc16a02b934a7a7b0d6de5c3"
-      quote_symbol: USDG
-      price_usd: 0.0001687
-      liquidity_usd: 8325.08
-      volume_h24: 16363.23
-      volume_h6: 14.8
-      txns_h24:
-        buys: 84
-        sells: 83
-      price_change_h24: -48.08
-      fdv: 165756
-      created_at: 2026-09-01T01:09:41.000Z
     - dex: uniswap
       pair_address: "0x92ec70b9c7152528a7c30b731adb9892b6b0433b8b5b2e1a90a938b7e26b151f"
       quote_symbol: USDG
-      price_usd: 0.0001382
-      liquidity_usd: 2734.65
-      volume_h24: 42515.55
-      volume_h6: 5347.38
+      price_usd: 0.0003382
+      liquidity_usd: 14452.27
+      volume_h24: 77053.38
+      volume_h6: 24254.01
       txns_h24:
-        buys: 259
-        sells: 236
-      price_change_h24: -43.65
-      fdv: 135740
+        buys: 382
+        sells: 292
+      price_change_h24: 121
+      market_cap: 332200
+      fdv: 332200
       created_at: 2026-08-30T06:32:34.000Z
     - dex: uniswap
       pair_address: "0x5e5d35abb4df66d4918789a7db3da5d7bbb1350ffc73af4d148aeb4a5bcf0131"
       quote_symbol: USDG
-      price_usd: 0.0001447
-      liquidity_usd: 650.43
-      volume_h24: 3817.72
-      volume_h6: 262.25
+      price_usd: 0.0003443
+      liquidity_usd: 1063.74
+      volume_h24: 2709.77
+      volume_h6: 882.38
       txns_h24:
-        buys: 59
-        sells: 52
-      price_change_h24: -42.92
-      fdv: 142153
+        buys: 61
+        sells: 43
+      price_change_h24: 119
+      market_cap: 338182
+      fdv: 338182
       created_at: null
-    - dex: uniswap
-      pair_address: "0xbcd32fd7d3b190be8717755a471054bcf1acee412e3303603d876367fe92f253"
-      quote_symbol: ETH
-      price_usd: 0.0001941
-      liquidity_usd: 293.02
-      volume_h24: 3.09
-      volume_h6: 0
-      txns_h24:
-        buys: 8
-        sells: 6
-      price_change_h24: -27.5
-      fdv: 190675
-      created_at: 2026-08-27T19:04:14.000Z
-    - dex: uniswap
-      pair_address: "0xe721b7256663c0c350514224cf544a023d1dc76783c8aa00f35b031cea9aefdd"
-      quote_symbol: ETH
-      price_usd: 0.0004462
-      liquidity_usd: 178.16
-      volume_h24: 0.01
-      volume_h6: 0
-      txns_h24:
-        buys: 0
-        sells: 1
-      price_change_h24: null
-      fdv: 438199
-      created_at: 2026-09-01T10:24:22.000Z
     - dex: uniswap
       pair_address: "0x6d3a46b9b7d4e94ef2cd01782dd9ddc013236a0593b1eed75cd0462315d514e7"
       quote_symbol: ETH
-      price_usd: 0.0001488
-      liquidity_usd: 38.64
-      volume_h24: 7.19
-      volume_h6: 2.13
+      price_usd: 0.0003664
+      liquidity_usd: 66.64
+      volume_h24: 20.36
+      volume_h6: 3.16
       txns_h24:
-        buys: 0
-        sells: 3
-      price_change_h24: -35.02
-      fdv: 146124
+        buys: 7
+        sells: 1
+      price_change_h24: 97.33
+      market_cap: 359866
+      fdv: 359866
       created_at: 2026-08-31T22:42:27.000Z
     - dex: uniswap
-      pair_address: "0x2211da23cc796037227c783d0d6f729e25f5d5c5cd6aca9994a35ad85bff955d"
+      pair_address: "0x2990891dce791c76cff7593a9d74179307b563a0dc16a02b934a7a7b0d6de5c3"
       quote_symbol: USDG
-      price_usd: 0.001053
-      liquidity_usd: 35.95
-      volume_h24: 1.9
-      volume_h6: 1.9
-      txns_h24:
-        buys: 0
-        sells: 1
-      price_change_h24: null
-      fdv: 1034418
-      created_at: 2026-08-30T03:04:12.000Z
-    - dex: uniswap
-      pair_address: "0xb7fb0a2ba01d6da6129f23c3ee153561b95fab632703d1c5c904487f8a474206"
-      quote_symbol: USDG
-      price_usd: 0.0005591
-      liquidity_usd: 18.78
-      volume_h24: 1.69
+      price_usd: 0.0001687
+      liquidity_usd: 10
+      volume_h24: 3396.59
       volume_h6: 0
       txns_h24:
-        buys: 0
-        sells: 1
-      price_change_h24: null
-      fdv: 549041
-      created_at: 2026-08-27T14:36:32.000Z
-    - dex: uniswap
-      pair_address: "0x1d6c2f73abf8f888d1ff1fffb934c2d64738cb49fc333958b019d9fed17c7f6b"
-      quote_symbol: USDG
-      price_usd: 2.939e-27
-      liquidity_usd: null
-      volume_h24: 0
-      volume_h6: 0
-      txns_h24:
-        buys: 0
-        sells: 1
-      price_change_h24: null
-      fdv: null
-      created_at: 2026-08-27T14:34:25.000Z
-  liquidity_usd: 45905.34
-  volume_h24: 177747.46
-  trades_h24: 1522
-  price_usd: 0.0001384
-  price_change_h24: -40.8
-  fdv: 135937
+        buys: 32
+        sells: 26
+      price_change_h24: 10.39
+      market_cap: 165725
+      fdv: 165725
+      created_at: 2026-09-01T01:09:41.000Z
+  liquidity_usd: 69481.87
+  volume_h24: 247488.38
+  trades_h24: 1676
+  price_usd: 0.0003354
+  price_change_h24: 118
+  market_cap_usd: 329447
+  fdv_usd: 329447
+  fdv: 329447
   first_pair_at: 2026-08-27T14:16:14.000Z
-  top10_share: 0.4245473104118323
-  top10_share_ex_pools: 0.3429146573506078
-  top10_as_of: 2026-09-02T22:38:55.976Z
+  top10_share: 0.3504383514094971
+  top10_share_ex_pools: 0.1770790041098179
+  burned_share: 0.0180000000268955
+  top10_as_of: 2026-09-04T11:23:39.609Z
   launchpad:
     slug: pons
     via: creator
     address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: no-mint-function
   renounced: null
   lp:
     - pair: "0xcb30901873dfce397b8373413ce5e42f2246cca005a93f0bd9336c14269efec6"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x2990891dce791c76cff7593a9d74179307b563a0dc16a02b934a7a7b0d6de5c3"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x92ec70b9c7152528a7c30b731adb9892b6b0433b8b5b2e1a90a938b7e26b151f"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x5e5d35abb4df66d4918789a7db3da5d7bbb1350ffc73af4d148aeb4a5bcf0131"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0xbcd32fd7d3b190be8717755a471054bcf1acee412e3303603d876367fe92f253"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0xe721b7256663c0c350514224cf544a023d1dc76783c8aa00f35b031cea9aefdd"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x6d3a46b9b7d4e94ef2cd01782dd9ddc013236a0593b1eed75cd0462315d514e7"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x2211da23cc796037227c783d0d6f729e25f5d5c5cd6aca9994a35ad85bff955d"
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x2990891dce791c76cff7593a9d74179307b563a0dc16a02b934a7a7b0d6de5c3"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0xb7fb0a2ba01d6da6129f23c3ee153561b95fab632703d1c5c904487f8a474206"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
-    - pair: "0x1d6c2f73abf8f888d1ff1fffb934c2d64738cb49fc333958b019d9fed17c7f6b"
-      locked_share: null
-      holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
-    - address: "0x8cf33e3026604bd85677e7bc6e04d256571b6653"
-      label: VYNEX token (cited by a third-party radar account, not the project)
+    - address: "0x8cF33E3026604Bd85677e7Bc6E04d256571b6653"
+      label: VYNEX token (PonsV2LauncherToken)
       role: token
       transactions_count: 11109
       token_transfers_count: 1
-      last_tx_at: 2026-09-02T22:41:36.000Z
+      last_tx_at: 2026-09-04T11:49:36.000Z
       last_method: approve
-      txns_24h: 368
+      txns_24h: 380
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T22:41:36.000Z
-  txns_24h: 368
-  launches_24h: null
+    - address: "0x6d48643d2438EbB75BB80cc6683360C1B9fC4C7b"
+      label: VaultFactory (current registry)
+      role: factory
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-09-01T14:14:41.000Z
+      last_method: "0x515d61ec"
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0xF9e012791490e555Dc6Fe101D556dd5D618A79CE"
+      label: VaultFactory implementation
+      role: implementation
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-09-01T14:13:23.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xee57E1B9B87Ca4318E046FAE2C45923f61d8D199"
+      label: VaultFactory revision 1 (legacyFactory)
+      role: factory
+      transactions_count: 16
+      token_transfers_count: 0
+      last_tx_at: 2026-08-28T13:24:54.000Z
+      last_method: "0x515d61ec"
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0x01680B41D61253a61c4C55e897a05D10F280cD2A"
+      label: Routed ys-USDG (forwards into steakUSDG)
+      role: vault
+      transactions_count: 15
+      token_transfers_count: 27
+      last_tx_at: 2026-09-03T18:41:43.000Z
+      last_method: "0x6e553f65"
+      txns_24h: 3
+      launches_24h: null
+      errors: []
+    - address: "0xf8670be5530f383ac7d8cf1b60d1814f0aa827ac"
+      label: YieldShares NVDA
+      role: vault
+      transactions_count: 10
+      token_transfers_count: 8
+      last_tx_at: 2026-09-02T12:54:34.000Z
+      last_method: "0xba087652"
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xcf29960266420A42f12061699ec2daBd7eEa8D6e"
+      label: NVDA/USDG Morpho oracle (from config.js)
+      role: other
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-30T15:58:26.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xDCAAA4973180094751D74Ac1B0D8A48EA1e0FacE"
+      label: StockZap (USDG in)
+      role: router
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-29T11:24:38.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x9c08276E5FA641DCEBC05d650a1b0Ced671EB208"
+      label: Factory / vault owner EOA
+      role: admin
+      transactions_count: 24
+      token_transfers_count: 2
+      last_tx_at: 2026-07-20T20:50:20.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T11:49:36.000Z
+  txns_24h: 383
+  launches_24h: 0
 errors: []

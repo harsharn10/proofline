@@ -111,3 +111,9 @@ findings:
     - text: "Is Gecko pool 0x588b…2746 still the trending JUGGERNAUT/WETH book vs the 0x0E03…F224 The Juggernauts clone? Next: retry the pool endpoint after the 429 window; do not loop"
     - text: "Does verified LaunchToken leave a factory callback after restrictionBlocks? Next: read remaining LaunchToken.sol transfer hooks on the explorer"
   unresolved: []
+risks:
+  - USD liquidity on the main book counts JUGGERNAUT plus WETH. [claim S8]
+  - Same-ticker clones (The Juggernauts 0x6b3A…9A17, HOODon-paired 0xAeaB…8888) and same-name X handles sit next to the canonical CA. [claim S8]
+  - Site footer says not affiliated with Robinhood Markets. [claim S8]
+tldr: A one-billion-supply ERC-20 cloned by the NOXA Fun Launch Factory into a Uniswap v3 JUGGERNAUT/WETH 1% pool.
+tldr_source: derived

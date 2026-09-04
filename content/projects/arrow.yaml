@@ -187,3 +187,9 @@ metrics:
     class: claim
     sources:
       - S24
+risks:
+  - CDP vault-manager and stability-pool addresses are unpublished, so liquidation, oracle and cap paths cannot be read on chain from official docs. [claim S20]
+  - Launchpad owner is a single EOA with no timelock. [claim S20]
+  - Docs, the borrow app and pre-open posts disagree on how many markets are live and at which LTV. [claim S20]
+tldr: An overcollateralized CDP on Robinhood Chain. A user deposits one approved asset into a vault, mints aUSD against it, and repays to release the collateral.
+tldr_source: derived

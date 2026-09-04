@@ -110,3 +110,13 @@ findings:
   unresolved:
     - text: deployment.address remains unresolved (CON-1).
     - text: economics.metric remains unresolved (CON-2).
+tldr: Kipseli is a proprietary AMM.
+tldr_source: derived
+why_people_care:
+  - The venue is a short-tail PropAMM with USDG as the Robinhood quote asset, which is a different control plane from Uniswap pools on this chain. [claim S2 S10 S13]
+  - Llama's Robinhood Chain slice is about 245k USD of reserve inventory. [claim S2 S10 S13]
+  - Integrators such as Exypnos list it as a router source. [claim S2 S10 S13]
+risks:
+  - The router is unverified. owner() is a Safe whose threshold is 1. [verified S4 S8 S18] [claim S14 S15]
+  - Docs name an EIP-712 verifier at one address on every chain; that address has no code on 4663. [verified S4 S8 S18] [claim S14 S15]
+  - Public posts describe two Base quoting-path incidents in 2026; those wrappers are not this router, but they are the same product family. [verified S4 S8 S18] [claim S14 S15]

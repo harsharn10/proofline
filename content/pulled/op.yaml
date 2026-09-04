@@ -1,0 +1,206 @@
+slug: op
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+chain: robinhood-chain
+addresses:
+  - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+    label: OP token (PonsV2LauncherToken)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: Sandisk Optimus
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 51169078
+    created_at: 2026-08-31T21:02:01.000Z
+    holders: 439
+    errors: []
+  - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+    label: PonsV2LaunchFactory
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: PonsV2LaunchFactory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 26841846
+    created_at: 2026-08-03T14:41:19.000Z
+    holders: null
+    errors: []
+  - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+    label: V2LaunchLocker (locked graduation position)
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: V2LaunchLocker
+    proxy:
+      type: unknown
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 26841845
+    created_at: 2026-08-03T14:41:19.000Z
+    holders: null
+    errors:
+      - step: rpc
+        message: "eth_getCode 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+      - step: rpc
+        message: "eth_getStorageAt admin 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+  - address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+    label: SNDK quote (pairToken / Robinhood Stock Token rail)
+    role: token
+    is_contract: true
+    source_verified: true
+    contract_name: BeaconProxy
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 48293
+    created_at: 2026-06-10T15:27:03.000Z
+    holders: 24550
+    errors: []
+metrics: []
+market:
+  token_address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+  pulled_at: 2026-09-04T11:23:39.609Z
+  pairs:
+    - dex: uniswap
+      pair_address: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
+      quote_symbol: SNDK
+      price_usd: 0.00008608
+      liquidity_usd: 27307.23
+      volume_h24: 189701.84
+      volume_h6: 45208.07
+      txns_h24:
+        buys: 556
+        sells: 426
+      price_change_h24: -42.92
+      market_cap: 86090
+      fdv: 86090
+      created_at: 2026-08-31T21:02:46.000Z
+    - dex: uniswap
+      pair_address: "0x0ce46e76a7f9227ef31fbe8737dbd91dbc2aeb72e8888e1c3accc3e5094fad20"
+      quote_symbol: USDG
+      price_usd: 0.00002473
+      liquidity_usd: 1.96
+      volume_h24: 1.2
+      volume_h6: 1.2
+      txns_h24:
+        buys: 0
+        sells: 1
+      price_change_h24: null
+      market_cap: 24732
+      fdv: 24732
+      created_at: 2026-09-03T18:38:32.000Z
+  liquidity_usd: 27309.19
+  volume_h24: 189703.04
+  trades_h24: 983
+  price_usd: 0.00008608
+  price_change_h24: -42.92
+  market_cap_usd: 86090
+  fdv_usd: 86090
+  fdv: 86090
+  first_pair_at: 2026-08-31T21:02:46.000Z
+  top10_share: 0.4540425901279719
+  top10_share_ex_pools: 0.2504287615472057
+  burned_share: 0
+  top10_as_of: 2026-09-04T11:23:39.609Z
+  launchpad:
+    slug: pons
+    via: creator
+    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
+  rialto: null
+  pair_asset:
+    ticker: SNDK
+    name: Sandisk Corporation
+    address: "0xb90a19ff0af67f7779aff50a882a9cff42446400"
+    category: stock
+    tokenized_value_usd: 1800721.96
+    tokenized_shares: 1158.027999999999
+    change_7d: 85948.84
+    source_url: https://analytics.rialto.xyz/tokenization
+  volume_disagreement: null
+  errors: []
+structure:
+  pulled_at: 2026-09-04T11:23:39.609Z
+  mint: no-mint-function
+  renounced: null
+  lp:
+    - pair: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x0ce46e76a7f9227ef31fbe8737dbd91dbc2aeb72e8888e1c3accc3e5094fad20"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+  errors:
+    - step: renounced
+      message: owner() was not present or could not be read
+activity:
+  pulled_at: 2026-09-04T11:23:39.609Z
+  addresses:
+    - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+      label: OP token (PonsV2LauncherToken)
+      role: token
+      transactions_count: 1476
+      token_transfers_count: 0
+      last_tx_at: 2026-09-04T12:36:26.000Z
+      last_method: approve
+      txns_24h: 170
+      launches_24h: null
+      errors: []
+    - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      label: PonsV2LaunchFactory
+      role: factory
+      transactions_count: 76659
+      token_transfers_count: 6719
+      last_tx_at: 2026-09-04T11:24:53.000Z
+      last_method: transferCreatorFeeRecipient
+      txns_24h: 2000
+      launches_24h: 805
+      errors:
+        - step: txns_24h capped
+          message: stopped after 40 pages; count is a floor
+    - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+      label: V2LaunchLocker (locked graduation position)
+      role: vault
+      transactions_count: 13
+      token_transfers_count: 7471
+      last_tx_at: 2026-08-30T15:18:53.000Z
+      last_method: "0xa480ca79"
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+      label: SNDK quote (pairToken / Robinhood Stock Token rail)
+      role: token
+      transactions_count: 6510
+      token_transfers_count: 39
+      last_tx_at: 2026-09-04T12:26:07.000Z
+      last_method: transfer
+      txns_24h: 624
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T12:36:26.000Z
+  txns_24h: 2794
+  launches_24h: 805
+errors: []

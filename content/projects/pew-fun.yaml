@@ -93,3 +93,13 @@ findings:
     - text: "Are Stable (988) instantFactories 0xee0665f2…10DB / 0x096b4622…9a07 live, and should chain_scope stay multichain? Next: eth_getCode those addresses on 988 before treating Stable as a reproduced venue"
     - text: "Can the OKX lifetime 555 launched / $11.8M DEX figure be reproduced on a live query? Next: do not treat nonce 556 as 555 launches; retry the dashboard or a Dune API"
   unresolved: []
+tldr: Pew.fun launches tokens straight into a locked SushiSwap or Uniswap v3 pool on Robinhood Chain.
+tldr_source: derived
+why_people_care:
+  - This is a documented Robinhood Chain pad with a reproduced factory and a bidirectional site/handle, not a census row. [claim S15 S16] [verified S9 S10]
+  - Emerson still maps 0xc918…9d8c to Pew.fun, but the 30d labeled board has no Pew.fun row. [claim S15 S16] [verified S9 S10]
+  - HARVEST.md OKX lifetime was 555 launched / $11.8M DEX; that dashboard 403'd this pass. [claim S15 S16] [verified S9 S10]
+risks:
+  - The Sushi factory is unverified on Blockscout. owner() on that factory and on later instant factories is one EOA with no code. [verified S9 S10 S13] [claim S5 S7]
+  - The 17 Jul morning post named Uniswap V3 (Noxa) before this factory existed; an integrator that treats Pew as NOXA is on the wrong address. [verified S9 S10 S13] [claim S5 S7]
+  - The handle bio says former while the site and fee-collect txs are still live. [verified S9 S10 S13] [claim S5 S7]

@@ -7,5 +7,6 @@ export * from "./link-pill";
 export * from "./metric-tile";
 export * from "./ranked-list";
 export * from "./segmented-control";
+export * from "./source-refs";
 export * from "./status-pill";
 export * from "./tag";

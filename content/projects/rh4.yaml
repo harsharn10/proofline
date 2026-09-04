@@ -143,3 +143,9 @@ findings:
     - text: "Which remaining RH4-ticker ERC-20s besides 0x9ECE…E0a9 still have a live book? Next: DexScreener tokens API on each collision CA if a later round needs a collision table"
     - text: "Is there an audit report for ChipFactory8 / ChipFeeVault / Pons v2? Next: ask in public if a report URL is published"
   unresolved: []
+risks:
+  - USD liquidity on the flagship book counts RH4 plus native ETH, not a USDG backstop. [claim S9]
+  - Several other 4663 ERC-20s reuse the rh4.cpu / RH4 ticker with far thinner books. [claim S9]
+  - Constructor socials are empty; Telegram preview has no CA. [claim S9]
+tldr: A one-billion-supply ERC-20 cloned onto a Pons v2 bonding curve and graduated into a Uniswap v4 pool quoted against native ETH.
+tldr_source: derived

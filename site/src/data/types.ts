@@ -146,6 +146,7 @@ export type PulledPair = {
   volume_h6: number | null;
   txns_h24: { buys: number; sells: number };
   price_change_h24: number | null;
+  market_cap: number | null;
   fdv: number | null;
   created_at: string | null;
 };
@@ -159,6 +160,8 @@ export type PulledMarket = {
   trades_h24: number | null;
   price_usd: number | null;
   price_change_h24: number | null;
+  market_cap_usd: number | null;
+  fdv_usd: number | null;
   fdv: number | null;
   first_pair_at: string | null;
   // Share of circulating supply (total supply less burned) held by the ten largest live holders.
@@ -179,6 +182,35 @@ export type PulledMarket = {
     address: string;
     shared?: boolean;
   } | null;
+  rialto?: {
+    pairs: Array<{
+      pool_id: string | null;
+      base: string;
+      target: string;
+      last_price: number | null;
+      base_volume_24h: number | null;
+      target_volume_24h: number | null;
+      volume_24h_usd: number | null;
+    }>;
+    // Rialto's own published 24h USD volume for the whole token, the only figure comparable with
+    // volume_h24 above. The per-pair figures are partial detail and never sum to it.
+    volume_24h_usd: number | null;
+    volume_note: string | null;
+    as_of: string;
+    source_url: string;
+  } | null;
+  pair_asset?: {
+    ticker: string;
+    name: string;
+    address: string | null;
+    category: string | null;
+    tokenized_value_usd: number | null;
+    // The asset explorer's share count (value / price). A size, not a count of holders.
+    tokenized_shares: number | null;
+    change_7d: number | null;
+    source_url: string;
+  } | null;
+  volume_disagreement?: { dexscreener_usd: number; rialto_usd: number } | null;
   errors: Array<{ step: string; message: string }>;
 };
 export type PulledStructure = {
@@ -226,6 +258,16 @@ export type PulledFile = {
   errors: Array<{ step: string; message: string }>;
 };
 
+export type ChainStats = {
+  pulledAt: string;
+  tvlUsd: number | null;
+  tvlSourceUrl: string;
+  feeRevenueLatestDayUsd: number | null;
+  feeRevenueDay: string | null;
+  economicsSourceUrl: string;
+  tvlByCategory: Array<{ category: string; tvlUsd: number }>;
+};
+
 // Activity status, computed server-side from the pulled reads (never asserted by a person):
 // live = on-chain activity or trades inside 7 days; quiet = inside 30 days; dormant = older;
 // announced = nothing located on chain; testnet = lifecycle testnet-only.
@@ -240,6 +282,7 @@ export type Kpis = {
   volume24h: number | null;
   trades24h: number | null;
   priceChange24h: number | null;
+  marketCap: number | null;
   fdv: number | null;
   holders: number | null;
   holdersDelta7d: number | null;
@@ -362,7 +405,11 @@ export type DirectoryEntry = {
   hasContractOn4663: boolean;
   shareBarMetric: "liquidity" | "tvl";
   summary: string;
+  tldr: string | null;
   officialLinks: Link[];
+  announcementAt: string;
+  announcementUrl: string | null;
+  sourceLinks: { market: string; holders: string | null };
   dependencyIds: string[];
   reviewedAt: string;
   derived: Derived;
@@ -377,6 +424,7 @@ export type DirectoryEntry = {
 
 export type HistoryPoint = {
   at: string;
+  market_cap?: number | null;
   holders?: number | null;
   liquidity_usd?: number | null;
   volume_h24?: number | null;
@@ -389,16 +437,6 @@ export type HistoryPoint = {
 
 export type TrendingEntry = { entry: DirectoryEntry; change24h: number | null };
 export type SectionLeader = { entry: DirectoryEntry; announced: boolean };
-export type LatestIcarusItem = {
-  kind: "icarus" | "post";
-  date: string;
-  slug: string;
-  who: string;
-  title: string;
-  body: string;
-  sourceUrl: string | null;
-};
-
 // A dependency card as the home page lists it: enough to label and link the chip.
 export type DependencyListing = { id: string; name: string; kind: DependencyCard["kind"] };
 
@@ -406,6 +444,19 @@ export type DependencyListing = { id: string; name: string; kind: DependencyCard
 export type LatestFeedItem = {
   name: { slug: string; symbol: string | null; name: string };
   item: FeedItem;
+};
+
+export type WireKind = "announcement" | "talk" | "onchain" | "note";
+export type WireItem = {
+  id: string;
+  kind: WireKind;
+  headline: string;
+  gist: string;
+  url: string;
+  slug: string;
+  name: { slug: string; symbol: string | null; name: string };
+  account?: string;
+  at: string;
 };
 
 export type Dossier = {
@@ -417,6 +468,9 @@ export type Dossier = {
   coverage: Coverage;
   role: CensusRole;
   summary: string;
+  tldr: string | null;
+  whyPeopleCare: string[];
+  risks: string[];
   links: Link[];
   dependencies: string[]; // ids into the top-level `dependencies` map
   deployments: Deployment[];
@@ -424,6 +478,7 @@ export type Dossier = {
   review: Review;
   research: Research;
   feed: FeedItem[];
+  wire: WireItem[];
   sources: SourceEntry[];
   changelog: ChangelogEntry[];
   derived: Derived;
@@ -445,6 +500,8 @@ export type Dossier = {
     }>;
     dailySeries: Record<string, Array<{ at: string; value: number }>>;
     top10Share: number | null;
+    top10ShareExPools: number | null;
+    burnedShare: number | null;
     launchpad: { slug: string; via: "factory" | "creator"; address: string } | null;
     mint: "owner-can-mint" | "no-mint-function" | "unknown" | null;
     liquidityLocks: Array<{
@@ -541,10 +598,13 @@ export type DirectoryBundle = {
   site: SiteConfig;
   sections: SectionDef[];
   entries: DirectoryEntry[];
+  // The whole wire, built once on the server. Home, /feed and each category slice it; nothing
+  // rebuilds it per render, and the raw feed bodies and change record it was built from stay on
+  // the server rather than riding along in the loader payload.
+  wire: WireItem[];
   histories: Record<string, HistoryPoint[]>;
-  changelog: ChangelogEntry[];
-  feed: LatestFeedItem[];
   dependencies: DependencyListing[];
+  chainStats: ChainStats | null;
   generatedAt: string; // build/derived.json generated_at — when scores were last computed
   now: number; // build time (ms epoch) for relative "2 min ago" wording
 };
@@ -594,7 +654,9 @@ export type DossierBundle = {
 // a launchpad is judged by volume and launches, a token by liquidity, credit by TVL.
 export const SECTION_KPIS: Record<string, KpiKey[]> = {
   launchpads: ["volume24h", "launches24h", "liquidityUsd", "holders"],
-  tokens: ["liquidityUsd", "volume24h", "holders", "priceChange24h"],
+  // Market cap sits second so it reaches the card's four tiles and the Related table's four columns
+  // (README §4) while liquidity, the first key, stays the ranking basis for the section.
+  tokens: ["liquidityUsd", "marketCap", "volume24h", "holders", "priceChange24h"],
   trading: ["volume24h", "liquidityUsd", "trades24h", "holders"],
   credit: ["tvl", "volume24h", "holders", "liquidityUsd"],
   yield: ["tvl", "volume24h", "holders", "liquidityUsd"],
@@ -611,6 +673,7 @@ export const KPI_LABEL: Record<KpiKey, string> = {
   volume24h: "vol 24h",
   trades24h: "trades 24h",
   priceChange24h: "24h",
+  marketCap: "market cap",
   fdv: "FDV",
   holders: "holders",
   holdersDelta7d: "holders 7d",
@@ -623,6 +686,7 @@ export const KPI_SOURCE: Record<KpiKey, string> = {
   volume24h: "DexScreener, all pools",
   trades24h: "DexScreener, buys plus sells",
   priceChange24h: "DexScreener, deepest pool",
+  marketCap: "DexScreener, all pools",
   fdv: "DexScreener, deepest pool",
   holders: "Blockscout holder count",
   holdersDelta7d: "Blockscout holder count, change over 7 days of snapshots",
@@ -630,6 +694,23 @@ export const KPI_SOURCE: Record<KpiKey, string> = {
   txnsTotal: "Blockscout transaction count",
   tvl: "DefiLlama, Robinhood Chain slice",
 };
+
+// README rule 2: a dash means "not read", never zero. DexScreener answers 0 for a token whose
+// supply it cannot price, so 0 and non-finite values are unread wherever a market figure renders —
+// in the figure itself and in the decision to label it "FDV".
+export function readFigure(value: number | null | undefined): number | null {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null;
+}
+
+// The one-sentence what-it-is a row prints: the name's own TL;DR, or the first sentence of its
+// research summary when the packet never wrote one. Empty only when there is no summary either.
+export function tldrLine(entry: { tldr: string | null; summary: string }): string {
+  if (entry.tldr) return entry.tldr;
+  const summary = entry.summary.trim();
+  if (!summary) return "";
+  const match = /^(.+?[.!?])(?:\s|$)/.exec(summary);
+  return (match?.[1] ?? summary).slice(0, 200);
+}
 
 // "$52.2M" / "$4.9K" / "$310" — mono everywhere it renders.
 export function formatUsd(v: number): string {
@@ -649,6 +730,7 @@ export function formatKpi(key: KpiKey, v: number | null): string {
   switch (key) {
     case "liquidityUsd":
     case "volume24h":
+    case "marketCap":
     case "fdv":
     case "tvl":
       return formatUsd(v);
@@ -817,11 +899,23 @@ export const LINK_KIND_LABEL: Record<LinkKind, string> = {
 };
 
 export const FEED_LABEL: Record<FeedKind, string> = {
-  company: "Project",
-  ct: "Commentary",
+  company: "Announcements",
+  ct: "Talk",
   onchain: "On-chain",
-  risk: "Risk",
+  risk: "Icarus notes",
 };
+
+export const WIRE_LABEL: Record<WireKind, string> = {
+  announcement: "Announcements",
+  talk: "Talk",
+  onchain: "On-chain",
+  note: "Icarus notes",
+};
+// Chip order, and the whitelist /feed validates `?kind=` against.
+export const WIRE_KINDS = ["announcement", "talk", "onchain", "note"] as const;
+export function isWireKind(value: unknown): value is WireKind {
+  return typeof value === "string" && (WIRE_KINDS as readonly string[]).includes(value);
+}
 
 // --- Tone helpers -------------------------------------------------------------
 

@@ -137,11 +137,26 @@ Body sections, in this order: What it is · Why it matters · What could go wron
 mechanics · Control and security · Team and provenance · Economics and activity · Material risks ·
 Verification passes · Operations log. Every material sentence cites `[R-n]`.
 
-For seed and full packets collected on or after 2026-09-03, three card inputs are required. The first
-paragraph under `## What it is` is the reader summary (mechanism first; target 80 words, hard maximum
-120). A separate `Themes: tag-a, tag-b` line supplies up to five lowercase tags. Every event carries a
-title, a summary containing what was posted, and at least one receipt whose URL opens the post or chain
-read; `account` records the `@handle` when the event is a post. Older packet-v2 files remain valid.
+For seed and full packets collected on or after 2026-09-03, the card inputs below are required. The
+first paragraph under `## What it is` is the reader summary (mechanism first; target 80 words, hard
+maximum 120). A separate `Themes: tag-a, tag-b` line supplies up to five lowercase tags. The line
+directly after `Themes:` is `TL;DR: <one sentence>` (160 characters or fewer) — the line the card
+prints under the name and the home page prints in its Trending, New launches and Announced rows.
+`## Why it matters` is **three** markdown bullets — the thesis, the traction hook, the next catalyst —
+each 200 characters or fewer and each ending in its evidence tag (`[verified R-2 R-8]`); more or fewer
+than three and the field is skipped rather than padded. `## What could go wrong` is up to three
+bullets under the same rule. Every event carries a title, a summary containing what was posted, and at
+least one receipt whose URL opens the post or chain read; `account` records the `@handle` when the
+event is a post. Older packet-v2 files remain valid.
+
+Derivation is the fallback, not the contract. A packet with no `TL;DR:` line gets one derived from the
+first sentences of `## What it is` that fit in 160 characters, recorded as `tldr_source: derived` in
+the project file so a real TL;DR in a later packet replaces it silently. A `## Why it matters` written
+as paragraphs rather than bullets is split into sentences and the first three become the field, each
+carrying its paragraph's evidence tag. A `## What could go wrong` written as paragraphs is read one
+bullet per paragraph. An over-length bullet is trimmed to its first sentence, or to the longest clause
+that fits with an ellipsis — never dropped, because dropping the first risk publishes the weakest one.
+Each derivation writes a compile notice.
 
 Tiers: **seed** = frontmatter required, body optional. **full** = both, with all three verification
 passes (receipts, numbers, adversarial) recorded. **update** = frontmatter with `supersedes: <prior
@@ -310,6 +325,9 @@ The compiler maps a URL-backed packet event into `content/feed/<slug>.yaml`: the
 the body, the cited receipt URL becomes `sourceUrl`, and the stable id uses the formula above. A post by
 the project's official handle is `company`; another account is `ct`; an explorer or DefiLlama receipt
 is `onchain`; and a flagged event is `risk`. Existing items merge by id, so compiling twice is a no-op.
+The public wire labels those four stored kinds as `company` → **Announcements**, `ct` → **Talk**,
+`onchain` → **On-chain**, and `risk` → **Icarus notes**. The stored event summary is the wire gist
+verbatim apart from whitespace normalization; titles are limited to 80 characters.
 
 ## 9. Retired
 

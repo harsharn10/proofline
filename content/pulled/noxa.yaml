@@ -1,45 +1,78 @@
 slug: noxa
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
-addresses: []
+addresses:
+  - address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
+    label: Launch factory
+    role: factory
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x7e035fb048a31e0481b88074557415b1c187242b"
+    owner_type: eoa
+    safe: null
+    created_block: 61688
+    created_at: 2026-06-16T13:53:01.000Z
+    holders: null
+    errors: []
 metrics:
   - kind: tvl
-    value: 5539192
-    as_of: 2026-09-02T22:17:23.000Z
+    value: 6037458
+    as_of: 2026-09-04T10:47:11.000Z
     source_url: https://api.llama.fi/protocol/noxa-fun
   - kind: fees_24h
-    value: 153498
-    as_of: 2026-09-02T22:38:55.976Z
+    value: 174831
+    as_of: 2026-09-04T11:23:39.609Z
     source_url: https://api.llama.fi/summary/fees/noxa-fun?dataType=dailyFees
   - kind: revenue_24h
     value: 0
-    as_of: 2026-09-02T22:38:55.976Z
+    as_of: 2026-09-04T11:23:39.609Z
     source_url: https://api.llama.fi/summary/fees/noxa-fun?dataType=dailyRevenue
 market:
   token_address: null
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
   trades_h24: null
   price_usd: null
   price_change_h24: null
+  market_cap_usd: null
+  fdv_usd: null
   fdv: null
   first_pair_at: null
   top10_share: null
   top10_share_ex_pools: null
+  burned_share: null
   top10_as_of: null
   launchpad: null
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors:
     - step: no token address
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
-  addresses: []
-  last_activity_at: null
-  txns_24h: null
-  launches_24h: null
+  pulled_at: 2026-09-04T11:23:39.609Z
+  addresses:
+    - address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
+      label: Launch factory
+      role: factory
+      transactions_count: 93432
+      token_transfers_count: 240737
+      last_tx_at: 2026-09-03T21:47:18.000Z
+      last_method: "0x686399cb"
+      txns_24h: 1
+      launches_24h: 0
+      errors: []
+  last_activity_at: 2026-09-03T21:47:18.000Z
+  txns_24h: 1
+  launches_24h: 0
 errors:
   - step: llama
     message: "volume_24h noxa-fun: HTTP 400: Dexs for noxa-fun not found, please visit /overview/dexs to see available protocols"

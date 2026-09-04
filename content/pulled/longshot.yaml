@@ -1,9 +1,9 @@
 slug: longshot
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x8701E2C87ade58325601f4F9bf37ADF46Cb75745"
-    label: RH Chain token (PRD Appendix A)
+    label: LONGSHOT token (official CA)
     role: token
     is_contract: true
     source_verified: true
@@ -17,66 +17,264 @@ addresses:
     safe: null
     created_block: 34903127
     created_at: 2026-08-12T22:53:45.000Z
-    holders: 60
+    holders: 57
+    errors: []
+  - address: "0xE1E635c1d952C4136f1fBF816c072EBb5D3E3661"
+    label: LaunchFactoryV4 (Robinhood Chain)
+    role: factory
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x1f687ba0ee85f5d08a1e6e988c09cbb6d29359e5"
+    owner_type: eoa
+    safe: null
+    created_block: 39894510
+    created_at: 2026-08-18T17:56:19.000Z
+    holders: null
+    errors: []
+  - address: "0xCFd8902c696fb74FA64ea6Fe339e149e5c50b00f"
+    label: LaunchLensV4 (Robinhood Chain)
+    role: other
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 39894512
+    created_at: 2026-08-18T17:56:19.000Z
+    holders: null
+    errors: []
+  - address: "0x1BAfB314515Cedf96Ac8D569304934EefA051bcA"
+    label: BondingRouterV4 (Robinhood Chain)
+    role: router
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 39894512
+    created_at: 2026-08-18T17:56:19.000Z
+    holders: null
+    errors: []
+  - address: "0xCA3C6DBF5F875156B146FCa72BCeed53A8414fC7"
+    label: LONGSHOT / WETH Uniswap v3 pool
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: UniswapV3Pool
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 34903127
+    created_at: 2026-08-12T22:53:45.000Z
+    holders: null
+    errors: []
+  - address: "0xB2F8c34181878E410bbbcEb9A992Ea7c66dc877E"
+    label: Pre-V4 launch contract that created the official token
+    role: factory
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 34879260
+    created_at: 2026-08-12T22:13:53.000Z
+    holders: null
+    errors: []
+  - address: "0x7A367caCc51227B4bF315eabB6Ee501FD01a4fE9"
+    label: PoolAccountRegistry (Robinhood Chain)
+    role: other
+    is_contract: true
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0xd9c0b4110bc29391c953d986d3a91e6114d0ad60"
+    owner_type: eoa
+    safe: null
+    created_block: 34547419
+    created_at: 2026-08-12T12:59:58.000Z
+    holders: null
+    errors: []
+  - address: "0xd9C0B4110bc29391c953d986d3a91E6114D0Ad60"
+    label: LaunchFactoryV4 keeper
+    role: other
+    is_contract: false
+    source_verified: false
+    contract_name: null
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: null
+    created_at: null
+    holders: null
     errors: []
 metrics: []
 market:
   token_address: "0x8701E2C87ade58325601f4F9bf37ADF46Cb75745"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs:
     - dex: uniswap
       pair_address: "0xCA3C6DBF5F875156B146FCa72BCeed53A8414fC7"
       quote_symbol: WETH
-      price_usd: 0.000004515
-      liquidity_usd: 4446.02
-      volume_h24: 4.09
+      price_usd: 0.000004285
+      liquidity_usd: 4263.19
+      volume_h24: 196.6
       volume_h6: 0
       txns_h24:
         buys: 0
-        sells: 1
-      price_change_h24: null
-      fdv: 4439
+        sells: 3
+      price_change_h24: -6.89
+      market_cap: 4213
+      fdv: 4213
       created_at: 2026-08-12T22:53:45.000Z
-  liquidity_usd: 4446.02
-  volume_h24: 4.09
-  trades_h24: 1
-  price_usd: 0.000004515
-  price_change_h24: null
-  fdv: 4439
+  liquidity_usd: 4263.19
+  volume_h24: 196.6
+  trades_h24: 3
+  price_usd: 0.000004285
+  price_change_h24: -6.89
+  market_cap_usd: 4213
+  fdv_usd: 4213
+  fdv: 4213
   first_pair_at: 2026-08-12T22:53:45.000Z
-  top10_share: 0.9883033123369867
-  top10_share_ex_pools: 0.1197827434636148
-  top10_as_of: 2026-09-02T22:38:55.976Z
+  top10_share: 1
+  top10_share_ex_pools: 0.077263016516099
+  burned_share: 0.0168027470564616
+  top10_as_of: 2026-09-04T11:23:39.609Z
   launchpad: null
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
   errors:
     - step: launchpad
-      message: creator 0x5F6828db3b38b1597cbB0F1a6a26b5406aB38789 did not match a known factory, curve or launcher deployer
+      message: creator 0x5F6828db3b38b1597cbB0F1a6a26b5406aB38789 did not match a launchpad factory, curve or known launcher deployer
+    - step: top10_share
+      message: holder balances exceeded the circulating supply read for 0x8701E2C87ade58325601f4F9bf37ADF46Cb75745; the share was clamped
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: no-mint-function
   renounced: null
   lp:
     - pair: "0xCA3C6DBF5F875156B146FCa72BCeed53A8414fC7"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
     - address: "0x8701E2C87ade58325601f4F9bf37ADF46Cb75745"
-      label: RH Chain token (PRD Appendix A)
+      label: LONGSHOT token (official CA)
       role: token
       transactions_count: 1229
       token_transfers_count: 1
-      last_tx_at: 2026-09-01T16:14:41.000Z
+      last_tx_at: 2026-09-03T21:22:05.000Z
       last_method: approve
+      txns_24h: 3
+      launches_24h: null
+      errors: []
+    - address: "0xE1E635c1d952C4136f1fBF816c072EBb5D3E3661"
+      label: LaunchFactoryV4 (Robinhood Chain)
+      role: factory
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-25T16:12:16.000Z
+      last_method: "0xde3428b6"
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0xCFd8902c696fb74FA64ea6Fe339e149e5c50b00f"
+      label: LaunchLensV4 (Robinhood Chain)
+      role: other
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-18T17:56:19.000Z
+      last_method: null
       txns_24h: 0
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-01T16:14:41.000Z
-  txns_24h: 0
-  launches_24h: null
+    - address: "0x1BAfB314515Cedf96Ac8D569304934EefA051bcA"
+      label: BondingRouterV4 (Robinhood Chain)
+      role: router
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-25T16:12:31.000Z
+      last_method: buyWithEth
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xCA3C6DBF5F875156B146FCa72BCeed53A8414fC7"
+      label: LONGSHOT / WETH Uniswap v3 pool
+      role: other
+      transactions_count: 0
+      token_transfers_count: 2496
+      last_tx_at: null
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xB2F8c34181878E410bbbcEb9A992Ea7c66dc877E"
+      label: Pre-V4 launch contract that created the official token
+      role: factory
+      transactions_count: 5
+      token_transfers_count: 0
+      last_tx_at: 2026-08-15T02:29:10.000Z
+      last_method: "0x0987b973"
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0x7A367caCc51227B4bF315eabB6Ee501FD01a4fE9"
+      label: PoolAccountRegistry (Robinhood Chain)
+      role: other
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: 2026-08-27T17:35:46.000Z
+      last_method: registerPool
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0xd9C0B4110bc29391c953d986d3a91E6114D0Ad60"
+      label: LaunchFactoryV4 keeper
+      role: other
+      transactions_count: 4296
+      token_transfers_count: 951
+      last_tx_at: 2026-09-01T10:23:15.000Z
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-03T21:22:05.000Z
+  txns_24h: 3
+  launches_24h: 0
 errors: []

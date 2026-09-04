@@ -188,3 +188,13 @@ themes:
   - rwa
   - stock-paired:nvda
   - hook
+risks:
+  - Restricted calls go through an OpenZeppelin AccessManager whose source is unverified on the explorer, so role membership and delay are not reproduced here. [claim S11]
+  - Fast roles can place bounded fee overrides and a one-way pause; a keeper or a bad Merkle root can mis-set fees or weekly USDG inside those bounds. [claim S11]
+  - FABLES redemption has no deployed contract and no official date. [claim S11]
+tldr: A Uniswap v4 DEX whose hooks set market-specific swap fees.
+tldr_source: derived
+why_people_care:
+  - Fables is a native listed-market venue for tokenised-equity pairs (NVDA, SPY, TSLA, AAPL, GLD, META against USDG) sitting on the canonical Uniswap v4 PoolManager… [claim S11]
+  - DefiLlama's Robinhood Chain slice is about $6.53M TVL and $18.4M 24h volume this pass, counted only on Fables-registered pools. [claim S11]
+  - $PROLOGUE is already trading; the ve(3,3) coordination layer that FABLES is supposed to run is not. [claim S11]

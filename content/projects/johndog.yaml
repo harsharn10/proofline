@@ -114,3 +114,13 @@ findings:
   unresolved:
     - text: economics.metric remains unresolved (CON-1).
     - text: economics.metric remains unresolved (CON-2).
+risks:
+  - USD liquidity on the JOHNDOG/SGOV book counts both sides, and the quote side is SGOV, not USDG. [claim S1]
+  - Gecko reserve_in_usd printed negative this pass, so a compiler must not copy it as TVL. [claim S1]
+  - DexScreener search lists other JOHNDOG/JohnDog contract addresses. [claim S1]
+tldr: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against SGOV. Token 0x64bc…1e18 is an EIP-1167 DopplerERC20V1 clone named John Dog / JOHNDOG.
+tldr_source: derived
+why_people_care:
+  - The JOHNDOG/SGOV Uniswap v4 book printed about $3.50M of 24h volume and $176,779 liquidity on DexScreener at collection. [claim S1]
+  - SGOV is iShares 0-3 Month Treasury Bond • Robinhood Token, a rail, not the subject. [claim S1]
+  - Gecko labeled the same pool dex bankr-robinhood and printed a negative reserve_in_usd; that print is not TVL. [claim S1]

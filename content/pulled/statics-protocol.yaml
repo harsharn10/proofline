@@ -1,9 +1,9 @@
 slug: statics-protocol
-pulled_at: 2026-09-02T22:38:55.976Z # chain head 52931655 at read time
+pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd"
-    label: STATICS token
+    label: STATICS token (DopplerERC20V1 EIP-1167 clone)
     role: token
     is_contract: true
     source_verified: true
@@ -15,85 +15,345 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: null
-    created_at: null
-    holders: 1028
+    created_block: 47690074
+    created_at: 2026-08-27T19:24:28.000Z
+    holders: 1047
+    errors: []
+  - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+    label: DopplerERC20V1 implementation
+    role: implementation
+    is_contract: true
+    source_verified: true
+    contract_name: DopplerERC20V1
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x0000000000000000000000000000000000000000"
+    owner_type: none
+    safe: null
+    created_block: 646841
+    created_at: 2026-06-30T22:03:14.000Z
+    holders: null
+    errors: []
+  - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+    label: DopplerERC20V1Factory
+    role: factory
+    is_contract: true
+    source_verified: true
+    contract_name: DopplerERC20V1Factory
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 646841
+    created_at: 2026-06-30T22:03:14.000Z
+    holders: null
+    errors: []
+  - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+    label: Airlock (token owner(); launch tx to)
+    role: admin
+    is_contract: true
+    source_verified: true
+    contract_name: Airlock
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x21e2ce70511e4fe542a97708e89520471daa7a66"
+    owner_type: safe
+    safe:
+      threshold: 3
+      signers:
+        - "0xf5b75474d006495c82dbbf010e230d5d2f86226f"
+        - "0x2c6c52b00d7360a8f82f3e8d27369f75c47306f9"
+        - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
+        - "0xdf95cc445469816234ad95f702c79d25bce401a7"
+        - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
+        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+    created_block: 646829
+    created_at: 2026-06-30T22:03:11.000Z
+    holders: null
+    errors: []
+  - address: "0x8AAAF9a22f439589987B8f1e69d79ca4f648C297"
+    label: StaticsGenesisVault
+    role: vault
+    is_contract: true
+    source_verified: true
+    contract_name: StaticsGenesisVault
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x603a8a2f22ac1d61e9c932a4f6fa23170cecb9ff"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x4cf8e4d37f561815f208565a5b6ca8a85b143205"
+        - "0x81709e16bf99936891cc720689f269103fabed91"
+    created_block: 47690390
+    created_at: 2026-08-27T19:25:01.000Z
+    holders: null
+    errors: []
+  - address: "0xad5E9F96A91D1A6F550580b157af2068A0e8F0BE"
+    label: Statics Operators NFT (StaticsGenesis, STATOPS)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: StaticsGenesis
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: "0x603a8a2f22ac1d61e9c932a4f6fa23170cecb9ff"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x4cf8e4d37f561815f208565a5b6ca8a85b143205"
+        - "0x81709e16bf99936891cc720689f269103fabed91"
+    created_block: 47690440
+    created_at: 2026-08-27T19:25:06.000Z
+    holders: 165
+    errors: []
+  - address: "0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544"
+    label: Doppler pool initializer hook (STATICS/WETH canonical pool hook)
+    role: other
+    is_contract: true
+    source_verified: true
+    contract_name: DopplerHookInitializer
+    proxy:
+      type: none
+      implementation: null
+      admin: null
+    owner: null
+    owner_type: none
+    safe: null
+    created_block: 646861
+    created_at: 2026-06-30T22:03:20.000Z
+    holders: null
     errors: []
 metrics: []
 market:
   token_address: "0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd"
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   pairs:
     - dex: uniswap
       pair_address: "0xe79228d6cae086a58bf5b22220b454e5d1ca4f13da767ea5bbe032d5a1e82e8a"
       quote_symbol: WETH
-      price_usd: 0.02294
-      liquidity_usd: 14507121.97
-      volume_h24: 3458691.46
-      volume_h6: 2572537.47
+      price_usd: 0.02187
+      liquidity_usd: 13952984.63
+      volume_h24: 1704764.91
+      volume_h6: 78695.45
       txns_h24:
-        buys: 571
-        sells: 443
-      price_change_h24: -33.01
-      fdv: 22949500
+        buys: 411
+        sells: 287
+      price_change_h24: 5
+      market_cap: 21878138
+      fdv: 21878138
       created_at: 2026-08-27T19:24:28.000Z
+    - dex: uniswap
+      pair_address: "0xb1d4626cfc843040a134ac1b89de7d5fdc2d55d2e3f44f77fd00289510ff377a"
+      quote_symbol: USDG
+      price_usd: 0.0212
+      liquidity_usd: 62460.44
+      volume_h24: 201.36
+      volume_h6: 0
+      txns_h24:
+        buys: 1
+        sells: 1
+      price_change_h24: -0.05
+      market_cap: 21200811
+      fdv: 21200811
+      created_at: 2026-09-03T10:31:59.000Z
     - dex: uniswap
       pair_address: "0xed7c000D15999C295929b3483C70C58D0721d6D9"
       quote_symbol: WETH
-      price_usd: 0.02295
-      liquidity_usd: 461.32
-      volume_h24: 12754.62
-      volume_h6: 6041.08
+      price_usd: 0.02234
+      liquidity_usd: 446.24
+      volume_h24: 679.54
+      volume_h6: 153.5
       txns_h24:
-        buys: 133
-        sells: 126
-      price_change_h24: -33.32
-      fdv: 22956654
+        buys: 24
+        sells: 22
+      price_change_h24: 6.97
+      market_cap: 22349803
+      fdv: 22349803
       created_at: 2026-08-30T17:13:09.000Z
-  liquidity_usd: 14507583.29
-  volume_h24: 3471446.08
-  trades_h24: 1273
-  price_usd: 0.02294
-  price_change_h24: -33.01
-  fdv: 22949500
+    - dex: uniswap
+      pair_address: "0x4379b6894596ab1d307a524712a3dfa3c1ade076e430cd28b074b591ffe4b854"
+      quote_symbol: USDG
+      price_usd: 0.03013
+      liquidity_usd: 2.34
+      volume_h24: 0.15
+      volume_h6: 0
+      txns_h24:
+        buys: 0
+        sells: 1
+      price_change_h24: null
+      market_cap: 30133431
+      fdv: 30133431
+      created_at: 2026-08-30T18:28:14.000Z
+    - dex: uniswap
+      pair_address: "0x733a2a408a0add28e9b6f1fbd4b58b94cd9383c32c231a3bee1a1dfed7edf9fb"
+      quote_symbol: USDG
+      price_usd: 0.03223
+      liquidity_usd: 1.6
+      volume_h24: 0.01
+      volume_h6: 0
+      txns_h24:
+        buys: 0
+        sells: 1
+      price_change_h24: null
+      market_cap: 32235215
+      fdv: 32235215
+      created_at: 2026-08-30T01:59:03.000Z
+    - dex: uniswap
+      pair_address: "0x742f29ebd7be0c074d6982e26e6ecac7edf1b999d4ff7098b6971f99fa244a5c"
+      quote_symbol: ETH
+      price_usd: 0.003588
+      liquidity_usd: 0.1
+      volume_h24: 0
+      volume_h6: 0
+      txns_h24:
+        buys: 0
+        sells: 1
+      price_change_h24: null
+      market_cap: 3588323
+      fdv: 3588323
+      created_at: 2026-08-30T15:56:43.000Z
+  liquidity_usd: 14015895.35
+  volume_h24: 1705645.97
+  trades_h24: 749
+  price_usd: 0.02187
+  price_change_h24: 5
+  market_cap_usd: 21878138
+  fdv_usd: 21878138
+  fdv: 21878138
   first_pair_at: 2026-08-27T19:24:28.000Z
-  top10_share: 0.9260302337083912
-  top10_share_ex_pools: 0.9260302337083912
-  top10_as_of: 2026-09-02T22:38:55.976Z
-  launchpad: null
-  errors:
-    - step: launchpad
-      message: addresses/0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd did not return creator_address_hash or creation_tx_hash
+  top10_share: 0.9411502425331272
+  top10_share_ex_pools: 0.1462823856358039
+  burned_share: 0
+  top10_as_of: 2026-09-04T11:23:39.609Z
+  launchpad:
+    slug: doppler
+    via: factory
+    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
+    shared: false
+  rialto: null
+  pair_asset: null
+  volume_disagreement: null
+  errors: []
 structure:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   mint: unknown
   renounced: false
   lp:
     - pair: "0xe79228d6cae086a58bf5b22220b454e5d1ca4f13da767ea5bbe032d5a1e82e8a"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xb1d4626cfc843040a134ac1b89de7d5fdc2d55d2e3f44f77fd00289510ff377a"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xed7c000D15999C295929b3483C70C58D0721d6D9"
       locked_share: null
       holder_kind: null
-      reason: v3/v4 position; not checked
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
+    - pair: "0x4379b6894596ab1d307a524712a3dfa3c1ade076e430cd28b074b591ffe4b854"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x733a2a408a0add28e9b6f1fbd4b58b94cd9383c32c231a3bee1a1dfed7edf9fb"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x742f29ebd7be0c074d6982e26e6ecac7edf1b999d4ff7098b6971f99fa244a5c"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-02T22:38:55.976Z
+  pulled_at: 2026-09-04T11:23:39.609Z
   addresses:
     - address: "0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd"
-      label: STATICS token
+      label: STATICS token (DopplerERC20V1 EIP-1167 clone)
       role: token
       transactions_count: 1847
       token_transfers_count: 1
-      last_tx_at: 2026-09-02T22:45:21.000Z
+      last_tx_at: 2026-09-04T11:28:22.000Z
       last_method: "0x095ea7b3"
-      txns_24h: 252
+      txns_24h: 176
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-02T22:45:21.000Z
-  txns_24h: 252
-  launches_24h: null
+    - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      label: DopplerERC20V1 implementation
+      role: implementation
+      transactions_count: 0
+      token_transfers_count: 0
+      last_tx_at: null
+      last_method: null
+      txns_24h: 0
+      launches_24h: null
+      errors: []
+    - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      label: DopplerERC20V1Factory
+      role: factory
+      transactions_count: 0
+      token_transfers_count: 1
+      last_tx_at: null
+      last_method: null
+      txns_24h: 0
+      launches_24h: 0
+      errors: []
+    - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+      label: Airlock (token owner(); launch tx to)
+      role: admin
+      transactions_count: 9126
+      token_transfers_count: 445362
+      last_tx_at: 2026-09-04T11:11:59.000Z
+      last_method: create
+      txns_24h: 166
+      launches_24h: null
+      errors: []
+    - address: "0x8AAAF9a22f439589987B8f1e69d79ca4f648C297"
+      label: StaticsGenesisVault
+      role: vault
+      transactions_count: 862
+      token_transfers_count: 1561
+      last_tx_at: 2026-09-04T11:28:45.000Z
+      last_method: buyGenesis
+      txns_24h: 127
+      launches_24h: null
+      errors: []
+    - address: "0xad5E9F96A91D1A6F550580b157af2068A0e8F0BE"
+      label: Statics Operators NFT (StaticsGenesis, STATOPS)
+      role: other
+      transactions_count: 96
+      token_transfers_count: 0
+      last_tx_at: 2026-09-03T18:07:18.000Z
+      last_method: approve
+      txns_24h: 23
+      launches_24h: null
+      errors: []
+    - address: "0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544"
+      label: Doppler pool initializer hook (STATICS/WETH canonical pool hook)
+      role: other
+      transactions_count: 27207
+      token_transfers_count: 7301226
+      last_tx_at: 2026-09-04T11:32:09.000Z
+      last_method: updateBeneficiary
+      txns_24h: 1623
+      launches_24h: null
+      errors: []
+  last_activity_at: 2026-09-04T11:32:09.000Z
+  txns_24h: 2115
+  launches_24h: 0
 errors: []

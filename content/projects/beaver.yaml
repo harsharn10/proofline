@@ -134,3 +134,13 @@ findings:
     - text: "Is there an audit whose scope includes DopplerERC20V1 as used by LongLauncher on 4663? Next: auditor report index for Doppler / long.xyz and a matching commit"
   unresolved:
     - text: economics.metric remains unresolved (CON-1).
+tldr: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against SPCX.
+tldr_source: derived
+why_people_care:
+  - '@elonmusk posted "In a way, it was built on beaver" at 17:58:01Z; LongLauncher created this token against SPCX one minute later. [claim S10]'
+  - The BEAVERCOIN/SPCX Uniswap v4 book printed about $1.53M of 24h volume on DexScreener at collection. [claim S10]
+  - Packed SPACEHOOD uses the same SPCX rail at a different CA. [claim S10]
+risks:
+  - USD liquidity on the BEAVERCOIN/SPCX book counts both sides, and the quote side is SPCX, not USDG. [claim S10]
+  - Gecko does not index that pool this pass, so Gecko token volume is not the SPCX book. [claim S10]
+  - Ticker BEAVER is reused by Pons v2 0x6496…af76 and by WETH-paired 0xAfA1…18B0. [claim S10]

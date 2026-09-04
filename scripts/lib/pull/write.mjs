@@ -3,7 +3,7 @@
 // pulled files are machine output and must not become a content-validation dependency.
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
@@ -20,12 +20,13 @@ const METRIC_KEYS = ["kind", "value", "as_of", "source_url"];
 const ERROR_KEYS = ["step", "message"];
 const MARKET_KEYS = [
   "token_address", "pulled_at", "pairs", "liquidity_usd", "volume_h24", "trades_h24",
-  "price_usd", "price_change_h24", "fdv", "first_pair_at", "top10_share",
-  "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad", "errors",
+  "price_usd", "price_change_h24", "market_cap_usd", "fdv_usd", "fdv", "first_pair_at", "top10_share",
+  "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad", "rialto",
+  "pair_asset", "volume_disagreement", "errors",
 ];
 const PAIR_KEYS = [
   "dex", "pair_address", "quote_symbol", "price_usd", "liquidity_usd", "volume_h24",
-  "volume_h6", "txns_h24", "price_change_h24", "fdv", "created_at",
+  "volume_h6", "txns_h24", "price_change_h24", "market_cap", "fdv", "created_at",
 ];
 const TXNS_KEYS = ["buys", "sells"];
 const STRUCTURE_KEYS = ["pulled_at", "mint", "renounced", "lp", "errors"];
@@ -35,11 +36,19 @@ const ACTIVITY_ADDRESS_KEYS = [
   "address", "label", "role", "transactions_count", "token_transfers_count",
   "last_tx_at", "last_method", "txns_24h", "launches_24h", "errors",
 ];
+const RIALTO_KEYS = ["pairs", "volume_24h_usd", "volume_note", "as_of", "source_url"];
+const RIALTO_PAIR_KEYS = [
+  "pool_id", "base", "target", "last_price", "base_volume_24h", "target_volume_24h", "volume_24h_usd",
+];
+const PAIR_ASSET_KEYS = [
+  "ticker", "name", "address", "category", "tokenized_value_usd", "tokenized_shares", "change_7d", "source_url",
+];
+const VOLUME_DISAGREEMENT_KEYS = ["dexscreener_usd", "rialto_usd"];
 
 /** Snapshot column order. One JSON line per run in content/pulled/history/<slug>.jsonl. */
 export const HISTORY_KEYS = [
   "at", "holders", "liquidity_usd", "volume_h24", "trades_h24",
-  "price_usd", "fdv", "txns_total", "launches_24h", "tvl", "revenue_24h", "top10_share",
+  "price_usd", "market_cap", "fdv", "txns_total", "launches_24h", "tvl", "revenue_24h", "top10_share",
 ];
 
 export const HISTORY_DIR = "content/pulled/history";
@@ -79,6 +88,12 @@ export function orderMarket(market) {
     pair.txns_h24 = pick(p.txns_h24 ?? { buys: 0, sells: 0 }, TXNS_KEYS);
     return pair;
   });
+  ordered.rialto = market.rialto ? pick(market.rialto, RIALTO_KEYS) : null;
+  if (ordered.rialto) ordered.rialto.pairs = (market.rialto.pairs ?? []).map((pair) => pick(pair, RIALTO_PAIR_KEYS));
+  ordered.pair_asset = market.pair_asset ? pick(market.pair_asset, PAIR_ASSET_KEYS) : null;
+  ordered.volume_disagreement = market.volume_disagreement
+    ? pick(market.volume_disagreement, VOLUME_DISAGREEMENT_KEYS)
+    : null;
   ordered.errors = orderErrors(market.errors);
   return ordered;
 }
@@ -123,6 +138,38 @@ export function createValidator(schemaDir = new URL("../../../schema/", import.m
   };
 }
 
+function compileValidator(name, schemaDir, select = (schema) => schema) {
+  const read = (schemaName) => JSON.parse(readFileSync(new URL(`${schemaName}.schema.json`, schemaDir), "utf8"));
+  const ajv = new Ajv({ allErrors: true, strict: true, strictTypes: false });
+  addFormats(ajv);
+  ajv.addSchema(read("shared"));
+  const source = read(name);
+  const validate = ajv.compile(select(source));
+  return (data) => {
+    if (validate(data)) return [];
+    return validate.errors.map((e) => {
+      let detail = "";
+      if (e.params?.allowedValues) detail = ` (${e.params.allowedValues.join(", ")})`;
+      else if (e.keyword === "additionalProperties") detail = ` (${e.params.additionalProperty})`;
+      else if (e.keyword === "required") detail = ` (${e.params.missingProperty})`;
+      return `${e.instancePath || "/"} ${e.message}${detail}`;
+    });
+  };
+}
+
+export function createChainValidator(schemaDir = new URL("../../../schema/", import.meta.url)) {
+  return compileValidator("pulled-chain", schemaDir);
+}
+
+export function createDiscoveryValidator(schemaDir = new URL("../../../schema/", import.meta.url)) {
+  return compileValidator("pulled-chain", schemaDir, (schema) => ({
+    $schema: schema.$schema,
+    $id: "pulled-discovery",
+    ...schema.$defs.discoveryDocument,
+    $defs: schema.$defs,
+  }));
+}
+
 /**
  * Serialises to YAML, annotating pulled_at with the chain head the run read at so a reader can tell
  * which block the RPC facts describe without a separate field.
@@ -151,6 +198,108 @@ export async function writePulled(doc, { dir = "content/pulled", blockNumber = n
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, text, "utf8");
   return { path, text, written: true };
+}
+
+const CHAIN_KEYS = ["pulled_at", "tvl", "economics", "activity", "tokenization", "transfers", "mintburn"];
+const TVL_KEYS = ["total_tracked_usd", "stablecoin_usd", "asset_supply_usd", "by_category", "by_protocol", "source_url", "errors"];
+const ECONOMICS_KEYS = ["cum_fee_revenue_usd", "cum_gross_profit_usd", "gross_margin_pct", "latest_day", "source_url", "errors"];
+const ACTIVITY_CHAIN_KEYS = ["latest_day", "daily_volume_usd", "active_wallets", "tx_count", "source_url", "errors"];
+const TOKENIZATION_KEYS = ["assets", "value_usd", "mint_24h_usd", "net_minting", "source_url", "errors"];
+const TRANSFER_KEYS = ["d1_volume_usd", "d7_volume_usd", "all_time_transfers", "source_url", "errors"];
+const MINTBURN_KEYS = ["mint_24h_usd", "cumulative_net_usd", "source_url", "errors"];
+const ROLLUP_KEYS = ["latest", "sum_7d", "sum_30d"];
+
+export function orderChainDocument(doc) {
+  const ordered = pick(doc, CHAIN_KEYS);
+  ordered.tvl = pick(doc.tvl ?? {}, TVL_KEYS);
+  ordered.tvl.by_category = (doc.tvl?.by_category ?? []).map((row) => pick(row, ["category", "tvl_usd"]));
+  ordered.tvl.by_protocol = (doc.tvl?.by_protocol ?? []).map((row) => pick(row, ["protocol", "category", "tvl_usd", "total_tracked_tvl", "share"]));
+  ordered.tvl.errors = orderErrors(doc.tvl?.errors);
+  ordered.economics = pick(doc.economics ?? {}, ECONOMICS_KEYS);
+  ordered.economics.errors = orderErrors(doc.economics?.errors);
+  ordered.activity = pick(doc.activity ?? {}, ACTIVITY_CHAIN_KEYS);
+  for (const key of ["daily_volume_usd", "active_wallets", "tx_count"]) {
+    ordered.activity[key] = pick(doc.activity?.[key] ?? {}, ROLLUP_KEYS);
+  }
+  ordered.activity.errors = orderErrors(doc.activity?.errors);
+  ordered.tokenization = pick(doc.tokenization ?? {}, TOKENIZATION_KEYS);
+  ordered.tokenization.errors = orderErrors(doc.tokenization?.errors);
+  ordered.transfers = pick(doc.transfers ?? {}, TRANSFER_KEYS);
+  ordered.transfers.errors = orderErrors(doc.transfers?.errors);
+  ordered.mintburn = pick(doc.mintburn ?? {}, MINTBURN_KEYS);
+  ordered.mintburn.errors = orderErrors(doc.mintburn?.errors);
+  return ordered;
+}
+
+export async function writeChainPulled(doc, {
+  path = "content/pulled/chain.yaml", dry = false, validate = createChainValidator(),
+} = {}) {
+  const ordered = orderChainDocument(doc);
+  const errors = validate(ordered);
+  if (errors.length) throw new Error(`${path} failed schema:\n  ${errors.join("\n  ")}`);
+  const text = toYaml(ordered);
+  if (!dry) {
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, text, "utf8");
+  }
+  return { path, text, written: !dry };
+}
+
+export async function writeDiscovery(doc, {
+  path = "content/pulled/discovery.yaml", dry = false, validate = createDiscoveryValidator(),
+} = {}) {
+  const ordered = {
+    pulled_at: doc.pulled_at ?? null,
+    candidates: (doc.candidates ?? []).map((row) => pick(row, [
+      "address", "symbol", "name", "first_seen", "rialto_volume_24h_usd", "dexscreener_liquidity_usd", "source_urls",
+    ])),
+    errors: orderErrors(doc.errors),
+  };
+  const errors = validate(ordered);
+  if (errors.length) throw new Error(`${path} failed schema:\n  ${errors.join("\n  ")}`);
+  const text = toYaml(ordered);
+  if (!dry) {
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, text, "utf8");
+  }
+  return { path, text, written: !dry };
+}
+
+export const CHAIN_SERIES_PATH = "content/pulled/series/chain.json";
+export const CHAIN_SERIES_KEYS = [
+  "tvl_by_category_daily", "volume_daily", "active_wallets_daily", "fee_revenue_daily",
+];
+
+export async function readChainSeries({ path = CHAIN_SERIES_PATH } = {}) {
+  try {
+    const parsed = JSON.parse(await readFile(path, "utf8"));
+    return Object.fromEntries(CHAIN_SERIES_KEYS.map((key) => [key, Array.isArray(parsed?.[key]) ? parsed[key] : []]));
+  } catch {
+    return Object.fromEntries(CHAIN_SERIES_KEYS.map((key) => [key, []]));
+  }
+}
+
+export async function writeChainSeries(series, { path = CHAIN_SERIES_PATH, dry = false } = {}) {
+  const existing = await readChainSeries({ path });
+  const kept = [];
+  const next = {};
+  for (const key of CHAIN_SERIES_KEYS) {
+    const incoming = Array.isArray(series?.[key]) ? series[key] : [];
+    const current = existing[key] ?? [];
+    if (incoming.length === 0 || incoming.length < current.length) {
+      next[key] = current;
+      if (current.length > incoming.length) kept.push({ key, incoming: incoming.length, existing: current.length });
+    } else {
+      next[key] = incoming;
+    }
+  }
+  const hasAny = CHAIN_SERIES_KEYS.some((key) => next[key].length > 0);
+  const text = hasAny ? `${JSON.stringify(next, null, 2)}\n` : null;
+  if (!dry && text) {
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, text, "utf8");
+  }
+  return { path, text, written: !dry && Boolean(text), kept };
 }
 
 // --- snapshots ------------------------------------------------------------
@@ -184,6 +333,7 @@ export function snapshotFrom(doc) {
     volume_h24: market?.volume_h24 ?? null,
     trades_h24: market?.trades_h24 ?? null,
     price_usd: market?.price_usd ?? null,
+    market_cap: market?.market_cap_usd ?? null,
     fdv: market?.fdv ?? null,
     txns_total: counts.length ? counts.reduce((a, b) => a + b, 0) : null,
     launches_24h: activity?.launches_24h ?? null,

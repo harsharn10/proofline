@@ -108,3 +108,13 @@ findings:
   unresolved:
     - text: product.mechanism remains unresolved (CON-1).
     - text: activity.status remains unresolved (CON-2).
+risks:
+  - Settlement is posted by one resolver EOA. [claim S1]
+  - Owner and guardian are the same EOA with pause and void rights and no timelock in the ABI. [claim S1]
+  - Homepage copy says 15% trader escrow while the verified source sets FEE_TRADER_BPS to 0. [claim S1]
+tldr: Binary options on a fomo trader's total account PnL.
+tldr_source: derived
+why_people_care:
+  - Robinhood Chain already hosts fomo trader PnL as a public number. [claim S1]
+  - Peer turns that number into a USDG binary the wallet can buy without holding $PEER. [claim S1]
+  - The same EOA that launched $PEER on Pons also deployed the market, flywheel and distributor. [claim S1]

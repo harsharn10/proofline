@@ -170,3 +170,9 @@ findings:
   unresolved:
     - text: product.mechanism remains unresolved (CON-1).
     - text: other remains unresolved (CON-2).
+tldr: GIGA DEX is a native AMM on Robinhood Chain. Classic pools are a Uniswap v2 fork. Concentrated pools are a PancakeSwap v3 / Uniswap v3 fork.
+tldr_source: derived
+risks:
+  - Controller, vault, fee center, and veGIGA are upgradeable ERC1967 proxies. [verified S13 S18 S29] [claim S6]
+  - ProxyAdmin owner() is one 2-of-3 Safe that includes the factory deployer EOA. [verified S13 S18 S29] [claim S6]
+  - No timelock was located. [verified S13 S18 S29] [claim S6]

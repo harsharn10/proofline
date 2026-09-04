@@ -83,7 +83,7 @@ Then, in this order:
 4. **Commentary**: the wire filtered to this name, newest first, with kind chips; "All →" to `/feed?name=<slug>`. Talk items show the handle; Announcements show the project; On-chain items link the explorer or the listing.
 5. Related table: the section cohort sorted by the section KPI.
 6. **What could go wrong**: at most three bullets in plain words ("a 2-of-3 Safe can change fees with no delay", "no audit matched the deployed code", "liquidity is not locked"), each with a footnote. This block sits at the bottom of the main column, below Related, never above the fold.
-7. **Details** (tabs): Contracts (deployment grid), Control (ownership, timelock, upgradeability, fees, structure rows), Sources. The Control badge, when a score exists, lives here and in the header only.
+7. **Details** (tabs): Contracts (deployment grid), Control (ownership, timelock, upgradeability, fees, structure rows), **Checks**, Sources. Checks is the rest of the research record behind the card — the verified positives, the open gaps and the still-disputed items, each carrying its §3 rule 1 evidence word ("checked on chain", "from the project", "from the evidence", "disputed", "Open") and its footnotes. Risk items are not repeated there; they are the three bullets in *What could go wrong*. The Control badge, when a score exists, lives here and in the header only.
 
 Tokens never show a score. Rows the data cannot fill are omitted or show muted "not checked"; never a zero.
 
@@ -94,7 +94,7 @@ Feed = the full wire with kind chips and the `?name=` filter; `/changelog` redir
 
 Pulled (`content/pulled/<slug>.yaml`): `market.market_cap_usd` and `market.fdv_usd` from DexScreener alongside the existing fields; snapshot lines gain `market_cap`.
 
-Project (`content/projects/<slug>.yaml`): `tldr` (one sentence, ≤ 160 characters), `why_people_care` (exactly three strings, each ≤ 160 characters, each ending with source ids in brackets), `risks` (up to three strings, plain words, each with source ids), plus the existing `summary`, `themes`, `official_links`. The compiler fills them from the packet: the `TL;DR:` line, the three bullets under `## Why it matters`, the bullets under `## What could go wrong`.
+Project (`content/projects/<slug>.yaml`): `tldr` (one sentence, ≤ 160 characters), `why_people_care` (exactly three strings, each ≤ 200 characters, each ending with source ids in brackets), `risks` (up to three strings, plain words, each ≤ 200 characters with source ids), plus the existing `summary`, `themes`, `official_links`. The compiler fills them from the packet: the `TL;DR:` line, the three bullets under `## Why it matters`, the bullets under `## What could go wrong`. When a packet writes those sections as prose, the compiler derives the fields from it and marks a derived TL;DR with `tldr_source: derived` so a real `TL;DR:` line replaces it later; the rules are in `docs/research-system.md` §5. An over-length bullet is trimmed to what fits, never dropped.
 
 Feed (`content/feed/<slug>.yaml`): items keep `kind` company | ct | onchain | risk; the site maps them to Announcements / Talk / On-chain / Icarus notes. Each item has `title` (≤ 80), `body` (the gist), `sourceUrl`, `account` (for ct), `date`.
 

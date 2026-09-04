@@ -6,13 +6,18 @@
 //   node scripts/telegram-digest.mjs --all --limit 5      ignore sent-state, cap entries
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { loadContent } from "./lib/load.mjs";
-import { selectApproved, selectShareBar, buildMessages, readDotEnv, entryKey } from "./lib/telegram.mjs";
+import {
+  selectApproved, selectShareBar, buildMessages, readDotEnv, entryKey,
+  selectWireItems, buildWireMessages, wireKey,
+} from "./lib/telegram.mjs";
 
 const args = process.argv.slice(2);
 const flag = (n) => args.includes(n);
 const opt = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : null; };
 const dryRun = flag("--dry-run"), all = flag("--all"), since = opt("--since"), limit = Number(opt("--limit") ?? 0);
 const testOnly = flag("--test"), markSent = flag("--mark-sent");
+// How many wire items one run posts when --limit is not given.
+const WIRE_PER_RUN = 3;
 
 let env = { ...process.env };
 try { env = { ...readDotEnv(await readFile(".env.local", "utf8")), ...env }; } catch { /* no .env.local */ }
@@ -55,7 +60,17 @@ let entries = selectShareBar(
 )
   .sort((a, b) => a.date.localeCompare(b.date) || a.slug.localeCompare(b.slug));
 if (limit > 0) entries = entries.slice(0, limit);
-if (!entries.length) {
+// The second message kind: the wire itself, for the same names the share bar already cleared.
+// Gated on the same channel switch as the publications, so pausing delivery pauses everything.
+let wire = review.channel_enabled === true
+  ? selectWireItems(content, derivedFile.shareBar, { since, all, state })
+  : [];
+// A first run has months of backlog behind it. Send the newest WIRE_PER_RUN and leave the rest
+// for the next run rather than posting a hundred items at once; --limit overrides.
+const pending = wire.length;
+wire = wire.slice(0, limit > 0 ? limit : WIRE_PER_RUN);
+const allKeys = [...entries.map(entryKey), ...wire.map(wireKey)];
+if (!allKeys.length) {
   const reason = review.channel_enabled === true
     ? "Icarus: no approved, unsent updates above the share bar — nothing sent."
     : "Icarus channel delivery is paused in ops/telegram-review.json — nothing sent.";
@@ -63,22 +78,28 @@ if (!entries.length) {
   process.exit(0);
 }
 if (markSent) {
-  state.sent_keys = [...new Set([...(state.sent_keys ?? []), ...entries.map(entryKey)])];
+  state.sent_keys = [...new Set([...(state.sent_keys ?? []), ...allKeys])];
   await mkdir("ops", { recursive: true });
   await writeFile(STATE, JSON.stringify(state, null, 2) + "\n");
-  console.log(`Marked ${entries.length} change(s) as sent without posting. Future digests start after this point.`);
+  console.log(`Marked ${allKeys.length} item(s) as sent without posting. Future digests start after this point.`);
   process.exit(0);
 }
 
 const derivedBySlug = new Map(Object.entries(derivedFile.projects ?? {}));
-const messages = buildMessages(entries, {
-  siteName: content.site.name, date: entries[entries.length - 1].date,
-  projects: content.projects, derivedBySlug, siteUrl, profilePath,
-});
+const latest = entries.at(-1)?.date ?? wire[0]?.at ?? new Date().toISOString().slice(0, 10);
+const messages = [
+  ...(entries.length
+    ? buildMessages(entries, {
+        siteName: content.site.name, date: latest,
+        projects: content.projects, derivedBySlug, siteUrl, profilePath,
+      })
+    : []),
+  ...buildWireMessages(wire, { siteName: content.site.name, date: latest, siteUrl, profilePath }),
+];
 
 if (dryRun) {
   console.log(messages.join("\n\n--- next Telegram message ---\n\n"));
-  console.log(`\n--- dry run: ${entries.length} change(s), ${messages.length} message(s). Nothing sent; state unchanged.`);
+  console.log(`\n--- dry run: ${entries.length} change(s), ${wire.length} of ${pending} unsent wire item(s), ${messages.length} message(s). Nothing sent; state unchanged.`);
   process.exit(0);
 }
 if (!token || !chatId) {
@@ -86,8 +107,8 @@ if (!token || !chatId) {
   process.exit(1);
 }
 for (const message of messages) await send(message);
-state.sent_keys = [...new Set([...(state.sent_keys ?? []), ...entries.map(entryKey)])];
+state.sent_keys = [...new Set([...(state.sent_keys ?? []), ...allKeys])];
 state.last_sent_at = new Date().toISOString();
 await mkdir("ops", { recursive: true });
 await writeFile(STATE, JSON.stringify(state, null, 2) + "\n");
-console.log(`Sent ${messages.length} message(s) covering ${entries.length} change(s). State recorded in ${STATE}.`);
+console.log(`Sent ${messages.length} message(s) covering ${entries.length} change(s) and ${wire.length} wire item(s). State recorded in ${STATE}.`);

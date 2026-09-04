@@ -166,3 +166,13 @@ metrics:
     class: claim
     sources:
       - S11
+risks:
+  - The four registry contracts are unverified, so fee sinks, revocation and upgrade paths were not read. [claim S4]
+  - Token deployer 0x4B4B…Ed69 and registry deployer 0x35A9…6155 are different EOAs. [claim S4]
+  - Blockscout lists other ERC-20s with the same or similar name. [claim S4]
+tldr: A .agent namespace on Robinhood Chain. A name resolves to an agent identity (key, wallet, endpoint, capabilities), not a wallet.
+tldr_source: derived
+why_people_care:
+  - Robinhood Chain has several human name systems; this one is the census row for agent identity. [claim S4]
+  - Four contracts named on agentsn.xyz/docs have non-empty code on chain 4663, and $ANS has a Uniswap v4 book, so census announced is below the mainnet bar. [claim S4]
+  - It is not Bankr and not Pons; Pons only launched the token. [claim S4]

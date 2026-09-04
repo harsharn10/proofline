@@ -239,3 +239,13 @@ metrics:
     class: claim
     sources:
       - S28
+risks:
+  - Strategy vault, stake and Morpho owner() values are one EOA with empty code. [verified S18 S22] [claim S8]
+  - Official TVL ($200k, then $112k) is an account post. [claim S10 S28] [verified S24]
+  - The word Earn also names Robinhood's in-app Morpho USDG product, which has no EARN token. Pairing that product with this CA mixes two systems. [claim S9 S29]
+tldr: "A yield layer for tokenized stocks on Robinhood Chain: deposits go into Uniswap v4 strategy vaults or into permissionless Omnipools of up to eight tokens, and…"
+tldr_source: derived
+why_people_care:
+  - "EARN is a live stock-token yield surface on chain 4663: strategy vaults, Omnipools, a Morpho USDG vault and Steer LP vaults sit under one app. [claim S8 S38 S39]"
+  - The EARN token trades. [claim S10]
+  - DexScreener's lead Uniswap EARN/SPY book printed about $324k liquidity and about $461k of 24h volume this pass, which is the token pair, not vault TVL. [claim S10]

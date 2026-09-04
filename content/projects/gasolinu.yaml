@@ -120,3 +120,13 @@ findings:
     - text: "Should Gecko dex bankr-robinhood be treated as Bankr-minted or as Doppler-hook taxonomy? Next: compare hook 0x4e34…a544 against a known Bankr launch and a known LONG launch"
     - text: "Which of the Blockscout GASOLINU-named tokens besides 0x1e6EA1…1e18 share the GASOLINU/USO book? Next: keep ca-collision on any new same-ticker 4663 deploy"
   unresolved: []
+tldr: A one-billion-supply ERC-20 cloned into a Uniswap v4 pool quoted against USO.
+tldr_source: derived
+why_people_care:
+  - The GASOLINU/USO Uniswap v4 book printed about $529k of 24h volume on Gecko at collection, with the quote token the USO rail in GET /rhj/assets. [claim S17]
+  - Gecko labels the pool Bankr (Robinhood) because the hook is DopplerHookInitializer; the create transaction is LongLauncher, not a Bankr API row. [claim S17]
+  - Distinct from packed CRUDECAT, which is a Circus USO graduation at a different CA. [claim S17]
+risks:
+  - USD liquidity figures on the GASOLINU/USO book count both sides, and the quote side is USO, not USDG. [claim S17]
+  - DexScreener ($134k liq / $539k vol) disagrees with Gecko ($111k / $529k). [claim S17]
+  - Same-ticker Gasoline Inu tokens exist on 4663 and BSC. gasolinu.fun hrefs @gasolineinu, but that handle was not reproduced this pass, so comms stay unconfirmed-official. [claim S17]
