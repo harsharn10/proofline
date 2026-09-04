@@ -206,7 +206,20 @@ export function wireKey(item) {
  * site/src/data/content-server.ts: a feed item needs a receipt URL, and only material or risk-rated
  * findings, risks and corrections cross over from the change record — never review bookkeeping.
  */
-export function selectWireItems(content, shareBar, { since = null, all = false, state = null } = {}) {
+/**
+ * What may leave the site for the channel. A subscriber opted in to news, not to data reads:
+ * only Announcements (the project's own posts) and Talk (what people on X said) travel, in plain
+ * language. On-chain reads and Icarus notes stay on the site, where the reader can open the source.
+ */
+export const TELEGRAM_WIRE_KINDS = new Set(["announcement", "talk"]);
+// API field names, raw hex and truncated dumps mark a gist that was written for a machine.
+const RAW_GIST_RE = /\b(volume_usd|reserve_in_usd|fdv_usd|liquidity\.usd|volume\.h24|price_usd|totalSupply|eth_call|allTokensLength|launchCreationEnabled)\b|0x[0-9a-fA-F]{6,}|returned .{0,40} at block|\u2026/;
+export function readerGrade(item) {
+  const text = `${item.headline ?? ""} ${item.gist ?? ""}`;
+  return !RAW_GIST_RE.test(text) && String(item.gist ?? "").trim().length >= 20;
+}
+
+export function selectWireItems(content, shareBar, { since = null, all = false, state = null, kinds = TELEGRAM_WIRE_KINDS, perName = 1, plain = true } = {}) {
   const sent = new Set(all ? [] : (state?.sent_keys ?? []));
   const above = (slug) => shareBar?.[slug] === true;
   const nameOf = (slug) => content.projects?.get(slug)?.name ?? slug;
@@ -244,9 +257,18 @@ export function selectWireItems(content, shareBar, { since = null, all = false, 
       at: entry.date,
     });
   }
+  const perNameCount = new Map();
   return items
     .filter((item) => (!since || item.at >= since) && !sent.has(wireKey(item)))
-    .sort((a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id));
+    .filter((item) => kinds.has(item.kind) && (!plain || readerGrade(item)))
+    .sort((a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id))
+    .filter((item) => {
+      // One item per name per run: the channel is a digest, not a firehose.
+      const seen = perNameCount.get(item.slug) ?? 0;
+      if (seen >= perName) return false;
+      perNameCount.set(item.slug, seen + 1);
+      return true;
+    });
 }
 
 /** One wire item as a message body: kicker, headline, gist, then the link — always last. */
