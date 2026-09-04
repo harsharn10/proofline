@@ -512,10 +512,11 @@ function validPulse(value: unknown): value is PulseSnapshot {
     typeof pulse.ticks === "number" && Array.isArray(pulse.alerts) && Array.isArray(pulse.hot);
 }
 
-async function loadPulse(now = Date.now()): Promise<PulseSnapshot | null> {
-  const configured = process.env.PULSE_URL?.trim();
-  if (!configured) return null;
-  if (pulseCache && now - pulseCache.readAt < PULSE_CACHE_MS) return pulseCache.value;
+// One in-flight read at a time: concurrent server-rendered requests share it instead of each opening
+// their own fetch and each paying the two-second timeout.
+let pulseInflight: Promise<PulseSnapshot | null> | null = null;
+
+async function fetchPulse(configured: string, now: number): Promise<PulseSnapshot | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 2_000);
   try {
@@ -528,23 +529,44 @@ async function loadPulse(now = Date.now()): Promise<PulseSnapshot | null> {
     return value;
   } catch (error) {
     console.warn(`[content-server] pulse unavailable — ${error instanceof Error ? error.message : String(error)}`);
-    return pulseCache?.value ?? null;
+    // Cache the failure too, holding whatever was last good. Returning without touching readAt left
+    // the cache permanently cold, so every request while the Worker was down paid the full timeout.
+    pulseCache = { readAt: now, value: pulseCache?.value ?? null };
+    return pulseCache.value;
   } finally {
     clearTimeout(timer);
   }
 }
 
-function withPulse(entry: DirectoryEntry, tokenAddress: string | null, pulse: PulseSnapshot | null): DirectoryEntry {
-  if (!pulse) return entry;
-  const hot = pulse.hot.find((row) =>
-    (tokenAddress && row.token.toLowerCase() === tokenAddress.toLowerCase()) ||
-    (entry.symbol && row.symbol.toUpperCase() === entry.symbol.toUpperCase()),
-  );
+async function loadPulse(now = Date.now()): Promise<PulseSnapshot | null> {
+  const configured = process.env.PULSE_URL?.trim();
+  if (!configured) return null;
+  if (pulseCache && now - pulseCache.readAt < PULSE_CACHE_MS) return pulseCache.value;
+  if (pulseInflight) return pulseInflight;
+  pulseInflight = fetchPulse(configured, now).finally(() => { pulseInflight = null; });
+  return pulseInflight;
+}
+
+// Token address only. `hot` is arbitrary live pools, most of them untracked, and matching by ticker
+// attached a copycat's volume and DexScreener link to the tracked project's row — the chain that put
+// 24 AMC copycats on one page. A number must belong to the name it sits next to.
+function withPulse(
+  entry: DirectoryEntry,
+  tokenAddress: string | null,
+  pulse: PulseSnapshot | null,
+  now: number,
+): DirectoryEntry {
+  if (!pulse || !tokenAddress) return entry;
+  const hot = pulse.hot.find((row) => row.token?.toLowerCase() === tokenAddress.toLowerCase());
   if (!hot) return entry;
+  const readAt = Date.parse(pulse.at);
   return {
     ...entry,
     pulse: {
       at: pulse.at,
+      // Measured here, at request time, against the document's own timestamp: the bundle's `now` is
+      // the build clock and would age the badge by however long ago the site was built.
+      ageMinutes: Number.isFinite(readAt) ? Math.max(0, Math.floor((now - readAt) / 60_000)) : null,
       h1VolumeUsd: hot.volume_h1_usd ?? null,
       links: hot.links,
     },
@@ -916,7 +938,8 @@ function relatedFor(
 // No research HTML, no source ledgers, no findings, no feeds.
 export const getContent = createServerFn({ method: "GET" }).handler(async (): Promise<DirectoryBundle> => {
   const content = getCachedContent();
-  const pulse = await loadPulse();
+  const readAt = Date.now();
+  const pulse = await loadPulse(readAt);
   return {
     site: content.site,
     sections: content.sections,
@@ -928,6 +951,7 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
         toDirectoryEntry(d, content.treeBySlug, content.censusBySlug, content.site),
         tokenAddress,
         pulse,
+        readAt,
       );
     }),
     histories: content.histories,
@@ -937,7 +961,10 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
       .sort((a, b) => a.name.localeCompare(b.name)),
     chainStats: content.chainStats,
     generatedAt: content.generatedAt,
-    now: Date.now(),
+    // The build clock, the same one getDossier returns. Launch windows and "not listed yet" must not
+    // read one way on the home page and another on the name's own page. The pulse badge carries its
+    // own request-time age instead.
+    now: content.now,
   };
 });
 

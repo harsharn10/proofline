@@ -9,6 +9,8 @@ import {
   requestJson,
   isRetryableStatus,
   backoffMs,
+  challengeDelayMs,
+  isBotChallenge,
   looksLikeHtml,
   mapWithConcurrency,
 } from "./lib/pull/http.mjs";
@@ -32,6 +34,12 @@ import {
   parseTransactionResponse,
   toInt,
   createBlockscoutClient,
+  resolveBlockscoutConfig,
+  createBlockscoutTracker,
+  blockscoutChallengeGate,
+  BLOCKSCOUT_BASE,
+  BLOCKSCOUT_PUBLIC_REST_BASE,
+  BLOCKSCOUT_PRO_REST_BASE,
   readAddress as readBlockscout,
 } from "./lib/pull/blockscout.mjs";
 import { findLlamaSlug, latestChainTvl, chainTotal24h, readProtocol } from "./lib/pull/llama.mjs";
@@ -296,20 +304,171 @@ test("one failing address does not stop the others in the same slug", async () =
   assert.equal(rows[1].errors[0].message, "boom");
 });
 
-test("a Cloudflare challenge page is an error, not a crash, and leaves the RPC row intact", async () => {
+/** The page Cloudflare actually serves: the interstitial title, `_cf_chl_opt`, the platform loader. */
+const CLOUDFLARE_CHALLENGE_BODY =
+  '<!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title></head>' +
+  '<body><div id="cf-wrapper"><div id="cf-chl-widget"></div></div>' +
+  '<script>window._cf_chl_opt={cvId:"3"};</script>' +
+  '<script src="/cdn-cgi/challenge-platform/h/b/orchestrate/chl_page/v1"></script></body></html>';
+
+/** A gateway's own error page: HTML, 5xx, and nothing to do with Cloudflare. */
+const GATEWAY_HTML_BODY =
+  "<!doctype html><html><head><title>502 Bad Gateway</title></head><body><h1>502 Bad Gateway</h1><hr>nginx</body></html>";
+
+test("a Cloudflare challenge is retried once, classified, and leaves the RPC row intact", async () => {
+  const log = [];
+  const waits = [];
+  const tracker = createBlockscoutTracker();
   const fetchImpl = stubFetch({
-    "/api/v2/addresses/": { status: 403, body: "<!doctype html><html>Just a moment...</html>", contentType: "text/html" },
-  });
-  const client = createBlockscoutClient({ deps: { fetchImpl, sleepImpl: async () => {}, attempts: 1 } });
+    "/api/v2/addresses/": { status: 403, body: CLOUDFLARE_CHALLENGE_BODY, contentType: "text/html" },
+  }, log);
+  const client = createBlockscoutClient({ deps: {
+    fetchImpl,
+    sleepImpl: async (ms) => void waits.push(ms),
+    attempts: 1,
+    randomImpl: () => 0.25,
+    onRequest: tracker.recordRequest,
+    onChallenge: tracker.recordChallenge,
+  } });
   const out = await readBlockscout(client, "0x1111111111111111111111111111111111111111");
 
   assert.equal(out.source_verified, null);
   assert.equal(out.contract_name, null);
   assert.equal(out.errors.length, 1);
   assert.equal(out.errors[0].step, "blockscout");
-  assert.match(out.errors[0].message, /HTML, not JSON/);
+  assert.match(out.errors[0].message, /explorer served a bot challenge/);
+  assert.equal(log.length, 2, "one challenge retry, even when ordinary attempts is one");
+  assert.deepEqual(waits, [750]);
+  assert.deepEqual(tracker.snapshot(), { credits: 2, challenges: 2 });
+  assert.equal(blockscoutChallengeGate(tracker.snapshot()).exitCode, 1, "the challenge counts toward the gate");
+
+  // Each Cloudflare marker is enough on its own; the classifier never parses the page.
+  assert.equal(isBotChallenge(CLOUDFLARE_CHALLENGE_BODY, "text/html"), true);
+  assert.equal(isBotChallenge("<html><title>Just a moment...</title></html>"), true);
+  assert.equal(isBotChallenge('<!doctype html><html><body><div id="cf-chl-widget"></div></body></html>'), true);
+  assert.equal(isBotChallenge('<!doctype html><script src="/cdn-cgi/challenge-platform/h/b/x"></script>'), true);
+  assert.equal(isBotChallenge("<!doctype html><script>window._cf_chl_opt={};</script>"), true);
+  assert.equal(isBotChallenge('{"a":1}', "application/json"), false);
+  assert.equal(challengeDelayMs(() => 0.25), 750);
   assert.equal(looksLikeHtml("<!doctype html>", ""), true);
   assert.equal(looksLikeHtml('{"a":1}', "application/json"), false);
+});
+
+test("an HTML gateway error is an ordinary transport error, not a bot challenge", async () => {
+  // No Cloudflare marker, so nothing here is a challenge — an HTML body alone is not enough.
+  assert.equal(isBotChallenge(GATEWAY_HTML_BODY, "text/html"), false);
+  assert.equal(isBotChallenge("<!doctype html><html><body>504 Gateway Timeout</body></html>", "text/html"), false);
+  assert.equal(isBotChallenge("<html><head><title>404 Not Found</title></head></html>", "text/html"), false);
+  assert.equal(looksLikeHtml(GATEWAY_HTML_BODY, "text/html"), true, "it is still HTML, just not a challenge");
+
+  const log = [];
+  const waits = [];
+  const tracker = createBlockscoutTracker();
+  const fetchImpl = stubFetch({
+    "/api/v2/addresses/": { status: 502, body: GATEWAY_HTML_BODY, contentType: "text/html" },
+  }, log);
+  const client = createBlockscoutClient({ env: {}, deps: {
+    fetchImpl,
+    sleepImpl: async (ms) => void waits.push(ms),
+    attempts: 3,
+    randomImpl: () => 0.25,
+    onRequest: tracker.recordRequest,
+    onChallenge: tracker.recordChallenge,
+  } });
+  const out = await readBlockscout(client, "0x1111111111111111111111111111111111111111");
+
+  assert.equal(out.source_verified, null);
+  assert.equal(out.errors.length, 1);
+  assert.equal(out.errors[0].step, "blockscout");
+  assert.match(out.errors[0].message, /HTTP 502 returned HTML/);
+  assert.doesNotMatch(out.errors[0].message, /served a bot challenge/);
+  // Retried by the ordinary 5xx policy — three attempts with backoff, not the challenge pause.
+  assert.equal(log.length, 3);
+  assert.deepEqual(waits, [500, 1000]);
+  assert.deepEqual(tracker.snapshot(), { credits: 3, challenges: 0 });
+  assert.equal(blockscoutChallengeGate(tracker.snapshot()).exitCode, 0, "a gateway blip is not a bot wall");
+  assert.equal(blockscoutChallengeGate(tracker.snapshot()).summary, null);
+});
+
+test("Blockscout selects PRO bearer auth with a key and the public browser fallback without it", async () => {
+  const proLog = [];
+  const pro = createBlockscoutClient({
+    env: { BLOCKSCOUT_API_KEY: "proapi_test" },
+    deps: { fetchImpl: stubFetch({ "/addresses/": { body: {} } }, proLog), attempts: 1 },
+  });
+  await pro.address("0x1111111111111111111111111111111111111111");
+  assert.ok(proLog[0].url.startsWith(`${BLOCKSCOUT_PRO_REST_BASE}/addresses/`));
+  assert.equal(proLog[0].headers.Authorization, "Bearer proapi_test");
+  assert.equal(pro.config.addressConcurrency, 4);
+  assert.equal(pro.config.requestsPerSecond, 5);
+
+  const publicLog = [];
+  const fallback = createBlockscoutClient({
+    env: {},
+    deps: { fetchImpl: stubFetch({ "/addresses/": { body: {} } }, publicLog), attempts: 1 },
+  });
+  await fallback.address("0x1111111111111111111111111111111111111111");
+  assert.ok(publicLog[0].url.startsWith(`${BLOCKSCOUT_PUBLIC_REST_BASE}/addresses/`));
+  assert.match(publicLog[0].headers["User-Agent"], /Mozilla/);
+  assert.equal(publicLog[0].headers.Authorization, undefined);
+  assert.equal(fallback.config.addressConcurrency, 2);
+
+  const overridden = resolveBlockscoutConfig({
+    env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: "https://example.test/4663" },
+  });
+  assert.equal(overridden.restBase, "https://example.test/4663/api/v2");
+});
+
+test("the PRO bearer is never sent to a host other than api.blockscout.com", async () => {
+  // The public explorer named explicitly: the key is held back and the browser identity is used.
+  const publicLog = [];
+  const publicBase = createBlockscoutClient({
+    env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: BLOCKSCOUT_BASE },
+    deps: { fetchImpl: stubFetch({ "/addresses/": { body: {} } }, publicLog), attempts: 1 },
+  });
+  await publicBase.address("0x1111111111111111111111111111111111111111");
+  assert.ok(publicLog[0].url.startsWith(`${BLOCKSCOUT_PUBLIC_REST_BASE}/addresses/`));
+  assert.equal(publicLog[0].headers.Authorization, undefined, "no bearer off the PRO host");
+  assert.match(publicLog[0].headers["User-Agent"], /Mozilla/);
+  assert.equal(publicBase.config.apiKey, null);
+  assert.equal(publicBase.config.isPro, false, "PRO allowances follow the header, not the key");
+  assert.equal(publicBase.config.requestsPerSecond, 4);
+  assert.equal(publicBase.config.addressConcurrency, 2);
+
+  // A mirror, a proxy or a mistyped secret: same answer.
+  const mirrorLog = [];
+  const mirror = createBlockscoutClient({
+    env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: "https://example.test/4663" },
+    deps: { fetchImpl: stubFetch({ "/addresses/": { body: {} } }, mirrorLog), attempts: 1 },
+  });
+  await mirror.address("0x1111111111111111111111111111111111111111");
+  assert.equal(mirrorLog[0].url, "https://example.test/4663/api/v2/addresses/0x1111111111111111111111111111111111111111");
+  assert.equal(mirrorLog[0].headers.Authorization, undefined);
+  assert.equal(mirror.config.isPro, false);
+
+  // A lookalike host does not count either — the match is the whole host, not a suffix.
+  const lookalike = resolveBlockscoutConfig({
+    env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: "https://api.blockscout.com.evil.test/4663" },
+  });
+  assert.equal(lookalike.headers.Authorization, undefined);
+  assert.equal(lookalike.isPro, false);
+
+  // The PRO host itself, however it is spelled, still gets the bearer.
+  for (const base of ["https://api.blockscout.com", "https://api.blockscout.com/4663", BLOCKSCOUT_PRO_REST_BASE]) {
+    const scoped = resolveBlockscoutConfig({ env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: base } });
+    assert.equal(scoped.headers.Authorization, "Bearer proapi_test", base);
+    assert.equal(scoped.isPro, true, base);
+  }
+});
+
+test("a majority of explorer challenge responses makes the run gate nonzero", () => {
+  assert.deepEqual(blockscoutChallengeGate({ credits: 3, challenges: 2 }), {
+    failed: true,
+    exitCode: 1,
+    summary: "explorer bot wall: 2/3 Blockscout requests served a challenge",
+  });
+  assert.equal(blockscoutChallengeGate({ credits: 4, challenges: 2 }).exitCode, 0, "exactly half is allowed");
+  assert.equal(blockscoutChallengeGate({ credits: 0, challenges: 0 }).exitCode, 0);
 });
 
 // --- retry and backoff ----------------------------------------------------

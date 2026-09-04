@@ -423,6 +423,9 @@ export type PulseSnapshot = {
 };
 export type DirectoryPulse = {
   at: string;
+  // Age of the pulse document when the page was rendered, in minutes. Measured server-side against
+  // the document's own `at`, not against the build clock the bundle's `now` carries.
+  ageMinutes: number | null;
   h1VolumeUsd: number | null;
   links: PulseLinks | null;
 };

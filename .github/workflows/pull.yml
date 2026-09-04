@@ -28,6 +28,9 @@ jobs:
   pull:
     name: Pull and commit
     runs-on: ubuntu-latest
+    env:
+      # Optional: without it the puller retains the public explorer fallback.
+      BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}
     # One bot on main at a time: the compile workflow shares this group.
     concurrency:
       group: main-bots

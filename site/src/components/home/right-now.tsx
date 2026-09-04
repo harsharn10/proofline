@@ -66,9 +66,10 @@ export function RightNow({ trending, launches, announced, notListed, now }: {
   notListed: number;
   now: number;
 }) {
-  const pulse = [...trending, ...launches.map((entry) => ({ entry, change24h: null }))]
-    .find(({ entry }) => entry.pulse)?.entry.pulse ?? null;
-  const pulseAgeMinutes = pulse ? Math.max(0, Math.floor((now - Date.parse(pulse.at)) / 60_000)) : null;
+  // The loader measures the age at request time; `now` here is the build clock and would report how
+  // long ago the site was built rather than how fresh the reading is.
+  const pulseAgeMinutes = [...trending, ...launches.map((entry) => ({ entry, change24h: null }))]
+    .find(({ entry }) => entry.pulse)?.entry.pulse?.ageMinutes ?? null;
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
       <Card
