@@ -463,7 +463,7 @@ async function makeContent(mutate = () => {}) {
   // Flip one qualifying test to false on the scratch copy: it must warn normally and error under --release.
   const censusPath = join(tmp, "census.yaml");
   const censusText = await readFile(censusPath, "utf8");
-  await writeFile(censusPath, censusText.replace(/citable:\s*\{ value: true,/, "citable:           { value: false,"));
+  await writeFile(censusPath, censusText.replace(/(citable:\s*\{?\s*)value: true/, "$1value: false"));
   const qualifyingFalse = await validateContent(tmp);
   const releaseRun = await validateContent(tmp, { release: true });
   await writeFile(censusPath, censusText);
