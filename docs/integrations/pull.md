@@ -33,7 +33,10 @@ environment variable. It is optional: when absent, the puller keeps using
 `https://robinhoodchain.blockscout.com/api/v2` with the existing browser user agent. When present,
 every native REST route uses `https://api.blockscout.com/4663/api/v2` and sends
 `Authorization: Bearer <key>`. `BLOCKSCOUT_API_BASE` can override the REST root for local testing;
-both a host root and a root ending in `/api/v2` are accepted.
+both a host root and a root ending in `/api/v2` are accepted. The bearer is scoped to the host that
+issued it: it is attached only when the resolved root is on `api.blockscout.com`, so a base pointing
+at the public explorer, a mirror or a local proxy sends no key at all and falls back to the browser
+user agent, the 4/s pace and two concurrent reads — even when `BLOCKSCOUT_API_KEY` is set.
 
 The free PRO tier allows 5 requests per second and 100,000 credits per day. A PRO run starts at most
 four explorer reads concurrently and paces their physical requests to 5/s. Public fallback retains

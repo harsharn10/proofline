@@ -37,6 +37,7 @@ import {
   resolveBlockscoutConfig,
   createBlockscoutTracker,
   blockscoutChallengeGate,
+  BLOCKSCOUT_BASE,
   BLOCKSCOUT_PUBLIC_REST_BASE,
   BLOCKSCOUT_PRO_REST_BASE,
   readAddress as readBlockscout,
@@ -362,6 +363,48 @@ test("Blockscout selects PRO bearer auth with a key and the public browser fallb
     env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: "https://example.test/4663" },
   });
   assert.equal(overridden.restBase, "https://example.test/4663/api/v2");
+});
+
+test("the PRO bearer is never sent to a host other than api.blockscout.com", async () => {
+  // The public explorer named explicitly: the key is held back and the browser identity is used.
+  const publicLog = [];
+  const publicBase = createBlockscoutClient({
+    env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: BLOCKSCOUT_BASE },
+    deps: { fetchImpl: stubFetch({ "/addresses/": { body: {} } }, publicLog), attempts: 1 },
+  });
+  await publicBase.address("0x1111111111111111111111111111111111111111");
+  assert.ok(publicLog[0].url.startsWith(`${BLOCKSCOUT_PUBLIC_REST_BASE}/addresses/`));
+  assert.equal(publicLog[0].headers.Authorization, undefined, "no bearer off the PRO host");
+  assert.match(publicLog[0].headers["User-Agent"], /Mozilla/);
+  assert.equal(publicBase.config.apiKey, null);
+  assert.equal(publicBase.config.isPro, false, "PRO allowances follow the header, not the key");
+  assert.equal(publicBase.config.requestsPerSecond, 4);
+  assert.equal(publicBase.config.addressConcurrency, 2);
+
+  // A mirror, a proxy or a mistyped secret: same answer.
+  const mirrorLog = [];
+  const mirror = createBlockscoutClient({
+    env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: "https://example.test/4663" },
+    deps: { fetchImpl: stubFetch({ "/addresses/": { body: {} } }, mirrorLog), attempts: 1 },
+  });
+  await mirror.address("0x1111111111111111111111111111111111111111");
+  assert.equal(mirrorLog[0].url, "https://example.test/4663/api/v2/addresses/0x1111111111111111111111111111111111111111");
+  assert.equal(mirrorLog[0].headers.Authorization, undefined);
+  assert.equal(mirror.config.isPro, false);
+
+  // A lookalike host does not count either — the match is the whole host, not a suffix.
+  const lookalike = resolveBlockscoutConfig({
+    env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: "https://api.blockscout.com.evil.test/4663" },
+  });
+  assert.equal(lookalike.headers.Authorization, undefined);
+  assert.equal(lookalike.isPro, false);
+
+  // The PRO host itself, however it is spelled, still gets the bearer.
+  for (const base of ["https://api.blockscout.com", "https://api.blockscout.com/4663", BLOCKSCOUT_PRO_REST_BASE]) {
+    const scoped = resolveBlockscoutConfig({ env: { BLOCKSCOUT_API_KEY: "proapi_test", BLOCKSCOUT_API_BASE: base } });
+    assert.equal(scoped.headers.Authorization, "Bearer proapi_test", base);
+    assert.equal(scoped.isPro, true, base);
+  }
 });
 
 test("a majority of explorer challenge responses makes the run gate nonzero", () => {
