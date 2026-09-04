@@ -1,5 +1,6 @@
 // Pure helpers for the publish-triggered Telegram digest (PRD §9.2). No I/O here.
 import { createHash } from "node:crypto";
+import { formatUsd } from "./signals.mjs";
 
 export const DISCLAIMER =
   "Icarus is powered by Project Proofline. This automated research may be incomplete, delayed or inaccurate. It is not an audit, guarantee or investment advice. Read the sources and do your own research.";
@@ -401,9 +402,9 @@ function displayValue(value, field = null) {
   return String(value);
 }
 
-function formatUsd(value) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 }).format(Number(value));
-}
+// One money formatter for the whole channel, shared with the pulse rules: the same figure must read
+// the same way in an alert, in the brief and on the Worker, and none of them may depend on the
+// runtime's ICU version.
 
 function formatPct(value) {
   const number = Number(value);
