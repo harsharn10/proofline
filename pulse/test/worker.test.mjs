@@ -88,6 +88,13 @@ test("a tick reads the bounded sources and stores an AMC pulse", async () => {
   assert.equal((await stored.json()).hot[0].symbol, "AMC");
 });
 
+test("the committed configuration deploys silent", async () => {
+  const config = await readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8");
+  // The deploy workflow overrides this from ops/telegram-review.json. Committing "true" here would
+  // let a hand-run deploy start posting without the repository having voted for it.
+  assert.match(config, /"TELEGRAM_ENABLED":\s*"false"/);
+});
+
 test("only GET /pulse.json is public", async () => {
   const env = { PULSE_STATE: memoryKv() };
   assert.equal((await worker.fetch(new Request("https://pulse.test/"), env)).status, 404);

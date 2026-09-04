@@ -84,8 +84,10 @@ rules still run and `/pulse.json` still carries every hit; only delivery stops, 
 is logged as `[pulse paused]`.
 
 `wrangler.jsonc` sets `TELEGRAM_ENABLED` to `"false"`, so a hand-run `wrangler deploy` from a laptop
-cannot start posting. `PULSE_DRY_RUN` is a second, independent brake for a first production tick:
-with it set to anything but `0`, `false` or `off`, eligible messages are logged instead of sent.
+cannot start posting; a test asserts that committed default. Flipping the repository flag is
+therefore sufficient on its own — there is no second variable to remember. `PULSE_DRY_RUN` is a hand
+brake for watching one production tick without delivering it: deploy with `--var PULSE_DRY_RUN:true`
+and eligible messages are logged instead of sent (any value but `0`, `false` or `off` means dry).
 
 ## Output
 

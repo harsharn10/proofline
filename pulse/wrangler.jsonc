@@ -15,8 +15,11 @@
   ],
   "vars": {
     // Delivery is off until the deploy workflow overrides this from ops/telegram-review.json, so a
-    // hand-run `wrangler deploy` from a laptop cannot post to the channel by accident.
+    // hand-run `wrangler deploy` from a laptop cannot post to the channel by accident. This is the
+    // only gate the repository controls — keep it "false" here.
     "TELEGRAM_ENABLED": "false",
-    "PULSE_DRY_RUN": "true"
+    // A separate hand brake for checking a production tick: deploy with
+    // `--var PULSE_DRY_RUN:true` to log the messages a live switch would have sent.
+    "PULSE_DRY_RUN": "false"
   }
 }

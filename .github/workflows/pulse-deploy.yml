@@ -44,10 +44,7 @@ jobs:
       - name: Read the delivery switch from ops/telegram-review.json
         id: switch
         run: |
-          enabled=$(node -e '
-            const review = require("./ops/telegram-review.json");
-            process.stdout.write(String(review.channel_enabled === true && review.wire_enabled === true));
-          ')
+          enabled=$(jq -r '(.channel_enabled == true and .wire_enabled == true)' ops/telegram-review.json)
           echo "Telegram delivery for the pulse Worker: $enabled (channel_enabled and wire_enabled in ops/telegram-review.json)"
           echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
 
