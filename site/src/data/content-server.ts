@@ -9,6 +9,7 @@ import {
   dexScreenerSearchUrl,
   explorerTokenUrl,
   headlineMetric,
+  tldrLine,
 } from "./types";
 // Shared with scripts/score.mjs so site and Telegram eligibility cannot drift.
 // @ts-expect-error The repository-level helper is intentionally plain ESM.
@@ -234,6 +235,7 @@ type ServerContent = {
   censusBySlug: Map<string, CensusEntry>;
   treeBySlug: Record<string, TreeRef>;
   histories: Record<string, HistoryPoint[]>;
+  wire: WireItem[];
   generatedAt: string;
   now: number;
 };
@@ -386,6 +388,7 @@ function loadContent(): ServerContent {
         return [slug, parseHistory(rawContent.pulledHistory[`${slug}.jsonl`])];
       }),
     ),
+    wire: compiledWire,
     generatedAt: derivedFile.generated_at,
     now: buildNow,
   };
@@ -556,12 +559,17 @@ export function notListedCount(
   return Math.max(0, factoryLaunches - listedToday);
 }
 
+// README rule 3: Announced needs a confirmed official surface, nothing on chain, and something to
+// say about it. A name with no TL;DR yet still qualifies when its research summary can supply one,
+// which is what `tldrLine` does; a name with neither is not ready to hold a slot.
 export function announcedNow(entries: DirectoryEntry[]): DirectoryEntry[] {
   return entries
     .filter(
       (entry) =>
         entry.kpis.status === "announced" &&
-        entry.officialConfirmed,
+        entry.officialConfirmed &&
+        entry.summary.trim().length > 0 &&
+        tldrLine(entry).length > 0,
     )
     .sort((a, b) => {
       if (Boolean(a.tldr) !== Boolean(b.tldr)) return a.tldr ? -1 : 1;
@@ -581,7 +589,7 @@ export function sectionLeaders(section: SectionDef, entries: DirectoryEntry[]): 
     .map((entry) => ({ entry, announced: false }));
   if (ranked.length >= 3) return ranked;
   const announced = announcedNow(entries)
-    .filter((entry) => entry.tree?.sectionId === section.id && entry.tldr)
+    .filter((entry) => entry.tree?.sectionId === section.id)
     .slice(0, 3 - ranked.length)
     .map((entry) => ({ entry, announced: true }));
   return [...ranked, ...announced];
@@ -635,7 +643,7 @@ export function wireItems(
       kind: "note",
       headline: wireHeadline(entry.title),
       gist: readerCopy(entry.detail),
-      url: `/n/${entry.slug}?tab=commentary`,
+      url: `/n/${entry.slug}#commentary`,
       slug: entry.slug,
       name,
       at: entry.date,
@@ -784,6 +792,7 @@ function sourceLinksFor(dossier: Dossier, site: SiteConfig): DossierBundle["rela
     volume24h: market,
     trades24h: market,
     priceChange24h: market,
+    marketCap: market,
     fdv: market,
     ...(explorer ? { holders: explorer, holdersDelta7d: explorer, launches24h: explorer, txnsTotal: explorer } : {}),
     ...(llama ? { tvl: llama } : {}),
@@ -833,6 +842,7 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
       toDirectoryEntry(d, content.treeBySlug, content.censusBySlug, content.site),
     ),
     histories: content.histories,
+    wire: content.wire,
     changelog: content.changelog,
     feed: content.dossiers.flatMap((d) =>
       d.feed.map((item) => ({ name: { slug: d.slug, symbol: d.symbol, name: d.name }, item })),

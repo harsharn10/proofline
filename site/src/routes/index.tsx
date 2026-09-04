@@ -10,7 +10,6 @@ import {
   notListedCount,
   sectionLeaders,
   trendingNow,
-  wireItems,
 } from "@/data/content-server";
 import { formatCount, formatUsd } from "@/data/types";
 
@@ -32,7 +31,7 @@ function chainReadLabel(iso: string | undefined): string {
 }
 
 function Home() {
-  const { site, sections, entries, histories, changelog, feed, now } = Route.useLoaderData();
+  const { site, sections, entries, histories, wire, now } = Route.useLoaderData();
   const live = entries.filter((entry) => entry.kpis.status === "live").length;
   const launchesToday = entries.reduce((sum, entry) => sum + entry.factoryLaunches24h, 0);
   const volume24h = entries.reduce((sum, entry) => sum + (entry.kpis.volume24h ?? 0), 0);
@@ -47,8 +46,6 @@ function Home() {
   const leaders = Object.fromEntries(
     sections.map((section) => [section.id, sectionLeaders(section, entries)]),
   );
-  const wire = wireItems({ entries, changelog, feed });
-
   return (
     <main className="wrap pb-10 pt-5">
       <section className="grid grid-cols-1 items-end gap-6 md:grid-cols-[minmax(0,1fr)_300px]">

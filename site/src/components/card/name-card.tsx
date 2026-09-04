@@ -10,11 +10,12 @@ import {
   LinkPill,
   MetricTile,
   SegmentedControl,
+  SourceRefs,
   StatusPill,
   Tag,
   type GrowthSeries,
 } from "@/components/ui";
-import { hostLabel, readerCopy, shortAddress } from "@/lib/dejargon";
+import { hostLabel, readerCopy, shortAddress, sourcedLine } from "@/lib/dejargon";
 import {
   DEFAULT_KPIS,
   KPI_LABEL,
@@ -29,6 +30,7 @@ import {
   relativeTime,
   type DependencyRef,
   type Dossier,
+  type EvidenceClass,
   type DossierBundle,
   type KpiKey,
   type SectionDef,
@@ -279,13 +281,21 @@ function CardHeader({ dossier, site, dependencies, tree, section, now, token, wi
             </Badge>
           ) : null}
         </div>
-        {dossier.tldr ? <p className="card-tldr">{readerCopy(dossier.tldr)}</p> : null}
+        <Tldr dossier={dossier} />
         <HeaderTags dossier={dossier} site={site} dependencies={dependencies} tree={tree} token={token} />
       </div>
       <SegmentedControl label="Chart window" options={WINDOW_OPTIONS} value={window} onChange={onWindow} />
       {section ? <span className="sr-only">Filed under {section.label}</span> : null}
     </header>
   );
+}
+
+// The header line under the name. A TL;DR carries its evidence tag like any other sourced field,
+// so it renders through sourcedLine and its ids become footnotes rather than visible "[claim S7]".
+function Tldr({ dossier }: Pick<NameCardProps, "dossier">) {
+  if (!dossier.tldr) return null;
+  const line = sourcedLine(dossier.tldr);
+  return <p className="card-tldr">{line.text} <SourceRefs ids={line.sources} /></p>;
 }
 
 function SummaryPanel({ dossier, site }: Pick<NameCardProps, "dossier" | "site">) {
@@ -297,15 +307,6 @@ function SummaryPanel({ dossier, site }: Pick<NameCardProps, "dossier" | "site">
       <OfficialLinks dossier={dossier} site={site} />
     </section>
   );
-}
-
-function sourcedLine(value: string): { text: string; sources: string[] } {
-  const tagPattern = /\s*\[(?:verified|claim|inference|disputed)\s+((?:S\d+\s*)+)\]/gi;
-  const sources = Array.from(value.matchAll(tagPattern), (match) => match[1]!.trim().split(/\s+/)).flat();
-  return {
-    text: readerCopy(value.replace(tagPattern, "").trim()),
-    sources: [...new Set(sources)],
-  };
 }
 
 function WhyPeopleCare({ dossier }: Pick<NameCardProps, "dossier">) {
@@ -464,10 +465,10 @@ function MetricsAndChart({ dossier, site, section, token, window }: Pick<NameCar
 
 function CardWire({ dossier, now }: Pick<NameCardProps, "dossier" | "now">) {
   return (
-    <section className="card-block">
+    <section className="card-block" id="commentary">
       <div className="card-block-head">
         <h2>Commentary</h2>
-        <Link to="/feed" search={{ name: dossier.slug } as never}>All →</Link>
+        <Link to="/feed" search={{ name: dossier.slug }}>All →</Link>
       </div>
       <Wire items={dossier.wire.slice(0, 6)} now={now} />
     </section>
@@ -505,11 +506,6 @@ function RelatedTable({ dossier, section, related }: Pick<NameCardProps, "dossie
   );
 }
 
-function SourceRefs({ ids }: { ids?: string[] }) {
-  if (!ids?.length) return null;
-  return <>{ids.map((id) => <sup key={id}><Link from="/n/$slug" search={{ tab: "sources" }} hash={`source-${id}`} resetScroll={false}>{id.replace(/^S/, "")}</Link></sup>)}</>;
-}
-
 function Risks({ dossier }: Pick<NameCardProps, "dossier">) {
   const rows = dossier.risks.length > 0
     ? dossier.risks.slice(0, 3).map(sourcedLine)
@@ -523,6 +519,73 @@ function Risks({ dossier }: Pick<NameCardProps, "dossier">) {
       <h2>What could go wrong</h2>
       <ul>{rows.map((row, index) => <li key={index}>{row.text} <SourceRefs ids={row.sources} /></li>)}</ul>
     </section>
+  );
+}
+
+// README §3 rule 1's evidence vocabulary. Every check the research recorded gets one of these
+// words, so a reader can tell an on-chain read from something the project said about itself.
+const EVIDENCE_WORDS: Record<EvidenceClass, string> = {
+  verified: "checked on chain",
+  claim: "from the project",
+  inference: "from the evidence",
+  disputed: "disputed",
+  unknown: "not classified",
+};
+
+/**
+ * The full research record behind the card: what checked out, what is still open, what two sources
+ * disagree about. The three risk bullets at the bottom of the page are the headline; this tab is
+ * where a diligence reader finds everything else, with its evidence word and its footnotes.
+ */
+function Checks({ dossier }: Pick<NameCardProps, "dossier">) {
+  const { positive, missing, unresolved } = dossier.findings;
+  if (positive.length + missing.length + unresolved.length === 0)
+    return <p className="card-empty">Nothing checked yet.</p>;
+  return (
+    <div className="card-checks">
+      {positive.length > 0 ? (
+        <section>
+          <h3>What checked out · {positive.length}</h3>
+          <ul>
+            {positive.map((finding, index) => (
+              <li key={index}>
+                <span className={`card-check-word is-${finding.class}`}>{EVIDENCE_WORDS[finding.class]}</span>
+                {readerCopy(finding.text)} <SourceRefs ids={finding.sources} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      {missing.length > 0 ? (
+        <section>
+          <h3>Open · {missing.length}</h3>
+          <ul>
+            {missing.map((gap, index) => (
+              <li key={index}>
+                <span className="card-check-word is-open">Open</span>
+                {readerCopy(gap.text)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      {unresolved.length > 0 ? (
+        <section>
+          <h3>Still disputed · {unresolved.length}</h3>
+          <ul>
+            {unresolved.map((gap, index) => (
+              <li key={index}>
+                <span className="card-check-word is-disputed">disputed</span>
+                {readerCopy(gap.text)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      <p className="card-checks-note">
+        Risks are listed above under What could go wrong. This tab is the rest of the record.
+      </p>
+    </div>
   );
 }
 
@@ -544,9 +607,12 @@ function Sources({ dossier }: Pick<NameCardProps, "dossier">) {
 }
 
 function CardTabs({ dossier, site, tab, token }: Pick<NameCardProps, "dossier" | "site" | "tab"> & { token: boolean }) {
+  const checkCount =
+    dossier.findings.positive.length + dossier.findings.missing.length + dossier.findings.unresolved.length;
   const tabs: Array<{ id: DossierTab; label: string }> = [
     { id: "contracts", label: dossier.deployments.length ? `Contracts · ${dossier.deployments.length}` : "Contracts" },
     { id: "control", label: "Control" },
+    { id: "checks", label: checkCount ? `Checks · ${checkCount}` : "Checks" },
     { id: "sources", label: dossier.sources.length ? `Sources · ${dossier.sources.length}` : "Sources" },
   ];
   return (
@@ -567,6 +633,7 @@ function CardTabs({ dossier, site, tab, token }: Pick<NameCardProps, "dossier" |
             ) : null}
           </div>
         ) : null}
+        {tab === "checks" ? <Checks dossier={dossier} /> : null}
         {tab === "sources" ? <Sources dossier={dossier} /> : null}
       </div>
     </section>

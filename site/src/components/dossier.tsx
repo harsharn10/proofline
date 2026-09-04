@@ -8,10 +8,8 @@ import type {
   TreeRef,
 } from "@/data/types";
 
-export const DOSSIER_TABS = ["contracts", "control", "sources"] as const;
-// `commentary` remains a type-level legacy input for the old feed component; the route no longer
-// accepts it and the visible card tabs are exactly the three Details views above.
-export type DossierTab = (typeof DOSSIER_TABS)[number] | "commentary";
+export const DOSSIER_TABS = ["contracts", "control", "checks", "sources"] as const;
+export type DossierTab = (typeof DOSSIER_TABS)[number];
 
 export function Dossier({
   dossier,

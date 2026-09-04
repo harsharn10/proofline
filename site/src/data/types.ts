@@ -559,6 +559,9 @@ export type DirectoryBundle = {
   site: SiteConfig;
   sections: SectionDef[];
   entries: DirectoryEntry[];
+  // The whole wire, built once on the server. Home, /feed and each category slice it; nothing
+  // rebuilds it per render.
+  wire: WireItem[];
   histories: Record<string, HistoryPoint[]>;
   changelog: ChangelogEntry[];
   feed: LatestFeedItem[];
@@ -612,7 +615,9 @@ export type DossierBundle = {
 // a launchpad is judged by volume and launches, a token by liquidity, credit by TVL.
 export const SECTION_KPIS: Record<string, KpiKey[]> = {
   launchpads: ["volume24h", "launches24h", "liquidityUsd", "holders"],
-  tokens: ["liquidityUsd", "volume24h", "holders", "priceChange24h"],
+  // Market cap sits second so it reaches the card's four tiles and the Related table's four columns
+  // (README §4) while liquidity, the first key, stays the ranking basis for the section.
+  tokens: ["liquidityUsd", "marketCap", "volume24h", "holders", "priceChange24h"],
   trading: ["volume24h", "liquidityUsd", "trades24h", "holders"],
   credit: ["tvl", "volume24h", "holders", "liquidityUsd"],
   yield: ["tvl", "volume24h", "holders", "liquidityUsd"],
@@ -650,6 +655,23 @@ export const KPI_SOURCE: Record<KpiKey, string> = {
   txnsTotal: "Blockscout transaction count",
   tvl: "DefiLlama, Robinhood Chain slice",
 };
+
+// README rule 2: a dash means "not read", never zero. DexScreener answers 0 for a token whose
+// supply it cannot price, so 0 and non-finite values are unread wherever a market figure renders —
+// in the figure itself and in the decision to label it "FDV".
+export function readFigure(value: number | null | undefined): number | null {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null;
+}
+
+// The one-sentence what-it-is a row prints: the name's own TL;DR, or the first sentence of its
+// research summary when the packet never wrote one. Empty only when there is no summary either.
+export function tldrLine(entry: { tldr: string | null; summary: string }): string {
+  if (entry.tldr) return entry.tldr;
+  const summary = entry.summary.trim();
+  if (!summary) return "";
+  const match = /^(.+?[.!?])(?:\s|$)/.exec(summary);
+  return (match?.[1] ?? summary).slice(0, 200);
+}
 
 // "$52.2M" / "$4.9K" / "$310" — mono everywhere it renders.
 export function formatUsd(v: number): string {
@@ -850,6 +872,11 @@ export const WIRE_LABEL: Record<WireKind, string> = {
   onchain: "On-chain",
   note: "Icarus notes",
 };
+// Chip order, and the whitelist /feed validates `?kind=` against.
+export const WIRE_KINDS = ["announcement", "talk", "onchain", "note"] as const;
+export function isWireKind(value: unknown): value is WireKind {
+  return typeof value === "string" && (WIRE_KINDS as readonly string[]).includes(value);
+}
 
 // --- Tone helpers -------------------------------------------------------------
 

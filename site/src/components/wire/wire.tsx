@@ -1,61 +1,53 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Icon } from "@/components/ui/icon";
-import { WIRE_LABEL, relativeTime, type WireItem, type WireKind } from "@/data/types";
+import { WIRE_KINDS, WIRE_LABEL, relativeTime, type WireItem, type WireKind } from "@/data/types";
 import { hostLabel } from "@/lib/dejargon";
 
-type WireFilter = "all" | WireKind;
+export type WireFilter = "all" | WireKind;
 
 const FILTERS: Array<{ value: WireFilter; label: string }> = [
   { value: "all", label: "All" },
-  { value: "announcement", label: "Announcements" },
-  { value: "talk", label: "Talk" },
-  { value: "onchain", label: "On-chain" },
-  { value: "note", label: "Icarus notes" },
+  ...WIRE_KINDS.map((kind) => ({ value: kind as WireFilter, label: WIRE_LABEL[kind] })),
 ];
 
-function isWireFilter(value: string | null): value is WireKind {
-  return FILTERS.some((filter) => filter.value !== "all" && filter.value === value);
-}
-
+/**
+ * The wire list. Filter state is owned by the caller wherever it belongs in the URL: `/feed` passes
+ * `kind`/`name` from its own search params and navigates on change, so a deep link server-renders
+ * already filtered. Everywhere else (home's compact strip, a card's Commentary) the chips are a local
+ * convenience and the component keeps the state itself.
+ */
 export function Wire({
   items,
   now,
   variant = "full",
   allowNameFilter = false,
   telegramUrl,
+  kind: kindProp,
+  name: nameProp,
+  onFilter,
 }: {
   items: WireItem[];
   now: number;
   variant?: "compact" | "full";
   allowNameFilter?: boolean;
   telegramUrl?: string;
+  kind?: WireFilter;
+  name?: string;
+  onFilter?: (next: { kind: WireFilter; name: string }) => void;
 }) {
-  const [kind, setKind] = useState<WireFilter>("all");
-  const [name, setName] = useState("");
+  const [localKind, setLocalKind] = useState<WireFilter>("all");
+  const [localName, setLocalName] = useState("");
+  const controlled = typeof onFilter === "function";
+  const kind = controlled ? (kindProp ?? "all") : localKind;
+  const name = controlled ? (nameProp ?? "") : localName;
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const queryKind = params.get("kind");
-    setKind(isWireFilter(queryKind) ? queryKind : "all");
-    setName(allowNameFilter ? (params.get("name") ?? "") : "");
-  }, [allowNameFilter]);
-
-  const replaceQuery = (nextKind: WireFilter, nextName: string) => {
-    const url = new URL(window.location.href);
-    if (nextKind === "all") url.searchParams.delete("kind");
-    else url.searchParams.set("kind", nextKind);
-    if (allowNameFilter && nextName) url.searchParams.set("name", nextName);
-    else url.searchParams.delete("name");
-    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-  };
-  const chooseKind = (next: WireFilter) => {
-    setKind(next);
-    replaceQuery(next, name);
-  };
-  const chooseName = (next: string) => {
-    setName(next);
-    replaceQuery(kind, next);
+  const choose = (nextKind: WireFilter, nextName: string) => {
+    if (onFilter) onFilter({ kind: nextKind, name: allowNameFilter ? nextName : "" });
+    else {
+      setLocalKind(nextKind);
+      setLocalName(allowNameFilter ? nextName : "");
+    }
   };
 
   const names = useMemo(
@@ -65,7 +57,9 @@ export function Wire({
   );
   const inName = name ? items.filter((item) => item.slug === name) : items;
   const filtered = inName.filter((item) => kind === "all" || item.kind === kind);
+  // The compact strip shows six rows, so it never advertises a corpus-wide count above them.
   const visible = variant === "compact" ? filtered.slice(0, 6) : filtered;
+  const showCounts = variant !== "compact";
 
   return (
     <div className="rounded-xl border-[0.5px] border-[var(--line)] bg-[var(--s2)] px-3.5 py-3">
@@ -74,11 +68,14 @@ export function Wire({
           <button
             key={filter.value}
             type="button"
-            onClick={() => chooseKind(filter.value)}
+            onClick={() => choose(filter.value, name)}
             aria-pressed={kind === filter.value}
             className={`rounded-full border-[0.5px] px-2.5 py-1 text-[11px] ${kind === filter.value ? "border-[var(--t2)] bg-[var(--s1)] text-[var(--t1)]" : "border-[var(--line)] text-[var(--t2)]"}`}
           >
-            {filter.label} · {inName.filter((item) => filter.value === "all" || item.kind === filter.value).length}
+            {filter.label}
+            {showCounts
+              ? ` · ${inName.filter((item) => filter.value === "all" || item.kind === filter.value).length}`
+              : ""}
           </button>
         ))}
         {allowNameFilter ? (
@@ -86,7 +83,7 @@ export function Wire({
             Name
             <select
               value={name}
-              onChange={(event) => chooseName(event.target.value)}
+              onChange={(event) => choose(kind, event.target.value)}
               className="rounded-full border-[0.5px] border-[var(--line)] bg-[var(--s1)] px-2.5 py-1 text-[var(--t1)]"
             >
               <option value="">All names</option>
@@ -115,7 +112,7 @@ export function Wire({
                 <p className="my-0.5 max-w-[84ch] text-[12px] text-[var(--t2)]">{item.gist}</p>
                 <div className="flex flex-wrap gap-1.5 text-[11px]">
                   {allowNameFilter ? (
-                    <button type="button" onClick={() => chooseName(item.slug)} className="rounded-full bg-[var(--s1)] px-2 py-0.5 text-[var(--acc)]">
+                    <button type="button" onClick={() => choose(kind, item.slug)} className="rounded-full bg-[var(--s1)] px-2 py-0.5 text-[var(--acc)]">
                       {item.name.symbol ?? item.name.name}
                     </button>
                   ) : (

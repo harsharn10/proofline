@@ -4,6 +4,7 @@ import {
   KPI_LABEL,
   SECTION_KPIS,
   formatKpi,
+  readFigure,
   type DirectoryEntry,
   type SectionDef,
   type SectionLeader,
@@ -66,7 +67,7 @@ export function CategoryCards({
                     >
                       {announced ? "announced" : formatKpi(key, entry.kpis[key])}
                     </span>
-                    {!announced && entry.kpis.marketCap !== null ? (
+                    {!announced && readFigure(entry.kpis.marketCap) !== null ? (
                       <span className="whitespace-nowrap text-[10.5px] text-[var(--t3)]">
                         · cap {formatKpi("marketCap", entry.kpis.marketCap)}
                       </span>

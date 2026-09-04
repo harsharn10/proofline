@@ -1034,6 +1034,7 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     export const SECTION_KPIS={launchpads:["volume24h","launches24h","liquidityUsd","holders"],tokens:["liquidityUsd","volume24h","holders","priceChange24h"]};
     export const dexScreenerSearchUrl=(value)=>"https://dex.test/"+value;
     export const explorerTokenUrl=(base,address)=>base+"/token/"+address;
+    export const tldrLine=(entry)=>entry.tldr ?? (String(entry.summary ?? "").trim().match(/^(.+?[.!?])(?:\\s|$)/)?.[1] ?? String(entry.summary ?? "").trim());
   `);
   const hooks = registerHooks({
     resolve(specifier, context, nextResolve) {
@@ -1138,10 +1139,24 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
       { id: "launchpads", label: "Launchpads", description: "" },
       [pons, announced, olderAnnouncement],
     );
+    // README 1(f): an announced name with no TL;DR line still leads with the first sentence of its
+    // research summary. Only a name with neither is not ready for a slot.
     assert.deepEqual(leaders.map((item) => [item.entry.slug, item.announced]), [
       ["pons", false],
       ["sight", true],
+      ["wire", true],
     ]);
+    const unwritten = entry("blank", {
+      hasContractOn4663: false,
+      tldr: null,
+      summary: "   ",
+      kpis: { ...entry("x").kpis, status: "announced", liquidityUsd: null, volume24h: null, firstPairAt: null },
+    });
+    assert.deepEqual(
+      rules.announcedNow([unwritten, announced]).map((item) => item.slug),
+      ["sight"],
+      "an announced name with no summary and no TL;DR never holds a slot",
+    );
 
     const wire = rules.wireItems({
       entries: [pons, ai],
@@ -1165,6 +1180,11 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.equal(wire[0].account, "@ai", "Talk carries the posting handle");
     assert.ok(wire[0].headline.length <= 80, "wire headlines stay within 80 characters");
     assert.deepEqual(wire.map((item) => item.at), ["2026-09-04", "2026-09-03"], "wire is newest first");
+    assert.equal(
+      wire[1].url,
+      "/n/pons#commentary",
+      "an Icarus note links the Commentary section, not a Details tab that no longer accepts it",
+    );
     console.log("ok   Icarus home and category rules");
   } catch (err) {
     failures++;

@@ -2,7 +2,7 @@ import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { DataTable } from "@/components/ui/data-table";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Wire } from "@/components/wire/wire";
-import { getContent, wireItems } from "@/data/content-server";
+import { getContent } from "@/data/content-server";
 import {
   KPI_LABEL,
   KPI_SOURCE,
@@ -10,6 +10,7 @@ import {
   formatCount,
   formatKpi,
   formatUsd,
+  readFigure,
   relativeTime,
   type DirectoryEntry,
   type KpiKey,
@@ -83,7 +84,7 @@ function CategoryPage() {
 
   const sectionEntries = entries.filter((entry) => entry.tree?.sectionId === section.id);
   const sectionSlugs = new Set(sectionEntries.map((entry) => entry.slug));
-  const sectionWire = wireItems(bundle).filter((item) => sectionSlugs.has(item.slug)).slice(0, 4);
+  const sectionWire = bundle.wire.filter((item) => sectionSlugs.has(item.slug)).slice(0, 4);
   const showsMarketCap = section.id === "tokens" || section.id === "launchpads";
   const keys = SECTION_KPIS[section.id] ?? ["volume24h", "liquidityUsd", "holders", "trades24h"];
   const rows = rankRows(sectionEntries, keys[0]!).filter((entry) => rowMatches(entry, f));
@@ -222,10 +223,10 @@ function CategoryPage() {
                       <td>
                         {entry.entityKind === "token" || section.id === "tokens" ? (
                           <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer">
-                            {entry.kpis.marketCap !== null
-                              ? formatUsd(entry.kpis.marketCap)
-                              : entry.kpis.fdv !== null
-                                ? `FDV ${formatUsd(entry.kpis.fdv)}`
+                            {readFigure(entry.kpis.marketCap) !== null
+                              ? formatUsd(entry.kpis.marketCap!)
+                              : readFigure(entry.kpis.fdv) !== null
+                                ? `FDV ${formatUsd(entry.kpis.fdv!)}`
                                 : "—"}
                           </a>
                         ) : "—"}

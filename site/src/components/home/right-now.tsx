@@ -1,15 +1,18 @@
 import { Link } from "@tanstack/react-router";
 import { Icon } from "@/components/ui/icon";
+import { SourceRefs } from "@/components/ui/source-refs";
 import { StatusPill } from "@/components/ui/status-pill";
 import {
   formatCount,
   formatKpi,
   formatUsd,
+  readFigure,
   relativeTime,
+  tldrLine,
   type DirectoryEntry,
   type TrendingEntry,
 } from "@/data/types";
-import { readerCopy } from "@/lib/dejargon";
+import { sourcedLine } from "@/lib/dejargon";
 
 function Card({ title, subtitle, icon, children }: {
   title: string;
@@ -37,13 +40,22 @@ function NameLink({ entry, children }: { entry: DirectoryEntry; children?: React
 }
 
 function MarketFigure({ entry }: { entry: DirectoryEntry }) {
-  const value = entry.kpis.marketCap ?? entry.kpis.fdv;
+  const marketCap = readFigure(entry.kpis.marketCap);
+  const value = marketCap ?? readFigure(entry.kpis.fdv);
   if (value === null) return <span className="italic text-[var(--t3)]">not checked</span>;
   return (
     <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer" title="DexScreener market data">
-      {entry.kpis.marketCap === null ? "FDV " : ""}{formatUsd(value)}
+      {marketCap === null ? "FDV " : ""}{formatUsd(value)}
     </a>
   );
+}
+
+// The TL;DR a row prints, with its source ids as footnotes rather than as visible "[claim S7]".
+function Tldr({ entry, fallback }: { entry: DirectoryEntry; fallback?: string }) {
+  const line = tldrLine(entry);
+  if (!line) return <span className="italic text-[var(--t3)]">{fallback ?? "no summary yet"}</span>;
+  const sourced = sourcedLine(line);
+  return <>{sourced.text} <SourceRefs ids={sourced.sources} slug={entry.slug} /></>;
 }
 
 export function RightNow({ trending, launches, announced, notListed, now }: {
@@ -65,7 +77,7 @@ export function RightNow({ trending, launches, announced, notListed, now }: {
                 <span className="ml-auto whitespace-nowrap text-[11px]"><MarketFigure entry={entry} /></span>
               </div>
               <p className="my-0.5 truncate pl-5 text-[11px] text-[var(--t3)]">
-                {readerCopy(entry.tldr ?? entry.summary)}
+                <Tldr entry={entry} />
               </p>
               <div className="flex flex-wrap gap-x-2 pl-5 text-[10.5px] text-[var(--t2)]">
                 <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer">
@@ -99,8 +111,8 @@ export function RightNow({ trending, launches, announced, notListed, now }: {
                 <NameLink entry={entry} />
                 <span className="ml-auto whitespace-nowrap text-[11px]"><MarketFigure entry={entry} /></span>
               </div>
-              <p className={`my-0.5 truncate text-[11px] ${entry.tldr ? "text-[var(--t2)]" : "italic text-[var(--t3)]"}`}>
-                {entry.tldr ? readerCopy(entry.tldr) : "no summary yet"}
+              <p className={`my-0.5 truncate text-[11px] ${tldrLine(entry) ? "text-[var(--t2)]" : "italic text-[var(--t3)]"}`}>
+                <Tldr entry={entry} />
               </p>
               <a href={entry.sourceLinks.market} target="_blank" rel="noreferrer" className="text-[10.5px] text-[var(--t3)]">
                 {relativeTime(entry.kpis.firstPairAt!, now)}
@@ -117,13 +129,13 @@ export function RightNow({ trending, launches, announced, notListed, now }: {
       <Card title="Announced" subtitle="official surface confirmed, nothing on chain yet" icon="bell">
         <ol className="m-0 list-none p-0">
           {announced.slice(0, 5).map((entry) => (
-            <li key={entry.slug} className={`border-t-[0.5px] border-[var(--line-soft)] py-2 first:border-0 ${entry.tldr ? "" : "text-[var(--t3)]"}`}>
+            <li key={entry.slug} className={`border-t-[0.5px] border-[var(--line-soft)] py-2 first:border-0 ${tldrLine(entry) ? "" : "text-[var(--t3)]"}`}>
               <div className="flex items-baseline gap-2 text-[12.5px]">
                 <NameLink entry={entry}>{entry.name}</NameLink>
                 <span className="ml-auto whitespace-nowrap text-[10.5px]">{relativeTime(entry.announcementAt, now)}</span>
               </div>
-              <p className={`my-0.5 text-[11px] ${entry.tldr ? "text-[var(--t2)]" : "italic text-[var(--t3)]"}`}>
-                {entry.tldr ? readerCopy(entry.tldr) : "no summary yet"}
+              <p className={`my-0.5 text-[11px] ${tldrLine(entry) ? "text-[var(--t2)]" : "italic text-[var(--t3)]"}`}>
+                <Tldr entry={entry} />
               </p>
               {entry.announcementUrl ? (
                 <a href={entry.announcementUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[10.5px] text-[var(--acc)]">
