@@ -10,20 +10,20 @@ why. It never guesses and never turns an unavailable read into zero.
 | Output | Source URL pattern | Refresh |
 | --- | --- | --- |
 | `addresses[].is_contract`, `proxy`, `owner`, `owner_type`, `safe` | `https://rpc.mainnet.chain.robinhood.com` (`eth_getCode`, `eth_getStorageAt`, `eth_call`) | Every pull (6 h) |
-| `addresses[].source_verified`, `contract_name`, `created_block`, `created_at`, `holders` | `https://robinhoodchain.blockscout.com/api/v2/addresses/<address>`, `/transactions/<creation-tx>`, `/tokens/<address>` | Every pull (6 h) |
+| `addresses[].source_verified`, `contract_name`, `created_block`, `created_at`, `holders` | Blockscout PRO `/4663/api/v2/addresses/<address>`, `/transactions/<creation-tx>`, `/tokens/<address>`; public fallback | When the address change signal moves |
 | `market.pairs`, `liquidity_usd`, `volume_h24`, `trades_h24`, `price_usd`, `price_change_h24`, `fdv`, `first_pair_at` | `https://api.dexscreener.com/token-pairs/v1/robinhood/<token>` (all-chain token endpoint is a filtered fallback) | Every pull (6 h) |
-| `market.top10_share`, `top10_share_ex_pools`, `burned_share`, `top10_as_of` | `https://robinhoodchain.blockscout.com/api/v2/tokens/<token>` and `/tokens/<token>/holders` page 1 | Every pull (6 h) |
-| `market.launchpad` | `https://robinhoodchain.blockscout.com/api/v2/addresses/<token>` creator, joined to the factory and curve addresses of launchpad projects in `content/projects/*.yaml` | Every pull (6 h) |
-| `structure.mint`, `structure.renounced` | `https://robinhoodchain.blockscout.com/api/v2/smart-contracts/<token>` verified ABI plus RPC `owner()` | Every pull (6 h) |
-| `structure.lp[]` | DexScreener pair address plus Blockscout `/tokens/<pair>` and `/tokens/<pair>/holders` page 1 | Every pull (6 h) |
-| `activity.*` | Blockscout `/addresses/<address>/counters` and `/addresses/<address>/transactions?filter=to` (40-page cap) | Every pull (6 h) |
+| `market.top10_share`, `top10_share_ex_pools`, `burned_share`, `top10_as_of` | Blockscout `/tokens/<token>` and `/tokens/<token>/holders` page 1 | When DexScreener's token trade count moves |
+| `market.launchpad` | Blockscout `/addresses/<token>` creator, joined to launchpad factory and curve addresses | When the token change signal moves |
+| `structure.mint`, `structure.renounced` | Blockscout `/smart-contracts/<token>` verified ABI plus RPC `owner()` | When the token change signal moves |
+| `structure.lp[]` | DexScreener pair address plus Blockscout `/tokens/<pair>` and `/tokens/<pair>/holders` page 1 | When the token change signal moves |
+| `activity.*` | Blockscout `/addresses/<address>/counters` and `/addresses/<address>/transactions?filter=to` | Counter every due pull; walk only on change (40 pages for factory/curve/router, 5 otherwise) |
 | `metrics[]` TVL | `https://api.llama.fi/protocol/<protocol>` Robinhood Chain slice | Every pull (6 h) |
 | `metrics[]` fees, revenue and volume | `https://api.llama.fi/summary/fees/<protocol>?dataType=dailyFees`, `dailyRevenue`, and `/summary/dexs/<protocol>?dataType=dailyVolume`, Robinhood Chain slice | Every pull (6 h) |
-| `series/<slug>.json.revenue_daily` | DefiLlama daily-revenue response above, Robinhood Chain slice, latest 90 daily points | Every pull (6 h), rewritten only when the read is at least as long |
+| `series/<slug>.json.revenue_daily` | DefiLlama daily-revenue response above, Robinhood Chain slice, latest 90 daily points | At most one replacement per UTC day; never shortened |
 | `chain.yaml`, `series/chain.json` | `https://analytics.rialto.xyz/api/stats/{tvl,onchain-economics,metrics,tokenization,transfers,mintburn}/…` | Every pull (6 h) or `--source rialto`; series never shorten |
 | `market.rialto`, `market.pair_asset`, `market.volume_disagreement` | `https://analytics.rialto.xyz/api/router/{tickers,tokens}`, `/api/market/robinhood-symbols`, `/api/stats/assets/explorer`, `/api/liquidity/spreads` | Every pull (6 h) or `--source rialto` |
 | `discovery.yaml` | Rialto router tokens and tickers plus the asset explorer; optional DexScreener liquidity for at most 40 newest candidates | Every pull (6 h) or `--source rialto` |
-| `history/<slug>.jsonl` | Snapshot of that pull: holders, market figures, transactions, launches, TVL, `revenue_24h`, `top10_share` | One append per successful full pull (6 h); never from `--source rialto` |
+| `history/<slug>.jsonl` | Snapshot of that pull: holders, market figures, transactions, launches, TVL, `revenue_24h`, `top10_share` | One append per successful due-name pull; never from `--source rialto` |
 
 ## Blockscout PRO key
 
@@ -37,10 +37,56 @@ both a host root and a root ending in `/api/v2` are accepted.
 
 The free PRO tier allows 5 requests per second and 100,000 credits per day. A PRO run starts at most
 four explorer reads concurrently and paces their physical requests to 5/s. Public fallback retains
-the previous two concurrent activity walks and 4/s pacing. The closing pull summary prints the
-physical request count as Blockscout credits, including retries, so the scheduled-run log is the
-budget receipt. At four full six-hourly runs per day, a run should remain under 25,000 credits to fit
-the free allocation.
+two concurrent reads and 4/s pacing. Every physical request, retries included, claims one credit
+before it leaves the process; Blockscout does not publish route weights, so one is the conservative
+documented fallback. The closing summary is the budget receipt.
+
+## Tiers, queue and hard budget
+
+The six-hour scheduler does not pull every name. `hot` means above the share bar or present in
+`ops/pull-queue.json` within 24 hours and runs every six hours; `live` means activity within seven
+days and runs every 12 hours; `quiet` means activity 7–30 days ago and runs daily; `dormant` runs
+weekly. `--only` and `--full` override cadence, while `--tier` limits it. Pulse or an operator can
+append `{ "slug": "name", "reason": "...", "at": "ISO timestamp" }` to the queue. A successful
+name is removed; a deferred or failed name stays queued.
+
+Contracts spend one explorer credit on `/counters` as their change signal. Tokens use the free
+DexScreener trade count and EOAs use the free RPC nonce. If the signal is unchanged, explorer-only
+facts are carried with their original `stale_since`, and the expensive activity walk, holder page,
+ABI and LP reads are skipped. RPC ownership/proxy facts, DexScreener, Rialto and DefiLlama remain
+fresh. `--full` deliberately bypasses the change check.
+
+`BLOCKSCOUT_BUDGET_PER_RUN` defaults to 12,000 credits and `BLOCKSCOUT_BUDGET_PER_DAY` to 60,000,
+leaving 40,000 credits of daily headroom. `ops/pull-budget.json` stores the UTC date, credits used and
+run count. A cap is checked before each physical request. Reaching it is not a failed run: remaining
+keyless reads finish, explorer reads are recorded as `deferred`, prior non-null values are retained,
+and the process exits zero unless an independent gate fails. The committed `reads` block explains
+what was read, unchanged or deferred, its signal, credit count and stale date.
+
+Planning allowance by explorer read kind (a changed name can own several addresses):
+
+| Read kind | Credits when attempted | When paid |
+| --- | ---: | --- |
+| Contract change signal | 1/address | Every due read |
+| Address metadata | 1–3/address | Signal changed; creation and token detail add calls |
+| Activity walk | 1–40 deep-role pages; 1–5 otherwise | Signal changed |
+| Token concentration | 2/token | Token signal changed; holder page 1 only |
+| Verified ABI | 1/token | Token signal changed |
+| LP check | 0–2/pair | Token signal changed; v3/v4 pool ids cost zero |
+
+For capacity planning we allow **10 credits per due name** after change skips. The observed 178-name
+mix on 2026-09-04 was 61 hot, 115 live, 0 quiet and 2 dormant: 34.3% / 64.6% / 0% / 1.1%.
+Holding that mix constant gives:
+
+| Names | Credits/day | Headroom below the 60,000 cap |
+| ---: | ---: | ---: |
+| 200 | 5,330 | 54,670 |
+| 500 | 13,325 | 46,675 |
+| 1,000 | 26,650 | 33,350 |
+
+The workflow uses two stable shards, never more, serialized through `main-bots`. Each starts from
+current `main`, has 45 minutes, commits pulled data plus both ops state files, and retains the
+fetch/rebase/push retry loop.
 
 Cloudflare managed-challenge HTML is never parsed as API data. A `<!DOCTYPE html` response or a page
 titled `Just a moment` is classified as a bot challenge, retried once after a 0.5–1.5 second jitter,
@@ -215,14 +261,17 @@ committed series, or empty, now keeps the committed file and records why in the 
 ```sh
 npm run pull -- --only pons,artificial-inu
 npm run pull -- --only pons,artificial-inu --dry
+npm run pull -- --tier hot --shard 0/2
+npm run pull -- --full --only pons
 npm run pull -- --rpc-only
 npm run pull -- --source rialto
 ```
 
 `--only` accepts comma-separated census slugs; the older single-value `--slug` remains compatible.
-Dry runs validate and print each slug's elapsed time without writing YAML, history or series files.
-The closing coverage line reports how many selected names received each requested field, and how many
-committed revenue series a short read left in place.
+`--full` forces explorer reads, `--tier` selects one cadence, and `--shard` accepts only `0/1`, `0/2`
+or `1/2`. Dry runs validate and print each slug's elapsed time without writing YAML, history, series
+or budget state. The closing report includes names per tier, credits this run and UTC day, skipped
+walks, deferred reads and tomorrow's projection.
 
 ### `--source rialto`: the fast refresh
 
@@ -251,5 +300,6 @@ and a mistake in one run cannot be inherited by the next.
 
 Public Blockscout calls send a browser User-Agent; PRO calls send the bearer key. Both use a request
 pacer and retry 429/5xx replies, with the separate managed-challenge behavior documented above.
-Explorer activity walks are capped at 40 pages and run at two addresses concurrently, keeping the
-scheduled full run inside its 60-minute workflow budget while making a capped count explicit.
+Explorer activity walks are capped at 40 pages for factory, curve and router roles and five pages for
+every other role. Four PRO reads can be in flight, paced to 5/s; the workflow's two serialized shards
+keep each scheduled job inside its 45-minute limit while making every capped count explicit.

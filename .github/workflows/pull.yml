@@ -14,6 +14,22 @@ on:
   schedule:
     - cron: "17 */6 * * *"
   workflow_dispatch:
+    inputs:
+      only:
+        description: "Comma-separated slugs (overrides cadence)"
+        required: false
+        type: string
+      full:
+        description: "Force explorer refresh even when signals are unchanged"
+        required: false
+        default: false
+        type: boolean
+      tier:
+        description: "Limit the run to one tier"
+        required: false
+        default: all
+        type: choice
+        options: [all, hot, live, quiet, dormant]
 
 permissions:
   contents: write
@@ -26,8 +42,13 @@ concurrency:
 
 jobs:
   pull:
-    name: Pull and commit
+    name: Pull and commit (${{ matrix.shard }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        shard: ["0/2", "1/2"]
     env:
       # Optional: without it the puller retains the public explorer fallback.
       BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}
@@ -38,7 +59,7 @@ jobs:
     # The 24h transaction walk is the long pole: Blockscout answers in a second or two, at most two
     # requests are in flight against it, and a busy factory can need forty pages. An hour is slack
     # over the observed run, not the expected one.
-    timeout-minutes: 150
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,7 +73,18 @@ jobs:
         run: npm ci
 
       - name: Pull chain facts
-        run: npm run pull
+        env:
+          INPUT_ONLY: ${{ inputs.only }}
+          INPUT_FULL: ${{ inputs.full }}
+          INPUT_TIER: ${{ inputs.tier }}
+          PULL_SHARD: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          args=(--shard "$PULL_SHARD")
+          if [ -n "${INPUT_ONLY:-}" ]; then args+=(--only "$INPUT_ONLY"); fi
+          if [ "${INPUT_FULL:-false}" = "true" ]; then args+=(--full); fi
+          if [ -n "${INPUT_TIER:-}" ] && [ "$INPUT_TIER" != "all" ]; then args+=(--tier "$INPUT_TIER"); fi
+          npm run pull -- "${args[@]}"
 
       # The gate. scripts/pull.mjs validates each document against schema/pulled.schema.json before
       # writing it, but this re-checks the whole corpus after the fact: a pulled file that breaks a
@@ -63,7 +95,7 @@ jobs:
       - name: Commit and push if the pulled facts changed
         run: |
           set -euo pipefail
-          git add content/pulled
+          git add content/pulled ops/pull-budget.json ops/pull-queue.json
           if git diff --cached --quiet; then
             echo "no change in content/pulled — nothing to commit"
             exit 0
