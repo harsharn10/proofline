@@ -1,5 +1,5 @@
 slug: doppler
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T16:22:34.904Z # chain head 54404270 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
@@ -115,7 +115,7 @@ addresses:
 metrics: []
 market:
   token_address: null
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T16:22:34.904Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -139,17 +139,17 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T16:22:34.904Z
   addresses:
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (unified create entry)
       role: factory
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-04T11:11:59.000Z
+      last_tx_at: 2026-09-04T16:05:30.000Z
       last_method: create
-      txns_24h: 166
-      launches_24h: 166
+      txns_24h: 138
+      launches_24h: 138
       errors: []
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory
@@ -176,11 +176,13 @@ activity:
       role: other
       transactions_count: 27207
       token_transfers_count: 7301226
-      last_tx_at: 2026-09-04T11:32:09.000Z
-      last_method: updateBeneficiary
-      txns_24h: 1623
+      last_tx_at: 2026-09-04T16:28:29.000Z
+      last_method: collectFees
+      txns_24h: 2000
       launches_24h: null
-      errors: []
+      errors:
+        - step: txns_24h capped
+          message: stopped after 40 pages; count is a floor
     - address: "0x6cce158B6D1747617fc218592B4D60B239B957ea"
       label: UniswapV4Initializer
       role: other
@@ -201,9 +203,9 @@ activity:
       txns_24h: 0
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T11:32:09.000Z
-  txns_24h: 1789
-  launches_24h: 166
+  last_activity_at: 2026-09-04T16:28:29.000Z
+  txns_24h: 2138
+  launches_24h: 138
 errors:
   - step: llama
     message: "protocol/doppler: HTTP 400: Protocol not found"

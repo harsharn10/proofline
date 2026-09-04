@@ -117,7 +117,8 @@ await test("entryKey prefers review_key", async () => {
   assert.equal(new Set(changelog.map(entryKey)).size, changelog.length, "review keys are unique");
   const state = JSON.parse(await readFile("ops/telegram-state.json", "utf8"));
   const known = new Set(changelog.flatMap((entry) => [entryKey(entry), legacyEntryKey(entry)]));
-  for (const key of state.sent_keys ?? []) assert.ok(known.has(key), `sent key no longer resolves: ${key}`);
+  // Wire items sent on 2026-09-04 carry their own namespace (wire|<feed id>); only changelog keys must resolve here.
+  for (const key of (state.sent_keys ?? []).filter((k) => !k.startsWith("wire|"))) assert.ok(known.has(key), `sent key no longer resolves: ${key}`);
   const sent = new Set(state.sent_keys ?? []);
   assert.equal(selectUnsent(changelog, state).filter((entry) => sent.has(legacyEntryKey(entry))).length, 0, "no already-sent entry is selected again");
 });

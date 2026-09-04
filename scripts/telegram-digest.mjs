@@ -401,6 +401,14 @@ function buildWrapData() {
   };
 }
 
+// The owner's kill switch (#89) covers every mode, not only the approval-gated publications:
+// alerts, the daily brief and the Sunday wrap all stop when the channel is paused. A dry run still
+// previews, so pausing the channel never blinds the operator to what would have gone out.
+if (review.channel_enabled !== true && !dryRun) {
+  console.log("Icarus channel delivery is paused in ops/telegram-review.json — nothing sent.");
+  process.exit(0);
+}
+
 const messages = [];
 const sentKeys = [];
 let alertResult = null;
