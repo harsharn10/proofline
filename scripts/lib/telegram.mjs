@@ -4,16 +4,31 @@ import { createHash } from "node:crypto";
 export const DISCLAIMER =
   "Icarus is powered by Project Proofline. This automated research may be incomplete, delayed or inaccurate. It is not an audit, guarantee or investment advice. Read the sources and do your own research.";
 
-// Telegram uses the same four reader-facing kinds as the site wire. The review workflow keeps
-// its more detailed event names internally; subscribers see one consistent vocabulary.
+// A publication's kicker is what the subscriber reads first, so it stays specific: a risk alert must
+// not arrive under the same word as a routine update, and Icarus's own alert is not a project post.
 export const EVENT_LABELS = {
-  "new-coverage": "ICARUS NOTES",
-  "research-update": "ICARUS NOTES",
-  "risk-alert": "ICARUS NOTES",
-  correction: "ICARUS NOTES",
-  breaking: "ANNOUNCEMENTS",
-  trending: "TALK",
-  roundup: "ICARUS NOTES",
+  "new-coverage": "NEW PROFILE",
+  "research-update": "RESEARCH UPDATE",
+  "risk-alert": "RISK ALERT",
+  correction: "CORRECTION",
+  breaking: "ICARUS ALERT",
+  trending: "TRENDING",
+  roundup: "ROUNDUP",
+};
+
+// The wire's four reader kinds as kickers. FEED_TO_WIRE mirrors the site's mapping in
+// site/src/data/content-server.ts; scripts/test.mjs asserts the two produce the same kinds.
+export const FEED_TO_WIRE = {
+  company: "announcement",
+  ct: "talk",
+  onchain: "onchain",
+  risk: "note",
+};
+export const WIRE_KICKERS = {
+  announcement: "ANNOUNCEMENT",
+  talk: "TALK",
+  onchain: "ON-CHAIN",
+  note: "ICARUS NOTE",
 };
 
 /**
@@ -122,6 +137,9 @@ export function formatPublication(
   const watch = publication.watch_next
     ? `<b>What we’re watching</b>\n${escapeHtml(publication.watch_next)}`
     : null;
+  // Trending is an attention measure. It goes out with that said plainly, every time.
+  const trendNote =
+    publication.event === "trending" ? "<i>Trending measures attention — not quality or endorsement.</i>" : null;
   const link = url ? `<a href="${escapeHtml(url)}">Read the full ${escapeHtml(name)} research →</a>` : null;
   return [
     `<b>${escapeHtml(label)} · ${escapeHtml(name.toUpperCase())}</b>`,
@@ -130,6 +148,7 @@ export function formatPublication(
     why,
     `<b>Icarus view</b>\n${escapeHtml(icarusView(derived))}`,
     watch,
+    trendNote,
     `<i>${escapeHtml(disclaimer)}</i>`,
     link,
   ]
@@ -170,6 +189,93 @@ export function buildMessages(
     ...roundup.map((entry) => formatRoundupEntry(entry, projects.get(entry.slug), { siteUrl, profilePath })),
   ].join("\n\n");
   return [...direct, ...chunkMessage(roundupText)];
+}
+
+// --- The wire on Telegram ---------------------------------------------------------------
+// A second message kind alongside the controller-approved publications above. Publications are
+// Icarus writing about a name; wire items are what already happened — a post, a piece of talk, an
+// on-chain event, a material note — read exactly as the site reads them: headline, gist, link last.
+
+/** Stable send key for a wire item, namespaced so it can never collide with a changelog key. */
+export function wireKey(item) {
+  return `wire|${item.id}`;
+}
+
+/**
+ * The wire for the names above the share bar, newest first. Mirrors wireItems() in
+ * site/src/data/content-server.ts: a feed item needs a receipt URL, and only material or risk-rated
+ * findings, risks and corrections cross over from the change record — never review bookkeeping.
+ */
+export function selectWireItems(content, shareBar, { since = null, all = false, state = null } = {}) {
+  const sent = new Set(all ? [] : (state?.sent_keys ?? []));
+  const above = (slug) => shareBar?.[slug] === true;
+  const nameOf = (slug) => content.projects?.get(slug)?.name ?? slug;
+  const items = [];
+  for (const [slug, file] of content.feed ?? []) {
+    if (!above(slug)) continue;
+    for (const item of file?.items ?? []) {
+      if (!item.sourceUrl || !FEED_TO_WIRE[item.kind]) continue;
+      items.push({
+        id: `feed-${slug}-${item.id}`,
+        kind: FEED_TO_WIRE[item.kind],
+        headline: item.title,
+        gist: item.body,
+        url: item.sourceUrl,
+        slug,
+        name: nameOf(slug),
+        ...(item.kind === "ct" && item.account ? { account: item.account } : {}),
+        at: item.date,
+      });
+    }
+  }
+  for (const entry of content.changelog ?? []) {
+    if (!above(entry.slug)) continue;
+    const material = entry.severity === "Material" || entry.severity === "Risk";
+    const newsworthy = entry.type === "risk" || entry.type === "finding" || entry.type === "correction";
+    if (!material || !newsworthy) continue;
+    items.push({
+      id: `note-${entry.slug}-${entry.date}-${entry.title}`,
+      kind: "note",
+      headline: entry.title,
+      gist: entry.detail,
+      url: `${entry.slug}#commentary`,
+      slug: entry.slug,
+      name: nameOf(entry.slug),
+      at: entry.date,
+    });
+  }
+  return items
+    .filter((item) => (!since || item.at >= since) && !sent.has(wireKey(item)))
+    .sort((a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id));
+}
+
+/** One wire item as a message body: kicker, headline, gist, then the link — always last. */
+export function formatWireItem(item, { siteUrl = "", profilePath = "/n/" } = {}) {
+  const base = siteUrl.replace(/\/$/, "");
+  const external = /^https?:\/\//i.test(item.url);
+  const href = external ? item.url : `${base}${profilePath}${item.url}`;
+  const link = external || base ? `<a href="${escapeHtml(href)}">${external ? "Open the source" : "Read the note"} →</a>` : null;
+  return [
+    `<b>${escapeHtml(WIRE_KICKERS[item.kind] ?? item.kind.toUpperCase())} · ${escapeHtml(String(item.name).toUpperCase())}</b>`,
+    `<b>${escapeHtml(item.headline)}</b>`,
+    escapeHtml(item.gist),
+    item.account ? `<i>${escapeHtml(item.account)}</i>` : null,
+    link,
+  ].filter(Boolean).join("\n\n");
+}
+
+export function buildWireMessages(
+  items,
+  { siteName, date, siteUrl, profilePath, disclaimer = DISCLAIMER },
+) {
+  if (!items.length) return [];
+  const text = [
+    `<b>${escapeHtml(siteName.toUpperCase())} WIRE · ${escapeHtml(date)}</b>`,
+    `${items.length} item${items.length === 1 ? "" : "s"} from names above the bar.`,
+    `<i>${escapeHtml(disclaimer)}</i>`,
+    ...items.map((item) => formatWireItem(item, { siteUrl, profilePath })),
+  ].join("\n\n");
+  return chunkMessage(text);
 }
 
 /** Split on blank lines so no message exceeds Telegram's 4096-char limit. */
