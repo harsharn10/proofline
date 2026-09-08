@@ -30,6 +30,9 @@ What remains on #80, in order:
 4. Data-semantics changes get a one-page design note reviewed before the build.
 5. Merges are always gated on the check's conclusion: `node ops/controller/pr-ci.mjs <branch> && gh pr merge <n> --merge`.
 
+## Blocker found at handoff time (2026-09-08 03:52 UTC)
+GitHub Actions jobs on this private repo now fail with zero steps and no runner assigned (Validate on PRs; Compile packets on main at 21:47 UTC on the 7th). That is the signature of exhausted Actions minutes or a billing block, after several 100-minute pull runs and many CI runs in one day. Every bot (pull, compile, publish) and every PR check is stopped until the owner checks GitHub Settings → Billing → Actions and either raises the spending limit or makes the repository public (public repositories get unlimited Actions minutes; the site is public anyway). This PR (#93) could not get a green check for that reason; merge it by hand first.
+
 ## Controller scripts (copied from the session scratchpad into `ops/controller/`)
 - `pr-ci.mjs <branch>`: waits for the newest `Root + site` run on a branch, exit 0 only on success.
 - `pr-info.mjs <n…>`: PR bodies (Done / Not done) and file lists.
