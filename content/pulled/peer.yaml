@@ -1,5 +1,5 @@
 slug: peer
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T16:39:21.499Z # chain head 57839799 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x96f0889cBC2D1423Fd64fd1307335fE72f1a198E"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 51025071
     created_at: 2026-08-31T16:59:09.000Z
-    holders: 361
+    holders: 287
     errors: []
   - address: "0xCeaF31F0aA9961A562C5d4CdD6265BC6104428CA"
     label: PeerMarketV1
@@ -30,7 +30,7 @@ addresses:
       implementation: null
       admin: null
     owner: "0xd5bc30feaa7974d8d121540fc997aa837755b447"
-    owner_type: eoa
+    owner_type: contract
     safe: null
     created_block: 52514830
     created_at: 2026-09-02T10:47:11.000Z
@@ -47,7 +47,7 @@ addresses:
       implementation: null
       admin: null
     owner: "0xd5bc30feaa7974d8d121540fc997aa837755b447"
-    owner_type: eoa
+    owner_type: contract
     safe: null
     created_block: 52514830
     created_at: 2026-09-02T10:47:11.000Z
@@ -64,58 +64,46 @@ addresses:
       implementation: null
       admin: null
     owner: "0xd5bc30feaa7974d8d121540fc997aa837755b447"
-    owner_type: eoa
+    owner_type: contract
     safe: null
     created_block: 52514828
     created_at: 2026-09-02T10:47:11.000Z
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: "transactions/0xdff51bb5ea2cfd381eb0d649ad2cb084bf12cf39aec718dabd6fa8ddb9fe62a9: timeout after 10000ms after 3 attempts"
 metrics: []
 market:
   token_address: "0x96f0889cBC2D1423Fd64fd1307335fE72f1a198E"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T16:39:21.499Z
   pairs:
     - dex: uniswap
       pair_address: "0x2adee79ea1ca6e41332f5e82790ad5daa0cae83ac2c7ca62df75fe5212c91e21"
       quote_symbol: ETH
-      price_usd: 0.00003357
-      liquidity_usd: 16814.35
-      volume_h24: 28286.71
-      volume_h6: 3970.66
-      txns_h24:
-        buys: 81
-        sells: 95
-      price_change_h24: 16.69
-      market_cap: 33574
-      fdv: 33574
-      created_at: 2026-08-31T16:59:23.000Z
-    - dex: uniswap
-      pair_address: "0xe0f35c8d4413d3d4d04dab32004f194474f06f6c03b4cd6741f4a00447055e4b"
-      quote_symbol: USDG
-      price_usd: 0.00005991
-      liquidity_usd: 8.84
-      volume_h24: 1
-      volume_h6: 0
+      price_usd: 0.000005579
+      liquidity_usd: 6906.77
+      volume_h24: 229.4
+      volume_h6: 146.85
       txns_h24:
         buys: 1
-        sells: 0
-      price_change_h24: null
-      market_cap: 59916
-      fdv: 59916
-      created_at: 2026-08-31T18:15:52.000Z
-  liquidity_usd: 16823.19
-  volume_h24: 28287.71
-  trades_h24: 177
-  price_usd: 0.00003357
-  price_change_h24: 16.69
-  market_cap_usd: 33574
-  fdv_usd: 33574
-  fdv: 33574
+        sells: 8
+      price_change_h24: -8.51
+      market_cap: 5579
+      fdv: 5579
+      created_at: 2026-08-31T16:59:23.000Z
+  liquidity_usd: 6906.77
+  volume_h24: 229.4
+  trades_h24: 9
+  price_usd: 0.000005579
+  price_change_h24: -8.51
+  market_cap_usd: 5579
+  fdv_usd: 5579
+  fdv: 5579
   first_pair_at: 2026-08-31T16:59:23.000Z
-  top10_share: 0.6086361344810656
-  top10_share_ex_pools: 0.3066775862284546
+  top10_share: 0.866298748330187
+  top10_share_ex_pools: 0.1810714278432972
   burned_share: 0
-  top10_as_of: 2026-09-04T20:46:36.233Z
+  top10_as_of: 2026-09-08T16:39:21.499Z
   launchpad:
     slug: pons
     via: creator
@@ -126,7 +114,7 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T16:39:21.499Z
   mint: no-mint-function
   renounced: null
   lp:
@@ -134,25 +122,23 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0xe0f35c8d4413d3d4d04dab32004f194474f06f6c03b4cd6741f4a00447055e4b"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T16:39:21.499Z
   addresses:
     - address: "0x96f0889cBC2D1423Fd64fd1307335fE72f1a198E"
       label: PEER token (PonsV2LauncherToken)
       role: token
       transactions_count: 1360
       token_transfers_count: 0
-      last_tx_at: 2026-09-04T21:35:48.000Z
+      last_tx_at: 2026-09-07T18:01:21.000Z
       last_method: approve
-      txns_24h: 49
+      txns_24h: 1
       launches_24h: null
+      window_as_of: 2026-09-08T16:39:21.499Z
+      stale_since: null
       errors: []
     - address: "0xCeaF31F0aA9961A562C5d4CdD6265BC6104428CA"
       label: PeerMarketV1
@@ -163,6 +149,8 @@ activity:
       last_method: redeem
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T16:39:21.499Z
+      stale_since: null
       errors: []
     - address: "0xb48Fb40942a7440A0085BE66fd3f4d478834aEFB"
       label: PeerFlywheel
@@ -173,6 +161,8 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T16:39:21.499Z
+      stale_since: null
       errors: []
     - address: "0x4c40e7C591F1f21A9c307d2C093Bd988aD2d938B"
       label: PeerDistributor
@@ -183,10 +173,127 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T16:39:21.499Z
+      stale_since: null
       errors: []
-  last_activity_at: 2026-09-04T21:35:48.000Z
-  txns_24h: 49
+  last_activity_at: 2026-09-07T18:01:21.000Z
+  txns_24h: 1
   launches_24h: null
+  window_as_of: 2026-09-08T16:39:21.499Z
+  stale_since: null
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x96f0889cBC2D1423Fd64fd1307335fE72f1a198E"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0xae8bc9ec5d5b62382e93bf09af60d3c701d38ed304e5fdda78c567abdfdb58d0"
+      code_hash: f8f1a56cdc648ca4
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0x96f0889cBC2D1423Fd64fd1307335fE72f1a198E"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0xae8bc9ec5d5b62382e93bf09af60d3c701d38ed304e5fdda78c567abdfdb58d0"
+      code_hash: f8f1a56cdc648ca4
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0xCeaF31F0aA9961A562C5d4CdD6265BC6104428CA"
+      status: read
+      reason: other baseline unavailable
+      signal_value: null
+      signal: "0xe1dc2d3d04c3ca19bd422dfbae8abfa718b5009c7e72f846130f31c4f181d13b"
+      code_hash: 6e122353ee4024f3
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0xCeaF31F0aA9961A562C5d4CdD6265BC6104428CA"
+      status: read
+      reason: other baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xe1dc2d3d04c3ca19bd422dfbae8abfa718b5009c7e72f846130f31c4f181d13b"
+      code_hash: 6e122353ee4024f3
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0xb48Fb40942a7440A0085BE66fd3f4d478834aEFB"
+      status: read
+      reason: other baseline unavailable
+      signal_value: null
+      signal: "0xb74cf3641b90374536bbf69a1050e1b14f842ed2bc9a4b06dc778d4f4bdb0080"
+      code_hash: 29eb130a3b3b55f8
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0xb48Fb40942a7440A0085BE66fd3f4d478834aEFB"
+      status: read
+      reason: other baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xb74cf3641b90374536bbf69a1050e1b14f842ed2bc9a4b06dc778d4f4bdb0080"
+      code_hash: 29eb130a3b3b55f8
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x4c40e7C591F1f21A9c307d2C093Bd988aD2d938B"
+      status: read
+      reason: other baseline unavailable
+      signal_value: null
+      signal: "0xdff51bb5ea2cfd381eb0d649ad2cb084bf12cf39aec718dabd6fa8ddb9fe62a9"
+      code_hash: 2761abe7a22b277b
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 5
+    - kind: activity
+      address: "0x4c40e7C591F1f21A9c307d2C093Bd988aD2d938B"
+      status: read
+      reason: other baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xdff51bb5ea2cfd381eb0d649ad2cb084bf12cf39aec718dabd6fa8ddb9fe62a9"
+      code_hash: 2761abe7a22b277b
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 1
+    - kind: top10
+      address: "0x96f0889cBC2D1423Fd64fd1307335fE72f1a198E"
+      status: read
+      reason: token change signal changed
+      signal_value: 9
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 2
+    - kind: structure
+      address: "0x96f0889cBC2D1423Fd64fd1307335fE72f1a198E"
+      status: read
+      reason: token change signal changed
+      signal_value: 9
+      signal: null
+      code_hash: f8f1a56cdc648ca4
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0x96f0889cBC2D1423Fd64fd1307335fE72f1a198E"
+      status: read
+      reason: token change signal changed
+      signal_value: 9
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 0
 errors:
   - step: llama
     message: "fees_24h peer: Robinhood Chain is not one of the chains the response breaks down (Base)"

@@ -1,5 +1,5 @@
 slug: robindex
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T16:39:21.499Z # chain head 57839799 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 27657355
     created_at: 2026-08-04T13:23:42.000Z
-    holders: 222
+    holders: 226
     errors: []
   - address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
     label: Uniswap v3 ROBINDEX/WETH pool
@@ -39,35 +39,35 @@ addresses:
 metrics: []
 market:
   token_address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T16:39:21.499Z
   pairs:
     - dex: uniswap
       pair_address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
       quote_symbol: WETH
-      price_usd: 0.00002674
-      liquidity_usd: 15627.51
-      volume_h24: 2153.53
-      volume_h6: 661.17
+      price_usd: 0.00003155
+      liquidity_usd: 17318.16
+      volume_h24: 1713.3
+      volume_h6: 689.4
       txns_h24:
-        buys: 6
-        sells: 16
-      price_change_h24: -15.79
-      market_cap: 26223
-      fdv: 26223
+        buys: 9
+        sells: 5
+      price_change_h24: 24.99
+      market_cap: 30935
+      fdv: 30935
       created_at: 2026-08-04T13:23:42.000Z
-  liquidity_usd: 15627.51
-  volume_h24: 2153.53
-  trades_h24: 22
-  price_usd: 0.00002674
-  price_change_h24: -15.79
-  market_cap_usd: 26223
-  fdv_usd: 26223
-  fdv: 26223
+  liquidity_usd: 17318.16
+  volume_h24: 1713.3
+  trades_h24: 14
+  price_usd: 0.00003155
+  price_change_h24: 24.99
+  market_cap_usd: 30935
+  fdv_usd: 30935
+  fdv: 30935
   first_pair_at: 2026-08-04T13:23:42.000Z
-  top10_share: 0.6676082165914966
-  top10_share_ex_pools: 0.3323921772250811
+  top10_share: 0.6497708542714377
+  top10_share_ex_pools: 0.3351730795970751
   burned_share: 0.0195515576409012
-  top10_as_of: 2026-09-04T20:46:36.233Z
+  top10_as_of: 2026-09-08T16:39:21.499Z
   launchpad:
     slug: pons
     via: factory
@@ -78,7 +78,7 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T16:39:21.499Z
   mint: no-mint-function
   renounced: null
   lp:
@@ -90,17 +90,19 @@ structure:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T16:39:21.499Z
   addresses:
     - address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
       label: ROBINDEX token (PonsLauncherToken)
       role: token
-      transactions_count: 1270
+      transactions_count: 1472
       token_transfers_count: 7
-      last_tx_at: 2026-09-04T17:48:04.000Z
+      last_tx_at: 2026-09-08T12:56:25.000Z
       last_method: approve
-      txns_24h: 10
+      txns_24h: 4
       launches_24h: null
+      window_as_of: 2026-09-08T16:39:21.499Z
+      stale_since: null
       errors: []
     - address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
       label: Uniswap v3 ROBINDEX/WETH pool
@@ -111,8 +113,85 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
-  last_activity_at: 2026-09-04T17:48:04.000Z
-  txns_24h: 10
+  last_activity_at: 2026-09-08T12:56:25.000Z
+  txns_24h: 4
   launches_24h: null
+  window_as_of: 2026-09-04T20:46:36.233Z
+  stale_since: 2026-09-04T20:46:36.233Z
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0xc62945ec63aad933cb50e9a8a9dc5cbee935fa2bfbd4fdfd4677e75d1e8175df"
+      code_hash: a34bc47e3c422122
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0xc62945ec63aad933cb50e9a8a9dc5cbee935fa2bfbd4fdfd4677e75d1e8175df"
+      code_hash: a34bc47e3c422122
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: f98ef04dbb492e9b
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: f98ef04dbb492e9b
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: top10
+      address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
+      status: read
+      reason: token change signal changed
+      signal_value: 14
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 1
+    - kind: structure
+      address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
+      status: read
+      reason: token change signal changed
+      signal_value: 14
+      signal: null
+      code_hash: a34bc47e3c422122
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
+      status: read
+      reason: token change signal changed
+      signal_value: 14
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T16:39:21.499Z
+      stale_since: null
+      credits: 1
 errors: []
