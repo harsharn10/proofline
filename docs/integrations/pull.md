@@ -193,6 +193,19 @@ upper bound:
 | 500 | 19,442 | 40,558 |
 | 1,000 | 38,883 | 21,117 |
 
+Measured runs, newest last (the closing report of each scheduled job):
+
+| Run (UTC) | Due | Read | Deferred at deadline | Credits | Hot / live / quiet per name | Projection at 1,000 names |
+| --- | ---: | ---: | ---: | ---: | --- | ---: |
+| 2026-09-08 11:20, first read after a four-day gap | 169 | 36 | 133 | 1,320 | 47.2 / 32.8 / 15.0 | 101,752/day |
+
+The first scheduled run was latency-bound, not credit-bound: it spent 1,320 of its 6,000 credits and
+reached 36 names in 45 minutes, about 75 seconds per name, because transaction walks page
+sequentially and the explorer answers each page in a few seconds. At that pace four runs a day read
+about 144 names, against roughly 456 name-reads a day the tier cadence asks for at 181 names, so
+names rotate through deferral and the hot tier is not refreshed every six hours. The fix is
+throughput (concurrent names, shallower default walks, or more runs), not budget.
+
 The steady-state figure is what matters for planning and only the scheduled runs can measure it:
 every run's closing report prints the measured credits per due name for each tier and rebuilds this
 projection from those figures. Replace the table with the steady-state numbers once two consecutive
