@@ -1,13 +1,13 @@
 slug: jobs
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
     label: JOBS token (PonsV2LauncherToken)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: PonsV2LauncherToken
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 50773130
-    created_at: 2026-08-31T09:55:11.000Z
-    holders: 546
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453: HTTP 402: {"error":"Out of credits"}'
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory
     role: factory
@@ -29,9 +33,14 @@ addresses:
       type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
@@ -43,7 +52,7 @@ addresses:
     source_verified: true
     contract_name: PonsV2LaunchDeployer
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
     owner: null
@@ -52,19 +61,13 @@ addresses:
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
   - address: "0x4E943DDd1fc47f69d56bc8Ed84948398c1cfbcF1"
     label: PonsV2BondingCurve (JOBS launch curve)
     role: other
     is_contract: true
-    source_verified: true
-    contract_name: PonsV2BondingCurve
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -72,10 +75,12 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 50773130
-    created_at: 2026-08-31T09:55:11.000Z
+    created_block: null
+    created_at: null
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: 'addresses/0x4E943DDd1fc47f69d56bc8Ed84948398c1cfbcF1: HTTP 402: {"error":"Out of credits"}'
   - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
     label: V2LaunchLocker (site-linked liquidity locker)
     role: other
@@ -83,59 +88,54 @@ addresses:
     source_verified: true
     contract_name: V2LaunchLocker
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841845
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
 metrics: []
 market:
   token_address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0xb1e490364d477cb267ab5dd491c7956253c9d7fbee78104fb7a7dd0ea81ada99"
       quote_symbol: AAPL
-      price_usd: 0.00004403
-      liquidity_usd: 16945.21
-      volume_h24: 107989.47
-      volume_h6: 9562.16
+      price_usd: 0.00002254
+      liquidity_usd: 12153.28
+      volume_h24: 32283.39
+      volume_h6: 4882.69
       txns_h24:
-        buys: 348
-        sells: 293
-      price_change_h24: -38.81
-      market_cap: 44032
-      fdv: 44032
+        buys: 134
+        sells: 132
+      price_change_h24: -63.87
+      market_cap: 22546
+      fdv: 22546
       created_at: 2026-08-31T10:54:34.000Z
-  liquidity_usd: 16945.21
-  volume_h24: 107989.47
-  trades_h24: 641
-  price_usd: 0.00004403
-  price_change_h24: -38.81
-  market_cap_usd: 44032
-  fdv_usd: 44032
-  fdv: 44032
+  liquidity_usd: 12153.28
+  volume_h24: 32283.39
+  trades_h24: 266
+  price_usd: 0.00002254
+  price_change_h24: -63.87
+  market_cap_usd: 22546
+  fdv_usd: 22546
+  fdv: 22546
   first_pair_at: 2026-08-31T10:54:34.000Z
-  top10_share: 0.450756915070682
-  top10_share_ex_pools: 0.2235773369833065
-  burned_share: 0
-  top10_as_of: 2026-09-04T11:23:39.609Z
-  launchpad:
-    slug: pons
-    via: creator
-    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
-    shared: false
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
   rialto: null
   pair_asset:
     ticker: AAPL
@@ -147,10 +147,20 @@ market:
     change_7d: 271065.66
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: launchpad
+      message: addresses/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453
 structure:
-  pulled_at: 2026-09-04T11:23:39.609Z
-  mint: no-mint-function
+  pulled_at: 2026-09-04T20:46:36.233Z
+  mint: unknown
   renounced: null
   lp:
     - pair: "0xb1e490364d477cb267ab5dd491c7956253c9d7fbee78104fb7a7dd0ea81ada99"
@@ -158,30 +168,38 @@ structure:
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
+    - step: mint
+      message: 'smart-contracts/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
+      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
       label: JOBS token (PonsV2LauncherToken)
       role: token
-      transactions_count: 1312
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T13:09:13.000Z
-      last_method: approve
-      txns_24h: 95
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: PonsV2LaunchFactory
       role: factory
       transactions_count: 76659
       token_transfers_count: 6719
-      last_tx_at: 2026-09-04T11:24:53.000Z
-      last_method: transferCreatorFeeRecipient
+      last_tx_at: 2026-09-04T20:47:30.000Z
+      last_method: launchToken
       txns_24h: 2000
-      launches_24h: 805
+      launches_24h: 845
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -198,13 +216,17 @@ activity:
     - address: "0x4E943DDd1fc47f69d56bc8Ed84948398c1cfbcF1"
       label: PonsV2BondingCurve (JOBS launch curve)
       role: other
-      transactions_count: 23
-      token_transfers_count: 0
-      last_tx_at: 2026-08-31T10:52:45.000Z
-      last_method: sweepFees
-      txns_24h: 0
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x4E943DDd1fc47f69d56bc8Ed84948398c1cfbcF1: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
       label: V2LaunchLocker (site-linked liquidity locker)
       role: other
@@ -215,7 +237,7 @@ activity:
       txns_24h: 0
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T13:09:13.000Z
-  txns_24h: 2095
-  launches_24h: 805
+  last_activity_at: 2026-09-04T20:47:30.000Z
+  txns_24h: 2000
+  launches_24h: 845
 errors: []

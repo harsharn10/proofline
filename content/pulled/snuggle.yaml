@@ -1,5 +1,5 @@
 slug: snuggle
-pulled_at: 2026-09-04T17:18:32.632Z # chain head 54437466 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
@@ -89,20 +89,20 @@ addresses:
     errors: []
 metrics:
   - kind: tvl
-    value: 5251074
-    as_of: 2026-09-04T16:54:35.000Z
+    value: 5353902
+    as_of: 2026-09-04T19:46:23.000Z
     source_url: https://api.llama.fi/protocol/snuggle
   - kind: fees_24h
-    value: 121374
-    as_of: 2026-09-04T17:18:32.632Z
+    value: 123149
+    as_of: 2026-09-04T20:46:36.233Z
     source_url: https://api.llama.fi/summary/fees/snuggle?dataType=dailyFees
   - kind: revenue_24h
-    value: 16325
-    as_of: 2026-09-04T17:18:32.632Z
+    value: 16610
+    as_of: 2026-09-04T20:46:36.233Z
     source_url: https://api.llama.fi/summary/fees/snuggle?dataType=dailyRevenue
 market:
   token_address: null
-  pulled_at: 2026-09-04T17:18:32.632Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -126,18 +126,20 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-04T17:18:32.632Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
       label: MaxFi Robinhood vault (SnuggleVault proxy)
       role: vault
       transactions_count: 129743
       token_transfers_count: 1332877
-      last_tx_at: 2026-09-04T11:44:35.000Z
-      last_method: harvest
+      last_tx_at: 2026-09-04T21:17:47.000Z
+      last_method: updateParameters
       txns_24h: 2000
       launches_24h: null
-      errors: []
+      errors:
+        - step: txns_24h capped
+          message: stopped after 40 pages; count is a floor
     - address: "0x999A74ddFde1575C4db454A0300d5F0351A891dE"
       label: SnuggleVaultUpgradeable
       role: implementation
@@ -178,92 +180,9 @@ activity:
       txns_24h: 0
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T11:44:35.000Z
+  last_activity_at: 2026-09-04T21:17:47.000Z
   txns_24h: 2000
   launches_24h: null
-reads:
-  tier: hot
-  explorer:
-    - kind: address
-      address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
-      status: unchanged
-      reason: vault signal unchanged
-      signal_value: 129743
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 0
-    - kind: activity
-      address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
-      status: unchanged
-      reason: 24h walk skipped; change signal unchanged
-      signal_value: 129743
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 1
-    - kind: address
-      address: "0x999A74ddFde1575C4db454A0300d5F0351A891dE"
-      status: unchanged
-      reason: implementation signal unchanged
-      signal_value: 0
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 0
-    - kind: activity
-      address: "0x999A74ddFde1575C4db454A0300d5F0351A891dE"
-      status: unchanged
-      reason: 24h walk skipped; change signal unchanged
-      signal_value: 0
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 1
-    - kind: address
-      address: "0x71b55E366a0F43260b1138A32c312ba7bb7F30F7"
-      status: unchanged
-      reason: other signal unchanged
-      signal_value: 0
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 0
-    - kind: activity
-      address: "0x71b55E366a0F43260b1138A32c312ba7bb7F30F7"
-      status: unchanged
-      reason: 24h walk skipped; change signal unchanged
-      signal_value: 0
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 2
-    - kind: address
-      address: "0x76bDb43d2EC3b190087076649224F47A58C44eF2"
-      status: unchanged
-      reason: other signal unchanged
-      signal_value: 0
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 0
-    - kind: activity
-      address: "0x76bDb43d2EC3b190087076649224F47A58C44eF2"
-      status: unchanged
-      reason: 24h walk skipped; change signal unchanged
-      signal_value: 0
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 1
-    - kind: address
-      address: "0x413Ca90D38D964546c2fE03cB103df57372630F6"
-      status: unchanged
-      reason: admin signal unchanged
-      signal_value: 0
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 0
-    - kind: activity
-      address: "0x413Ca90D38D964546c2fE03cB103df57372630F6"
-      status: unchanged
-      reason: 24h walk skipped; change signal unchanged
-      signal_value: 0
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 1
 errors:
   - step: llama
     message: "volume_24h snuggle: HTTP 400: Dexs for snuggle not found, please visit /overview/dexs to see available protocols"

@@ -1,5 +1,5 @@
 slug: beefzos
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x21d3462d3F0A5f661Ed46D033a8cF05595c11e18"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 52864187
     created_at: 2026-09-02T20:42:41.000Z
-    holders: 42
+    holders: 39
     errors: []
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
     label: DopplerERC20V1Factory (create tokenFactory)
@@ -85,7 +85,7 @@ addresses:
     safe: null
     created_block: 48288
     created_at: 2026-06-10T15:26:45.000Z
-    holders: 38932
+    holders: 40357
     errors: []
   - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
     label: Airlock (token owner)
@@ -107,7 +107,7 @@ addresses:
         - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
         - "0xdf95cc445469816234ad95f702c79d25bce401a7"
         - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
-        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+        - "0x5f512dfeacc95e8c47135a1ebbdf5a9e70a0eeff"
     created_block: 646829
     created_at: 2026-06-30T22:03:11.000Z
     holders: null
@@ -115,35 +115,35 @@ addresses:
 metrics: []
 market:
   token_address: "0x21d3462d3F0A5f661Ed46D033a8cF05595c11e18"
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x234d6fd95269d352da17d8e9b7cd08c06522e699aa879b0d49e93ecdefc743ac"
       quote_symbol: AMZN
-      price_usd: 0.00002992
-      liquidity_usd: 29494.36
-      volume_h24: 11212.31
-      volume_h6: 125.9
+      price_usd: 0.00002936
+      liquidity_usd: 28998.04
+      volume_h24: 3061.59
+      volume_h6: 124.4
       txns_h24:
-        buys: 86
-        sells: 61
-      price_change_h24: -33.97
-      market_cap: 29929
-      fdv: 29929
+        buys: 23
+        sells: 19
+      price_change_h24: -7.93
+      market_cap: 29361
+      fdv: 29361
       created_at: 2026-09-02T20:42:41.000Z
-  liquidity_usd: 29494.36
-  volume_h24: 11212.31
-  trades_h24: 147
-  price_usd: 0.00002992
-  price_change_h24: -33.97
-  market_cap_usd: 29929
-  fdv_usd: 29929
-  fdv: 29929
+  liquidity_usd: 28998.04
+  volume_h24: 3061.59
+  trades_h24: 42
+  price_usd: 0.00002936
+  price_change_h24: -7.93
+  market_cap_usd: 29361
+  fdv_usd: 29361
+  fdv: 29361
   first_pair_at: 2026-09-02T20:42:41.000Z
-  top10_share: 0.9683541602352028
-  top10_share_ex_pools: 0.1371132108326618
-  burned_share: 0
-  top10_as_of: 2026-09-04T11:23:39.609Z
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
   launchpad:
     slug: doppler
     via: factory
@@ -160,9 +160,13 @@ market:
     change_7d: -16162.42
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: top10_share
+      message: "tokens/0x21d3462d3F0A5f661Ed46D033a8cF05595c11e18/holders: HTTP 503 returned HTML, not JSON (bot challenge or error page)"
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x21d3462d3F0A5f661Ed46D033a8cF05595c11e18
 structure:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   mint: unknown
   renounced: false
   lp:
@@ -174,16 +178,16 @@ structure:
     - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x21d3462d3F0A5f661Ed46D033a8cF05595c11e18"
       label: BEEFZOS token (EIP-1167 DopplerERC20V1 clone)
       role: token
       transactions_count: 0
       token_transfers_count: 0
-      last_tx_at: 2026-09-04T04:37:20.000Z
+      last_tx_at: 2026-09-04T21:23:51.000Z
       last_method: "0x095ea7b3"
-      txns_24h: 23
+      txns_24h: 11
       launches_24h: null
       errors: []
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
@@ -211,10 +215,10 @@ activity:
       role: factory
       transactions_count: 13369
       token_transfers_count: 4
-      last_tx_at: 2026-09-04T11:27:33.000Z
+      last_tx_at: 2026-09-04T20:52:03.000Z
       last_method: create
       txns_24h: 2000
-      launches_24h: 1997
+      launches_24h: 1998
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -223,22 +227,24 @@ activity:
       role: token
       transactions_count: 17766
       token_transfers_count: 57
-      last_tx_at: 2026-09-04T12:32:16.000Z
+      last_tx_at: 2026-09-04T22:21:44.000Z
       last_method: approve
-      txns_24h: 1331
+      txns_24h: 750
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: "transactions?filter=to page 16: HTTP 503 returned HTML, not JSON (bot challenge or error page)"
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (token owner)
       role: other
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-04T11:11:59.000Z
+      last_tx_at: 2026-09-04T20:42:51.000Z
       last_method: create
-      txns_24h: 166
+      txns_24h: 112
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T12:32:16.000Z
-  txns_24h: 3520
-  launches_24h: 1997
+  last_activity_at: 2026-09-04T22:21:44.000Z
+  txns_24h: 2873
+  launches_24h: 1998
 errors: []

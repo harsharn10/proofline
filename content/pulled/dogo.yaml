@@ -1,13 +1,13 @@
 slug: dogo
-pulled_at: 2026-09-04T17:18:32.632Z # chain head 54437466 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x77b0AA38451ccDC1b42587E2f80B9879A7f82356"
     label: DOGO token (verified DogBull.sol)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: DogBull
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 31265843
-    created_at: 2026-08-08T17:49:30.000Z
-    holders: 20546
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x77b0AA38451ccDC1b42587E2f80B9879A7f82356: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x77b0AA38451ccDC1b42587E2f80B9879A7f82356: HTTP 402: {"error":"Out of credits"}'
   - address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
     label: Uniswap v4 PoolManager (DOGO/ETH LP holder)
     role: other
@@ -39,19 +43,19 @@ addresses:
 metrics: []
 market:
   token_address: "0x77b0AA38451ccDC1b42587E2f80B9879A7f82356"
-  pulled_at: 2026-09-04T17:18:32.632Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0xbe05adff5cf9a0bfd2f1eeb69458d5dda27e7075d6f49b0458db4b4c1967b6b1"
       quote_symbol: ETH
       price_usd: 0.01015
       liquidity_usd: 1017235.75
-      volume_h24: 228016.82
-      volume_h6: 227324.57
+      volume_h24: 227528.74
+      volume_h6: 0
       txns_h24:
         buys: 9
-        sells: 13
-      price_change_h24: 45.64
+        sells: 11
+      price_change_h24: 45.48
       market_cap: 10257490
       fdv: 10257490
       created_at: 2026-08-10T11:40:15.000Z
@@ -84,28 +88,36 @@ market:
       fdv: 35032658
       created_at: 2026-08-10T12:24:35.000Z
   liquidity_usd: 1017236
-  volume_h24: 228016.82
-  trades_h24: 24
+  volume_h24: 227528.74
+  trades_h24: 22
   price_usd: 0.01015
-  price_change_h24: 45.64
+  price_change_h24: 45.48
   market_cap_usd: 10257490
   fdv_usd: 10257490
   fdv: 10257490
   first_pair_at: 2026-08-10T11:40:15.000Z
-  top10_share: 0.1554960724419195
-  top10_share_ex_pools: 0.0567068931987085
-  burned_share: 0
-  top10_as_of: 2026-09-04T17:18:32.632Z
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
   launchpad: null
   rialto: null
   pair_asset: null
   volume_disagreement: null
   errors:
     - step: launchpad
-      message: creator 0x986260fd57204B0732b4e9ee678fb21fA5F76EEb did not match a launchpad factory, curve or known launcher deployer
+      message: addresses/0x77b0AA38451ccDC1b42587E2f80B9879A7f82356 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x77b0AA38451ccDC1b42587E2f80B9879A7f82356: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x77b0AA38451ccDC1b42587E2f80B9879A7f82356/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x77b0AA38451ccDC1b42587E2f80B9879A7f82356
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x77b0AA38451ccDC1b42587E2f80B9879A7f82356
 structure:
-  pulled_at: 2026-09-04T17:18:32.632Z
-  mint: no-mint-function
+  pulled_at: 2026-09-04T20:46:36.233Z
+  mint: unknown
   renounced: null
   lp:
     - pair: "0xbe05adff5cf9a0bfd2f1eeb69458d5dda27e7075d6f49b0458db4b4c1967b6b1"
@@ -121,91 +133,40 @@ structure:
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
+    - step: mint
+      message: 'smart-contracts/0x77b0AA38451ccDC1b42587E2f80B9879A7f82356: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
+      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T17:18:32.632Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x77b0AA38451ccDC1b42587E2f80B9879A7f82356"
       label: DOGO token (verified DogBull.sol)
       role: token
-      transactions_count: 17840
-      token_transfers_count: 10
-      last_tx_at: 2026-09-04T08:57:40.000Z
-      last_method: approve
-      txns_24h: 1
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x77b0AA38451ccDC1b42587E2f80B9879A7f82356: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
       label: Uniswap v4 PoolManager (DOGO/ETH LP holder)
       role: other
       transactions_count: 28805
       token_transfers_count: 90198819
-      last_tx_at: 2026-09-04T11:30:33.000Z
+      last_tx_at: 2026-09-04T20:57:22.000Z
       last_method: initialize
-      txns_24h: 1340
+      txns_24h: 1249
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T11:30:33.000Z
-  txns_24h: 1341
+  last_activity_at: 2026-09-04T20:57:22.000Z
+  txns_24h: 1249
   launches_24h: null
-reads:
-  tier: hot
-  explorer:
-    - kind: address
-      address: "0x77b0AA38451ccDC1b42587E2f80B9879A7f82356"
-      status: read
-      reason: token signal changed
-      signal_value: 24
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: null
-      credits: 3
-    - kind: activity
-      address: "0x77b0AA38451ccDC1b42587E2f80B9879A7f82356"
-      status: read
-      reason: token signal changed; 24h walk refreshed
-      signal_value: 24
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: null
-      credits: 2
-    - kind: address
-      address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
-      status: unchanged
-      reason: other signal unchanged
-      signal_value: 28805
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 0
-    - kind: activity
-      address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
-      status: unchanged
-      reason: 24h walk skipped; change signal unchanged
-      signal_value: 28805
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: 2026-09-04T11:23:39.609Z
-      credits: 0
-    - kind: top10
-      address: "0x77b0AA38451ccDC1b42587E2f80B9879A7f82356"
-      status: read
-      reason: token change signal changed
-      signal_value: 24
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: null
-      credits: 1
-    - kind: structure
-      address: "0x77b0AA38451ccDC1b42587E2f80B9879A7f82356"
-      status: read
-      reason: token change signal changed
-      signal_value: 24
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: null
-      credits: 1
-    - kind: lp
-      address: "0x77b0AA38451ccDC1b42587E2f80B9879A7f82356"
-      status: read
-      reason: token change signal changed
-      signal_value: 24
-      checked_at: 2026-09-04T17:18:32.632Z
-      stale_since: null
-      credits: 0
 errors: []

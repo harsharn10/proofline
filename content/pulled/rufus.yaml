@@ -1,13 +1,13 @@
 slug: rufus
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18"
     label: RUFUS token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: RUFUS
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: 50373970
-    created_at: 2026-08-30T22:43:53.000Z
-    holders: 69
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18: HTTP 402: {"error":"Out of credits"}'
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
     label: DopplerERC20V1Factory (create tokenFactory)
     role: factory
@@ -85,7 +89,7 @@ addresses:
     safe: null
     created_block: 48288
     created_at: 2026-06-10T15:26:45.000Z
-    holders: 38932
+    holders: 40357
     errors: []
   - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
     label: Airlock (token owner)
@@ -107,7 +111,7 @@ addresses:
         - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
         - "0xdf95cc445469816234ad95f702c79d25bce401a7"
         - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
-        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+        - "0x5f512dfeacc95e8c47135a1ebbdf5a9e70a0eeff"
     created_block: 646829
     created_at: 2026-06-30T22:03:11.000Z
     holders: null
@@ -115,40 +119,36 @@ addresses:
 metrics: []
 market:
   token_address: "0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18"
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x0f5a0c5b0a1c665757433fc734c4c8f047ee606af3d8ec0efdb9b09c8b884cb1"
       quote_symbol: AMZN
-      price_usd: 0.00004307
-      liquidity_usd: 38941.74
-      volume_h24: 23344.15
-      volume_h6: 15132.74
+      price_usd: 0.00003709
+      liquidity_usd: 34833.65
+      volume_h24: 37014.82
+      volume_h6: 11889.45
       txns_h24:
-        buys: 188
-        sells: 199
-      price_change_h24: 2.85
-      market_cap: 43078
-      fdv: 43078
+        buys: 288
+        sells: 297
+      price_change_h24: 13.83
+      market_cap: 37099
+      fdv: 37099
       created_at: 2026-08-30T22:43:53.000Z
-  liquidity_usd: 38941.74
-  volume_h24: 23344.15
-  trades_h24: 387
-  price_usd: 0.00004307
-  price_change_h24: 2.85
-  market_cap_usd: 43078
-  fdv_usd: 43078
-  fdv: 43078
+  liquidity_usd: 34833.65
+  volume_h24: 37014.82
+  trades_h24: 585
+  price_usd: 0.00003709
+  price_change_h24: 13.83
+  market_cap_usd: 37099
+  fdv_usd: 37099
+  fdv: 37099
   first_pair_at: 2026-08-30T22:43:53.000Z
-  top10_share: 0.8706996384522564
-  top10_share_ex_pools: 0.2037820089818122
-  burned_share: 0
-  top10_as_of: 2026-09-04T11:23:39.609Z
-  launchpad:
-    slug: doppler
-    via: factory
-    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
-    shared: false
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
   rialto: null
   pair_asset:
     ticker: AMZN
@@ -160,9 +160,19 @@ market:
     change_7d: -16162.42
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: launchpad
+      message: addresses/0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18
 structure:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   mint: unknown
   renounced: false
   lp:
@@ -172,20 +182,26 @@ structure:
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: mint
+      message: 'smart-contracts/0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18"
       label: RUFUS token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T12:38:14.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 32
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x218D84Bdd20982bD7c3CdBf2E6d8bb7FD6fe1E18: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory (create tokenFactory)
       role: factory
@@ -211,10 +227,10 @@ activity:
       role: factory
       transactions_count: 13369
       token_transfers_count: 4
-      last_tx_at: 2026-09-04T11:27:33.000Z
+      last_tx_at: 2026-09-04T20:52:03.000Z
       last_method: create
       txns_24h: 2000
-      launches_24h: 1997
+      launches_24h: 1998
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -223,22 +239,24 @@ activity:
       role: token
       transactions_count: 17766
       token_transfers_count: 57
-      last_tx_at: 2026-09-04T12:32:16.000Z
+      last_tx_at: 2026-09-04T22:21:44.000Z
       last_method: approve
-      txns_24h: 1331
+      txns_24h: 750
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: "transactions?filter=to page 16: HTTP 503 returned HTML, not JSON (bot challenge or error page)"
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (token owner)
       role: other
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-04T11:11:59.000Z
+      last_tx_at: 2026-09-04T20:42:51.000Z
       last_method: create
-      txns_24h: 166
+      txns_24h: 112
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T12:38:14.000Z
-  txns_24h: 3529
-  launches_24h: 1997
+  last_activity_at: 2026-09-04T22:21:44.000Z
+  txns_24h: 2862
+  launches_24h: 1998
 errors: []

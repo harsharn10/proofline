@@ -3,11 +3,12 @@
 // request carries a browser User-Agent; a challenge page still comes back as an error the caller
 // records under step "blockscout" and continues past. See the header of scripts/pull.mjs.
 
-import { requestJson, BROWSER_UA } from "./http.mjs";
+import { requestJson, BROWSER_UA, hostOf } from "./http.mjs";
 
 export const BLOCKSCOUT_BASE = "https://robinhoodchain.blockscout.com";
 export const BLOCKSCOUT_PUBLIC_REST_BASE = `${BLOCKSCOUT_BASE}/api/v2`;
-export const BLOCKSCOUT_PRO_REST_BASE = "https://api.blockscout.com/4663/api/v2";
+export const BLOCKSCOUT_PRO_HOST = "api.blockscout.com";
+export const BLOCKSCOUT_PRO_REST_BASE = `https://${BLOCKSCOUT_PRO_HOST}/4663/api/v2`;
 
 const HEADERS = { "User-Agent": BROWSER_UA, Accept: "application/json" };
 
@@ -22,14 +23,20 @@ export function resolveBlockscoutConfig({ env = process.env, base = null, apiKey
     if (/^https:\/\/api\.blockscout\.com$/i.test(restBase)) restBase += "/4663";
     restBase += "/api/v2";
   }
+  // The key belongs to the host that issued it. BLOCKSCOUT_API_BASE can point anywhere — the public
+  // explorer, a mirror, a local proxy — and a mistyped or debugging base must not hand a working PRO
+  // key to a third party, so the bearer is attached only when the resolved host is Blockscout's own
+  // API. Anywhere else the request goes out with the anonymous browser identity, and the PRO rate
+  // and concurrency allowances go with the header rather than with the key.
+  const authorized = Boolean(key) && hostOf(restBase).toLowerCase() === BLOCKSCOUT_PRO_HOST;
   return {
     restBase,
     apiRoot: restBase.replace(/\/api\/v2$/i, ""),
-    apiKey: key,
-    isPro: Boolean(key),
-    requestsPerSecond: key ? 5 : 4,
-    addressConcurrency: key ? 4 : 2,
-    headers: key
+    apiKey: authorized ? key : null,
+    isPro: authorized,
+    requestsPerSecond: authorized ? 5 : 4,
+    addressConcurrency: authorized ? 4 : 2,
+    headers: authorized
       ? { Accept: "application/json", Authorization: `Bearer ${key}` }
       : { ...HEADERS },
   };

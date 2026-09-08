@@ -1,13 +1,13 @@
 slug: appleseed
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3"
     label: Appleseed token (PonsV2LauncherToken)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: John Appleseed
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 53067764
-    created_at: 2026-09-03T02:31:54.000Z
-    holders: 207
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3: HTTP 402: {"error":"Out of credits"}'
   - address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
     label: PonsV2LaunchDeployer (token creator)
     role: factory
@@ -26,7 +30,7 @@ addresses:
     source_verified: true
     contract_name: PonsV2LaunchDeployer
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
     owner: null
@@ -35,13 +39,7 @@ addresses:
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory (token launchFactory)
     role: factory
@@ -52,9 +50,14 @@ addresses:
       type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
@@ -63,7 +66,7 @@ addresses:
     label: Pons v2 bonding curve (create-tx clone)
     role: other
     is_contract: true
-    source_verified: false
+    source_verified: null
     contract_name: null
     proxy:
       type: none
@@ -72,10 +75,12 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 53067764
-    created_at: 2026-09-03T02:31:54.000Z
+    created_block: null
+    created_at: null
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: 'addresses/0x261ae32F5787983a5fEd1828485cA24f58FB391f: HTTP 402: {"error":"Out of credits"}'
   - address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
     label: PonsV2LaunchAndBuy (create tx to)
     role: router
@@ -83,22 +88,21 @@ addresses:
     source_verified: true
     contract_name: PonsV2LaunchAndBuy
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841867
     created_at: 2026-08-03T14:41:21.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0xe33E9E479dF8802cb0866d5d05258bEc4cF62948: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0xe33E9E479dF8802cb0866d5d05258bEc4cF62948: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0xe33E9E479dF8802cb0866d5d05258bEc4cF62948: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
   - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
     label: V2LaunchLocker (top holder after PoolManager)
     role: vault
@@ -106,73 +110,82 @@ addresses:
     source_verified: true
     contract_name: V2LaunchLocker
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841845
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
 metrics: []
 market:
   token_address: "0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3"
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x67bc6687c7ecbdff594df2b5200df55a925f97165da05b1014b7157f134bfc46"
       quote_symbol: AAPL
-      price_usd: 0.00001201
-      liquidity_usd: 8985.63
-      volume_h24: 11882.43
-      volume_h6: 580.67
+      price_usd: 0.000008143
+      liquidity_usd: 7304.23
+      volume_h24: 6785.98
+      volume_h6: 449.75
       txns_h24:
-        buys: 69
-        sells: 118
-      price_change_h24: -33.21
-      market_cap: 12015
-      fdv: 12015
+        buys: 39
+        sells: 56
+      price_change_h24: -43.66
+      market_cap: 8144
+      fdv: 8144
       created_at: 2026-09-03T02:33:13.000Z
+    - dex: uniswap
+      pair_address: "0x4da06913448af8f9d81b6d66ad84adecf7d94fec10a52db5306cf25ad8873737"
+      quote_symbol: USDG
+      price_usd: 0.0000332
+      liquidity_usd: 22.85
+      volume_h24: 0.45
+      volume_h6: 0.45
+      txns_h24:
+        buys: 0
+        sells: 1
+      price_change_h24: null
+      market_cap: 33202
+      fdv: 33202
+      created_at: 2026-09-03T02:35:13.000Z
     - dex: uniswap
       pair_address: "0x723018f193fc7aac3049e07cbe039e012e4a23f24871761994ed234ae41c1f36"
       quote_symbol: USDG
-      price_usd: 0.00001153
-      liquidity_usd: 47.17
-      volume_h24: 18.34
+      price_usd: 0.000007153
+      liquidity_usd: 37.16
+      volume_h24: 13.18
       volume_h6: 0
       txns_h24:
-        buys: 3
-        sells: 5
-      price_change_h24: -28.44
-      market_cap: 11537
-      fdv: 11537
+        buys: 1
+        sells: 4
+      price_change_h24: -37.2
+      market_cap: 7153
+      fdv: 7153
       created_at: 2026-09-03T02:41:16.000Z
-  liquidity_usd: 9032.8
-  volume_h24: 11900.77
-  trades_h24: 195
-  price_usd: 0.00001201
-  price_change_h24: -33.21
-  market_cap_usd: 12015
-  fdv_usd: 12015
-  fdv: 12015
+  liquidity_usd: 7364.24
+  volume_h24: 6799.61
+  trades_h24: 101
+  price_usd: 0.000008143
+  price_change_h24: -43.66
+  market_cap_usd: 8144
+  fdv_usd: 8144
+  fdv: 8144
   first_pair_at: 2026-09-03T02:33:13.000Z
-  top10_share: 0.6852843630352301
-  top10_share_ex_pools: 0.2725322671803233
-  burned_share: 0
-  top10_as_of: 2026-09-04T11:23:39.609Z
-  launchpad:
-    slug: pons
-    via: creator
-    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
-    shared: false
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
   rialto: null
   pair_asset:
     ticker: AAPL
@@ -184,13 +197,27 @@ market:
     change_7d: 271065.66
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: launchpad
+      message: addresses/0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3
 structure:
-  pulled_at: 2026-09-04T11:23:39.609Z
-  mint: no-mint-function
+  pulled_at: 2026-09-04T20:46:36.233Z
+  mint: unknown
   renounced: null
   lp:
     - pair: "0x67bc6687c7ecbdff594df2b5200df55a925f97165da05b1014b7157f134bfc46"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x4da06913448af8f9d81b6d66ad84adecf7d94fec10a52db5306cf25ad8873737"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
@@ -199,21 +226,29 @@ structure:
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
+    - step: mint
+      message: 'smart-contracts/0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
+      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3"
       label: Appleseed token (PonsV2LauncherToken)
       role: token
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T12:17:57.000Z
-      last_method: approve
-      txns_24h: 86
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0xF8b22322E2b3DEe225D173a36B7Bc421D7d9B0e3: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
       label: PonsV2LaunchDeployer (token creator)
       role: factory
@@ -229,29 +264,33 @@ activity:
       role: factory
       transactions_count: 76659
       token_transfers_count: 6719
-      last_tx_at: 2026-09-04T11:24:53.000Z
-      last_method: transferCreatorFeeRecipient
+      last_tx_at: 2026-09-04T20:47:30.000Z
+      last_method: launchToken
       txns_24h: 2000
-      launches_24h: 805
+      launches_24h: 845
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
     - address: "0x261ae32F5787983a5fEd1828485cA24f58FB391f"
       label: Pons v2 bonding curve (create-tx clone)
       role: other
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-03T02:33:06.000Z
-      last_method: "0xd04c6983"
-      txns_24h: 0
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x261ae32F5787983a5fEd1828485cA24f58FB391f: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
       label: PonsV2LaunchAndBuy (create tx to)
       role: router
       transactions_count: 79462
       token_transfers_count: 11161
-      last_tx_at: 2026-09-04T11:26:05.000Z
+      last_tx_at: 2026-09-04T20:49:16.000Z
       last_method: launchAndBuy
       txns_24h: 2000
       launches_24h: null
@@ -268,7 +307,7 @@ activity:
       txns_24h: 0
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T12:17:57.000Z
-  txns_24h: 4086
-  launches_24h: 805
+  last_activity_at: 2026-09-04T20:49:16.000Z
+  txns_24h: 4000
+  launches_24h: 845
 errors: []

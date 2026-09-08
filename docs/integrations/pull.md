@@ -35,7 +35,10 @@ environment variable. It is optional: when absent, the puller keeps using
 `https://robinhoodchain.blockscout.com/api/v2` with the existing browser user agent. When present,
 every native REST route uses `https://api.blockscout.com/4663/api/v2` and sends
 `Authorization: Bearer <key>`. `BLOCKSCOUT_API_BASE` can override the REST root for local testing;
-both a host root and a root ending in `/api/v2` are accepted.
+both a host root and a root ending in `/api/v2` are accepted. The bearer is scoped to the host that
+issued it: it is attached only when the resolved root is on `api.blockscout.com`, so a base pointing
+at the public explorer, a mirror or a local proxy sends no key at all and falls back to the browser
+user agent, the 4/s pace and two concurrent reads — even when `BLOCKSCOUT_API_KEY` is set.
 
 The free PRO tier allows 5 requests per second and 100,000 credits per day. A PRO run starts at most
 four explorer reads concurrently and paces their physical requests to 5/s. Public fallback retains
@@ -201,11 +204,15 @@ free to spend a full run cap, would blow through a 60,000/day limit that nobody 
 step commits `ops/pull-budget.json` and `ops/pull-queue.json` only, with the same bot identity and
 push loop, and drops the uncommitted data rather than smuggling it past a failed gate.
 
-Cloudflare managed-challenge HTML is never parsed as API data. A `<!DOCTYPE html` response or a page
-titled `Just a moment` is classified as a bot challenge, retried once after a 0.5–1.5 second jitter,
-then recorded as `explorer served a bot challenge` with nullable fields. If challenge responses are
-more than half of all physical explorer requests, the pull exits nonzero with a one-line bot-wall
-summary instead of silently publishing a mostly empty explorer snapshot.
+Cloudflare managed-challenge HTML is never parsed as API data. A challenge is an HTML body carrying
+one of Cloudflare's own markers — a `Just a moment` title, a `cf-chl` element, the
+`/cdn-cgi/challenge-platform` loader, or the `_cf_chl_opt` script — and it is retried once after a
+0.5–1.5 second jitter, then recorded as `explorer served a bot challenge` with nullable fields. HTML
+alone is not a challenge: a 404, 502 or 504 error page carries no marker, so it stays an ordinary
+transport error, retried by the 429/5xx policy and recorded as `HTTP <status> returned HTML, not
+JSON`. Only real challenges count toward the gate: if they are more than half of all physical
+explorer requests, the pull exits nonzero with a one-line bot-wall summary instead of silently
+publishing a mostly empty explorer snapshot. A gateway blip can no longer be reported as a bot wall.
 
 ## Rialto Analytics
 

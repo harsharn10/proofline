@@ -1,13 +1,13 @@
 slug: verity
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6"
     label: VERITY token (PonsV2LauncherToken)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: Verity
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 52952791
-    created_at: 2026-09-02T23:15:11.000Z
-    holders: 764
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6: HTTP 402: {"error":"Out of credits"}'
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory (token launchFactory())
     role: factory
@@ -29,9 +33,14 @@ addresses:
       type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
@@ -43,7 +52,7 @@ addresses:
     source_verified: true
     contract_name: PonsV2LaunchDeployer
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
     owner: null
@@ -52,19 +61,13 @@ addresses:
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
   - address: "0x1D86D5b3c28e4837F365b54300d437ceD6Bf0be6"
     label: Pons v2 bonding curve (token curve())
     role: other
     is_contract: true
-    source_verified: true
-    contract_name: PonsV2BondingCurve
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -72,10 +75,12 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 52952791
-    created_at: 2026-09-02T23:15:11.000Z
+    created_block: null
+    created_at: null
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: 'addresses/0x1D86D5b3c28e4837F365b54300d437ceD6Bf0be6: HTTP 402: {"error":"Out of credits"}'
   - address: "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
     label: MSFT Microsoft • Robinhood Token (pair quote / rail)
     role: token
@@ -91,7 +96,7 @@ addresses:
     safe: null
     created_block: 48275
     created_at: 2026-06-10T15:24:59.000Z
-    holders: 46787
+    holders: 46951
     errors: []
   - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
     label: V2LaunchLocker (post-graduation locked tokens)
@@ -100,129 +105,82 @@ addresses:
     source_verified: true
     contract_name: V2LaunchLocker
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841845
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
 metrics: []
 market:
   token_address: "0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6"
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x4711ddd41dcc198823fed7e52eb8bc1a270134f0fa129c77f35965216ab3b49b"
       quote_symbol: MSFT
-      price_usd: 0.0002853
-      liquidity_usd: 43470.64
-      volume_h24: 1316563.7
-      volume_h6: 89715.45
+      price_usd: 0.0003011
+      liquidity_usd: 44458.08
+      volume_h24: 506834.65
+      volume_h6: 65916.59
       txns_h24:
-        buys: 3120
-        sells: 2832
-      price_change_h24: 150
-      market_cap: 285349
-      fdv: 285349
+        buys: 1090
+        sells: 992
+      price_change_h24: -52.25
+      market_cap: 301187
+      fdv: 301187
       created_at: 2026-09-02T23:34:22.000Z
     - dex: uniswap
       pair_address: "0x92f5fcbab693478a319753cb18c4a14710ab8544da9f914c772a5097af549a2d"
       quote_symbol: USDG
       price_usd: 0.0003974
       liquidity_usd: 119.27
-      volume_h24: 2515.95
+      volume_h24: 643.21
       volume_h6: 0
       txns_h24:
-        buys: 156
-        sells: 149
-      price_change_h24: -33.98
+        buys: 42
+        sells: 41
+      price_change_h24: -38.46
       market_cap: 397496
       fdv: 397496
       created_at: 2026-09-03T19:54:33.000Z
-    - dex: uniswap
-      pair_address: "0xabbfd225989feb11bd4c989e2ab61f9f338d4222163027bcff771b8a45167813"
-      quote_symbol: USDG
-      price_usd: 0.0006049
-      liquidity_usd: 30.56
-      volume_h24: 88.47
-      volume_h6: 0
-      txns_h24:
-        buys: 22
-        sells: 31
-      price_change_h24: -1.38
-      market_cap: 604943
-      fdv: 604943
-      created_at: 2026-09-03T19:54:49.000Z
-    - dex: uniswap
-      pair_address: "0x8139fbaf286c75b4553db244c59fe2f54397248137c2b8a468130bca91e0793c"
-      quote_symbol: USDG
-      price_usd: 0.0001717
-      liquidity_usd: 3.55
-      volume_h24: 4.87
-      volume_h6: 0
-      txns_h24:
-        buys: 4
-        sells: 0
-      price_change_h24: 106
-      market_cap: 171736
-      fdv: 171736
-      created_at: 2026-09-03T19:57:04.000Z
     - dex: uniswap
       pair_address: "0xbd06bd30a467c56ea6dfa86843481d524bf6c28797b9c6712215f1d495a1f951"
       quote_symbol: ETH
       price_usd: 0.0001461
       liquidity_usd: 29.04
-      volume_h24: 32.08
-      volume_h6: 3
+      volume_h24: 5.44
+      volume_h6: 0
       txns_h24:
-        buys: 7
+        buys: 1
         sells: 1
-      price_change_h24: 55.35
+      price_change_h24: 9.17
       market_cap: 146145
       fdv: 146145
       created_at: 2026-09-02T23:19:10.000Z
-    - dex: uniswap
-      pair_address: "0x7a10941a5921c4b98cb92c8851a21b6379b93b90d608848054a7edb36cf1c9c6"
-      quote_symbol: ETH
-      price_usd: 0.0001696
-      liquidity_usd: 20.99
-      volume_h24: 16.58
-      volume_h6: 0
-      txns_h24:
-        buys: 4
-        sells: 0
-      price_change_h24: 87.19
-      market_cap: 169694
-      fdv: 169694
-      created_at: 2026-09-02T23:19:09.000Z
-  liquidity_usd: 43674.05
-  volume_h24: 1319221.65
-  trades_h24: 6326
-  price_usd: 0.0002853
-  price_change_h24: 150
-  market_cap_usd: 285349
-  fdv_usd: 285349
-  fdv: 285349
-  first_pair_at: 2026-09-02T23:19:09.000Z
-  top10_share: 0.3334156780280368
-  top10_share_ex_pools: 0.2077501184062886
-  burned_share: 0
-  top10_as_of: 2026-09-04T11:23:39.609Z
-  launchpad:
-    slug: pons
-    via: creator
-    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
-    shared: false
+  liquidity_usd: 44606.39
+  volume_h24: 507483.3
+  trades_h24: 2167
+  price_usd: 0.0003011
+  price_change_h24: -52.25
+  market_cap_usd: 301187
+  fdv_usd: 301187
+  fdv: 301187
+  first_pair_at: 2026-09-02T23:19:10.000Z
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
   rialto: null
   pair_asset:
     ticker: MSFT
@@ -234,10 +192,20 @@ market:
     change_7d: 71580.62
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: launchpad
+      message: addresses/0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6
 structure:
-  pulled_at: 2026-09-04T11:23:39.609Z
-  mint: no-mint-function
+  pulled_at: 2026-09-04T20:46:36.233Z
+  mint: unknown
   renounced: null
   lp:
     - pair: "0x4711ddd41dcc198823fed7e52eb8bc1a270134f0fa129c77f35965216ab3b49b"
@@ -248,47 +216,43 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0xabbfd225989feb11bd4c989e2ab61f9f338d4222163027bcff771b8a45167813"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x8139fbaf286c75b4553db244c59fe2f54397248137c2b8a468130bca91e0793c"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xbd06bd30a467c56ea6dfa86843481d524bf6c28797b9c6712215f1d495a1f951"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x7a10941a5921c4b98cb92c8851a21b6379b93b90d608848054a7edb36cf1c9c6"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
+    - step: mint
+      message: 'smart-contracts/0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
+      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6"
       label: VERITY token (PonsV2LauncherToken)
       role: token
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T13:25:32.000Z
-      last_method: transfer
-      txns_24h: 894
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x16A49c0896b889B31d00ac1EdF51AD1fFcDF7BC6: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: PonsV2LaunchFactory (token launchFactory())
       role: factory
       transactions_count: 76659
       token_transfers_count: 6719
-      last_tx_at: 2026-09-04T11:24:53.000Z
-      last_method: transferCreatorFeeRecipient
+      last_tx_at: 2026-09-04T20:47:30.000Z
+      last_method: launchToken
       txns_24h: 2000
-      launches_24h: 805
+      launches_24h: 845
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -305,19 +269,23 @@ activity:
     - address: "0x1D86D5b3c28e4837F365b54300d437ceD6Bf0be6"
       label: Pons v2 bonding curve (token curve())
       role: other
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-02T23:33:20.000Z
-      last_method: sweepFees
-      txns_24h: 0
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x1D86D5b3c28e4837F365b54300d437ceD6Bf0be6: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
       label: MSFT Microsoft • Robinhood Token (pair quote / rail)
       role: token
       transactions_count: 19820
       token_transfers_count: 60
-      last_tx_at: 2026-09-04T12:34:22.000Z
+      last_tx_at: 2026-09-04T22:20:13.000Z
       last_method: approve
       txns_24h: 2000
       launches_24h: null
@@ -334,7 +302,7 @@ activity:
       txns_24h: 0
       launches_24h: null
       errors: []
-  last_activity_at: 2026-09-04T13:25:32.000Z
-  txns_24h: 4894
-  launches_24h: 805
+  last_activity_at: 2026-09-04T22:20:13.000Z
+  txns_24h: 4000
+  launches_24h: 845
 errors: []

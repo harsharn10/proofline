@@ -1,12 +1,28 @@
 name: Publish
 
-# Runs on every push to main and on explicit dispatch. Recomputes derived scores, then asks the
-# approval-only Telegram sender for eligible entries. A merge creates pending review items; it does
-# not authorize delivery. Only approvals in ops/telegram-review.json can be sent.
+# Pushes retain the approval-only publication path. Successful chain pulls run signal alerts; the
+# schedules run the daily brief and Sunday wrap. Every path shares one serialized state file.
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "0 13 * * *"
+    - cron: "0 14 * * 0"
+  workflow_run:
+    workflows: ["Pull chain facts"]
+    types: [completed]
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Telegram mode to run
+        required: true
+        default: publications
+        type: choice
+        options:
+          - publications
+          - alerts
+          - brief
+          - weekly
 
 permissions:
   contents: write
@@ -19,6 +35,7 @@ concurrency:
 
 jobs:
   publish:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     # The `secrets` context is NOT available in step- or job-level `if:` — only in `env:` and step
     # inputs. Hoisting the three secrets to job-level env lets every step's `if:` read them back out
@@ -43,12 +60,30 @@ jobs:
       - name: Derive scores
         run: npm run score
 
+      - name: Select Telegram mode
+        id: mode
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+          DISPATCH_MODE: ${{ inputs.mode }}
+        run: |
+          case "$EVENT_NAME" in
+            workflow_run) mode="alerts" ;;
+            schedule)
+              if [ "$EVENT_SCHEDULE" = "0 14 * * 0" ]; then mode="weekly"; else mode="brief"; fi
+              ;;
+            workflow_dispatch) mode="${DISPATCH_MODE:-publications}" ;;
+            *) mode="publications" ;;
+          esac
+          echo "arg=--$mode" >> "$GITHUB_OUTPUT"
+          echo "Telegram mode: $mode"
+
       # Skipped (not failed) when the repo secrets aren't set, so forks and secret-less CI runs stay
       # green.
-      - name: Telegram digest (approved entries only)
+      - name: Telegram delivery
         id: digest
         if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
-        run: npm run telegram
+        run: node scripts/telegram-digest.mjs "${{ steps.mode.outputs.arg }}"
 
       # Only runs when the digest step above actually ran (outcome == success — 'skipped' when the
       # secrets were absent short-circuits this too), and only commits if that run actually changed

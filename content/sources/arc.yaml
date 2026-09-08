@@ -1,0 +1,211 @@
+slug: arc
+sources:
+  - id: S1
+    url: https://arcliquidity.capital/
+    publisher: Arc
+    kind: official-site
+    accessed_at: 2026-09-04T14:01:00Z
+    claim: Official site arcliquidity.capital
+    excerpt: "HTTP 200. SPA bundle assets/home-CWhF5yzM.js hardcodes 0xce845443428867d271929bd739148b85524b536a as Arc token contract, copy The only official contract. Mechanism copy: liquidity margin layer on Robinhood Chain; position liquidity; keep buying power. Launch App links /app/."
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S2
+    url: https://arcliquidity.capital/docs
+    publisher: Arc
+    kind: docs
+    accessed_at: 2026-09-04T14:01:00Z
+    claim: arcliquidity.capital/docs
+    excerpt: "HTTP 200. Docs JS: Arc is the liquidity margin layer on Robinhood Chain. Launch set NVDA AAPL MSFT GOOGL AMZN TSLA each against USDG. Figures used across this site are the demo value. Copy: v1 has not been audited."
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S3
+    url: https://arcliquidity.capital/app/
+    publisher: Arc
+    kind: official-site
+    accessed_at: 2026-09-04T14:01:00Z
+    claim: arcliquidity.capital/app/
+    excerpt: HTTP 200. SPA shell 884 bytes; application bundle assets/app-BHKlLO45.js. No contract address in the HTML itself.
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S4
+    url: https://arcliquidity.capital/assets/app-BHKlLO45.js
+    publisher: Arc app bundle
+    kind: other
+    accessed_at: 2026-09-04T14:01:00Z
+    claim: app-BHKlLO45.js hardcoded Railway backend
+    excerpt: Bundle hardcodes https://back-end-production-b628.up.railway.app. That host is not arcliquidity.capital. Flag third-party-link for CAs taken from that API.
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S5
+    url: https://back-end-production-b628.up.railway.app/v1/config
+    publisher: Railway Arc backend
+    kind: third-party-data
+    accessed_at: 2026-09-04T14:01:00Z
+    claim: GET /v1/config chainId 4663
+    excerpt: JSON chainId 4663. contracts registry 0xcfe634461795b5954c8fce02a677087a6c2c6b19 oracle 0x879be77045e99913215b8a2b72320cc3457c7a00 positionManager 0x353b45eac23e6bad9c35e72304eab24312f16b31 lendingPool 0x618389d2048ee7e4c823cec121c5d07edd95d0de core 0xa75fe67a563cdff3fcbf6c64bf5d85aab33fd1c7 zapRouter 0x6959773224c47060d8650b4e740c19c3d28b3fe7. borrowAsset USDG 0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168 decimals 6.
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S6
+    url: https://back-end-production-b628.up.railway.app/v1/pool
+    publisher: Railway Arc backend
+    kind: third-party-data
+    accessed_at: 2026-09-04T14:01:00Z
+    claim: GET /v1/pool USDG totals
+    excerpt: asset USDG 0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168. totalAssets 15.245929 totalBorrows 15.051027 availableLiquidity 0.200003 utilizationPercent 98.68 borrowAprPercent 97.40 supplyAprPercent 86.50 reserveFactorBps 1000. API claim, not explorer-decoded.
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S7
+    url: https://back-end-production-b628.up.railway.app/v1/markets
+    publisher: Railway Arc backend
+    kind: third-party-data
+    accessed_at: 2026-09-04T14:01:00Z
+    claim: GET /v1/markets six stock/USDG pools
+    excerpt: Six markets positionsEnabled true. Pools NVDA 0xd4EB21209C4D6093f80B5b84f5C45cc093EA14a3 AAPL 0x783C9bbB765047CFdD2b84b92b2Ca9F11D34b7Ed MSFT 0xeb60bCD1D920ad6E102690CCFC6fB488899E1510 GOOGL 0x34D0dC122CF9A8Eb296fC5e0D3A233625D7d19b7 AMZN 0x8AC92DA74AB5F3b1d024Dc1943Ad7e15Dc4179Ef TSLA 0xf4ACdAEEB7022862A763C9B1B885e11191c889E3. TSLA collateral Under review.
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S8
+    url: https://robinhoodchain.blockscout.com/address/0xce845443428867d271929bd739148b85524b536a
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-04T14:02:00Z
+    claim: ARC token 0xce845443…
+    excerpt: "HTML title: Robinhood Chain address details for 0xce845443428867d271929bd739148b85524b536a | Blockscout. HTTP 200. API v2 PonsV2LauncherToken is_fully_verified true. RPC name ARC LIQUIDITY symbol ARC decimals 18 totalSupply 1e9*10^18, code 6496 hex chars, block 54320413."
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S9
+    url: https://robinhoodchain.blockscout.com/address/0x618389d2048ee7e4c823cec121c5d07edd95d0de
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-04T14:02:00Z
+    claim: ArcLendingPool 0x618389d2…
+    excerpt: "HTML HTTP 200. API v2 ArcLendingPool is_fully_verified true file_path project/src/core/ArcLendingPool.sol. Same check: ArcRegistry, ArcOracle, ArcPositionManager, ArcCore, ArcZapRouter all is_fully_verified true. Lending state not decoded."
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S10
+    url: https://rpc.mainnet.chain.robinhood.com
+    publisher: Robinhood Chain RPC
+    kind: explorer
+    accessed_at: 2026-09-04T14:02:00Z
+    claim: eth_getCode / eth_call on chain 4663
+    excerpt: JSON-RPC eth_blockNumber 0x33cdd1d (54320413). Non-empty code on ARC token, six Arc-named core contracts, and six API-labeled Uniswap v3 pools. owner() of five core contracts 0xb1e919b33c7a69f51c584dc1f0d325cfd641d042 with empty code.
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S11
+    url: https://dexscreener.com/robinhood/0xeeeaeab3b9e0bd2673163a02da8739922ba3c8d05feb75831e68db2e5890ebbc
+    publisher: DexScreener
+    kind: third-party-data
+    accessed_at: 2026-09-04T14:03:00Z
+    claim: ARC/ETH Uniswap pair on Robinhood
+    excerpt: "api.dexscreener.com token-pairs robinhood/0xce845443…: uniswap, base ARC LIQUIDITY/ARC, quote Ether, volume.h24 2893.8, liquidity.usd 9687.9, marketCap 11164, pairCreatedAt 1787925738000 (2026-08-28T14:02:18Z), websites https://arcliquidity.capital/, socials https://x.com/ArcLiquidity."
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S12
+    url: https://api.llama.fi/protocols
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-04T14:02:00Z
+    claim: Protocols API, Robinhood Chain slice
+    excerpt: 141 protocol rows listed Robinhood Chain among chains. No Arc Liquidity, ArcLiquidity, or arcliquidity row. Other arc-substring names (Arcus Perps, Arcadia V2, Aave Arc) are different products.
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S13
+    url: https://api.llama.fi/v2/chains
+    publisher: DefiLlama
+    kind: third-party-data
+    accessed_at: 2026-09-04T14:02:00Z
+    claim: Chains API Robinhood Chain TVL
+    excerpt: Row name Robinhood Chain, chainId 4663, tvl 840982408.8156091 as of this request. Chain TVL is not an Arc protocol figure.
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S14
+    url: https://x.com/ArcLiquidity/status/2094877861681451449
+    publisher: "@ArcLiquidity"
+    kind: social
+    accessed_at: 2026-09-04T14:04:00Z
+    claim: status/2094877861681451449 v1 live six markets
+    excerpt: "Signed-in X scout intake 2026-09-04. This environment HTTP 200 with no post body. Paraphrase: Arc v1 live on Robinhood Chain; six USDG-quoted markets NVDA AAPL MSFT GOOGL AMZN TSLA; nine positions; funded lending pool; loan without unwinding liquidity; more oracle-priced markets coming; https://arcliquidity.capital/app/."
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S15
+    url: https://x.com/ArcLiquidity/status/2094769217815847119
+    publisher: "@ArcLiquidity"
+    kind: social
+    accessed_at: 2026-09-04T14:04:00Z
+    claim: status/2094769217815847119 contracts deployed quote
+    excerpt: "Signed-in X scout intake 2026-09-04. This environment did not recover the post body. X may label unavailable; still attributed. Quote: The contracts are deployed, the markets are live, and LP positions have already been opened onchain."
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S16
+    url: https://x.com/ArcLiquidity/status/2094693595479499086
+    publisher: "@ArcLiquidity"
+    kind: social
+    accessed_at: 2026-09-04T14:04:00Z
+    claim: status/2094693595479499086 deposit-to-credit E2E
+    excerpt: "Signed-in X scout intake 2026-09-04. This environment did not recover the post body. Paraphrase: deposit then collateral then credit end-to-end on Robinhood Chain mainnet; six CL markets, USDG lending, loan while liquidity stayed in range."
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S17
+    url: https://x.com/ArcLiquidity/status/2094552389629944140
+    publisher: "@ArcLiquidity"
+    kind: social
+    accessed_at: 2026-09-04T14:04:00Z
+    claim: status/2094552389629944140 lending params 65/75/6
+    excerpt: "Signed-in X scout intake 2026-09-04. This environment did not recover the post body. Paraphrase: lending/borrowing live; 65% borrow limit, 75% liquidation threshold, 6% liquidation bonus. Blockscout lend/borrow tx links shown but truncated in capture."
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S18
+    url: https://robinhoodchain.blockscout.com/address/0xd4EB21209C4D6093f80B5b84f5C45cc093EA14a3
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-04T14:02:00Z
+    claim: NVDA/USDG pool 0xd4EB2120… UniswapV3Pool
+    excerpt: HTML HTTP 200. API v2 name UniswapV3Pool is_fully_verified false is_partially_verified true compiler v0.7.6. RPC code 44284 hex chars. API-labeled Arc market pool, not an Arc token.
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true
+  - id: S19
+    url: https://robinhoodchain.blockscout.com/address/0xb1e919b33c7a69f51c584dc1f0d325cfd641d042
+    publisher: Blockscout
+    kind: explorer
+    accessed_at: 2026-09-04T14:02:00Z
+    claim: Core owner EOA 0xb1e919b3…
+    excerpt: HTML HTTP 200. API v2 smart-contracts 404. RPC eth_getCode empty. owner() of ArcRegistry/ArcOracle/ArcPositionManager/ArcLendingPool/ArcCore returned this address.
+    hash: null
+    archive_url: null
+    researcher: grok-bot
+    available: true

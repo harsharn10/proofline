@@ -1,0 +1,101 @@
+slug: floor
+name: Floor
+symbol: FLR
+category: Fee-funded RWA distributor
+lifecycle: mainnet
+coverage: stub
+summary: Floor is a Pons-graduated token on Robinhood Chain. The official site says a 2% creator tax on $FLR trades buys a basket of tokenized equities, with half claimable by holders and half held as a redeemable floor. The site publishes the token, vault, and distributor addresses on chain 4663. RPC this round reproduced the FLOOR/FLR ERC-20 and a vault whose token() returns that address. Distinct from The Index.
+tldr: "Pons-graduated $FLR on chain 4663: a 2% trade tax is stated to buy tokenized equities; token, vault, and distributor contracts exist [CLM-1 CLM-3 CLM-4]."
+why_people_care:
+  - "Thesis: a native tax-to-equities distributor on chain 4663, with published addresses, is a different machine from The Index. [claim S1] [verified S3 S10]"
+  - "Traction: token, vault, and distributor have non-empty code on 4663; DexScreener 24h volume about $63.8k on 2026-09-04. [verified S3 S4 S5] [claim S6]"
+  - "Catalyst: still off the public census after the 2026-08-31 candidate; this packet is the seed for slug floor. [claim S1] [verified S3]"
+risks:
+  - owner() on the vault and distributor is one externally owned account; explorer source was not flagged because Blockscout API v2 returned 403. [verified S4 S5]
+  - Homepage copy says no lockup while a later vault section describes timed locks that multiply rewards. [claim S1]
+  - Two on-page basket tables disagree on assets and weights, so the live treasury split is unread. [claim S1]
+themes:
+  - rwa
+  - vault
+  - fee-routing
+  - tax-distributor
+  - pons
+official_links:
+  - kind: site
+    url: https://floorfi.app
+  - kind: docs
+    url: https://floorfi.app/docs
+  - kind: x
+    url: https://x.com/Floor_fi
+  - kind: telegram
+    url: https://t.me/floorrobinhood
+  - kind: explorer
+    url: https://robinhoodchain.blockscout.com/address/0x8aD25c65587979533fa1cA0d2194A76D5bAE305d
+  - kind: explorer
+    url: https://robinhoodchain.blockscout.com/address/0xEf9Cb10585F7641c89AFb5Ab97559749CB7B1b71
+  - kind: explorer
+    url: https://robinhoodchain.blockscout.com/address/0xc2f799fF3c16DBE4801A8bF9c9b47177BcFD2479
+  - kind: dexscreener
+    url: https://dexscreener.com/robinhood/0x2a526d2b957a6f58ba5bf796cd966fe1de4269fb80ad654c313f9c603bf2c1c5
+dependencies: []
+deployments:
+  - label: $FLR token (RPC name FLOOR, symbol FLR, ERC-20)
+    chain: robinhood-chain
+    address: "0x8aD25c65587979533fa1cA0d2194A76D5bAE305d"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S3
+      - S12
+  - label: Site-labeled FLOOR Vault
+    chain: robinhood-chain
+    address: "0xEf9Cb10585F7641c89AFb5Ab97559749CB7B1b71"
+    role: vault
+    verified: true
+    sources:
+      - S1
+      - S4
+      - S12
+  - label: Site-labeled FLOOR Distributor
+    chain: robinhood-chain
+    address: "0xc2f799fF3c16DBE4801A8bF9c9b47177BcFD2479"
+    role: other
+    verified: true
+    sources:
+      - S1
+      - S5
+      - S12
+metrics:
+  - kind: volume_24h
+    value: 63839.74
+    currency: USD
+    as_of: 2026-09-04
+    class: claim
+    sources:
+      - S6
+  - kind: market_cap
+    value: 113309
+    currency: USD
+    as_of: 2026-09-04
+    class: claim
+    sources:
+      - S6
+review:
+  researcher: grok-bot
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-04
+  published_at: null
+findings:
+  positive: []
+  risk: []
+  missing:
+    - text: "Can owner() on the vault and distributor change the basket, keeper, or payout path without a timelock? Next: Read verified source if it appears, or eth_call the basket/keeper setters and record the access modifier"
+    - text: "Which on-page basket table matches balances held by the treasury contracts? Next: eth_call balances of the listed NVDA/AAPL/… addresses on the vault or treasury holder and compare to both tables"
+    - text: "X Latest from @Floor_fi and the accounts.yaml follow list this window? Next: Re-run Latest on @Floor_fi, @graildoteth, @0xSammy, @OGDfarmer, @MEADGod when this environment can read post bodies"
+    - text: "Is the timed-lock vault live, unused, or only documentation? Next: Read vault lock/unstake selectors and any staked supply"
+    - text: "Is there a DefiLlama protocol row or GitHub org still missing? Next: Watch Llama listings and any repository link the official pages add"
+  unresolved:
+    - text: product.mechanism remains unresolved (CON-1).
+    - text: product.mechanism remains unresolved (CON-2).

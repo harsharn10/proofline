@@ -1,0 +1,203 @@
+slug: arc
+name: Arc
+symbol: ARC
+category: Isolated lending market
+lifecycle: announced
+coverage: stub
+summary: Arc is a liquidity-margin layer on Robinhood Chain. Official docs say a CL position can stay in range while valued as USDG collateral. The homepage publishes token `0xce84…` as ARC LIQUIDITY / ARC. An app-bundled Railway API lists six stock/USDG markets and an ArcLendingPool. RPC and Blockscout reproduced the token and six Arc-named core contracts on chain 4663. Distinct from Arrow Finance CDP. Lending balances were not independently read on DefiLlama.
+tldr: "Arc on chain 4663: LP-as-collateral USDG credit; ARC token and ArcLendingPool exist; six stock/USDG markets claimed. [CLM-1 CLM-3]"
+why_people_care:
+  - "Thesis: a native isolated money market that values CL positions as USDG collateral is a different machine from Arrow Finance CDP. [claim S1] [verified S8]"
+  - "Traction: ARC token, ArcLendingPool, and five sibling Arc contracts have verified source and bytecode on 4663; DexScreener 24h volume about $2.9k. [verified S8 S9] [claim S11]"
+  - "Catalyst: still off census after the 2026-08-31 candidate; this packet is the seed for slug arc. [claim S1] [verified S8]"
+risks:
+  - Docs state v1 has not been audited; testing is not an audit. [claim S2]
+  - ArcRegistry, ArcOracle, ArcPositionManager, ArcLendingPool, and ArcCore owner() is one EOA. [verified S9]
+  - USDG pool totals in this round came from a Railway API, not an explorer or DefiLlama protocol row. [claim S6] [verified S12]
+themes:
+  - lending
+  - rwa
+  - vault
+  - oracle
+official_links:
+  - kind: site
+    url: https://arcliquidity.capital/
+  - kind: app
+    url: https://arcliquidity.capital/app/
+  - kind: docs
+    url: https://arcliquidity.capital/docs
+  - kind: x
+    url: https://x.com/ArcLiquidity
+  - kind: explorer
+    url: https://robinhoodchain.blockscout.com/address/0xce845443428867d271929bd739148b85524b536a
+  - kind: explorer
+    url: https://robinhoodchain.blockscout.com/address/0x618389d2048ee7e4c823cec121c5d07edd95d0de
+  - kind: dexscreener
+    url: https://dexscreener.com/robinhood/0xeeeaeab3b9e0bd2673163a02da8739922ba3c8d05feb75831e68db2e5890ebbc
+dependencies: []
+deployments:
+  - label: Homepage Arc token contract (RPC name ARC LIQUIDITY, symbol ARC, PonsV2LauncherToken)
+    chain: robinhood-chain
+    address: "0xce845443428867d271929bd739148B85524B536a"
+    role: token
+    verified: true
+    sources:
+      - S1
+      - S8
+      - S10
+  - label: API-labeled ArcRegistry
+    chain: robinhood-chain
+    address: "0xcfe634461795b5954c8fce02a677087a6c2c6b19"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S9
+      - S10
+  - label: API-labeled ArcOracle
+    chain: robinhood-chain
+    address: "0x879be77045e99913215b8a2b72320cc3457c7a00"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S5
+      - S9
+      - S10
+  - label: API-labeled ArcPositionManager
+    chain: robinhood-chain
+    address: "0x353b45eac23e6bad9c35e72304eab24312f16b31"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S5
+      - S9
+      - S10
+  - label: API-labeled ArcLendingPool
+    chain: robinhood-chain
+    address: "0x618389d2048ee7e4c823cec121c5d07edd95d0de"
+    role: vault
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S9
+      - S10
+  - label: API-labeled ArcCore
+    chain: robinhood-chain
+    address: "0xa75fe67a563cdff3fcbf6c64bf5d85aab33fd1c7"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S5
+      - S9
+      - S10
+  - label: API-labeled ArcZapRouter
+    chain: robinhood-chain
+    address: "0x6959773224c47060d8650b4e740c19c3d28b3fe7"
+    role: router
+    verified: false
+    sources:
+      - S4
+      - S5
+      - S9
+      - S10
+  - label: API-labeled NVDA/USDG Uniswap v3 pool (not an Arc token)
+    chain: robinhood-chain
+    address: "0xd4EB21209C4D6093f80B5b84f5C45cc093EA14a3"
+    role: other
+    verified: false
+    sources:
+      - S7
+      - S10
+      - S18
+  - label: API-labeled AAPL/USDG Uniswap v3 pool (not an Arc token)
+    chain: robinhood-chain
+    address: "0x783C9bbB765047CFdD2b84b92b2Ca9F11D34b7Ed"
+    role: other
+    verified: false
+    sources:
+      - S7
+      - S10
+  - label: API-labeled MSFT/USDG Uniswap v3 pool (not an Arc token)
+    chain: robinhood-chain
+    address: "0xeb60bCD1D920ad6E102690CCFC6fB488899E1510"
+    role: other
+    verified: false
+    sources:
+      - S7
+      - S10
+  - label: API-labeled GOOGL/USDG Uniswap v3 pool (not an Arc token)
+    chain: robinhood-chain
+    address: "0x34D0dC122CF9A8Eb296fC5e0D3A233625D7d19b7"
+    role: other
+    verified: false
+    sources:
+      - S7
+      - S10
+  - label: API-labeled AMZN/USDG Uniswap v3 pool (not an Arc token)
+    chain: robinhood-chain
+    address: "0x8AC92DA74AB5F3b1d024Dc1943Ad7e15Dc4179Ef"
+    role: other
+    verified: false
+    sources:
+      - S7
+      - S10
+  - label: API-labeled TSLA/USDG Uniswap v3 pool (not an Arc token)
+    chain: robinhood-chain
+    address: "0xf4ACdAEEB7022862A763C9B1B885e11191c889E3"
+    role: other
+    verified: false
+    sources:
+      - S7
+      - S10
+  - label: owner() of ArcRegistry/ArcOracle/ArcPositionManager/ArcLendingPool/ArcCore (EOA, no bytecode)
+    chain: robinhood-chain
+    address: "0xb1e919b33c7a69f51c584dc1f0d325cfd641d042"
+    role: admin
+    verified: false
+    sources:
+      - S10
+      - S19
+metrics:
+  - kind: volume_24h
+    value: 2893.8
+    currency: USD
+    as_of: 2026-09-04
+    class: claim
+    sources:
+      - S11
+  - kind: market_cap
+    value: 11164
+    currency: USD
+    as_of: 2026-09-04
+    class: claim
+    sources:
+      - S11
+  - kind: tvl
+    value: 15.245929
+    currency: USD
+    as_of: 2026-09-04
+    class: claim
+    sources:
+      - S6
+review:
+  researcher: grok-bot
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-04
+  published_at: null
+findings:
+  positive: []
+  risk: []
+  missing:
+    - text: "Do ArcLendingPool totalAssets/totalBorrows on explorer match the Railway /v1/pool numbers? Next: eth_call totalAssets/totalBorrows (or equivalent) on 0x618389… and compare to /v1/pool"
+    - text: "Can owner() on ArcRegistry and ArcLendingPool change markets, oracles, or liquidation params without a timelock? Next: Read verified source setters and any timelock/proxy on the Arc-named contracts"
+    - text: "Independent explorer reproduction of open LP positions and a USDG borrow, beyond the project's posts and API? Next: Read positionManager positions and a sample borrow tx on Blockscout"
+    - text: "X Latest from @ArcLiquidity in this environment? Next: Re-run Latest on @ArcLiquidity when this environment can read post bodies"
+    - text: "Is there a DefiLlama protocol row or GitHub org still missing? Next: Watch Llama listings and any repository link the official pages add"
+  unresolved:
+    - text: deployment.address remains unresolved (CON-1).

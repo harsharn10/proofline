@@ -1,13 +1,13 @@
 slug: dogecoin-tsla
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18"
     label: DOGECOIN token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: DOGECOIN
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -15,10 +15,14 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: 52150428
-    created_at: 2026-09-02T00:34:38.000Z
-    holders: 734
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18: HTTP 402: {"error":"Out of credits"}'
   - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
     label: DopplerERC20V1 implementation
     role: implementation
@@ -90,7 +94,7 @@ addresses:
         - "0xb8aa608671a639873c63ccd02548706aa8be2ff7"
         - "0xdf95cc445469816234ad95f702c79d25bce401a7"
         - "0xd39475c553cc86f0a569001f22b79f693ea92f0e"
-        - "0xc2b3a6e720c5f4e422caa6026bb9c3d1813a7ddb"
+        - "0x5f512dfeacc95e8c47135a1ebbdf5a9e70a0eeff"
     created_block: 646829
     created_at: 2026-06-30T22:03:11.000Z
     holders: null
@@ -99,8 +103,8 @@ addresses:
     label: Tesla • Robinhood Token (pair quote / rail)
     role: token
     is_contract: true
-    source_verified: true
-    contract_name: BeaconProxy
+    source_verified: null
+    contract_name: null
     proxy:
       type: none
       implementation: null
@@ -108,29 +112,47 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: 34767
-    created_at: 2026-06-05T14:08:35.000Z
-    holders: 52520
-    errors: []
+    created_block: null
+    created_at: null
+    holders: null
+    errors:
+      - step: blockscout
+        message: 'addresses/0x322F0929c4625eD5bAd873c95208D54E1c003b2d: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'tokens/0x322F0929c4625eD5bAd873c95208D54E1c003b2d: HTTP 402: {"error":"Out of credits"}'
 metrics: []
 market:
   token_address: "0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18"
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x4c023aad373f280d83c81edf1de4ff30164aa75f5365642c5e71448e86ea86d8"
       quote_symbol: TSLA
-      price_usd: 0.000061
-      liquidity_usd: 52841.61
-      volume_h24: 21040.84
-      volume_h6: 5238.04
+      price_usd: 0.00005601
+      liquidity_usd: 49799.39
+      volume_h24: 12269.77
+      volume_h6: 395.2
       txns_h24:
-        buys: 282
-        sells: 213
-      price_change_h24: -39.7
-      market_cap: 61005
-      fdv: 61005
+        buys: 178
+        sells: 125
+      price_change_h24: -29.7
+      market_cap: 56020
+      fdv: 56020
       created_at: 2026-09-02T00:34:38.000Z
+    - dex: uniswap
+      pair_address: "0x049592098696bf28bdc6fc8908c3116b06669394aaacd310ae0fe06de4860e32"
+      quote_symbol: ETH
+      price_usd: 0.0002456
+      liquidity_usd: 28.81
+      volume_h24: 2.87
+      volume_h6: 0
+      txns_h24:
+        buys: 0
+        sells: 1
+      price_change_h24: null
+      market_cap: 245647
+      fdv: 245647
+      created_at: 2026-09-02T00:37:58.000Z
     - dex: uniswap
       pair_address: "0x9644ed1b8262fc91ce1cbe3706b3f8b0cbbcfe1ed38d808cf800cb72832b3d91"
       quote_symbol: ETH
@@ -145,24 +167,20 @@ market:
       market_cap: 34982
       fdv: 34982
       created_at: 2026-09-02T03:21:28.000Z
-  liquidity_usd: 52842.61
-  volume_h24: 21041.34
-  trades_h24: 496
-  price_usd: 0.000061
-  price_change_h24: -39.7
-  market_cap_usd: 61005
-  fdv_usd: 61005
-  fdv: 61005
+  liquidity_usd: 49829.2
+  volume_h24: 12273.14
+  trades_h24: 305
+  price_usd: 0.00005601
+  price_change_h24: -29.7
+  market_cap_usd: 56020
+  fdv_usd: 56020
+  fdv: 56020
   first_pair_at: 2026-09-02T00:34:38.000Z
-  top10_share: 0.7170916856346434
-  top10_share_ex_pools: 0.1242222360061565
-  burned_share: 0
-  top10_as_of: 2026-09-04T11:23:39.609Z
-  launchpad:
-    slug: doppler
-    via: factory
-    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
-    shared: false
+  top10_share: null
+  top10_share_ex_pools: null
+  burned_share: null
+  top10_as_of: null
+  launchpad: null
   rialto: null
   pair_asset:
     ticker: TSLA
@@ -174,13 +192,27 @@ market:
     change_7d: 222239.49
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: launchpad
+      message: addresses/0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18 did not return creator_address_hash
+    - step: top10_share
+      message: 'tokens/0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: 'tokens/0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18/holders: HTTP 402: {"error":"Out of credits"}'
+    - step: top10_share
+      message: token total_supply was not returned for 0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18
+    - step: top10_share_ex_pools
+      message: holder page was not available for 0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18
 structure:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   mint: unknown
   renounced: false
   lp:
     - pair: "0x4c023aad373f280d83c81edf1de4ff30164aa75f5365642c5e71448e86ea86d8"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x049592098696bf28bdc6fc8908c3116b06669394aaacd310ae0fe06de4860e32"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
@@ -190,20 +222,26 @@ structure:
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: mint
+      message: 'smart-contracts/0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18: HTTP 402: {"error":"Out of credits"}'
+    - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18"
       label: DOGECOIN token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T13:20:29.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 52
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
-      errors: []
+      errors:
+        - step: blockscout
+          message: 'counters/0x51d3bBe1ab7467F71E06029e46Ef9044BF551E18: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       label: DopplerERC20V1 implementation
       role: implementation
@@ -229,10 +267,10 @@ activity:
       role: factory
       transactions_count: 13369
       token_transfers_count: 4
-      last_tx_at: 2026-09-04T11:27:33.000Z
+      last_tx_at: 2026-09-04T20:52:03.000Z
       last_method: create
       txns_24h: 2000
-      launches_24h: 1997
+      launches_24h: 1998
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -241,24 +279,26 @@ activity:
       role: admin
       transactions_count: 9126
       token_transfers_count: 445362
-      last_tx_at: 2026-09-04T11:11:59.000Z
+      last_tx_at: 2026-09-04T20:42:51.000Z
       last_method: create
-      txns_24h: 166
+      txns_24h: 112
       launches_24h: null
       errors: []
     - address: "0x322F0929c4625eD5bAd873c95208D54E1c003b2d"
       label: Tesla • Robinhood Token (pair quote / rail)
       role: token
-      transactions_count: 46997
-      token_transfers_count: 80
-      last_tx_at: 2026-09-04T12:43:22.000Z
-      last_method: approve
-      txns_24h: 2000
+      transactions_count: null
+      token_transfers_count: null
+      last_tx_at: null
+      last_method: null
+      txns_24h: null
       launches_24h: null
       errors:
-        - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
-  last_activity_at: 2026-09-04T13:20:29.000Z
-  txns_24h: 4218
-  launches_24h: 1997
+        - step: blockscout
+          message: 'counters/0x322F0929c4625eD5bAd873c95208D54E1c003b2d: HTTP 402: {"error":"Out of credits"}'
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+  last_activity_at: 2026-09-04T20:52:03.000Z
+  txns_24h: 2112
+  launches_24h: 1998
 errors: []

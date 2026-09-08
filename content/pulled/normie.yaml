@@ -1,5 +1,5 @@
 slug: normie
-pulled_at: 2026-09-04T11:23:39.609Z # chain head 54227036 at read time
+pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: null
     created_at: null
-    holders: 2164
+    holders: 2124
     errors: []
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory (token launchFactory)
@@ -29,9 +29,14 @@ addresses:
       type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
@@ -60,22 +65,21 @@ addresses:
     source_verified: true
     contract_name: PonsV2LaunchAndBuy
     proxy:
-      type: unknown
+      type: none
       implementation: null
       admin: null
-    owner: null
-    owner_type: none
-    safe: null
+    owner: "0x263ed295dafae1d9aadd6e56c4b6f9f38ee019dd"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0x1320a2b04a9e9ff511c7209c9669ebfe13cc818e"
+        - "0x3825e7b3ff17637b08219e99d78b6c622b73f5b7"
+        - "0xfa31fe751c203a623b52fad26b4063abc2ffdf50"
     created_block: 26841867
     created_at: 2026-08-03T14:41:21.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0xe33E9E479dF8802cb0866d5d05258bEc4cF62948: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0xe33E9E479dF8802cb0866d5d05258bEc4cF62948: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
-      - step: rpc
-        message: "eth_getStorageAt admin 0xe33E9E479dF8802cb0866d5d05258bEc4cF62948: HTTP 403 returned HTML, not JSON (bot challenge or error page)"
+    errors: []
   - address: "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C"
     label: SPY Stock Token (pair quote / rhj rail)
     role: token
@@ -91,96 +95,82 @@ addresses:
     safe: null
     created_block: 48294
     created_at: 2026-06-10T15:27:06.000Z
-    holders: 53878
+    holders: 55043
     errors: []
 metrics: []
 market:
   token_address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   pairs:
     - dex: uniswap
       pair_address: "0x8ece55481e6dcca5393ce2246c51952ba5fd996ff0f620ab76a038856e8bb2e6"
       quote_symbol: SPY
-      price_usd: 0.00008104
-      liquidity_usd: 23786.63
-      volume_h24: 116436.27
-      volume_h6: 14966.64
+      price_usd: 0.00004972
+      liquidity_usd: 18465.37
+      volume_h24: 73397.37
+      volume_h6: 10338.62
       txns_h24:
-        buys: 574
-        sells: 538
-      price_change_h24: -35.93
-      market_cap: 81047
-      fdv: 81047
+        buys: 338
+        sells: 321
+      price_change_h24: -24.77
+      market_cap: 49728
+      fdv: 49728
       created_at: 2026-09-02T02:25:38.000Z
     - dex: uniswap
       pair_address: "0xbc26e953101ce5b21f6a95eea9016b5b657d64088b64475ea0de9176e9684309"
       quote_symbol: USDG
-      price_usd: 0.00006586
-      liquidity_usd: 125.43
-      volume_h24: 145.17
-      volume_h6: 106.9
+      price_usd: 0.00004928
+      liquidity_usd: 108.5
+      volume_h24: 329.59
+      volume_h6: 27.54
       txns_h24:
-        buys: 17
-        sells: 16
-      price_change_h24: 9.77
-      market_cap: 65861
-      fdv: 65861
+        buys: 31
+        sells: 29
+      price_change_h24: -17.86
+      market_cap: 49285
+      fdv: 49285
       created_at: 2026-09-04T04:10:32.000Z
-    - dex: uniswap
-      pair_address: "0x664cabd9c2093ce6bbfa7f06d98598623063e8da6446695499c147edef5401c8"
-      quote_symbol: USDG
-      price_usd: 0.00006655
-      liquidity_usd: 74.87
-      volume_h24: 196.6
-      volume_h6: 7.63
-      txns_h24:
-        buys: 13
-        sells: 23
-      price_change_h24: -42.2
-      market_cap: 66551
-      fdv: 66551
-      created_at: 2026-09-02T02:43:07.000Z
     - dex: uniswap
       pair_address: "0x62a2e89c1ff34074d662fb84ca27974795573e5da2fd000083b590d69e20bb07"
       quote_symbol: ETH
-      price_usd: 0.00007751
-      liquidity_usd: 191.99
-      volume_h24: 195.7
-      volume_h6: 33.92
+      price_usd: 0.00004995
+      liquidity_usd: 151.86
+      volume_h24: 173.86
+      volume_h6: 6.14
       txns_h24:
-        buys: 16
-        sells: 17
-      price_change_h24: -18
-      market_cap: 77515
-      fdv: 77515
+        buys: 13
+        sells: 11
+      price_change_h24: -26.6
+      market_cap: 49953
+      fdv: 49953
       created_at: 2026-09-02T02:39:33.000Z
     - dex: uniswap
-      pair_address: "0x77baec062458f96cd6a1f63a1e47c52339acfffa120b4d45dcb911fe3861e2f8"
+      pair_address: "0x664cabd9c2093ce6bbfa7f06d98598623063e8da6446695499c147edef5401c8"
       quote_symbol: USDG
-      price_usd: 2.939e-27
-      liquidity_usd: null
-      volume_h24: 0
-      volume_h6: 0
+      price_usd: 0.00004413
+      liquidity_usd: 51.84
+      volume_h24: 33.19
+      volume_h6: 2.41
       txns_h24:
-        buys: 0
-        sells: 1
-      price_change_h24: null
-      market_cap: null
-      fdv: null
-      created_at: 2026-09-02T05:37:06.000Z
-  liquidity_usd: 24178.92
-  volume_h24: 116973.74
-  trades_h24: 1215
-  price_usd: 0.00008104
-  price_change_h24: -35.93
-  market_cap_usd: 81047
-  fdv_usd: 81047
-  fdv: 81047
+        buys: 5
+        sells: 10
+      price_change_h24: -33.42
+      market_cap: 44131
+      fdv: 44131
+      created_at: 2026-09-02T02:43:07.000Z
+  liquidity_usd: 18777.57
+  volume_h24: 73934.01
+  trades_h24: 758
+  price_usd: 0.00004972
+  price_change_h24: -24.77
+  market_cap_usd: 49728
+  fdv_usd: 49728
+  fdv: 49728
   first_pair_at: 2026-09-02T02:25:38.000Z
-  top10_share: 0.3913203786758794
-  top10_share_ex_pools: 0.1815602168714987
+  top10_share: 0.4412715313068246
+  top10_share_ex_pools: 0.1947645212242448
   burned_share: 0
-  top10_as_of: 2026-09-04T11:23:39.609Z
+  top10_as_of: 2026-09-04T20:46:36.233Z
   launchpad: null
   rialto: null
   pair_asset: null
@@ -189,7 +179,7 @@ market:
     - step: launchpad
       message: addresses/0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612 did not return creator_address_hash
 structure:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   mint: unknown
   renounced: null
   lp:
@@ -201,15 +191,11 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x664cabd9c2093ce6bbfa7f06d98598623063e8da6446695499c147edef5401c8"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x62a2e89c1ff34074d662fb84ca27974795573e5da2fd000083b590d69e20bb07"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x77baec062458f96cd6a1f63a1e47c52339acfffa120b4d45dcb911fe3861e2f8"
+    - pair: "0x664cabd9c2093ce6bbfa7f06d98598623063e8da6446695499c147edef5401c8"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
@@ -219,16 +205,16 @@ structure:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T11:23:39.609Z
+  pulled_at: 2026-09-04T20:46:36.233Z
   addresses:
     - address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
       label: NORMIE token
       role: token
       transactions_count: 0
       token_transfers_count: 0
-      last_tx_at: 2026-09-04T11:49:08.000Z
+      last_tx_at: 2026-09-04T22:09:32.000Z
       last_method: "0x095ea7b3"
-      txns_24h: 247
+      txns_24h: 145
       launches_24h: null
       errors: []
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
@@ -236,10 +222,10 @@ activity:
       role: factory
       transactions_count: 76659
       token_transfers_count: 6719
-      last_tx_at: 2026-09-04T11:24:53.000Z
-      last_method: transferCreatorFeeRecipient
+      last_tx_at: 2026-09-04T20:47:30.000Z
+      last_method: launchToken
       txns_24h: 2000
-      launches_24h: 805
+      launches_24h: 845
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -258,7 +244,7 @@ activity:
       role: router
       transactions_count: 79462
       token_transfers_count: 11161
-      last_tx_at: 2026-09-04T11:26:05.000Z
+      last_tx_at: 2026-09-04T20:49:16.000Z
       last_method: launchAndBuy
       txns_24h: 2000
       launches_24h: null
@@ -270,14 +256,14 @@ activity:
       role: token
       transactions_count: 50757
       token_transfers_count: 66
-      last_tx_at: 2026-09-04T12:33:16.000Z
+      last_tx_at: 2026-09-04T22:14:39.000Z
       last_method: approve
       txns_24h: 2000
       launches_24h: null
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
-  last_activity_at: 2026-09-04T12:33:16.000Z
-  txns_24h: 6247
-  launches_24h: 805
+  last_activity_at: 2026-09-04T22:14:39.000Z
+  txns_24h: 6145
+  launches_24h: 845
 errors: []
