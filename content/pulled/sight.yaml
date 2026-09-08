@@ -1,5 +1,5 @@
 slug: sight
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T11:21:05.295Z # chain head 57650574 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D"
@@ -15,10 +15,12 @@ addresses:
     owner: "0x4de0d3a415e1109fb55702da2989dd9d5d912584"
     owner_type: eoa
     safe: null
-    created_block: null
-    created_at: null
-    holders: 1065
-    errors: []
+    created_block: 50320541
+    created_at: 2026-08-30T21:13:38.000Z
+    holders: 1045
+    errors:
+      - step: blockscout
+        message: 'transactions?filter=to/0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D: HTTP 500: {"error":"Internal server error","source":"upstream"}'
   - address: "0x09a26fC8FCEF18192E267D7A6da9dFb4be81Dd6A"
     label: ERC721SeaDropCloneable
     role: implementation
@@ -73,7 +75,7 @@ addresses:
 metrics: []
 market:
   token_address: "0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -84,19 +86,19 @@ market:
   fdv_usd: null
   fdv: null
   first_pair_at: null
-  top10_share: 0.0974099099099099
-  top10_share_ex_pools: 0.0974099099099099
+  top10_share: 0.1233108108108108
+  top10_share_ex_pools: 0.1233108108108108
   burned_share: 0
-  top10_as_of: 2026-09-04T20:46:36.233Z
+  top10_as_of: 2026-09-08T11:21:05.295Z
   launchpad: null
   rialto: null
   pair_asset: null
   volume_disagreement: null
   errors:
     - step: launchpad
-      message: addresses/0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D did not return creator_address_hash
+      message: creator 0x008EbCCaE39d001200c3003c3225ce0A00690066 did not match a launchpad factory, curve or known launcher deployer
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   mint: unknown
   renounced: false
   lp: []
@@ -104,18 +106,22 @@ structure:
     - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   addresses:
     - address: "0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D"
       label: Sight Genesis ERC-721
       role: token
-      transactions_count: 9
-      token_transfers_count: 0
+      transactions_count: 3452
+      token_transfers_count: 1095
       last_tx_at: 2026-09-04T20:48:26.000Z
       last_method: "0xa22cb465"
       txns_24h: 208
       launches_24h: null
-      errors: []
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      errors:
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 500: {"error":"Internal server error","source":"upstream"}'
     - address: "0x09a26fC8FCEF18192E267D7A6da9dFb4be81Dd6A"
       label: ERC721SeaDropCloneable
       role: implementation
@@ -125,16 +131,20 @@ activity:
       last_method: updatePublicDrop
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
     - address: "0x008EbCCaE39d001200c3003c3225ce0A00690066"
       label: ERC721SeaDropCloneFactory
       role: factory
-      transactions_count: 35539
+      transactions_count: 36802
       token_transfers_count: 12
-      last_tx_at: 2026-09-04T21:08:57.000Z
+      last_tx_at: 2026-09-08T11:59:30.000Z
       last_method: createClone
-      txns_24h: 149
-      launches_24h: 149
+      txns_24h: 220
+      launches_24h: 220
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x4de0D3A415E1109Fb55702Da2989Dd9D5d912584"
       label: Sight Genesis owner
@@ -145,8 +155,125 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
-  last_activity_at: 2026-09-04T21:08:57.000Z
-  txns_24h: 357
-  launches_24h: 149
+  last_activity_at: 2026-09-08T11:59:30.000Z
+  txns_24h: 428
+  launches_24h: 220
+  window_as_of: 2026-09-04T20:46:36.233Z
+  stale_since: 2026-09-04T20:46:36.233Z
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D"
+      status: read
+      reason: token signal unavailable
+      signal_value: null
+      signal: null
+      code_hash: 38fe6e7c378858ba
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 6
+    - kind: activity
+      address: "0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D"
+      status: read
+      reason: token signal unavailable; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: 38fe6e7c378858ba
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x09a26fC8FCEF18192E267D7A6da9dFb4be81Dd6A"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 77ad78ae4056ca65
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x09a26fC8FCEF18192E267D7A6da9dFb4be81Dd6A"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 77ad78ae4056ca65
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: address
+      address: "0x008EbCCaE39d001200c3003c3225ce0A00690066"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0xc6b6a3f98064cd6a2782b46990ecbd73af076db84efacd95edf21edcaec3aa9e"
+      code_hash: c586ba771fb6feb0
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x008EbCCaE39d001200c3003c3225ce0A00690066"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xc6b6a3f98064cd6a2782b46990ecbd73af076db84efacd95edf21edcaec3aa9e"
+      code_hash: c586ba771fb6feb0
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 7
+    - kind: address
+      address: "0x4de0D3A415E1109Fb55702Da2989Dd9D5d912584"
+      status: unchanged
+      reason: admin role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x4de0D3A415E1109Fb55702Da2989Dd9D5d912584"
+      status: unchanged
+      reason: admin role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: top10
+      address: "0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D"
+      status: read
+      reason: token change signal changed
+      signal_value: null
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: structure
+      address: "0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D"
+      status: read
+      reason: token change signal changed
+      signal_value: null
+      signal: null
+      code_hash: 38fe6e7c378858ba
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 2
+    - kind: lp
+      address: "0x6F2893a2BF65CC52a23FC5c1bb4626742965a84D"
+      status: read
+      reason: token change signal changed
+      signal_value: null
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
 errors: []

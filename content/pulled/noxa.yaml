@@ -1,5 +1,5 @@
 slug: noxa
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T11:21:05.295Z # chain head 57650574 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
@@ -18,23 +18,25 @@ addresses:
     created_block: 61688
     created_at: 2026-06-16T13:53:01.000Z
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: "addresses/0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB: timeout after 10000ms after 3 attempts"
 metrics:
   - kind: tvl
-    value: 5770790
-    as_of: 2026-09-04T19:53:23.000Z
+    value: 5262029
+    as_of: 2026-09-08T09:39:59.000Z
     source_url: https://api.llama.fi/protocol/noxa-fun
   - kind: fees_24h
-    value: 174831
-    as_of: 2026-09-04T20:46:36.233Z
+    value: 75529
+    as_of: 2026-09-08T11:21:05.295Z
     source_url: https://api.llama.fi/summary/fees/noxa-fun?dataType=dailyFees
   - kind: revenue_24h
     value: 0
-    as_of: 2026-09-04T20:46:36.233Z
+    as_of: 2026-09-08T11:21:05.295Z
     source_url: https://api.llama.fi/summary/fees/noxa-fun?dataType=dailyRevenue
 market:
   token_address: null
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -58,7 +60,7 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   addresses:
     - address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
       label: Launch factory
@@ -67,12 +69,39 @@ activity:
       token_transfers_count: 240737
       last_tx_at: 2026-09-03T21:47:18.000Z
       last_method: "0x686399cb"
-      txns_24h: 1
+      txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
   last_activity_at: 2026-09-03T21:47:18.000Z
-  txns_24h: 1
+  txns_24h: 0
   launches_24h: 0
+  window_as_of: 2026-09-08T11:21:05.295Z
+  stale_since: null
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0x43dfdb09d070d129df9695238d7fd292594540b46a15726b77d15e4c54de8074"
+      code_hash: 419884f6be82de95
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0xD9eC2db5f3D1b236843925949fe5bd8a3836FCcB"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x43dfdb09d070d129df9695238d7fd292594540b46a15726b77d15e4c54de8074"
+      code_hash: 419884f6be82de95
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
 errors:
   - step: llama
     message: "volume_24h noxa-fun: HTTP 400: Dexs for noxa-fun not found, please visit /overview/dexs to see available protocols"

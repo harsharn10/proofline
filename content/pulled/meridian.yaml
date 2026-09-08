@@ -1,5 +1,5 @@
 slug: meridian
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T11:21:05.295Z # chain head 57650574 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 22051004
     created_at: 2026-07-29T01:15:03.000Z
-    holders: 617
+    holders: 631
     errors: []
   - address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
     label: AccountableYield strategy (ERC1967 proxy; app manageUrl)
@@ -115,12 +115,12 @@ addresses:
     errors: []
 metrics:
   - kind: tvl
-    value: 2344525
-    as_of: 2026-09-04T19:55:23.000Z
+    value: 2418040
+    as_of: 2026-09-08T09:34:59.000Z
     source_url: https://api.llama.fi/protocol/meridian-perps
 market:
   token_address: null
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -144,27 +144,31 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   addresses:
     - address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
       label: Meridian Liquidity Provider (MLP share vault)
       role: vault
       transactions_count: 970
       token_transfers_count: 1025
-      last_tx_at: 2026-09-04T19:51:06.000Z
-      last_method: withdraw
-      txns_24h: 16
+      last_tx_at: 2026-09-08T11:03:54.000Z
+      last_method: deposit
+      txns_24h: 7
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
       label: AccountableYield strategy (ERC1967 proxy; app manageUrl)
       role: proxy
       transactions_count: 81
       token_transfers_count: 2
-      last_tx_at: 2026-09-04T16:33:14.000Z
+      last_tx_at: 2026-09-07T10:33:13.000Z
       last_method: accrueAndProcess
-      txns_24h: 4
+      txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
       label: AccountableYield implementation
@@ -175,6 +179,8 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
     - address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
       label: YieldStrategyFactory (Accountable)
@@ -185,6 +191,8 @@ activity:
       last_method: createYieldStrategy
       txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
       label: YieldStrategyFactory owner Safe
@@ -193,8 +201,10 @@ activity:
       token_transfers_count: 2
       last_tx_at: 2026-09-04T09:49:53.000Z
       last_method: execTransaction
-      txns_24h: 1
+      txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0xE42847eE3feE1B29065F14D39EcF664A04d70475"
       label: ConditionalTokensConditionResolver (app robinhood-mainnet map)
@@ -205,10 +215,137 @@ activity:
       last_method: transferOwnership
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
-  last_activity_at: 2026-09-04T19:51:06.000Z
-  txns_24h: 21
+  last_activity_at: 2026-09-08T11:03:54.000Z
+  txns_24h: 7
   launches_24h: 0
+  window_as_of: 2026-09-04T20:46:36.233Z
+  stale_since: 2026-09-04T20:46:36.233Z
+reads:
+  tier: hot
+  explorer:
+    - kind: address
+      address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
+      status: read
+      reason: vault baseline unavailable
+      signal_value: null
+      signal: "0x73232090c5755469dd48da0b218a1f115bce6d59b982498ce07295da4a8627c6"
+      code_hash: 1c000304ed01324c
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
+      status: read
+      reason: vault baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x73232090c5755469dd48da0b218a1f115bce6d59b982498ce07295da4a8627c6"
+      code_hash: 1c000304ed01324c
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
+      status: read
+      reason: proxy baseline unavailable
+      signal_value: null
+      signal: "0x981f14abb243745aa3d1914514834c04ca8d3d71f11ce37ecaa109bb08248e6a"
+      code_hash: 07f22738dfcdc3b7
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
+      status: read
+      reason: proxy baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x981f14abb243745aa3d1914514834c04ca8d3d71f11ce37ecaa109bb08248e6a"
+      code_hash: 07f22738dfcdc3b7
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 45f616107a68c031
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 45f616107a68c031
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: address
+      address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0x28fe07f3a7b8d3cade043704f1f2454e8aaf535fcb4bd523af0cdf16a06c0398"
+      code_hash: 861252ce202318e5
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x28fe07f3a7b8d3cade043704f1f2454e8aaf535fcb4bd523af0cdf16a06c0398"
+      code_hash: 861252ce202318e5
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
+      status: read
+      reason: multisig baseline unavailable
+      signal_value: null
+      signal: "0x49b139bce3083377bb0984cb4124acd2e2ddf812c12ebff52983ea286177be83"
+      code_hash: 788b11033f24c6fe
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
+      status: read
+      reason: multisig baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x49b139bce3083377bb0984cb4124acd2e2ddf812c12ebff52983ea286177be83"
+      code_hash: 788b11033f24c6fe
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0xE42847eE3feE1B29065F14D39EcF664A04d70475"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: ec8ad1f28fba0df1
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0xE42847eE3feE1B29065F14D39EcF664A04d70475"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: ec8ad1f28fba0df1
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
 errors:
   - step: llama
     message: "fees_24h meridian-perps: HTTP 400: Fees for meridian-perps not found, please visit /overview/fees to see available protocols"

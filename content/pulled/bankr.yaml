@@ -1,5 +1,5 @@
 slug: bankr
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T11:21:05.295Z # chain head 57650574 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
@@ -95,10 +95,18 @@ addresses:
     created_at: 2026-07-09T06:30:06.000Z
     holders: 2
     errors: []
-metrics: []
+metrics:
+  - kind: fees_24h
+    value: 20790
+    as_of: 2026-09-08T11:21:05.295Z
+    source_url: https://api.llama.fi/summary/fees/bankr?dataType=dailyFees
+  - kind: revenue_24h
+    value: 0
+    as_of: 2026-09-08T11:21:05.295Z
+    source_url: https://api.llama.fi/summary/fees/bankr?dataType=dailyRevenue
 market:
   token_address: "0x9965de8400b382164e4dbF6dc0E5035cfFE28ba3"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -112,7 +120,7 @@ market:
   top10_share: 1
   top10_share_ex_pools: 0.15
   burned_share: 0
-  top10_as_of: 2026-09-04T20:46:36.233Z
+  top10_as_of: 2026-09-08T11:21:05.295Z
   launchpad:
     slug: doppler
     via: factory
@@ -123,7 +131,7 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   mint: unknown
   renounced: false
   lp: []
@@ -131,7 +139,7 @@ structure:
     - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   addresses:
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory (shared with LONG)
@@ -142,6 +150,8 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       label: DopplerERC20V1 implementation
@@ -152,16 +162,20 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
     - address: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
       label: Airlock (token owner)
       role: other
-      transactions_count: 9126
-      token_transfers_count: 445362
-      last_tx_at: 2026-09-04T20:42:51.000Z
+      transactions_count: 9792
+      token_transfers_count: 514126
+      last_tx_at: 2026-09-08T11:20:31.000Z
       last_method: create
-      txns_24h: 112
+      txns_24h: 119
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x9965de8400b382164e4dbF6dc0E5035cfFE28ba3"
       label: TAYSOM (Bankr stock-paired graduation, quote TSM)
@@ -172,6 +186,8 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x4D4aD0e4dfACB73C6cf85F81acbD09a40Fd95bA3"
       label: ROBINHOOD GOON (Bankr graduation; not GOONER)
@@ -182,18 +198,147 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
-  last_activity_at: 2026-09-04T20:42:51.000Z
-  txns_24h: 112
+  last_activity_at: 2026-09-08T11:20:31.000Z
+  txns_24h: 119
   launches_24h: 0
+  window_as_of: 2026-09-04T20:46:36.233Z
+  stale_since: 2026-09-04T20:46:36.233Z
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: factory signal unavailable
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: factory signal unavailable; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: address
+      address: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
+      status: read
+      reason: other baseline unavailable
+      signal_value: null
+      signal: "0xb7c386087239f0cf91db5b0ca5cfefb19ba824aca7d009f1b9b0fcdf9b4d28d3"
+      code_hash: f8de098a2663a757
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
+      status: read
+      reason: other baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xb7c386087239f0cf91db5b0ca5cfefb19ba824aca7d009f1b9b0fcdf9b4d28d3"
+      code_hash: f8de098a2663a757
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x9965de8400b382164e4dbF6dc0E5035cfFE28ba3"
+      status: read
+      reason: token signal unavailable
+      signal_value: null
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0x9965de8400b382164e4dbF6dc0E5035cfFE28ba3"
+      status: read
+      reason: token signal unavailable; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x4D4aD0e4dfACB73C6cf85F81acbD09a40Fd95bA3"
+      status: read
+      reason: token signal unavailable
+      signal_value: null
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0x4D4aD0e4dfACB73C6cf85F81acbD09a40Fd95bA3"
+      status: read
+      reason: token signal unavailable; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: top10
+      address: "0x9965de8400b382164e4dbF6dc0E5035cfFE28ba3"
+      status: read
+      reason: token change signal changed
+      signal_value: null
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: structure
+      address: "0x9965de8400b382164e4dbF6dc0E5035cfFE28ba3"
+      status: read
+      reason: token change signal changed
+      signal_value: null
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0x9965de8400b382164e4dbF6dc0E5035cfFE28ba3"
+      status: read
+      reason: token change signal changed
+      signal_value: null
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
 errors:
   - step: llama
-    message: "fees_24h bankr: Robinhood Chain is not one of the chains the response breaks down (Base)"
-  - step: llama
-    message: "revenue_24h bankr: Robinhood Chain is not one of the chains the response breaks down (Base)"
-  - step: llama
-    message: "revenue_daily bankr: no Robinhood Chain daily series in the response"
-  - step: llama
     message: "volume_24h bankr: HTTP 400: Dexs for bankr not found, please visit /overview/dexs to see available protocols"
-  - step: llama
-    message: "revenue_daily bankr: the read returned no daily points, so no series file was written"

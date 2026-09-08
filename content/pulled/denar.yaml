@@ -1,5 +1,5 @@
 slug: denar
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T11:21:05.295Z # chain head 57650574 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 50334878
     created_at: 2026-08-30T21:37:55.000Z
-    holders: 1437
+    holders: 1441
     errors: []
   - address: "0xf0A0a33729270586cDD66010B1cedE649745c3A5"
     label: Denar Morpho Blue (equity lending core)
@@ -29,9 +29,14 @@ addresses:
       type: none
       implementation: null
       admin: null
-    owner: "0xdcb002787fb86873051b838582063517fdc47c6f"
-    owner_type: eoa
-    safe: null
+    owner: "0x11f16bf503e1f5243e5847e79d05d1f9b98d352d"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0xdcb002787fb86873051b838582063517fdc47c6f"
+        - "0xa6f3eeaa4841218ba07b94dee9805f98276f513a"
+        - "0x797d9a10da635da66c8a61ce3f414000004aaeb6"
     created_block: 30436487
     created_at: 2026-08-07T18:44:49.000Z
     holders: null
@@ -63,12 +68,17 @@ addresses:
       type: none
       implementation: null
       admin: null
-    owner: "0xdcb002787fb86873051b838582063517fdc47c6f"
-    owner_type: eoa
-    safe: null
+    owner: "0x11f16bf503e1f5243e5847e79d05d1f9b98d352d"
+    owner_type: safe
+    safe:
+      threshold: 2
+      signers:
+        - "0xdcb002787fb86873051b838582063517fdc47c6f"
+        - "0xa6f3eeaa4841218ba07b94dee9805f98276f513a"
+        - "0x797d9a10da635da66c8a61ce3f414000004aaeb6"
     created_block: 30436959
     created_at: 2026-08-07T18:45:37.000Z
-    holders: 21
+    holders: 28
     errors: []
   - address: "0x99a0bD825beDA579794F3f715ab3984310C7226E"
     label: MetaMorphoV1_1Factory
@@ -97,7 +107,7 @@ addresses:
       type: none
       implementation: null
       admin: null
-    owner: "0xdcb002787fb86873051b838582063517fdc47c6f"
+    owner: "0x797d9a10da635da66c8a61ce3f414000004aaeb6"
     owner_type: eoa
     safe: null
     created_block: 30437312
@@ -108,8 +118,8 @@ addresses:
     label: Denar Frontier USDG (dnFRONT)
     role: vault
     is_contract: true
-    source_verified: false
-    contract_name: Denar Frontier USDG
+    source_verified: true
+    contract_name: VaultV2
     proxy:
       type: none
       implementation: null
@@ -119,8 +129,10 @@ addresses:
     safe: null
     created_block: null
     created_at: null
-    holders: 1
-    errors: []
+    holders: 2
+    errors:
+      - step: blockscout
+        message: 'transactions/0xe340bbeace87e07af6005a13ddcf07e9e4c0bf22cc80505760fca2de5dbf2dc1: HTTP 500: {"error":"Internal server error","source":"upstream"}'
   - address: "0xdCB002787Fb86873051b838582063517FDc47c6F"
     label: Protocol owner / deployer
     role: admin
@@ -169,105 +181,63 @@ addresses:
 metrics: []
 market:
   token_address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   pairs:
     - dex: uniswap
       pair_address: "0x8e1a7addeed794d59f04755f7bd1a8d47c1eb1c60f7891587d30cd8616699f3c"
       quote_symbol: ETH
-      price_usd: 0.001062
-      liquidity_usd: 94546.17
-      volume_h24: 232315.11
-      volume_h6: 32545.14
+      price_usd: 0.0013
+      liquidity_usd: 105051.3
+      volume_h24: 114937.69
+      volume_h6: 21176.54
       txns_h24:
-        buys: 446
-        sells: 383
-      price_change_h24: -1.37
-      market_cap: 1062880
-      fdv: 1062880
+        buys: 199
+        sells: 189
+      price_change_h24: -24.18
+      market_cap: 1300276
+      fdv: 1300276
       created_at: 2026-08-30T21:37:58.000Z
     - dex: uniswap
       pair_address: "0xfe0441319d330ade7b6f36ba98ace45bba229719a720dea9bee6b56d1a7e243e"
       quote_symbol: USDG
-      price_usd: 0.001065
-      liquidity_usd: 11507.76
-      volume_h24: 34046.06
-      volume_h6: 561.07
+      price_usd: 0.001301
+      liquidity_usd: 25295.19
+      volume_h24: 73762.57
+      volume_h6: 19094.27
       txns_h24:
         buys: 153
-        sells: 168
-      price_change_h24: 10.47
-      market_cap: 1065813
-      fdv: 1065813
+        sells: 164
+      price_change_h24: -23.12
+      market_cap: 1301726
+      fdv: 1301726
       created_at: 2026-08-31T03:13:10.000Z
-    - dex: uniswap
-      pair_address: "0x828d1868055b760374f6a9fcd627f8080f8b70cacda6fe24a0d26ac93df5c6cb"
-      quote_symbol: ETH
-      price_usd: 0.001321
-      liquidity_usd: 2002.18
-      volume_h24: 1056.87
-      volume_h6: 0
-      txns_h24:
-        buys: 26
-        sells: 18
-      price_change_h24: 42.82
-      market_cap: 1321587
-      fdv: 1321587
-      created_at: 2026-09-03T03:17:34.000Z
     - dex: uniswap
       pair_address: "0x7957344debad2fbb5b69860d391116b771bc5a39c89c7c5ee79e7dcc6c758340"
       quote_symbol: USDG
-      price_usd: 0.001124
-      liquidity_usd: 256.21
-      volume_h24: 415.9
-      volume_h6: 54.52
+      price_usd: 0.001376
+      liquidity_usd: 219.04
+      volume_h24: 193.11
+      volume_h6: 52.39
       txns_h24:
-        buys: 20
-        sells: 23
-      price_change_h24: 9.28
-      market_cap: 1124930
-      fdv: 1124930
+        buys: 9
+        sells: 13
+      price_change_h24: -14.53
+      market_cap: 1376240
+      fdv: 1376240
       created_at: 2026-08-30T21:45:08.000Z
-    - dex: uniswap
-      pair_address: "0x750ae02f2522bdf00c817018940c264f2f7967a21868a70563113582f4c7ded5"
-      quote_symbol: ETH
-      price_usd: 0.001503
-      liquidity_usd: 56.73
-      volume_h24: 19.95
-      volume_h6: 0
-      txns_h24:
-        buys: 1
-        sells: 3
-      price_change_h24: -14.28
-      market_cap: 1503872
-      fdv: 1503872
-      created_at: 2026-08-31T14:06:50.000Z
-    - dex: uniswap
-      pair_address: "0x64edb323c75122fbcb18334599b95e34646ba0a67b9893086ea9b30817195f2b"
-      quote_symbol: DENAR
-      price_usd: 0.00004001
-      liquidity_usd: 407.12
-      volume_h24: 305.15
-      volume_h6: 0
-      txns_h24:
-        buys: 6
-        sells: 8
-      price_change_h24: 3.64
-      market_cap: 40012
-      fdv: 40012
-      created_at: 2026-09-04T02:47:43.000Z
-  liquidity_usd: 108776.17
-  volume_h24: 268159.04
-  trades_h24: 1255
-  price_usd: 0.001062
-  price_change_h24: -1.37
-  market_cap_usd: 1062880
-  fdv_usd: 1062880
-  fdv: 1062880
+  liquidity_usd: 130565.53
+  volume_h24: 188893.37
+  trades_h24: 727
+  price_usd: 0.0013
+  price_change_h24: -24.18
+  market_cap_usd: 1300276
+  fdv_usd: 1300276
+  fdv: 1300276
   first_pair_at: 2026-08-30T21:37:58.000Z
-  top10_share: 0.295509102707993
-  top10_share_ex_pools: 0.1771823699163682
+  top10_share: 0.3231674985477057
+  top10_share_ex_pools: 0.2011934051532026
   burned_share: 0
-  top10_as_of: 2026-09-04T20:46:36.233Z
+  top10_as_of: 2026-09-08T11:21:05.295Z
   launchpad:
     slug: pons
     via: creator
@@ -278,7 +248,7 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   mint: no-mint-function
   renounced: null
   lp:
@@ -290,19 +260,7 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x828d1868055b760374f6a9fcd627f8080f8b70cacda6fe24a0d26ac93df5c6cb"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x7957344debad2fbb5b69860d391116b771bc5a39c89c7c5ee79e7dcc6c758340"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x750ae02f2522bdf00c817018940c264f2f7967a21868a70563113582f4c7ded5"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x64edb323c75122fbcb18334599b95e34646ba0a67b9893086ea9b30817195f2b"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
@@ -310,27 +268,31 @@ structure:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   addresses:
     - address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
       label: DENAR token (PonsV2LauncherToken)
       role: token
-      transactions_count: 4099
+      transactions_count: 5579
       token_transfers_count: 0
-      last_tx_at: 2026-09-04T20:49:34.000Z
+      last_tx_at: 2026-09-08T11:24:40.000Z
       last_method: approve
-      txns_24h: 216
+      txns_24h: 121
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0xf0A0a33729270586cDD66010B1cedE649745c3A5"
       label: Denar Morpho Blue (equity lending core)
       role: other
-      transactions_count: 68
-      token_transfers_count: 86
-      last_tx_at: 2026-09-04T08:33:31.000Z
-      last_method: borrow
-      txns_24h: 7
+      transactions_count: 90
+      token_transfers_count: 135
+      last_tx_at: 2026-09-07T22:29:13.000Z
+      last_method: setOwner
+      txns_24h: 1
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x9316E7eDAB60eF0f489b1E4D11DDcDaa560aCbfD"
       label: AdaptiveCurveIrm (Denar instance)
@@ -341,16 +303,20 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
     - address: "0xF0E6AD006080c48766ddb95b8c568D72bC059050"
       label: Denar USDG Vault (dnUSDG, MetaMorphoV1_1)
       role: vault
-      transactions_count: 74
-      token_transfers_count: 64
-      last_tx_at: 2026-09-04T16:24:32.000Z
-      last_method: deposit
-      txns_24h: 3
+      transactions_count: 102
+      token_transfers_count: 110
+      last_tx_at: 2026-09-07T22:21:14.000Z
+      last_method: transferOwnership
+      txns_24h: 2
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x99a0bD825beDA579794F3f715ab3984310C7226E"
       label: MetaMorphoV1_1Factory
@@ -361,26 +327,32 @@ activity:
       last_method: createMetaMorpho
       txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x4d61E8a7eF442eb077650D349781F2cc3Ebe42d1"
       label: DenarLiquidator (equity)
       role: other
-      transactions_count: 1
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T14:02:44.000Z
+      transactions_count: 3
+      token_transfers_count: 8
+      last_tx_at: 2026-09-08T00:17:26.000Z
       last_method: liquidate
       txns_24h: 2
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x338b2f252dae1deb00Afb700128e592a19F8918c"
       label: Denar Frontier USDG (dnFRONT)
       role: vault
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-02T19:48:09.000Z
-      last_method: "0xac9650d8"
-      txns_24h: 0
+      transactions_count: 31
+      token_transfers_count: 12
+      last_tx_at: 2026-09-07T23:24:25.000Z
+      last_method: multicall
+      txns_24h: 13
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0xdCB002787Fb86873051b838582063517FDc47c6F"
       label: Protocol owner / deployer
@@ -391,20 +363,239 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
     - address: "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010"
       label: Morpho Blue (canonical; not Denar-owned)
       role: other
-      transactions_count: 2634
-      token_transfers_count: 363281
-      last_tx_at: 2026-09-04T21:09:00.000Z
-      last_method: withdrawCollateral
-      txns_24h: 154
+      transactions_count: 3732
+      token_transfers_count: 469677
+      last_tx_at: 2026-09-08T11:22:19.000Z
+      last_method: borrow
+      txns_24h: 204
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
-  last_activity_at: 2026-09-04T21:09:00.000Z
-  txns_24h: 382
+  last_activity_at: 2026-09-08T11:24:40.000Z
+  txns_24h: 343
   launches_24h: 0
+  window_as_of: 2026-09-04T20:46:36.233Z
+  stale_since: 2026-09-04T20:46:36.233Z
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0x062970f4d364543c896181524dc98116a1fd8b6731e5b37817b7bf235b5dffcd"
+      code_hash: 36c18b33e64f820c
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 5
+    - kind: activity
+      address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0x062970f4d364543c896181524dc98116a1fd8b6731e5b37817b7bf235b5dffcd"
+      code_hash: 36c18b33e64f820c
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 4
+    - kind: address
+      address: "0xf0A0a33729270586cDD66010B1cedE649745c3A5"
+      status: read
+      reason: other baseline unavailable
+      signal_value: null
+      signal: "0x6086f62048a21aea1961f9a994f69dfc294c52d1d5cc586d6f8da045ea72aaec"
+      code_hash: 807a754a5b6098ea
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0xf0A0a33729270586cDD66010B1cedE649745c3A5"
+      status: read
+      reason: other baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x6086f62048a21aea1961f9a994f69dfc294c52d1d5cc586d6f8da045ea72aaec"
+      code_hash: 807a754a5b6098ea
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x9316E7eDAB60eF0f489b1E4D11DDcDaa560aCbfD"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: a7673bf567df609d
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x9316E7eDAB60eF0f489b1E4D11DDcDaa560aCbfD"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: a7673bf567df609d
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: address
+      address: "0xF0E6AD006080c48766ddb95b8c568D72bC059050"
+      status: read
+      reason: vault baseline unavailable
+      signal_value: null
+      signal: "0xab7b6d99c7b930aaa73a644b57783ee377c14f5e215550854c7e5b10c367f302"
+      code_hash: 4f42afcecfe9d6b2
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0xF0E6AD006080c48766ddb95b8c568D72bC059050"
+      status: read
+      reason: vault baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xab7b6d99c7b930aaa73a644b57783ee377c14f5e215550854c7e5b10c367f302"
+      code_hash: 4f42afcecfe9d6b2
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x99a0bD825beDA579794F3f715ab3984310C7226E"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0x6896149ae40cd645b4800629032e2ff4ec05b8fbedc066049aef883bfb41ae20"
+      code_hash: edbbafc030ba9daf
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x99a0bD825beDA579794F3f715ab3984310C7226E"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x6896149ae40cd645b4800629032e2ff4ec05b8fbedc066049aef883bfb41ae20"
+      code_hash: edbbafc030ba9daf
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x4d61E8a7eF442eb077650D349781F2cc3Ebe42d1"
+      status: read
+      reason: other baseline unavailable
+      signal_value: null
+      signal: "0x72e4ffc15b1387339d00146b9249f6febb257e0ce5f4f854b15647f75ec51f39"
+      code_hash: 3d3731cfff1acadc
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x4d61E8a7eF442eb077650D349781F2cc3Ebe42d1"
+      status: read
+      reason: other baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x72e4ffc15b1387339d00146b9249f6febb257e0ce5f4f854b15647f75ec51f39"
+      code_hash: 3d3731cfff1acadc
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x338b2f252dae1deb00Afb700128e592a19F8918c"
+      status: read
+      reason: vault baseline unavailable
+      signal_value: null
+      signal: "0xcd91cd6d4b9e59ea09b9173823bd95efd330514f83e4c72da171f2ad23377df6"
+      code_hash: f255d4497b0ebcbd
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 6
+    - kind: activity
+      address: "0x338b2f252dae1deb00Afb700128e592a19F8918c"
+      status: read
+      reason: vault baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xcd91cd6d4b9e59ea09b9173823bd95efd330514f83e4c72da171f2ad23377df6"
+      code_hash: f255d4497b0ebcbd
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0xdCB002787Fb86873051b838582063517FDc47c6F"
+      status: unchanged
+      reason: admin role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0xdCB002787Fb86873051b838582063517FDc47c6F"
+      status: unchanged
+      reason: admin role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: address
+      address: "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010"
+      status: read
+      reason: other baseline unavailable
+      signal_value: null
+      signal: "0xae8c664f6de0a90bcda8e07ddfa2e12157badd4abb96c3e7569c24f2f133d5b8"
+      code_hash: 3f940e787f5bd41e
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010"
+      status: read
+      reason: other baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xae8c664f6de0a90bcda8e07ddfa2e12157badd4abb96c3e7569c24f2f133d5b8"
+      code_hash: 3f940e787f5bd41e
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 6
+    - kind: top10
+      address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
+      status: read
+      reason: token change signal changed
+      signal_value: 727
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: structure
+      address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
+      status: read
+      reason: token change signal changed
+      signal_value: 727
+      signal: null
+      code_hash: 36c18b33e64f820c
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0x3786728a2c49C4617Bf4FE5BD82b90B6B0dF5508"
+      status: read
+      reason: token change signal changed
+      signal_value: 727
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
 errors:
   - step: llama
     message: "protocol/denar: HTTP 400: Protocol not found"

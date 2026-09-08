@@ -1,5 +1,5 @@
 slug: long
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T11:21:05.295Z # chain head 57650574 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
@@ -81,7 +81,7 @@ addresses:
 metrics: []
 market:
   token_address: null
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -105,20 +105,20 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T11:21:05.295Z
   addresses:
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       label: LongLauncher (PRD 0x22e9…eeED)
       role: factory
-      transactions_count: 13369
-      token_transfers_count: 4
-      last_tx_at: 2026-09-04T20:52:03.000Z
+      transactions_count: 27619
+      token_transfers_count: 8
+      last_tx_at: 2026-09-08T11:23:34.000Z
       last_method: create
-      txns_24h: 2000
-      launches_24h: 1998
-      errors:
-        - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
+      txns_24h: 1839
+      launches_24h: 1835
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      errors: []
     - address: "0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845"
       label: TickerAirlockFactory (PRD 0x9c88…0845)
       role: factory
@@ -128,6 +128,8 @@ activity:
       last_method: create
       txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory (trusted token factory)
@@ -138,18 +140,107 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (create primitive)
       role: router
-      transactions_count: 9126
-      token_transfers_count: 445362
-      last_tx_at: 2026-09-04T20:42:51.000Z
+      transactions_count: 9792
+      token_transfers_count: 514126
+      last_tx_at: 2026-09-08T11:20:31.000Z
       last_method: create
-      txns_24h: 112
+      txns_24h: 119
       launches_24h: null
+      window_as_of: 2026-09-08T11:21:05.295Z
+      stale_since: null
       errors: []
-  last_activity_at: 2026-09-04T20:52:03.000Z
-  txns_24h: 2112
-  launches_24h: 1998
+  last_activity_at: 2026-09-08T11:23:34.000Z
+  txns_24h: 1958
+  launches_24h: 1835
+  window_as_of: 2026-09-08T11:21:05.295Z
+  stale_since: null
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0x0d9acf54da4f91afc4178a0ca6a8eec7f033c1453523d6c1b83f3533919e95a8"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x0d9acf54da4f91afc4178a0ca6a8eec7f033c1453523d6c1b83f3533919e95a8"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0xaeb69131d6ad8057d804fdc6d392cb0ffaeac27824647a4f071c0bf130f61fa6"
+      code_hash: 84d022517ff706be
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xaeb69131d6ad8057d804fdc6d392cb0ffaeac27824647a4f071c0bf130f61fa6"
+      code_hash: 84d022517ff706be
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: factory signal unavailable
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: factory signal unavailable; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+      status: read
+      reason: router baseline unavailable
+      signal_value: null
+      signal: "0xb7c386087239f0cf91db5b0ca5cfefb19ba824aca7d009f1b9b0fcdf9b4d28d3"
+      code_hash: f8de098a2663a757
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+      status: read
+      reason: router baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xb7c386087239f0cf91db5b0ca5cfefb19ba824aca7d009f1b9b0fcdf9b4d28d3"
+      code_hash: f8de098a2663a757
+      checked_at: 2026-09-08T11:21:05.295Z
+      stale_since: null
+      credits: 0
 errors: []
