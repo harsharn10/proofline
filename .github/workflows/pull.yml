@@ -52,6 +52,10 @@ jobs:
     env:
       # Optional: without it the puller retains the public explorer fallback.
       BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}
+      # Stop starting new names at 45 minutes so there is time to validate, commit and push what was
+      # already read. A run is latency-bound long before it is pace-bound, so it can reach the job
+      # timeout with credits to spare — and a killed job loses every name it had finished.
+      PULL_DEADLINE_MINUTES: "45"
     # One bot on main at a time: the compile workflow shares this group.
     #
     # Deliberately one job and not a two-shard matrix. `cancel-in-progress: false` protects the job

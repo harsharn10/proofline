@@ -10,13 +10,15 @@ why. It never guesses and never turns an unavailable read into zero.
 | Output | Source URL pattern | Refresh |
 | --- | --- | --- |
 | `addresses[].is_contract`, `proxy`, `owner`, `owner_type`, `safe` | `https://rpc.mainnet.chain.robinhood.com` (`eth_getCode`, `eth_getStorageAt`, `eth_call`) | Every pull (6 h) |
-| `addresses[].source_verified`, `contract_name`, `created_block`, `created_at`, `holders` | Blockscout PRO `/4663/api/v2/addresses/<address>`, `/transactions/<creation-tx>`, `/tokens/<address>`; public fallback | When the address change signal moves |
+| `addresses[].holders` | Blockscout PRO `/4663/api/v2/tokens/<address>`; public fallback | When the address change signal moves |
+| `addresses[].source_verified`, `contract_name`, `created_block`, `created_at` | Blockscout `/addresses/<address>` and `/transactions/<creation-tx>` | First read, then only when the free RPC code hash changes |
 | `market.pairs`, `liquidity_usd`, `volume_h24`, `trades_h24`, `price_usd`, `price_change_h24`, `fdv`, `first_pair_at` | `https://api.dexscreener.com/token-pairs/v1/robinhood/<token>` (all-chain token endpoint is a filtered fallback) | Every pull (6 h) |
 | `market.top10_share`, `top10_share_ex_pools`, `burned_share`, `top10_as_of` | Blockscout `/tokens/<token>` and `/tokens/<token>/holders` page 1 | When DexScreener's token trade count moves |
 | `market.launchpad` | Blockscout `/addresses/<token>` creator, joined to launchpad factory and curve addresses | When the token change signal moves |
 | `structure.mint`, `structure.renounced` | Blockscout `/smart-contracts/<token>` verified ABI plus RPC `owner()` | When the token change signal moves |
 | `structure.lp[]` | DexScreener pair address plus Blockscout `/tokens/<pair>` and `/tokens/<pair>/holders` page 1 | When the token change signal moves |
-| `activity.*` | Blockscout `/addresses/<address>/counters` and `/addresses/<address>/transactions?filter=to` | Counter every due pull; walk only on change (40 pages for factory/curve/router, 5 otherwise) |
+| `activity.txns_24h`, `launches_24h`, `last_tx_at`, `last_method` | Blockscout `/addresses/<address>/transactions?filter=to` | Page one every due pull — it is the change signal; further pages only on change (40 for factory/curve/router, 5 otherwise) |
+| `activity.transactions_count`, `token_transfers_count` | Blockscout `/addresses/<address>/counters` | Only when the signal moved; a lifetime figure that otherwise carries |
 | `metrics[]` TVL | `https://api.llama.fi/protocol/<protocol>` Robinhood Chain slice | Every pull (6 h) |
 | `metrics[]` fees, revenue and volume | `https://api.llama.fi/summary/fees/<protocol>?dataType=dailyFees`, `dailyRevenue`, and `/summary/dexs/<protocol>?dataType=dailyVolume`, Robinhood Chain slice | Every pull (6 h) |
 | `series/<slug>.json.revenue_daily` | DefiLlama daily-revenue response above, Robinhood Chain slice, latest 90 daily points | At most one replacement per UTC day; never shortened |
@@ -46,22 +48,122 @@ documented fallback. The closing summary is the budget receipt.
 The six-hour scheduler does not pull every name. `hot` means above the share bar or present in
 `ops/pull-queue.json` within 24 hours and runs every six hours; `live` means activity within seven
 days and runs every 12 hours; `quiet` means activity 7–30 days ago and runs daily; `dormant` runs
-weekly. `--only` and `--full` override cadence, while `--tier` limits it. Pulse or an operator can
-append `{ "slug": "name", "reason": "...", "at": "ISO timestamp" }` to the queue. A successful
-name is removed; a deferred or failed name stays queued.
+weekly. Due-ness is compared with half a cron period of tolerance: without it a name read at
+17:17:09 is eleven seconds short of twelve hours when the 05:17 run asks, slips a whole slot, and
+"every second run" silently becomes every third — a live cadence of 18 hours, a quiet one of 30.
+`--only` and `--full` override cadence, while `--tier` limits it. Pulse or an operator can append
+`{ "slug": "name", "reason": "...", "at": "ISO timestamp" }` to the queue. A successful name is
+removed; a deferred or failed name stays queued, and an entry older than a week expires so a name
+that is never due cannot pin itself hot for ever.
 
-Contracts spend one explorer credit on `/counters` as their change signal. Tokens use the free
-DexScreener trade count and EOAs use the free RPC nonce. If the signal is unchanged, explorer-only
-facts are carried with their original `stale_since`, and the expensive activity walk, holder page,
-ABI and LP reads are skipped. RPC ownership/proxy facts, DexScreener, Rialto and DefiLlama remain
-fresh. `--full` deliberately bypasses the change check.
+### The change signal
 
-`BLOCKSCOUT_BUDGET_PER_RUN` defaults to 12,000 credits and `BLOCKSCOUT_BUDGET_PER_DAY` to 60,000,
-leaving 40,000 credits of daily headroom. `ops/pull-budget.json` stores the UTC date, credits used and
-run count. A cap is checked before each physical request. Reaching it is not a failed run: remaining
-keyless reads finish, explorer reads are recorded as `deferred`, prior non-null values are retained,
-and the process exits zero unless an independent gate fails. The committed `reads` block explains
-what was read, unchanged or deferred, its signal, credit count and stale date.
+Before any expensive explorer read, one cheap signal decides whether the answer can have moved.
+
+- **A contract**: page one of `/addresses/<address>/transactions?filter=to`, one credit. The signal
+  is the hash and timestamp of the newest transaction *to* the address.
+- **An EOA or Safe signer**: the RPC nonce, free.
+- **A token**: both. DexScreener's 24-hour trade count is a pre-filter that can force a read on its
+  own — a swap routed through a router or a v4 PoolManager never appears as a transaction to the
+  token contract, so the token's inbound list can sit still while its holder set churns — but an
+  unmoved trade count is never on its own a reason to skip the explorer read.
+
+It is deliberately **not** `/addresses/<address>/counters.transactions_count`. On this deployment
+that counter is a cached aggregate. On 2026-09-04 the PONS locker
+`0x736D76699C26D0d966744cAe304C000d471f7F35` returned `transactions_count: 903584` at 11:23, at
+17:49 and again at 18:00 UTC, while `/transactions?filter=to` moved from 11:24:10 to 17:55:47 with
+fifty fresh `collectFees` calls on page one alone. A signal that cannot move classifies every
+contract unchanged on every run for ever: the walk, the holder page, the ABI and the LP read never
+execute again, `pulled_at` keeps advancing, and the corpus freezes while presenting itself as
+current. The counters endpoint is still read — it is where the lifetime `transactions_count` comes
+from — but only when the signal has already said something moved, and it is never a signal itself.
+
+Page one is not a separate purchase. It is the first page of the 24-hour walk, so the credit that
+buys the signal is the credit that starts the count, and for most addresses finishes it: when page
+one reaches a transaction older than the window the count is exact and the window is refreshed for
+nothing, which is how a quiet address falls to zero instead of reporting yesterday's number for ever.
+Only an address with fifty or more inbound transactions inside 24 hours needs a second page.
+
+A signal is not bought for every address. `token`, `factory`, `curve`, `router`, `vault` and
+`multisig` are read every due run — that is where the published facts actually move. An `admin`,
+`proxy`, `implementation`, `timelock` or unclassified `other` row is a static contract whose holder
+count, ABI and creation block have not changed since deployment, so it is signalled only on a first
+read, under `--full`, or when it transacted in the last seven days.
+
+When the signal is unchanged the expensive reads are skipped and the committed facts are carried
+with their original `stale_since`. RPC ownership and proxy facts, DexScreener, Rialto and DefiLlama
+stay fresh regardless; they cost nothing.
+
+### What a skipped read may and may not carry
+
+`is_contract`, `source_verified`, `contract_name`, `created_block`, `created_at`, `holders`,
+`transactions_count`, `token_transfers_count`, `last_tx_at` and `last_method` are facts. They only
+go stale, so a run that did not buy them carries the committed value and dates it.
+
+`txns_24h` and `launches_24h` are not facts. They are measurements of the 24 hours before a read,
+and restating one under a newer `pulled_at` redefines the window it claims to describe — a factory
+that launched 24 tokens yesterday and nothing since would report 24 launches in the last 24 hours
+indefinitely. A carried figure therefore keeps `window_as_of`, the timestamp of the run that
+actually measured it, carries `stale_since`, and keeps the errors that qualified it — above all the
+`txns_24h capped` caveat of a page-capped walk, which is the difference between a measured 2,000 and
+a lower bound that could be 50,000. At the block level, `activity.window_as_of` and
+`activity.stale_since` are the oldest of the contributing rows': a sum of windows is only as fresh
+as its oldest term.
+
+`history/<slug>.jsonl` is append-only and cannot be corrected by a later run, so `txns_total` is the
+sum of the explorer's lifetime `transactions_count` per address and nothing else. A run that did not
+buy the counters carries the committed figure rather than substituting a different measurement that
+happens to be at hand — an RPC nonce, a DexScreener trade count. Two consecutive runs of an
+unchanged address write the same number.
+
+### An empty read is not a fact
+
+A null where the committed snapshot held a value is a failed read until proven otherwise. On
+2026-09-04 at 13:27 UTC one run nulled `owner`, `owner_type` and the whole `safe` block on 82
+address rows, 35 of them with `errors: []`, because a failed `eth_call` was being read as "this
+contract has no `owner()`"; the signals feed published that as PONS renouncing ownership. Three
+rules now hold:
+
+- a node-reported error (`execution reverted`) is the contract answering, and is a fact; a transport
+  failure is not, and leaves `owner_type: unknown` rather than `none`, with the failure recorded;
+- a null where a value existed keeps the previous value, dates it, and records
+  `read returned empty where a value existed; kept previous` when nothing else explains it;
+- a genuine transition to null must arrive as a successful read carrying the confirming detail —
+  `owner()` returning the zero address is a value, not an absence — or as the same empty answer
+  repeating on the very next pull.
+
+### The budget
+
+`BLOCKSCOUT_BUDGET_PER_RUN` defaults to 6,000 credits and `BLOCKSCOUT_BUDGET_PER_DAY` to 60,000,
+leaving 40,000 credits of daily headroom on the free tier's 100,000. 6,000 is not arbitrary: the
+explorer pacer serialises physical requests to five per second, so 6,000 requests are twenty minutes
+of pacing before any latency, and a cap the job cannot reach inside its 60-minute timeout would make
+the deferral path unreachable — the previous 12,000 needed forty minutes against a 45-minute timeout.
+
+There is a second budget, in wall-clock time. A run is latency-bound long before it is pace-bound —
+the explorer answers in a second or two and the RPC has its own pacer — so a job can reach its
+timeout with credits to spare, be killed, and lose every name it had already written.
+`PULL_DEADLINE_MINUTES` (45 in the workflow, against a 60-minute job timeout) stops the loop from
+starting new names, lists the ones it did not reach as deferred, and leaves time to validate, commit
+and push what was read.
+
+`ops/pull-budget.json` stores the UTC date, credits used and run count, and is rewritten after every
+name rather than only at the end, so a job killed by its timeout still records what it spent. A cap
+is checked before each physical request. Reaching it is not a failed run: remaining keyless reads
+finish, explorer reads are recorded as `deferred`, prior non-null values are retained, the deferred
+names and addresses are printed, and the process exits zero unless an independent gate fails. A
+deferral is labelled `<slug>:<address>`, never the request URL — the label is written into the
+committed document, and a URL there is both unreadable and the wrong place for anything a
+query-string API key could one day end up in.
+
+Credits are attributed, not sampled. Address workers run concurrently, so the previous
+"credits used since I started" delta on a process-global counter folded in whatever the siblings
+spent in the same window and double-counted: a `/counters`-only read was recorded as 2 credits and a
+three-request address read as 4. Each read now runs in its own accounting scope, so the `credits`
+field on a `reads` record is that read's own cost and a cost model built on it can be trusted.
+
+The committed `reads` block explains what was read, unchanged or deferred, with its signal, its
+code hash, its credit count and its stale date.
 
 Planning allowance by explorer read kind (a changed name can own several addresses):
 
@@ -84,9 +186,20 @@ Holding that mix constant gives:
 | 500 | 13,252 | 46,748 |
 | 1,000 | 26,504 | 33,496 |
 
-The workflow uses two stable shards, never more, serialized through `main-bots`. Each starts from
-current `main`, has 45 minutes, commits pulled data plus both ops state files, and retains the
-fetch/rebase/push retry loop.
+The scheduled workflow is one job, not a two-shard matrix. `cancel-in-progress: false` protects the
+job that is running and not the one queued behind it, so a compile run starting mid-pull cancelled a
+pending second shard outright — half the registry skipping a cycle, its queue entries never consumed
+and its spend never recorded, while the workflow reported success. The per-run credit cap is what
+bounds the job now. It starts from current `main`, has 60 minutes, keeps the `main-bots` group and
+the fetch/rebase/push retry loop, and commits the pulled data plus both ops state files. `--shard`
+remains available as a dispatch input for a manual half-registry run.
+
+The credit counter is committed by its own step with `if: always()`. A run that trips the bot-wall
+gate or fails validation has still spent every credit it claimed, and if the day counter goes home
+with the runner the next job starts from the same stale number: four crons of failing jobs, each
+free to spend a full run cap, would blow through a 60,000/day limit that nobody was recording. That
+step commits `ops/pull-budget.json` and `ops/pull-queue.json` only, with the same bot identity and
+push loop, and drops the uncommitted data rather than smuggling it past a failed gate.
 
 Cloudflare managed-challenge HTML is never parsed as API data. A `<!DOCTYPE html` response or a page
 titled `Just a moment` is classified as a bot challenge, retried once after a 0.5–1.5 second jitter,
@@ -270,13 +383,13 @@ npm run pull -- --source rialto
 `--only` accepts comma-separated census slugs; the older single-value `--slug` remains compatible.
 `--full` forces explorer reads, `--tier` selects one cadence, and `--shard` accepts only `0/1`, `0/2`
 or `1/2`. Dry runs validate and print each slug's elapsed time without writing YAML, history, series
-or budget state. The closing report includes names per tier, credits this run and UTC day, skipped
-walks, deferred reads and tomorrow's projection.
+or budget state. Every name's line ends with what it cost. The closing report prints credits this run
+and this UTC day, skipped walks, the measured credits per due name for each tier, the projection at
+200, 500 and 1,000 names built from those measurements, and the deferred reads by name and address.
 
 ### `--source rialto`: the fast refresh
 
-A full run walks Blockscout for every address and takes about an hour and three-quarters at 179 names.
-Rialto's own reads take under a minute, so `--source rialto` (or `--rialto-only`) refreshes only what
+A full run walks Blockscout for every address. Rialto's own reads take under a minute, so `--source rialto` (or `--rialto-only`) refreshes only what
 Rialto produces, against the files already on disk:
 
 - `content/pulled/chain.yaml`, `content/pulled/series/chain.json` and `content/pulled/discovery.yaml`
@@ -301,5 +414,5 @@ and a mistake in one run cannot be inherited by the next.
 Public Blockscout calls send a browser User-Agent; PRO calls send the bearer key. Both use a request
 pacer and retry 429/5xx replies, with the separate managed-challenge behavior documented above.
 Explorer activity walks are capped at 40 pages for factory, curve and router roles and five pages for
-every other role. Four PRO reads can be in flight, paced to 5/s; the workflow's two serialized shards
-keep each scheduled job inside its 45-minute limit while making every capped count explicit.
+every other role, and a capped count carries its floor caveat wherever it goes. Four PRO reads can be
+in flight, paced to 5/s; the per-run credit cap keeps the scheduled job inside its 60-minute limit.
