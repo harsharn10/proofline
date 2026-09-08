@@ -1,5 +1,5 @@
 slug: bomba
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
@@ -23,6 +23,8 @@ addresses:
         message: 'addresses/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
       - step: blockscout
         message: 'tokens/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'transactions?filter=to/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
   - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
     label: DopplerERC20V1 implementation
     role: implementation
@@ -114,49 +116,49 @@ addresses:
     safe: null
     created_block: 48285
     created_at: 2026-06-10T15:26:04.000Z
-    holders: 35715
+    holders: 36928
     errors: []
 metrics: []
 market:
   token_address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   pairs:
     - dex: uniswap
       pair_address: "0xa1bb85096e15d26cca05bda378052dd4dccf24527286cf76d9dc51332eba1e79"
       quote_symbol: PLTR
-      price_usd: 0.00004681
-      liquidity_usd: 43430.9
-      volume_h24: 16973.72
-      volume_h6: 4332.63
+      price_usd: 0.00004256
+      liquidity_usd: 40385.9
+      volume_h24: 6755.97
+      volume_h6: 323.18
       txns_h24:
-        buys: 218
-        sells: 193
-      price_change_h24: -35.84
-      market_cap: 46598
-      fdv: 46598
+        buys: 125
+        sells: 124
+      price_change_h24: 0.87
+      market_cap: 42366
+      fdv: 42366
       created_at: 2026-08-31T18:30:19.000Z
     - dex: uniswap
       pair_address: "0xd8b8aed67c6417a7b37d74b566bcd934206d8617a63203186d2419b0c449f2bf"
       quote_symbol: USDG
-      price_usd: 0.00004457
-      liquidity_usd: 16.94
-      volume_h24: 2.05
+      price_usd: 0.00003537
+      liquidity_usd: 15.09
+      volume_h24: 3.74
       volume_h6: 0
       txns_h24:
-        buys: 0
+        buys: 1
         sells: 1
-      price_change_h24: null
-      market_cap: 44371
-      fdv: 44371
+      price_change_h24: -41.24
+      market_cap: 35209
+      fdv: 35209
       created_at: 2026-09-01T18:03:01.000Z
-  liquidity_usd: 43447.84
-  volume_h24: 16975.77
-  trades_h24: 412
-  price_usd: 0.00004681
-  price_change_h24: -35.84
-  market_cap_usd: 46598
-  fdv_usd: 46598
-  fdv: 46598
+  liquidity_usd: 40400.99
+  volume_h24: 6759.71
+  trades_h24: 251
+  price_usd: 0.00004256
+  price_change_h24: 0.87
+  market_cap_usd: 42366
+  fdv_usd: 42366
+  fdv: 42366
   first_pair_at: 2026-08-31T18:30:19.000Z
   top10_share: null
   top10_share_ex_pools: null
@@ -169,9 +171,9 @@ market:
     name: Palantir Technologies
     address: "0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a"
     category: stock
-    tokenized_value_usd: 1675804.46
-    tokenized_shares: 9180.980999999998
-    change_7d: 89973.61
+    tokenized_value_usd: 1829388.86
+    tokenized_shares: 10493.827
+    change_7d: -33265.43
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
   errors:
@@ -186,7 +188,7 @@ market:
     - step: top10_share_ex_pools
       message: holder page was not available for 0x525F24BF41F178174788C3297Af9c0Af1bA01E18
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   mint: unknown
   renounced: false
   lp:
@@ -204,7 +206,7 @@ structure:
     - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   addresses:
     - address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
       label: BOMBA token (EIP-1167 DopplerERC20V1 clone)
@@ -215,6 +217,8 @@ activity:
       last_method: null
       txns_24h: null
       launches_24h: null
+      window_as_of: null
+      stale_since: null
       errors:
         - step: blockscout
           message: 'counters/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
@@ -229,6 +233,8 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory
@@ -239,40 +245,203 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       label: LongLauncher (creation tx to)
       role: factory
-      transactions_count: 13369
-      token_transfers_count: 4
-      last_tx_at: 2026-09-04T20:52:03.000Z
+      transactions_count: 29212
+      token_transfers_count: 10
+      last_tx_at: 2026-09-08T21:09:58.000Z
       last_method: create
-      txns_24h: 2000
-      launches_24h: 1998
-      errors:
-        - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
+      txns_24h: 1781
+      launches_24h: 1776
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      errors: []
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (token owner)
       role: admin
-      transactions_count: 9126
-      token_transfers_count: 445362
-      last_tx_at: 2026-09-04T20:42:51.000Z
+      transactions_count: 9892
+      token_transfers_count: 520446
+      last_tx_at: 2026-09-08T21:11:02.000Z
       last_method: create
-      txns_24h: 112
+      txns_24h: 171
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
     - address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
       label: PLTR Palantir Technologies • Robinhood Token (pair quote / numeraire)
       role: token
-      transactions_count: 14903
-      token_transfers_count: 55
-      last_tx_at: 2026-09-04T21:51:23.000Z
+      transactions_count: 22581
+      token_transfers_count: 57
+      last_tx_at: 2026-09-08T21:27:21.000Z
       last_method: approve
-      txns_24h: 1198
+      txns_24h: 250
       launches_24h: null
-      errors: []
-  last_activity_at: 2026-09-04T21:51:23.000Z
-  txns_24h: 3310
-  launches_24h: 1998
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      errors:
+        - step: txns_24h capped
+          message: stopped after 5 pages; count is a floor
+  last_activity_at: 2026-09-08T21:27:21.000Z
+  txns_24h: 2202
+  launches_24h: 1776
+  window_as_of: 2026-09-04T20:46:36.233Z
+  stale_since: 2026-09-04T20:46:36.233Z
+reads:
+  tier: hot
+  explorer:
+    - kind: address
+      address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: address
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: factory signal unavailable
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: factory signal unavailable; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0xc6265a359821d2808f7fa0779b9544a6761c9b215d7b28c0be0a3ca6fc8909ad"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xc6265a359821d2808f7fa0779b9544a6761c9b215d7b28c0be0a3ca6fc8909ad"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+      status: read
+      reason: admin baseline unavailable
+      signal_value: null
+      signal: "0x62e1ff6c3644db424bcc5975208498e8ae5bdcbda677be94ecf9aa1a04b5bfc6"
+      code_hash: f8de098a2663a757
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+      status: read
+      reason: admin baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x62e1ff6c3644db424bcc5975208498e8ae5bdcbda677be94ecf9aa1a04b5bfc6"
+      code_hash: f8de098a2663a757
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0xdbc69488a28d8a032c27018d45b60cbc26e3ac1ba4c3f4f102c2b5f423abe230"
+      code_hash: caced2aa743efc36
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0xdbc69488a28d8a032c27018d45b60cbc26e3ac1ba4c3f4f102c2b5f423abe230"
+      code_hash: caced2aa743efc36
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: top10
+      address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
+      status: read
+      reason: token change signal changed
+      signal_value: 251
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: structure
+      address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
+      status: read
+      reason: token change signal changed
+      signal_value: 251
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
+      status: read
+      reason: token change signal changed
+      signal_value: 251
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
 errors: []

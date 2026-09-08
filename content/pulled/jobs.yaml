@@ -1,5 +1,5 @@
 slug: jobs
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
@@ -23,6 +23,8 @@ addresses:
         message: 'addresses/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453: HTTP 402: {"error":"Out of credits"}'
       - step: blockscout
         message: 'tokens/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'transactions?filter=to/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453: HTTP 402: {"error":"Out of credits"}'
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory
     role: factory
@@ -78,9 +80,7 @@ addresses:
     created_block: null
     created_at: null
     holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0x4E943DDd1fc47f69d56bc8Ed84948398c1cfbcF1: HTTP 402: {"error":"Out of credits"}'
+    errors: []
   - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
     label: V2LaunchLocker (site-linked liquidity locker)
     role: other
@@ -106,30 +106,30 @@ addresses:
 metrics: []
 market:
   token_address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   pairs:
     - dex: uniswap
       pair_address: "0xb1e490364d477cb267ab5dd491c7956253c9d7fbee78104fb7a7dd0ea81ada99"
       quote_symbol: AAPL
-      price_usd: 0.00002254
-      liquidity_usd: 12153.28
-      volume_h24: 32283.39
-      volume_h6: 4882.69
+      price_usd: 0.00001504
+      liquidity_usd: 9700.48
+      volume_h24: 1842.1
+      volume_h6: 738.59
       txns_h24:
-        buys: 134
-        sells: 132
-      price_change_h24: -63.87
-      market_cap: 22546
-      fdv: 22546
+        buys: 7
+        sells: 9
+      price_change_h24: -13.78
+      market_cap: 15044
+      fdv: 15044
       created_at: 2026-08-31T10:54:34.000Z
-  liquidity_usd: 12153.28
-  volume_h24: 32283.39
-  trades_h24: 266
-  price_usd: 0.00002254
-  price_change_h24: -63.87
-  market_cap_usd: 22546
-  fdv_usd: 22546
-  fdv: 22546
+  liquidity_usd: 9700.48
+  volume_h24: 1842.1
+  trades_h24: 16
+  price_usd: 0.00001504
+  price_change_h24: -13.78
+  market_cap_usd: 15044
+  fdv_usd: 15044
+  fdv: 15044
   first_pair_at: 2026-08-31T10:54:34.000Z
   top10_share: null
   top10_share_ex_pools: null
@@ -142,9 +142,9 @@ market:
     name: Apple
     address: "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9"
     category: stock
-    tokenized_value_usd: 4858900.11
-    tokenized_shares: 14804.241534039995
-    change_7d: 271065.66
+    tokenized_value_usd: 5656861.94
+    tokenized_shares: 17679.350991899995
+    change_7d: 115269.37
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
   errors:
@@ -159,7 +159,7 @@ market:
     - step: top10_share_ex_pools
       message: holder page was not available for 0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   mint: unknown
   renounced: null
   lp:
@@ -175,7 +175,7 @@ structure:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   addresses:
     - address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
       label: JOBS token (PonsV2LauncherToken)
@@ -186,6 +186,8 @@ activity:
       last_method: null
       txns_24h: null
       launches_24h: null
+      window_as_of: null
+      stale_since: null
       errors:
         - step: blockscout
           message: 'counters/0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453: HTTP 402: {"error":"Out of credits"}'
@@ -194,12 +196,14 @@ activity:
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: PonsV2LaunchFactory
       role: factory
-      transactions_count: 76659
-      token_transfers_count: 6719
-      last_tx_at: 2026-09-04T20:47:30.000Z
+      transactions_count: 162864
+      token_transfers_count: 24334
+      last_tx_at: 2026-09-08T21:10:31.000Z
       last_method: launchToken
       txns_24h: 2000
-      launches_24h: 845
+      launches_24h: 1683
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -212,6 +216,8 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
     - address: "0x4E943DDd1fc47f69d56bc8Ed84948398c1cfbcF1"
       label: PonsV2BondingCurve (JOBS launch curve)
@@ -222,11 +228,9 @@ activity:
       last_method: null
       txns_24h: null
       launches_24h: null
-      errors:
-        - step: blockscout
-          message: 'counters/0x4E943DDd1fc47f69d56bc8Ed84948398c1cfbcF1: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+      window_as_of: null
+      stale_since: null
+      errors: []
     - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
       label: V2LaunchLocker (site-linked liquidity locker)
       role: other
@@ -236,8 +240,145 @@ activity:
       last_method: "0xa480ca79"
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
-  last_activity_at: 2026-09-04T20:47:30.000Z
+  last_activity_at: 2026-09-08T21:10:31.000Z
   txns_24h: 2000
-  launches_24h: 845
+  launches_24h: 1683
+  window_as_of: 2026-09-04T20:46:36.233Z
+  stale_since: 2026-09-04T20:46:36.233Z
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: null
+      code_hash: 1fa1d4bdadb74ce5
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: 1fa1d4bdadb74ce5
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0xd535d6679e2dae2b239b0640a427c9f6a4cb22b676828c5ce540411aee00a0a9"
+      code_hash: 2ac92839c8aafdd8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xd535d6679e2dae2b239b0640a427c9f6a4cb22b676828c5ce540411aee00a0a9"
+      code_hash: 2ac92839c8aafdd8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 03e83a4788c83fb5
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 03e83a4788c83fb5
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: address
+      address: "0x4E943DDd1fc47f69d56bc8Ed84948398c1cfbcF1"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 420dda29598ba810
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x4E943DDd1fc47f69d56bc8Ed84948398c1cfbcF1"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 420dda29598ba810
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: address
+      address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 693ee37f225b5208
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 693ee37f225b5208
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: top10
+      address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
+      status: read
+      reason: token change signal changed
+      signal_value: 16
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: structure
+      address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
+      status: read
+      reason: token change signal changed
+      signal_value: 16
+      signal: null
+      code_hash: 1fa1d4bdadb74ce5
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0x88952E52cDF3BB14015D9A6499eA3c7F0bEd6453"
+      status: read
+      reason: token change signal changed
+      signal_value: 16
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
 errors: []

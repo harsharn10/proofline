@@ -1,13 +1,13 @@
 slug: karma
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xb1B800835f93d40D43e3B3467494b9155364baC3"
     label: KARMA token (PonsV2LauncherToken bytecode, Reddit Founder Cat)
     role: token
     is_contract: true
-    source_verified: false
-    contract_name: Reddit Founder Cat
+    source_verified: true
+    contract_name: PonsV2LauncherToken
     proxy:
       type: none
       implementation: null
@@ -15,9 +15,9 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: null
-    created_at: null
-    holders: 663
+    created_block: 52586450
+    created_at: 2026-09-02T12:47:28.000Z
+    holders: 617
     errors: []
   - address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
     label: PonsV2LaunchDeployer
@@ -71,8 +71,8 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: null
-    created_at: null
+    created_block: 52586450
+    created_at: 2026-09-02T12:47:28.000Z
     holders: null
     errors: []
   - address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
@@ -102,7 +102,7 @@ addresses:
     role: vault
     is_contract: true
     source_verified: true
-    contract_name: V2LaunchLocker
+    contract_name: PonsV2LaunchLocker
     proxy:
       type: none
       implementation: null
@@ -134,7 +134,7 @@ addresses:
     safe: null
     created_block: 46131
     created_at: 2026-06-09T21:14:17.000Z
-    holders: 18324
+    holders: 19007
     errors: []
   - address: "0x55f9ec832384F737d5ad57FC0c314ddc8Bf41e18"
     label: KARMA ticker collision (LongLauncher Karma Points, not this row)
@@ -151,7 +151,7 @@ addresses:
     safe: null
     created_block: 52358545
     created_at: 2026-09-02T06:24:44.000Z
-    holders: 128
+    holders: 112
     errors: []
   - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
     label: LongLauncher (collision create tx to)
@@ -190,86 +190,70 @@ addresses:
 metrics: []
 market:
   token_address: "0xb1B800835f93d40D43e3B3467494b9155364baC3"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   pairs:
     - dex: uniswap
       pair_address: "0x351835802f3ee56f4336fc4c7e9fed3cc3dbcd320aa10e320a720249465165a5"
       quote_symbol: RDDT
-      price_usd: 0.00001086
-      liquidity_usd: 7623.77
-      volume_h24: 7656.83
-      volume_h6: 871.5
+      price_usd: 0.000007987
+      liquidity_usd: 6590.14
+      volume_h24: 543.74
+      volume_h6: 80.87
       txns_h24:
-        buys: 49
-        sells: 71
-      price_change_h24: -54.56
-      market_cap: 10866
-      fdv: 10866
+        buys: 3
+        sells: 15
+      price_change_h24: -18.29
+      market_cap: 7987
+      fdv: 7987
       created_at: 2026-09-02T12:56:30.000Z
-    - dex: uniswap
-      pair_address: "0x816b16d888f437e491fab054ea30be0fc1c3e29606f01f3e0d708f2a6c2f1dc2"
-      quote_symbol: USDG
-      price_usd: 0.00002213
-      liquidity_usd: 32.76
-      volume_h24: 1.8
-      volume_h6: 0
-      txns_h24:
-        buys: 0
-        sells: 2
-      price_change_h24: -1.13
-      market_cap: 22133
-      fdv: 22133
-      created_at: 2026-09-02T13:03:20.000Z
-  liquidity_usd: 7656.53
-  volume_h24: 7658.63
-  trades_h24: 122
-  price_usd: 0.00001086
-  price_change_h24: -54.56
-  market_cap_usd: 10866
-  fdv_usd: 10866
-  fdv: 10866
+  liquidity_usd: 6590.14
+  volume_h24: 543.74
+  trades_h24: 18
+  price_usd: 0.000007987
+  price_change_h24: -18.29
+  market_cap_usd: 7987
+  fdv_usd: 7987
+  fdv: 7987
   first_pair_at: 2026-09-02T12:56:30.000Z
-  top10_share: 0.606039927276664
-  top10_share_ex_pools: 0.1960393707918075
+  top10_share: 0.7216317034345264
+  top10_share_ex_pools: 0.2549082065149796
   burned_share: 0
-  top10_as_of: 2026-09-04T20:46:36.233Z
-  launchpad: null
+  top10_as_of: 2026-09-08T21:10:27.749Z
+  launchpad:
+    slug: pons
+    via: creator
+    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
   rialto: null
   pair_asset: null
   volume_disagreement: null
-  errors:
-    - step: launchpad
-      message: addresses/0xb1B800835f93d40D43e3B3467494b9155364baC3 did not return creator_address_hash
+  errors: []
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
-  mint: unknown
+  pulled_at: 2026-09-08T21:10:27.749Z
+  mint: no-mint-function
   renounced: null
   lp:
     - pair: "0x351835802f3ee56f4336fc4c7e9fed3cc3dbcd320aa10e320a720249465165a5"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x816b16d888f437e491fab054ea30be0fc1c3e29606f01f3e0d708f2a6c2f1dc2"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
-    - step: mint
-      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   addresses:
     - address: "0xb1B800835f93d40D43e3B3467494b9155364baC3"
       label: KARMA token (PonsV2LauncherToken bytecode, Reddit Founder Cat)
       role: token
-      transactions_count: 0
-      token_transfers_count: 0
-      last_tx_at: 2026-09-04T21:13:24.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 45
+      transactions_count: 3393
+      token_transfers_count: 1
+      last_tx_at: 2026-09-08T21:07:35.000Z
+      last_method: approve
+      txns_24h: 11
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
     - address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
       label: PonsV2LaunchDeployer
@@ -280,16 +264,20 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: PonsV2LaunchFactory (token launchFactory)
       role: factory
-      transactions_count: 76659
-      token_transfers_count: 6719
-      last_tx_at: 2026-09-04T20:47:30.000Z
+      transactions_count: 162864
+      token_transfers_count: 24334
+      last_tx_at: 2026-09-08T21:10:31.000Z
       last_method: launchToken
       txns_24h: 2000
-      launches_24h: 845
+      launches_24h: 1683
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -302,63 +290,73 @@ activity:
       last_method: "0x3729bb9a"
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
     - address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
       label: PonsV2LaunchAndBuy (create tx to)
       role: router
-      transactions_count: 79462
-      token_transfers_count: 11161
-      last_tx_at: 2026-09-04T20:49:16.000Z
+      transactions_count: 175195
+      token_transfers_count: 181632
+      last_tx_at: 2026-09-08T21:11:01.000Z
       last_method: launchAndBuy
       txns_24h: 2000
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
     - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
       label: V2LaunchLocker (isLocked true for this token)
       role: vault
-      transactions_count: 13
-      token_transfers_count: 7471
-      last_tx_at: 2026-08-30T15:18:53.000Z
+      transactions_count: 14
+      token_transfers_count: 20284
+      last_tx_at: 2026-09-06T00:04:54.000Z
       last_method: "0xa480ca79"
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
     - address: "0x05b37Fb53A299a1b874A619e1c4C404D52C36F4C"
       label: RDDT Stock Token (pair quote / launch pairToken; rail, not this subject)
       role: token
-      transactions_count: 17102
-      token_transfers_count: 37
-      last_tx_at: 2026-09-04T22:18:28.000Z
+      transactions_count: 30630
+      token_transfers_count: 40
+      last_tx_at: 2026-09-08T21:36:21.000Z
       last_method: approve
-      txns_24h: 2000
+      txns_24h: 250
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors:
         - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
+          message: stopped after 5 pages; count is a floor
     - address: "0x55f9ec832384F737d5ad57FC0c314ddc8Bf41e18"
       label: KARMA ticker collision (LongLauncher Karma Points, not this row)
       role: token
-      transactions_count: 0
+      transactions_count: 785
       token_transfers_count: 0
-      last_tx_at: 2026-09-04T14:20:13.000Z
+      last_tx_at: 2026-09-08T15:59:07.000Z
       last_method: "0x095ea7b3"
-      txns_24h: 10
+      txns_24h: 5
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       label: LongLauncher (collision create tx to)
       role: factory
-      transactions_count: 13369
-      token_transfers_count: 4
-      last_tx_at: 2026-09-04T20:52:03.000Z
+      transactions_count: 29212
+      token_transfers_count: 10
+      last_tx_at: 2026-09-08T21:09:58.000Z
       last_method: create
-      txns_24h: 2000
-      launches_24h: 1998
-      errors:
-        - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
+      txns_24h: 1781
+      launches_24h: 1776
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      errors: []
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       label: DopplerERC20V1 implementation (collision token)
       role: implementation
@@ -368,8 +366,245 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
-  last_activity_at: 2026-09-04T22:18:28.000Z
-  txns_24h: 8055
-  launches_24h: 2843
+  last_activity_at: 2026-09-08T21:36:21.000Z
+  txns_24h: 6047
+  launches_24h: 3459
+  window_as_of: 2026-09-04T20:46:36.233Z
+  stale_since: 2026-09-04T20:46:36.233Z
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0xb1B800835f93d40D43e3B3467494b9155364baC3"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0xa16dfc5e24053ff6e4ed44e3f872632a5476e2064f5a47e529577c9c19417c99"
+      code_hash: 72b20a111cc624dc
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0xb1B800835f93d40D43e3B3467494b9155364baC3"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0xa16dfc5e24053ff6e4ed44e3f872632a5476e2064f5a47e529577c9c19417c99"
+      code_hash: 72b20a111cc624dc
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0x849d092ee4ed37d8138636839c28aabd2878e445cb68ba99c4cdafa11a778b2e"
+      code_hash: 03e83a4788c83fb5
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x849d092ee4ed37d8138636839c28aabd2878e445cb68ba99c4cdafa11a778b2e"
+      code_hash: 03e83a4788c83fb5
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0xd535d6679e2dae2b239b0640a427c9f6a4cb22b676828c5ce540411aee00a0a9"
+      code_hash: 2ac92839c8aafdd8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xd535d6679e2dae2b239b0640a427c9f6a4cb22b676828c5ce540411aee00a0a9"
+      code_hash: 2ac92839c8aafdd8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x8b9F9beeA986E60f1d629eEE48DA78e3e341B1c3"
+      status: read
+      reason: other baseline unavailable
+      signal_value: null
+      signal: "0x6805b39f5d3e89d17d37a2d6f0d0238b86aafca9da22f47d7f594e5e85004275"
+      code_hash: 246ef288b863c096
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 2
+    - kind: activity
+      address: "0x8b9F9beeA986E60f1d629eEE48DA78e3e341B1c3"
+      status: read
+      reason: other baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x6805b39f5d3e89d17d37a2d6f0d0238b86aafca9da22f47d7f594e5e85004275"
+      code_hash: 246ef288b863c096
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+      status: read
+      reason: router baseline unavailable
+      signal_value: null
+      signal: "0x93a753f600d96ffc8cb3c95bd4a5dc15d95e7cc323b3a268f2b28ac9383a48d3"
+      code_hash: 8557d5489003bbc0
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+      status: read
+      reason: router baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x93a753f600d96ffc8cb3c95bd4a5dc15d95e7cc323b3a268f2b28ac9383a48d3"
+      code_hash: 8557d5489003bbc0
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+      status: read
+      reason: vault baseline unavailable
+      signal_value: null
+      signal: "0xaf9a4a03533761f1a104aefa69e4dc884a2153e44519d3a9ba8e3d8c65c36bbe"
+      code_hash: 693ee37f225b5208
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 2
+    - kind: activity
+      address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+      status: read
+      reason: vault baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xaf9a4a03533761f1a104aefa69e4dc884a2153e44519d3a9ba8e3d8c65c36bbe"
+      code_hash: 693ee37f225b5208
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x05b37Fb53A299a1b874A619e1c4C404D52C36F4C"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0x7757c3d41538addedcb805b8448d93e30769d8c3ac8ab5462ad3e7aed66b2c36"
+      code_hash: caced2aa743efc36
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0x05b37Fb53A299a1b874A619e1c4C404D52C36F4C"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0x7757c3d41538addedcb805b8448d93e30769d8c3ac8ab5462ad3e7aed66b2c36"
+      code_hash: caced2aa743efc36
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 5
+    - kind: address
+      address: "0x55f9ec832384F737d5ad57FC0c314ddc8Bf41e18"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0x4c800ee7e6dfe3cabd9fcc72d14347e2edbf8b9caa6997feb5c289051db080b8"
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0x55f9ec832384F737d5ad57FC0c314ddc8Bf41e18"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0x4c800ee7e6dfe3cabd9fcc72d14347e2edbf8b9caa6997feb5c289051db080b8"
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0xc6265a359821d2808f7fa0779b9544a6761c9b215d7b28c0be0a3ca6fc8909ad"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xc6265a359821d2808f7fa0779b9544a6761c9b215d7b28c0be0a3ca6fc8909ad"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: top10
+      address: "0xb1B800835f93d40D43e3B3467494b9155364baC3"
+      status: read
+      reason: token change signal changed
+      signal_value: 18
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: structure
+      address: "0xb1B800835f93d40D43e3B3467494b9155364baC3"
+      status: read
+      reason: token change signal changed
+      signal_value: 18
+      signal: null
+      code_hash: 72b20a111cc624dc
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0xb1B800835f93d40D43e3B3467494b9155364baC3"
+      status: read
+      reason: token change signal changed
+      signal_value: 18
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
 errors: []

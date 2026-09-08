@@ -1,5 +1,5 @@
 slug: op
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
@@ -23,6 +23,8 @@ addresses:
         message: 'addresses/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
       - step: blockscout
         message: 'tokens/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
+      - step: blockscout
+        message: 'transactions?filter=to/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory
     role: factory
@@ -50,7 +52,7 @@ addresses:
     role: vault
     is_contract: true
     source_verified: true
-    contract_name: V2LaunchLocker
+    contract_name: PonsV2LaunchLocker
     proxy:
       type: none
       implementation: null
@@ -82,49 +84,35 @@ addresses:
     safe: null
     created_block: 48293
     created_at: 2026-06-10T15:27:03.000Z
-    holders: 24537
+    holders: 25972
     errors: []
 metrics: []
 market:
   token_address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   pairs:
     - dex: uniswap
       pair_address: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
       quote_symbol: SNDK
-      price_usd: 0.00009993
-      liquidity_usd: 30101.24
-      volume_h24: 118731
-      volume_h6: 14099.29
+      price_usd: 0.00004439
+      liquidity_usd: 20442.5
+      volume_h24: 41728.26
+      volume_h6: 8701.41
       txns_h24:
-        buys: 374
-        sells: 279
-      price_change_h24: -0.8
-      market_cap: 99932
-      fdv: 99932
+        buys: 127
+        sells: 121
+      price_change_h24: -22.57
+      market_cap: 44393
+      fdv: 44393
       created_at: 2026-08-31T21:02:46.000Z
-    - dex: uniswap
-      pair_address: "0x0ce46e76a7f9227ef31fbe8737dbd91dbc2aeb72e8888e1c3accc3e5094fad20"
-      quote_symbol: USDG
-      price_usd: 0.00002473
-      liquidity_usd: 1.96
-      volume_h24: 1.2
-      volume_h6: 0
-      txns_h24:
-        buys: 0
-        sells: 1
-      price_change_h24: null
-      market_cap: 24732
-      fdv: 24732
-      created_at: 2026-09-03T18:38:32.000Z
-  liquidity_usd: 30103.2
-  volume_h24: 118732.2
-  trades_h24: 654
-  price_usd: 0.00009993
-  price_change_h24: -0.8
-  market_cap_usd: 99932
-  fdv_usd: 99932
-  fdv: 99932
+  liquidity_usd: 20442.5
+  volume_h24: 41728.26
+  trades_h24: 248
+  price_usd: 0.00004439
+  price_change_h24: -22.57
+  market_cap_usd: 44393
+  fdv_usd: 44393
+  fdv: 44393
   first_pair_at: 2026-08-31T21:02:46.000Z
   top10_share: null
   top10_share_ex_pools: null
@@ -137,9 +125,9 @@ market:
     name: Sandisk Corporation
     address: "0xb90a19ff0af67f7779aff50a882a9cff42446400"
     category: stock
-    tokenized_value_usd: 1800721.96
-    tokenized_shares: 1158.027999999999
-    change_7d: 85948.84
+    tokenized_value_usd: 1738559.28
+    tokenized_shares: 999.1719999999991
+    change_7d: 240430.76
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
   errors:
@@ -154,15 +142,11 @@ market:
     - step: top10_share_ex_pools
       message: holder page was not available for 0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   mint: unknown
   renounced: null
   lp:
     - pair: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x0ce46e76a7f9227ef31fbe8737dbd91dbc2aeb72e8888e1c3accc3e5094fad20"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
@@ -174,7 +158,7 @@ structure:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   addresses:
     - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
       label: OP token (PonsV2LauncherToken)
@@ -185,6 +169,8 @@ activity:
       last_method: null
       txns_24h: null
       launches_24h: null
+      window_as_of: null
+      stale_since: null
       errors:
         - step: blockscout
           message: 'counters/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
@@ -193,36 +179,159 @@ activity:
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: PonsV2LaunchFactory
       role: factory
-      transactions_count: 76659
-      token_transfers_count: 6719
-      last_tx_at: 2026-09-04T20:47:30.000Z
+      transactions_count: 162864
+      token_transfers_count: 24334
+      last_tx_at: 2026-09-08T21:10:31.000Z
       last_method: launchToken
       txns_24h: 2000
-      launches_24h: 845
+      launches_24h: 1683
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
     - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
       label: V2LaunchLocker (locked graduation position)
       role: vault
-      transactions_count: 13
-      token_transfers_count: 7471
-      last_tx_at: 2026-08-30T15:18:53.000Z
+      transactions_count: 14
+      token_transfers_count: 20284
+      last_tx_at: 2026-09-06T00:04:54.000Z
       last_method: "0xa480ca79"
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
     - address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
       label: SNDK quote (pairToken / Robinhood Stock Token rail)
       role: token
-      transactions_count: 6510
-      token_transfers_count: 39
-      last_tx_at: 2026-09-04T22:07:40.000Z
+      transactions_count: 11687
+      token_transfers_count: 41
+      last_tx_at: 2026-09-08T21:28:09.000Z
       last_method: approve
-      txns_24h: 511
+      txns_24h: 250
       launches_24h: null
-      errors: []
-  last_activity_at: 2026-09-04T22:07:40.000Z
-  txns_24h: 2511
-  launches_24h: 845
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      errors:
+        - step: txns_24h capped
+          message: stopped after 5 pages; count is a floor
+  last_activity_at: 2026-09-08T21:28:09.000Z
+  txns_24h: 2250
+  launches_24h: 1683
+  window_as_of: 2026-09-08T21:10:27.749Z
+  stale_since: null
+reads:
+  tier: hot
+  explorer:
+    - kind: address
+      address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: null
+      code_hash: 93595a440df135c8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: 93595a440df135c8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0xd535d6679e2dae2b239b0640a427c9f6a4cb22b676828c5ce540411aee00a0a9"
+      code_hash: 2ac92839c8aafdd8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xd535d6679e2dae2b239b0640a427c9f6a4cb22b676828c5ce540411aee00a0a9"
+      code_hash: 2ac92839c8aafdd8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+      status: read
+      reason: vault baseline unavailable
+      signal_value: null
+      signal: "0xaf9a4a03533761f1a104aefa69e4dc884a2153e44519d3a9ba8e3d8c65c36bbe"
+      code_hash: 693ee37f225b5208
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
+      status: read
+      reason: vault baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xaf9a4a03533761f1a104aefa69e4dc884a2153e44519d3a9ba8e3d8c65c36bbe"
+      code_hash: 693ee37f225b5208
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0x367aee6d1f38f33f97688d8e13f5b8c6fd9ee99ce6d9f0db6fd3fcf49f4e8cfe"
+      code_hash: caced2aa743efc36
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0x367aee6d1f38f33f97688d8e13f5b8c6fd9ee99ce6d9f0db6fd3fcf49f4e8cfe"
+      code_hash: caced2aa743efc36
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: top10
+      address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+      status: read
+      reason: token change signal changed
+      signal_value: 248
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: structure
+      address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+      status: read
+      reason: token change signal changed
+      signal_value: 248
+      signal: null
+      code_hash: 93595a440df135c8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
+      status: read
+      reason: token change signal changed
+      signal_value: 248
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
 errors: []

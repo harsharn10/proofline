@@ -1,5 +1,5 @@
 slug: klik
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x16cF6788B762EE8969744586eD16fc5705140dd7"
@@ -56,7 +56,7 @@ addresses:
 metrics: []
 market:
   token_address: null
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -80,17 +80,19 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   addresses:
     - address: "0x16cF6788B762EE8969744586eD16fc5705140dd7"
       label: Robinhood Chain factory
       role: factory
-      transactions_count: 9348
-      token_transfers_count: 17973
-      last_tx_at: 2026-09-04T22:02:10.000Z
+      transactions_count: 9873
+      token_transfers_count: 19025
+      last_tx_at: 2026-09-08T21:15:06.000Z
       last_method: deployCoin
-      txns_24h: 28
-      launches_24h: 26
+      txns_24h: 36
+      launches_24h: 25
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
     - address: "0x745d717620052a97a22dEEE2e5Eba59583f3e0CC"
       label: UniversalKlikHook
@@ -101,18 +103,87 @@ activity:
       last_method: setFactory
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
     - address: "0x81EE2B6BcfcF9a614036578e5E4f2B02e507da5a"
       label: platformController()
       role: admin
-      transactions_count: 1425
-      token_transfers_count: 4
+      transactions_count: 1987
+      token_transfers_count: 767
       last_tx_at: 2026-09-03T01:13:41.000Z
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
-  last_activity_at: 2026-09-04T22:02:10.000Z
-  txns_24h: 28
-  launches_24h: 26
+  last_activity_at: 2026-09-08T21:15:06.000Z
+  txns_24h: 36
+  launches_24h: 25
+  window_as_of: 2026-09-04T20:46:36.233Z
+  stale_since: 2026-09-04T20:46:36.233Z
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x16cF6788B762EE8969744586eD16fc5705140dd7"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0x689f19d570c4a9ab5bed6e8586d584186895dfb1a4341d08543f057c4421e4c0"
+      code_hash: b081ed0916900a57
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x16cF6788B762EE8969744586eD16fc5705140dd7"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x689f19d570c4a9ab5bed6e8586d584186895dfb1a4341d08543f057c4421e4c0"
+      code_hash: b081ed0916900a57
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: address
+      address: "0x745d717620052a97a22dEEE2e5Eba59583f3e0CC"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 15cad47f7cdd2189
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x745d717620052a97a22dEEE2e5Eba59583f3e0CC"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 15cad47f7cdd2189
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: address
+      address: "0x81EE2B6BcfcF9a614036578e5E4f2B02e507da5a"
+      status: read
+      reason: admin baseline unavailable
+      signal_value: 1984
+      signal: "1984"
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: activity
+      address: "0x81EE2B6BcfcF9a614036578e5E4f2B02e507da5a"
+      status: read
+      reason: admin baseline unavailable; 24h walk refreshed
+      signal_value: 1984
+      signal: "1984"
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 2
 errors: []

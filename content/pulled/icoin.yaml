@@ -1,13 +1,13 @@
 slug: icoin
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x5d6EF090a1461B11c9427aC319260122D1C61e18"
     label: ICOIN token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: iCoin
     proxy:
       type: none
       implementation: null
@@ -15,14 +15,10 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: null
-    created_at: null
-    holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0x5d6EF090a1461B11c9427aC319260122D1C61e18: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'tokens/0x5d6EF090a1461B11c9427aC319260122D1C61e18: HTTP 402: {"error":"Out of credits"}'
+    created_block: 16449441
+    created_at: 2026-07-22T13:08:44.000Z
+    holders: 6270
+    errors: []
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
     label: DopplerERC20V1Factory (token creator)
     role: factory
@@ -78,7 +74,7 @@ addresses:
     label: Community vault (LongFeeVaultFactory deployVault)
     role: vault
     is_contract: true
-    source_verified: null
+    source_verified: false
     contract_name: null
     proxy:
       type: none
@@ -87,237 +83,285 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: null
-    created_at: null
+    created_block: 53013821
+    created_at: 2026-09-03T00:59:42.000Z
     holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0x24c2410941B4603CF5504810d5dF841dB4d303ad: HTTP 402: {"error":"Out of credits"}'
+    errors: []
 metrics: []
 market:
   token_address: "0x5d6EF090a1461B11c9427aC319260122D1C61e18"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   pairs:
     - dex: uniswap
       pair_address: "0xc39187cec78a076c41a4085598b4cc05be2ed9b04a3443167471fa0fc4984188"
       quote_symbol: AAPL
-      price_usd: 0.006716
-      liquidity_usd: 745722.99
-      volume_h24: 4681821
-      volume_h6: 1550945.96
+      price_usd: 0.006258
+      liquidity_usd: 704015.98
+      volume_h24: 1793402.95
+      volume_h6: 426792.47
       txns_h24:
-        buys: 3721
-        sells: 6676
-      price_change_h24: 0.5
-      market_cap: 6699187
-      fdv: 6699187
+        buys: 1342
+        sells: 2484
+      price_change_h24: 10.14
+      market_cap: 6227276
+      fdv: 6227276
       created_at: 2026-07-22T13:08:44.000Z
+    - dex: uniswap
+      pair_address: "0xb5a1e17c7ad0e4f2c992109b41195388d484c7915371eb4ba59a10f59efa9319"
+      quote_symbol: AI
+      price_usd: 0.006459
+      liquidity_usd: 54260.18
+      volume_h24: 89738.01
+      volume_h6: 56670.55
+      txns_h24:
+        buys: 174
+        sells: 158
+      price_change_h24: 22.85
+      market_cap: 6427803
+      fdv: 6427803
+      created_at: 2026-09-08T12:15:39.000Z
     - dex: uniswap
       pair_address: "0xcca8a63e1d448091715c1644769bc8a40e6bc2f0805747feb53112396b0e480c"
       quote_symbol: USDG
-      price_usd: 0.006503
-      liquidity_usd: 84164.96
-      volume_h24: 394888.82
-      volume_h6: 99406.78
+      price_usd: 0.006115
+      liquidity_usd: 87582.23
+      volume_h24: 195319.48
+      volume_h6: 88121.26
       txns_h24:
-        buys: 1461
-        sells: 980
-      price_change_h24: 0.72
-      market_cap: 6486577
-      fdv: 6486577
+        buys: 357
+        sells: 314
+      price_change_h24: 6.46
+      market_cap: 6084936
+      fdv: 6084936
       created_at: 2026-09-02T19:49:23.000Z
     - dex: uniswap
-      pair_address: "0x09b23d0402ebcd80fb1c77ec90c92460a7e03c772684ad2ea4be101c04080ff3"
-      quote_symbol: USDG
-      price_usd: 0.005691
-      liquidity_usd: 8935.76
-      volume_h24: 33360.67
-      volume_h6: 0
-      txns_h24:
-        buys: 183
-        sells: 162
-      price_change_h24: -17.53
-      market_cap: 5677253
-      fdv: 5677253
-      created_at: 2026-09-04T02:44:53.000Z
-    - dex: ramses
-      pair_address: "0x4a569beaEF7C908C11a3ca108D3C7Ba7b2E68AF0"
-      quote_symbol: WETH
-      price_usd: 0.006408
-      liquidity_usd: 79608.56
-      volume_h24: 601014.41
-      volume_h6: 237162.32
-      txns_h24:
-        buys: 2315
-        sells: 1630
-      price_change_h24: -0.88
-      market_cap: 6392577
-      fdv: 6392577
-      created_at: 2026-09-03T00:00:09.000Z
-    - dex: uniswap
-      pair_address: "0x74639512f5cdb4e5d16993bdfb200fc548f7ab1492ae4e71e84dbc968a14cef7"
-      quote_symbol: ETH
-      price_usd: 0.006475
-      liquidity_usd: 1630.03
-      volume_h24: 19399.07
-      volume_h6: 8106.67
-      txns_h24:
-        buys: 176
-        sells: 125
-      price_change_h24: 47.52
-      market_cap: 6459175
-      fdv: 6459175
-      created_at: 2026-09-04T05:30:25.000Z
-    - dex: uniswap
-      pair_address: "0x957fd0426540b6fef34dd6728ed26ea75f2a91612567e33ed950db4a3de69602"
-      quote_symbol: ETH
-      price_usd: 0.006435
-      liquidity_usd: 18343.53
-      volume_h24: 107508.62
-      volume_h6: 30442.79
-      txns_h24:
-        buys: 495
-        sells: 388
-      price_change_h24: 1.83
-      market_cap: 6419282
-      fdv: 6419282
-      created_at: 2026-09-02T20:08:39.000Z
-    - dex: uniswap
-      pair_address: "0xec50a5ec8af1680420ede265349a2cf6d16340c5207de8aa4e553bc8d1133e97"
-      quote_symbol: USDG
-      price_usd: 0.006539
-      liquidity_usd: 984.15
-      volume_h24: 10801.09
-      volume_h6: 0
-      txns_h24:
-        buys: 106
-        sells: 100
-      price_change_h24: 33.85
-      market_cap: 6523233
-      fdv: 6523233
-      created_at: 2026-09-04T05:12:27.000Z
-    - dex: uniswap
-      pair_address: "0x26aaF72937f55353CE46f32b03B0E52De3bb9F4d"
-      quote_symbol: AAPL
-      price_usd: 0.006357
-      liquidity_usd: 759.17
-      volume_h24: 6359.83
-      volume_h6: 2004.63
-      txns_h24:
-        buys: 428
-        sells: 382
-      price_change_h24: -2.94
-      market_cap: 6341001
-      fdv: 6341001
-      created_at: 2026-09-02T20:28:49.000Z
-    - dex: uniswap
-      pair_address: "0xe9261513a34e9bc13f75b45838afa2fc50c02f86ed105b30997220b244867fc1"
-      quote_symbol: WETH
-      price_usd: 0.00595
-      liquidity_usd: 976.64
-      volume_h24: 3835.73
-      volume_h6: 1213.58
-      txns_h24:
-        buys: 107
-        sells: 87
-      price_change_h24: 1.67
-      market_cap: 5935435
-      fdv: 5935435
-      created_at: 2026-09-03T19:38:06.000Z
-    - dex: uniswap
-      pair_address: "0xc7f3e196a865c16e042a266786dca0294ff733ee5259154d89c922148a70512b"
-      quote_symbol: ETH
-      price_usd: 0.006097
-      liquidity_usd: 275.11
-      volume_h24: 329.17
-      volume_h6: 90.86
-      txns_h24:
-        buys: 33
-        sells: 31
-      price_change_h24: -7.83
-      market_cap: 6081830
-      fdv: 6081830
-      created_at: 2026-09-02T19:43:46.000Z
-    - dex: uniswap
-      pair_address: "0x03889afa4ce71d3250bc18c0490c81d4a11092ee1caf8a3177378e3021d312dd"
-      quote_symbol: USDG
-      price_usd: 0.00008782
-      liquidity_usd: 0.15
-      volume_h24: 2.11
-      volume_h6: 2.11
+      pair_address: "0x78dbbfa6f89fdcb33f0701fa569e5c5c858711436ecf20cd4cecedc5e18d6aa1"
+      quote_symbol: SPACEHOOD
+      price_usd: 0.0069
+      liquidity_usd: 3118.94
+      volume_h24: 114.25
+      volume_h6: 114.25
       txns_h24:
         buys: 6
         sells: 0
-      price_change_h24: 81.02
-      market_cap: 87600
-      fdv: 87600
-      created_at: 2026-09-04T16:51:06.000Z
+      price_change_h24: 9.32
+      market_cap: 6866740
+      fdv: 6866740
+      created_at: 2026-09-08T17:34:31.000Z
     - dex: uniswap
-      pair_address: "0x5bbb4d0138e73935a309bdb5421c611f1458a59d037f8f9d67ab554debcbe0b8"
+      pair_address: "0x44dfd7e7573db49e741291cd7e581bb56dea8ded4bce2c2c5d021d14e22c0295"
+      quote_symbol: AI
+      price_usd: 0.00631
+      liquidity_usd: 75078.68
+      volume_h24: 541365.38
+      volume_h6: 17169.78
+      txns_h24:
+        buys: 643
+        sells: 756
+      price_change_h24: 17.47
+      market_cap: 6278851
+      fdv: 6278851
+      created_at: 2026-09-07T13:02:36.000Z
+    - dex: uniswap
+      pair_address: "0x0e131fae5f90ef8d38b82f362ed28dd762c6e43451a154b9d0a11980871af342"
+      quote_symbol: SPACEHOOD
+      price_usd: 0.006127
+      liquidity_usd: 1642.61
+      volume_h24: 7.34
+      volume_h6: 7.34
+      txns_h24:
+        buys: 1
+        sells: 0
+      price_change_h24: null
+      market_cap: 6096832
+      fdv: 6096832
+      created_at: 2026-09-08T17:10:34.000Z
+    - dex: ramses
+      pair_address: "0x4a569beaEF7C908C11a3ca108D3C7Ba7b2E68AF0"
+      quote_symbol: WETH
+      price_usd: 0.006283
+      liquidity_usd: 90421.7
+      volume_h24: 283900.13
+      volume_h6: 71722.38
+      txns_h24:
+        buys: 519
+        sells: 543
+      price_change_h24: 12
+      market_cap: 6252643
+      fdv: 6252643
+      created_at: 2026-09-03T00:00:09.000Z
+    - dex: uniswap
+      pair_address: "0x957fd0426540b6fef34dd6728ed26ea75f2a91612567e33ed950db4a3de69602"
       quote_symbol: ETH
-      price_usd: 0.0007959
-      liquidity_usd: 0.09
-      volume_h24: 0.01
+      price_usd: 0.006295
+      liquidity_usd: 19511.54
+      volume_h24: 41160.24
+      volume_h6: 12146.88
+      txns_h24:
+        buys: 170
+        sells: 175
+      price_change_h24: 9.1
+      market_cap: 6264717
+      fdv: 6264717
+      created_at: 2026-09-02T20:08:39.000Z
+    - dex: uniswap
+      pair_address: "0xf7c1493a664613ae9b04ff7dac494a395e0206ab1eb57a2f2ebf6eb1fbce1849"
+      quote_symbol: USDG
+      price_usd: 0.006329
+      liquidity_usd: 9149.89
+      volume_h24: 39678.93
+      volume_h6: 14415.8
+      txns_h24:
+        buys: 628
+        sells: 565
+      price_change_h24: 13.38
+      market_cap: 6298249
+      fdv: 6298249
+      created_at: 2026-09-07T17:56:47.000Z
+    - dex: uniswap
+      pair_address: "0xb8695bbd1ad439979f1de8e8e179dbda9b9158df64bf090938889f0c020d0f65"
+      quote_symbol: WETH
+      price_usd: 0.006235
+      liquidity_usd: 1989.6
+      volume_h24: 4023.38
+      volume_h6: 1693.17
+      txns_h24:
+        buys: 121
+        sells: 100
+      price_change_h24: 12.05
+      market_cap: 6204235
+      fdv: 6204235
+      created_at: 2026-09-05T17:29:59.000Z
+    - dex: uniswap
+      pair_address: "0xf8cec07e45ad1ff1ac7b369e2b39cb7eb063bf4e50c08b6e0fc64d97469ae5e2"
+      quote_symbol: USDG
+      price_usd: 0.006579
+      liquidity_usd: 4204.21
+      volume_h24: 2841.13
+      volume_h6: 292.73
+      txns_h24:
+        buys: 51
+        sells: 17
+      price_change_h24: 18.47
+      market_cap: 6546650
+      fdv: 6546650
+      created_at: 2026-09-07T11:52:32.000Z
+    - dex: uniswap
+      pair_address: "0xfaf49c651e5ca9a3d1bd66c591228504022430cb3e98a5b790872609141bf5ec"
+      quote_symbol: USDG
+      price_usd: 0.006348
+      liquidity_usd: 312.06
+      volume_h24: 210.7
+      volume_h6: 210.7
+      txns_h24:
+        buys: 5
+        sells: 4
+      price_change_h24: -7.04
+      market_cap: 6317283
+      fdv: 6317283
+      created_at: 2026-09-08T19:04:58.000Z
+    - dex: uniswap
+      pair_address: "0x150d027da64f14a4fa07d91c3a6dda0be4794c72fc31879de7234118f12b461f"
+      quote_symbol: USDG
+      price_usd: 0.005966
+      liquidity_usd: 72.28
+      volume_h24: 50.7
+      volume_h6: 13.13
+      txns_h24:
+        buys: 16
+        sells: 10
+      price_change_h24: -2.08
+      market_cap: 5936710
+      fdv: 5936710
+      created_at: 2026-09-04T23:48:49.000Z
+    - dex: uniswap
+      pair_address: "0x922fa2155a2b0cb6bb66f4ad0f590c71501d8eb2ec7aa1e870b8ab50da63beca"
+      quote_symbol: ETH
+      price_usd: 0.006253
+      liquidity_usd: 20.99
+      volume_h24: 15.76
+      volume_h6: 14.77
+      txns_h24:
+        buys: 6
+        sells: 4
+      price_change_h24: -16.64
+      market_cap: 6222597
+      fdv: 6222597
+      created_at: 2026-09-08T14:38:04.000Z
+    - dex: uniswap
+      pair_address: "0x3d790ceb57d587337918b3d141a74d6517c2f3d390692fb6c46924e0d85751f1"
+      quote_symbol: ETH
+      price_usd: 0.001381
+      liquidity_usd: 1.28
+      volume_h24: 0.88
       volume_h6: 0
       txns_h24:
         buys: 1
         sells: 0
       price_change_h24: null
-      market_cap: 793926
-      fdv: 793926
-      created_at: 2026-09-03T15:25:13.000Z
+      market_cap: 1374857
+      fdv: 1374857
+      created_at: 2026-09-08T14:53:36.000Z
     - dex: uniswap
       pair_address: "0xe2cde1259105a5174619935178a05458a8f7ced3f27131ccabc455bad66da79d"
       quote_symbol: USDG
-      price_usd: 4.7207157346695256e+26
+      price_usd: 4.1397357841891175e+26
       liquidity_usd: null
-      volume_h24: 8.41
-      volume_h6: 2.52
+      volume_h24: 0.06
+      volume_h6: 0
       txns_h24:
-        buys: 12
-        sells: 6
-      price_change_h24: 8.18825174730459e+30
+        buys: 1
+        sells: 0
+      price_change_h24: null
       market_cap: null
       fdv: null
       created_at: 2026-09-02T20:08:43.000Z
-  liquidity_usd: 941401.14
-  volume_h24: 5859328.94
-  trades_h24: 19611
-  price_usd: 0.006716
-  price_change_h24: 0.5
-  market_cap_usd: 6699187
-  fdv_usd: 6699187
-  fdv: 6699187
+    - dex: uniswap
+      pair_address: "0x5ebdbcd79fcabca0a293c5e347ba3338e2dbb236443f15d2c1ea7124ac2fc739"
+      quote_symbol: ICOIN
+      price_usd: 0.0004111
+      liquidity_usd: 533.94
+      volume_h24: 3629.17
+      volume_h6: 297.42
+      txns_h24:
+        buys: 56
+        sells: 75
+      price_change_h24: -27.48
+      market_cap: 403881
+      fdv: 403881
+      created_at: 2026-09-06T21:31:56.000Z
+  liquidity_usd: 1051916.11
+  volume_h24: 2995458.49
+  trades_h24: 9302
+  price_usd: 0.006258
+  price_change_h24: 10.14
+  market_cap_usd: 6227276
+  fdv_usd: 6227276
+  fdv: 6227276
   first_pair_at: 2026-07-22T13:08:44.000Z
-  top10_share: null
-  top10_share_ex_pools: null
-  burned_share: null
-  top10_as_of: null
-  launchpad: null
+  top10_share: 0.2324586320129553
+  top10_share_ex_pools: 0.1733109558171371
+  burned_share: 0
+  top10_as_of: 2026-09-08T21:10:27.749Z
+  launchpad:
+    slug: doppler
+    via: factory
+    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
+    shared: false
   rialto: null
   pair_asset:
     ticker: AAPL
     name: Apple
     address: "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9"
     category: stock
-    tokenized_value_usd: 4858900.11
-    tokenized_shares: 14804.241534039995
-    change_7d: 271065.66
+    tokenized_value_usd: 5656861.94
+    tokenized_shares: 17679.350991899995
+    change_7d: 115269.37
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors:
-    - step: launchpad
-      message: addresses/0x5d6EF090a1461B11c9427aC319260122D1C61e18 did not return creator_address_hash
-    - step: top10_share
-      message: 'tokens/0x5d6EF090a1461B11c9427aC319260122D1C61e18: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: 'tokens/0x5d6EF090a1461B11c9427aC319260122D1C61e18/holders: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: token total_supply was not returned for 0x5d6EF090a1461B11c9427aC319260122D1C61e18
-    - step: top10_share_ex_pools
-      message: holder page was not available for 0x5d6EF090a1461B11c9427aC319260122D1C61e18
+  errors: []
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   mint: unknown
   renounced: false
   lp:
@@ -325,47 +369,59 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0xb5a1e17c7ad0e4f2c992109b41195388d484c7915371eb4ba59a10f59efa9319"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0xcca8a63e1d448091715c1644769bc8a40e6bc2f0805747feb53112396b0e480c"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x09b23d0402ebcd80fb1c77ec90c92460a7e03c772684ad2ea4be101c04080ff3"
+    - pair: "0x78dbbfa6f89fdcb33f0701fa569e5c5c858711436ecf20cd4cecedc5e18d6aa1"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x44dfd7e7573db49e741291cd7e581bb56dea8ded4bce2c2c5d021d14e22c0295"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x0e131fae5f90ef8d38b82f362ed28dd762c6e43451a154b9d0a11980871af342"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
     - pair: "0x4a569beaEF7C908C11a3ca108D3C7Ba7b2E68AF0"
       locked_share: null
       holder_kind: null
-      reason: LP token details could not be read from the explorer
-    - pair: "0x74639512f5cdb4e5d16993bdfb200fc548f7ab1492ae4e71e84dbc968a14cef7"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
     - pair: "0x957fd0426540b6fef34dd6728ed26ea75f2a91612567e33ed950db4a3de69602"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0xec50a5ec8af1680420ede265349a2cf6d16340c5207de8aa4e553bc8d1133e97"
+    - pair: "0xf7c1493a664613ae9b04ff7dac494a395e0206ab1eb57a2f2ebf6eb1fbce1849"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x26aaF72937f55353CE46f32b03B0E52De3bb9F4d"
-      locked_share: null
-      holder_kind: null
-      reason: LP token details could not be read from the explorer
-    - pair: "0xe9261513a34e9bc13f75b45838afa2fc50c02f86ed105b30997220b244867fc1"
+    - pair: "0xb8695bbd1ad439979f1de8e8e179dbda9b9158df64bf090938889f0c020d0f65"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0xc7f3e196a865c16e042a266786dca0294ff733ee5259154d89c922148a70512b"
+    - pair: "0xf8cec07e45ad1ff1ac7b369e2b39cb7eb063bf4e50c08b6e0fc64d97469ae5e2"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x03889afa4ce71d3250bc18c0490c81d4a11092ee1caf8a3177378e3021d312dd"
+    - pair: "0xfaf49c651e5ca9a3d1bd66c591228504022430cb3e98a5b790872609141bf5ec"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x5bbb4d0138e73935a309bdb5421c611f1458a59d037f8f9d67ab554debcbe0b8"
+    - pair: "0x150d027da64f14a4fa07d91c3a6dda0be4794c72fc31879de7234118f12b461f"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x922fa2155a2b0cb6bb66f4ad0f590c71501d8eb2ec7aa1e870b8ab50da63beca"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x3d790ceb57d587337918b3d141a74d6517c2f3d390692fb6c46924e0d85751f1"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
@@ -373,32 +429,30 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+    - pair: "0x5ebdbcd79fcabca0a293c5e347ba3338e2dbb236443f15d2c1ea7124ac2fc739"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
     - step: mint
-      message: 'smart-contracts/0x5d6EF090a1461B11c9427aC319260122D1C61e18: HTTP 402: {"error":"Out of credits"}'
-    - step: mint
       message: verified ABI unavailable
-    - step: lp
-      message: 'tokens/0x4a569beaef7c908c11a3ca108d3c7ba7b2e68af0: HTTP 402: {"error":"Out of credits"}'
-    - step: lp
-      message: 'tokens/0x26aaf72937f55353ce46f32b03b0e52de3bb9f4d: HTTP 402: {"error":"Out of credits"}'
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   addresses:
     - address: "0x5d6EF090a1461B11c9427aC319260122D1C61e18"
       label: ICOIN token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 7616
+      token_transfers_count: 5
+      last_tx_at: 2026-09-08T21:34:26.000Z
+      last_method: "0x095ea7b3"
+      txns_24h: 250
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors:
-        - step: blockscout
-          message: 'counters/0x5d6EF090a1461B11c9427aC319260122D1C61e18: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+        - step: txns_24h capped
+          message: stopped after 5 pages; count is a floor
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory (token creator)
       role: factory
@@ -408,6 +462,8 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors: []
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       label: DopplerERC20V1 implementation
@@ -418,34 +474,169 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-04T20:46:36.233Z
+      stale_since: 2026-09-04T20:46:36.233Z
       errors: []
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       label: LongLauncher (create caller)
       role: factory
-      transactions_count: 13369
-      token_transfers_count: 4
-      last_tx_at: 2026-09-04T20:52:03.000Z
+      transactions_count: 29212
+      token_transfers_count: 10
+      last_tx_at: 2026-09-08T21:09:58.000Z
       last_method: create
-      txns_24h: 2000
-      launches_24h: 1998
-      errors:
-        - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
+      txns_24h: 1781
+      launches_24h: 1776
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      errors: []
     - address: "0x24c2410941B4603CF5504810d5dF841dB4d303ad"
       label: Community vault (LongFeeVaultFactory deployVault)
       role: vault
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 55
+      token_transfers_count: 264
+      last_tx_at: 2026-09-08T12:59:20.000Z
+      last_method: "0xe4fc6b6d"
+      txns_24h: 3
       launches_24h: null
-      errors:
-        - step: blockscout
-          message: 'counters/0x24c2410941B4603CF5504810d5dF841dB4d303ad: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
-  last_activity_at: 2026-09-04T20:52:03.000Z
-  txns_24h: 2000
-  launches_24h: 1998
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      errors: []
+  last_activity_at: 2026-09-08T21:34:26.000Z
+  txns_24h: 2034
+  launches_24h: 1776
+  window_as_of: 2026-09-04T20:46:36.233Z
+  stale_since: 2026-09-04T20:46:36.233Z
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x5d6EF090a1461B11c9427aC319260122D1C61e18"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0xa88e5e7fb4d70d1c51db3746808c44c5c998f091aba628c99ad1a8a3f6a4532f"
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 4
+    - kind: activity
+      address: "0x5d6EF090a1461B11c9427aC319260122D1C61e18"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0xa88e5e7fb4d70d1c51db3746808c44c5c998f091aba628c99ad1a8a3f6a4532f"
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 5
+    - kind: address
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: factory signal unavailable
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: factory signal unavailable; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: activity
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: 2026-09-04T20:46:36.233Z
+      credits: 0
+    - kind: address
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0xc6265a359821d2808f7fa0779b9544a6761c9b215d7b28c0be0a3ca6fc8909ad"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xc6265a359821d2808f7fa0779b9544a6761c9b215d7b28c0be0a3ca6fc8909ad"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x24c2410941B4603CF5504810d5dF841dB4d303ad"
+      status: read
+      reason: vault baseline unavailable
+      signal_value: null
+      signal: "0xf5fb613ed4ac2a995d0ec9d85722a346646f8ee904b9cdc8c7a1e3eab883009e"
+      code_hash: 6910278b5a20609b
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x24c2410941B4603CF5504810d5dF841dB4d303ad"
+      status: read
+      reason: vault baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xf5fb613ed4ac2a995d0ec9d85722a346646f8ee904b9cdc8c7a1e3eab883009e"
+      code_hash: 6910278b5a20609b
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: top10
+      address: "0x5d6EF090a1461B11c9427aC319260122D1C61e18"
+      status: read
+      reason: token change signal changed
+      signal_value: 9302
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: structure
+      address: "0x5d6EF090a1461B11c9427aC319260122D1C61e18"
+      status: read
+      reason: token change signal changed
+      signal_value: 9302
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0x5d6EF090a1461B11c9427aC319260122D1C61e18"
+      status: read
+      reason: token change signal changed
+      signal_value: 9302
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
 errors: []

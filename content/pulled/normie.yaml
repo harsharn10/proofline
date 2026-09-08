@@ -1,13 +1,13 @@
 slug: normie
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
     label: NORMIE token
     role: token
     is_contract: true
-    source_verified: false
-    contract_name: normie
+    source_verified: true
+    contract_name: PonsV2LauncherToken
     proxy:
       type: none
       implementation: null
@@ -17,8 +17,10 @@ addresses:
     safe: null
     created_block: null
     created_at: null
-    holders: 2124
-    errors: []
+    holders: 1974
+    errors:
+      - step: blockscout
+        message: "transactions/0x7fe993ff12790a8edf40c7ed06c0c74a46d6296ced29497f571396f023d0a775: HTTP 502 returned HTML, not JSON (bot challenge or error page)"
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory (token launchFactory)
     role: factory
@@ -57,7 +59,9 @@ addresses:
     created_block: null
     created_at: null
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: "transactions/0x7fe993ff12790a8edf40c7ed06c0c74a46d6296ced29497f571396f023d0a775: HTTP 502 returned HTML, not JSON (bot challenge or error page)"
   - address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
     label: PonsV2LaunchAndBuy (create tx to)
     role: router
@@ -95,92 +99,82 @@ addresses:
     safe: null
     created_block: 48294
     created_at: 2026-06-10T15:27:06.000Z
-    holders: 55043
-    errors: []
+    holders: 63756
+    errors:
+      - step: blockscout
+        message: "transactions/0x68b343238e46406e466aba0fa206cdcad84f27ba610dbfb2bd48fba8e0d52842: HTTP 502 returned HTML, not JSON (bot challenge or error page)"
 metrics: []
 market:
   token_address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   pairs:
     - dex: uniswap
       pair_address: "0x8ece55481e6dcca5393ce2246c51952ba5fd996ff0f620ab76a038856e8bb2e6"
       quote_symbol: SPY
-      price_usd: 0.00004972
-      liquidity_usd: 18465.37
-      volume_h24: 73397.37
-      volume_h6: 10338.62
+      price_usd: 0.0000115
+      liquidity_usd: 8863.05
+      volume_h24: 2776.72
+      volume_h6: 797.43
       txns_h24:
-        buys: 338
-        sells: 321
-      price_change_h24: -24.77
-      market_cap: 49728
-      fdv: 49728
+        buys: 16
+        sells: 29
+      price_change_h24: -20.85
+      market_cap: 11508
+      fdv: 11508
       created_at: 2026-09-02T02:25:38.000Z
     - dex: uniswap
       pair_address: "0xbc26e953101ce5b21f6a95eea9016b5b657d64088b64475ea0de9176e9684309"
       quote_symbol: USDG
-      price_usd: 0.00004928
-      liquidity_usd: 108.5
-      volume_h24: 329.59
-      volume_h6: 27.54
+      price_usd: 0.00001345
+      liquidity_usd: 56.67
+      volume_h24: 12.79
+      volume_h6: 6
       txns_h24:
-        buys: 31
-        sells: 29
-      price_change_h24: -17.86
-      market_cap: 49285
-      fdv: 49285
+        buys: 3
+        sells: 5
+      price_change_h24: -9.78
+      market_cap: 13455
+      fdv: 13455
       created_at: 2026-09-04T04:10:32.000Z
     - dex: uniswap
       pair_address: "0x62a2e89c1ff34074d662fb84ca27974795573e5da2fd000083b590d69e20bb07"
       quote_symbol: ETH
-      price_usd: 0.00004995
-      liquidity_usd: 151.86
-      volume_h24: 173.86
-      volume_h6: 6.14
+      price_usd: 0.00001275
+      liquidity_usd: 77.54
+      volume_h24: 4.39
+      volume_h6: 3.4
       txns_h24:
-        buys: 13
-        sells: 11
-      price_change_h24: -26.6
-      market_cap: 49953
-      fdv: 49953
+        buys: 0
+        sells: 2
+      price_change_h24: -14.93
+      market_cap: 12757
+      fdv: 12757
       created_at: 2026-09-02T02:39:33.000Z
-    - dex: uniswap
-      pair_address: "0x664cabd9c2093ce6bbfa7f06d98598623063e8da6446695499c147edef5401c8"
-      quote_symbol: USDG
-      price_usd: 0.00004413
-      liquidity_usd: 51.84
-      volume_h24: 33.19
-      volume_h6: 2.41
-      txns_h24:
-        buys: 5
-        sells: 10
-      price_change_h24: -33.42
-      market_cap: 44131
-      fdv: 44131
-      created_at: 2026-09-02T02:43:07.000Z
-  liquidity_usd: 18777.57
-  volume_h24: 73934.01
-  trades_h24: 758
-  price_usd: 0.00004972
-  price_change_h24: -24.77
-  market_cap_usd: 49728
-  fdv_usd: 49728
-  fdv: 49728
+  liquidity_usd: 8997.26
+  volume_h24: 2793.9
+  trades_h24: 55
+  price_usd: 0.0000115
+  price_change_h24: -20.85
+  market_cap_usd: 11508
+  fdv_usd: 11508
+  fdv: 11508
   first_pair_at: 2026-09-02T02:25:38.000Z
-  top10_share: 0.4412715313068246
-  top10_share_ex_pools: 0.1947645212242448
+  top10_share: 0.6158051839520392
+  top10_share_ex_pools: 0.1617861576012796
   burned_share: 0
-  top10_as_of: 2026-09-04T20:46:36.233Z
-  launchpad: null
+  top10_as_of: 2026-09-08T21:10:27.749Z
+  launchpad:
+    slug: pons
+    via: creator
+    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
   rialto: null
   pair_asset: null
   volume_disagreement: null
-  errors:
-    - step: launchpad
-      message: addresses/0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612 did not return creator_address_hash
+  errors: []
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
-  mint: unknown
+  pulled_at: 2026-09-08T21:10:27.749Z
+  mint: no-mint-function
   renounced: null
   lp:
     - pair: "0x8ece55481e6dcca5393ce2246c51952ba5fd996ff0f620ab76a038856e8bb2e6"
@@ -195,37 +189,37 @@ structure:
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x664cabd9c2093ce6bbfa7f06d98598623063e8da6446695499c147edef5401c8"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
   errors:
-    - step: mint
-      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-08T21:10:27.749Z
   addresses:
     - address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
       label: NORMIE token
       role: token
       transactions_count: 0
       token_transfers_count: 0
-      last_tx_at: 2026-09-04T22:09:32.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 145
+      last_tx_at: 2026-09-08T16:31:38.000Z
+      last_method: approve
+      txns_24h: 17
       launches_24h: null
-      errors: []
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      errors:
+        - step: blockscout
+          message: "counters/0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612: HTTP 503 returned HTML, not JSON (bot challenge or error page)"
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: PonsV2LaunchFactory (token launchFactory)
       role: factory
-      transactions_count: 76659
-      token_transfers_count: 6719
-      last_tx_at: 2026-09-04T20:47:30.000Z
+      transactions_count: 162864
+      token_transfers_count: 24334
+      last_tx_at: 2026-09-08T21:10:31.000Z
       last_method: launchToken
       txns_24h: 2000
-      launches_24h: 845
+      launches_24h: 1683
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -238,16 +232,22 @@ activity:
       last_method: "0xd04c6983"
       txns_24h: 0
       launches_24h: null
-      errors: []
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      errors:
+        - step: blockscout
+          message: "counters/0xB75ECc0B9D174738D680B416a5760d24162BbFa3: HTTP 503 returned HTML, not JSON (bot challenge or error page)"
     - address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
       label: PonsV2LaunchAndBuy (create tx to)
       role: router
-      transactions_count: 79462
-      token_transfers_count: 11161
-      last_tx_at: 2026-09-04T20:49:16.000Z
+      transactions_count: 175195
+      token_transfers_count: 181632
+      last_tx_at: 2026-09-08T21:11:01.000Z
       last_method: launchAndBuy
       txns_24h: 2000
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors:
         - step: txns_24h capped
           message: stopped after 40 pages; count is a floor
@@ -256,14 +256,153 @@ activity:
       role: token
       transactions_count: 50757
       token_transfers_count: 66
-      last_tx_at: 2026-09-04T22:14:39.000Z
+      last_tx_at: 2026-09-08T21:36:24.000Z
       last_method: approve
-      txns_24h: 2000
+      txns_24h: 50
       launches_24h: null
+      window_as_of: 2026-09-08T21:10:27.749Z
+      stale_since: null
       errors:
-        - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
-  last_activity_at: 2026-09-04T22:14:39.000Z
-  txns_24h: 6145
-  launches_24h: 845
+        - step: blockscout
+          message: "counters/0x117cc2133c37B721F49dE2A7a74833232B3B4C0C: HTTP 503 returned HTML, not JSON (bot challenge or error page)"
+        - step: blockscout
+          message: "transactions?filter=to page 2: HTTP 502 returned HTML, not JSON (bot challenge or error page)"
+  last_activity_at: 2026-09-08T21:36:24.000Z
+  txns_24h: 4067
+  launches_24h: 1683
+  window_as_of: 2026-09-08T21:10:27.749Z
+  stale_since: null
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0xa06352df86423d58ee4fb1f55cf1b1d32c39d9df393650a34e9fbc835a4df9b0"
+      code_hash: 996e0c1d2870baf3
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 3
+    - kind: activity
+      address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0xa06352df86423d58ee4fb1f55cf1b1d32c39d9df393650a34e9fbc835a4df9b0"
+      code_hash: 996e0c1d2870baf3
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 3
+    - kind: address
+      address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      status: read
+      reason: factory baseline unavailable
+      signal_value: null
+      signal: "0xd535d6679e2dae2b239b0640a427c9f6a4cb22b676828c5ce540411aee00a0a9"
+      code_hash: 2ac92839c8aafdd8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+      status: read
+      reason: factory baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xd535d6679e2dae2b239b0640a427c9f6a4cb22b676828c5ce540411aee00a0a9"
+      code_hash: 2ac92839c8aafdd8
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0xB75ECc0B9D174738D680B416a5760d24162BbFa3"
+      status: read
+      reason: other baseline unavailable
+      signal_value: null
+      signal: "0xaae5bc026b2b5d660d234b32aa0fddab99bc2686c234c2a4e72d3da210d53b8c"
+      code_hash: 4e5c8596a36d345f
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 5
+    - kind: activity
+      address: "0xB75ECc0B9D174738D680B416a5760d24162BbFa3"
+      status: read
+      reason: other baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0xaae5bc026b2b5d660d234b32aa0fddab99bc2686c234c2a4e72d3da210d53b8c"
+      code_hash: 4e5c8596a36d345f
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 3
+    - kind: address
+      address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+      status: read
+      reason: router baseline unavailable
+      signal_value: null
+      signal: "0x93a753f600d96ffc8cb3c95bd4a5dc15d95e7cc323b3a268f2b28ac9383a48d3"
+      code_hash: 8557d5489003bbc0
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
+      status: read
+      reason: router baseline unavailable; 24h walk refreshed
+      signal_value: null
+      signal: "0x93a753f600d96ffc8cb3c95bd4a5dc15d95e7cc323b3a268f2b28ac9383a48d3"
+      code_hash: 8557d5489003bbc0
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C"
+      status: read
+      reason: token DexScreener trade count changed
+      signal_value: null
+      signal: "0x535d5b19b7f0975e83be2c99af77cdb05efddb5f1c8db70c24eaf4be24470918"
+      code_hash: caced2aa743efc36
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 6
+    - kind: activity
+      address: "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C"
+      status: read
+      reason: token DexScreener trade count changed; 24h walk refreshed
+      signal_value: null
+      signal: "0x535d5b19b7f0975e83be2c99af77cdb05efddb5f1c8db70c24eaf4be24470918"
+      code_hash: caced2aa743efc36
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 6
+    - kind: top10
+      address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
+      status: read
+      reason: token change signal changed
+      signal_value: 55
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 2
+    - kind: structure
+      address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
+      status: read
+      reason: token change signal changed
+      signal_value: 55
+      signal: null
+      code_hash: 996e0c1d2870baf3
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 1
+    - kind: lp
+      address: "0x92ef7CaA35F85f50311Fa5eD7ADE2D9786C61612"
+      status: read
+      reason: token change signal changed
+      signal_value: 55
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-08T21:10:27.749Z
+      stale_since: null
+      credits: 0
 errors: []
