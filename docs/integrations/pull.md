@@ -179,15 +179,24 @@ Planning allowance by explorer read kind (a changed name can own several address
 | Verified ABI | 1/token | Token signal changed |
 | LP check | 0–2/pair | Token signal changed; v3/v4 pool ids cost zero |
 
-For capacity planning we allow **10 credits per due name** after change skips. The observed 179-name
-mix on 2026-09-04 was 61 hot, 115 live, 0 quiet and 3 dormant: 34.1% / 64.2% / 0% / 1.7%.
-Holding that mix constant gives:
+The measured cost on 2026-09-04, read through the public fallback with the corrected change signal,
+was **26.1 credits per hot name on a first read**: 61 hot names, 1,621 credits, 33 minutes. A first
+read buys the signal, the metadata, the walk, the holder page, the ABI and the LP check for every
+address a name owns; a steady-state read buys the signal and skips the rest when nothing moved, so it
+costs less. The registry mix that day was 61 hot, 115 live, 0 quiet and 3 dormant: 34.1% / 64.2% /
+0% / 1.7%. Holding that mix constant and charging the first-read price on every due read gives an
+upper bound:
 
-| Names | Credits/day | Headroom below the 60,000 cap |
+| Names | Credits/day (first-read price) | Headroom below the 60,000 cap |
 | ---: | ---: | ---: |
-| 200 | 5,301 | 54,699 |
-| 500 | 13,252 | 46,748 |
-| 1,000 | 26,504 | 33,496 |
+| 200 | 7,777 | 52,223 |
+| 500 | 19,442 | 40,558 |
+| 1,000 | 38,883 | 21,117 |
+
+The steady-state figure is what matters for planning and only the scheduled runs can measure it:
+every run's closing report prints the measured credits per due name for each tier and rebuilds this
+projection from those figures. Replace the table with the steady-state numbers once two consecutive
+scheduled hot-tier reads have printed them.
 
 The scheduled workflow is one job, not a two-shard matrix. `cancel-in-progress: false` protects the
 job that is running and not the one queued behind it, so a compile run starting mid-pull cancelled a
