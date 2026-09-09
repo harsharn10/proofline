@@ -14,6 +14,56 @@ const graph = buildRelationships([a,b]);
 const index = relationshipIndex(graph);
 const census = { identity: { status: "verified" }, role: "subject" };
 
+test("failed refreshes cool down daily; manual and newer dated evidence can reactivate", () => {
+  const previous={chain:'robinhood-chain',refresh:{status:'partial',attempted_at:new Date(now).toISOString(),last_success_at:'2026-08-01T00:00:00Z'}};
+  const decide=extra=>refreshDecision({project:b,census,previous,index,now,aboveShareBar:true,...extra});
+  assert.equal(decide({}).due,false);
+  assert.equal(decide({force:true}).due,true);
+  assert.equal(decide({now:now+22*3600_000}).due,true);
+  assert.equal(decide({now:now+1000,queuedAt:new Date(now-1000).toISOString()}).due,false);
+  assert.equal(decide({now:now+1000,queuedAt:new Date(now+1000).toISOString()}).due,true);
+  assert.equal(decide({}).lastSuccessAt,previous.refresh.last_success_at);
+});
+
+test("daily allocations preserve regular and seed progress while rotating persistent failures", () => {
+  const projects=Array.from({length:82},(_,i)=>({...project(`p${String(i).padStart(3,'0')}`,i+100),deployments:[deployment(i+100,'token')]}));
+  const localIndex=relationshipIndex(buildRelationships(projects));
+  const state=new Map(projects.slice(0,81).map((p,i)=>[p.slug,{chain:'robinhood-chain',
+    refresh:{status:i<80?'partial':'complete',last_success_at:new Date(now-40*DAY).toISOString(),attempted_at:new Date(now-DAY).toISOString()}}]));
+  const attempted=new Set();
+  for(let day=0;day<5;day++) {
+    const clock=now+day*DAY;
+    const targets=projects.map(p=>({slug:p.slug,refresh:refreshDecision({project:p,census,index:localIndex,now:clock,aboveShareBar:true,
+      previous:state.has(p.slug)?{...state.get(p.slug),market:{trades_h24:1,pulled_at:new Date(clock).toISOString()}}:null})}));
+    const result=selectRefreshTargets(targets);
+    assert(result.selected.some(t=>t.slug===projects[80].slug),'ordinary due name progresses every day');
+    assert(result.selected.filter(t=>t.refresh.retry).length<=20,'retry budget remains bounded');
+    if(day===0) assert(result.selected.some(t=>t.slug===projects[81].slug),'new seed is not starved');
+    const firstRetry=result.selected.findIndex(t=>t.refresh.retry);
+    assert(result.selected.slice(firstRetry).every(t=>t.refresh.retry),'retries execute after non-retry work');
+    for(const target of result.selected) {
+      const failing=Number(target.slug.slice(1))<80;
+      if(failing) attempted.add(target.slug);
+      state.set(target.slug,{chain:'robinhood-chain',refresh:{status:failing?'partial':'complete',attempted_at:new Date(clock).toISOString(),
+        last_success_at:failing?state.get(target.slug).refresh.last_success_at:new Date(clock).toISOString()}});
+    }
+  }
+  assert.equal(attempted.size,80,'every persistent failure rotates through the retry slots');
+});
+
+test("retry cap counts failed seeds, manual selection overrides caps, ordinary work fills unused retry slots", () => {
+  const targets=Array.from({length:100},(_,i)=>({slug:String(i),refresh:{due:true,retry:i<80,seed:i<30,priority:100-i}}));
+  const normal=selectRefreshTargets(targets);
+  assert.equal(normal.selected.filter(t=>t.refresh.retry).length,20);
+  assert.equal(normal.selected.filter(t=>t.refresh.seed).length,10);
+  assert.equal(selectRefreshTargets(targets,{force:true}).selected.length,100);
+  assert.equal(selectRefreshTargets(targets.map(t=>({...t,refresh:{...t.refresh,seed:false,retry:false}}))).selected.length,80);
+  const seeds=Array.from({length:30},(_,i)=>({slug:`seed-${i}`,refresh:{due:true,seed:true,retry:i<20,priority:i<20?1:100}}));
+  const selection=selectRefreshTargets(seeds).selected;
+  assert.equal(selection.filter(t=>t.refresh.retry).length,5,'new discovery cannot starve failed seeds');
+  assert.equal(selection.filter(t=>!t.refresh.retry).length,5,'failed seeds cannot starve discovery');
+});
+
 test("known totals preserve zero and do not disguise missing observations", () => {
   assert.equal(knownTotal([0,0]),0);
   assert.equal(knownTotal([1,2]),3);
