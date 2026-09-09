@@ -73,11 +73,18 @@ export function ownActivityAt(project, pulled, index, now = Date.now()) {
     .filter(a => own.has(addressKey(pulled.chain, a.address)))
     .map(a => a.last_tx_at).filter(at => Number.isFinite(Date.parse(at)) && Date.parse(at) <= now);
   if ((pulled?.market?.trades_h24 ?? 0) > 0 &&
-      (project.deployments ?? []).some(d => d.role === "token" && own.has(addressKey(d.chain, d.address)))) {
+      (project.deployments ?? []).some(d => d.chain === pulled.chain && d.role === "token" && own.has(addressKey(d.chain, d.address)))) {
     const at = pulled.market.pulled_at ?? pulled.pulled_at;
     if (Number.isFinite(Date.parse(at)) && Date.parse(at) <= now) times.push(at);
   }
-  return times.sort().at(-1) ?? null;
+  return times.sort((a,b) => Date.parse(a) - Date.parse(b)).at(-1) ?? null;
+}
+
+// A total is known only when all contributing observations are known. Preserve measured zero.
+export function knownTotal(values) {
+  if (!values.length || !values.every(value => Number.isFinite(value) && value >= 0)) return null;
+  const total = values.reduce((sum, value) => sum + value, 0);
+  return Number.isFinite(total) ? total : null;
 }
 
 // Fresh unique factory observations only. Missing/capped windows remain explicitly partial.
@@ -88,18 +95,24 @@ export function uniqueLaunches(pulledFiles, now = Date.now()) {
     const key = addressKey(file.chain, row.address);
     if (!key) continue;
     const at = row.window_as_of ?? file.activity.window_as_of ?? file.activity.pulled_at;
-    const candidate = { row, at, stale: row.stale_since ?? file.activity.stale_since };
+    // Null is an explicit fresh marker; only an absent legacy field inherits aggregate state.
+    const candidate = { row, at, stale: Object.hasOwn(row, 'stale_since') ? row.stale_since : file.activity.stale_since, conflict: false };
     const old = latest.get(key);
     if (!old || Number.isFinite(Date.parse(at)) && (!Number.isFinite(Date.parse(old.at)) || Date.parse(at) > Date.parse(old.at))) latest.set(key, candidate);
+    else if (Date.parse(at) === Date.parse(old.at)) {
+      // A run-wide timestamp cannot choose between conflicting independently sampled copies.
+      old.conflict ||= row.launches_24h !== old.row.launches_24h || Boolean(candidate.stale) !== Boolean(old.stale);
+      if ((row.errors ?? []).length) old.partial = true;
+    }
   }
   let total = 0, fresh = 0, partial = false;
-  for (const {row, at, stale} of latest.values()) {
+  for (const {row, at, stale, conflict, partial: duplicatePartial} of latest.values()) {
     const age = now - Date.parse(at);
-    if (stale || !Number.isFinite(age) || age < 0 || age > 36 * 3600_000 || !Number.isFinite(row.launches_24h)) {
+    if (conflict || stale || !Number.isFinite(age) || age < 0 || age > 36 * 3600_000 || !Number.isFinite(row.launches_24h) || row.launches_24h < 0) {
       partial = true; continue;
     }
     fresh++; total += row.launches_24h;
-    if ((row.errors ?? []).length) partial = true;
+    if (duplicatePartial || (row.errors ?? []).length) partial = true;
   }
   return { value: fresh ? total : null, partial, factories: latest.size, freshFactories: fresh };
 }
@@ -113,8 +126,11 @@ export function uniqueVolume(pulledFiles, now = Date.now()) {
       if (!pair.pair_address || !Number.isFinite(pair.volume_h24)) continue;
       const key = addressKey(file.chain, pair.pair_address);
       if (!key) continue;
-      if (!pairs.has(key) || pairs.get(key).at < at) pairs.set(key, { at, value: pair.volume_h24 });
+      if (!pairs.has(key) || pairs.get(key).at < at) pairs.set(key, { at, value: pair.volume_h24, conflict: false });
+      else if (pairs.get(key).at === at && pairs.get(key).value !== pair.volume_h24) pairs.get(key).conflict = true;
     }
   }
-  return pairs.size ? [...pairs.values()].reduce((n,p) => n+p.value,0) : null;
+  // The public volume API has no partial flag. Withhold instead of silently understating a conflict.
+  return [...pairs.values()].some(pair => pair.conflict) ? null
+    : knownTotal([...pairs].sort(([a],[b]) => a.localeCompare(b)).map(([,pair]) => pair.value));
 }

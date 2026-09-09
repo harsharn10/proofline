@@ -2,7 +2,7 @@ import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 // @ts-expect-error Shared deterministic relationship projection.
-import { buildRelationships, sharedRelationships, uniqueLaunches, uniqueVolume } from "../../../scripts/lib/relationships.mjs";
+import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolume } from "../../../scripts/lib/relationships.mjs";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
 import { readerCopy } from "../lib/dejargon";
 import {
@@ -315,9 +315,10 @@ function loadContent(): ServerContent {
     dependencies[card.id] = card;
   }
 
-  const dossiers: Dossier[] = Object.entries(rawContent.projects).map(([file, raw]) => {
+  const projects = Object.entries(rawContent.projects).map(([file, raw]) => ({file, project: parseYaml<ProjectFile>(raw)}));
+  const activityIndex = relationshipIndex(buildRelationships(projects.map(entry => entry.project)));
+  const dossiers: Dossier[] = projects.map(({file, project}) => {
     const slug = file.replace(/\.yaml$/, "");
-    const project = parseYaml<ProjectFile>(raw);
     const sourcesFile = readYamlOrWarn<SourcesFile>(
       rawContent.sources[`${slug}.yaml`],
       `sources/${slug}.yaml`,
@@ -365,7 +366,7 @@ function loadContent(): ServerContent {
       changelog,
       derived: withPulledMetrics(pickDerived(derivedFile.projects[slug], slug, project.coverage), pulled),
       pulled,
-      kpis: kpisFor({ lifecycle: project.lifecycle }, pulled, history, buildNow),
+      kpis: kpisFor({ lifecycle: project.lifecycle }, pulled, history, buildNow, ownActivityAt(project, pulled, activityIndex, buildNow)),
       card: {
         officialConfirmed: officialSurfaceConfirmed(censusRow),
         handle: censusRow?.handle ?? null,
@@ -793,12 +794,11 @@ function deltaFrom(history: HistoryPoint[], key: "holders", days: number): numbe
 // Every tracker number on a card comes from here: DexScreener market read, Blockscout activity read,
 // holder counts and their 7-day change from snapshots, DefiLlama TVL. Status is computed from the
 // reads, never typed by a person.
-function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | null, history: HistoryPoint[], now: number): Kpis {
+function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | null, history: HistoryPoint[], now: number, lastActivityAt: string | null): Kpis {
   const market = pulled?.market ?? null;
   const activity = pulled?.activity ?? null;
   const located = locatedOnChain(pulled);
   const holders = tokenHolders(pulled);
-  const lastActivityAt = activity?.last_activity_at ?? null;
   const tvl = pulled?.metrics.find((m) => m.kind === "tvl")?.value ?? null;
   const marketAge = now - Date.parse(market?.pulled_at ?? "");
   const marketFresh = Number.isFinite(marketAge) && marketAge >= 0 && marketAge <= 36 * 3600_000;
@@ -810,7 +810,7 @@ function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | nu
   else if (!located) status = "announced";
   else {
     const age = lastActivityAt ? now - new Date(lastActivityAt).getTime() : null;
-    if ((age !== null && age <= 7 * DAY) || (trades ?? 0) > 0) status = "live";
+    if (age !== null && age >= 0 && age <= 7 * DAY) status = "live";
     else if (age !== null && age <= 30 * DAY) status = "quiet";
     else if (age !== null) status = "dormant";
     else status = located ? "quiet" : "announced";
@@ -827,7 +827,7 @@ function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | nu
     holders,
     holdersDelta7d: deltaFrom(history, "holders", 7),
     launches24h: activityFresh ? activity?.launches_24h ?? null : null,
-    txnsTotal: activity ? activity.addresses.reduce((n, a) => n + (a.transactions_count ?? 0), 0) || null : null,
+    txnsTotal: knownTotal(activity?.addresses.map(a => a.transactions_count) ?? []),
     firstPairAt: market?.first_pair_at ?? null,
     tvl,
     readAt: pulled?.refresh ? pulled.refresh.last_success_at : pulled?.pulled_at ?? null,

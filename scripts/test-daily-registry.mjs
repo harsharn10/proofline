@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createCreditBudget, blockscoutCreditCost, normalizeBudgetState } from "./lib/pull/budget.mjs";
 import { requestJson } from "./lib/pull/http.mjs";
-import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, uniqueLaunches, uniqueVolume } from "./lib/relationships.mjs";
+import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolume } from "./lib/relationships.mjs";
 import { refreshDecision, selectRefreshTargets, selectInfrastructureReaders, hasIdentityConflict, DAY } from "./lib/refresh-policy.mjs";
 
 const now = Date.parse("2026-09-09T12:00:00Z");
@@ -13,6 +13,56 @@ const a = project("a",1), b = project("b",2);
 const graph = buildRelationships([a,b]);
 const index = relationshipIndex(graph);
 const census = { identity: { status: "verified" }, role: "subject" };
+
+test("known totals preserve zero and do not disguise missing observations", () => {
+  assert.equal(knownTotal([0,0]),0);
+  assert.equal(knownTotal([1,2]),3);
+  for (const values of [[],[null],[1,null],[undefined],[NaN],[-1],[Number.MAX_VALUE,Number.MAX_VALUE]]) assert.equal(knownTotal(values),null);
+});
+
+test("own activity rejects conflicted tokens, other-chain market attribution and future times", () => {
+  const conflicted=relationshipIndex(buildRelationships([a,{...b,deployments:[deployment(1,'token')]}]));
+  const data={chain:'robinhood-chain',market:{trades_h24:3,pulled_at:new Date(now).toISOString()},activity:{addresses:[{address:address(1),last_tx_at:new Date(now+DAY).toISOString()}]}};
+  assert.equal(ownActivityAt(a,data,conflicted,now),null);
+  assert.equal(ownActivityAt(a,{...data,chain:'ethereum'},index,now),null);
+  assert.equal(ownActivityAt(a,data,index,now),new Date(now).toISOString());
+  assert.equal(ownActivityAt(a,{...data,market:null},index,now),null);
+  const crossZone={...a,deployments:[deployment(1,'token'),deployment(2,'router')]};
+  const times={chain:'robinhood-chain',activity:{addresses:[
+    {address:address(1),last_tx_at:'2026-09-09T10:00:00Z'},
+    {address:address(2),last_tx_at:'2026-09-09T11:00:00+02:00'}]}};
+  assert.equal(ownActivityAt(crossZone,times,relationshipIndex(buildRelationships([crossZone])),now),'2026-09-09T10:00:00Z');
+});
+
+test("explicit fresh factory row survives a stale aggregate; legacy rows inherit staleness", () => {
+  const row = {address:address(9), role:'factory', window_as_of:new Date(now).toISOString(), stale_since:null, launches_24h:0};
+  const file = {chain:'robinhood-chain',activity:{stale_since:'2026-09-01',addresses:[row]}};
+  assert.equal(uniqueLaunches([file],now).value,0);
+  delete row.stale_since;
+  assert.equal(uniqueLaunches([file],now).value,null);
+});
+
+test("equally current conflicting observations never depend on file order", () => {
+  const file = n => ({chain:'robinhood-chain',activity:{window_as_of:new Date(now).toISOString(),addresses:[
+    {address:address(9),role:'factory',launches_24h:n,stale_since:null,errors:[]}
+  ]},market:{pulled_at:new Date(now).toISOString(),pairs:[{pair_address:address(8),volume_h24:n}]}});
+  for (const inputs of [[file(3),file(9)],[file(9),file(3)],[file(3),file(9),file(3)]]) {
+    assert.equal(uniqueLaunches(inputs,now).value,null);
+    assert.equal(uniqueLaunches(inputs,now).partial,true);
+    assert.equal(uniqueVolume(inputs,now),null);
+  }
+  const fresh=file(12);fresh.activity.window_as_of=new Date(now+1000).toISOString();fresh.market.pulled_at=fresh.activity.window_as_of;
+  assert.equal(uniqueLaunches([file(3),file(9),fresh],now+1000).value,12);
+  assert.equal(uniqueVolume([file(3),file(9),fresh],now+1000),12);
+  const capped=file(3);capped.activity.addresses[0].errors=[{step:'capped'}];
+  assert.equal(uniqueLaunches([file(3),capped],now).partial,true);
+  assert.equal(uniqueLaunches([capped,file(3)],now).partial,true);
+  const stale=file(3);stale.activity.addresses[0].stale_since='2026-09-01';
+  for(const inputs of [[stale,file(3)],[file(3),stale]]) {
+    assert.equal(uniqueLaunches(inputs,now).value,null);
+    assert.equal(uniqueLaunches(inputs,now).partial,true);
+  }
+});
 
 test("weighted reservations include retries and 402 prevents subsequent calls and survives restart", async () => {
   const budget = createCreditBudget({now,perRun:200,perDay:1000});
