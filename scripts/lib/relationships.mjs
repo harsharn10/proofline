@@ -6,6 +6,17 @@ export function addressKey(chain, address) {
   return null;
 }
 
+// Market observations can identify a pool by its contract address OR a 32-byte pool ID
+// (e.g. Uniswap v4). This namespace is not deployment identity: a pool ID is not a token,
+// contract, wallet or evidence of common ownership. Solana identifiers remain case-sensitive.
+export function poolKey(chain, id) {
+  const address = addressKey(chain, id);
+  if (address) return `pool:${address}`;
+  if (typeof chain === 'string' && chain.length > 0 && chain !== 'solana' &&
+      typeof id === 'string' && /^0x[0-9a-fA-F]{64}$/.test(id)) return `pool:${chain}:${id.toLowerCase()}`;
+  return null;
+}
+
 export function buildRelationships(projects = [], dependencies = []) {
   const nodes = new Map();
   const links = new Map();
@@ -128,7 +139,7 @@ export function uniqueVolumeSummary(pulledFiles, now = Date.now()) {
     const at = Date.parse(file?.market?.pulled_at ?? "");
     if (!file?.market) { partial = true; continue; }
     for (const pair of file.market.pairs ?? []) {
-      const key = addressKey(file.chain, pair.pair_address);
+      const key = poolKey(file.chain, pair.pair_address);
       if (!key) { partial = true; continue; }
       if (!pairs.has(key) || Number.isFinite(at) && (!Number.isFinite(pairs.get(key).at) || pairs.get(key).at < at)) pairs.set(key, { at, value: pair.volume_h24, conflict: false });
       else if (pairs.get(key).at === at && pairs.get(key).value !== pair.volume_h24) pairs.get(key).conflict = true;
