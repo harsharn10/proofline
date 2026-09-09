@@ -1,5 +1,7 @@
 # Selective daily registry
 
+For the proposed mission, user-story acceptance criteria and sequenced implementation backlog, see [product alignment](product/mission-and-system.md). Existing operating rules below remain in force until their scoped changes are reviewed and merged.
+
 The user approved a daily, relevance-filtered registry on September 8, 2026. This policy supersedes the six-hour blanket refresh and three-events-per-update requirements in older assignments and operational notes. Existing research, identity, evidence and publication gates remain in force.
 
 ## Source of truth

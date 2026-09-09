@@ -1,5 +1,7 @@
 # Icarus build spec
 
+Product alignment review: [mission, user journeys and system contract](../../product/mission-and-system.md). This proposed review records gaps and owner decisions; it does not silently replace this approved visual specification.
+
 Proofline becomes **Icarus: building the Robinhood Registry**. Same content system, same data, new front door. This folder is the whole spec: `mock.html` is the visual spec (open it in a browser; hash routes `#/`, `#/s/launchpads`, `#/t/artificial-inu`, `#/n/pons`), this file is the rules and the PR map. Where the mock and this file disagree, this file wins.
 
 Owner: harsharn10. Written 2026-09-03 from the approved mock v2.
