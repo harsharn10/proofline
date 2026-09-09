@@ -101,7 +101,7 @@ async function fixtureRepo(packets) {
     await writeFile(join(work, path), text);
   }
   await git(work, "add", "-A");
-  await git(work, "commit", "-q", "-m", "packets\n\nProducer: grok-heavy");
+  await git(work, "commit", "-q", "--allow-empty", "-m", "packets\n\nProducer: grok-heavy");
   await git(work, "push", "-q", "origin", PRODUCER_BRANCH);
   await git(work, "checkout", "-q", "main");
   await git(work, "fetch", "-q", "origin");
@@ -383,11 +383,25 @@ await test("conflicting same-path producer packets never depend on branch iterat
     for (const branches of [[PRODUCER_BRANCH,"grok/other"],["grok/other",PRODUCER_BRANCH]]) {
       const report=await run(work,{branches});
       assert.deepEqual(report.compiled,[]);
+      assert.equal(report.status,'blocked','safe conflict hold is not an ordinary empty inbox');
       assert.equal(report.branches.flatMap(b=>b.skipped).length,2);
       assert.ok(report.branches.flatMap(b=>b.skipped).every(s=>s.errors[0].includes("conflicting")));
       assert.equal((await git(work,"status","--porcelain")).trim(),"");
     }
   } finally { await rm(root,{recursive:true,force:true}); }
+});
+
+await test("empty and inaccessible producer inputs have distinct operational outcomes", async () => {
+  const {root,work}=await fixtureRepo({});
+  try {
+    const empty=await run(work,{branches:[PRODUCER_BRANCH]});
+    assert.equal(empty.status,'no-change');assert.equal(empty.ok,true);
+    await assert.rejects(run(work,{branches:['grok/missing']}),/couldn't find remote ref/,'fetch failures stop the workflow');
+    const missing=await run(work,{branches:['grok/missing'],fetch:false});
+    assert.equal(missing.status,'blocked');assert.equal(missing.ok,true,'safe no-write execution remains successful');
+    const persisted=JSON.parse(await readFile(join(work,'build/compile-report.json'),'utf8'));
+    assert.equal(persisted.status,'blocked');
+  } finally {await rm(root,{recursive:true,force:true});}
 });
 
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }
