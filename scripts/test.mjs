@@ -1497,6 +1497,13 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.equal(rules.observationTotals(observations,trees,now,'tokens').volume24h,99,'category is isolated');
     assert.equal(rules.observationTotals(observations,trees,now,'missing').launches.value,null,'empty category is unknown, not zero');
     assert.equal(rules.observationTotals(observations,trees,now).launches.value,null,'cross-category conflicts are not silently summed on home');
+    const poolId = `0x${'a'.repeat(64)}`;
+    const poolObservation = (slug, value) => ({slug,pulled:{chain:'robinhood-chain',market:{
+      pulled_at:new Date(now).toISOString(),pairs:[{pair_address:poolId,volume_h24:value}]}}});
+    const sharedPools = [poolObservation('a',12),poolObservation('b',12)];
+    assert.equal(rules.observationTotals(sharedPools,trees,now).volume24h,12,'home retains and deduplicates pool IDs');
+    assert.equal(rules.observationTotals([...sharedPools,poolObservation('other-section',99)],trees,now,'launchpads').volume24h,12,'pool-ID dedup follows category filtering');
+    assert.equal(rules.observationTotals([...sharedPools,poolObservation('other-section',99)],trees,now).volume24h,null,'home withholds conflicting pool-ID observations');
     assert.deepEqual(rules.announcedNow([olderAnnouncement, announced]).map((item) => item.slug), ["sight", "wire"]);
     assert.equal(rules.announcedNow([olderAnnouncement, announced]).at(-1).tldr, null, "missing summaries form the muted tail");
 
