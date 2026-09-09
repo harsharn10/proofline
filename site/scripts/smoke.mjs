@@ -6,6 +6,8 @@
 //   npm run build && npm run smoke
 
 import { spawn } from "node:child_process";
+import { readFile } from "node:fs/promises";
+import { parse } from "yaml";
 
 const PORT = Number(process.env.SMOKE_PORT ?? 8081); // override when 8081 is taken by another worktree's server
 const BASE = `http://localhost:${PORT}`;
@@ -15,6 +17,7 @@ const ROUTES = [
   "/n/pons?tab=evidence",
   "/n/pons?tab=feed",
   "/n/hoodfun",
+  "/n/cashcat?tab=control",
   "/feed",
   "/methodology",
   "/relationships",
@@ -199,6 +202,23 @@ async function main() {
 
     const dossierRes = await fetch(`${BASE}/n/pons`);
     const dossierHtml = await dossierRes.text();
+    const tokenHtml = await fetch(`${BASE}/n/cashcat?tab=control`).then(response => response.text());
+    const structureHtml = tokenHtml.slice(tokenHtml.indexOf(">Structure</h2>"));
+    const pulled = parse(await readFile(new URL("../../content/pulled/cashcat.yaml", import.meta.url), "utf8"));
+    const checkedLock = pulled.structure?.lp?.find(row => row.locked_share !== null || row.holder_kind !== null);
+    for (const [label, present, at] of [
+      ["Mint", ["owner-can-mint", "no-mint-function"].includes(pulled.structure?.mint), pulled.structure?.mint_as_of],
+      ["Liquidity", Boolean(checkedLock), checkedLock?.as_of],
+      ["Top-10 hold, pools out", pulled.market?.top10_share != null || pulled.market?.top10_share_ex_pools != null, pulled.market?.top10_as_of],
+    ]) {
+      if (!present) continue;
+      const start = structureHtml.indexOf(`<span>${label}</span>`);
+      const row = start < 0 ? "" : structureHtml.slice(start, structureHtml.indexOf("</div>", start));
+      const expected = at ? at.slice(0, 10) : "measurement date unknown";
+      const honest = row.includes(expected) && (at ? row.includes("<time") : true);
+      console.log(`  ${honest ? "ok  " : "FAIL"} /n/cashcat ${label} exposes its measurement date`);
+      if (!honest) failures.push(`/n/cashcat ${label} did not render measurement freshness: ${expected}`);
+    }
     for (const banned of BANNED_IN_DOSSIER) {
       if (dossierHtml.includes(banned)) {
         failures.push(

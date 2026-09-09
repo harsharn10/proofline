@@ -172,7 +172,7 @@ export async function readTop10(client, tokenAddress, {
   const circulating = supply > burned ? supply - burned : 0n;
   if (circulating === 0n) {
     errors.push({ step: "top10_share", message: `the whole supply of ${tokenAddress} is burned; there is no circulating supply to concentrate` });
-    return { ...blank, burned_share: burnedShare.value };
+    return { ...blank, burned_share: burnedShare.value, top10_as_of: pulledAt };
   }
   const circulatingText = circulating.toString();
 

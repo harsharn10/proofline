@@ -29,8 +29,8 @@ const PAIR_KEYS = [
   "volume_h6", "txns_h24", "price_change_h24", "market_cap", "fdv", "created_at",
 ];
 const TXNS_KEYS = ["buys", "sells"];
-const STRUCTURE_KEYS = ["pulled_at", "mint", "renounced", "lp", "errors"];
-const LP_KEYS = ["pair", "locked_share", "holder_kind", "reason"];
+const STRUCTURE_KEYS = ["pulled_at", "mint", "mint_as_of", "renounced", "renounced_as_of", "lp", "errors"];
+const LP_KEYS = ["pair", "locked_share", "holder_kind", "reason", "as_of"];
 const ACTIVITY_KEYS = ["pulled_at", "addresses", "last_activity_at", "txns_24h", "launches_24h", "window_as_of", "stale_since"];
 const ACTIVITY_ADDRESS_KEYS = [
   "address", "label", "role", "transactions_count", "token_transfers_count",

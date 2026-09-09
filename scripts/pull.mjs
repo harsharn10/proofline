@@ -87,7 +87,7 @@ import {
   attributeCreator,
   launchpadSlugsFrom,
 } from "./lib/pull/attribution.mjs";
-import { readTop10, readMintAndRenounce, readLpLocks, renouncedFromOwner } from "./lib/pull/token.mjs";
+import { readTop10, readMintAndRenounce, readLpLocks, renouncedFromOwner, LP_REASON } from "./lib/pull/token.mjs";
 import { writeSeries, seriesReplacement } from "./lib/pull/series.mjs";
 import {
   createRialtoClient,
@@ -283,13 +283,49 @@ export function activityWindow(fresh, previous, { measured, pulledAt, previousAs
 }
 
 export function carryMarketFacts(fresh, previous) {
-  return carry(fresh, previous, [
-    "top10_share", "top10_share_ex_pools", "burned_share", "top10_as_of", "launchpad",
-  ]);
+  const out = carry(fresh, previous, ["launchpad"]);
+  // These shares are one measurement. A fresh null (e.g. all supply burned) must not
+  // acquire an older concentration under the new measurement's date.
+  if (fresh.top10_as_of == null) {
+    for (const key of ["top10_share", "top10_share_ex_pools", "burned_share", "top10_as_of"]) out[key] = previous?.[key] ?? fresh[key] ?? null;
+  }
+  out.errors = uniqueErrors([...(fresh.errors ?? []), ...(previous?.errors ?? []).filter(error =>
+    (fresh.top10_as_of == null && ["top10_share", "top10_share_ex_pools", "burned_share"].includes(error.step)) ||
+    (fresh.launchpad == null && error.step === "launchpad"))]);
+  return out;
 }
 
-export function carryStructureFacts(fresh, previous) {
-  return carry(fresh, previous, ["mint", "renounced", "lp"]);
+const uniqueErrors = errors => [...new Map(errors.map(error => [`${error.step}:${error.message}`, error])).values()];
+
+export function carryStructureFacts(fresh, previous, { mintMeasured = false, renouncedMeasured = false } = {}) {
+  // A skipped block keeps both its date and its caveats. Never infer a legacy field
+  // date from pulled_at: older writers advanced that date without remeasurement.
+  if (fresh === null) return previous ? structuredClone(previous) : null;
+  const out = { ...fresh };
+  const measured = { mint: mintMeasured && fresh.mint !== "unknown" && fresh.mint != null,
+    renounced: renouncedMeasured && fresh.renounced != null };
+  for (const key of ["mint", "renounced"]) {
+    out[key] = measured[key] ? fresh[key] : previous?.[key] ?? (key === "mint" ? "unknown" : null);
+    out[`${key}_as_of`] = measured[key] ? fresh.pulled_at : previous?.[`${key}_as_of`] ?? null;
+  }
+  let carriedLp = false;
+  const unavailable = new Set([LP_REASON.detailsUnavailable, LP_REASON.holdersUnavailable, LP_REASON.noSupply]);
+  out.lp = (fresh.lp ?? []).map(row => {
+    const prior = previous?.lp?.find(old => old.pair?.toLowerCase() === row.pair?.toLowerCase());
+    if (row.locked_share == null && unavailable.has(row.reason) && prior?.locked_share != null) {
+      carriedLp = true;
+      return { ...prior, as_of: prior.as_of ?? null, reason: row.reason };
+    }
+    return { ...row, as_of: row.locked_share != null ? fresh.pulled_at : null };
+  });
+  if (!out.lp.length && previous?.lp?.length) {
+    carriedLp = true;
+    out.lp = previous.lp.map(row => ({ ...row, as_of: row.as_of ?? null }));
+  }
+  out.errors = uniqueErrors([...(fresh.errors ?? []), ...(previous?.errors ?? []).filter(error =>
+    (error.step === "mint" && !measured.mint) || (error.step === "renounced" && !measured.renounced) ||
+    (error.step === "lp" && carriedLp))]);
+  return out;
 }
 
 export function explorerReadRecord({
@@ -941,6 +977,7 @@ async function main() {
       if (addressDeferred || activityDeferred) deferredReads.push(label);
       return {
         row, creator: bsResult.creator ?? null, activity, changed: true, codeChanged, codeHash, metadataRead,
+        ownerMeasured: rpcResult.unread?.owner === false && rpcResult.owner != null,
         records: [
           explorerReadRecord({ kind: "address", address: entry.address, status: addressDeferred ? "deferred" : "read", reason: addressDeferred ? "budget exhausted; prior non-null facts retained" : metadataRead ? decision.reason : `${decision.reason}; code hash unchanged, metadata not re-read`, signalValue, signal: currentSignal ?? priorSignal, codeHash, checkedAt: pulledAt, previous: previousAddressRead, credits: signalCredits + addressCredits }),
           explorerReadRecord({ kind: "activity", address: entry.address, status: activityDeferred ? "deferred" : "read", reason: activityDeferred ? "budget exhausted; prior non-null activity retained" : `${decision.reason}; 24h walk refreshed`, signalValue, signal: currentSignal ?? priorSignal, codeHash, checkedAt: pulledAt, previous: previousActivityRead, credits: activityCredits }),
@@ -1008,7 +1045,7 @@ async function main() {
         let ownership = { mint: priorStructure?.mint ?? "unknown", renounced: renouncedFromOwner(tokenRow?.owner ?? null), errors: [] };
         let ownershipCredits = 0;
         if (abiIsStale) {
-          const ownershipRead = await creditBudget.withCredits(tokenLabel, () => readMintAndRenounce(blockscout, tokenAddress, tokenRow?.owner ?? null));
+          const ownershipRead = await creditBudget.withCredits(tokenLabel, () => readMintAndRenounce(blockscout, tokenAddress, tokenRead.ownerMeasured ? tokenRow?.owner ?? null : null));
           ownership = ownershipRead.value;
           ownershipCredits = ownershipRead.credits;
         }
@@ -1020,7 +1057,7 @@ async function main() {
         structure = carryStructureFacts({
           pulled_at: pulledAt, mint: ownership.mint, renounced: ownership.renounced,
           lp: locks.lp, errors: [...ownership.errors, ...locks.errors],
-        }, priorStructure);
+        }, priorStructure, { mintMeasured: abiIsStale, renouncedMeasured: tokenRead.ownerMeasured === true });
         readRecords.push(
           explorerReadRecord({ kind: "structure", address: tokenAddress, status: structureDeferred ? "deferred" : abiIsStale ? "read" : "unchanged", reason: structureDeferred ? "budget exhausted; prior mint facts retained" : abiIsStale ? "token change signal changed" : "contract code hash unchanged; verified ABI not re-read", signalValue: market.trades_h24, codeHash: tokenRead.codeHash ?? null, checkedAt: pulledAt, previous: priorStructureRead, credits: ownershipCredits }),
           explorerReadRecord({ kind: "lp", address: tokenAddress, status: lpDeferred ? "deferred" : "read", reason: lpDeferred ? "budget exhausted; prior LP facts retained" : "token change signal changed", signalValue: market.trades_h24, checkedAt: pulledAt, previous: priorLpRead, credits: lpCredits }),
@@ -1028,9 +1065,9 @@ async function main() {
         if (structureDeferred || lpDeferred) deferredReads.push(`${target.slug}:structure`);
       } else {
         market = carryMarketFacts(market, priorMarket);
-        structure = priorStructure ? { ...priorStructure, pulled_at: pulledAt, errors: [] } : null;
+        structure = carryStructureFacts(null, priorStructure);
         for (const [kind, previous] of [["top10", priorTop10Read], ["structure", priorStructureRead], ["lp", priorLpRead]]) {
-          readRecords.push(explorerReadRecord({ kind, address: tokenAddress, status: "unchanged", reason: "token trade count unchanged; explorer read skipped", signalValue: market.trades_h24, checkedAt: pulledAt, previous, credits: 0 }));
+          readRecords.push(explorerReadRecord({ kind, address: tokenAddress, status: "unchanged", reason: "token change signals unchanged; explorer measurement skipped", signalValue: market.trades_h24, checkedAt: pulledAt, previous, credits: 0 }));
         }
       }
 

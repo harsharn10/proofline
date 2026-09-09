@@ -216,10 +216,13 @@ export type PulledMarket = {
 export type PulledStructure = {
   pulled_at: string;
   mint: "owner-can-mint" | "no-mint-function" | "unknown";
+  mint_as_of?: string | null;
   renounced: boolean | null;
+  renounced_as_of?: string | null;
   // locked_share 0 means "read, and nothing is locked"; null means the read could not tell, and
   // `reason` says why. Never render a null as zero.
   lp: Array<{
+    as_of?: string | null;
     pair: string | null;
     locked_share: number | null;
     holder_kind: "burn" | "locker" | "burn-and-locker" | "none" | null;
@@ -551,11 +554,14 @@ export type Dossier = {
     }>;
     dailySeries: Record<string, Array<{ at: string; value: number }>>;
     top10Share: number | null;
+    top10AsOf?: string | null;
     top10ShareExPools: number | null;
     burnedShare: number | null;
     launchpad: { slug: string; via: "factory" | "creator"; address: string } | null;
     mint: "owner-can-mint" | "no-mint-function" | "unknown" | null;
+    mintAsOf?: string | null;
     liquidityLocks: Array<{
+      asOf?: string | null;
       pair: string | null;
       lockedShare: number | null;
       holderKind: "burn" | "locker" | "burn-and-locker" | "none" | null;
