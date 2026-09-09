@@ -439,6 +439,7 @@ await test("own-token proposals stay within canonical projects; shared launchpad
   const packet={slug:"token-copy",deployments:[{role:"token",address:{chain:"robinhood-chain",value:token}}]};
   assert.match(ownTokenDuplicate(packet,projects),/canonical project protocol/);
   assert.equal(ownTokenDuplicate({...packet,slug:"protocol"},projects),null);
+  assert.match(ownTokenDuplicate({...packet,slug:"unrelated"},[...projects,{slug:"unrelated",deployments:[]}]),/canonical project protocol/);
   assert.equal(ownTokenDuplicate({slug:"independent",deployments:[{role:"token",address:{chain:"robinhood-chain",value:"0x3333333333333333333333333333333333333333"}},{role:"factory",address:{chain:"robinhood-chain",value:factory}}]},projects),null);
   assert.equal(ownTokenDuplicate({...packet,deployments:[{role:"token",address:{chain:"another-chain",value:token}}]},projects),null);
 });

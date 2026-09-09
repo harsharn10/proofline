@@ -28,7 +28,7 @@ Owner decision, September 9, 2026: a protocol and its own token share one canoni
 
 A launchpad's own token follows the same rule. Independent projects launched through it remain separate canonical projects, linked by their sourced launch infrastructure/attribution. Shared factories, routers and pools do not imply common ownership. Quote assets and collateral are dependencies, not the subject project's own token (`role: other` where a deployment reference is needed). Discovery does not imply an active profile or daily refresh for every launched token; use the selective registry policy. Protocol TVL, token liquidity and shared-pool volume remain distinct measurement scopes.
 
-The inbox compiler holds any new-slug proposal whose own token is already a canonical project's own-token deployment on the same chain. Update that canonical slug instead. Existing records are never automatically merged; ambiguous identity evidence remains held for the controller.
+The inbox compiler holds any proposal assigning another canonical project's own-token deployment to its subject on the same chain, including updates to an existing unrelated profile. Update the owning canonical slug instead. Existing records are never automatically merged; ambiguous identity evidence remains held for the controller.
 
 ## 2. Field ownership
 

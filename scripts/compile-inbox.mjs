@@ -3,7 +3,8 @@
 // working tree for .github/workflows/compile.yml to commit. Nothing here merges a PR: producers keep
 // their branches, this reads packet files off them.
 //
-//   node scripts/compile-inbox.mjs [--branch <name>]... [--dry] [--remote origin] [--no-fetch]
+//   node scripts/compile-inbox.mjs --open-prs <snapshot.json> [--dry] [--remote origin] [--no-fetch]
+//   node scripts/compile-inbox.mjs --branch <name> [--branch <name>]... [--dry]  # explicit recovery
 //
 // Contract (docs/research-system.md §6 "Unattended compile"):
 //   - a producer never writes content/**; the compiler is the only writer there;
@@ -98,12 +99,11 @@ export function researchIntake(pages) {
 
 /** An own token is a deployment of its canonical project, never another project identity. */
 export function ownTokenDuplicate(packet, projects) {
-  if (projects.some(project => project.slug === packet?.slug)) return null;
   for (const deployment of packet?.deployments ?? []) {
     if (deployment.role !== "token") continue;
     const key = addressKey(deployment.address?.chain, deployment.address?.value);
     if (!key) continue;
-    const owner = projects.find(project => (project.deployments ?? []).some(old =>
+    const owner = projects.find(project => project.slug !== packet?.slug && (project.deployments ?? []).some(old =>
       old.role === "token" && addressKey(old.chain, old.address) === key));
     if (owner) return `token already belongs to canonical project ${owner.slug}; submit token research under ${owner.slug}, not a separate ${packet.slug} profile`;
   }
