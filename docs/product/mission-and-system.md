@@ -12,6 +12,8 @@ Ecosystem tracking is the product; trustworthy research is its foundation. The t
 
 Mission: **Help readers understand what exists, what it does, what changed, how it connects, why it matters, and what the evidence does—or does not—support.**
 
+Canonical identity rule (owner, September 9): one project profile includes its protocol and own token. A launchpad's own token stays on that profile; independently launched projects remain distinct and link to the launchpad. Token/protocol browsing must not create duplicate identities or duplicate totals. Quote assets and shared infrastructure are relationships, not ownership. The enforced intake details live in `docs/research-system.md`.
+
 Proofline is the repository/research system; Icarus is the current public presentation. This review does not rename either. The intended product is a sourced ecosystem registry with maintained research and material change reporting, not a comprehensive price terminal, investment recommendation, contract audit, safety guarantee, or feed of every token launch.
 
 The useful outcome is a reader making sense of a project faster without mistaking a claim for a checked fact. Discovery and market activity help readers find relevant research; they must not become substitutes for that research.

@@ -22,6 +22,14 @@ historical evidence, not instructions.
 A packet can be rejected without deleting the evidence it holds. A profile merge never implies a
 Telegram post. An event can reach the site feed without changing the profile.
 
+### Protocols, own tokens and launched projects
+
+Owner decision, September 9, 2026: a protocol and its own token share one canonical project slug. Record the own token under that project's `deployments` with `role: token`; put token research and dated token metrics on that profile, not on a second ticker-named project. Thus DTF belongs to `downto` and BOW to `longbow`. This does not merge unrelated tokens that happen to share a ticker.
+
+A launchpad's own token follows the same rule. Independent projects launched through it remain separate canonical projects, linked by their sourced launch infrastructure/attribution. Shared factories, routers and pools do not imply common ownership. Quote assets and collateral are dependencies, not the subject project's own token (`role: other` where a deployment reference is needed). Discovery does not imply an active profile or daily refresh for every launched token; use the selective registry policy. Protocol TVL, token liquidity and shared-pool volume remain distinct measurement scopes.
+
+The inbox compiler holds any new-slug proposal whose own token is already a canonical project's own-token deployment on the same chain. Update that canonical slug instead. Existing records are never automatically merged; ambiguous identity evidence remains held for the controller.
+
 ## 2. Field ownership
 
 Ownership is by path. A PR that writes outside its class is refused.
@@ -199,15 +207,15 @@ Hard stops:
 
 ### Unattended compile
 
-Steps 5 and 6 run on a schedule, with no human in the loop. `.github/workflows/compile.yml` fires every
-six hours at :47 — thirty minutes after the pull at :17, sharing its `main-bots` concurrency group so
+Steps 5 and 6 run on a schedule, with no human in the loop. `.github/workflows/compile.yml` fires daily
+at 11:47 UTC, after the 09:17 UTC pull, sharing its `main-bots` concurrency group so
 only one bot writes main at a time — and runs `scripts/compile-inbox.mjs`:
 
-1. **Collect.** Every remote branch under `grok-heavy/`, `supergrok/`, `grok/` or `codex/` that is not
-   merged into main, or the one branch given to `workflow_dispatch`. Packet files under
+1. **Collect.** Snapshot all open PRs targeting main from GitHub with pagination. Only ready (non-draft), same-repository PRs under `grok-heavy/`, `grok-bot/`, `supergrok/`, `grok/` or `codex/` are active. Drafts are held; closed/merged PRs and orphan branches are retired from automatic intake; fork PRs are excluded. The standing #62 intake remains explicitly open and is never merged. Build PRs contribute no work unless they actually contain changed packets. API/snapshot errors fail closed, and fetched heads must match the snapshot. The snapshot and intake states are retained with the compile report. A manual `workflow_dispatch` branch is an explicit operator override, not automatic reactivation. Packet files under
    `research/inbox/packets/` that differ from main are written into the working tree. A file main already
    carries with an `as_of` at least as new is left alone: main's copy is the one that compiled and a
    controller may have corrected it, so a packet that supersedes it must carry a newer `as_of`.
+   Local automatic runs must pass `--open-prs <snapshot.json>`; there is no fallback scan of all remote branches. Use `--branch` only for explicit review/recovery. An unchanged accepted packet on main is completed work and is not recompiled. Reopening/marking a PR ready reactivates it; do not reopen obsolete separate-token proposals. Preserve retired work under an exact-SHA archival tag and record its canonical destination before removing a closed branch.
 2. **Validate.** `validatePacketDirectory` runs over the whole batch at once, so the per-(`work_id`,
    `slug`) uniqueness check sees every packet. A packet with errors is put back the way main has it and
    its errors are collected against its branch; the rest of the batch carries on. Reverting one packet

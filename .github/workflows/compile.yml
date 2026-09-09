@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: "One producer branch to compile (default: every unmerged grok-heavy/, supergrok/, grok/ or codex/ branch)"
+        description: "Manual producer branch override (default: open, ready, same-repository producer PRs)"
         required: false
         type: string
 
@@ -71,11 +71,14 @@ jobs:
       - name: Compile the inbox
         id: compile
         run: |
-          set -uo pipefail
-          ARGS=()
+          set -euo pipefail
+          mkdir -p build
+          # A failed API request must fail the job, never fall back to historical branches.
+          gh api "repos/$REPO/pulls?state=open&base=main&per_page=100" --paginate --slurp > build/open-prs.json
+          ARGS=(--open-prs build/open-prs.json)
           if [ -n "${BRANCH_INPUT:-}" ]; then
             case "$BRANCH_INPUT" in
-              grok-heavy/*|supergrok/*|grok/*|codex/*) ARGS=(--branch "$BRANCH_INPUT") ;;
+              grok-heavy/*|grok-bot/*|supergrok/*|grok/*|codex/*) ARGS=(--branch "$BRANCH_INPUT") ;;
               *) echo "branch input '$BRANCH_INPUT' is not a producer branch"; exit 1 ;;
             esac
           fi
@@ -185,6 +188,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: daily-compile-${{ github.run_id }}
-          path: build/compile-report.*
+          path: |
+            build/compile-report.*
+            build/open-prs.json
           retention-days: 7
           if-no-files-found: warn
