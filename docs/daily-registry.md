@@ -1,6 +1,6 @@
 # Selective daily registry
 
-For the proposed mission, user-story acceptance criteria and sequenced implementation backlog, see [product alignment](product/mission-and-system.md). Existing operating rules below remain in force until their scoped changes are reviewed and merged.
+For the owner-confirmed mission and user-story acceptance criteria, see [product alignment](product/mission-and-system.md). Current implementation status and remaining decisions live in [roadmap #102](https://github.com/harsharn10/proofline/issues/102). Proposed changes do not override the operating rules below until reviewed and merged.
 
 The user approved a daily, relevance-filtered registry on September 8, 2026. This policy supersedes the six-hour blanket refresh and three-events-per-update requirements in older assignments and operational notes. Existing research, identity, evidence and publication gates remain in force.
 
@@ -47,6 +47,8 @@ Blockscout requests reserve the documented route weight (usually 20 credits), in
 
 Default activity walks use two pages; deep legacy role-specific walks are available only with `--full`. A cap produces a lower bound, not an exact total. Shared low-level RPC/explorer method calls retain per-run memoization. Address documents are still stored per project for compatibility; the graph is deduplicated, and a future storage migration can normalize those files without changing consumers.
 
+`npm run audit:observations` is a read-only inventory of repeated payloads and unresolved variants. It preserves project bindings, measurement windows and market token perspectives. Repeated canonical-JSON bytes are not measured compressed-storage savings or duplicate provider calls. Address facts without uniform field-level dates remain undated in the audit; never replace them with a file refresh time. Define field/source provenance before physical normalization. Market-volume keys accept both pool contract addresses and 32-byte pool IDs; this does not widen deployment/token identity or turn a pool ID into a contract address.
+
 Partial provider failures leave last-success time unchanged and keep requested work in the queue. A successful partial file write is not proof the sources refreshed. Snapshot history remains append-only. Home and category totals choose one latest observation per distinct factory or pool within their own scope, discard stale windows, and label partial totals. Equal-time conflicts are withheld. The available launch measurements are tracked-factory launch-method calls, not a chain-wide count of distinct launched projects. The New launches footer counts other tracked names with first pools in the same 14-day window; it never subtracts project counts from factory calls or claims unobserved names are below a liquidity threshold.
 
 ## Daily workflow and responsibility map
@@ -59,7 +61,9 @@ Partial provider failures leave last-success time unchanged and keep requested w
 
 Grok and Claude sessions are external to these workflows. Changing repository instructions does not start or reschedule a running external session. On rollout the owner/controller must point the existing Grok session to the new daily assignment; do not leave the old six-hour prompt running. No model API calls or new paid service are introduced here.
 
-The existing optional Pulse Worker remains a separately bounded ten-minute live snapshot. Its alerts remain behind the existing paused delivery switches; this change does not turn them on. Its source rules are hour-based, so changing its cron to daily would require a different signal design. The researched registry and packet cycle are daily.
+Recovery must also match the workflow version. Rerunning a historical scheduled job can use its old workflow definition with newer checked-out code; do not rerun it blindly after an interface change such as required PR-intake snapshots. Validate recovery against current main, use the current manual workflow where appropriate, and await a new scheduled cycle for scheduled-health evidence. A manual or local dry-run success does not replace that evidence.
+
+The existing optional Pulse Worker remains a separately bounded ten-minute live snapshot. Its checked-in `TELEGRAM_ENABLED` switch is false; the registry's separate `ops/telegram-review.json` ledger has `channel_enabled: true` at the reconciled main snapshot. Do not describe the whole system as paused or infer successful delivery from either flag alone: approval fingerprints, destination configuration and runtime credentials also apply. Preserve each existing setting; collection, compilation and a documentation change do not authorize enabling publication. Pulse source rules are hour-based, so changing its cron to daily would require a different signal design. The researched registry and packet cycle are daily.
 
 ## Frontend and operations
 

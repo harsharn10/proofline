@@ -1,6 +1,6 @@
 # Mission, user journeys and system alignment
 
-Status: proposed alignment and implementation backlog for owner/controller review, September 9, 2026. Inspected base: `5bf713c`. This is not a new approved PRD or an automatic policy migration.
+Owner-confirmed mission and system alignment. Original review base: `5bf713c`; shipped foundation references reconciled through `c6455bc`. Score wording, risk placement and research-standard proposals still require explicit decisions. This document is not an automatic policy migration. Current delivery status belongs in [roadmap #102](https://github.com/harsharn10/proofline/issues/102), not in a second checklist here.
 
 ## What we are building
 
@@ -107,7 +107,7 @@ Logical separation need not mean microservices or new databases. Keep one reposi
 3. **Risk prominence:** the original mission emphasizes control and uncertainty; the Icarus spec deliberately puts the risk block below Related. Recommend testing a compact material-warning/evidence-gap summary near the identity/status area, while keeping detailed analysis below. Do not silently overrule the approved layout.
 4. **Daily product versus real-time language:** “right now”, “live” and “launches today” need explicit windows and tracked-coverage explanations. Daily collection is appropriate, but cannot promise uninterrupted real-time monitoring.
 5. **Documentation drift:** README/older contracts still describe already-shipped components as planned; original PRD excludes filters/charts while Icarus includes them; six-hour references survive. Establish an owner-approved current product contract and mark superseded sections rather than pretending all documents agree.
-6. **Execution gap:** repository producer instructions are not proof that Grok/Claude sessions are on the daily assignment. Standing PR #62 still advertises six-hour work in its title. Verify actual session configuration before declaring rollout complete; do not change external schedules or merge the standing producer PR as a documentation side effect.
+6. **Execution gap:** repository producer instructions are not proof that Grok/Claude sessions are on the daily assignment. Standing PR #62 now names daily relevance-filtered work, but a corrected title does not verify its external schedule. Verify actual session configuration before declaring rollout complete; do not change external schedules or merge the standing producer PR as a documentation side effect.
 
 ## Operating model and goals
 
@@ -128,24 +128,24 @@ No new paid service is necessary for the proposed fixes. Zero spend is a budget 
 
 ## Sequenced work: nothing silently dropped
 
-| Work | Stories | Scope and completion gate | State |
+| Work | Stories | Scope and completion gate | Delivery reference |
 | --- | --- | --- | --- |
-| P0 product alignment | All | This document, owner review of score wording/risk placement and source-of-authority drift | Proposed in this PR |
-| P1 observation interpretation | U3–U5, U8 | Shared own-activity rule; fresh row versus stale aggregate; equal-time duplicate conflicts; zero versus unknown. Regression fixtures, UI consumer checks, unchanged unrelated policy | Next code assignment |
-| P2 refresh/recovery health | U8–U9 | Established-failure fairness/backoff; report-aware watchdog; distinguish no-change/held/failed compiler input. Multi-day simulation and failure cases | Pending |
-| P3 measurement provenance | U3, U5, U8 | Preserve carried structure measurement times/errors; surface field freshness and audit cheap-signal invalidation | Pending |
-| P4 shared observations | U4–U5, U8 | Canonical chain/address and chain/pool storage behind tested resolver; compatibility comparison; preserve sourced roles, conflicts and history | After P1/P3 |
-| P5 public/private read efficiency | U1–U5, U8 | Compact/static public projections; bounded review API fan-out with consistent revisions and write concurrency preserved. Measure deployed CPU/build/API usage | Pending |
-| P6 research and relationship quality | U1, U3–U4, U9 | Prioritize relevant gaps; Claude resolves identity/dependency semantics with evidence; source-backed common ties beyond infrastructure only where justified | Separate research lane |
-| P7 design/state assurance | U1–U7 | State matrix, source/window visibility, score-label decision, keyboard/mobile/theme QA and short user-story walkthrough | Pending |
-| P8 rollout and recovery | U6, U8–U9 | Verify daily external sessions; production cache benefit; data health; manual replay/idempotence; preserve paused delivery settings | Pending |
+| P0 product alignment | All | This document, owner review of score wording/risk placement and source-of-authority drift | Mission/stories captured in #100; decisions in #102 |
+| P1 observation interpretation | U3–U5, U8 | Shared own-activity rule; fresh row versus stale aggregate; equal-time duplicate conflicts; zero versus unknown. Regression fixtures, UI consumer checks, unchanged unrelated policy | Shipped in #101/#106; pool-ID support in #118 |
+| P2 refresh/recovery health | U8–U9 | Established-failure fairness/backoff; report-aware watchdog; distinguish no-change/held/failed compiler input. Multi-day simulation and failure cases | Shipped in #108/#110; PR-backed intake in #114; scheduled verification remains separate |
+| P3 measurement provenance | U3, U5, U8 | Preserve carried structure measurement times/errors; surface field freshness and audit cheap-signal invalidation | Shipped in #112; uniform address-field provenance is not complete |
+| P4 shared observations | U4–U5, U8 | Canonical chain/address and chain/pool storage behind tested resolver; compatibility comparison; preserve sourced roles, conflicts and history | Audit #120; physical normalization deferred pending provenance/compatibility |
+| P5 public/private read efficiency | U1–U5, U8 | Compact/static public projections; bounded review API fan-out with consistent revisions and write concurrency preserved. Measure deployed CPU/build/API usage | Private reads shipped in #116; public reads and deployed measurement tracked in #102 |
+| P6 research and relationship quality | U1, U3–U4, U9 | Prioritize relevant gaps; Claude resolves identity/dependency semantics with evidence; source-backed common ties beyond infrastructure only where justified | Existing research issues #50/#33 |
+| P7 design/state assurance | U1–U7 | State matrix, source/window visibility, score-label decision, keyboard/mobile/theme QA and short user-story walkthrough | Decisions and verification in #102 |
+| P8 rollout and recovery | U6, U8–U9 | Verify daily external sessions; production cache benefit; data health; manual replay/idempotence; preserve current delivery settings | Verification in #102; GitHub enforcement gap in #103 |
 
-The first implementation assignment should be P1, not a new database or a new feed. P1's truthfulness fixes follow existing contracts and do not depend on approving a redesigned homepage. P2 can follow independently. Existing activity-stream PR #92 must be evaluated against these stories and cost boundaries; it is not implicitly approved or merged by this backlog.
+The shipped interpretation fixes precede any storage rewrite. The observation audit measures repeat payloads but does not establish provider identity, field freshness or safe latest-wins semantics. Compact serving projections can improve public reads without migrating canonical files. Existing activity-stream PR #92 must be evaluated against these stories and cost boundaries; it is not implicitly approved or merged by this backlog.
 
 ## Evidence and limits
 
 Implementation anchors: `scripts/lib/relationships.mjs` (own activity and unique totals); `scripts/lib/refresh-policy.mjs` (eligibility and priority); `scripts/pull.mjs` (attempt versus retained measurements); `scripts/lib/score.mjs` (weighted score); `scripts/compile-inbox.mjs` (candidate dispositions); `.github/workflows/daily-health.yml`; `site/src/data/content-server.ts`; `site/src/data/review-auth.ts`; `site/src/data/review-server.ts`; `site/src/components/card/name-card.tsx`.
 
-The preceding read-only logic review reproduced: shared versus own activity divergence in seven project inputs; a fresh factory row hidden by aggregate staleness; duplicate totals changing from 3 to 9 when input order reverses; and an 80-failure queue excluding one overdue healthy name. Existing pull tests and site type/Markdown checks passed despite those missing cases. These are unshipped fixes, not completed work.
+The original read-only logic review reproduced shared versus own activity divergence in seven project inputs, a fresh factory row hidden by aggregate staleness, order-dependent duplicate totals, and an 80-failure queue excluding overdue healthy work. Those defects now have merged fixes and regression coverage in the references above. They are historical findings, not evidence of unresolved current failures.
 
 No new user interviews, visual/browser QA, penetration test, external agent rescheduling or live cost benchmark was performed for this document. It connects mission to verifiable work and makes the remaining decisions explicit.
