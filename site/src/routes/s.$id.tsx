@@ -101,8 +101,8 @@ function CategoryPage() {
   const rows = rankRows(sectionEntries, keys[0]!).filter((entry) => rowMatches(entry, f));
   const live = sectionEntries.filter((entry) => entry.kpis.status === "live").length;
   const dormant = sectionEntries.filter((entry) => entry.kpis.status === "dormant").length;
-  const launches = sectionEntries.reduce((sum, entry) => sum + entry.factoryLaunches24h, 0);
-  const volume = sectionEntries.reduce((sum, entry) => sum + (entry.kpis.volume24h ?? 0), 0);
+  const launches = bundle.launches;
+  const volume = bundle.volume24h;
   const rialtoCategory = RIALTO_TVL_CATEGORY[section.id];
   const categoryTvl = rialtoCategory
     ? chainStats?.tvlByCategory.find((row) => row.category === rialtoCategory) ?? null
@@ -151,13 +151,13 @@ function CategoryPage() {
             </a>
             <a href="#ranking">
               <b className="block text-base font-semibold text-[var(--t1)]">
-                {formatCount(launches)}
+                {launches.value === null ? "—" : `${formatCount(launches.value)}${launches.partial ? " (partial)" : ""}`}
               </b>
-              launches today
+              tracked launch calls 24h
             </a>
             <a href="#ranking">
-              <b className="block text-base font-semibold text-[var(--t1)]">{formatUsd(volume)}</b>
-              volume 24h
+              <b className="block text-base font-semibold text-[var(--t1)]">{volume === null ? "—" : `${formatUsd(volume)}${bundle.volumePartial ? " (partial)" : ""}`}</b>
+              tracked volume 24h
             </a>
           </div>
           {/* Every figure above is this section's own. This one is the whole chain's category TVL,

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createCreditBudget, blockscoutCreditCost, normalizeBudgetState } from "./lib/pull/budget.mjs";
 import { requestJson } from "./lib/pull/http.mjs";
-import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolume } from "./lib/relationships.mjs";
+import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolume, uniqueVolumeSummary } from "./lib/relationships.mjs";
 import { refreshDecision, selectRefreshTargets, selectInfrastructureReaders, hasIdentityConflict, DAY } from "./lib/refresh-policy.mjs";
 
 const now = Date.parse("2026-09-09T12:00:00Z");
@@ -13,6 +13,17 @@ const a = project("a",1), b = project("b",2);
 const graph = buildRelationships([a,b]);
 const index = relationshipIndex(graph);
 const census = { identity: { status: "verified" }, role: "subject" };
+
+test("volume coverage preserves fresh zero and reports missing, stale and conflicting pools", () => {
+  const file = (id,value,at=now) => ({chain:'robinhood-chain',market:{pulled_at:new Date(at).toISOString(),pairs:[{pair_address:address(id),volume_h24:value}]}});
+  assert.deepEqual(uniqueVolumeSummary([file(1,0),file(1,0)],now),{value:0,partial:false,pools:1,freshPools:1});
+  assert.deepEqual(uniqueVolumeSummary([file(1,0),file(2,50,now-2*DAY)],now),{value:0,partial:true,pools:2,freshPools:1});
+  assert.equal(uniqueVolumeSummary([file(1,10),null],now).partial,true);
+  assert.equal(uniqueVolumeSummary([file(1,10),file(1,null)],now).value,null);
+  assert.equal(uniqueVolumeSummary([file(1,null),file(1,10)],now).value,null);
+  assert.equal(uniqueVolumeSummary([file(1,10),file(1,null,now+1000)],now+1000).value,null);
+  assert.equal(uniqueVolumeSummary([file(1,10,now-2*DAY)],now).value,null);
+});
 
 test("known totals preserve zero and do not disguise missing observations", () => {
   assert.equal(knownTotal([0,0]),0);

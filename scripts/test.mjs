@@ -1422,7 +1422,6 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     sourceLinks: { market: "https://dex.test", holders: "https://explorer.test" },
     reviewedAt: "2026-09-01T00:00:00Z",
     tree: { sectionId: "launchpads" },
-    factoryLaunches24h: 0,
     kpis: {
       status: "live",
       liquidityUsd: 30_000,
@@ -1468,23 +1467,36 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.equal(trending[1].change24h, 100, "change uses the snapshot nearest 24h earlier");
 
     assert.deepEqual(rules.newLaunches([pons, ai, announced], now).map((item) => item.slug), ["artificial-inu", "pons"]);
-    // New launches is a 14-day list; the launch count is a 24-hour figure. Only names whose
-    // first pool is inside that window come off it.
-    const factory = entry("factory", { factoryLaunches24h: 12 });
+    // Count tracked names in the same 14-day window; factory calls are a different unit.
+    const other = entry("other", { officialConfirmed: false });
     const launchedToday = entry("hookr", {
       kpis: { ...entry("x").kpis, firstPairAt: "2026-09-02T09:00:00Z" },
     });
-    assert.equal(rules.notListedCount([factory], [pons, ai], now), 12, "older listed names never subtract");
+    assert.equal(rules.notListedCount([other,other,pons,ai], [pons, ai], now), 1, "distinct tracked names only");
     assert.equal(
-      rules.notListedCount([factory], [launchedToday, pons, ai], now),
-      11,
-      "one launch listed today, two older names left alone",
+      rules.notListedCount([other,launchedToday,pons,ai], [launchedToday, pons, ai], now),
+      1,
+      "listed recent names are excluded regardless of their exact age",
     );
     assert.equal(
-      rules.notListedCount([entry("factory", { factoryLaunches24h: 0 })], [launchedToday], now),
+      rules.notListedCount([announced,entry("old", {kpis:{...other.kpis,firstPairAt:'2026-01-01'}}),
+        entry("future",{kpis:{...other.kpis,firstPairAt:'2027-01-01'}})], [launchedToday], now),
       0,
-      "never negative",
+      "unlocated, old and future pool dates do not count",
     );
+    const address = `0x${'1'.repeat(40)}`;
+    const pulled = count => ({chain:'robinhood-chain',activity:{window_as_of:new Date(now).toISOString(),
+      addresses:[{address,role:'factory',launches_24h:count}]},market:{pulled_at:new Date(now).toISOString(),
+      pairs:[{pair_address:address,volume_h24:count}]}});
+    const observations = [{slug:'a',pulled:pulled(12)},{slug:'b',pulled:pulled(12)},
+      {slug:'other-section',pulled:pulled(99)}];
+    const trees = {a:{sectionId:'launchpads'},b:{sectionId:'launchpads'},'other-section':{sectionId:'tokens'}};
+    const categoryTotals = rules.observationTotals(observations,trees,now,'launchpads');
+    assert.equal(categoryTotals.launches.value,12,'shared factory counted once inside category');
+    assert.equal(categoryTotals.volume24h,12,'shared pool counted once inside category');
+    assert.equal(rules.observationTotals(observations,trees,now,'tokens').volume24h,99,'category is isolated');
+    assert.equal(rules.observationTotals(observations,trees,now,'missing').launches.value,null,'empty category is unknown, not zero');
+    assert.equal(rules.observationTotals(observations,trees,now).launches.value,null,'cross-category conflicts are not silently summed on home');
     assert.deepEqual(rules.announcedNow([olderAnnouncement, announced]).map((item) => item.slug), ["sight", "wire"]);
     assert.equal(rules.announcedNow([olderAnnouncement, announced]).at(-1).tldr, null, "missing summaries form the muted tail");
 
