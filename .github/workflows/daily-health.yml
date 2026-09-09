@@ -1,0 +1,27 @@
+name: Daily pipeline health
+on:
+  schedule:
+    - cron: "37 15 * * *"
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: read
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Require recent successful daily workflows
+        run: |
+          set -euo pipefail
+          for workflow in pull.yml compile.yml; do
+            latest=$(gh run list --workflow "$workflow" --branch main --status success --limit 1 --json createdAt --jq '.[0].createdAt // empty')
+            if [ -z "$latest" ] || [ "$(( $(date -u +%s) - $(date -u -d "$latest" +%s) ))" -gt 129600 ]; then
+              echo "::error::$workflow has no successful run in 36 hours. Inspect and manually dispatch after resolving the failure."
+              exit 1
+            fi
+            echo "$workflow: $latest" >> "$GITHUB_STEP_SUMMARY"
+          done

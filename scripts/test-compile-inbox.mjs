@@ -371,5 +371,24 @@ await test("inventory detection reads both the reserved slug and an unknown-enti
   assert.equal(inventoryCandidateCount({ body: "nothing here" }), 0);
 });
 
+await test("conflicting same-path producer packets never depend on branch iteration order", async () => {
+  const path = packetPath("beta", "WORK-20260903-grok-heavy-beta");
+  const { root, work } = await fixtureRepo({ [path]: VALID });
+  try {
+    await git(work, "checkout", "-q", "-b", "grok/other", "main");
+    await mkdir(dirname(join(work,path)), { recursive:true });
+    await writeFile(join(work,path), VALID + "\nDifferent producer observation.\n");
+    await git(work,"add","research"); await git(work,"commit","-q","-m","other packet");
+    await git(work,"push","-q","origin","grok/other"); await git(work,"checkout","-q","main");
+    for (const branches of [[PRODUCER_BRANCH,"grok/other"],["grok/other",PRODUCER_BRANCH]]) {
+      const report=await run(work,{branches});
+      assert.deepEqual(report.compiled,[]);
+      assert.equal(report.branches.flatMap(b=>b.skipped).length,2);
+      assert.ok(report.branches.flatMap(b=>b.skipped).every(s=>s.errors[0].includes("conflicting")));
+      assert.equal((await git(work,"status","--porcelain")).trim(),"");
+    }
+  } finally { await rm(root,{recursive:true,force:true}); }
+});
+
 if (failures) { console.error(`${failures} failure(s)`); process.exit(1); }
 console.log("all compile-inbox tests passed");

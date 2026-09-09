@@ -1,5 +1,7 @@
 # Pulled chain data
 
+Current policy: [Selective daily registry](../daily-registry.md). Daily selected refresh, weighted provider credits, two-page default walks and explicit hold/archive rules supersede the six-hour/request-count descriptions and historical projections below. The old tables are incident history, not current capacity guarantees.
+
 `npm run pull` is the sole writer for `content/pulled/**`. It reads free, keyless endpoints and
 refreshes the current YAML documents plus append-only snapshots. The scheduled workflow runs every
 six hours. A null value means the read did not determine the fact; the adjacent `errors[]` explains

@@ -304,11 +304,37 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
     catch (error) { branchReport.skipped.push({ path: "(branch)", errors: [error.message] }); continue; }
     for (const candidate of found) {
       if (candidate.skipped) { branchReport.unchanged.push({ path: candidate.path, reason: candidate.skipped }); continue; }
-      await mkdir(dirname(candidate.path), { recursive: true });
-      await writeFile(candidate.path, candidate.branchText);
       candidates.push({ ...candidate, branch: name, report: branchReport });
     }
     log(`${name}: ${found.length - branchReport.unchanged.length} candidate packet(s), ${branchReport.unchanged.length} left alone`);
+  }
+
+  // Resolve same-path candidates before touching disk. Equal-time conflicting copies need review.
+  const byPath = new Map();
+  for (const candidate of candidates) {
+    if (!byPath.has(candidate.path)) byPath.set(candidate.path, []);
+    byPath.get(candidate.path).push(candidate);
+  }
+  const selected = [];
+  for (const rows of byPath.values()) {
+    rows.sort((a,b) => (asOfMs(b.branchText) ?? 0) - (asOfMs(a.branchText) ?? 0) || a.branch.localeCompare(b.branch));
+    const newest = rows[0];
+    const conflict = rows.some(r => asOfMs(r.branchText) === asOfMs(newest.branchText) && r.branchText !== newest.branchText);
+    for (const row of rows) {
+      if (!conflict && row === newest) selected.push(row);
+      else row.report.skipped.push({ path: row.path, errors: [conflict ? "same path and date have conflicting producer copies; controller review required" : "newer or identical packet selected from another branch"] });
+    }
+  }
+  if (!selected.length) {
+    report.ok = true;
+    report.gates = { validate: { ok: true, skipped: true, output: "No selected changes." }, score: { ok: true, skipped: true, output: "No selected changes." } };
+    await writeReport(report);
+    log("No selected packet changes; skipped compilation and scoring.");
+    return report;
+  }
+  for (const candidate of selected) {
+    await mkdir(dirname(candidate.path), { recursive: true });
+    await writeFile(candidate.path, candidate.branchText);
   }
 
   // 2. Validate. A packet with errors goes back the way main has it and is reported against its branch;
@@ -316,7 +342,7 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
   const census = parse(await readFile(join(CONTENT_DIR, "census.yaml"), "utf8")) ?? [];
   // The registry as main has it, before anything in this batch is compiled: everything else is a newcomer.
   const existingSlugs = new Set(census.map((row) => row.slug));
-  let live = candidates;
+  let live = selected;
   for (let pass = 0; pass < VALIDATION_PASSES; pass++) {
     const { errors, warnings } = await validatePacketDirectory(PACKET_ROOT, census);
     report.packetWarnings = warnings;

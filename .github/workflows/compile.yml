@@ -1,7 +1,7 @@
 name: Compile packets
 
 # The unattended half of docs/research-system.md §6. Grok Heavy PUTs packets onto long-lived producer
-# branches through the contents API; nobody merges those PRs. Every six hours this job lifts the packet
+# branches through the contents API; nobody merges those PRs. Once daily this job lifts the packet
 # files off those branches, validates them, compiles the valid ones into content/, runs the content
 # gates, and pushes the result to main so Render redeploys.
 #
@@ -10,10 +10,10 @@ name: Compile packets
 # exits 2 rather than pushing a red main. Invalid packets are reported on the producer's PR and skipped
 # — one bad packet never blocks the rest.
 #
-# :47 past, 30 minutes after the pull's :17, so the two bots do not queue behind each other on the hour.
+# 11:47 UTC, with space after the 09:17 pull and the external daily research window.
 on:
   schedule:
-    - cron: "47 */6 * * *"
+    - cron: "47 11 * * *"
   workflow_dispatch:
     inputs:
       branch:
@@ -51,19 +51,17 @@ jobs:
       # Available to any compile-time pull validation; absent keeps the public explorer fallback.
       BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}
     steps:
-      # fetch-depth: 0 plus the full refspec below: the compiler diffs producer branches against main, so
+      # fetch-depth: 0 plus the compiler's own fetch: it diffs producer branches against main, so
       # it needs every remote head, not just the one checkout would fetch.
       - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
 
-      - name: Fetch every producer branch
-        run: git fetch --no-tags --prune origin "+refs/heads/*:refs/remotes/origin/*"
-
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          cache: npm
 
       - name: Install
         run: npm ci
@@ -107,14 +105,14 @@ jobs:
           git config user.email "bot@proofline.local"
           for attempt in 1 2 3; do
             git fetch origin main
-            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            if git rebase origin/main && npm run validate:release && git push origin HEAD:main; then exit 0; fi
             git rebase --abort 2>/dev/null || true
             sleep 20
           done
           echo "push failed after 3 attempts"; exit 1
 
       # One comment per producer PR per distinct set of errors. A packet that stays broken is skipped
-      # every six hours; the marker stops the PR filling with the same comment forty times.
+      # every day; the marker stops the PR filling with the same comment repeatedly.
       - name: Report skipped packets on the producer PRs
         if: always() && steps.compile.outputs.code != '1'
         run: |
@@ -133,7 +131,7 @@ jobs:
               echo "These packets did not compile this run and were skipped. Everything else on this branch compiled; a skipped packet never blocks the rest of the batch."
               echo
               jq -r '.skipped[] | "**`" + .path + "`**\n\n```text\n" + (.errors | join("\n")) + "\n```\n"' <<< "$ROW"
-              echo "Fix by PUTting the same path again on this branch — the next compile (every 6 hours, :47) picks the new copy up. A packet that names a possible match created in the same batch is skipped this round and compiles on the next one, once that name is in the registry."
+              echo "Fix by PUTting the same path again on this branch — the next daily compile (11:47 UTC), or a manual dispatch, picks the new copy up. A packet that names a possible match created in the same batch is skipped this round and compiles on the next one, once that name is in the registry."
               echo
               echo "<!-- $MARKER -->"
             } > comment.md
@@ -166,6 +164,10 @@ jobs:
         if: success() && steps.compile.outputs.code == '0'
         run: |
           set -uo pipefail
+          if ! jq -e '.gates.validate.ok == true and .gates.validate.skipped != true' build/compile-report.json >/dev/null; then
+            echo "No content gate ran; leave any existing gate-failure issue open."
+            exit 0
+          fi
           TITLE="Compile gate failed"
           NUMBER="$(gh issue list --repo "$REPO" --state open --search "$TITLE in:title" --json number,title --jq "[.[] | select(.title == \"$TITLE\")][0].number // empty")"
           [ -n "$NUMBER" ] || exit 0
@@ -177,3 +179,12 @@ jobs:
         run: |
           echo "compile-inbox exited ${{ steps.compile.outputs.code }} — see the 'Compile gate failed' issue."
           exit 1
+
+      - name: Retain compiler report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-compile-${{ github.run_id }}
+          path: build/compile-report.*
+          retention-days: 7
+          if-no-files-found: warn

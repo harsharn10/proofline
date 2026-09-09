@@ -2,7 +2,7 @@ import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { DataTable } from "@/components/ui/data-table";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Wire } from "@/components/wire/wire";
-import { getContent } from "@/data/content-server";
+import { getCategoryContent } from "@/data/content-server";
 import {
   KPI_LABEL,
   KPI_SOURCE,
@@ -38,7 +38,7 @@ const RIALTO_TVL_CATEGORY: Partial<Record<string, string>> = {
 export const Route = createFileRoute("/s/$id")({
   validateSearch: (search: Record<string, unknown>): { f?: Filter } =>
     FILTERS.some(({ value }) => value === search.f) ? { f: search.f as Filter } : {},
-  loader: () => getContent(),
+  loader: ({ params }) => getCategoryContent({ data: params.id }),
   head: ({ params, loaderData }) => {
     const section = loaderData?.sections.find((item) => item.id === params.id);
     return section
@@ -76,7 +76,7 @@ function CategoryPage() {
   const { f: searchFilter } = Route.useSearch();
   const f = searchFilter ?? "all";
   const navigate = useNavigate({ from: Route.fullPath }) as any;
-  const bundle = Route.useLoaderData() as Awaited<ReturnType<typeof getContent>>;
+  const bundle = Route.useLoaderData();
   const { sections, entries, dependencies, chainStats, now } = bundle;
   const section = sections.find((item) => item.id === id);
 

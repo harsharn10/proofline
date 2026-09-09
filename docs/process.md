@@ -1,5 +1,7 @@
 # Order of operations
 
+Current collection cadence and relevance rules: [Selective daily registry](daily-registry.md). The daily pull at 09:17 UTC and compile at 11:47 UTC supersede older six-hour timing references below. Agent path ownership, PR gates and merge rules remain unchanged.
+
 For anyone who opens a branch on this repository: the owner, a Claude controller session, Codex, a
 Grok producer, or a bot. This sits above `docs/research-system.md` (the research contract: objects,
 packets, hard gates) and `docs/design/icarus/review-checklist.md` (what to run before and after a
@@ -14,8 +16,8 @@ construction, whatever the diff says.
 | Writer | Owns | Lands through |
 | --- | --- | --- |
 | Producers (`grok`, `grok-heavy`, `supergrok`, `grok-bot`, Codex research runs) | `research/inbox/packets/<slug>/` | A producer branch and PR that the producer never merges. The compile workflow lifts packets off the branch. |
-| Compile bot | `content/**` compiled from packets, `content/changelog/` | Pushes to `main` every six hours at :47 |
-| Pull bot | `content/pulled/**`, `ops/pull-budget.json`, `ops/pull-queue.json` | Pushes to `main` every six hours at :17 |
+| Compile bot | `content/**` compiled from packets, `content/changelog/` | Pushes to `main` daily at 11:47 UTC |
+| Pull bot | `content/pulled/**`, `ops/pull-budget.json`, `ops/pull-queue.json` | Pushes to `main` daily at 09:17 UTC |
 | Publish bot | Telegram review state under `ops/` | Pushes to `main` after a content change |
 | Codex (build assignments) | `scripts/`, `site/`, `schema/`, `pulse/`, `docs/`, `.github/` within the assignment's `allowed_paths` | `codex/<YYYYMMDD>/<work-id>` branch and PR |
 | Controller (a Claude session or the owner) | Assignments, compile PRs, fixes, docs, review, merge | `claude/<YYYYMMDD>/<topic>` branch and PR |
@@ -65,7 +67,7 @@ cases and reports the others.
 8. **After merge.** The branch is gone. Run checklist part C on `main`. For research, the compile
    run lands the canonical change in its own PR. Close superseded PRs and issues with a one-line
    reason. Update the handoff document if the session is ending.
-9. **Bots keep going.** Pull at :17, compile at :47, every six hours. Nothing in steps 0 to 8 waits
+9. **Bots keep going.** Pull at 09:17 UTC, compile at 11:47 UTC, daily. Nothing in steps 0 to 8 waits
    for them, and they do not wait for you.
 
 ## Stacks
@@ -76,7 +78,7 @@ The v3 stack was #74 and #75 through #76.
 
 ## Named exceptions
 
-- `grok-heavy/standing/updates` (PR #62) is long-lived by design: one work id per six-hour cycle,
+- `grok-heavy/standing/updates` (PR #62) is long-lived by design: one work id per daily cycle,
   never merged. Do not prune it.
 - A data migration that must rewrite `content/pulled/**` (a schema change, a repair) carries the
   label `allow-pulled-data`, says why in the body, and merges right before a bot cycle so the bot

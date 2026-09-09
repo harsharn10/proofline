@@ -1,0 +1,14 @@
+# Standing daily Grok Heavy collection
+
+Supersedes the six-hour standing order after the daily-registry PR is merged. One cycle per UTC day; use the existing producer branch `grok-heavy/standing/updates` and PR #62. Never merge it. Never change content, quotas, workflows, scores or channel decisions.
+
+Read `docs/daily-registry.md`, `docs/research-system.md`, the packet schema and the current `/data/registry.json` from the deployed site. Verify its revision/freshness against canonical main; if absent/stale, the controller runs `npm run registry:plan` on current main and supplies `build/registry.json`. Never invent the worklist from an older branch. Use work id `WORK-YYYYMMDD-grok-heavy-daily`.
+
+1. Fix previously rejected packets in place using the current compiler report. Read the errors before doing new research.
+2. Inspect only the report's `grok.updates` list, at most 20 names/day. Fetch each selected name's newest packet, canonical project and primary receipts. Check exact changes since that packet. If there is no material change, write nothing. One supported event is enough; never manufacture three events to satisfy an old minimum.
+3. Discover at most 10 new seeds/day. Require a confirmed official surface and a concrete product, deployment or dated launch. An arbitrary pool, ticker mention, wallet trade or metric spike alone is not a seed. Match chain/address, official domain, handle, aliases and pending packets first. A match becomes an update to the canonical slug; uncertain matches go to Claude, not to a duplicate profile.
+4. Shared factory/router/implementation ties describe infrastructure use, not team/ownership ties. Cite the exact deployments and source receipts. A common token address must be reviewed before creating another identity. Never let activity at a shared factory masquerade as activity of its individual tokens.
+5. Archived or held names receive no broad research sweep. A new dated primary announcement, own deployment or controller-approved identity correction may be proposed as a reactivation lead. The controller queues the canonical slug with a date and reason. Never silently bypass a conflict hold.
+6. Write only changed packets under `research/inbox/packets/<slug>/<work_id>.md`. Preserve evidence classes, source URLs, receipt dates, mainnet gates and previous packet IDs. Existing seed requirements remain; update packets carry only the events that actually occurred. Do not copy stale provider values under today's date.
+
+End-of-cycle report: inspected / changed / new / duplicate or conflict / reactivation leads / no-change counts; exact packet paths; missing sources. Zero new packets is a successful quiet day. Claude reviews identity and receipt questions; the compiler validates deterministic structure; neither substitutes for the other.

@@ -9,10 +9,10 @@ name: Pull chain facts
 # content/pulled/**, and a failed `npm run validate` after the pull aborts before it, so a bad pull
 # cannot land on main.
 #
-# Every six hours at :17 past. The offset keeps the run off the hour, where scheduled jobs queue.
+# Once daily at 09:17 UTC, away from the busy top of the hour.
 on:
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "17 9 * * *"
   workflow_dispatch:
     inputs:
       only:
@@ -52,10 +52,10 @@ jobs:
     env:
       # Optional: without it the puller retains the public explorer fallback.
       BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}
-      # Stop starting new names at 45 minutes so there is time to validate, commit and push what was
+      # Stop starting new names at 30 minutes so there is time to validate, commit and push what was
       # already read. A run is latency-bound long before it is pace-bound, so it can reach the job
       # timeout with credits to spare — and a killed job loses every name it had finished.
-      PULL_DEADLINE_MINUTES: "45"
+      PULL_DEADLINE_MINUTES: "30"
     # One bot on main at a time: the compile workflow shares this group.
     #
     # Deliberately one job and not a two-shard matrix. `cancel-in-progress: false` protects the job
@@ -66,10 +66,9 @@ jobs:
     concurrency:
       group: main-bots
       cancel-in-progress: false
-    # The run cap is the real bound: 6,000 credits against an explorer pacer that serialises physical
-    # requests to five per second is twenty minutes of pacing, and the deferral path — defer, record,
-    # exit 0 — has to be reachable inside the timeout or it is decoration. An hour is slack over that.
-    timeout-minutes: 60
+    # Both weighted quota and elapsed time bound collection. Leave 15 minutes after the work
+    # deadline for validation, budget persistence and push retries.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -77,7 +76,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          cache: npm
 
       - name: Install
         run: npm ci
@@ -118,7 +118,7 @@ jobs:
           git config user.email "bot@proofline.local"
           for attempt in 1 2 3; do
             git fetch origin main
-            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            if git rebase origin/main && npm run validate && git push origin HEAD:main; then exit 0; fi
             git rebase --abort 2>/dev/null || true
             sleep 20
           done
@@ -152,3 +152,26 @@ jobs:
             sleep 20
           done
           echo "budget push failed after 3 attempts"; exit 1
+
+      - name: Retain daily selection and quota report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-pull-${{ github.run_id }}
+          path: |
+            build/pull-plan.json
+            build/pull-report.json
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Report incomplete collection
+        if: always()
+        run: |
+          if [ -f build/pull-report.json ]; then
+            jq '{status, selected, completed: (.completed | length), deferred: (.deferred_names | length), budget}' build/pull-report.json >> "$GITHUB_STEP_SUMMARY"
+            if [ "$(jq -r .status build/pull-report.json)" != complete ]; then
+              echo '::warning::Daily pull was degraded; inspect retained report before treating data as current.'
+            fi
+          else
+            echo '::warning::Daily pull produced no completion report.'
+          fi

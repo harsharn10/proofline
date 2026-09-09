@@ -5,7 +5,7 @@ import { StatBox } from "@/components/home/stat-box";
 import { Wire } from "@/components/wire/wire";
 import {
   announcedNow,
-  getContent,
+  getHomeContent,
   newLaunches,
   notListedCount,
   sectionLeaders,
@@ -14,7 +14,7 @@ import {
 import { formatCount, formatUsd } from "@/data/types";
 
 export const Route = createFileRoute("/")({
-  loader: () => getContent(),
+  loader: () => getHomeContent(),
   component: Home,
 });
 
@@ -31,10 +31,9 @@ function chainReadLabel(iso: string | undefined): string {
 }
 
 function Home() {
-  const { site, sections, entries, histories, wire, now } = Route.useLoaderData();
+  const { site, sections, entries, histories, wire, now, launches: launchSummary, volume24h } = Route.useLoaderData();
   const live = entries.filter((entry) => entry.kpis.status === "live").length;
-  const launchesToday = entries.reduce((sum, entry) => sum + entry.factoryLaunches24h, 0);
-  const volume24h = entries.reduce((sum, entry) => sum + (entry.kpis.volume24h ?? 0), 0);
+  const launchesToday = launchSummary.value;
   const readAt = entries
     .map((entry) => entry.kpis.readAt)
     .filter((value): value is string => Boolean(value))
@@ -63,10 +62,10 @@ function Home() {
           stats={[
             { label: "names on file", value: formatCount(entries.length), href: "#categories" },
             { label: "live on chain", value: formatCount(live), href: "#right-now" },
-            { label: "launches today", value: formatCount(launchesToday), href: "#right-now" },
-            { label: "volume 24h", value: formatUsd(volume24h), href: "#right-now" },
+            { label: "tracked launches", value: launchesToday === null ? "—" : `${launchSummary.partial ? "≥ " : ""}${formatCount(launchesToday)}`, href: "#right-now" },
+            { label: "tracked volume 24h", value: volume24h === null ? "—" : formatUsd(volume24h), href: "#right-now" },
           ]}
-          note={<>Chain read {chainReadLabel(readAt)} · refreshes every 6 hours</>}
+          note={<>Latest read {chainReadLabel(readAt)} · selected names refresh daily · launch counts use distinct factories and recent windows</>}
         />
       </section>
 
@@ -113,7 +112,7 @@ function Home() {
             announcements, talk, on-chain activity and material Icarus notes
           </span>
         </div>
-        <Wire items={wire} now={now} variant="compact" telegramUrl={site.telegram.url} />
+        <Wire items={wire} now={now} variant="compact" allowNameFilter={false} telegramUrl={site.telegram.url} />
       </section>
     </main>
   );

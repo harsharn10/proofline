@@ -7,6 +7,8 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
+import YAML from "yaml";
+import { parseResearchMarkdown } from "./src/data/markdown";
 
 const VIRTUAL_CONTENT_ID = "virtual:proofline-content";
 const RESOLVED_CONTENT_ID = `\0${VIRTUAL_CONTENT_ID}`;
@@ -23,7 +25,12 @@ function prooflineContent(): Plugin {
       const read = (relative: string) => {
         const file = path.join(repositoryRoot, relative);
         this.addWatchFile(file);
-        return fs.readFileSync(file, "utf8");
+        const raw = fs.readFileSync(file, "utf8");
+        // Parse and sanitize once at build time, not on the first request to each isolate.
+        if (relative.endsWith(".yaml")) return JSON.stringify(YAML.parse(raw));
+        if (relative.startsWith("content/research/") && relative.endsWith(".md")) return JSON.stringify(parseResearchMarkdown(raw));
+        if (relative.endsWith(".jsonl")) return raw.trim().split("\n").slice(-360).join("\n");
+        return raw;
       };
       const directory = (relative: string, extension: string) => {
         const folder = path.join(repositoryRoot, relative);
@@ -38,7 +45,7 @@ function prooflineContent(): Plugin {
       const snapshot = {
         site: read("content/site.yaml"),
         changelog: directory("content/changelog", ".yaml"),
-        accounts: read("content/accounts.yaml"),
+        accounts: "[]", // account notes never belong in a public serving bundle
         census: read("content/census.yaml"),
         methodology: read("content/methodology.md"),
         derived: read("build/derived.json"),
@@ -53,6 +60,10 @@ function prooflineContent(): Plugin {
         pulledSeries: directory("content/pulled/series", ".json"),
       };
       return `export default ${JSON.stringify(snapshot)};`;
+    },
+    generateBundle() {
+      const registry = fs.readFileSync(path.join(repositoryRoot, "build/registry.json"), "utf8");
+      this.emitFile({ type: "asset", fileName: "data/registry.json", source: registry });
     },
   };
 }
