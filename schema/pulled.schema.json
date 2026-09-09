@@ -294,6 +294,7 @@
       "additionalProperties": false,
       "required": ["pair", "locked_share", "holder_kind", "reason"],
       "properties": {
+        "as_of": { "type": ["string", "null"], "format": "date-time" },
         "pair": { "type": ["string", "null"] },
         "locked_share": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
         "holder_kind": { "enum": ["burn", "locker", "burn-and-locker", "none", null] },
@@ -301,13 +302,16 @@
       }
     },
     "pulledStructure": {
+      "$comment": "pulled_at is the block attempt time, not proof every field was measured. Optional mint_as_of, renounced_as_of and lp[].as_of identify actual measurements; absent legacy dates remain unknown.",
       "type": "object",
       "additionalProperties": false,
       "required": ["pulled_at", "mint", "renounced", "lp", "errors"],
       "properties": {
         "pulled_at": { "type": "string", "format": "date-time" },
         "mint": { "enum": ["owner-can-mint", "no-mint-function", "unknown"] },
+        "mint_as_of": { "type": ["string", "null"], "format": "date-time" },
         "renounced": { "type": ["boolean", "null"] },
+        "renounced_as_of": { "type": ["string", "null"], "format": "date-time" },
         "lp": { "type": "array", "items": { "$ref": "#/$defs/lpLock" } },
         "errors": { "type": "array", "items": { "$ref": "#/$defs/pullStepError" } }
       }

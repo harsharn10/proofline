@@ -131,6 +131,7 @@ import {
   addressesFor, activityWindow, carryActivityFacts, carryAddressFacts, carryOwnershipFacts,
   explorerReadRecord, mergeAddress, summaryLine, tokenAddressFor, countErrors, errorKey,
   memoizeClient, parseArgs, refreshedMarket, EMPTY_READ_MESSAGE, emptyReadMessage,
+  carryStructureFacts, carryMarketFacts,
 } from "./pull.mjs";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -924,6 +925,47 @@ test("the Rialto refresh replaces its own two sources and carries the rest of th
 });
 
 // --- token concentration, attribution and structure ----------------------
+
+test("measurement carry preserves dates and caveats, including mixed LP success and real zero", () => {
+  const old = "2026-09-01T00:00:00.000Z", now = "2026-09-09T00:00:00.000Z";
+  const prior = {pulled_at:old,mint:"no-mint-function",mint_as_of:old,renounced:true,renounced_as_of:old,
+    lp:[{pair:"0xABC",locked_share:0.5,holder_kind:"burn",reason:null,as_of:old}],
+    errors:[{step:"lp",message:"clamped"},{step:"mint",message:"old caveat"}]};
+  const skipped = carryStructureFacts(null,prior);
+  assert.deepEqual(skipped,prior);assert.notEqual(skipped,prior);
+  const fresh = {pulled_at:now,mint:"unknown",renounced:null,
+    lp:[{pair:"0xabc",locked_share:null,holder_kind:null,reason:LP_REASON.holdersUnavailable},
+      {pair:"0xdef",locked_share:0,holder_kind:"none",reason:null}],errors:[{step:"lp",message:"timeout"}]};
+  const mixed = carryStructureFacts(fresh,prior,{mintMeasured:true,renouncedMeasured:false});
+  assert.equal(mixed.mint,"no-mint-function");assert.equal(mixed.mint_as_of,old);
+  assert.equal(mixed.renounced_as_of,old);assert.equal(mixed.lp[0].locked_share,0.5);assert.equal(mixed.lp[0].as_of,old);
+  assert.equal(mixed.lp[1].locked_share,0);assert.equal(mixed.lp[1].as_of,now);
+  assert.equal(mixed.errors.length,3);
+  const renewed = carryStructureFacts({...fresh,mint:"owner-can-mint",renounced:false,lp:[fresh.lp[1]],errors:[]},prior,{mintMeasured:true,renouncedMeasured:true});
+  assert.equal(renewed.mint_as_of,now);assert.equal(renewed.renounced,false);assert.equal(renewed.renounced_as_of,now);
+  assert.deepEqual(renewed.errors,[]);
+  const reused = carryStructureFacts({...fresh,mint:prior.mint},prior);
+  assert.equal(reused.mint_as_of,old,"ABI reuse is not a measurement");
+  const legacy = {...prior};delete legacy.mint_as_of;delete legacy.renounced_as_of;delete legacy.lp[0].as_of;
+  const carriedLegacy = carryStructureFacts(fresh,legacy);
+  assert.equal(carriedLegacy.mint_as_of,null);assert.equal(carriedLegacy.renounced_as_of,null);assert.equal(carriedLegacy.lp[0].as_of,null);
+  const doc = orderDocument({slug:"pons",pulled_at:now,chain:"robinhood-chain",addresses:[],metrics:[],structure:mixed,errors:[]});
+  assert.equal(doc.structure.mint_as_of,old);assert.equal(doc.structure.lp[1].as_of,now);
+  assert.deepEqual(createValidator()(doc),[]);
+  doc.structure.lp[1].as_of="invalid";assert(createValidator()(doc).length);
+});
+
+test("concentration carry keeps one dated measurement and its caveats; burned supply invalidates old concentration", async () => {
+  const old="2026-09-01T00:00:00.000Z", now="2026-09-09T00:00:00.000Z";
+  const previous={top10_share:0.3,top10_share_ex_pools:0.2,burned_share:0,top10_as_of:old,errors:[{step:"top10_share",message:"clamped"}]};
+  const carried=carryMarketFacts({pulled_at:now,errors:[]},previous);
+  assert.equal(carried.top10_as_of,old);assert.deepEqual(carried.errors,previous.errors);
+  const burned=await readTop10({token:async()=>({total_supply:"100",type:"ERC-20"}),tokenHolders:async()=>({items:[{address:{hash:"0x000000000000000000000000000000000000dEaD"},value:"100"}]})},"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",{pulledAt:now});
+  const updated=carryMarketFacts(burned,previous);
+  assert.equal(updated.top10_as_of,now);assert.equal(updated.burned_share,1);
+  assert.equal(updated.top10_share,null);assert.equal(updated.top10_share_ex_pools,null);
+  assert(!updated.errors.some(error=>error.message==="clamped"));
+});
 
 test("computes top-10 supply share and excludes pools and lockers", async () => {
   const pair = "0x1111111111111111111111111111111111111111";

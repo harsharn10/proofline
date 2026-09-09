@@ -10,6 +10,10 @@ Canonical project deployments and dependency cards are the sources for a derived
 
 Sharing an infrastructure address does not establish common ownership or a common team. A shared token address flags a possible identity conflict for Claude/owner review; it never automatically merges projects. Source IDs are scoped to each project's source ledger. Conflicting claims remain visible. Display names and tickers are labels, never identity keys. Solana address case remains significant.
 
+## Measurement dates are not refresh dates
+
+A successful pull/check is not proof every field was remeasured. Token structure retains its block timestamp and caveats when the explorer measurement is skipped. New `mint_as_of`, `renounced_as_of` and individual LP `as_of` dates advance only for measured results; ABI reuse and retained LP results keep their original dates. Failed owner probes cannot date carried ownership as newly measured. Legacy field dates remain unknown rather than borrowing a potentially rewritten `pulled_at`. Token cards expose mint, LP and concentration measurement dates, including unknown dates and retained LP failure reasons. Concentration shares travel together with `top10_as_of` and their caveats; a newly observed fully burned supply clears old concentration instead of relabeling it. This is additive metadata, not a bulk reseed or additional provider schedule.
+
 ## Refresh selection
 
 | Condition | Scheduled treatment |

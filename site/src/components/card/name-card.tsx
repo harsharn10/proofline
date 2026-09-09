@@ -132,6 +132,11 @@ function FactRow({ label, children, tone }: { label: string; children: ReactNode
   );
 }
 
+function MeasurementDate({ at }: { at?: string | null }) {
+  const valid = typeof at === "string" && Number.isFinite(Date.parse(at));
+  return <small className="card-missing"> · {valid ? <>measured <time dateTime={at}>{at.slice(0, 10)}</time></> : "measurement date unknown"}</small>;
+}
+
 function firstSentence(summary: string): { first: string; rest: string } {
   const clean = readerCopy(summary);
   const match = clean.match(/^(.+?[.!?])(?:\s+|$)(.*)$/s);
@@ -359,19 +364,21 @@ function TokenStructure({ dossier, site }: Pick<NameCardProps, "dossier" | "site
   return (
     <>
       <FactRow label="Ownership" tone={owner?.label === "One key" ? "warn" : undefined}>{owner ? <a href={owner.href ?? undefined}>{owner.label}</a> : <Missing />}</FactRow>
-      <FactRow label="Liquidity">{liquidity ? <a href={dexScreenerSearchUrl(dossier.symbol ?? dossier.name)}>{liquidity}</a> : <Missing />}</FactRow>
-      <FactRow label="Mint" tone={dossier.card.mint === "owner-can-mint" ? "warn" : undefined}>{mint ? <a href={explorer ?? undefined}>{mint}</a> : <Missing />}</FactRow>
+      <FactRow label="Liquidity">{liquidity ? <><a href={dexScreenerSearchUrl(dossier.symbol ?? dossier.name)}>{liquidity}</a><MeasurementDate at={checkedLock?.asOf} />{checkedLock?.reason && <small className="card-missing"> · {checkedLock.reason}</small>}</> : <Missing />}</FactRow>
+      <FactRow label="Mint" tone={dossier.card.mint === "owner-can-mint" ? "warn" : undefined}>{mint ? <><a href={explorer ?? undefined}>{mint}</a><MeasurementDate at={dossier.card.mintAsOf} /></> : <Missing />}</FactRow>
       <FactRow label="Top-10 hold, pools out">
         {dossier.card.top10ShareExPools !== null
           ? <a href={explorer ?? undefined}>{(dossier.card.top10ShareExPools * 100).toFixed(1)}%</a>
           : dossier.card.top10Share !== null
             ? <a href={explorer ?? undefined}>{(dossier.card.top10Share * 100).toFixed(1)}%</a>
             : <Missing />}
+        {(dossier.card.top10ShareExPools !== null || dossier.card.top10Share !== null) && <MeasurementDate at={dossier.card.top10AsOf} />}
       </FactRow>
       <FactRow label="Burned supply">
         {dossier.card.burnedShare !== null
           ? <a href={explorer ?? undefined}>{(dossier.card.burnedShare * 100).toFixed(1)}%</a>
           : <Missing />}
+        {dossier.card.burnedShare !== null && <MeasurementDate at={dossier.card.top10AsOf} />}
       </FactRow>
     </>
   );
@@ -456,7 +463,7 @@ function MetricsAndChart({ dossier, site, section, token, window }: Pick<NameCar
       </div>
       {series.length > 0 ? <GrowthChart series={series} window={window} active={active} onChange={setActive} /> : <p className="card-empty">No snapshots yet.</p>}
       <div className="card-source-line">
-        {top10Share !== null && explorer ? <a href={explorer}>Top 10 hold{token ? ", pools out" : ""} {(top10Share * 100).toFixed(1)}%</a> : null}
+        {top10Share !== null && explorer ? <span><a href={explorer}>Top 10 hold{token ? ", pools out" : ""} {(top10Share * 100).toFixed(1)}%</a><MeasurementDate at={dossier.card.top10AsOf} /></span> : null}
         {/* A disagreement is only useful if the reader can check it, so the row carries both 24h
             figures on their own links instead of an unclickable "sources disagree". */}
         {disagreement && rialto ? (
