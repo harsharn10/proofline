@@ -37,7 +37,7 @@ Blockscout requests reserve the documented route weight (usually 20 credits), in
 
 Default activity walks use two pages; deep legacy role-specific walks are available only with `--full`. A cap produces a lower bound, not an exact total. Shared low-level RPC/explorer method calls retain per-run memoization. Address documents are still stored per project for compatibility; the graph is deduplicated, and a future storage migration can normalize those files without changing consumers.
 
-Partial provider failures leave last-success time unchanged and keep requested work in the queue. A successful partial file write is not proof the sources refreshed. Snapshot history remains append-only. Homepage launch totals choose one latest observation per distinct factory, discard stale windows, and label partial totals. The available measurements are tracked-factory launch-method observations, not a chain-wide count of distinct launched projects.
+Partial provider failures leave last-success time unchanged and keep requested work in the queue. A successful partial file write is not proof the sources refreshed. Snapshot history remains append-only. Home and category totals choose one latest observation per distinct factory or pool within their own scope, discard stale windows, and label partial totals. Equal-time conflicts are withheld. The available launch measurements are tracked-factory launch-method calls, not a chain-wide count of distinct launched projects. The New launches footer counts other tracked names with first pools in the same 14-day window; it never subtracts project counts from factory calls or claims unobserved names are below a liquidity threshold.
 
 ## Daily workflow and responsibility map
 

@@ -118,19 +118,30 @@ export function uniqueLaunches(pulledFiles, now = Date.now()) {
 }
 
 export function uniqueVolume(pulledFiles, now = Date.now()) {
+  return uniqueVolumeSummary(pulledFiles, now).value;
+}
+
+export function uniqueVolumeSummary(pulledFiles, now = Date.now()) {
   const pairs = new Map();
+  let partial = false;
   for (const file of pulledFiles) {
     const at = Date.parse(file?.market?.pulled_at ?? "");
-    if (!Number.isFinite(at) || now < at || now - at > 36 * 3600_000) continue;
+    if (!file?.market) { partial = true; continue; }
     for (const pair of file.market.pairs ?? []) {
-      if (!pair.pair_address || !Number.isFinite(pair.volume_h24)) continue;
       const key = addressKey(file.chain, pair.pair_address);
-      if (!key) continue;
-      if (!pairs.has(key) || pairs.get(key).at < at) pairs.set(key, { at, value: pair.volume_h24, conflict: false });
+      if (!key) { partial = true; continue; }
+      if (!pairs.has(key) || Number.isFinite(at) && (!Number.isFinite(pairs.get(key).at) || pairs.get(key).at < at)) pairs.set(key, { at, value: pair.volume_h24, conflict: false });
       else if (pairs.get(key).at === at && pairs.get(key).value !== pair.volume_h24) pairs.get(key).conflict = true;
     }
   }
-  // The public volume API has no partial flag. Withhold instead of silently understating a conflict.
-  return [...pairs.values()].some(pair => pair.conflict) ? null
-    : knownTotal([...pairs].sort(([a],[b]) => a.localeCompare(b)).map(([,pair]) => pair.value));
+  const fresh = [...pairs].sort(([a],[b]) => a.localeCompare(b)).map(([,pair]) => pair).filter(pair => {
+    const valid = Number.isFinite(pair.at) && now >= pair.at && now - pair.at <= 36 * 3600_000 &&
+      Number.isFinite(pair.value) && pair.value >= 0 && !pair.conflict;
+    if (!valid) partial = true;
+    return valid;
+  });
+  // Preserve scalar compatibility: an unresolved current conflict withholds the total.
+  const conflict = [...pairs.values()].some(pair => pair.conflict && now >= pair.at && now - pair.at <= 36 * 3600_000);
+  return { value: conflict ? null : knownTotal(fresh.map(pair => pair.value)), partial,
+    pools: pairs.size, freshPools: fresh.length };
 }

@@ -470,7 +470,6 @@ export type DirectoryEntry = {
   holders: number | null;
   pulse?: DirectoryPulse;
   kpis: Kpis;
-  factoryLaunches24h: number;
 };
 
 export type HistoryPoint = {
@@ -647,6 +646,7 @@ export type SiteConfig = {
 // the dependency cards as chips. No feed, no ledger counts.
 export type DirectoryBundle = {
   volume24h: number | null;
+  volumePartial: boolean;
   launches: { value: number | null; partial: boolean; factories: number; freshFactories: number };
   site: SiteConfig;
   sections: SectionDef[];

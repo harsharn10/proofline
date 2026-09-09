@@ -2,7 +2,7 @@ import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 // @ts-expect-error Shared deterministic relationship projection.
-import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolume } from "../../../scripts/lib/relationships.mjs";
+import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolumeSummary } from "../../../scripts/lib/relationships.mjs";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
 import { readerCopy } from "../lib/dejargon";
 import {
@@ -444,7 +444,6 @@ function toDirectoryEntry(
   const census = censusBySlug.get(d.slug);
   const officialConfirmed = officialSurfaceConfirmed(census);
   const hasContractOn4663 = locatedOnChain(d.pulled);
-  const factoryLaunches24h = uniqueLaunches([d.pulled], Date.now()).value ?? 0;
   const tokenAddress = d.pulled?.addresses.find((row) => row.role === "token")?.address
     ?? d.pulled?.addresses[0]?.address
     ?? null;
@@ -480,7 +479,6 @@ function toDirectoryEntry(
     tree,
     holders: tokenHolders(d.pulled),
     kpis: d.kpis,
-    factoryLaunches24h,
   };
 }
 
@@ -638,21 +636,17 @@ export function newLaunches(entries: DirectoryEntry[], now = Date.now()): Direct
     );
 }
 
-// "Launches below $25K are not listed: N today". The launch count is a 24-hour figure, so only
-// the listed names whose first pool is also inside that window can be subtracted from it —
-// New launches itself is a 14-day list.
+// Count other tracked recent names, never subtract projects from factory method-call counts.
 export function notListedCount(
   entries: DirectoryEntry[],
   listed: DirectoryEntry[],
   now = Date.now(),
 ): number {
-  const factoryLaunches = entries.reduce((sum, entry) => sum + entry.factoryLaunches24h, 0);
-  const listedToday = listed.filter((entry) => {
-    if (!entry.kpis.firstPairAt) return false;
-    const age = now - new Date(entry.kpis.firstPairAt).getTime();
-    return age >= 0 && age <= DAY;
-  }).length;
-  return Math.max(0, factoryLaunches - listedToday);
+  const shown = new Set(listed.map(entry => entry.slug));
+  return new Set(entries.filter(entry => {
+    const age = now - Date.parse(entry.kpis.firstPairAt ?? "");
+    return entry.hasContractOn4663 && !shown.has(entry.slug) && Number.isFinite(age) && age >= 0 && age <= 14 * DAY;
+  }).map(entry => entry.slug)).size;
 }
 
 // README rule 3: Announced needs a confirmed official surface, nothing on chain, and something to
@@ -934,7 +928,13 @@ function relatedFor(
 
 // The directory: the sections in order, one slim entry per name, and the dependency cards as chips.
 // No research HTML, no source ledgers, no findings, no feeds.
-async function directoryBundle(): Promise<DirectoryBundle> {
+export function observationTotals(dossiers: Array<Pick<Dossier, "slug" | "pulled">>, treeBySlug: Record<string, TreeRef>, now: number, sectionId?: string) {
+  const files = dossiers.filter(d => sectionId === undefined || treeBySlug[d.slug]?.sectionId === sectionId).map(d => d.pulled);
+  const volume = uniqueVolumeSummary(files, now);
+  return { launches: uniqueLaunches(files, now), volume24h: volume.value, volumePartial: volume.partial };
+}
+
+async function directoryBundle(sectionId?: string): Promise<DirectoryBundle> {
   const content = getCachedContent();
   const readAt = Date.now();
   const pulse = await loadPulse(readAt);
@@ -963,12 +963,11 @@ async function directoryBundle(): Promise<DirectoryBundle> {
     // read one way on the home page and another on the name's own page. The pulse badge carries its
     // own request-time age instead.
     now: content.now,
-    launches: uniqueLaunches(content.dossiers.map(d => d.pulled), readAt),
-    volume24h: uniqueVolume(content.dossiers.map(d => d.pulled), readAt),
+    ...observationTotals(content.dossiers, content.treeBySlug, readAt, sectionId),
   };
 }
 
-export const getContent = createServerFn({ method: "GET" }).handler(directoryBundle);
+export const getContent = createServerFn({ method: "GET" }).handler(() => directoryBundle());
 
 // Compact home filters need the newest six of each kind, not the entire archive.
 export function compactWire(items: WireItem[]): WireItem[] {
@@ -988,7 +987,7 @@ export const getHomeContent = createServerFn({ method: "GET" }).handler(async ()
 });
 
 export const getCategoryContent = createServerFn({ method: "GET" }).validator((id: string) => id).handler(async ({ data: id }) => {
-  const bundle = await directoryBundle();
+  const bundle = await directoryBundle(id);
   const entries = bundle.entries.filter(entry => entry.tree?.sectionId === id);
   const slugs = new Set(entries.map(entry => entry.slug));
   return { ...bundle, entries, histories: {}, wire: bundle.wire.filter(item => slugs.has(item.slug)).slice(0, 4) };

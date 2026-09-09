@@ -31,7 +31,7 @@ function chainReadLabel(iso: string | undefined): string {
 }
 
 function Home() {
-  const { site, sections, entries, histories, wire, now, launches: launchSummary, volume24h } = Route.useLoaderData();
+  const { site, sections, entries, histories, wire, now, launches: launchSummary, volume24h, volumePartial } = Route.useLoaderData();
   const live = entries.filter((entry) => entry.kpis.status === "live").length;
   const launchesToday = launchSummary.value;
   const readAt = entries
@@ -62,8 +62,8 @@ function Home() {
           stats={[
             { label: "names on file", value: formatCount(entries.length), href: "#categories" },
             { label: "live on chain", value: formatCount(live), href: "#right-now" },
-            { label: "tracked launches", value: launchesToday === null ? "—" : `${launchSummary.partial ? "≥ " : ""}${formatCount(launchesToday)}`, href: "#right-now" },
-            { label: "tracked volume 24h", value: volume24h === null ? "—" : formatUsd(volume24h), href: "#right-now" },
+            { label: "tracked launch calls 24h", value: launchesToday === null ? "—" : `${formatCount(launchesToday)}${launchSummary.partial ? " (partial)" : ""}`, href: "#right-now" },
+            { label: "tracked volume 24h", value: volume24h === null ? "—" : `${formatUsd(volume24h)}${volumePartial ? " (partial)" : ""}`, href: "#right-now" },
           ]}
           note={<>Latest read {chainReadLabel(readAt)} · selected names refresh daily · launch counts use distinct factories and recent windows</>}
         />

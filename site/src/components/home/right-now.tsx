@@ -140,7 +140,7 @@ export function RightNow({ trending, launches, announced, notListed, now }: {
           ))}
           {launches.length === 0 ? <li className="py-2 text-xs italic text-[var(--t3)]">No new launch clears the bar yet.</li> : null}
           <li className="border-t-[0.5px] border-[var(--line-soft)] py-1.5 text-[11px] italic text-[var(--t3)]">
-            Launches below $25K are not listed: {notListed.toLocaleString("en-US")} today
+            {notListed.toLocaleString("en-US")} other tracked names with first pools in the last 14 days. Not a chain-wide launch count.
           </li>
         </ol>
       </Card>
