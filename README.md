@@ -3,6 +3,8 @@
 Evidence-backed research profiles for native Robinhood Chain plays. Research, not advice.
 Spec: `PRD.md`. Content-system design: `docs/superpowers/specs/2026-08-30-content-system-design.md`.
 
+Direction: **“SemiAnalysis for the Robinhood ecosystem”**—a nutshell for casual readers, original evidence-backed depth for analysts. See the [current product contract](docs/product/mission-and-system.md), [living roadmap and decisions](https://github.com/harsharn10/proofline/issues/102), and [contribution guide](CONTRIBUTING.md). Use issues for planning and notes, PRs for repository changes. [GitHub setup status](https://github.com/harsharn10/proofline/issues/103) records verified settings and remaining protection gaps.
+
 Research operations are defined by one contract, [`docs/research-system.md`](docs/research-system.md):
 The order of operations for anyone opening a branch, and what makes a branch stale, is [`docs/process.md`](docs/process.md).
 objects, who may write which paths, roles, the packet format (§5), branch and PR protocol, evidence
