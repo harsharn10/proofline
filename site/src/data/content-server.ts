@@ -2,7 +2,7 @@ import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 // @ts-expect-error Shared deterministic relationship projection.
-import { buildRelationships, uniqueLaunches, uniqueVolume } from "../../../scripts/lib/relationships.mjs";
+import { buildRelationships, sharedRelationships, uniqueLaunches, uniqueVolume } from "../../../scripts/lib/relationships.mjs";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
 import { readerCopy } from "../lib/dejargon";
 import {
@@ -996,11 +996,12 @@ export const getCategoryContent = createServerFn({ method: "GET" }).validator((i
 
 export const getRelationships = createServerFn({ method: "GET" }).handler(async () => {
   const content = getCachedContent();
-  return buildRelationships(content.dossiers, Object.values(content.dependencies)) as RelationshipGraph;
+  return sharedRelationships(buildRelationships(content.dossiers, Object.values(content.dependencies))) as RelationshipGraph;
 });
 
 export type RelationshipGraph = {
   version: number;
+  totalAddresses: number;
   projectNames: Record<string, string>;
   addresses: Array<{ id: string; chain: string; address: string; identityConflict: boolean;
     projects: Array<{ slug: string; roles: string[]; verified: boolean; sources: string[] }>; dependencies: string[] }>;

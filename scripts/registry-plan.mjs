@@ -33,6 +33,7 @@ export async function buildRegistryReport() {
     grok: { maximum_updates: REFRESH_POLICY.researchLimit, maximum_new_seeds: REFRESH_POLICY.seedLimit,
       updates: research, discovery: "Only confirmed primary surfaces with a concrete product, deployment, or dated launch. Match address, official domain and handle against the registry and pending packets before seeding." },
     claude: { conflicts, identity_holds: plan.ignored.filter(row => row.reason.startsWith("identity conflict")),
+      unassigned_infrastructure: plan.infrastructure.filter(row => row.reader === null),
       instruction: "Review source receipts, relationship meaning, new identity collisions and the latest degraded pull report; approve code separately from research and channel delivery." } };
   await mkdir("build", { recursive: true });
   await writeFile("build/registry.json", `${JSON.stringify(report, null, 2)}\n`);

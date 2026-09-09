@@ -8,15 +8,34 @@ export const REFRESH_POLICY = Object.freeze({
 });
 const ms = value => Number.isFinite(Date.parse(value)) ? Date.parse(value) : null;
 
+export function hasIdentityConflict(project, census, index) {
+  return census?.identity?.status === "conflicted" || (project.deployments ?? [])
+    .some(d => d.role === "token" && index.get(addressKey(d.chain, d.address))?.identityConflict);
+}
+
+// Pick an eligible reader, not simply the first name mentioning an address. Prefer a factory
+// claim so its launch window is collected even if another name calls the same address a router.
+export function selectInfrastructureReaders(index, eligibleSlugs, chain) {
+  const readers = new Map();
+  const roles = ["factory", "router", "vault"];
+  for (const node of index.values()) {
+    if (node.projects.length < 2 || node.identityConflict || chain && node.chain !== chain) continue;
+    const candidates = node.projects.filter(p => (!eligibleSlugs || eligibleSlugs.has(p.slug)) && p.roles.some(r => roles.includes(r)))
+      .sort((a,b) => Math.min(...a.roles.map(r => roles.indexOf(r)).filter(i => i >= 0)) -
+        Math.min(...b.roles.map(r => roles.indexOf(r)).filter(i => i >= 0)) || a.slug.localeCompare(b.slug));
+    if (candidates.length) readers.set(node.id, candidates[0].slug);
+  }
+  return readers;
+}
+
 export function refreshDecision({ project, census, previous, seededAt, index, aboveShareBar,
-  queuedAt, now = Date.now(), force = false }) {
+  queuedAt, now = Date.now(), force = false, infrastructureReaders = selectInfrastructureReaders(index) }) {
   const first = !previous;
   const queued = ms(queuedAt) !== null && now - ms(queuedAt) >= 0 && now - ms(queuedAt) <= 7 * DAY;
   const ownAt = ownActivityAt(project, previous, index, now);
   const age = ownAt ? now - ms(ownAt) : null;
   const seedAge = ms(seededAt) === null ? null : now - ms(seededAt);
-  const conflict = census?.identity?.status === "conflicted" || (project.deployments ?? [])
-    .some(d => d.role === "token" && index.get(addressKey(d.chain, d.address))?.identityConflict);
+  const conflict = hasIdentityConflict(project, census, index);
   const reviewed = census?.role !== "observe" && census?.identity?.status === "verified";
   let tier, reason, ignored = false;
   if (conflict && !first) { tier = "dormant"; ignored = true; reason = "identity conflict: Claude review required"; }
@@ -32,22 +51,25 @@ export function refreshDecision({ project, census, previous, seededAt, index, ab
     tier = "live"; reason = "recent own activity or seed observation window: weekly";
   } else { tier = age === null ? "dormant" : "quiet"; reason = "maintenance only: monthly"; }
   // Shared infrastructure is monitored through at least one deterministic representative.
-  const representative = (project.deployments ?? []).some(d => {
-    const node = index.get(addressKey(d.chain, d.address));
-    return node && node.projects.length > 1 && !node.identityConflict &&
-      node.projects[0].slug === project.slug && ["factory", "router", "vault"].includes(d.role);
-  });
+  const representative = (project.deployments ?? []).some(d =>
+    infrastructureReaders.get(addressKey(d.chain, d.address)) === project.slug);
   if (!conflict && representative && tier !== "hot" && !first) {
     ignored = false; tier = "live"; reason = "shared infrastructure representative: weekly";
   }
   const interval = REFRESH_POLICY[tier];
-  const lastAt = previous?.refresh?.last_success_at ?? previous?.pulled_at;
+  // Explicit null means no successful read yet; the attempted file timestamp is not a fallback.
+  const lastAt = previous?.refresh ? previous.refresh.last_success_at : previous?.pulled_at;
   const failed = previous?.refresh?.status === "partial";
   // Small tolerance covers scheduler jitter, not a half-day early refresh.
   const due = force || !ignored && (first || queued || failed || ms(lastAt) === null || now - ms(lastAt) >= interval - 2 * 3600_000);
-  const overdue = ms(lastAt) === null ? 100 : (now - ms(lastAt)) / interval;
+  // Failed seeds have no success to age from. Rotate retries by their last attempt so a
+  // permanently unavailable first batch cannot monopolize all ten seed slots forever.
+  const attemptedAt = previous?.refresh?.attempted_at;
+  const overdue = ms(lastAt) === null
+    ? ms(attemptedAt) === null ? 100 : (now - ms(attemptedAt)) / interval
+    : (now - ms(lastAt)) / interval;
   return { tier, reason: force ? `manual override; ${reason}` : reason, ignored: ignored && !force,
-    due, seed: first, queued, ownActivityAt: ownAt, intervalDays: interval / DAY,
+    due, seed: first || Boolean(previous?.refresh && lastAt === null), queued, ownActivityAt: ownAt, intervalDays: interval / DAY,
     priority: queued ? 1000 + overdue : overdue + (tier === "hot" ? 2 : 0),
     lastSuccessAt: lastAt ?? null };
 }

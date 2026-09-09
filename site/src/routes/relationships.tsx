@@ -21,7 +21,7 @@ function Relationships() {
     <label className="block my-4">Find a project or address
       <input className="block w-full mt-2 rounded border p-2 bg-[var(--s1)]" value={query} onChange={e => setQuery(e.target.value)} />
     </label>
-    <p>{graph.addresses.length} distinct addresses · {shared.length} matching shared contracts</p>
+    <p>{graph.totalAddresses} distinct addresses · {shared.length} matching shared contracts</p>
     {shared.map(node => <section key={node.id} className="border-b py-4">
       <h2 className="text-sm break-all">{node.chain} · {node.address}</h2>
       {node.identityConflict && <p className="text-[var(--warn)]">Identity overlap: multiple records list this as their token. Needs source review.</p>}

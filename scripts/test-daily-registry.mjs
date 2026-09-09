@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createCreditBudget, blockscoutCreditCost, normalizeBudgetState } from "./lib/pull/budget.mjs";
 import { requestJson } from "./lib/pull/http.mjs";
-import { buildRelationships, relationshipIndex, ownActivityAt, uniqueLaunches, uniqueVolume } from "./lib/relationships.mjs";
-import { refreshDecision, selectRefreshTargets, DAY } from "./lib/refresh-policy.mjs";
+import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, uniqueLaunches, uniqueVolume } from "./lib/relationships.mjs";
+import { refreshDecision, selectRefreshTargets, selectInfrastructureReaders, hasIdentityConflict, DAY } from "./lib/refresh-policy.mjs";
 
 const now = Date.parse("2026-09-09T12:00:00Z");
 const address = n => `0x${String(n).padStart(40, "0")}`;
@@ -43,6 +43,18 @@ test("relationships deduplicate case and distinguish shared infrastructure from 
   const mixed=buildRelationships([a,{...b,deployments:[{...deployment(1,'token'),address:address(1).toUpperCase().replace('0X','0x')}]}]);
   assert.equal(mixed.addresses.filter(n=>n.address===address(1)).length,1);
 });
+
+test("public relationship payload keeps shared edges and leaves the full registry intact",()=>{
+  const projection=sharedRelationships(graph);
+  assert.equal(projection.totalAddresses,3);
+  assert.equal(projection.addresses.length,1);
+  assert.deepEqual(projection.dependencies[0].projects,['a','b']);
+  assert.deepEqual(projection.projectNames,{a:'a',b:'b'});
+  assert.equal(graph.addresses.length,3);
+  const solo=sharedRelationships(buildRelationships([{...b,deployments:[deployment(2,'token')]}]));
+  assert.equal(solo.totalAddresses,1);
+  assert.deepEqual(solo.projectNames,{});
+});
 test("shared factory activity does not revive an inactive token; relevance needs own activity", () => {
   const previous={chain:'robinhood-chain',pulled_at:new Date(now-DAY).toISOString(), activity:{addresses:[
     {address:address(9),last_tx_at:new Date(now).toISOString()}, {address:address(1),last_tx_at:'2026-05-01T00:00:00Z'},
@@ -79,4 +91,41 @@ test("volume counts distinct fresh pools and preserves Solana address case",()=>
   assert.equal(uniqueVolume([file('robinhood-chain',address(9),12,now-1000),file('robinhood-chain',address(9),15)],now),15);
   assert.equal(uniqueVolume([file('robinhood-chain',address(9),12,now-2*DAY)],now),null);
   assert.equal(uniqueVolume([file('solana','A'.repeat(32),12),file('solana','a'.repeat(32),15)],now),27);
+});
+
+test("failed initial reads keep null success and remain inside the seed cap",()=>{
+  const previous={chain:'robinhood-chain',pulled_at:new Date(now).toISOString(),
+    refresh:{status:'partial',last_success_at:null}};
+  const decision=refreshDecision({project:b,census,previous,index,now,aboveShareBar:false});
+  assert.equal(decision.lastSuccessAt,null);
+  assert.equal(decision.seed,true);
+  assert.equal(decision.due,true);
+  const selected=selectRefreshTargets(Array.from({length:20},(_,i)=>({slug:String(i),refresh:decision})));
+  assert.equal(selected.selected.length,10);
+  const completed=refreshDecision({project:b,census,previous:{...previous,refresh:{status:'partial',last_success_at:'2026-09-01T00:00:00Z'}},index,now});
+  assert.equal(completed.lastSuccessAt,'2026-09-01T00:00:00Z');
+  assert.equal(completed.seed,false);
+  const retry=at=>refreshDecision({project:b,census,index,now,previous:{...previous,
+    refresh:{...previous.refresh,attempted_at:new Date(at).toISOString()}}});
+  const rotated=selectRefreshTargets([{slug:'a-retried-today',refresh:retry(now)},
+    {slug:'z-waiting',refresh:retry(now-3*DAY)}],{seedLimit:1});
+  assert.equal(rotated.selected[0].slug,'z-waiting');
+});
+
+test("shared infrastructure chooses an eligible factory reader and preserves identity holds",()=>{
+  const held={...a,deployments:[deployment(1,'token'),deployment(9,'other')]};
+  const router={...project('aa-router',3),deployments:[deployment(3,'token'),deployment(9,'router')]};
+  const localIndex=relationshipIndex(buildRelationships([held,router,b]));
+  const heldCensus={...census,identity:{status:'conflicted'}};
+  assert.equal(hasIdentityConflict(held,heldCensus,localIndex),true);
+  const readers=selectInfrastructureReaders(localIndex,new Set([router.slug,b.slug]),'robinhood-chain');
+  assert.equal(readers.get(`robinhood-chain:${address(9)}`),'b');
+  const previous={chain:'robinhood-chain',pulled_at:'2026-09-01',activity:{addresses:[]}};
+  const chosen=refreshDecision({project:b,census,previous,index:localIndex,now,seededAt:'2026-01-01',aboveShareBar:false,infrastructureReaders:readers});
+  assert.equal(chosen.ignored,false);
+  assert.equal(chosen.reason,'shared infrastructure representative: weekly');
+  const blocked=refreshDecision({project:held,census:heldCensus,previous,index:localIndex,now,infrastructureReaders:readers});
+  assert.equal(blocked.ignored,true);
+  assert.equal(selectInfrastructureReaders(localIndex,new Set(), 'robinhood-chain').size,0);
+  assert.equal(selectInfrastructureReaders(localIndex,new Set(['b']), 'solana').size,0);
 });

@@ -51,6 +51,17 @@ export function relationshipIndex(graph) {
   return new Map(graph.addresses.map(node => [node.id, node]));
 }
 
+// The human Connections page only displays shared edges. Keep the complete graph in the
+// machine-readable registry, without shipping hundreds of unused private-to-one-project nodes.
+export function sharedRelationships(graph) {
+  const addresses = graph.addresses.filter(node => node.projects.length > 1);
+  const dependencies = graph.dependencies.filter(node => node.projects.length > 1);
+  const slugs = new Set([...addresses.flatMap(node => node.projects.map(p => p.slug)),
+    ...dependencies.flatMap(node => node.projects)]);
+  return { ...graph, totalAddresses: graph.addresses.length, addresses, dependencies,
+    projectNames: Object.fromEntries(Object.entries(graph.projectNames).filter(([slug]) => slugs.has(slug))) };
+}
+
 // Only activity belonging to this project's token or unshared deployment can keep it alive.
 // Activity at a factory used by fifty projects says nothing about the other forty-nine tokens.
 export function ownActivityAt(project, pulled, index, now = Date.now()) {

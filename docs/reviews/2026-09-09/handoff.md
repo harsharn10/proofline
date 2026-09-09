@@ -29,3 +29,13 @@ Passed locally: `npm test`; `npm run validate:release` (181 projects, zero error
 - Existing open lanes at kickoff: #62 standing Grok (never merge), #95 Grok seed work, #92 separate trenches implementation. Recheck their current state; do not close or overwrite them from this assignment.
 
 Next controller commands: `bash ops/controller/start.sh codex/20260909/daily-registry`, inspect PR #98 and `node ops/controller/pr-ci.mjs codex/20260909/daily-registry`. Merge only after review and green required checks, then use checklist C and the rollout steps above.
+
+## Resumed verification, September 9
+
+Main remained at `0b5340f`. Initial implementation commit `c8c53a0` passed all GitHub checks and the connected Cloudflare branch-preview build; no controller review had been submitted. The preview integration publishes automatically on branch push; no production merge or manual deployment was performed.
+
+Fixed additional edge cases on the same PR: a null last-success time no longer falls back to a failed attempt's file timestamp; failed seed retries stay within the seed cap and rotate by last-attempt age. Infrastructure readers are chosen only among eligible, non-conflicted on-chain names, with factory claims preferred. The current plan has 23 shared infrastructure addresses: 16 have an assigned reader and seven are explicitly surfaced to Claude as unassigned, rather than silently bypassing identity holds.
+
+The Connections payload now contains only the 60 shared-address nodes it displays, while `/data/registry.json` keeps all 884. Direct JSON measurement: 279,763 to 54,037 bytes; gzip 40,016 to 7,889 bytes (about 80% smaller). This is the relationship data payload, not whole-page transfer size or CPU.
+
+Read-only checks on the initial branch preview: Connections HTTP 200; registry JSON HTTP 200 with expected `c8c53a0` base and 181 names; review HTTP 401. No browser was available, so visual/mobile/theme checks remain outstanding. Follow-up local checks passed: root tests, release validation (unchanged zero errors / 655 warnings), pull regression tests (including ten daily-registry tests), site types/lint, Cloudflare build/dry packaging/smoke, and Render build/smoke. Recheck the latest follow-up commit's CI before controller merge.

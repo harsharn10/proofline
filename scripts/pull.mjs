@@ -100,7 +100,7 @@ import {
 } from "./lib/pull/rialto.mjs";
 import { createCreditBudget, blockscoutCreditCost } from "./lib/pull/budget.mjs";
 import { buildRelationships, relationshipIndex } from "./lib/relationships.mjs";
-import { refreshDecision, selectRefreshTargets } from "./lib/refresh-policy.mjs";
+import { refreshDecision, selectRefreshTargets, hasIdentityConflict, selectInfrastructureReaders } from "./lib/refresh-policy.mjs";
 import {
   consumeQueue,
   explorerChangeDecision,
@@ -524,6 +524,10 @@ async function main() {
   for (const f of projectFiles) projects.set(basename(f, ".yaml"), await readYaml(join("content/projects", f)));
   const graph = buildRelationships([...projects.values()]);
   const graphIndex = relationshipIndex(graph);
+  const censusBySlug = new Map(census.map(row => [row.slug, row]));
+  const infrastructureReaders = selectInfrastructureReaders(graphIndex, new Set([...projects.values()]
+    .filter(project => censusBySlug.has(project.slug) && addressesFor(project).length > 0 &&
+      !hasIdentityConflict(project, censusBySlug.get(project.slug), graphIndex)).map(project => project.slug)), CHAIN);
   const forceCadence = Boolean(args.only || args.full || args.rialtoOnly);
 
   const queueEntries = await readJson("ops/pull-queue.json", []);
@@ -548,7 +552,7 @@ async function main() {
     const previous = await readYaml(join("content/pulled", `${row.slug}.yaml`)).catch(() => null);
     const history = readHistory(row.slug);
     const lastSnapshot = history.at(-1) ?? null;
-    const refresh = refreshDecision({ project, census: row, previous, index: graphIndex,
+    const refresh = refreshDecision({ project, census: row, previous, index: graphIndex, infrastructureReaders,
       seededAt: history[0]?.at ?? previous?.pulled_at,
       aboveShareBar: aboveShareBar(row, previous),
       queuedAt: queueBySlug.get(row.slug)?.at ?? null,
@@ -580,6 +584,9 @@ async function main() {
   }), { force: forceCadence });
   const targets = selection.selected;
   const plan = { at: pulledAt, policy_version: 1, registry: allTargets.length,
+    infrastructure: graph.addresses.filter(node => node.chain === CHAIN && node.projects.length > 1 &&
+      node.projects.some(p => p.roles.some(role => ["factory", "router", "vault"].includes(role))))
+      .map(node => ({ address: node.id, reader: infrastructureReaders.get(node.id) ?? null })),
     selected: targets.map(t => ({ slug: t.slug, ...t.refresh })),
     deferred: selection.deferred.map(t => ({ slug: t.slug, ...t.refresh })),
     ignored: selection.ignored.map(t => ({ slug: t.slug, reason: t.refresh.reason })),

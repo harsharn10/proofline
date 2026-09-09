@@ -23,6 +23,8 @@ Sharing an infrastructure address does not establish common ownership or a commo
 
 Shared factory activity cannot keep every token launched through it active. Activity comes from a project's own non-conflicted token or unshared deployment. At least one deterministic representative of shared factory/router/vault infrastructure remains on weekly maintenance; it does not establish ownership of that infrastructure. No records are deleted by archiving.
 
+The infrastructure reader is selected from non-conflicted names that the puller can actually collect on its chain. Factory claims take precedence over router/vault claims so launch windows are not silently skipped. If every candidate is held, the plan reports that address as unassigned for Claude review; it never bypasses the identity hold. A failed initial read retains a null last-success time, and its retries continue to count toward the seed cap.
+
 Select at most 80 due names per automatic run, sorted by queue priority and overdue age, with a seed cap of 10. Aging eventually lifts maintenance work above regularly completed names. Provider credit and time budgets can reduce the number actually reached. The command `node scripts/pull.mjs --plan` is entirely read-only and performs no provider requests.
 
 These thresholds are conservative operating defaults, not a ranking of project quality. A project can re-enter through an explicit dated queue request or a new independently sourced observation; archived projects do not continuously poll themselves for reactivation.
