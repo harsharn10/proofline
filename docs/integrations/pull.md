@@ -179,32 +179,38 @@ Planning allowance by explorer read kind (a changed name can own several address
 | Verified ABI | 1/token | Token signal changed |
 | LP check | 0–2/pair | Token signal changed; v3/v4 pool ids cost zero |
 
-The measured cost on 2026-09-04, read through the public fallback with the corrected change signal,
-was **26.1 credits per hot name on a first read**: 61 hot names, 1,621 credits, 33 minutes. A first
-read buys the signal, the metadata, the walk, the holder page, the ABI and the LP check for every
-address a name owns; a steady-state read buys the signal and skips the rest when nothing moved, so it
-costs less. The registry mix that day was 61 hot, 115 live, 0 quiet and 3 dormant: 34.1% / 64.2% /
-0% / 1.7%. Holding that mix constant and charging the first-read price on every due read gives an
-upper bound:
+The planning figure is the third scheduled run on 2026-09-08 (PRO host, receipts warm): **20.6
+credits per hot name and 14.0 per live name** with unchanged walks skipped, 1,942 credits for 115
+names. The registry mix that day was 59 hot, 109 live, 0 quiet and 3 dormant. Holding that mix
+constant:
 
-| Names | Credits/day (first-read price) | Headroom below the 60,000 cap |
+| Names | Credits/day | Headroom below the 60,000 cap |
 | ---: | ---: | ---: |
-| 200 | 7,777 | 52,223 |
-| 500 | 19,442 | 40,558 |
-| 1,000 | 38,883 | 21,117 |
+| 181 (today) | 7,931 | 52,069 |
+| 200 | 8,763 | 51,237 |
+| 500 | 21,907 | 38,093 |
+| 1,000 | 43,813 | 16,187 |
+
+A first read after a gap costs more (47.2 per hot name on 2026-09-08 11:20, after four days without
+a pull) and a large intake of new names will look like that for a run or two.
 
 Measured runs, newest last (the closing report of each scheduled job):
 
 | Run (UTC) | Due | Read | Deferred at deadline | Credits | Hot / live / quiet per name | Projection at 1,000 names |
 | --- | ---: | ---: | ---: | ---: | --- | ---: |
 | 2026-09-08 11:20, first read after a four-day gap | 169 | 36 | 133 | 1,320 | 47.2 / 32.8 / 15.0 | 101,752/day |
+| 2026-09-08 16:38 | 145 | 57 | 88 | 1,411 | 27.7 / 22.1 / – | 63,515/day |
+| 2026-09-08 21:10 | 136 | 115 | 21 | 1,942 | 20.6 / 14.0 / – | 43,813/day |
 
 The first scheduled run was latency-bound, not credit-bound: it spent 1,320 of its 6,000 credits and
-reached 36 names in 45 minutes, about 75 seconds per name, because transaction walks page
-sequentially and the explorer answers each page in a few seconds. At that pace four runs a day read
-about 144 names, against roughly 456 name-reads a day the tier cadence asks for at 181 names, so
-names rotate through deferral and the hot tier is not refreshed every six hours. The fix is
-throughput (concurrent names, shallower default walks, or more runs), not budget.
+reached 36 names in 45 minutes, about 75 seconds per name, because every address was a first read
+under the new signal and transaction walks page sequentially. The next two runs show the receipts
+doing their job: unchanged walks skipped went 70, 113, 260; names reached went 36, 57, 115; the
+deferral at the deadline fell 133, 88, 21; and the per-name price fell 47 to 21 credits for hot,
+33 to 14 for live. By the third run the job reads about 115 names in 45 minutes against roughly
+136 due, so the hot tier refreshes every six hours and about twenty live names slip a cycle. The
+remaining lever is throughput (concurrent names, or a shorter explorer timeout than 10 s times three
+attempts), not budget: the day closed at 4,673 credits of 60,000.
 
 The steady-state figure is what matters for planning and only the scheduled runs can measure it:
 every run's closing report prints the measured credits per due name for each tier and rebuilds this
