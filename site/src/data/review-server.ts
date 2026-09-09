@@ -2,6 +2,7 @@ import * as nodeCrypto from "node:crypto";
 import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
+import { createReviewReader, decodeReviewContent as decodeContent } from "./review-snapshot";
 import type {
   ChannelDelivery,
   ChannelEvent,
@@ -68,11 +69,8 @@ type ModerateRequest = {
   items?: Array<{ key: string; copy?: ChannelPublication }>;
 };
 
-type GitHubContent = { sha: string; content: string; encoding: string };
-
 const REVIEW_PATH = "ops/telegram-review.json";
-const CHANGELOG_DIR = "content/changelog"; // one file per slug since the stable-id migration (#39)
-const SENT_STATE_PATH = "ops/telegram-state.json";
+const reviewReader = createReviewReader(githubJson);
 
 function entryKey(entry: ChangelogEntry): string {
   return `${entry.date}|${entry.slug}|${entry.type}|${entry.title}`;
@@ -107,32 +105,17 @@ function prooflineView(derived: {
   return `${derived.score}/100 · ${derived.risk} risk\n${derived.confidence}% confidence${derived.provisional ? " · Provisional" : ""}`;
 }
 
-// The changelog is one file per slug (content/changelog/<slug>.yaml since #39): list the directory,
-// then fetch every file. Entries come back in directory order; callers key them, never index them.
-async function fetchChangelog(api: string, token: string): Promise<ChangelogEntry[]> {
-  const dir = await githubJson<Array<{ name: string; path: string; type: string }>>(
-    `${api}/contents/${CHANGELOG_DIR}?ref=${encodeURIComponent(REVIEW_BRANCH)}`,
-    token,
-  );
-  const files = await Promise.all(
-    dir
-      .filter((f) => f.type === "file" && f.name.endsWith(".yaml"))
-      .map((f) => githubJson<GitHubContent>(`${api}/contents/${f.path}?ref=${encodeURIComponent(REVIEW_BRANCH)}`, token)),
-  );
-  return files.flatMap((file) => (YAML.parse(decodeContent(file)) as ChangelogEntry[] | null) ?? []);
+function parseChangelog(files: string[]): ChangelogEntry[] {
+  return files.flatMap(text => (YAML.parse(text) as ChangelogEntry[] | null) ?? []);
 }
 
 async function loadQueue(principal: ReviewPrincipal): Promise<ReviewQueue> {
   const api = `https://api.github.com/repos/${REVIEW_REPOSITORY}`;
-  const contentUrl = (file: string) =>
-    `${api}/contents/${file}?ref=${encodeURIComponent(REVIEW_BRANCH)}`;
-  const [changelog, reviewFile, sentStateFile] = await Promise.all([
-    fetchChangelog(api, principal.githubToken),
-    githubJson<GitHubContent>(contentUrl(REVIEW_PATH), principal.githubToken),
-    githubJson<GitHubContent>(contentUrl(SENT_STATE_PATH), principal.githubToken),
-  ]);
+  const snapshot = await reviewReader.load(api, REVIEW_BRANCH, principal.githubToken);
+  const { reviewFile, sentStateFile } = snapshot;
+  const changelog = parseChangelog(snapshot.changelog);
   const ledger = JSON.parse(decodeContent(reviewFile)) as ReviewLedger;
-  const sentState = JSON.parse(decodeContent(sentStateFile)) as SentState;
+  const sentState = JSON.parse(decodeContent(sentStateFile!)) as SentState;
   const sent = new Set(sentState.sent_keys ?? []);
   const derived = JSON.parse(rawContent.derived) as {
     projects?: Record<
@@ -274,11 +257,6 @@ function normalizePublication(copy: ChannelPublication): ChannelPublication {
   };
 }
 
-function decodeContent(file: GitHubContent): string {
-  if (file.encoding !== "base64") throw new Error("Unexpected GitHub content encoding.");
-  return Buffer.from(file.content.replace(/\n/g, ""), "base64").toString("utf8");
-}
-
 function requirePrincipal(
   context: { reviewPrincipal?: ReviewPrincipal } | undefined,
 ): ReviewPrincipal {
@@ -296,13 +274,9 @@ export const moderateTelegram = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ ok: true; commit: string; message: string }> => {
     const { githubToken, login } = requirePrincipal(context);
     const api = `https://api.github.com/repos/${REVIEW_REPOSITORY}`;
-    const [reviewFile, currentEntries] = await Promise.all([
-      githubJson<GitHubContent>(
-        `${api}/contents/${REVIEW_PATH}?ref=${encodeURIComponent(REVIEW_BRANCH)}`,
-        githubToken,
-      ),
-      fetchChangelog(api, githubToken),
-    ]);
+    const snapshot = await reviewReader.load(api, REVIEW_BRANCH, githubToken, false);
+    const { reviewFile } = snapshot;
+    const currentEntries = parseChangelog(snapshot.changelog);
 
     const ledger = JSON.parse(decodeContent(reviewFile)) as ReviewLedger;
     ledger.version = 2;
