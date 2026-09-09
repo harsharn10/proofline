@@ -1703,9 +1703,9 @@ test("tier cadence, pulse queue and two-way shards are deterministic", () => {
   // Cadence is compared with half a cron period of tolerance. Without it a name read at 17:17:09 is
   // eleven seconds short of twelve hours when the 05:17 run asks, slips a whole slot, and "every
   // second run" silently becomes every third — an 18-hour live cadence the docs never claimed.
-  assert.equal(tierIsDue("live", "2026-09-04T00:10:00.000Z", { now }), true, "11h50m into a 12h tier is due");
-  assert.equal(tierIsDue("live", "2026-09-04T04:00:00.000Z", { now }), false, "8h into a 12h tier is not");
-  assert.equal(tierIsDue("quiet", "2026-09-03T12:10:00.000Z", { now }), true);
+  assert.equal(tierIsDue("live", "2026-08-28T12:10:00.000Z", { now }), true, "weekly tier tolerates scheduler jitter");
+  assert.equal(tierIsDue("live", "2026-09-03T04:00:00.000Z", { now }), false, "weekly tier does not run daily");
+  assert.equal(tierIsDue("quiet", "2026-08-05T12:10:00.000Z", { now }), true);
   assert.equal(tierIsDue("quiet", "2026-09-03T20:00:00.000Z", { now }), false);
   assert.equal(tierIsDue("quiet", "2026-09-04T11:59:00.000Z", { now, force: true }), true);
   assert.deepEqual(parseShard("1/2"), { index: 1, total: 2 });
@@ -1726,12 +1726,12 @@ test("change detector skips equal signals and full overrides every signal", () =
 
 test("credit ledger hard-defers before a request and resets on a new UTC day", () => {
   const now = Date.parse("2026-09-04T12:00:00.000Z");
-  const budget = createCreditBudget({ state: { date: "2026-09-04", credits_used: 4, runs: 2 }, now, perRun: 2, perDay: 6 });
+  const budget = createCreditBudget({ state: { version: 2, date: "2026-09-04", credits_used: 4, runs: 2 }, now, perRun: 2, perDay: 6 });
   budget.claim("one");
   budget.claim("two");
   assert.throws(() => budget.claim("three"), /deferred: budget \(run cap reached\)/);
   assert.equal(budget.snapshot().run_credits, 2);
-  assert.deepEqual(budget.finish(), { date: "2026-09-04", credits_used: 6, runs: 3 });
+  assert.deepEqual(budget.finish(), { version: 2, date: "2026-09-04", credits_used: 6, runs: 3, provider_remaining: null, provider_exhausted: false });
   assert.deepEqual(normalizeBudgetState({ date: "2026-09-03", credits_used: 99, runs: 4 }, now), {
     date: "2026-09-04", credits_used: 0, runs: 0,
   });
@@ -1795,21 +1795,19 @@ test("read summary validates and conservative projections stay under the daily c
   assert.ok(Math.abs(scaled.hot - 340.8) < 0.2, `hot at 1,000 names: ${scaled.hot}`);
   for (const names of [200, 500, 1000]) {
     const projected = projectDailyCredits(scaleTierMix(OBSERVED_MIX, names), MEASURED_CREDITS_PER_NAME);
-    assert.ok(projected < 60_000, `${names} names projects ${Math.ceil(projected)} credits/day`);
+    assert.equal(projected, null, "historical request counts cannot establish provider-credit capacity");
   }
   // A run cap of 6,000 has to hold too: the heaviest scheduled run reads every hot name and half the
   // live ones, and a projection that only clears the day cap would defer on every single run.
-  const heaviest = scaleTierMix(OBSERVED_MIX, 1000);
-  const perRun = heaviest.hot * MEASURED_CREDITS_PER_NAME.hot + (heaviest.live / 2) * MEASURED_CREDITS_PER_NAME.live;
-  assert.ok(perRun < 6_000, `heaviest run at 1,000 names: ${Math.ceil(perRun)} credits`);
+  assert.equal(projectDailyCredits({ hot: 10, live: 7 }, { hot: 20, live: 40 }), 240);
 
   // And the constant itself is not free to drift: these are measurements from a real run, so a
   // change to them is a claim that a new run measured something else.
-  assert.deepEqual(Object.keys(MEASURED_CREDITS_PER_NAME).sort(), ["dormant", "hot", "live", "quiet"]);
+  assert.deepEqual(Object.keys(MEASURED_CREDITS_PER_NAME), []);
   for (const [tier, cost] of Object.entries(MEASURED_CREDITS_PER_NAME)) {
     assert.ok(cost > 0 && cost < 60, `${tier}: ${cost}`);
   }
-  assert.deepEqual(TIER_DAILY_READS, { hot: 4, live: 2, quiet: 1, dormant: 1 / 7 });
+  assert.deepEqual(TIER_DAILY_READS, { hot: 1, live: 1 / 7, quiet: 1 / 30, dormant: 1 / 30 });
 });
 
 test("pull CLI accepts only/full/tier/shard overrides", () => {
@@ -2005,7 +2003,7 @@ test("budget exhaustion defers, keeps prior facts, names what it deferred and st
   const dir = mkdtempSync(join(tmpdir(), "pull-budget-"));
   try {
     const now = Date.parse("2026-09-04T12:00:00.000Z");
-    const budget = createCreditBudget({ state: { date: "2026-09-04", credits_used: 10, runs: 1 }, now, perRun: 3, perDay: 1000 });
+    const budget = createCreditBudget({ state: { version: 2, date: "2026-09-04", credits_used: 10, runs: 1 }, now, perRun: 3, perDay: 1000 });
     const bodies = {
       "/addresses/": { is_contract: true, is_verified: true, name: "Token", creation_transaction_hash: null, token: {} },
       "/tokens/": { holders_count: "42" },
@@ -2058,7 +2056,7 @@ test("budget exhaustion defers, keeps prior facts, names what it deferred and st
     // And the day counter reaches disk even though the run stopped short of what it wanted.
     const path = join(dir, "pull-budget.json");
     writeFileSync(path, `${JSON.stringify(budget.finish(), null, 2)}\n`);
-    assert.deepEqual(JSON.parse(readFileSync(path, "utf8")), { date: "2026-09-04", credits_used: 13, runs: 2 });
+    assert.deepEqual(JSON.parse(readFileSync(path, "utf8")), { version: 2, date: "2026-09-04", credits_used: 13, runs: 2, provider_remaining: null, provider_exhausted: false });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

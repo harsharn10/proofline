@@ -16,6 +16,17 @@
     "structure": { "oneOf": [{ "$ref": "#/$defs/pulledStructure" }, { "type": "null" }] },
     "activity": { "oneOf": [{ "$ref": "#/$defs/pulledActivity" }, { "type": "null" }] },
     "reads": { "$ref": "#/$defs/readSummary" },
+    "refresh": {
+      "type": "object", "additionalProperties": false,
+      "required": ["policy_version", "status", "attempted_at", "last_success_at", "reason"],
+      "properties": {
+        "policy_version": { "const": 1 },
+        "status": { "enum": ["complete", "partial"] },
+        "attempted_at": { "type": "string", "format": "date-time" },
+        "last_success_at": { "type": ["string", "null"], "format": "date-time" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
     "errors": { "type": "array", "items": { "$ref": "#/$defs/pullError" } }
   },
   "$defs": {

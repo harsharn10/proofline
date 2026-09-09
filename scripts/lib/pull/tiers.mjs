@@ -1,32 +1,32 @@
 // Cadence, sharding and the change signal are pure so a thousand-name registry can be scheduled
-// without first touching a network. Time thresholds mirror a six-hour cron while remaining correct
-// after a delayed run.
+// without first touching a network. Cadence comes from the canonical refresh policy.
+import { REFRESH_POLICY, DAY } from "../refresh-policy.mjs";
 
-export const CRON_PERIOD_MS = 6 * 60 * 60 * 1000;
+export const CRON_PERIOD_MS = DAY;
 
 export const TIER_INTERVAL_MS = Object.freeze({
-  hot: 0,
-  live: 12 * 60 * 60 * 1000,
-  quiet: 24 * 60 * 60 * 1000,
-  dormant: 7 * 24 * 60 * 60 * 1000,
+  hot: REFRESH_POLICY.hot,
+  live: REFRESH_POLICY.live,
+  quiet: REFRESH_POLICY.quiet,
+  dormant: REFRESH_POLICY.dormant,
 });
 
 /**
- * A name read at 17:17:09 is 11 h 59 m 51 s old when the 05:17 run asks whether it is due. Comparing
- * an exact 12-hour interval against an exact six-hour cron therefore slips every tier one whole slot
- * — live becomes an 18-hour cadence, quiet 30 hours — and the documented reads-per-day are then
- * fiction. Half a cron period of tolerance makes "every second run" mean every second run.
+ * Small scheduler jitter must not turn a daily refresh into every other day.
  */
-export const DUE_TOLERANCE_MS = CRON_PERIOD_MS / 2;
+export const DUE_TOLERANCE_MS = 2 * 60 * 60 * 1000;
 
-export const TIER_DAILY_READS = Object.freeze({ hot: 4, live: 2, quiet: 1, dormant: 1 / 7 });
+export const TIER_DAILY_READS = Object.freeze(Object.fromEntries(
+  Object.entries(TIER_INTERVAL_MS).map(([tier, interval]) => [tier, DAY / interval]),
+));
 
 /**
  * Measured credits per due name, by tier, from the 2026-09-04 budgeted run (see
  * docs/integrations/pull.md). These are observations, not allowances: the projection below is only
  * as honest as the run these came from, so they are replaced whenever a run measures new ones.
  */
-export const MEASURED_CREDITS_PER_NAME = Object.freeze({ hot: 6.9, live: 2.6, quiet: 2.6, dormant: 2.6 });
+// Historical values counted requests, not provider credits. No fabricated scaling baseline.
+export const MEASURED_CREDITS_PER_NAME = Object.freeze({});
 
 /**
  * Roles whose explorer signal is worth a credit every due run. A token, a factory, a curve, a
@@ -59,7 +59,7 @@ export function tierFor({ aboveShareBar = false, queuedAt = null, lastActivityAt
 }
 
 export function tierIsDue(tier, lastSnapshotAt, { now = Date.now(), force = false, tolerance = DUE_TOLERANCE_MS } = {}) {
-  if (force || tier === "hot") return true;
+  if (force) return true;
   const prior = time(lastSnapshotAt);
   if (prior === null) return true;
   const interval = TIER_INTERVAL_MS[tier] ?? TIER_INTERVAL_MS.dormant;
@@ -111,13 +111,14 @@ export function parseShard(value) {
 
 /**
  * Credits per UTC day for a tier population, using one measured cost per tier rather than one
- * allowance for every name. A hot name is read four times a day and costs more per read than a
+ * allowance for every name. A hot name is read daily and costs more per read than a
  * dormant one, so a single average hides both facts.
  */
 export function projectDailyCredits(tierCounts = {}, costs = MEASURED_CREDITS_PER_NAME) {
   const perName = typeof costs === "number"
     ? Object.fromEntries(Object.keys(TIER_DAILY_READS).map((tier) => [tier, costs]))
     : { ...MEASURED_CREDITS_PER_NAME, ...costs };
+  if (Object.entries(tierCounts).some(([tier, count]) => count > 0 && !Number.isFinite(perName[tier]))) return null;
   return Object.entries(TIER_DAILY_READS).reduce(
     (sum, [tier, reads]) => sum + (Number(tierCounts[tier]) || 0) * reads * (Number(perName[tier]) || 0),
     0,

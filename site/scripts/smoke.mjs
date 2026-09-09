@@ -17,6 +17,8 @@ const ROUTES = [
   "/n/hoodfun",
   "/feed",
   "/methodology",
+  "/relationships",
+  "/data/registry.json",
   "/disclaimer",
   "/terms",
   "/privacy",
@@ -90,6 +92,13 @@ async function main() {
       const ok = res.status === 200;
       console.log(`  ${ok ? "ok  " : "FAIL"} ${route} -> ${res.status}`);
       if (!ok) failures.push(`${route} returned ${res.status}, expected 200`);
+      if (route === "/data/registry.json") {
+        if (!res.headers.get("content-type")?.includes("application/json")) failures.push("registry artifact must be JSON, not HTML");
+        const registry = await res.json();
+        if (registry.version !== 1 || !registry.base_sha || !Array.isArray(registry.relationships?.addresses)) failures.push("registry artifact is incomplete");
+        if (registry.grok?.updates?.length > 20) failures.push("daily research worklist exceeded its cap");
+        continue; // Static JSON assets do not pass through HTML security middleware.
+      }
       const csp = res.headers.get("content-security-policy") ?? "";
       if (!csp.includes("default-src 'self'") || !csp.includes("object-src 'none'") || !csp.includes("frame-ancestors 'none'"))
         failures.push(`${route} is missing the required Content-Security-Policy`);

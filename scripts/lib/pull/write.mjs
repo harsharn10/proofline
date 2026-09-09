@@ -9,7 +9,7 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { Document } from "yaml";
 
-const DOC_KEYS = ["slug", "pulled_at", "chain", "addresses", "metrics", "market", "structure", "activity", "reads", "errors"];
+const DOC_KEYS = ["slug", "pulled_at", "chain", "addresses", "metrics", "market", "structure", "activity", "reads", "refresh", "errors"];
 const ADDRESS_KEYS = [
   "address", "label", "role", "is_contract", "source_verified", "contract_name",
   "proxy", "owner", "owner_type", "safe", "created_block", "created_at", "holders", "errors",
@@ -66,6 +66,7 @@ const orderErrors = (errors = []) => errors.map((e) => pick(e, ERROR_KEYS));
 /** Reorders one document's keys to schema order so diffs between runs stay readable. */
 export function orderDocument(doc) {
   const ordered = pick(doc, DOC_KEYS);
+  if (!doc.refresh) delete ordered.refresh;
   ordered.addresses = (doc.addresses ?? []).map((a) => {
     const entry = pick(a, ADDRESS_KEYS);
     entry.proxy = pick(a.proxy ?? {}, PROXY_KEYS);
@@ -349,7 +350,7 @@ export function snapshotFrom(doc) {
     market_cap: market?.market_cap_usd ?? null,
     fdv: market?.fdv ?? null,
     txns_total: counts.length ? counts.reduce((a, b) => a + b, 0) : null,
-    launches_24h: activity?.launches_24h ?? null,
+    launches_24h: activity?.stale_since ? null : activity?.launches_24h ?? null,
     tvl: typeof tvl?.value === "number" ? tvl.value : null,
     revenue_24h: typeof revenue?.value === "number" ? revenue.value : null,
     top10_share: typeof market?.top10_share === "number" ? market.top10_share : null,

@@ -86,6 +86,7 @@ export async function requestWithRetry(url, options = {}, deps = {}) {
     defaultHeaders = null,
     beforeRequest = null,
     onRequest = null,
+    onResponse = null,
     onChallenge = null,
     challengeRetries = 1,
     randomImpl = Math.random,
@@ -95,10 +96,10 @@ export async function requestWithRetry(url, options = {}, deps = {}) {
   let attempt = 1;
   let challengeRetriesUsed = 0;
   while (attempt <= attempts) {
-    // Budget reservation happens before pacing and before the physical request. A budget error is
+    // Budget reservation happens after pacing, immediately before the physical request. An error is
     // deliberately not retried; the caller records a deferred read and continues keyless work.
-    beforeRequest?.(url);
     if (pace) await pace(hostOf(url));
+    beforeRequest?.(url);
     onRequest?.(url);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -109,6 +110,7 @@ export async function requestWithRetry(url, options = {}, deps = {}) {
         signal: controller.signal,
       };
       const res = await fetchImpl(url, requestOptions);
+      onResponse?.(res, url);
       const body = await res.text();
       const challenge = isBotChallenge(body, res.headers?.get?.("content-type") ?? "");
       if (challenge) {

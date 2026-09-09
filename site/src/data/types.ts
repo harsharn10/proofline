@@ -230,6 +230,8 @@ export type PulledStructure = {
 // Blockscout activity read per address (scripts/lib/pull/activity.mjs).
 export type PulledActivity = {
   pulled_at: string;
+  window_as_of?: string | null;
+  stale_since?: string | null;
   addresses: Array<{
     address: string;
     label: string | null;
@@ -240,6 +242,8 @@ export type PulledActivity = {
     last_method: string | null;
     txns_24h: number | null;
     launches_24h: number | null;
+    window_as_of?: string | null;
+    stale_since?: string | null;
     errors: Array<{ step: string; message: string }>;
   }>;
   last_activity_at: string | null;
@@ -247,6 +251,7 @@ export type PulledActivity = {
   launches_24h: number | null;
 };
 export type PulledFile = {
+  refresh?: { policy_version: 1; status: "complete" | "partial"; attempted_at: string; last_success_at: string | null; reason: string };
   slug: string;
   pulled_at: string;
   chain: "robinhood-chain";
@@ -641,6 +646,8 @@ export type SiteConfig = {
 // What getContent() ships to the directory: the sections in order, one slim entry per name, and
 // the dependency cards as chips. No feed, no ledger counts.
 export type DirectoryBundle = {
+  volume24h: number | null;
+  launches: { value: number | null; partial: boolean; factories: number; freshFactories: number };
   site: SiteConfig;
   sections: SectionDef[];
   entries: DirectoryEntry[];

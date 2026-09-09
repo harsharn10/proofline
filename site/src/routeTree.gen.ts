@@ -15,6 +15,7 @@ import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RelationshipsRouteImport } from './routes/relationships'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as DIdRouteImport } from './routes/d.$id'
@@ -51,6 +52,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RelationshipsRoute = RelationshipsRouteImport.update({
+  id: '/relationships',
+  path: '/relationships',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReviewRoute = ReviewRouteImport.update({
   id: '/review',
   path: '/review',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/feed': typeof FeedRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
+  '/relationships': typeof RelationshipsRoute
   '/review': typeof ReviewRoute
   '/terms': typeof TermsRoute
   '/d/$id': typeof DIdRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/feed': typeof FeedRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
+  '/relationships': typeof RelationshipsRoute
   '/review': typeof ReviewRoute
   '/terms': typeof TermsRoute
   '/d/$id': typeof DIdRoute
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/feed': typeof FeedRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
+  '/relationships': typeof RelationshipsRoute
   '/review': typeof ReviewRoute
   '/terms': typeof TermsRoute
   '/d/$id': typeof DIdRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/methodology'
     | '/privacy'
+    | '/relationships'
     | '/review'
     | '/terms'
     | '/d/$id'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/methodology'
     | '/privacy'
+    | '/relationships'
     | '/review'
     | '/terms'
     | '/d/$id'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/methodology'
     | '/privacy'
+    | '/relationships'
     | '/review'
     | '/terms'
     | '/d/$id'
@@ -166,6 +178,7 @@ export interface RootRouteChildren {
   FeedRoute: typeof FeedRoute
   MethodologyRoute: typeof MethodologyRoute
   PrivacyRoute: typeof PrivacyRoute
+  RelationshipsRoute: typeof RelationshipsRoute
   ReviewRoute: typeof ReviewRoute
   TermsRoute: typeof TermsRoute
   DIdRoute: typeof DIdRoute
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/relationships': {
+      id: '/relationships'
+      path: '/relationships'
+      fullPath: '/relationships'
+      preLoaderRoute: typeof RelationshipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/review': {
       id: '/review'
       path: '/review'
@@ -262,6 +282,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedRoute: FeedRoute,
   MethodologyRoute: MethodologyRoute,
   PrivacyRoute: PrivacyRoute,
+  RelationshipsRoute: RelationshipsRoute,
   ReviewRoute: ReviewRoute,
   TermsRoute: TermsRoute,
   DIdRoute: DIdRoute,

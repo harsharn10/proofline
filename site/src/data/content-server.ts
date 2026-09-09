@@ -1,6 +1,8 @@
 import YAML from "yaml";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
+// @ts-expect-error Shared deterministic relationship projection.
+import { buildRelationships, sharedRelationships, uniqueLaunches, uniqueVolume } from "../../../scripts/lib/relationships.mjs";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
 import { readerCopy } from "../lib/dejargon";
 import {
@@ -58,7 +60,7 @@ type TaxonomyFile = {
 const pulledSeries: Record<string, string> = rawContent.pulledSeries ?? {};
 
 function parseYaml<T>(raw: string): T {
-  return YAML.parse(raw) as T;
+  return (raw.trimStart().startsWith("[") || raw.trimStart().startsWith("{") ? JSON.parse(raw) : YAML.parse(raw)) as T;
 }
 
 function parseJson<T>(raw: string): T {
@@ -85,7 +87,7 @@ function readYamlOrWarn<T>(raw: string | undefined, label: string, slug: string,
 function readResearchOrWarn(raw: string | undefined, slug: string): Research {
   if (raw === undefined) return { sections: [] };
   try {
-    return parseResearchMarkdown(raw);
+    return raw.startsWith('{"sections":') ? JSON.parse(raw) as Research : parseResearchMarkdown(raw);
   } catch (err) {
     console.warn(
       `[content-server] ${slug}: failed to parse research/${slug}.md — ${err instanceof Error ? err.message : String(err)}`,
@@ -412,12 +414,7 @@ function loadContent(): ServerContent {
     changelog: changelogAll,
     censusBySlug,
     treeBySlug,
-    histories: Object.fromEntries(
-      Object.keys(rawContent.projects).map((file) => {
-        const slug = file.replace(/\.yaml$/, "");
-        return [slug, parseHistory(rawContent.pulledHistory[`${slug}.jsonl`])];
-      }),
-    ),
+    histories: Object.fromEntries(Object.keys(rawContent.projects).map(file => [file.replace(/\.yaml$/, ""), parseHistory(rawContent.pulledHistory[file.replace(/\.yaml$/, ".jsonl")])])),
     wire: compiledWire,
     chainStats,
     generatedAt: derivedFile.generated_at,
@@ -428,7 +425,7 @@ function loadContent(): ServerContent {
 let cachedContent: ServerContent | null = null;
 
 function getCachedContent(): ServerContent {
-  if (process.env.NODE_ENV === "production" && cachedContent) return cachedContent;
+  if (process.env.NODE_ENV === "production" && cachedContent && Date.now() - cachedContent.now < 300_000) return cachedContent;
   const content = loadContent();
   if (process.env.NODE_ENV === "production") cachedContent = content;
   return content;
@@ -446,10 +443,7 @@ function toDirectoryEntry(
   const census = censusBySlug.get(d.slug);
   const officialConfirmed = officialSurfaceConfirmed(census);
   const hasContractOn4663 = locatedOnChain(d.pulled);
-  const factoryLaunches24h =
-    d.pulled?.activity?.addresses
-      .filter((address) => address.role === "factory")
-      .reduce((sum, address) => sum + (address.launches_24h ?? 0), 0) ?? 0;
+  const factoryLaunches24h = uniqueLaunches([d.pulled], Date.now()).value ?? 0;
   const tokenAddress = d.pulled?.addresses.find((row) => row.role === "token")?.address
     ?? d.pulled?.addresses[0]?.address
     ?? null;
@@ -806,7 +800,11 @@ function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | nu
   const holders = tokenHolders(pulled);
   const lastActivityAt = activity?.last_activity_at ?? null;
   const tvl = pulled?.metrics.find((m) => m.kind === "tvl")?.value ?? null;
-  const trades = market?.trades_h24 ?? null;
+  const marketAge = now - Date.parse(market?.pulled_at ?? "");
+  const marketFresh = Number.isFinite(marketAge) && marketAge >= 0 && marketAge <= 36 * 3600_000;
+  const windowAge = now - Date.parse(activity?.window_as_of ?? activity?.pulled_at ?? "");
+  const activityFresh = !activity?.stale_since && Number.isFinite(windowAge) && windowAge >= 0 && windowAge <= 36 * 3600_000;
+  const trades = marketFresh ? market?.trades_h24 ?? null : null;
   let status: Kpis["status"];
   if (d.lifecycle === "testnet-only") status = "testnet";
   else if (!located) status = "announced";
@@ -821,18 +819,18 @@ function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | nu
     status,
     lastActivityAt,
     liquidityUsd: market?.liquidity_usd ?? null,
-    volume24h: market?.volume_h24 ?? null,
+    volume24h: marketFresh ? market?.volume_h24 ?? null : null,
     trades24h: trades,
-    priceChange24h: market?.price_change_h24 ?? null,
+    priceChange24h: marketFresh ? market?.price_change_h24 ?? null : null,
     marketCap: market?.market_cap_usd ?? null,
     fdv: market?.fdv_usd ?? market?.fdv ?? null,
     holders,
     holdersDelta7d: deltaFrom(history, "holders", 7),
-    launches24h: activity?.launches_24h ?? null,
+    launches24h: activityFresh ? activity?.launches_24h ?? null : null,
     txnsTotal: activity ? activity.addresses.reduce((n, a) => n + (a.transactions_count ?? 0), 0) || null : null,
     firstPairAt: market?.first_pair_at ?? null,
     tvl,
-    readAt: pulled?.pulled_at ?? null,
+    readAt: pulled?.refresh ? pulled.refresh.last_success_at : pulled?.pulled_at ?? null,
   };
 }
 
@@ -936,7 +934,7 @@ function relatedFor(
 
 // The directory: the sections in order, one slim entry per name, and the dependency cards as chips.
 // No research HTML, no source ledgers, no findings, no feeds.
-export const getContent = createServerFn({ method: "GET" }).handler(async (): Promise<DirectoryBundle> => {
+async function directoryBundle(): Promise<DirectoryBundle> {
   const content = getCachedContent();
   const readAt = Date.now();
   const pulse = await loadPulse(readAt);
@@ -965,8 +963,50 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
     // read one way on the home page and another on the name's own page. The pulse badge carries its
     // own request-time age instead.
     now: content.now,
+    launches: uniqueLaunches(content.dossiers.map(d => d.pulled), readAt),
+    volume24h: uniqueVolume(content.dossiers.map(d => d.pulled), readAt),
   };
+}
+
+export const getContent = createServerFn({ method: "GET" }).handler(directoryBundle);
+
+// Compact home filters need the newest six of each kind, not the entire archive.
+export function compactWire(items: WireItem[]): WireItem[] {
+  const counts = new Map<string, number>();
+  return items.filter(item => {
+    const count = counts.get(item.kind) ?? 0;
+    counts.set(item.kind, count + 1);
+    return count < 6;
+  });
+}
+
+export const getHomeContent = createServerFn({ method: "GET" }).handler(async () => {
+  const bundle = await directoryBundle();
+  const trending = new Set(trendingNow(bundle.entries, bundle.histories).map(row => row.entry.slug));
+  return { ...bundle, wire: compactWire(bundle.wire),
+    histories: Object.fromEntries(Object.entries(bundle.histories).filter(([slug]) => trending.has(slug))) };
 });
+
+export const getCategoryContent = createServerFn({ method: "GET" }).validator((id: string) => id).handler(async ({ data: id }) => {
+  const bundle = await directoryBundle();
+  const entries = bundle.entries.filter(entry => entry.tree?.sectionId === id);
+  const slugs = new Set(entries.map(entry => entry.slug));
+  return { ...bundle, entries, histories: {}, wire: bundle.wire.filter(item => slugs.has(item.slug)).slice(0, 4) };
+});
+
+export const getRelationships = createServerFn({ method: "GET" }).handler(async () => {
+  const content = getCachedContent();
+  return sharedRelationships(buildRelationships(content.dossiers, Object.values(content.dependencies))) as RelationshipGraph;
+});
+
+export type RelationshipGraph = {
+  version: number;
+  totalAddresses: number;
+  projectNames: Record<string, string>;
+  addresses: Array<{ id: string; chain: string; address: string; identityConflict: boolean;
+    projects: Array<{ slug: string; roles: string[]; verified: boolean; sources: string[] }>; dependencies: string[] }>;
+  dependencies: Array<{ id: string; name: string; projects: string[] }>;
+};
 
 // One dossier, the cards it references (label/link only — /d/$id carries the rest), its peers (full
 // records only; a stub page has no room for them) and its taxonomy placement. `dossier` is null for

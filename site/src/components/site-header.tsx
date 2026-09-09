@@ -21,6 +21,7 @@ export function SiteHeader() {
         <Link to="/feed" activeProps={{ className: "on" }}>
           Feed
         </Link>
+        <Link to="/relationships" activeProps={{ className: "on" }}>Connections</Link>
         <Link to="/methodology" activeProps={{ className: "on" }}>
           How to read this
         </Link>

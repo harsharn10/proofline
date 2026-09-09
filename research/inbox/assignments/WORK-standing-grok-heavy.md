@@ -1,4 +1,6 @@
-# WORK-standing-grok-heavy: standing research order, every 6 hours
+# Historical six-hour standing order — superseded
+
+After the daily-registry change merges, use `WORK-standing-grok-heavy-daily.md` and `docs/daily-registry.md`. The text below is historical and must not schedule a new six-hour cycle or impose a three-event minimum on updates. An already-running external session must be repointed by its owner/controller.
 
 Self-contained paste prompt for Grok Heavy (v2.2, 2026-09-04: every event carries a tag; TL;DR, Why it matters bullets, What could go wrong bullets, three events per changed name; write about the project, never the research; a token of an existing name is an update, not a new name). The branch grok-heavy/standing/updates is long-lived; the compile workflow lifts new packets off it every 6 hours and pushes the compiled result to main.
 

@@ -23,7 +23,7 @@ npm --prefix site run build                    # Vite build
 ## B. Research PRs (Grok, Codex research)
 
 - CI comment on the PR reports 0 packet errors.
-- Each packet: `## What it is` ≤ 80 words, mechanism first; a `Themes:` line; `links` with `seen` dates; ≥ 3 `events` with URL and date; lifecycle matches the mainnet bar (a `REP-` on 4663 for mainnet).
+- Each packet: `## What it is` ≤ 80 words, mechanism first; a `Themes:` line; `links` with `seen` dates; only material `events` with URL and date (one is sufficient for an update; no-change means no packet); lifecycle matches the mainnet bar (a `REP-` on 4663 for mainnet).
 - Compile: `node scripts/compile-packet.mjs research/inbox/packets/<slug>/<work-id>.md` for each packet, then `npm run validate` and `npm run score`. Compiled changes land in a separate controller PR (`claude/<date>/compile-<batch>`), never on the producer's branch.
 - Spot-check three claims per batch against their receipts (open the URL; the number or statement must be there).
 - Duplicate check: `possible_matches` against `content/census.yaml` and every pending packet; a match means one census row, not two.
