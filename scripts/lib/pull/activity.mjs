@@ -141,7 +141,10 @@ export async function countRecentInbound(fetchPage, {
       return false;
     }
     const at = item.timestamp ? Date.parse(item.timestamp) : NaN;
-    if (!Number.isFinite(at) || at > until) { invalid = true; return false; }
+    if (!Number.isFinite(at)) { invalid = true; return false; }
+    // A long pull can observe transactions newer than its fixed as-of time. They belong to
+    // the next window, not to this count, and are not malformed just because the job is slow.
+    if (at > until) return false;
     if (at > previousTime) invalid = true;
     previousTime = at;
     if (at < since) { reachedOlder = true; return false; }

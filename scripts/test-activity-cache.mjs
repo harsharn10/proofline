@@ -106,6 +106,9 @@ test("duplicate hashes are counted once; malformed timestamps and repeating curs
   const pages=[page(stable.slice(0,2),{index:1}),page([stable[1],stable[2]])];
   const unique=await countRecentInbound(async()=>pages[calls++],{since,until:now});
   assert.equal(unique.txns_24h,3);assert.equal(unique.complete,true);
+  const afterAsOf=await countRecentInbound(async()=>page([tx(50,-1),tx(1)]),{since,until:now});
+  assert.equal(afterAsOf.txns_24h,1);assert.equal(afterAsOf.complete,true);
+  assert.equal(afterAsOf.last_tx_at,tx(1).timestamp);
   const malformed=await countRecentInbound(async()=>page([{...tx(1),timestamp:null},tx(2)]),{since,until:now});
   assert.equal(malformed.txns_24h,1);assert.equal(malformed.complete,false);
   const missing=await countRecentInbound(async()=>({items:null}),{since,until:now});
