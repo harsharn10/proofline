@@ -25,6 +25,27 @@ test("volume coverage preserves fresh zero and reports missing, stale and confli
   assert.equal(uniqueVolumeSummary([file(1,10,now-2*DAY)],now).value,null);
 });
 
+test("shared volume retains 32-byte pool IDs without treating them as contracts", () => {
+  const id = `0x${'ab'.repeat(32)}`;
+  const file = (value, at = now, chain = 'robinhood-chain', pool = id) => ({chain,
+    market:{pulled_at:new Date(at).toISOString(),pairs:[{pair_address:pool,volume_h24:value}]}});
+  assert.deepEqual(uniqueVolumeSummary([file(12),file(12,now,'robinhood-chain',`0x${'AB'.repeat(32)}`)],now),
+    {value:12,partial:false,pools:1,freshPools:1});
+  assert.equal(uniqueVolume([file(0)],now),0);
+  assert.equal(uniqueVolume([file(12),file(15,now-1000)],now),12);
+  assert.equal(uniqueVolume([file(12,now-2*DAY)],now),null);
+  assert.equal(uniqueVolume([file(12,now+1000)],now),null);
+  for (const rows of [[file(12),file(15)],[file(15),file(12)],[file(null),file(12)]])
+    assert.deepEqual(uniqueVolumeSummary(rows,now),{value:null,partial:true,pools:1,freshPools:0});
+  assert.equal(uniqueVolume([file(12),file(15,now,'base')],now),27);
+  assert.equal(uniqueVolume([file(12),file(15,now,'robinhood-chain',address(1))],now),27);
+  for (const invalid of [id.slice(0,-1),`${id}0`,'0x'+'z'.repeat(64),null,'not-verified'])
+    assert.deepEqual(uniqueVolumeSummary([file(12,now,'robinhood-chain',invalid)],now),
+      {value:null,partial:true,pools:0,freshPools:0});
+  assert.equal(uniqueVolumeSummary([file(12,now,'solana')],now).pools,0);
+  assert.equal(buildRelationships([{slug:'pool-is-not-a-contract',deployments:[{chain:'robinhood-chain',address:id,role:'token'}]}]).addresses.length,0);
+});
+
 test("known totals preserve zero and do not disguise missing observations", () => {
   assert.equal(knownTotal([0,0]),0);
   assert.equal(knownTotal([1,2]),3);
