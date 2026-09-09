@@ -4,6 +4,7 @@ Evidence-backed research profiles for native Robinhood Chain plays. Research, no
 Spec: `PRD.md`. Content-system design: `docs/superpowers/specs/2026-08-30-content-system-design.md`.
 
 Research operations are defined by one contract, [`docs/research-system.md`](docs/research-system.md):
+The order of operations for anyone opening a branch, and what makes a branch stale, is [`docs/process.md`](docs/process.md).
 objects, who may write which paths, roles, the packet format (§5), branch and PR protocol, evidence
 and conflict rules. Controlled product and display labels are in [`docs/taxonomy.md`](docs/taxonomy.md)
 with the machine copy in `schema/taxonomy.json`. Producer notes restate the contract for one producer:

@@ -2,6 +2,8 @@
 
 Run this on every Codex or Grok PR before merging, and once more on `main` after the last merge. Anyone can run it: a Claude session, Codex, or the owner.
 
+The order these gates sit in, and how to tell whether the branch you are about to review is still live, is `docs/process.md`. Step zero there is `ops/controller/start.sh <branch>`.
+
 ## A. Every PR
 
 ```sh
