@@ -982,12 +982,29 @@ export function compactWire(items: WireItem[]): WireItem[] {
   });
 }
 
-export const getHomeContent = createServerFn({ method: "GET" }).handler(async () => {
-  const bundle = await directoryBundle();
-  const trending = new Set(trendingNow(bundle.entries, bundle.histories).map(row => row.entry.slug));
-  return { ...bundle, wire: compactWire(bundle.wire),
-    histories: Object.fromEntries(Object.entries(bundle.histories).filter(([slug]) => trending.has(slug))) };
-});
+// Only the selected cards and aggregate counts belong in the home response. The complete
+// directory and historical series remain server-side; search has its own slim root projection.
+export function homeProjection(bundle: DirectoryBundle) {
+  const { entries, histories, sections, now } = bundle;
+  const launches = newLaunches(entries, now);
+  return {
+    site: bundle.site, sections, now, chainStats: bundle.chainStats,
+    namesOnFile: entries.length,
+    live: entries.filter(entry => entry.kpis.status === 'live').length,
+    readAt: entries.map(entry => entry.kpis.readAt).filter((at): at is string => Boolean(at)).sort().at(-1),
+    sectionCounts: Object.fromEntries(sections.map(section => [section.id,
+      entries.filter(entry => entry.tree?.sectionId === section.id).length])),
+    trending: trendingNow(entries, histories),
+    newLaunches: launches,
+    announced: announcedNow(entries),
+    leaders: Object.fromEntries(sections.map(section => [section.id, sectionLeaders(section, entries)])),
+    notListed: notListedCount(entries, launches, now),
+    wire: compactWire(bundle.wire),
+    launches: bundle.launches, volume24h: bundle.volume24h, volumePartial: bundle.volumePartial,
+  };
+}
+
+export const getHomeContent = createServerFn({ method: "GET" }).handler(async () => homeProjection(await directoryBundle()));
 
 export const getCategoryContent = createServerFn({ method: "GET" }).validator((id: string) => id).handler(async ({ data: id }) => {
   const bundle = await directoryBundle(id);

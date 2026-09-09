@@ -1530,6 +1530,32 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
       "an announced name with no summary and no TL;DR never holds a slot",
     );
 
+    const homeEntries = [pons, announced, olderAnnouncement, unwritten];
+    const homeSections = [{ id:'launchpads',label:'Launchpads',description:'' },{id:'empty',label:'Empty',description:''}];
+    const homeHistories = {pons:[{at:'2026-09-01T21:00:00Z',volume_h24:100}]};
+    const fullHome = {site:{chain:{id:4663}},sections:homeSections,entries:homeEntries,histories:homeHistories,
+      wire:[],now,launches:{value:null,partial:true},volume24h:null,volumePartial:true,
+      dependencies:[{privateUnused:'must not ship'}],chainStats:{unused:true},generatedAt:'unused'};
+    const compactHome = rules.homeProjection(fullHome);
+    assert.equal(compactHome.namesOnFile,homeEntries.length);
+    assert.equal(compactHome.live,homeEntries.filter(e=>e.kpis.status==='live').length);
+    assert.deepEqual(compactHome.trending,rules.trendingNow(homeEntries,homeHistories));
+    assert.deepEqual(compactHome.newLaunches,rules.newLaunches(homeEntries,now));
+    assert.deepEqual(compactHome.announced,rules.announcedNow(homeEntries));
+    assert.equal(compactHome.notListed,rules.notListedCount(homeEntries,compactHome.newLaunches,now));
+    assert.deepEqual(compactHome.launches,fullHome.launches);
+    assert.equal(compactHome.volume24h,null);
+    assert.equal(compactHome.volumePartial,true);
+    for(const section of homeSections){
+      assert.equal(compactHome.sectionCounts[section.id],homeEntries.filter(e=>e.tree?.sectionId===section.id).length);
+      assert.deepEqual(compactHome.leaders[section.id],rules.sectionLeaders(section,homeEntries));
+    }
+    assert.deepEqual(compactHome.chainStats,fullHome.chainStats,'chain statistics remain available to the nested StatBox');
+    for(const key of ['entries','histories','dependencies','generatedAt'])
+      assert.equal(Object.hasOwn(compactHome,key),false,`${key} stays out of the home response`);
+    assert.equal(rules.homeProjection({...fullHome,entries:[],histories:{}}).namesOnFile,0);
+    assert.equal(rules.homeProjection({...fullHome,entries:[],histories:{}}).readAt,undefined);
+
     const wire = rules.wireItems({
       entries: [pons, ai],
       changelog: [

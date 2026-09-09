@@ -3,14 +3,7 @@ import { CategoryCards } from "@/components/home/category-cards";
 import { RightNow } from "@/components/home/right-now";
 import { StatBox } from "@/components/home/stat-box";
 import { Wire } from "@/components/wire/wire";
-import {
-  announcedNow,
-  getHomeContent,
-  newLaunches,
-  notListedCount,
-  sectionLeaders,
-  trendingNow,
-} from "@/data/content-server";
+import { getHomeContent } from "@/data/content-server";
 import { formatCount, formatUsd } from "@/data/types";
 
 export const Route = createFileRoute("/")({
@@ -31,20 +24,9 @@ function chainReadLabel(iso: string | undefined): string {
 }
 
 function Home() {
-  const { site, sections, entries, histories, wire, now, launches: launchSummary, volume24h, volumePartial } = Route.useLoaderData();
-  const live = entries.filter((entry) => entry.kpis.status === "live").length;
+  const { site, sections, namesOnFile, live, sectionCounts, readAt, trending, newLaunches: launches,
+    announced, leaders, notListed, wire, now, launches: launchSummary, volume24h, volumePartial } = Route.useLoaderData();
   const launchesToday = launchSummary.value;
-  const readAt = entries
-    .map((entry) => entry.kpis.readAt)
-    .filter((value): value is string => Boolean(value))
-    .sort()
-    .at(-1);
-  const trending = trendingNow(entries, histories);
-  const launches = newLaunches(entries, now);
-  const announced = announcedNow(entries);
-  const leaders = Object.fromEntries(
-    sections.map((section) => [section.id, sectionLeaders(section, entries)]),
-  );
   return (
     <main className="wrap pb-10 pt-5">
       <section className="grid grid-cols-1 items-end gap-6 md:grid-cols-[minmax(0,1fr)_300px]">
@@ -60,7 +42,7 @@ function Home() {
         </div>
         <StatBox
           stats={[
-            { label: "names on file", value: formatCount(entries.length), href: "#categories" },
+            { label: "names on file", value: formatCount(namesOnFile), href: "#categories" },
             { label: "live on chain", value: formatCount(live), href: "#right-now" },
             { label: "tracked launch calls 24h", value: launchesToday === null ? "—" : `${formatCount(launchesToday)}${launchSummary.partial ? " (partial)" : ""}`, href: "#right-now" },
             { label: "tracked volume 24h", value: volume24h === null ? "—" : `${formatUsd(volume24h)}${volumePartial ? " (partial)" : ""}`, href: "#right-now" },
@@ -73,7 +55,7 @@ function Home() {
         {sections.map((section) => (
           <a key={section.id} href={`/s/${section.id}`}>
             {section.label}{" "}
-            <small>{entries.filter((entry) => entry.tree?.sectionId === section.id).length}</small>
+            <small>{sectionCounts[section.id] ?? 0}</small>
           </a>
         ))}
       </nav>
@@ -90,7 +72,7 @@ function Home() {
           trending={trending}
           launches={launches}
           announced={announced}
-          notListed={notListedCount(entries, launches, now)}
+          notListed={notListed}
           now={now}
         />
       </section>
@@ -102,7 +84,7 @@ function Home() {
             leaders by the number that matters for each · open a category for the full ranking
           </span>
         </div>
-        <CategoryCards sections={sections} entries={entries} leaders={leaders} />
+        <CategoryCards sections={sections} counts={sectionCounts} leaders={leaders} />
       </section>
 
       <section className="mt-[26px]">
