@@ -12,6 +12,6 @@ Implementation: finalized suffix/checkpoint cache; one chain/address record inde
 
 Gates: root and pull tests, release validation, site tests/build/smoke to catch shared module consumers, read-only production check after PR #98 rollout. New implementation lands in a separate reviewed PR; do not automatically merge this next PR.
 
-Done: main rechecked, PR #98 merged, post-merge release validation green; capability probe completed.
+Done: PR #98 merged and production revision `1ba2961` verified (registry/Connections 200, private review 401). Finalized activity cache and incremental walker implemented; normalized storage, bounded retention, atomic writes, telemetry, checkpoint/overlap verification, duplicate handling and malformed-window protection covered by eight new tests. Existing pull tests and daily-registry tests pass; root/release checks and frontend/Cloudflare build/smoke pass. See `docs/reviews/2026-09-09/incremental-activity.md` for evidence and rollout limits.
 
-Not done: implementation, full verification and producer/controller review. Browser/mobile QA remains unavailable in this session. PR #92 and producer PRs #62/#95 are separate lanes.
+Not done: controller review and merge of PR #99; production cache-hit measurement and successful live explorer join verification. Browser/mobile QA remains unavailable in this session. PR #92 and producer PRs #62/#95 are separate lanes. Full observation normalization, static serving and external producer session changes remain separate follow-ons.

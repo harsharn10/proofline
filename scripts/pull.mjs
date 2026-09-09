@@ -99,6 +99,7 @@ import {
   RIALTO_BASE,
 } from "./lib/pull/rialto.mjs";
 import { createCreditBudget, blockscoutCreditCost } from "./lib/pull/budget.mjs";
+import { openActivityCache } from "./lib/pull/activity-cache.mjs";
 import { buildRelationships, relationshipIndex } from "./lib/relationships.mjs";
 import { refreshDecision, selectRefreshTargets, hasIdentityConflict, selectInfrastructureReaders } from "./lib/refresh-policy.mjs";
 import {
@@ -631,6 +632,8 @@ async function main() {
   const dexscreener = memoizeClient(createDexscreenerClient({ deps }));
   const activityClient = memoizeClient(createActivityClient({ base: explorerConfig.apiRoot, deps: explorerDeps }));
   const validate = createValidator();
+  const activityCache = await openActivityCache({ rpc, chain: CHAIN, now: Date.parse(pulledAt),
+    disabled: args.full || args.rpcOnly || args.rialtoOnly || targets.length === 0 });
 
   // Rialto is a chain-wide read: each endpoint is fetched once, cached for the run and paced at one
   // request per second. It is completed before per-name writes so every name sees the same snapshot.
@@ -883,7 +886,7 @@ async function main() {
         // instead of reporting yesterday's number for ever. When it does not, the committed figure is
         // carried with the timestamp of the run that measured it.
         const walk = await readAddressActivity(activityClient, entry, {
-          now, firstPage, readCounters: false, allowPaging: false,
+          now, firstPage, readCounters: false, allowPaging: false, activityCache,
         });
         const measured = walk.txns_24h !== null;
         const fresh = carryActivityFacts({
@@ -925,7 +928,7 @@ async function main() {
       );
 
       const activityRead = await creditBudget.withCredits(label, () => readAddressActivity(activityClient, entry, {
-        now, firstPage, ...(args.full ? {} : { maxPages: 2 }),
+        now, firstPage, activityCache, ...(args.full ? {} : { maxPages: 2 }),
       }));
       const walk = activityRead.value;
       const activityCredits = activityRead.credits;
@@ -1073,7 +1076,7 @@ async function main() {
     };
     const retryable = [...slugErrors, ...addresses.flatMap(a => a.errors ?? []),
       ...(market?.errors ?? []), ...(activity?.addresses ?? []).flatMap(a => a.errors ?? []),
-      ...(structure?.errors ?? [])].some(e => /deferred:|HTTP (?:402|429|5\d\d)|timeout|after \d+ attempts|bot challenge/i.test(e.message));
+      ...(structure?.errors ?? [])].some(e => /deferred:|HTTP (?:402|429|5\d\d)|timeout|after \d+ attempts|bot challenge|invalid activity response/i.test(e.message));
     doc.refresh = { policy_version: 1, status: retryable ? "partial" : "complete",
       attempted_at: pulledAt, last_success_at: retryable ? target.refresh.lastSuccessAt : pulledAt,
       reason: target.refresh.reason };
@@ -1274,10 +1277,13 @@ async function main() {
       await writeFile("ops/pull-queue.json", `${JSON.stringify(remainingQueue, null, 2)}\n`);
     }
   }
+  try { await activityCache.flush({ dry: args.dry }); }
+  catch (error) { runErrors.push({ step: "rpc", message: `activity cache not saved: ${error.message}` }); }
   await writeFile("build/pull-report.json", `${JSON.stringify({ at: pulledAt,
-    status: deferredNames.length || deferredReads.length || failures.length || creditBudget.snapshot().provider_exhausted || completedSlugs.length < targets.length ? "degraded" : "complete",
+    status: runErrors.length || deferredNames.length || deferredReads.length || failures.length || creditBudget.snapshot().provider_exhausted || completedSlugs.length < targets.length ? "degraded" : "complete",
     selected: targets.length, completed: completedSlugs, deferred_names: deferredNames,
     deferred_reads: [...new Set(deferredReads)], failures, budget: creditBudget.snapshot(),
+    activity_cache: activityCache.snapshot(), run_errors: runErrors,
   }, null, 2)}\n`);
   const challengeGate = blockscoutChallengeGate(explorerStats);
   if (challengeGate.failed) {
