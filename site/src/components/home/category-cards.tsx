@@ -5,7 +5,6 @@ import {
   SECTION_KPIS,
   formatKpi,
   readFigure,
-  type DirectoryEntry,
   type SectionDef,
   type SectionLeader,
 } from "@/data/types";
@@ -25,17 +24,17 @@ const ICONS: Record<string, IconName> = {
 
 export function CategoryCards({
   sections,
-  entries,
+  counts,
   leaders,
 }: {
   sections: SectionDef[];
-  entries: DirectoryEntry[];
+  counts: Record<string, number>;
   leaders: Record<string, SectionLeader[]>;
 }) {
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
       {sections.map((section) => {
-        const sectionEntries = entries.filter((entry) => entry.tree?.sectionId === section.id);
+        const count = counts[section.id] ?? 0;
         const key = (SECTION_KPIS[section.id] ?? ["volume24h"])[0]!;
         return (
           <section
@@ -45,7 +44,7 @@ export function CategoryCards({
             <h3 className="m-0 flex items-center gap-1.5 text-[13px] font-semibold">
               <Icon name={ICONS[section.id] ?? "cat"} />
               <a href={`/s/${section.id}`}>{section.label}</a>
-              <span className="font-normal text-[var(--t3)]">{sectionEntries.length}</span>
+              <span className="font-normal text-[var(--t3)]">{count}</span>
             </h3>
             <p className="mb-1.5 mt-0 text-[11.5px] text-[var(--t3)]">by {KPI_LABEL[key]}</p>
             <ol className="m-0 list-none p-0">
@@ -80,7 +79,7 @@ export function CategoryCards({
               ) : null}
             </ol>
             <a href={`/s/${section.id}`} className="mt-1.5 block text-[11.5px] text-[var(--acc)]">
-              All {sectionEntries.length} →
+              All {count} →
             </a>
           </section>
         );
