@@ -72,9 +72,11 @@ export function parseTransactionsPage(body) {
       timestamp: toIsoOrNull(it?.timestamp),
       method: typeof it?.method === "string" ? it.method : null,
       hash: typeof it?.hash === "string" ? it.hash : null,
+      block_number: Number.isSafeInteger(it?.block_number) && it.block_number >= 0 ? it.block_number : null,
       from: typeof it?.from?.hash === "string" ? it.from.hash : null,
     })),
     next: next && typeof next === "object" && Object.keys(next).length > 0 ? next : null,
+    ...(!Array.isArray(body?.items) || next != null && (typeof next !== "object" || Array.isArray(next)) ? { malformed: true } : {}),
   };
 }
 
@@ -114,6 +116,8 @@ export async function countRecentInbound(fetchPage, {
   maxPages = MAX_PAGES,
   countLaunches = false,
   firstPage = null,
+  until = Infinity,
+  cached = null,
 } = {}) {
   const errors = [];
   let params = null;
@@ -127,6 +131,29 @@ export async function countRecentInbound(fetchPage, {
   let lastTxAt = null;
   let lastMethod = null;
   let pending = firstPage;
+  const items = [], seen = new Map(), cursors = new Set();
+  let invalid = false, reused = 0, cacheHit = false, previousTime = Infinity;
+  const add = item => {
+    const key = typeof item.hash === "string" && item.hash ? item.hash.toLowerCase() : null;
+    if (key && seen.has(key)) {
+      const old = seen.get(key);
+      if (old.timestamp !== item.timestamp || old.method !== item.method || old.block_number !== item.block_number) invalid = true;
+      return false;
+    }
+    const at = item.timestamp ? Date.parse(item.timestamp) : NaN;
+    if (!Number.isFinite(at)) { invalid = true; return false; }
+    // A long pull can observe transactions newer than its fixed as-of time. They belong to
+    // the next window, not to this count, and are not malformed just because the job is slow.
+    if (at > until) return false;
+    if (at > previousTime) invalid = true;
+    previousTime = at;
+    if (at < since) { reachedOlder = true; return false; }
+    const clean = { ...item, hash: key };
+    if (key) seen.set(key, clean);
+    items.push(clean); txns++;
+    if (countLaunches && isLaunchMethod(item.method)) launches++;
+    return true;
+  };
 
   for (;;) {
     if (pages >= maxPages) {
@@ -147,29 +174,55 @@ export async function countRecentInbound(fetchPage, {
       }
     }
     pages++;
+    if (page.malformed || !Array.isArray(page.items) || page.items.length === 0 && page.next !== null) {
+      invalid = true; break;
+    }
 
     // The very first row of the very first page is the most recent time anyone called this address.
     if (pages === 1 && page.items.length > 0) {
-      lastTxAt = page.items[0].timestamp;
-      lastMethod = page.items[0].method;
+      const newest = page.items.find(item => Number.isFinite(Date.parse(item.timestamp)) && Date.parse(item.timestamp) <= until);
+      lastTxAt = newest?.timestamp ?? null;
+      lastMethod = newest?.method ?? null;
     }
 
     for (const item of page.items) {
-      const at = item.timestamp ? Date.parse(item.timestamp) : Number.NaN;
-      if (!Number.isFinite(at) || at < since) {
-        reachedOlder = true;
-        break;
-      }
-      txns++;
-      if (countLaunches && isLaunchMethod(item.method)) launches++;
+      add(item);
+      if (reachedOlder) break;
     }
 
     if (page.next === null) exhausted = true;
     if (reachedOlder || exhausted) break;
+    // The cached head is finalized and its checkpoint has been checked by the cache store.
+    // Verify every overlapping row supplied by this page before joining its unseen stable tail.
+    const anchor = !invalid && cached?.items?.[0]?.hash;
+    const atAnchor = anchor ? page.items.findIndex(item => item.hash?.toLowerCase() === anchor) : -1;
+    if (atAnchor >= 0) {
+      const overlap = page.items.slice(atAnchor);
+      const consistent = overlap.every((item, i) => {
+        const old = cached.items[i];
+        return old && item.hash?.toLowerCase() === old.hash && item.timestamp === old.timestamp &&
+          item.method === old.method && item.block_number === old.block_number;
+      });
+      if (consistent && items.every(item => item.hash)) {
+        cacheHit = true;
+        for (const item of cached.items.slice(overlap.length)) {
+          if (add(item)) reused++;
+          if (reachedOlder) break;
+        }
+        exhausted = true;
+        break;
+      }
+      // An indexer disagreement invalidates cache reuse, but a fresh bounded walk can still finish.
+      cached = null;
+    }
+    const cursor = toQuery(Object.fromEntries(Object.entries(page.next).sort(([a],[b]) => a.localeCompare(b))));
+    if (cursors.has(cursor)) { invalid = true; break; }
+    cursors.add(cursor);
     params = page.next;
   }
 
   if (capped) errors.push({ step: "txns_24h capped", message: `stopped after ${maxPages} pages; count is a floor` });
+  if (invalid) errors.push({ step: "activity response invalid", message: "invalid activity response: malformed or unordered rows, inconsistent duplicates, or repeating cursor; window is incomplete" });
 
   return {
     txns_24h: txns,
@@ -180,7 +233,10 @@ export async function countRecentInbound(fetchPage, {
     capped,
     // Complete means the walk reached past the window or off the end of the list: every transaction
     // inside the 24 hours was seen, so the count is exact rather than a floor.
-    complete: (reachedOlder || exhausted) && !failed,
+    complete: (reachedOlder || exhausted) && !failed && !invalid,
+    items,
+    reused,
+    cache_hit: cacheHit,
     errors,
   };
 }
@@ -212,6 +268,7 @@ export async function readAddressActivity(client, entry, {
   firstPage = null,
   readCounters = true,
   allowPaging = true,
+  activityCache = null,
 } = {}) {
   const errors = [];
   const isFactory = entry?.role === "factory";
@@ -227,16 +284,21 @@ export async function readAddressActivity(client, entry, {
     }
   }
 
+  const cached = await activityCache?.get(entry.address, now - WINDOW_MS);
   const recent = await countRecentInbound((params) => client.transactions(entry.address, params), {
     since: now - WINDOW_MS,
     maxPages: allowPaging ? maxPages : 1,
     countLaunches: isFactory,
     firstPage,
+    until: now,
+    cached,
   });
+  activityCache?.record(entry.address, recent, now - WINDOW_MS);
   // A deliberate stop at page one is not a capped walk: nothing was read that could be a floor, so
   // the caller carries the previous window rather than publishing a partial count as a measurement.
   const walkErrors = allowPaging ? recent.errors : recent.errors.filter((e) => e.step !== "txns_24h capped");
-  const measured = recent.pages > 0 && (allowPaging || recent.complete);
+  const measured = recent.pages > 0 && (allowPaging || recent.complete) &&
+    (recent.items.length > 0 || recent.complete);
 
   return {
     address: entry.address,

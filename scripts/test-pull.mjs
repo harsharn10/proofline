@@ -1392,7 +1392,8 @@ test("counters arrive as strings and become integers or null", () => {
 
 test("the 24h walk stops at the first older item and keeps the newest inbound call", async () => {
   const now = Date.parse("2026-09-02T12:00:00.000Z");
-  const tx = (iso, method) => ({ timestamp: iso, method, hash: "0xabc", from: { hash: "0xdef" } });
+  let txId = 0;
+  const tx = (iso, method) => ({ timestamp: iso, method, hash: `0x${String(++txId).padStart(64, "0")}`, from: { hash: "0xdef" } });
   const pages = [
     {
       items: [
@@ -1433,7 +1434,7 @@ test("the page cap stops the walk, keeps the partial count and records why", asy
   const out = await countRecentInbound(
     async () => {
       asked++;
-      return recent;
+      return { ...recent, next_page_params: { index: asked } };
     },
     { since: Date.parse("2026-09-01T12:00:00.000Z"), maxPages: 3, countLaunches: true },
   );
@@ -1505,7 +1506,7 @@ test("a blocked counters call still leaves the 24h walk, and vice versa", async 
   assert.equal(partial.launches_24h, null);
   assert.match(partial.errors[0].message, /transactions\?filter=to page 1/);
 
-  assert.deepEqual(parseTransactionsPage({ items: null }), { items: [], next: null });
+  assert.deepEqual(parseTransactionsPage({ items: null }), { items: [], next: null, malformed: true });
   assert.equal(parseTransactionsPage({ items: [], next_page_params: {} }).next, null);
 });
 
