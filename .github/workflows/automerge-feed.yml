@@ -31,11 +31,14 @@ jobs:
   classify:
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
       (startsWith(github.event.workflow_run.head_branch, 'grok/') ||
       startsWith(github.event.workflow_run.head_branch, 'grok-heavy/') ||
+      startsWith(github.event.workflow_run.head_branch, 'grok-bot/') ||
       startsWith(github.event.workflow_run.head_branch, 'supergrok/') ||
       startsWith(github.event.workflow_run.head_branch, 'codex/'))
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       REPO: ${{ github.repository }}

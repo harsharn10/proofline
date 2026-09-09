@@ -37,6 +37,7 @@ jobs:
   publish:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # The `secrets` context is NOT available in step- or job-level `if:` — only in `env:` and step
     # inputs. Hoisting the three secrets to job-level env lets every step's `if:` read them back out
     # as `env.*`, which IS available in `if:`.
@@ -51,13 +52,16 @@ jobs:
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
         with:
           node-version: 22
 
       - name: Install
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
         run: npm ci
 
       - name: Derive scores
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
         run: npm run score
 
       - name: Select Telegram mode

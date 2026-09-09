@@ -14,6 +14,11 @@ on:
   push:
     branches: [main]
 
+# Only superseded PR runs are disposable. Never cancel a main verification run.
+concurrency:
+  group: validate-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
     timeout-minutes: 20
@@ -35,6 +40,9 @@ jobs:
 
       - name: Root test (validate content/ + scoring fixtures + rule tests)
         run: npm test
+
+      - name: Background workflow safety contracts
+        run: node --test scripts/test-workflow-efficiency.mjs
 
       - name: Release blockers (informational — never fails this job)
         continue-on-error: true
