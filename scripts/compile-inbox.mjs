@@ -20,6 +20,7 @@ import { promisify } from "node:util";
 import { parse } from "yaml";
 import { parsePacket, validatePacketDirectory } from "./lib/packet.mjs";
 import { runCompile } from "./compile-packet.mjs";
+import { compileDisposition } from "./lib/pipeline-health.mjs";
 
 const execFileAsync = promisify(execFile);
 const SCRIPTS_DIR = fileURLToPath(new URL(".", import.meta.url));
@@ -322,7 +323,8 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
     const conflict = rows.some(r => asOfMs(r.branchText) === asOfMs(newest.branchText) && r.branchText !== newest.branchText);
     for (const row of rows) {
       if (!conflict && row === newest) selected.push(row);
-      else row.report.skipped.push({ path: row.path, errors: [conflict ? "same path and date have conflicting producer copies; controller review required" : "newer or identical packet selected from another branch"] });
+      else if (conflict) row.report.skipped.push({ path: row.path, errors: ["same path and date have conflicting producer copies; controller review required"] });
+      else row.report.unchanged.push({ path: row.path, reason: "newer or identical packet selected from another branch" });
     }
   }
   if (!selected.length) {
@@ -481,6 +483,7 @@ export function renderReport(report) {
   const lines = [];
   lines.push(`# Compile report — ${report.generated_at}${report.dry ? " (dry run)" : ""}`);
   lines.push("");
+  lines.push(`Outcome: ${report.status ?? compileDisposition(report)}. Execution gates and research disposition are separate.`);
   lines.push(report.ok
     ? `Gates passed. ${report.compiled.length} packet(s) compiled from ${report.branches.length} branch(es).`
     : `Gates FAILED — content/ and ${PACKET_ROOT}/ were reverted, nothing is staged for main.`);
@@ -551,6 +554,7 @@ export function renderReport(report) {
 }
 
 async function writeReport(report) {
+  report.status = compileDisposition(report);
   await mkdir("build", { recursive: true });
   await writeFile(REPORT_MD, `${renderReport(report)}\n`);
   await writeFile(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`);

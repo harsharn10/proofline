@@ -14,14 +14,12 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_REPO: ${{ github.repository }}
     steps:
-      - name: Require recent successful daily workflows
-        run: |
-          set -euo pipefail
-          for workflow in pull.yml compile.yml; do
-            latest=$(gh run list --workflow "$workflow" --branch main --status success --limit 1 --json createdAt --jq '.[0].createdAt // empty')
-            if [ -z "$latest" ] || [ "$(( $(date -u +%s) - $(date -u -d "$latest" +%s) ))" -gt 129600 ]; then
-              echo "::error::$workflow has no successful run in 36 hours. Inspect and manually dispatch after resolving the failure."
-              exit 1
-            fi
-            echo "$workflow: $latest" >> "$GITHUB_STEP_SUMMARY"
-          done
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Inspect latest scheduled runs and retained reports
+        run: node scripts/pipeline-health.mjs
