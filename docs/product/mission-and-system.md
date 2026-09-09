@@ -4,7 +4,13 @@ Status: proposed alignment and implementation backlog for owner/controller revie
 
 ## What we are building
 
-Working mission: **Help readers understand what exists on Robinhood Chain, what it does, what changed, how it connects, and what the evidence does—or does not—support.**
+Owner-confirmed positioning: **Be the #1 Robinhood ecosystem tracker—for screen-glued analysts and casual readers alike. “SemiAnalysis for the Robinhood ecosystem.”** This is an ambition and editorial shorthand, not a claim of current market leadership or affiliation.
+
+One product, two depths: casual readers get the nutshell—what it is, what happened and why it matters. Analysts get original analysis, mechanisms, activity, relationships, controls and traceable evidence. Simple on the surface, rigorous underneath.
+
+Ecosystem tracking is the product; trustworthy research is its foundation. The tracker supplies facts; original analysis connects the dots and explains implications, with inference and uncertainty explicitly distinguished from verified evidence. We are not merely a directory, dashboard or rewritten-news feed. Start with the existing Robinhood Chain coverage; the broader Robinhood ambition does not silently authorize brokerage or other-chain expansion.
+
+Mission: **Help readers understand what exists, what it does, what changed, how it connects, why it matters, and what the evidence does—or does not—support.**
 
 Proofline is the repository/research system; Icarus is the current public presentation. This review does not rename either. The intended product is a sourced ecosystem registry with maintained research and material change reporting, not a comprehensive price terminal, investment recommendation, contract audit, safety guarantee, or feed of every token launch.
 
@@ -46,6 +52,7 @@ These are design hypotheses grounded in the existing specifications, not results
 | U7 — Reader/project representative: correct an error | Profile → corrections contact → reviewed correction | Contact is reachable; a correction preserves prior evidence/history; a claimant cannot overwrite canonical identity merely by requesting it. End-to-end response handling needs an operational check. |
 | U8 — Bootstrapped operator: maintain the registry | Daily plan → bounded collection → report → selective recovery | Eligibility, skips, holds and retry reasons are visible; failures cannot starve other due work; success reports distinguish execution from data freshness; no automatic paid fallback. |
 | U9 — Grok/Claude: do distinct work | Assigned worklist → sourced packet → verification/controller review | Grok proposes evidence and identity matches, not final merges; verifiers file independent evidence; Claude/controller resolves holds and reviews. No-change is legitimate; actual external session completion is observable. |
+| U10 — Analyst or casual: understand implications | Nutshell → original analysis → supporting evidence and counterevidence | Explain why a development matters, mechanisms and relevant common ties; distinguish analysis from fact; expose uncertainty and contrary evidence. The nutshell and deep read must tell the same story at different depths. |
 
 ## Do we have a design system?
 
