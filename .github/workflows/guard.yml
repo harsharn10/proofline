@@ -1,0 +1,40 @@
+name: Guard
+
+# A PR never carries generated data. content/pulled/** and ops/pull-budget.json are written by the pull
+# bot on main every six hours, so a branch copy is stale by construction and merges as conflicts
+# (PR #80 arrived with 126). A deliberate migration carries the label allow-pulled-data and says why.
+# Separate from Validate on purpose: the feed gate reads Validate's conclusion, and this must not
+# change what that conclusion means. See docs/process.md.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  generated-data:
+    name: No generated data in PRs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Diff the PR against its base
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          ALLOWED: ${{ contains(github.event.pull_request.labels.*.name, 'allow-pulled-data') }}
+        run: |
+          changed=$(git diff --name-only "$BASE...$HEAD" -- content/pulled ops/pull-budget.json || true)
+          if [ -z "$changed" ]; then echo "no generated data in this PR"; exit 0; fi
+          n=$(printf '%s\n' "$changed" | grep -c .)
+          printf '%s\n' "$changed" | head -20
+          if [ "$ALLOWED" = "true" ]; then
+            echo "::warning::$n generated-data files changed; allowed by the label allow-pulled-data"
+            exit 0
+          fi
+          echo "::error::$n files under content/pulled or ops/pull-budget.json changed in a PR. The pull bot owns them on main. Drop them with: git checkout origin/main -- content/pulled ops/pull-budget.json. For a deliberate migration add the label allow-pulled-data and say why in the body."
+          exit 1
