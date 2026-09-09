@@ -3,7 +3,8 @@
 // working tree for .github/workflows/compile.yml to commit. Nothing here merges a PR: producers keep
 // their branches, this reads packet files off them.
 //
-//   node scripts/compile-inbox.mjs [--branch <name>]... [--dry] [--remote origin] [--no-fetch]
+//   node scripts/compile-inbox.mjs --open-prs <snapshot.json> [--dry] [--remote origin] [--no-fetch]
+//   node scripts/compile-inbox.mjs --branch <name> [--branch <name>]... [--dry]  # explicit recovery
 //
 // Contract (docs/research-system.md §6 "Unattended compile"):
 //   - a producer never writes content/**; the compiler is the only writer there;
@@ -21,6 +22,7 @@ import { parse } from "yaml";
 import { parsePacket, validatePacketDirectory } from "./lib/packet.mjs";
 import { runCompile } from "./compile-packet.mjs";
 import { compileDisposition } from "./lib/pipeline-health.mjs";
+import { addressKey } from "./lib/relationships.mjs";
 
 const execFileAsync = promisify(execFile);
 const SCRIPTS_DIR = fileURLToPath(new URL(".", import.meta.url));
@@ -29,7 +31,7 @@ const CONTENT_DIR = "content";
 const REPORT_MD = "build/compile-report.md";
 const REPORT_JSON = "build/compile-report.json";
 /** Long-lived producer branch namespaces. A branch outside these is never read. */
-export const PRODUCER_PREFIXES = ["grok-heavy/", "supergrok/", "grok/", "codex/"];
+export const PRODUCER_PREFIXES = ["grok-heavy/", "grok-bot/", "supergrok/", "grok/", "codex/"];
 const MAX_BUFFER = 64 * 1024 * 1024;
 /** Reverting one bad packet can clear a uniqueness error another packet was blamed for; revalidate. */
 const VALIDATION_PASSES = 5;
@@ -48,7 +50,7 @@ async function git(args, { allowFail = false } = {}) {
 
 function argumentsFor(argv) {
   const branches = [];
-  let dry = false, remote = "origin", fetch = true, base = null;
+  let dry = false, remote = "origin", fetch = true, base = null, openPrsFile = null;
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--dry" || arg === "--dry-run") dry = true;
@@ -63,30 +65,49 @@ function argumentsFor(argv) {
     } else if (arg === "--base") {
       base = argv[++i];
       if (!base) throw new Error("--base requires a ref");
+    } else if (arg === "--open-prs") {
+      openPrsFile = argv[++i];
+      if (!openPrsFile) throw new Error("--open-prs requires a JSON snapshot path");
     } else throw new Error(`unexpected argument ${arg}`);
   }
-  return { branches, dry, remote, fetch, base: base ?? `${remote}/main` };
+  return { branches, dry, remote, fetch, base: base ?? `${remote}/main`, openPrsFile };
 }
 
 /** A branch name as the producer wrote it, with any `<remote>/` prefix stripped. */
 const bareBranch = (name, remote) => (name.startsWith(`${remote}/`) ? name.slice(remote.length + 1) : name);
 
 /**
- * Every producer branch the remote carries that is not already merged into the base. A merged branch has
- * nothing left to lift: its packets are on main, so its files no longer differ.
+ * GitHub PR lifecycle is the intake source of truth. A closed branch is an archive,
+ * not recurring work. Draft PRs are intentionally held; forks cannot name a local ref.
  */
-export async function discoverBranches(remote, base) {
-  const listed = (await git(["for-each-ref", "--format=%(refname:short)", `refs/remotes/${remote}`]))
-    .split("\n").map((line) => line.trim()).filter(Boolean)
-    .filter((name) => name !== `${remote}/HEAD`)
-    .map((name) => bareBranch(name, remote))
-    .filter((name) => PRODUCER_PREFIXES.some((prefix) => name.startsWith(prefix)));
-  const out = [];
-  for (const name of listed) {
-    const merged = await git(["merge-base", "--is-ancestor", `${remote}/${name}`, base], { allowFail: true });
-    if (merged === null) out.push(name);
+export function researchIntake(pages) {
+  if (!Array.isArray(pages)) throw new Error("Missing or invalid open-PR snapshot; refusing legacy branch scan");
+  const rows = pages.flat();
+  const seen = new Set();
+  return rows.map(pr => {
+    if (!pr || !Number.isInteger(pr.number) || !["open", "closed"].includes(pr.state) || typeof pr.draft !== "boolean" ||
+        typeof pr.head?.ref !== "string" || !/^[a-f0-9]{40}$/.test(pr.head?.sha ?? "") ||
+        typeof pr.base?.repo?.full_name !== "string" || typeof pr.base?.ref !== "string") throw new Error("Malformed open-PR snapshot");
+    const branch = pr.head.ref;
+    const state = pr.state !== "open" ? "retired" : pr.head.repo?.full_name !== pr.base.repo.full_name || pr.base.ref !== "main" ? "out-of-scope" :
+      !PRODUCER_PREFIXES.some(prefix => branch.startsWith(prefix)) ? "out-of-scope" : pr.draft ? "held" : "active";
+    if (state === "active" && seen.has(branch)) throw new Error(`Duplicate active intake branch: ${branch}`);
+    if (state === "active") seen.add(branch);
+    return { pr: pr.number, branch, sha: pr.head.sha, state };
+  });
+}
+
+/** An own token is a deployment of its canonical project, never another project identity. */
+export function ownTokenDuplicate(packet, projects) {
+  for (const deployment of packet?.deployments ?? []) {
+    if (deployment.role !== "token") continue;
+    const key = addressKey(deployment.address?.chain, deployment.address?.value);
+    if (!key) continue;
+    const owner = projects.find(project => project.slug !== packet?.slug && (project.deployments ?? []).some(old =>
+      old.role === "token" && addressKey(old.chain, old.address) === key));
+    if (owner) return `token already belongs to canonical project ${owner.slug}; submit token research under ${owner.slug}, not a separate ${packet.slug} profile`;
   }
-  return out.sort();
+  return null;
 }
 
 /** Frontmatter `as_of` as a timestamp, or null when the file does not parse as a packet. */
@@ -271,31 +292,36 @@ export function failingSlugs(output, newcomers = new Set()) {
 export const duplicateReason = ({ other, surface }) =>
   `duplicate of ${other} on ${surface ?? "the official handle/domain"}; write an update packet for ${other} instead of a new name`;
 
-export async function compileInbox({ branches = [], dry = false, remote = "origin", fetch = true, base = `${remote}/main`, log = console.log } = {}) {
+export async function compileInbox({ branches = [], dry = false, remote = "origin", fetch = true, base = `${remote}/main`, openPrs, openPrsFile = null, log = console.log } = {}) {
   const dirty = await git(["status", "--porcelain", "--", CONTENT_DIR, PACKET_ROOT]);
   if (dirty.trim()) throw new Error(`working tree is not clean under ${CONTENT_DIR}/ or ${PACKET_ROOT}/:\n${dirty.trim()}`);
 
   let names = branches.map((name) => bareBranch(name, remote));
+  const intake = names.length ? [] : researchIntake(openPrs ?? (openPrsFile ? JSON.parse(await readFile(openPrsFile, "utf8")) : undefined));
+  if (!names.length) names = intake.filter(row => row.state === "active").map(row => row.branch).sort();
+  if (names.some(name => !PRODUCER_PREFIXES.some(prefix => name.startsWith(prefix)))) throw new Error("Branch is outside producer namespaces");
   if (fetch) {
     if (names.length) {
       for (const name of names)
         await git(["fetch", "--no-tags", remote, `+refs/heads/${name}:refs/remotes/${remote}/${name}`]);
-    } else {
-      await git(["fetch", "--no-tags", "--prune", remote, `+refs/heads/*:refs/remotes/${remote}/*`]);
     }
   }
-  if (!names.length) names = await discoverBranches(remote, base);
+  for (const row of intake.filter(row => row.state === "active")) {
+    const actual = (await git(["rev-parse", `${remote}/${row.branch}`])).trim();
+    if (actual !== row.sha) throw new Error(`Intake head changed for PR #${row.pr}; take a new snapshot before compiling`);
+  }
   log(`${names.length} producer branch(es): ${names.join(", ") || "none"}`);
 
   const report = {
     generated_at: new Date().toISOString(),
-    dry, base, branches: [], compiled: [], inventory: [], notices: [],
+    dry, base, intake, intakeMode: branches.length ? "manual" : "open-prs", branches: [], compiled: [], inventory: [], notices: [],
     gates: {}, shareBar: null, packetPaths: [], preexistingErrors: [], packetWarnings: [], duplicates: [],
   };
 
   // 1. Collect. Every candidate lands in the working tree before anything is validated, so the
   //    per-(work_id, slug) uniqueness check sees the whole batch at once.
   const candidates = [];
+  let projects;
   for (const name of names) {
     const ref = `${remote}/${name}`;
     const branchReport = { branch: name, compiled: [], skipped: [], inventory: [], unchanged: [] };
@@ -305,6 +331,15 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
     catch (error) { branchReport.skipped.push({ path: "(branch)", errors: [error.message] }); continue; }
     for (const candidate of found) {
       if (candidate.skipped) { branchReport.unchanged.push({ path: candidate.path, reason: candidate.skipped }); continue; }
+      if (!projects) {
+        const paths = (await git(["ls-tree", "-r", "--name-only", base, "--", "content/projects"])).trim().split("\n").filter(path => path.endsWith(".yaml"));
+        projects = [];
+        for (const path of paths) projects.push(parse(await git(["show", `${base}:${path}`])));
+      }
+      let duplicate;
+      try { duplicate = ownTokenDuplicate(parsePacket(candidate.branchText).frontmatter, projects); }
+      catch { /* Normal packet validation reports malformed submissions. */ }
+      if (duplicate) { branchReport.skipped.push({ path: candidate.path, errors: [duplicate] }); continue; }
       candidates.push({ ...candidate, branch: name, report: branchReport });
     }
     log(`${name}: ${found.length - branchReport.unchanged.length} candidate packet(s), ${branchReport.unchanged.length} left alone`);
@@ -484,6 +519,10 @@ export function renderReport(report) {
   lines.push(`# Compile report — ${report.generated_at}${report.dry ? " (dry run)" : ""}`);
   lines.push("");
   lines.push(`Outcome: ${report.status ?? compileDisposition(report)}. Execution gates and research disposition are separate.`);
+  if (report.intakeMode) {
+    lines.push(`Intake: ${report.intakeMode}. ${(report.intake ?? []).filter(row => row.state === "active").length} active, ${(report.intake ?? []).filter(row => row.state === "held").length} held PR(s).`);
+    for (const row of report.intake ?? []) lines.push(`- PR #${row.pr}: ${row.state} — ${row.branch} @ ${row.sha}`);
+  }
   lines.push(report.ok
     ? `Gates passed. ${report.compiled.length} packet(s) compiled from ${report.branches.length} branch(es).`
     : `Gates FAILED — content/ and ${PACKET_ROOT}/ were reverted, nothing is staged for main.`);

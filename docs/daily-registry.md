@@ -6,6 +6,10 @@ The user approved a daily, relevance-filtered registry on September 8, 2026. Thi
 
 ## Source of truth
 
+A protocol and its own token are one canonical project profile. Independently launched tokens keep their own project identities and sourced launchpad relationships; sharing a launch factory is not token ownership. Own-token and quote/collateral roles must remain distinct. See the [research identity contract](research-system.md#protocols-own-tokens-and-launched-projects).
+
+Scheduled research intake follows open, ready, same-repository producer PRs; drafts are held and closed historical branches are not work. The GitHub snapshot fails closed on errors and is retained with the report. Retire superseded packets without deleting evidence or relabeling old observations as fresh; see the [September 9 retirement audit](../research/archive/20260909/README.md).
+
 Canonical project deployments and dependency cards are the sources for a derived relationship index, keyed by chain and normalized address. `scripts/lib/relationships.mjs` owns that projection; `scripts/lib/refresh-policy.mjs` owns eligibility. Do not hand-maintain a second address list, relationships spreadsheet, or per-producer relevance policy. `npm run registry:plan` writes the reproducible projection to `build/registry.json`; builds publish it at `/data/registry.json`. The `/relationships` page shows sourced shared contracts and declared dependencies.
 
 Sharing an infrastructure address does not establish common ownership or a common team. A shared token address flags a possible identity conflict for Claude/owner review; it never automatically merges projects. Source IDs are scoped to each project's source ledger. Conflicting claims remain visible. Display names and tickers are labels, never identity keys. Solana address case remains significant.

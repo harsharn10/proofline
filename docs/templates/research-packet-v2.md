@@ -5,6 +5,9 @@
 # From 2026-09-03, seed and full packets require a What it is paragraph, a Themes line and URL-backed events.
 # A required field you attempted and could not establish is the string "NULL — <reason>".
 # Ids are packet-local, start at 1 and are never reused.
+# Use the protocol's canonical slug for its own token. Only independently launched projects get new slugs.
+# Shared factories and quote/collateral tokens are not the subject's own token. Record their sourced relationships.
+# Keep the PR draft until ready for scheduled intake; closing it retires it from automatic collection.
 contract_version: proofline-research-v2
 work_id: WORK-20260902-grok-heavy-example-protocol
 producer: grok-heavy                  # grok-heavy | grok-bot | supergrok | codex | claude | <github id>

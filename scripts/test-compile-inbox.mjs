@@ -11,8 +11,8 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
-import { parse } from "yaml";
-import { compileInbox, duplicateReason, failingSlugs, inventoryCandidateCount, isInventoryPacket } from "./compile-inbox.mjs";
+import { parse, stringify } from "yaml";
+import { compileInbox, duplicateReason, failingSlugs, inventoryCandidateCount, isInventoryPacket, researchIntake, ownTokenDuplicate } from "./compile-inbox.mjs";
 import { runCompile } from "./compile-packet.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -59,7 +59,7 @@ const packetPath = (slug, workId) => `research/inbox/packets/${slug}/${workId}.m
  * A repo shaped like proofline: content/ with one compiled project on main, an empty packet root, and
  * a producer branch carrying `packets` (a map of repo-relative path to text). Returns the work tree.
  */
-async function fixtureRepo(packets) {
+async function fixtureRepo(packets, { ownToken = null } = {}) {
   const root = await mkdtemp(join(tmpdir(), "proofline-compile-inbox-"));
   const origin = join(root, "origin.git");
   const work = join(root, "work");
@@ -90,6 +90,12 @@ async function fixtureRepo(packets) {
   process.chdir(work);
   try { await runCompile({ packetPath: seedPath, contentDir: join(work, "content") }); }
   finally { process.chdir(previous); }
+  if (ownToken) {
+    const path = join(work, "content/projects/alpha.yaml");
+    const project = parse(await readFile(path, "utf8"));
+    project.deployments.push({label:"Alpha own token",role:"token",chain:"robinhood-chain",address:ownToken,verified:false,sources:["S1"]});
+    await writeFile(path,stringify(project));
+  }
 
   await git(work, "add", "-A");
   await git(work, "commit", "-q", "-m", "fixture: main with one project");
@@ -112,7 +118,7 @@ async function fixtureRepo(packets) {
 async function run(work, options = {}) {
   const previous = process.cwd();
   process.chdir(work);
-  try { return await compileInbox({ log: process.env.DEBUG_COMPILE_INBOX ? console.log : () => {}, ...options }); }
+  try { return await compileInbox({ branches: [PRODUCER_BRANCH], log: process.env.DEBUG_COMPILE_INBOX ? console.log : () => {}, ...options }); }
   finally { process.chdir(previous); }
 }
 
@@ -401,6 +407,53 @@ await test("empty and inaccessible producer inputs have distinct operational out
     assert.equal(missing.status,'blocked');assert.equal(missing.ok,true,'safe no-write execution remains successful');
     const persisted=JSON.parse(await readFile(join(work,'build/compile-report.json'),'utf8'));
     assert.equal(persisted.status,'blocked');
+  } finally {await rm(root,{recursive:true,force:true});}
+});
+
+await test("active research intake follows PR lifecycle and fails closed", async () => {
+  const row = {number:62,state:"open",draft:false,head:{ref:PRODUCER_BRANCH,sha:"a".repeat(40),repo:{full_name:"owner/repo"}},base:{ref:"main",repo:{full_name:"owner/repo"}}};
+  assert.equal(researchIntake([[row]])[0].state,"active");
+  assert.equal(researchIntake([{...row,state:"closed"}])[0].state,"retired");
+  assert.equal(researchIntake([{...row,draft:true}])[0].state,"held");
+  assert.equal(researchIntake([{...row,head:{...row.head,repo:{full_name:"fork/repo"}}}])[0].state,"out-of-scope");
+  assert.equal(researchIntake([{...row,head:{...row.head,ref:"grok-bot/new"}}])[0].state,"active");
+  for (const bad of [undefined,{},[{}],[row,row]]) assert.throws(()=>researchIntake(bad));
+  const {root,work}=await fixtureRepo({[packetPath("beta","WORK-20260903-grok-heavy-beta")]:VALID});
+  try {
+    const head=(await git(work,"rev-parse",`origin/${PRODUCER_BRANCH}`)).trim();
+    const current={...row,head:{...row.head,sha:head}};
+    const empty=await run(work,{branches:[],openPrs:[]});
+    assert.equal(empty.status,"no-change");assert.deepEqual(empty.branches,[]);
+    const held=await run(work,{branches:[],openPrs:[{...current,draft:true}]});
+    assert.equal(held.status,"no-change");assert.equal(held.intake[0].state,"held");
+    await assert.rejects(run(work,{branches:[]}),/snapshot/);
+    await assert.rejects(run(work,{branches:[],openPrs:[row]}),/head changed/);
+    const active=await run(work,{branches:[],openPrs:[current]});
+    assert.deepEqual(active.compiled,["beta"]);
+  } finally {await rm(root,{recursive:true,force:true});}
+});
+
+await test("own-token proposals stay within canonical projects; shared launchpads do not merge projects", () => {
+  const token="0x1111111111111111111111111111111111111111", factory="0x2222222222222222222222222222222222222222";
+  const projects=[{slug:"protocol",deployments:[{role:"token",chain:"robinhood-chain",address:token},{role:"factory",chain:"robinhood-chain",address:factory}]}];
+  const packet={slug:"token-copy",deployments:[{role:"token",address:{chain:"robinhood-chain",value:token}}]};
+  assert.match(ownTokenDuplicate(packet,projects),/canonical project protocol/);
+  assert.equal(ownTokenDuplicate({...packet,slug:"protocol"},projects),null);
+  assert.match(ownTokenDuplicate({...packet,slug:"unrelated"},[...projects,{slug:"unrelated",deployments:[]}]),/canonical project protocol/);
+  assert.equal(ownTokenDuplicate({slug:"independent",deployments:[{role:"token",address:{chain:"robinhood-chain",value:"0x3333333333333333333333333333333333333333"}},{role:"factory",address:{chain:"robinhood-chain",value:factory}}]},projects),null);
+  assert.equal(ownTokenDuplicate({...packet,deployments:[{role:"token",address:{chain:"another-chain",value:token}}]},projects),null);
+});
+
+await test("compiler holds a new profile for an existing canonical own token before writing content", async () => {
+  const token="0x1111111111111111111111111111111111111111";
+  const duplicate = VALID.replace("deployments: []", `deployments: [{label: Own token, role: token, address: {chain: robinhood-chain, value: "${token}"}, receipt_ids: [R-1]}]`);
+  const {root,work}=await fixtureRepo({[packetPath("beta","WORK-20260903-grok-heavy-beta")]:duplicate},{ownToken:token});
+  try {
+    const before=await snapshot(join(work,"content"));
+    const report=await run(work);
+    assert.equal(report.status,"blocked");assert.deepEqual(report.compiled,[]);
+    assert.match(report.branches[0].skipped[0].errors[0],/token already belongs to canonical project alpha/);
+    assert.deepEqual(await snapshot(join(work,"content")),before);
   } finally {await rm(root,{recursive:true,force:true});}
 });
 
