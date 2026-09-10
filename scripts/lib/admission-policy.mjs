@@ -1,7 +1,7 @@
 import { addressKey } from './relationships.mjs';
 
 const DAY = 86_400_000;
-export const ADMISSION_POLICY = Object.freeze({ version: 1, evidenceDays: 30, activityDays: 7,
+export const ADMISSION_POLICY = Object.freeze({ version: 2, evidenceDays: 30, activityDays: 7,
   sustainedDays: 7, discoveryLimit: 10, reassessmentDays: 30 });
 const url = value => { try { return new URL(value).protocol === 'https:'; } catch { return false; } };
 
@@ -19,12 +19,16 @@ export function admissionDecision({ subject, observations = [], duplicate = fals
   if (conflict) return { decision: 'hold', reason: 'identity conflict; controller review', research: 'none' };
   if (duplicate) return { decision: 'existing', reason: 'match existing or pending identity; update it', research: 'none' };
   const key = addressKey(subject.chain, subject.address);
+  const token = subject.entity_kind === 'token';
   const evidence = observations.filter(o => {
     if (!o || typeof o !== 'object') return false;
     const age = now - Date.parse(o.observed_at);
     return o.subject === subject.id && o.chain === subject.chain && url(o.source_url) &&
       Number.isFinite(age) && age >= 0 && age <= ADMISSION_POLICY.evidenceDays * DAY &&
-      o.status === 'observed' && (!o.address || key && addressKey(o.chain, o.address) === key);
+      // Every token claim must bind to its exact contract, not only badges/activity.
+      // Tokenless product receipts may omit an address; malformed values are not omission.
+      o.status === 'observed' && ((!token && o.address == null) ||
+        key && addressKey(o.chain, o.address) === key);
   });
   const has = kind => evidence.some(o => o.kind === kind);
   const relevant = has('robinhood-relevance');
@@ -32,14 +36,14 @@ export function admissionDecision({ subject, observations = [], duplicate = fals
   const active = evidence.filter(o => o.kind === 'activity' && Number.isFinite(o.value) && o.value > 0 &&
     (subject.entity_kind !== 'token' || key && addressKey(o.chain, o.address) === key) &&
     now - Date.parse(o.window_end) >= 0 && now - Date.parse(o.window_end) <= ADMISSION_POLICY.activityDays * DAY &&
-    Date.parse(o.window_start) < Date.parse(o.window_end) && o.scope === 'own' && o.complete === true);
+    Date.parse(o.window_start) < Date.parse(o.window_end) &&
+    Date.parse(o.window_end) <= Date.parse(o.observed_at) && o.scope === 'own' && o.complete === true);
   const sustained = active.some(o => Date.parse(o.window_end) - Date.parse(o.window_start) >= ADMISSION_POLICY.sustainedDays * DAY);
   const recognized = evidence.some(o => ['fomo-verified', 'coingecko-active'].includes(o.kind) &&
     key && addressKey(o.chain, o.address) === key);
   const mechanism = has('product-mechanism');
   const deployed = has('deployment');
   const dependency = has('dependency-use');
-  const token = subject.entity_kind === 'token';
   if (has('out-of-scope') && !relevant) return { decision: 'ignore', reason: 'sourced out-of-scope finding', research: 'none' };
   if (!identity || !relevant) return { decision: 'watch', reason: 'identity or Robinhood relevance not established', research: 'targeted' };
   if (subject.lifecycle === 'inactive') return { decision: 'watch', reason: active.length ?
