@@ -208,7 +208,7 @@ TL;DR: .agent names resolve on 4663 to an agent key and wallet. Three of four re
 
 ## Product and mechanics
 
-A .agent name is leased, not owned. register is commit-and-reveal and needs an EIP-712 signature from the agent key; the controller wallet submits and pays. The resolver implements ENS-shaped addr/text/name reads. [claim R-2]
+A .agent name is leased, not owned. register is commit-and-reveal and needs an EIP-712 signature from the agent key; a designated wallet submits the transaction and pays. The resolver implements ENS-shaped addr/text/name reads. [claim R-2]
 
 A sale moves the name's controller, not the agent identity; pointing the name at a different agent still needs that agent's signature. [claim R-2]
 
