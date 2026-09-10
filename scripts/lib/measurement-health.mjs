@@ -1,6 +1,7 @@
 // A read-only projection. Neither execution/build time nor the last transaction dates a measurement.
 import { REFRESH_POLICY, DAY } from './refresh-policy.mjs';
 import { needsExplorerSignal } from './pull/tiers.mjs';
+import { addressKey, buildRelationships, relationshipIndex, subjectObservations, isOwnDeployment } from './relationships.mjs';
 const finite = value => typeof value === 'number' && Number.isFinite(value);
 const time = value => typeof value === 'string' && Number.isFinite(Date.parse(value)) ? Date.parse(value) : null;
 const own = (object,key,fallback) => object && Object.hasOwn(object,key) ? object[key] : fallback;
@@ -14,7 +15,7 @@ export function measurementState(component, now = Date.now()) {
   return now-at > REFRESH_POLICY.freshness ? 'stale' : 'fresh';
 }
 
-export function measurementComponents(file, now = Date.now()) {
+export function measurementComponents(file, now = Date.now(), {activityCritical} = {}) {
   if (!file) return [];
   const out = [];
   const add = (key,at,measured,critical=false,retained=false) => out.push({key,at:at??null,measured:Boolean(measured),critical,retained:Boolean(retained)});
@@ -31,7 +32,8 @@ export function measurementComponents(file, now = Date.now()) {
     add('activity',at,finite(a.txns_24h)||finite(a.launches_24h),false,a.stale_since);
     for (const [i,row] of (a.addresses??[]).entries())
       add(`activity-row:${i}`,own(row,'window_as_of',at),finite(row.txns_24h)||finite(row.launches_24h),
-        needsExplorerSignal({role:row.role,lastTxAt:row.last_tx_at,now}).signal,own(row,'stale_since',a.stale_since));
+        activityCritical ? activityCritical(row) : needsExplorerSignal({role:row.role,lastTxAt:row.last_tx_at,now}).signal,
+        own(row,'stale_since',a.stale_since));
   }
   for (const [i,row] of (file.metrics??[]).entries()) add(`metric:${row.kind}:${i}`,row.as_of,finite(row.value),true);
   if (s) {
@@ -45,15 +47,26 @@ export function measurementComponents(file, now = Date.now()) {
   return out;
 }
 
-export function buildMeasurementManifest({files,plan,baseSha}) {
+export function buildMeasurementManifest({files,plan,baseSha,projects:canonicalProjects,relationships=buildRelationships(canonicalProjects)}) {
+  if (!Array.isArray(canonicalProjects)) throw new Error('Canonical projects are required for measurement attribution');
   const bySlug=new Map(files.map(file=>[file.slug,file]));
+  const canonical=new Map(canonicalProjects.map(project=>[project.slug,project]));
+  const index=relationshipIndex(relationships), now=Date.parse(plan.at);
+  const readers=new Map((plan.infrastructure??[]).map(row=>[row.address,row.reader]));
   const groups=['selected','deferred','not_due','ignored'];
   const projects=groups.flatMap(group=>(plan[group]??[]).map(row=>{
     const file=bySlug.get(row.slug);
+    const project=canonical.get(row.slug);
+    if (!project) throw new Error('Planner project is missing canonical attribution');
+    const subject=subjectObservations(project,file,index);
+    const activityCritical=observation=>(project.deployments??[]).some(deployment=>
+      addressKey(deployment.chain,deployment.address)===addressKey(subject?.chain,observation.address) &&
+      (isOwnDeployment(project,deployment,index)||readers.get(addressKey(deployment.chain,deployment.address))===row.slug) &&
+      needsExplorerSignal({role:deployment.role,lastTxAt:observation.last_tx_at,now}).signal);
     return {slug:row.slug,tier:group==='ignored'?null:row.tier,interval_days:group==='ignored'?null:row.intervalDays,selection:group,
       reason:row.reason,partial:file?.refresh?.status==='partial',
       last_success_at:file?.refresh ? file.refresh.last_success_at??null : file?.pulled_at??null,
-      components:measurementComponents(file,Date.parse(plan.at))};
+      components:measurementComponents(subject,now,{activityCritical})};
   })).sort((a,b)=>a.slug.localeCompare(b.slug));
   if (new Set(projects.map(p=>p.slug)).size!==projects.length) throw new Error('Duplicate planner membership');
   const manifest={version:1,base_sha:baseSha,generated_at:plan.at,projects,

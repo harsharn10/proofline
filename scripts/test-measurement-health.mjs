@@ -4,16 +4,20 @@ import { readFileSync } from 'node:fs';
 import YAML from 'yaml';
 import { measurementState,measurementComponents,buildMeasurementManifest,assessMeasurements } from './lib/measurement-health.mjs';
 import { readPublicManifest,assessServedManifest } from './measurement-health.mjs';
+import { buildRelationships } from './lib/relationships.mjs';
 const sha='a'.repeat(40),at='2026-09-10T06:00:00Z',now=Date.parse(at),old='2026-09-07T06:00:00Z';
-const file=()=>({slug:'example',pulled_at:at,refresh:{status:'complete',last_success_at:at},
-  market:{pulled_at:at,volume_h24:0,top10_share:0.4,top10_as_of:null},
+const address=n=>`0x${String(n).padStart(40,'0')}`;
+const deployment=(n,role)=>({address:address(n),chain:'robinhood-chain',role});
+const project={slug:'example',deployments:[deployment(1,'token'),deployment(2,'factory'),deployment(3,'other')]};
+const file=()=>({slug:'example',chain:'robinhood-chain',pulled_at:at,refresh:{status:'complete',last_success_at:at},
+  market:{token_address:address(1),pulled_at:at,volume_h24:0,top10_share:0.4,top10_as_of:null},
   activity:{pulled_at:at,window_as_of:old,stale_since:old,txns_24h:4,
-    addresses:[{role:'token',window_as_of:at,stale_since:null,txns_24h:0},{role:'factory',window_as_of:null,txns_24h:2}]},
+    addresses:[{address:address(1),role:'token',window_as_of:at,stale_since:null,txns_24h:0},{address:address(2),role:'factory',window_as_of:null,txns_24h:2}]},
   metrics:[{kind:'tvl',value:0,as_of:at}],
   structure:{pulled_at:at,mint:'unknown',renounced:false,lp:[{locked_share:0,as_of:old},{locked_share:null,as_of:at}]},
   addresses:[{is_contract:true}]});
 const row=(tier='hot')=>({slug:'example',tier,intervalDays:{hot:1,live:7,quiet:30,dormant:30}[tier],reason:'fixture'});
-const manifest=(f=file(),r=row(),selection='selected')=>buildMeasurementManifest({files:[f],plan:{at,[selection]:[r]},baseSha:sha});
+const manifest=(f=file(),r=row(),selection='selected')=>buildMeasurementManifest({files:[f],plan:{at,[selection]:[r]},baseSha:sha,projects:[project]});
 const freshFile=()=>{const f=file();for(const row of f.activity.addresses){row.window_as_of=at;row.stale_since=null;}return f;};
 
 test('component dates and null/zero semantics never borrow a file, build or transaction clock',()=>{
@@ -37,7 +41,7 @@ test('hot retained components and partial collection alert; maintenance and expl
   assert.equal(assessMeasurements(manifest(),now).healthy,false);
   const f=freshFile();
   assert.equal(assessMeasurements(manifest(f),now).healthy,true,'noncritical undated structure remains disclosed, not forced daily');
-  f.activity.addresses.push({role:'other',window_as_of:old,stale_since:old,last_tx_at:old,txns_24h:0});
+  f.activity.addresses.push({address:address(3),role:'other',window_as_of:old,stale_since:old,last_tx_at:old,txns_24h:0});
   assert.equal(assessMeasurements(manifest(f),now).healthy,false,'recent activity is dynamic under the existing pull policy');
   f.activity.addresses.at(-1).last_tx_at='2026-08-01';
   assert.equal(assessMeasurements(manifest(f),now).healthy,true,'quiet static rows do not force daily reads');
@@ -50,7 +54,7 @@ test('hot retained components and partial collection alert; maintenance and expl
   assert.equal(assessMeasurements(manifest(file(),row('quiet'),'not_due'),now).healthy,true);
   const overdue=file();overdue.refresh.last_success_at='2026-06-01';
   assert.equal(assessMeasurements(manifest(overdue,row('quiet')),now).healthy,false);
-  const missing=buildMeasurementManifest({files:[],plan:{at,selected:[row()]},baseSha:sha});
+  const missing=buildMeasurementManifest({files:[],plan:{at,selected:[row()]},baseSha:sha,projects:[project]});
   assert.equal(assessMeasurements(missing,now).healthy,false);
 });
 
@@ -73,7 +77,26 @@ test('manifest reader fails closed on malformed membership or shape',()=>{
     {...m,projects:[{...m.projects[0],interval_days:999}]},
     {...m,projects:[{...m.projects[0],components:[{key:'bad'}]}]}])
     assert.throws(()=>assessMeasurements(changed,now),/Invalid/);
-  assert.throws(()=>buildMeasurementManifest({files:[file()],baseSha:sha,plan:{at,selected:[row()],ignored:[row()]}}),/Duplicate/);
+  assert.throws(()=>buildMeasurementManifest({files:[file()],baseSha:sha,projects:[project],plan:{at,selected:[row()],ignored:[row()]}}),/Duplicate/);
+  assert.throws(()=>buildMeasurementManifest({files:[file()],baseSha:sha,plan:{at,selected:[row()]}}),/Canonical/);
+});
+
+test('canonical references and assigned shared readers override historical machine role labels',()=>{
+  const canonical={...project,deployments:[...project.deployments,deployment(4,'reference-token')]};
+  const peer={slug:'peer',deployments:[deployment(2,'factory')]};
+  const projects=[canonical,peer],relationships=buildRelationships(projects);
+  const f=freshFile();f.market={token_address:address(4),pulled_at:old,volume_h24:100};
+  f.activity.addresses.push({address:address(4),role:'token',window_as_of:old,stale_since:old,txns_24h:99});
+  f.activity.addresses.find(r=>r.address===address(2)).window_as_of=old;
+  const before=JSON.stringify(f);
+  const build=reader=>buildMeasurementManifest({files:[f],baseSha:sha,projects,relationships,
+    plan:{at,selected:[row()],infrastructure:[{address:`robinhood-chain:${address(2)}`,reader}]}});
+  const nonreader=build('peer');
+  assert.equal(nonreader.projects[0].components.some(c=>c.key==='market'),false,'quote token market is not a subject measurement');
+  assert.equal(nonreader.projects[0].components.filter(c=>c.key.startsWith('activity-row:')).length,2,'historical quote-token row excluded');
+  assert.equal(assessMeasurements(nonreader,now).healthy,true,'shared factory does not force every attached project daily');
+  assert.equal(assessMeasurements(build('example'),now).healthy,false,'assigned infrastructure reader retains responsibility');
+  assert.equal(JSON.stringify(f),before,'source observations are immutable');
 });
 
 test('public fetch is bounded, unauthenticated, nonredirecting and rejects non-JSON/errors',async()=>{

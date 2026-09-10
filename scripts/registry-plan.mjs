@@ -46,7 +46,7 @@ export async function buildRegistryReport() {
   await mkdir("build", { recursive: true });
   await writeFile("build/registry.json", `${JSON.stringify(report, null, 2)}\n`);
   const observations=(await readDir('content/pulled')).filter(file=>file?.slug);
-  const health=buildMeasurementManifest({files:observations,plan,baseSha:report.base_sha});
+  const health=buildMeasurementManifest({files:observations,plan,baseSha:report.base_sha,projects,relationships});
   await writeFile('build/measurement-health.json',`${JSON.stringify(health)}\n`);
   return report;
 }

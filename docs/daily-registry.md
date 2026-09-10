@@ -101,6 +101,11 @@ An old build alone does not force a daily rebuild when main is unchanged and mea
 their policy. Deployment mismatch remains visible during an in-progress host build; recheck the exact
 revision after deployment. This does not prove research completion or authorize automatic recovery.
 
+Measurement attribution uses the same canonical subject/dependency projection as the website. Old
+quote-token roles in retained files cannot make reference assets the subject's market or daily activity.
+Shared infrastructure is critical only for its existing planner-assigned reader, not every attached
+profile; source files and dates remain unchanged.
+
 The existing optional Pulse Worker remains a separately bounded ten-minute live snapshot. Its checked-in `TELEGRAM_ENABLED` switch is false; the registry's separate `ops/telegram-review.json` ledger has `channel_enabled: true` at the reconciled main snapshot. Do not describe the whole system as paused or infer successful delivery from either flag alone: approval fingerprints, destination configuration and runtime credentials also apply. Preserve each existing setting; collection, compilation and a documentation change do not authorize enabling publication. Pulse source rules are hour-based, so changing its cron to daily would require a different signal design. The researched registry and packet cycle are daily.
 
 ## Frontend and operations
