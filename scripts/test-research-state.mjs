@@ -28,7 +28,10 @@ test('token activity never launches an announced or inactive product', () => {
     assert.equal(productActivityStatus('inactive',located,new Date(now).toISOString(),now),'dormant');
     assert.equal(productActivityStatus('testnet-only',located,new Date(now).toISOString(),now),'testnet');
   }
-  for(const [age,status] of [[0,'live'],[7,'live'],[8,'quiet'],[30,'quiet'],[31,'dormant'],[-1,'quiet']])
+  for(const [age,status] of [[0,'live'],[7,'live'],[8,'quiet'],[30,'quiet'],[31,'dormant'],[-1,'unmeasured']])
     assert.equal(productActivityStatus('mainnet',true,new Date(now-age*86400000).toISOString(),now),status);
-  assert.equal(productActivityStatus('mainnet',true,null,now),'quiet');
+  for (const lifecycle of ['mainnet','beta']) for (const located of [true,false])
+    for (const missing of [null, undefined, '', 'invalid'])
+      assert.equal(productActivityStatus(lifecycle,located,missing,now),'unmeasured');
+  assert.equal(productActivityStatus('unknown',false,null,now),'announced');
 });

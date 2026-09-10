@@ -216,8 +216,6 @@ function HeaderTags({
   token,
 }: Pick<NameCardProps, "dossier" | "dependencies" | "tree" | "site"> & { token: boolean }) {
   const tags: ReactNode[] = [];
-  const address = primaryAddress(dossier);
-  const source = address ? explorerTokenUrl(site.chain.explorer, address) : undefined;
   const audit = auditState(dossier);
   const owner = ownerState(dossier, site);
   const market = dossier.pulled?.market;
@@ -242,8 +240,11 @@ function HeaderTags({
   } else {
     if (tree?.label) tags.push(<Tag key="category" icon="cat" value={tree.label} />);
     for (const theme of dossier.card.themes.slice(0, 1)) tags.push(<Tag key={`mechanism-${theme}`} icon="tag" value={titleCase(theme)} />);
-    const created = dossier.pulled?.addresses.map((row) => row.created_at).filter((value): value is string => Boolean(value)).sort()[0];
-    if (created) tags.push(<Tag key="mainnet" icon="cal" label="Mainnet" value={dateLabel(created)} href={source} />);
+    // A contract's creation date is not the product's launch date. Keep its own source address.
+    const createdContract = dossier.pulled?.addresses
+      .filter((row) => row.is_contract === true && row.created_at && Number.isFinite(Date.parse(row.created_at)))
+      .sort((a, b) => Date.parse(a.created_at!) - Date.parse(b.created_at!))[0];
+    if (createdContract?.created_at) tags.push(<Tag key="contract-created" icon="cal" label="Contract created" value={dateLabel(createdContract.created_at)} href={`${site.chain.explorer.replace(/\/$/, '')}/address/${createdContract.address}`} />);
     const rails = dossier.dependencies.map((id) => dependencies[id]?.name).filter((value): value is string => Boolean(value));
     if (rails.length > 0) tags.push(<Tag key="rails" icon="drop" label={dossier.category.toLowerCase().includes("launch") ? "Graduates into" : "Runs on"} value={rails.join(" / ")} />);
     if (owner) tags.push(<Tag key="owner" icon="key" label="Owner" value={owner.label} href={owner.href ?? undefined} />);
@@ -262,7 +263,7 @@ function CardHeader({ dossier, site, dependencies, tree, section, now, token, wi
   const statusPill = (
     <StatusPill
       status={dossier.kpis.status}
-      relativeTime={['mainnet','beta'].includes(dossier.lifecycle) && dossier.kpis.lastActivityAt ? relativeTime(dossier.kpis.lastActivityAt, now) : null}
+      relativeTime={['live','quiet','dormant'].includes(dossier.kpis.status) && ['mainnet','beta'].includes(dossier.lifecycle) && dossier.kpis.lastActivityAt ? relativeTime(dossier.kpis.lastActivityAt, now) : null}
     />
   );
   return (

@@ -24,7 +24,7 @@ const FILTERS: Array<{ value: Filter; label: string }> = [
   { value: "announced", label: "Announced" },
   { value: "watchlist", label: "Watchlist" },
 ];
-const STATUS_ORDER = { live: 0, quiet: 1, dormant: 2, announced: 3, testnet: 4 } as const;
+const STATUS_ORDER = { live: 0, quiet: 1, unmeasured: 2, dormant: 3, announced: 4, testnet: 5 } as const;
 // Taxonomy sections only map where Rialto publishes a directly comparable TVL category. Sections
 // without one stay silent rather than borrowing a nearby total (for example, launchpads != all DEXs).
 const RIALTO_TVL_CATEGORY: Partial<Record<string, string>> = {
