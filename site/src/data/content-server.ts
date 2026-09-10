@@ -799,7 +799,7 @@ function deltaFrom(history: HistoryPoint[], key: "holders", days: number): numbe
 // Every tracker number on a card comes from here: DexScreener market read, Blockscout activity read,
 // holder counts and their 7-day change from snapshots, DefiLlama TVL. Status is computed from the
 // reads, never typed by a person.
-function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | null, history: HistoryPoint[], now: number, lastActivityAt: string | null): Kpis {
+export function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | null, history: HistoryPoint[], now: number, lastActivityAt: string | null): Kpis {
   const market = pulled?.market ?? null;
   const activity = pulled?.activity ?? null;
   const located = locatedOnChain(pulled);
@@ -807,8 +807,8 @@ function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | nu
   const tvl = pulled?.metrics.find((m) => m.kind === "tvl")?.value ?? null;
   const marketAge = now - Date.parse(market?.pulled_at ?? "");
   const marketFresh = Number.isFinite(marketAge) && marketAge >= 0 && marketAge <= 36 * 3600_000;
-  const windowAge = now - Date.parse(activity?.window_as_of ?? activity?.pulled_at ?? "");
-  const activityFresh = !activity?.stale_since && Number.isFinite(windowAge) && windowAge >= 0 && windowAge <= 36 * 3600_000;
+  // Factory counts use their own observation windows, not the oldest unrelated contract read.
+  const launches = uniqueLaunches(pulled ? [pulled] : [], now);
   const trades = marketFresh ? market?.trades_h24 ?? null : null;
   const status: Kpis['status'] = productActivityStatus(d.lifecycle, located, lastActivityAt, now);
   return {
@@ -822,7 +822,8 @@ function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | nu
     fdv: market?.fdv_usd ?? market?.fdv ?? null,
     holders,
     holdersDelta7d: deltaFrom(history, "holders", 7),
-    launches24h: activityFresh ? activity?.launches_24h ?? null : null,
+    launches24h: launches.value,
+    launches24hPartial: launches.partial,
     txnsTotal: knownTotal(activity?.addresses.map(a => a.transactions_count) ?? []),
     firstPairAt: market?.first_pair_at ?? null,
     tvl,

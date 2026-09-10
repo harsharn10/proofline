@@ -296,12 +296,13 @@ export type Kpis = {
   holders: number | null;
   holdersDelta7d: number | null;
   launches24h: number | null;
+  launches24hPartial: boolean;
   txnsTotal: number | null;
   firstPairAt: string | null;
   tvl: number | null;
   readAt: string | null;
 };
-export type KpiKey = Exclude<keyof Kpis, "status" | "lastActivityAt" | "firstPairAt" | "readAt">;
+export type KpiKey = Exclude<keyof Kpis, "status" | "lastActivityAt" | "firstPairAt" | "readAt" | "launches24hPartial">;
 
 export type ChangelogType = "score" | "risk" | "stage" | "finding" | "correction" | "coverage";
 export type ChangelogSeverity = "Info" | "Review" | "Material" | "Risk";
@@ -739,7 +740,7 @@ export const KPI_LABEL: Record<KpiKey, string> = {
   fdv: "FDV",
   holders: "holders",
   holdersDelta7d: "holders 7d",
-  launches24h: "launches 24h",
+  launches24h: "launch calls 24h",
   txnsTotal: "txns",
   tvl: "TVL",
 };
@@ -752,7 +753,7 @@ export const KPI_SOURCE: Record<KpiKey, string> = {
   fdv: "DexScreener, deepest pool",
   holders: "Blockscout holder count",
   holdersDelta7d: "Blockscout holder count, change over 7 days of snapshots",
-  launches24h: "Blockscout, launch transactions to the factory in 24h",
+  launches24h: "Blockscout, tracked factory launch-method calls in 24h; partial counts may be lower bounds",
   txnsTotal: "Blockscout transaction count",
   tvl: "DefiLlama, Robinhood Chain slice",
 };
@@ -787,7 +788,7 @@ export function formatCount(v: number): string {
   if (v >= 1e4) return `${(v / 1e3).toFixed(0)}K`;
   return Math.round(v).toLocaleString("en-US");
 }
-export function formatKpi(key: KpiKey, v: number | null): string {
+export function formatKpi(key: KpiKey, v: number | null, partial = false): string {
   if (v === null || Number.isNaN(v)) return "—";
   switch (key) {
     case "liquidityUsd":
@@ -800,6 +801,8 @@ export function formatKpi(key: KpiKey, v: number | null): string {
       return `${v > 0 ? "+" : ""}${v.toFixed(1)}%`;
     case "holdersDelta7d":
       return `${v > 0 ? "+" : ""}${formatCount(v)}`;
+    case "launches24h":
+      return `${formatCount(v)}${partial ? " · partial" : ""}`;
     default:
       return formatCount(v);
   }
