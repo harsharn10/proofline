@@ -47,8 +47,9 @@ coverage or publication. The shared site/score/refresh surface predicate separat
 `site`/`docs` links and product `app` links for protocols, applications and tools, with its existing
 observe/conflict exclusions. A token's third-party launchpad listing labelled `app` is not its own
 product surface and does not qualify. A reviewed community-only
-daily-refresh path and token leader thresholds remain separate policy work; an X-only row is not
-automatically promoted by this change. The September 10 threshold replay is a proposal, not a new cutoff.
+daily-refresh path now requires the separate controller decision in
+[daily registry](daily-registry.md#controller-refresh-decisions); an X-only row is not automatically
+promoted. Token leader thresholds and the September 10 threshold replay remain proposals, not new cutoffs.
 
 ### Preparing planner input
 

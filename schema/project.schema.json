@@ -66,6 +66,22 @@
     },
     "themes": { "type": "array", "maxItems": 5, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9:-]*$" } },
     "controller_edited": { "type": "boolean" },
+    "refresh_review": { "type": "object", "additionalProperties": false,
+      "required": ["decision","reviewer","reviewed_at","expires_at","reason","sources","basis"],
+      "properties": {
+        "decision": { "enum": ["community","stop"] },
+        "reviewer": { "type": "string", "pattern": "^(?!(?:pending|tbd|none|todo)$)[a-z0-9-]+$" },
+        "reviewed_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "reason": { "type": "string", "minLength": 1 },
+        "sources": { "$ref": "#/$defs/sourceRefs", "minItems": 1 },
+        "basis": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "chain": { "const": "robinhood-chain" },
+        "address": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$" }
+      },
+      "if": { "properties": { "decision": { "const": "community" } } },
+      "then": { "required": ["chain","address"], "properties": { "chain": true, "address": true, "sources": { "minItems": 2 } } }
+    },
     "lifecycle_source": { "type": "string", "pattern": "^pulled 0x[0-9a-fA-F]{40} [^ ]+$" },
     "official_links": { "type": "array", "items": { "$ref": "#/$defs/link" } },
     "dependencies": { "type": "array", "items": { "$ref": "#/$defs/slug" }, "uniqueItems": true },

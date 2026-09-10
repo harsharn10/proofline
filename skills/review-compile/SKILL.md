@@ -26,6 +26,12 @@ public copy and replay guards. A structural pass is not semantic proof. Use curr
 validation paths; inspect the diff before authorized writes. Leave unrelated facts, IDs and approvals intact.
 Do not suppress errors, extend the legacy baseline or relabel missing evidence to clear the worklist.
 
+Canonical `refresh_review` is controller-owned, separate from identity/editorial approval. Follow
+docs/daily-registry.md for source-bound community exceptions and stop/re-entry decisions. Inspect actual
+receipts before authoring a decision; computing its basis hash does not verify the sources. Compilers
+preserve existing decisions, but changed identity/source evidence invalidates an exception. Never clear
+a stop through a collector packet, a queue request or expiry; release it in an explicitly reviewed change.
+
 Before unattended writes, record the exact-head/path acceptance from `docs/ingestion.md` on the producer
 PR using the controller account. Ready state is not acceptance. A changed head requires new review;
 withdraw with a new hold decision. Collectors must never self-accept through a shared owner account.

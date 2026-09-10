@@ -102,6 +102,7 @@ import { createCreditBudget, blockscoutCreditCost } from "./lib/pull/budget.mjs"
 import { openActivityCache } from "./lib/pull/activity-cache.mjs";
 import { buildRelationships, relationshipIndex, addressKey, isOwnDeployment, referenceReason } from "./lib/relationships.mjs";
 import { refreshDecision, selectRefreshTargets, hasIdentityConflict, selectInfrastructureReaders } from "./lib/refresh-policy.mjs";
+import { refreshReviewStatus } from './lib/refresh-review.mjs';
 import {
   consumeQueue,
   explorerChangeDecision,
@@ -364,7 +365,10 @@ export function aboveShareBar(census, pulled, context = null) {
         isOwnDeployment(project, d, index))) return false;
   }
   return meetsShareBar({
-    officialConfirmed: officialSurfaceConfirmed(census),
+    officialConfirmed: officialSurfaceConfirmed(census) || Boolean(context && refreshReviewStatus({
+      project:context.project,census,sources:context.sources,index:context.index,now:context.now}).community &&
+      addressKey(context.project.refresh_review.chain,context.project.refresh_review.address) ===
+        addressKey(pulled?.chain,pulled?.market?.token_address)),
     hasContractOn4663: locatedOnChain(pulled),
     shareBarMetric: usesLiquidity ? "liquidity" : "tvl",
     kpis: { liquidityUsd: pulled?.market?.liquidity_usd ?? null, tvl },
@@ -577,9 +581,14 @@ async function main() {
   const graph = buildRelationships([...projects.values()], dependencies);
   const graphIndex = relationshipIndex(graph);
   const censusBySlug = new Map(census.map(row => [row.slug, row]));
+  const ledgers = new Map();
+  for (const project of projects.values()) ledgers.set(project.slug,
+    await readYaml(join('content/sources', `${project.slug}.yaml`)).catch(() => null));
   const infrastructureReaders = selectInfrastructureReaders(graphIndex, new Set([...projects.values()]
     .filter(project => censusBySlug.has(project.slug) && addressesFor(project, graphIndex).length > 0 &&
-      !hasIdentityConflict(project, censusBySlug.get(project.slug), graphIndex)).map(project => project.slug)), CHAIN);
+      !hasIdentityConflict(project, censusBySlug.get(project.slug), graphIndex) &&
+      !refreshReviewStatus({project,census:censusBySlug.get(project.slug),sources:ledgers.get(project.slug)?.sources,
+        index:graphIndex,now:Date.parse(pulledAt)}).stopped).map(project => project.slug)), CHAIN);
   const forceCadence = Boolean(args.only || args.full || args.rialtoOnly);
 
   const queueEntries = await readJson("ops/pull-queue.json", []);
@@ -598,15 +607,16 @@ async function main() {
     const addresses = addressesFor(project, graphIndex);
     // A name with no located address still gets a file when its ledger cites a DefiLlama protocol
     // page: the chain-slice metrics are worth reading on their own.
-    const ledger = await readYaml(join("content/sources", `${row.slug}.yaml`)).catch(() => null);
+    const ledger = ledgers.get(row.slug);
     const hasLlama = Boolean(findLlamaSlug(ledger?.sources ?? []));
     if (addresses.length === 0 && !hasLlama) continue;
     const previous = await readYaml(join("content/pulled", `${row.slug}.yaml`)).catch(() => null);
     const history = readHistory(row.slug);
     const lastSnapshot = history.at(-1) ?? null;
     const refresh = refreshDecision({ project, census: row, previous, index: graphIndex, infrastructureReaders,
+      sources: ledger?.sources ?? [],
       seededAt: history[0]?.at ?? previous?.pulled_at,
-      aboveShareBar: aboveShareBar(row, previous, { project, index: graphIndex, now: Date.parse(pulledAt) }),
+      aboveShareBar: aboveShareBar(row, previous, { project, index: graphIndex, sources:ledger?.sources ?? [], now: Date.parse(pulledAt) }),
       queuedAt: queueBySlug.get(row.slug)?.at ?? null,
       now: Date.parse(pulledAt),
       force: forceCadence,
