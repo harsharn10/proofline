@@ -23,6 +23,7 @@ const ROUTES = [
   "/methodology",
   "/relationships",
   "/data/registry.json",
+  "/data/health.json",
   "/disclaimer",
   "/terms",
   "/privacy",
@@ -119,6 +120,13 @@ async function main() {
       const ok = res.status === 200;
       console.log(`  ${ok ? "ok  " : "FAIL"} ${route} -> ${res.status}`);
       if (!ok) failures.push(`${route} returned ${res.status}, expected 200`);
+      if (route === "/data/health.json") {
+        if (!res.headers.get("content-type")?.includes("application/json")) failures.push("measurement health must be JSON");
+        const health = await res.json();
+        if (health.version !== 1 || !/^[a-f0-9]{40}$/.test(health.base_sha ?? "") || !Array.isArray(health.projects) || !health.projects.length) failures.push("measurement health artifact is incomplete");
+        if (JSON.stringify(health).length > 2_000_000) failures.push("measurement health exceeded its reader bound");
+        continue;
+      }
       if (route === "/data/registry.json") {
         if (!res.headers.get("content-type")?.includes("application/json")) failures.push("registry artifact must be JSON, not HTML");
         const registry = await res.json();

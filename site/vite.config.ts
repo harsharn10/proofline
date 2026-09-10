@@ -64,6 +64,8 @@ function prooflineContent(): Plugin {
     generateBundle() {
       const registry = fs.readFileSync(path.join(repositoryRoot, "build/registry.json"), "utf8");
       this.emitFile({ type: "asset", fileName: "data/registry.json", source: registry });
+      const health = fs.readFileSync(path.join(repositoryRoot, "build/measurement-health.json"), "utf8");
+      this.emitFile({ type: "asset", fileName: "data/health.json", source: health });
     },
   };
 }
