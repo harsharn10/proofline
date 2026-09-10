@@ -124,6 +124,41 @@ carry its named questions; a new work ID alone cannot reset a task.
 
 ## Submission lifecycle and rollout
 
+### Controller acceptance for unattended writes
+
+A non-draft producer PR is ready for review, not permission to publish canonical data. After source
+review, the repository owner posts one full acceptance decision on that PR. Use the actual 40-character
+PR head and exact packet paths; this illustrative placeholder is not a runnable acceptance:
+
+````markdown
+<!-- proofline:compile-acceptance:v1 -->
+```json
+{"version":1,"head_sha":"<40-character-PR-head>","decision":"accept","packets":["research/inbox/packets/<slug>/<work-id>.md"]}
+```
+````
+
+The newest posted owner decision wins. To withdraw acceptance, post the same marker with the current
+head, `decision: "hold"` and `packets: []`. A new push invalidates prior acceptance, even when a packet
+path is unchanged. Acceptance is per path: unlisted packets remain held. Malformed owner decisions hold
+the PR rather than falling back to an earlier acceptance. Editing an older comment cannot supersede a
+newer decision. Producer comments, PR labels and passing CI do not grant acceptance.
+
+`node scripts/compile-intake.mjs` exports paginated open PRs and controller comments into ignored
+`build/open-prs.json`. The compiler requires this snapshot for writes, including a manual `--branch`
+selection; snapshots expire after 15 minutes. `--branch` does not revive closed/draft PRs or bypass review.
+An explicit `--dry --branch <branch>` still permits structural review without acceptance, restores the
+working tree and reports `dry-run`; it cannot be used as a push authorization.
+
+The workflow rechecks PR state, exact head, accepted paths and the same decision comment immediately
+before each push attempt. A revoked/edited decision, newer head or GitHub read failure stops the push.
+The report retains acceptance comment IDs, packet paths, PR revisions and checked times. This is a
+bounded check-before-push, not an atomic transaction between GitHub comments and Git refs.
+
+Only the repository owner account currently grants acceptance. This does not prove an independent human
+review when agents share that account's credentials: collectors must not post controller decisions.
+Credential/role isolation remains an operations responsibility; no new token or paid review service is
+introduced. Acceptance authorizes compilation only, not identity merging, scores or Telegram delivery.
+
 1. Controller pins current main, task IDs, gaps, owner, paths, maximum batch and stopping condition in a GitHub issue/assignment.
 2. Collector reads the repository skills, then confirms that same assignment and no pending duplicate.
 3. One short-lived branch/PR contains a bounded batch. Draft means held. No-change means an issue note, no packet/PR.

@@ -23,6 +23,7 @@ import { parsePacket, validatePacketDirectory } from "./lib/packet.mjs";
 import { runCompile } from "./compile-packet.mjs";
 import { compileDisposition } from "./lib/pipeline-health.mjs";
 import { addressKey } from "./lib/relationships.mjs";
+import { packetAcceptance } from './lib/compile-acceptance.mjs';
 
 const execFileAsync = promisify(execFile);
 const SCRIPTS_DIR = fileURLToPath(new URL(".", import.meta.url));
@@ -296,12 +297,13 @@ export function failingSlugs(output, newcomers = new Set()) {
 export const duplicateReason = ({ other, surface }) =>
   `duplicate of ${other} on ${surface ?? "the official handle/domain"}; write an update packet for ${other} instead of a new name`;
 
-export async function compileInbox({ branches = [], dry = false, remote = "origin", fetch = true, base = `${remote}/main`, openPrs, openPrsFile = null, log = console.log } = {}) {
+export async function compileInbox({ branches = [], dry = false, remote = "origin", fetch = true, base = `${remote}/main`, openPrs, openPrsFile = null, repository = process.env.REPO ?? 'harsharn10/proofline', log = console.log } = {}) {
   const dirty = await git(["status", "--porcelain", "--", CONTENT_DIR, PACKET_ROOT]);
   if (dirty.trim()) throw new Error(`working tree is not clean under ${CONTENT_DIR}/ or ${PACKET_ROOT}/:\n${dirty.trim()}`);
 
   let names = branches.map((name) => bareBranch(name, remote));
-  const intake = names.length ? [] : researchIntake(openPrs ?? (openPrsFile ? JSON.parse(await readFile(openPrsFile, "utf8")) : undefined));
+  const snapshot = openPrs ?? (openPrsFile ? JSON.parse(await readFile(openPrsFile, "utf8")) : undefined);
+  const intake = snapshot ? researchIntake(snapshot) : names.length && dry ? [] : researchIntake(snapshot);
   if (!names.length) names = intake.filter(row => row.state === "active").map(row => row.branch).sort();
   if (names.some(name => !PRODUCER_PREFIXES.some(prefix => name.startsWith(prefix)))) throw new Error("Branch is outside producer namespaces");
   if (fetch) {
@@ -310,7 +312,7 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
         await git(["fetch", "--no-tags", remote, `+refs/heads/${name}:refs/remotes/${remote}/${name}`]);
     }
   }
-  for (const row of intake.filter(row => row.state === "active")) {
+  for (const row of intake.filter(row => row.state === "active" && names.includes(row.branch))) {
     const actual = (await git(["rev-parse", `${remote}/${row.branch}`])).trim();
     if (actual !== row.sha) throw new Error(`Intake head changed for PR #${row.pr}; take a new snapshot before compiling`);
   }
@@ -319,7 +321,7 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
   const report = {
     generated_at: new Date().toISOString(),
     dry, base, intake, intakeMode: branches.length ? "manual" : "open-prs", branches: [], compiled: [], inventory: [], notices: [],
-    gates: {}, shareBar: null, packetPaths: [], preexistingErrors: [], packetWarnings: [], duplicates: [],
+    gates: {}, shareBar: null, packetPaths: [], preexistingErrors: [], packetWarnings: [], duplicates: [], acceptances: [],
   };
 
   // 1. Collect. Every candidate lands in the working tree before anything is validated, so the
@@ -336,6 +338,16 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
     for (const candidate of found) {
       if (candidate.held) { branchReport.skipped.push({ path: candidate.path, errors: [candidate.held] }); continue; }
       if (candidate.skipped) { branchReport.unchanged.push({ path: candidate.path, reason: candidate.skipped }); continue; }
+      if (!dry) {
+        const pr = snapshot?.flat().find(pr => pr.head?.ref === name);
+        const acceptance = packetAcceptance(pr, candidate.path, { repository });
+        const actual = (await git(['rev-parse', ref])).trim();
+        if (!acceptance.ok || acceptance.head_sha !== actual) {
+          branchReport.skipped.push({ path: candidate.path, errors: [acceptance.reason ?? 'controller acceptance required: fetched revision changed'] });
+          continue;
+        }
+        report.acceptances.push(acceptance);
+      }
       if (!projects) {
         const paths = (await git(["ls-tree", "-r", "--name-only", base, "--", "content/projects"])).trim().split("\n").filter(path => path.endsWith(".yaml"));
         projects = [];

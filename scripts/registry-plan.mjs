@@ -7,6 +7,7 @@ import { parse } from "yaml";
 import { buildRelationships } from "./lib/relationships.mjs";
 import { REFRESH_POLICY } from "./lib/refresh-policy.mjs";
 import { reassessmentSlice } from './lib/admission-policy.mjs';
+import { buildMeasurementManifest } from './lib/measurement-health.mjs';
 
 export async function buildRegistryReport() {
   const readDir = async dir => Promise.all((await readdir(dir)).filter(f => f.endsWith(".yaml"))
@@ -44,6 +45,9 @@ export async function buildRegistryReport() {
       instruction: "Review source receipts, relationship meaning, new identity collisions and the latest degraded pull report; approve code separately from research and channel delivery." } };
   await mkdir("build", { recursive: true });
   await writeFile("build/registry.json", `${JSON.stringify(report, null, 2)}\n`);
+  const observations=(await readDir('content/pulled')).filter(file=>file?.slug);
+  const health=buildMeasurementManifest({files:observations,plan,baseSha:report.base_sha,projects,relationships});
+  await writeFile('build/measurement-health.json',`${JSON.stringify(health)}\n`);
   return report;
 }
 

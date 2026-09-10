@@ -26,6 +26,11 @@ public copy and replay guards. A structural pass is not semantic proof. Use curr
 validation paths; inspect the diff before authorized writes. Leave unrelated facts, IDs and approvals intact.
 Do not suppress errors, extend the legacy baseline or relabel missing evidence to clear the worklist.
 
+Before unattended writes, record the exact-head/path acceptance from `docs/ingestion.md` on the producer
+PR using the controller account. Ready state is not acceptance. A changed head requires new review;
+withdraw with a new hold decision. Collectors must never self-accept through a shared owner account.
+Use `scripts/compile-intake.mjs` to fetch checked input; manual branch selection cannot bypass acceptance.
+
 Compilation is separate from merge authority and channel publication. After accepted output reaches main,
 verify public fields and private access boundaries; record accepted SHA and per-task disposition. Close a
 finite producer PR only when every packet is accepted, explicitly rejected or transferred to a held task.

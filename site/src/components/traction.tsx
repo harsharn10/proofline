@@ -22,7 +22,7 @@ export function Traction({ kpis, now }: { kpis: Kpis; now: number }) {
         {cells.map((k) => (
           <div className="s" key={k} title={KPI_SOURCE[k]}>
             <div className="k">{KPI_LABEL[k]}</div>
-            <div className={`v num${k === "priceChange24h" || k === "holdersDelta7d" ? (kpis[k]! >= 0 ? " pos" : " neg") : ""}`}>{formatKpi(k, kpis[k])}</div>
+            <div className={`v num${k === "priceChange24h" || k === "holdersDelta7d" ? (kpis[k]! >= 0 ? " pos" : " neg") : ""}`}>{formatKpi(k, kpis[k], kpis.launches24hPartial)}</div>
           </div>
         ))}
       </div>

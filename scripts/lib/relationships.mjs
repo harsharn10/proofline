@@ -149,7 +149,8 @@ export function uniqueLaunches(pulledFiles, now = Date.now()) {
     if (row.role !== "factory") continue;
     const key = addressKey(file.chain, row.address);
     if (!key) continue;
-    const at = row.window_as_of ?? file.activity.window_as_of ?? file.activity.pulled_at;
+    const aggregateAt = Object.hasOwn(file.activity, 'window_as_of') ? file.activity.window_as_of : file.activity.pulled_at;
+    const at = Object.hasOwn(row, 'window_as_of') ? row.window_as_of : aggregateAt;
     // Null is an explicit fresh marker; only an absent legacy field inherits aggregate state.
     const candidate = { row, at, stale: Object.hasOwn(row, 'stale_since') ? row.stale_since : file.activity.stale_since, conflict: false };
     const old = latest.get(key);

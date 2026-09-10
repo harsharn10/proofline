@@ -8,6 +8,9 @@
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
+import YAML from "yaml";
+import { uniqueLaunches } from "../../scripts/lib/relationships.mjs";
+import { formatKpi } from "../src/data/types.ts";
 import { parse } from "yaml";
 
 const PORT = Number(process.env.SMOKE_PORT ?? 8081); // override when 8081 is taken by another worktree's server
@@ -23,6 +26,7 @@ const ROUTES = [
   "/methodology",
   "/relationships",
   "/data/registry.json",
+  "/data/health.json",
   "/disclaimer",
   "/terms",
   "/privacy",
@@ -119,6 +123,13 @@ async function main() {
       const ok = res.status === 200;
       console.log(`  ${ok ? "ok  " : "FAIL"} ${route} -> ${res.status}`);
       if (!ok) failures.push(`${route} returned ${res.status}, expected 200`);
+      if (route === "/data/health.json") {
+        if (!res.headers.get("content-type")?.includes("application/json")) failures.push("measurement health must be JSON");
+        const health = await res.json();
+        if (health.version !== 1 || !/^[a-f0-9]{40}$/.test(health.base_sha ?? "") || !Array.isArray(health.projects) || !health.projects.length) failures.push("measurement health artifact is incomplete");
+        if (JSON.stringify(health).length > 2_000_000) failures.push("measurement health exceeded its reader bound");
+        continue;
+      }
       if (route === "/data/registry.json") {
         if (!res.headers.get("content-type")?.includes("application/json")) failures.push("registry artifact must be JSON, not HTML");
         const registry = await res.json();
@@ -246,6 +257,14 @@ async function main() {
 
     const dossierRes = await fetch(`${BASE}/n/pons`);
     const dossierHtml = await dossierRes.text();
+    const ponsRead = YAML.parse(await readFile(new URL('../../content/pulled/pons.yaml',import.meta.url),'utf8'));
+    const launches = uniqueLaunches([ponsRead],Date.now());
+    if (launches.value !== null) {
+      const expected = formatKpi('launches24h',launches.value,launches.partial);
+      const visible = dossierHtml.includes(expected) && dossierHtml.includes('launch calls 24h');
+      console.log(`  ${visible ? 'ok  ' : 'FAIL'} Pons factory-window KPI is ${expected}`);
+      if (!visible) failures.push('Pons fresh factory KPI must survive unrelated retained activity and label partial counts');
+    }
     for (const slug of ['stonkbroker', 'longbow', 'sight', 'arc', 'alandale']) {
       const response = await fetch(`${BASE}/n/${slug}`);
       const html = await response.text();

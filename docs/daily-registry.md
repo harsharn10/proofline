@@ -61,11 +61,50 @@ Use [the operating map](operating-flow.md) for the single shared flow, owners an
 Grok assignments use the generated bounded worklist; daily limits live in the shared policy.
 This document owns measurement selection, costs and health semantics, not another workflow map.
 
-Health: inspect the latest scheduled main pull/compile runs and their retained reports, not just the last successful workflow badge. Require a successful scheduled run within 36 hours and valid timestamped artifacts. Pull health checks exact selected-name completion, failed/deferred reads, provider exhaustion and plan membership. Intentional selection deferrals are visible backlog, not failed selected work; deferred names whose last success exceeds their interval plus a grace of max(7 days, one interval) alert. Compiler outcomes distinguish complete, no-change, partial, blocked, failed and dry-run; only complete/no-change with successful gates is healthy. Routine superseded copies are not producer errors. Manual narrow dispatches do not substitute for the scheduled cycle; rerun the failed scheduled run after recovery or await the next scheduled cycle. No automatic paid failover or retry storm. Artifacts are retained for 7 days; missing legacy/expired/corrupt artifacts fail closed until a new scheduled run supplies evidence. The health reader uses bounded read-only GitHub requests and no npm install. A cron hosted on GitHub cannot independently detect a complete GitHub outage; public observation timestamps remain the reader-visible fallback. These checks do not independently re-measure every stored field or prove external research sessions completed.
+Health inspects the latest scheduled main coordinator, not just the last successful badge. Require a
+successful scheduled run within 36 hours and timestamped per-lane reports bound to that run ID, attempt
+and trigger SHA by versioned execution receipts. Parent failure and lane outcomes are separate: a
+failed compile does not suppress inspection of a successful pull. The receipt's workspace SHA describes
+checkout/commit state, not the deployed website or fresh measurements. Old-attempt artifacts, manual
+dispatches and missing/expired/corrupt artifacts cannot substitute for current scheduled evidence.
+
+Pull health checks exact selected-name completion, failed/deferred reads, provider exhaustion and plan
+membership. Intentional selection deferrals are visible backlog, not failed selected work; deferred
+names whose last success exceeds their interval plus a grace of max(7 days, one interval) alert.
+Compiler outcomes distinguish complete, no-change, partial, blocked, failed and dry-run; only
+complete/no-change with successful gates is healthy. Routine superseded copies are not producer errors.
+Artifacts are retained for 7 days. The health reader uses bounded read-only GitHub requests and no npm
+install. No automatic paid failover or retry storm. A cron hosted on GitHub cannot independently detect
+a complete GitHub outage; public observation timestamps remain the reader-visible fallback. These
+checks do not independently re-measure every stored field or prove external research sessions completed.
 
 Grok and Claude sessions are external to these workflows. Changing repository instructions does not start or reschedule a running external session. On rollout the owner/controller must point the existing Grok session to the new daily assignment; do not leave the old six-hour prompt running. No model API calls or new paid service are introduced here.
 
 Recovery must also match the workflow version. Rerunning a historical scheduled job can use its old workflow definition with newer checked-out code; do not rerun it blindly after an interface change such as required PR-intake snapshots. Validate recovery against current main, use the current manual workflow where appropriate, and await a new scheduled cycle for scheduled-health evidence. A manual or local dry-run success does not replace that evidence.
+
+The watchdog separately runs `scripts/measurement-health.mjs`, even after execution-report failure.
+It compares the public `/data/health.json` manifest's served SHA to current main and recomputes ages at
+check time. The manifest is built from the existing read-only planner and canonical pulled files;
+it exposes no credentials or private account notes. Requests are HTTPS-only, unauthenticated, bounded
+to 15 seconds and 2 MB with no redirect/retry. Missing or malformed output is unverified, not healthy.
+
+Fresh, stale, retained, undated and unmeasured are distinct component states. Zero is measured; null
+is not. Activity row dates/retention flags take precedence over aggregate dates. Mint, LP and
+concentration use their own field dates; undated legacy/address facts never borrow `pulled_at`.
+Daily hot market/metric components and dynamic activity rows require fresh observations. Activity
+criticality reuses the puller's role/recent-activity predicate; an aggregate containing intentionally
+quiet contracts does not force all of them to refresh daily. Partial collection, future
+dates and maintenance beyond its interval plus max(7 days, one interval) require attention. Ignored
+identities/archives remain disclosed without forcing reads. Noncritical static/structure dates are
+inventory, not an instruction to remeasure every contract daily. Counts describe components, not names.
+An old build alone does not force a daily rebuild when main is unchanged and measurements remain within
+their policy. Deployment mismatch remains visible during an in-progress host build; recheck the exact
+revision after deployment. This does not prove research completion or authorize automatic recovery.
+
+Measurement attribution uses the same canonical subject/dependency projection as the website. Old
+quote-token roles in retained files cannot make reference assets the subject's market or daily activity.
+Shared infrastructure is critical only for its existing planner-assigned reader, not every attached
+profile; source files and dates remain unchanged.
 
 The existing optional Pulse Worker remains a separately bounded ten-minute live snapshot. Its checked-in `TELEGRAM_ENABLED` switch is false; the registry's separate `ops/telegram-review.json` ledger has `channel_enabled: true` at the reconciled main snapshot. Do not describe the whole system as paused or infer successful delivery from either flag alone: approval fingerprints, destination configuration and runtime credentials also apply. Preserve each existing setting; collection, compilation and a documentation change do not authorize enabling publication. Pulse source rules are hour-based, so changing its cron to daily would require a different signal design. The researched registry and packet cycle are daily.
 

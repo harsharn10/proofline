@@ -10,14 +10,26 @@ export function compileDisposition(report) {
   return blocked ? changed ? 'partial' : 'blocked' : changed ? 'complete' : 'no-change';
 }
 
-export function assessRun(run, now = Date.now()) {
+export function assessRun(run, now = Date.now(), { requireSuccess = true } = {}) {
   if (!object(run) || !Number.isSafeInteger(run.databaseId) || run.databaseId <= 0) return ['No scheduled run found'];
   const age = now - Date.parse(run.createdAt);
   const errors = [];
   if (!Number.isFinite(age) || age < 0 || age > 36*HOUR) errors.push('Scheduled run is missing a valid timestamp or older than 36 hours');
-  if (run.status !== 'completed' || run.conclusion !== 'success') errors.push(`Latest scheduled run is ${run.status}/${run.conclusion || 'pending'}`);
+  if (run.status !== 'completed' || (requireSuccess && run.conclusion !== 'success')) errors.push(`Latest scheduled run is ${run.status}/${run.conclusion || 'pending'}`);
   if (run.event !== 'schedule') errors.push('A manual/narrow run is not proof of the scheduled daily cycle');
   return errors;
+}
+
+export function assessReceipt(kind, run, receipt, now = Date.now()) {
+  if (!object(receipt) || receipt.version !== 1 || receipt.kind !== kind ||
+      receipt.run_id !== run.databaseId || receipt.run_attempt !== run.attempt ||
+      !Number.isSafeInteger(run.attempt) || run.attempt < 1 ||
+      receipt.event !== 'schedule' || receipt.trigger_sha !== run.headSha ||
+      !/^[a-f0-9]{40}$/.test(receipt.trigger_sha ?? '') ||
+      !/^[a-f0-9]{40}$/.test(receipt.workspace_sha ?? '') ||
+      !['success','failure','cancelled'].includes(receipt.result) || !reportTime(receipt.at,run,now))
+    return ['Lane receipt does not match this scheduled run, attempt, revision or time'];
+  return [];
 }
 
 function reportTime(at, run, now) {

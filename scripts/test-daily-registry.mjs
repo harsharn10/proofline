@@ -155,6 +155,16 @@ test("explicit fresh factory row survives a stale aggregate; legacy rows inherit
   assert.equal(uniqueLaunches([file],now).value,null);
 });
 
+test('explicit unknown factory dates never borrow a newer aggregate or file date',()=>{
+  const row={address:address(9),role:'factory',window_as_of:null,stale_since:null,launches_24h:0};
+  const file={chain:'robinhood-chain',activity:{window_as_of:new Date(now).toISOString(),pulled_at:new Date(now).toISOString(),addresses:[row]}};
+  assert.equal(uniqueLaunches([file],now).value,null);
+  delete row.window_as_of;
+  assert.equal(uniqueLaunches([file],now).value,0,'absent legacy date inherits documented aggregate window');
+  file.activity.window_as_of=null;
+  assert.equal(uniqueLaunches([file],now).value,null,'explicit unknown aggregate cannot borrow file rewrite time');
+});
+
 test("equally current conflicting observations never depend on file order", () => {
   const file = n => ({chain:'robinhood-chain',activity:{window_as_of:new Date(now).toISOString(),addresses:[
     {address:address(9),role:'factory',launches_24h:n,stale_since:null,errors:[]}
