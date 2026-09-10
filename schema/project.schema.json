@@ -62,7 +62,7 @@
     },
     "risks": {
       "type": "array", "maxItems": 3,
-      "items": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "\\[(?:verified|claim|inference|disputed) S[1-9][0-9]*(?: S[1-9][0-9]*)*\\]$" }
+      "items": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "\\[(?:(?:verified|claim|inference|disputed) S[1-9][0-9]*(?: S[1-9][0-9]*)*|unknown)\\]$" }
     },
     "themes": { "type": "array", "maxItems": 5, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9:-]*$" } },
     "controller_edited": { "type": "boolean" },
