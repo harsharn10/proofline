@@ -25,6 +25,33 @@ do not count them as independent votes or sum their totals. A provider's query t
 
 ## Offline controller command
 
+### Community tokens without a website
+
+A community-only token can be considered for research through the existing observation contract; do not
+invent a website or relabel an X/Telegram/DEX listing URL as `site` or `app` to clear the refresh gate.
+The controller must review a dated primary-account post that crosslinks the **exact chain and token
+contract**, establish that the account belongs to this subject, and retain the receipt in
+`identity-crosslink`. Record separate `robinhood-relevance` and `deployment` observations, plus either
+exact-contract `fomo-verified` / `coingecko-active` recognition or the existing sustained own-activity
+evidence. Use the real full address on token identity and deployment observations, not a ticker.
+Different observation kinds are different claims to verify, not automatically independent sources.
+
+For example, an exact-contract primary post, a reproduced deployment and a matching active CoinGecko
+listing can support a **targeted research recommendation** without a website. A social profile URL,
+badge, mention count or one volume spike alone cannot. Missing or inaccessible receipts stay unknown;
+the program validates declarations, not who controls an account or whether a source tells the truth.
+Existing/pending matches still route to the existing slug and conflicts remain held.
+
+This admission recommendation does not grant daily refresh, public prominence, identity approval,
+coverage or publication. The shared site/score/refresh surface predicate separately recognizes canonical
+`site`/`docs` links and product `app` links for protocols, applications and tools, with its existing
+observe/conflict exclusions. A token's third-party launchpad listing labelled `app` is not its own
+product surface and does not qualify. A reviewed community-only
+daily-refresh path and token leader thresholds remain separate policy work; an X-only row is not
+automatically promoted by this change. The September 10 threshold replay is a proposal, not a new cutoff.
+
+### Preparing planner input
+
 For stored discovery leads, first run `node scripts/planning-inputs.mjs --issue 132` after fetching current
 main/PR refs. It assembles canonical/dependency addresses, pending packet addresses (including drafts),
 subjects from `content/pulled/discovery.yaml`, and runs this planner automatically. Outputs are
