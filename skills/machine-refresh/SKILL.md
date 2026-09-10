@@ -20,6 +20,10 @@ Daily provisional eligibility and quote-asset exclusions are defined in `docs/da
 this skill. Collection eligibility never grants identity or editorial approval. After a pause, report the
 scoped recovery needed; a productive plan alone does not make the site's measurements fresh.
 
+Honor canonical `refresh_review` decisions as defined in daily-registry. A controller stop cannot be
+bypassed by `--only`, `--full`, queue entries or an expired review. Report it for reassessment; do not
+remove it yourself. Community-review invalidation falls back to ordinary selection, not public approval.
+
 Retained measurements keep their measurement dates; failed reads are partial/blocked, never fresh zeroes.
 Inspect completion/deferred/provider reports, not just a green workflow badge. Preserve quota accounting
 on failures; no paid failover, retry storms, credential changes or destructive resets.
