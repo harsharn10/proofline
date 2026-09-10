@@ -71,6 +71,7 @@ export function enforceResearchMinimums(packet) {
   if (isLegacyPacket(packet)) return [];
   const errors = researchMinimumGaps(packet).map(g => `research minimum: ${g}`);
   const f = packet.frontmatter ?? {};
+  if (f.update_reason !== undefined && f.packet_tier !== 'update') errors.push('update_reason belongs only to update packets, not seed/full backfills');
   if (f.packet_tier === 'update') {
     if (!['event', 'measurement', 'correction', 'verification'].includes(f.update_reason)) errors.push('update: declare update_reason (event, measurement, correction or verification); backfills use a full packet');
     if (typeof f.change_summary !== 'string' || !f.change_summary.trim()) errors.push('update: change_summary must explain the material difference, not a routine check');

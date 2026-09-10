@@ -1,5 +1,5 @@
 // Research metrics are latest observations by kind. An older/repeated packet must not roll them back.
-export function measurementUpdateErrors(incoming, previous = []) {
+export function measurementUpdateErrors(incoming, previous = [], { requireChange = true } = {}) {
   const errors = [];
   let changed = false;
   for (const metric of incoming) {
@@ -13,6 +13,6 @@ export function measurementUpdateErrors(incoming, previous = []) {
     if (nextAt === oldAt && value(metric) !== value(old)) errors.push(`measurement ${metric.kind}: conflicting value/window at the same date requires a sourced correction`);
     else if (nextAt !== oldAt || value(metric) !== value(old)) changed = true;
   }
-  if (!changed && !errors.length) errors.push('No new measurement: unchanged observations are not another research update');
+  if (requireChange && !changed && !errors.length) errors.push('No new measurement: unchanged observations are not another research update');
   return errors;
 }

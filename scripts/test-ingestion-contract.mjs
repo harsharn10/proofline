@@ -76,6 +76,8 @@ test('measurements cannot roll back, conflict at the same date or replay unchang
   assert.match(measurementUpdateErrors([{ ...old, value: 200 }], [old]).join(), /conflicting/);
   assert.match(measurementUpdateErrors([old], [old]).join(), /No new measurement/);
   assert.deepEqual(measurementUpdateErrors([{ ...old, as_of: '2026-09-04' }], [old]), []);
+  assert.deepEqual(measurementUpdateErrors([old], [old], { requireChange: false }), []);
+  assert.match(measurementUpdateErrors([{ ...old, as_of: '2026-09-02' }], [old], { requireChange: false }).join(), /older/);
 });
 test('backfill is one deterministic task per canonical name, independent of ordering', () => {
   const a = buildBackfillPlan(input());

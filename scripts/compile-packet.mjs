@@ -124,9 +124,10 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
   try { pulled = await yamlOr(pulledPath, null); } catch { pulled = null; }
   // The census goes in so the compiler can drop an alias that is only another canonical name (§7).
   const result = compile(packet, priorProject, priorCensusRow, priorSources, priorFeed, { pulled, priorResearch, census });
-  if (enforceMinimums && packet.frontmatter.update_reason === 'measurement') {
+  if (enforceMinimums && packet.frontmatter.metrics?.length && packet.frontmatter.update_reason !== 'correction') {
     const kinds = new Set(packet.frontmatter.metrics.map(row => row.kind));
-    const errors = measurementUpdateErrors((result.project.metrics ?? []).filter(row => kinds.has(row.kind)), priorProject?.metrics);
+    const errors = measurementUpdateErrors((result.project.metrics ?? []).filter(row => kinds.has(row.kind)), priorProject?.metrics,
+      { requireChange: packet.frontmatter.update_reason === 'measurement' });
     if (errors.length) throw new Error(errors.join('\n'));
   }
   if (enforceMinimums && packet.frontmatter.update_reason === 'event' &&

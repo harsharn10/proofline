@@ -49,8 +49,9 @@ not create a new row; contradictory copy requires an explicit sourced correction
 URLs can describe different events, so only matching date/kind/title/body is coalesced there. Semantic
 paraphrase detection for general URLs is still a reviewer responsibility. Existing duplicate history is
 not bulk-deleted. An `event` update with no new website row is rejected before canonical writes.
-Measurement updates likewise reject older observations, changed values/windows at the same date, and
-unchanged readings. A genuinely newer measurement can retain the same value. Corrections use the separate
+All incoming research metrics, including full backfills, reject older observations and changed values/windows
+at the same date. Measurement-only updates also reject unchanged readings; a full backfill can retain unchanged
+metrics while improving other evidence. A genuinely newer measurement can retain the same value. Corrections use the separate
 sourced correction path; they do not masquerade as an ordinary refresh.
 
 Other existing gates still apply: receipt/reproduction references, canonical collisions, ownership lanes,
