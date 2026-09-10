@@ -88,6 +88,14 @@ Partial provider failures leave last-success time unchanged and keep requested w
 
 ## Workflow health and recovery
 
+Pull completion describes the current collection attempt, not completeness of all retained evidence.
+Retryable errors are captured directly from current reader results before prior facts and caveats are
+carried forward. Old mint/ABI, concentration or activity caveats remain on their fields but cannot alone
+mark a new attempt partial. A new failure still counts even if its message exactly repeats an old one.
+Unknown ABI/control facts remain unknown; successful collection does not approve or redate them.
+The pull report lists `partial_names` with scoped current retryable errors. A partial name preserves
+last-success and queue state; historical partial records are not rewritten by this code change.
+
 Use [the operating map](operating-flow.md) for the single shared flow, owners and schedule.
 Grok assignments use the generated bounded worklist; daily limits live in the shared policy.
 This document owns measurement selection, costs and health semantics, not another workflow map.

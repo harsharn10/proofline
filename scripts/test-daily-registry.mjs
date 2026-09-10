@@ -379,3 +379,4 @@ test("retry cap counts failed seeds, manual selection overrides caps, ordinary w
 });
 import './test-stock-pairs.mjs';
 import './test-refresh-review.mjs';
+import './test-pull-attempt.mjs';
