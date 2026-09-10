@@ -1,5 +1,12 @@
 import { FULL_WEIGHT_CONFIDENCE, UNAPPROVED_APPROVERS } from "./score.mjs";
 import { leafLabel } from "./taxonomy.mjs";
+import { buildRelationships } from './relationships.mjs';
+
+export function deploymentIdentityWarnings(projects, dependencies = []) {
+  return buildRelationships(projects, dependencies).addresses.filter(node => node.identityConflict)
+    .map(node => `deployment ${node.address} (${node.chain}) has competing own-token claims on ${node.projects
+      .filter(p => p.roles.includes('token')).map(p => p.slug).join(', ')}; resolve identity before merging either record`);
+}
 
 /** Approver values that mean "nobody yet" but are not the literal `pending` the cap keys on. */
 export const PLACEHOLDER_APPROVERS = new Set([...UNAPPROVED_APPROVERS].filter((value) => value !== "pending"));
@@ -246,19 +253,9 @@ export function crossCheck(content) {
     }
   }
 
-  // Re-use of a product deployment across canonical names is never silently merged. Shared admins,
-  // multisigs and infrastructure are expected, but token/factory/router/vault collisions need eyes.
-  const deploymentOwners = new Map();
-  for (const [slug, project] of content.projects) {
-    for (const deployment of project.deployments ?? []) {
-      if (deployment.address === "not-verified" || ["admin", "multisig", "timelock", "implementation"].includes(deployment.role)) continue;
-      const key = `${deployment.chain}:${deployment.address.toLowerCase()}`;
-      const prior = deploymentOwners.get(key);
-      if (prior && prior.slug !== slug)
-        warnings.push(`deployment ${deployment.address} (${deployment.chain}) appears on ${prior.slug} and ${slug}; resolve identity before merging either record`);
-      else deploymentOwners.set(key, { slug, role: deployment.role });
-    }
-  }
+  // Shared infrastructure is a sourced connection, not a duplicate identity. Use the same
+  // address/case/role interpretation as refresh planning and the public relationship map.
+  warnings.push(...deploymentIdentityWarnings([...content.projects.values()], [...(content.dependencies?.values() ?? [])]));
 
   return { errors, warnings };
 }

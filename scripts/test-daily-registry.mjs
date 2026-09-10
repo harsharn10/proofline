@@ -7,6 +7,7 @@ import { refreshDecision, selectRefreshTargets, selectInfrastructureReaders, has
 import { referenceReason, subjectObservations, subjectHistory } from './lib/relationships.mjs';
 import { referenceTokenErrors } from './compile-packet.mjs';
 import { aboveShareBar, addressesFor } from './pull.mjs';
+import { deploymentIdentityWarnings } from './lib/checks.mjs';
 
 const now = Date.parse("2026-09-09T12:00:00Z");
 const address = n => `0x${String(n).padStart(40, "0")}`;
@@ -16,6 +17,16 @@ const a = project("a",1), b = project("b",2);
 const graph = buildRelationships([a,b]);
 const index = relationshipIndex(graph);
 const census = { identity: { status: "verified" }, role: "subject" };
+
+test('validation warnings use own-token conflicts, not shared factories or independent token references',()=>{
+  assert.deepEqual(deploymentIdentityWarnings([a,b]),[]);
+  assert.deepEqual(deploymentIdentityWarnings([a,{...b,deployments:[deployment(1,'reference-token')]}]),[]);
+  const conflict={...b,deployments:[deployment(1,'token')]};
+  assert.equal(deploymentIdentityWarnings([a,conflict]).length,1);
+  assert.deepEqual(deploymentIdentityWarnings([a,{...conflict,deployments:[{...deployment(1,'token'),chain:'ethereum'}]}]),[]);
+  const sol=n=>({slug:n,deployments:[{chain:'solana',address:n.repeat(32),role:'token'}]});
+  assert.deepEqual(deploymentIdentityWarnings([sol('A'),sol('a')]),[]);
+});
 
 test('independent launched tokens remain mapped without transferring their activity or old market to the platform',()=>{
   const owner={...a,deployments:[deployment(1,'token')]};
