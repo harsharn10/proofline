@@ -970,8 +970,6 @@ async function directoryBundle(sectionId?: string): Promise<DirectoryBundle> {
   };
 }
 
-export const getContent = createServerFn({ method: "GET" }).handler(() => directoryBundle());
-
 // The full wire needs neither directory histories/KPIs nor a live Pulse read. Keep its
 // existing order, complete filter universe and build clock without serializing other pages.
 export const getWire = createServerFn({ method: "GET" }).handler(
@@ -1109,6 +1107,7 @@ export const getMethodology = createServerFn({ method: "GET" }).handler(async ()
   return {
     html: renderWholeMarkdown(rawContent.methodology),
     methodologyVersion: content.site.methodology_version,
+    site: { telegram: content.site.telegram, corrections: content.site.corrections },
     chain: content.site.chain,
     trending: content.site.trending,
   };
@@ -1121,6 +1120,8 @@ export const getSiteMeta = createServerFn({ method: "GET" }).handler(async () =>
   const content = getCachedContent();
   return {
     name: content.site.name,
+    title: content.site.title,
+    telegram: content.site.telegram,
     tagline: content.site.tagline,
     updated: content.generatedAt,
     namesOnFile: content.dossiers.length,

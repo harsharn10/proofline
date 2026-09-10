@@ -1,17 +1,14 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getContent, getSiteMeta } from "@/data/content-server";
+import { getSiteMeta } from "@/data/content-server";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
   // Site-wide meta for the header (names on file, trending count, …) — loaded once here
   // rather than SiteHeader fetching its own slice client-side, since it renders outside
   // any route's own loader (mounted once in __root.tsx around every page).
-  loader: async () => {
-    const [meta, directory] = await Promise.all([getSiteMeta(), getContent()]);
-    return { ...meta, title: directory.site.title, telegram: directory.site.telegram };
-  },
+  loader: () => getSiteMeta(),
   head: ({ loaderData }) => ({
     meta: [
       { charSet: "utf-8" },

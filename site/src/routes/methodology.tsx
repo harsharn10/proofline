@@ -1,11 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getContent, getMethodology } from "@/data/content-server";
+import { getMethodology } from "@/data/content-server";
 
 export const Route = createFileRoute("/methodology")({
-  loader: async () => {
-    const [methodology, directory] = await Promise.all([getMethodology(), getContent()]);
-    return { ...methodology, site: directory.site };
-  },
+  loader: () => getMethodology(),
   head: () => ({
     meta: [
       { title: "How to read this · Icarus" },
