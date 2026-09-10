@@ -149,10 +149,11 @@ claims:
   - { id: CLM-15, field: deployment.address, value: "Llama LADDER_MANAGER_V2 0xC5941433114BB47a9733CB31a0A3A3dBfF45B418", class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-15], reproduction_ids: [REP-12], supersedes: null }
   - { id: CLM-16, field: deployment.address, value: "Llama ROUTER_V3 0x46dFEa430d1F069C129E26445319562e29f39C47", class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-16], reproduction_ids: [REP-13], supersedes: null }
   - { id: CLM-17, field: control.owner, value: "VaultFactory, VaultFarmFactory and Llama ROUTER_V3 owner() 0xf98c…2a1d; ladder v3, v8 and both Llama ladder managers owner() 0xb1c2…9e69; both EOAs have empty code in this RPC; no timelock in that path", class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-7, R-8, R-12, R-13, R-16], reproduction_ids: [REP-4, REP-5, REP-9, REP-10, REP-13], supersedes: null }
-  - { id: CLM-18, field: security.audit, value: "Llama audits=0; no report URL on site, docs or X this pass; 2026-08-31 engagement claim from the prior packet is still without an artifact", class: unknown, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-2, R-3, R-17], reproduction_ids: [], supersedes: null }
+  - { id: CLM-18, field: security.audit, value: "No audit report URL established this pass", class: unknown, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [], reproduction_ids: [], supersedes: null }
+  - { id: CLM-26, field: communications.status, value: "Llama protocol record for delta reports audits=0; that is an aggregator field, not a located report", class: claim, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-17], reproduction_ids: [], supersedes: null }
   - { id: CLM-19, field: team.identity, value: "@deltaliquidity posted 2026-09-10 that @cataction_sol joined frontend; no legal entity named", class: claim, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-3], reproduction_ids: [], supersedes: null }
   - { id: CLM-20, field: economics.metric, value: "Llama Robinhood Chain TVL $9,540.89 vs DexScreener DELTA/WETH v3 liquidity $829,483.95 vs @deltaliquidity 2026-09-09 post '2m+ total value locked'; slices are not the same custody", class: claim, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-3, R-5, R-17], reproduction_ids: [], supersedes: null }
-  - { id: CLM-21, field: product.mechanism, value: "Current /docs fee table is 7.5% of claimed fees; prior packet recorded a 1% protocol cut on 2026-09-02", class: claim, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-2], reproduction_ids: [], supersedes: null }
+  - { id: CLM-21, field: product.mechanism, value: "Current /docs fee table is 7.5% of claimed fees; prior packet recorded a 1% protocol cut on 2026-09-02. Docs copy is not a reproduction of the deployed fee setter", class: claim, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-2], reproduction_ids: [], supersedes: null }
   - { id: CLM-22, field: communications.status, value: "Sep 7 tokenomics article, Sep 8 buyback/burn post, Sep 9 '2m+ TVL / 2m+ fees' post, Sep 10 frontend hire", class: claim, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-3], reproduction_ids: [], supersedes: null }
   - { id: CLM-23, field: activity.status, value: "DexScreener DELTA/WETH v3 24h volume $1,560,235.74; token still trades", class: claim, observed_at: 2026-09-10T18:22:00Z, receipt_ids: [R-5], reproduction_ids: [], supersedes: null }
   - { id: CLM-24, field: lifecycle, value: mainnet, class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-4, R-7], reproduction_ids: [REP-1, REP-4], supersedes: null }
@@ -192,7 +193,7 @@ receipts:
   - { id: R-14, publisher: Robinhood RPC, title: "eth_getCode Llama LADDER_MANAGER", url: "https://robinhoodchain.blockscout.com/address/0x64680254BF644BBdDe394b95129895c13317FeD4", published_at: null, accessed_at: 2026-09-10T18:24:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-14], excerpt: "eth_getCode 18721 bytes; owner() 0xb1c2…9e69" }
   - { id: R-15, publisher: Robinhood RPC, title: "eth_getCode Llama LADDER_MANAGER_V2", url: "https://robinhoodchain.blockscout.com/address/0xC5941433114BB47a9733CB31a0A3A3dBfF45B418", published_at: null, accessed_at: 2026-09-10T18:24:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-15], excerpt: "eth_getCode 19168 bytes; owner() 0xb1c2…9e69" }
   - { id: R-16, publisher: Robinhood RPC, title: "eth_getCode Llama ROUTER_V3", url: "https://robinhoodchain.blockscout.com/address/0x46dFEa430d1F069C129E26445319562e29f39C47", published_at: null, accessed_at: 2026-09-10T18:24:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-16, CLM-17], excerpt: "eth_getCode 16391 bytes; owner() 0xf98c…2a1d" }
-  - { id: R-17, publisher: DefiLlama, title: "Delta protocol chain slice", url: "https://api.llama.fi/protocol/delta", published_at: null, accessed_at: 2026-09-10T18:24:00Z, kind: third-party-data, authority: aggregator, authenticity: confirmed, supports: [CLM-18, CLM-20], excerpt: "currentChainTvls['Robinhood Chain'] 9540.89378; audits 0; url https://deltaliquidity.app/; twitter deltaliquidity" }
+  - { id: R-17, publisher: DefiLlama, title: "Delta protocol chain slice", url: "https://api.llama.fi/protocol/delta", published_at: null, accessed_at: 2026-09-10T18:24:00Z, kind: third-party-data, authority: aggregator, authenticity: confirmed, supports: [CLM-20, CLM-26], excerpt: "currentChainTvls['Robinhood Chain'] 9540.89378; audits 0; url https://deltaliquidity.app/; twitter deltaliquidity" }
   - { id: R-18, publisher: Robinhood RPC, title: "eth_getCode DELTA/WETH v3 pair", url: "https://robinhoodchain.blockscout.com/address/0xD64FbdA67E1015dF43Fa5e49F02cA844729E5F94", published_at: null, accessed_at: 2026-09-10T18:24:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-5], excerpt: "eth_getCode 22142 bytes at 0xD64FbdA67E1015dF43Fa5e49F02cA844729E5F94" }
 
 gaps:
@@ -211,23 +212,23 @@ A liquidity manager: users deposit a token or LP into a stake or a shaped Uniswa
 
 Themes: vault, rwa, memecoin
 
-TL;DR: Live LP manager on 4663 whose docs now list ladder v8 and a 7.5% claim fee; Llama's custodied TVL is far below the token book and the project's 2m+ TVL post. [CLM-1 CLM-13 CLM-20]
+TL;DR: LP manager on 4663. Docs list ladder v8 and a 7.5% claim fee; Llama TVL is far below the token book and the 2m+ TVL post.
 
 ## Why it matters
 
-- Thesis: unmanaged Uniswap LP on Robinhood Chain can be deposited or shaped without handing keys to the team [CLM-1].
-- Traction: DELTA/WETH v3 still prints seven-figure 24h volume [CLM-23].
-- Catalyst: which ladder is live, and whether owner bounds in the FAQ match bytecode, remain unread [CLM-25].
+- Thesis: unmanaged Uniswap LP on Robinhood Chain can be deposited or shaped without handing keys to the team. [claim R-2]
+- Traction: DELTA/WETH v3 still prints seven-figure 24h volume. [claim R-5]
+- Catalyst: which ladder is live, and whether owner bounds in the FAQ match bytecode, remain unread. [claim R-2]
 
 ## What could go wrong
 
-- Two EOAs own the vault/ladder stack with no timelock in owner() [CLM-17].
-- FAQ owner limits are unread on unverified source [CLM-25].
-- TVL figures from Llama, DexScreener and X are not the same custody [CLM-20].
+- Two EOAs own the vault/ladder stack with no timelock in owner(). [verified R-7]
+- FAQ owner limits are unread on unverified source. [claim R-2]
+- TVL figures from Llama, DexScreener and X are not the same custody. [claim R-17]
 
 ## Product and mechanics
 
-Stakes attach to one WETH pool and stream rewards over seven days. Pools mint a shaped Uniswap position into a Delta-held NFT. Current docs take 7.5% of claimed fees, never principal; the 2026-09-02 packet recorded 1%. [claim R-2]
+Stakes attach to one WETH pool and stream rewards over seven days. Pools mint a shaped Uniswap position into a Delta-held NFT. Current docs take 7.5% of claimed fees, never principal; the 2026-09-02 packet recorded 1%. That 7.5% is docs copy, not a reproduced on-chain fee. [claim R-2]
 
 Docs now list DeltaLadderManager v8 0xbCb9…d5FB above v3. Both have code. Which one the app uses for new positions was not read from JS. [verified R-13 R-12]
 
