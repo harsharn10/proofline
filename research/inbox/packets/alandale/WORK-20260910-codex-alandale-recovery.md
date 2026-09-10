@@ -1905,6 +1905,12 @@ TL;DR: Robinhood-only ve(3,3) CLMM: lock LUTE for veLUTE, vote emissions, collec
 - Llama audits field is 0; no audit report found on the site, docs, or GitHub this round. [claim R-7 R-12]
 - LUTE owner() is the Minter; AlgebraFactory owner is a small unread contract. [verified R-5]
 
+## Verification passes
+
+- Receipts: on September 10, the site and GitBook welcome crosslinked the site, app and documentation. DefiLlama's Alandale V3 endpoint returned the same site and LUTE address with Robinhood Chain as its only listed chain. These matches support attribution, not an audit or editorial identity approval. [claim R-42 R-44 R-45]
+- Numbers: at chain 4663 block 0x385a4a5, the documented RouterV2, SwapRouter, NonfungiblePositionManager, GaugeRewarder and Airdrop addresses returned 14446, 12286, 24208, 2430 and 2430 bytes of code respectively. The previously reported factory-owner address returned 171 bytes. The exact address mapping is in REP-11; the read proves existence, not current privileges or implementation safety. Historical TVL and volume remain September 9 observations. [verified R-43]
+- Adversarial: code at an address does not establish an audited implementation, safe admin controls or the identity of the controller. Proxy/admin slots and deployment-matched audit evidence remain unresolved. [unknown]
+
 ## Operations log
 
 - 2026-09-09: collector grok-bot. Gap hunted: Alandale / LUTE / veLUTE, absent from content/census.yaml and research/inbox/packets/alandale/ on main SHA c9fc96756d44b69870b33c6ee8f85995eb53f32e. Opened alandale.xyz, app.alandale.xyz, app.alandale.xyz/airdrop, GitBook welcome/contracts/tokenomics, GitHub org/repo, Llama protocol and summary/dexs/fees, holders-revenue, Robinhood RPC with browser UA, Blockscout HTML (API v2 403), DexScreener LUTE/CRUMBS/Hound, Llama ample / t3tris-finance / gami-labs / accountable / fenix-finance.
