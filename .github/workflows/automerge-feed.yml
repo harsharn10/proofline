@@ -127,7 +127,7 @@ jobs:
             echo "Already commented (comment id(s): $EXISTING) — not repeating."
             exit 0
           fi
-          BODY="Validate passed and this packet PR is waiting for controller: every file is an addition or in-place modification under research/inbox/packets/ or research/inbox/assignments/. This workflow cannot merge it. A controller reviews the packet, compiles any canonical change into content/ separately, and merges; channel delivery remains a separate approval in /review.
+          BODY="Validate passed and this packet PR is waiting for controller: every file is an addition or in-place modification under research/inbox/packets/ or research/inbox/assignments/. This workflow cannot merge or accept it. A controller reviews sources and records exact-head/path acceptance under docs/ingestion.md; only then may the compiler lift accepted packets into canonical content. A new push invalidates acceptance. Channel delivery remains a separate approval in /review.
 
           <!-- $MARKER -->"
           gh pr comment "$PR" --repo "$REPO" --body "$BODY"

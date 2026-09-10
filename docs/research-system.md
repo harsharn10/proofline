@@ -232,7 +232,7 @@ only one bot writes main at a time — and runs `scripts/compile-inbox.mjs`:
    `research/inbox/packets/` that differ from main are written into the working tree. A file main already
    carries with an `as_of` at least as new is left alone: main's copy is the one that compiled and a
    controller may have corrected it, so a packet that supersedes it must carry a newer `as_of`.
-   Local automatic runs must pass `--open-prs <snapshot.json>`; there is no fallback scan of all remote branches. Use `--branch` only for explicit review/recovery. An unchanged accepted packet on main is completed work and is not recompiled. Reopening/marking a PR ready reactivates it; do not reopen obsolete separate-token proposals. Preserve retired work under an exact-SHA archival tag and record its canonical destination before removing a closed branch.
+   Local automatic runs must pass `--open-prs <snapshot.json>` from `scripts/compile-intake.mjs`; there is no fallback scan of all remote branches. Canonical writes require the exact-revision, path-scoped controller acceptance defined in [ingestion](ingestion.md#controller-acceptance-for-unattended-writes). Ready state alone never grants acceptance. Use `--branch` only to narrow accepted open PRs, or with `--dry` for explicit structural review. An unchanged accepted packet on main is completed work and is not recompiled. Do not reopen obsolete separate-token proposals. Preserve retired work under an exact-SHA archival tag and record its canonical destination before removing a closed branch.
 2. **Validate.** `validatePacketDirectory` runs over the whole batch at once, so the per-(`work_id`,
    `slug`) uniqueness check sees every packet. A packet with errors is put back the way main has it and
    its errors are collected against its branch; the rest of the batch carries on. Reverting one packet
@@ -253,7 +253,7 @@ only one bot writes main at a time — and runs `scripts/compile-inbox.mjs`:
    never pushed.
 5. **Push.** The workflow commits `content/` plus the packets it compiled as `proofline-bot`, message
    `compile: <n> packets from <branches>` with the trailer `Producer: compile-bot`, then rebases onto main
-   and pushes, retrying three times. Copying the packets onto main is what makes the next run a no-op: the
+   and revalidates the exact controller acceptance against GitHub before each push attempt, retrying at most three times. Missing/revoked acceptance or a changed PR head prevents the push. Copying the packets onto main is what makes the next run a no-op: the
    branch file no longer differs. Render redeploys from main.
 
 The report is `build/compile-report.md`, with `build/compile-report.json` for the workflow. Per branch it
