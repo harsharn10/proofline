@@ -62,6 +62,44 @@ await test("compile a full packet into an existing stub without granting full co
   assert.ok(!("scoring" in update.project));
 });
 
+await test("unknown card evidence survives mapping, fallback and truncation without borrowed sources", async () => {
+  for (const suffix of ["[unknown]", "[unknown]   "]) {
+    const packet = await fixture("new-seed.md");
+    packet.body = `## What could go wrong\n\n- No audit report was located. ${suffix}\n`;
+    assert.deepEqual(compile(packet).project.risks, ["No audit report was located. [unknown]"]);
+  }
+
+  const packet = await fixture("new-seed.md");
+  packet.body = "## What could go wrong\n\n- No audit report was located. [verified R-999]\n";
+  assert.throws(() => compile(packet), /R-999 is referenced but not defined/);
+  packet.body = `## What could go wrong\n\n- ${"The audit scope remains unresolved and needs investigation; ".repeat(8)} [unknown]\n`;
+  const [risk] = compile(packet).project.risks;
+  assert.ok(risk.length <= 200);
+  assert.match(risk, /… \[unknown\]$/);
+  assert.ok(!risk.includes("[claim"));
+
+  packet.body = `## What could go wrong\n\n- ${"Some contract code exists but audit coverage remains unresolved; ".repeat(8)} [verified R-1] [unknown]\n`;
+  const [mixed] = compile(packet).project.risks;
+  assert.ok(mixed.length <= 200);
+  assert.match(mixed, /… \[verified S1\] \[unknown\]$/);
+});
+
+await test("derived unknown reasons are not promoted to sourced claims and unknown risk paragraphs survive", async () => {
+  const packet = await fixture("new-seed.md");
+  packet.body = `## Why it matters\n\nProduct utility is unknown. Activity is unknown. Adoption is unknown. [unknown]\n\n## What could go wrong\n\nNo audit report was located. [unknown]\n`;
+  const result = compile(packet);
+  assert.equal(result.project.why_people_care, undefined);
+  assert.deepEqual(result.project.risks, ["No audit report was located. [unknown]"]);
+  assert.ok(result.notices.some(n => n.includes("every bullet needs a source id")));
+
+  packet.body = "## What could go wrong\n\n- Missing audit scope.\n- Code exists. [verified R-1]\n- Audit coverage remains disputed. [disputed R-1]\n";
+  assert.deepEqual(compile(packet).project.risks, [
+    "Missing audit scope. [claim S1]",
+    "Code exists. [verified S1]",
+    "Audit coverage remains disputed. [disputed S1]",
+  ], "untagged fallback and explicit sourced classes keep their existing behavior");
+});
+
 await test("an explicit conflict keeps prior state and files the disagreement", async () => {
   const seed = compile(await fixture("new-seed.md"));
   const prior = compile(await fixture("update-full.md"), seed.project, seed.censusRow, seed.sources, seed.feed);

@@ -581,7 +581,7 @@ function stripCodeMarks(value) {
 
 // Every consecutive closing tag, not just the last one: a paragraph often closes
 // "[verified S39] [claim S36]" and dropping the first group would drop a receipt.
-const CANONICAL_TAGS_END_RE = /(?:\s*\[(?:verified|claim|inference|disputed)\s+S[1-9][0-9]*(?:\s+S[1-9][0-9]*)*\])+\s*$/i;
+const CANONICAL_TAGS_END_RE = /(?:\s*\[(?:(?:verified|claim|inference|disputed)\s+S[1-9][0-9]*(?:\s+S[1-9][0-9]*)*|unknown)\])+\s*$/i;
 
 /** Split "prose [verified S1] [claim S3]" into its parts; an untagged bullet keeps an empty tag. */
 function splitTrailingTag(value) {
@@ -600,7 +600,8 @@ function sentencesOf(text) {
 /**
  * Fit a bullet inside the card budget without ever losing it. First choice is the whole paragraph,
  * then its first sentence, then the longest clause that fits, marked with an ellipsis so the reader
- * can see it was cut. The source tag always survives — a bullet without its receipt is not publishable.
+ * can see it was cut. Evidence tags always survive, including an explicit unknown without a source.
+ * An unknown must never borrow the packet's primary receipt just to fill a card.
  */
 function fitBullet(value, limit) {
   const { prose, tag } = splitTrailingTag(value);
@@ -693,7 +694,7 @@ function v3FieldsFromBody(frontmatter, body, receiptToSource, notice) {
   // write to a length limit or to the bullet contract.
   const shapeFit = (value, limit = MAX_BULLET) => {
     let mapped = normalizeText(stripCodeMarks(mappedTag(value, receiptToSource)));
-    if (!CANONICAL_SOURCE_TAG_RE.test(mapped))
+    if (!CANONICAL_TAGS_END_RE.test(mapped))
       mapped = `${mapped} ${derivedTag(frontmatter, value, receiptToSource, fallbackReceiptId)}`;
     return fitBullet(mapped, limit);
   };
@@ -757,7 +758,7 @@ function v3FieldsFromBody(frontmatter, body, receiptToSource, notice) {
   for (const item of candidates) {
     if (risks.length === 3) { notice(`risks: kept the first 3 of ${candidates.length} entries`); break; }
     let mapped = normalizeText(stripCodeMarks(mappedTag(item, receiptToSource)));
-    if (!CANONICAL_SOURCE_TAG_RE.test(mapped))
+    if (!CANONICAL_TAGS_END_RE.test(mapped))
       mapped = `${mapped} ${derivedTag(frontmatter, item, receiptToSource, fallbackReceiptId)}`;
     const fitted = fitBullet(mapped, MAX_BULLET);
     if (fitted) risks.push(fitted);
