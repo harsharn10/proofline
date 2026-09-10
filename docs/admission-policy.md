@@ -81,11 +81,17 @@ observations: []
 rialto_pulled: [] # optional existing content/pulled/<slug>.yaml objects; no new collector
 ```
 
-An observation has `subject`, `chain`, optional exact `address`, `kind`, `source_url`, `observed_at`,
+An observation has `subject`, `chain`, `address`, `kind`, `source_url`, `observed_at`,
 and `status: observed`. Kinds: `identity-crosslink`, `robinhood-relevance`, `deployment`,
 `product-mechanism`, `dependency-use`, `fomo-verified`, `coingecko-active`, `out-of-scope`, `activity`.
 Activity additionally needs numeric `value`, `metric`, `window_start`, `window_end`, `scope: own`,
-and `complete: true`. Token activity requires the exact contract. These declarations require source review;
+and `complete: true`. Policy version 2 requires the exact subject contract on **every token observation**,
+including identity, relevance, deployment, recognition, dependency and out-of-scope claims. Missing/null,
+malformed, pool-ID, wrong-contract and wrong-chain token receipts do not qualify. EVM address case is
+normalized, never a ticker join. Tokenless product receipts may omit `address` (or use null); an explicit
+malformed address is not omission. A complete activity window must end no later than its own
+`observed_at`, as well as meeting the existing seven-day recency and duration requirements. A later
+planner run or file timestamp cannot repair an impossible measurement window. These declarations require source review;
 the program checks shape/identity/time, not truth. Do not fabricate declarations from a badge or project name.
 Pending snapshots expire after 24 hours. Selection is capped at ten seeds; it is not an assignment claim.
 
@@ -133,7 +139,8 @@ note, not a packet or news item. The existing daily scheduler and provider caps 
 ## Regression cases
 
 `scripts/test-admission-policy.mjs` covers recognition without identity, mismatched contracts/chains,
-preview listings, tokenless products, dependency relevance, short spikes, zero/negative activity, stale/future
+preview listings, missing/malformed token contracts on prerequisite claims, tokenless products, dependency
+relevance, impossible observation/window ordering, short spikes, zero/negative activity, stale/future
 evidence, inactive/announced states, duplicate subjects, partial/expired Dune results, source replay,
 Rialto attribution and file-timestamp false freshness. These are synthetic policy tests, not verification of
 real project identities. The 176 provisional/five conflicted identities are not bulk approved by this work.

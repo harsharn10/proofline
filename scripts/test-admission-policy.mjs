@@ -48,6 +48,46 @@ test('reviewed community-token receipts can recommend research without granting 
     {kind:'app',url:`https://app.long.xyz/tokens/${address}`}]}),false,'a launchpad listing does not bypass token evidence review');
   assert.deepEqual(input,[...communityBase,recognized],'recommendations do not mutate or approve evidence');
 });
+test('every token admission receipt needs the exact subject contract, including prerequisite claims',()=>{
+  const valid=[...base,obs('coingecko-active')];
+  for(const kind of ['identity-crosslink','robinhood-relevance','deployment','coingecko-active']) {
+    for(const invalid of [undefined,null,'','EXAMPLE','0x'+'2'.repeat(40),'0x'+'1'.repeat(64)]) {
+      const input=valid.map(o=>o.kind===kind?{...o,address:invalid}:o);
+      assert.equal(decide(input).decision,'watch',`${kind}: ${String(invalid)} must not qualify`);
+    }
+  }
+  for(const invalid of [undefined,null,'','EXAMPLE']) {
+    assert.equal(decide([...valid,obs('dependency-use')],{subject:{...subject,address:invalid}}).decision,'watch');
+    assert.equal(decide([{...obs('out-of-scope'),address:invalid}]).decision,'watch',
+      'an unbound finding cannot ignore a token');
+  }
+  const mixedAddress='0x'+'aB'.repeat(20);
+  assert.equal(decide(valid.map(o=>({...o,address:mixedAddress.toLowerCase()})),
+    {subject:{...subject,address:mixedAddress}}).decision,'seed');
+  assert.equal(decide([...base,{...obs('dependency-use'),address:undefined}]).decision,'watch',
+    'unbound dependency claims cannot bypass token significance');
+  assert.equal(decide([...base,{...activity,address:undefined}]).decision,'watch');
+});
+test('tokenless product and dependency research keeps optional-address evidence',()=>{
+  const product={...subject,entity_kind:'protocol',address:undefined};
+  const evidence=[...base,obs('product-mechanism')].map(({address,...o})=>o);
+  assert.equal(decide(evidence,{subject:product}).decision,'seed');
+  assert.equal(decide([...evidence,{...obs('dependency-use'),address:undefined}],{subject:product}).research,'full');
+  assert.equal(decide(evidence.map(o=>({...o,address:''})),{subject:product}).decision,'watch',
+    'an explicit malformed address is not an absent address');
+});
+test('activity windows cannot claim measurements made after the receipt was observed',()=>{
+  assert.equal(decide([...base,activity]).decision,'seed','window end may equal observation time');
+  const earlierReceipt={...activity,observed_at:'2026-09-09T12:00:00Z'};
+  assert.equal(decide([...base,earlierReceipt]).decision,'watch');
+  assert.equal(decide([...base,{...earlierReceipt,window_end:earlierReceipt.observed_at}]).decision,'seed');
+  for(const change of [{window_start:'invalid'},{window_end:'invalid'},{window_start:at},
+    {observed_at:'2026-09-11T12:00:00Z'},{window_end:'2026-09-11T12:00:00Z'}])
+    assert.equal(decide([...base,{...activity,...change}]).decision,'watch');
+  assert.equal(decide([...base,{...obs('product-mechanism')},{...earlierReceipt,address:undefined}],
+    {subject:{...subject,entity_kind:'protocol'}}).research,'targeted',
+    'tokenless product remains researchable but impossible activity cannot justify full research');
+});
 test('protocols and dependencies need no token badge; token spikes do not buy full research',()=>{
   assert.equal(decide([...base,obs('product-mechanism')],{subject:{...subject,entity_kind:'protocol'}}).decision,'seed');
   assert.equal(decide([...base,obs('dependency-use')]).research,'full');
@@ -97,6 +137,27 @@ test('planner requires a fresh pending snapshot and holds duplicate candidate ad
   const input={subjects:[subject,{...subject,id:'other'}],observations:base,existing_addresses:[],pending_addresses:[],pending_checked_at:new Date().toISOString()};
   const report=await admissionPlan(input);assert.ok(report.results.every(r=>r.decision==='hold'));
   await assert.rejects(admissionPlan({...input,pending_checked_at:'2020-01-01'}));
+});
+test('planner applies contract and activity integrity before allocating seed slots, without mutating inputs',async()=>{
+  const checked=new Date().toISOString();
+  const input={subjects:[subject],observations:[...base,obs('coingecko-active')].map(o=>({...o,observed_at:checked})),
+    existing_addresses:[],pending_addresses:[],pending_checked_at:checked};
+  const original=structuredClone(input);
+  const valid=await admissionPlan(input);
+  assert.deepEqual(valid.selected_seeds,['example']);
+  assert.equal(valid.policy.version,2);
+  assert.equal(valid.recommendations_only,true);
+  const missingContract=await admissionPlan({...input,observations:input.observations.map(o=>
+    o.kind==='deployment'?{...o,address:null}:o)});
+  assert.deepEqual(missingContract.selected_seeds,[]);
+  assert.equal(missingContract.results[0].decision,'watch');
+  const end=Date.now()-1000;
+  const impossibleActivity={...activity,observed_at:new Date(end-86400_000).toISOString(),
+    window_start:new Date(end-8*86400_000).toISOString(),window_end:new Date(end).toISOString()};
+  const impossible=await admissionPlan({...input,observations:[...input.observations.slice(0,3),impossibleActivity]});
+  assert.deepEqual(impossible.selected_seeds,[]);
+  assert.equal(impossible.results[0].decision,'watch');
+  assert.deepEqual(input,original);
 });
 test('unreferenced dependencies remain visible; imports are not separate capital totals',()=>{
   assert.deepEqual(buildRelationships([],[{id:'morpho',name:'Morpho'}]).dependencies,[{id:'morpho',name:'Morpho',projects:[]}]);
