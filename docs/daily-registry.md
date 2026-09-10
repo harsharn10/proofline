@@ -45,6 +45,37 @@ These thresholds are conservative operating defaults, not a ranking of project q
 
 ## Cost and collection boundaries
 
+### Controller refresh decisions
+
+An optional `refresh_review` on the canonical project controls **machine collection only**. The
+compiler preserves it and cannot accept it from packet frontmatter. The controller must inspect the
+actual sources and submit a reviewed canonical change; an admission recommendation is not this approval.
+No existing name is opted in by the schema change, and public share-bar/coverage/identity flags stay separate.
+
+Fields: `decision: community|stop`, `reviewer`, `reviewed_at`, `expires_at`, `reason`, canonical source
+IDs in `sources`, and SHA-256 `basis`. Community decisions additionally name `chain: robinhood-chain`
+and the exact own-token `address`. Two distinct, available HTTPS receipts must crosslink that contract:
+a primary social/announcement receipt and an explorer/data corroboration, accessed within 30 days of
+review. Controller review must establish account ownership, relevance and significance (recognition or
+sustained own activity); text containing an address is only a structural safeguard, not semantic proof.
+
+Use `refreshReviewBasis(project, census, ledger.sources)` from `scripts/lib/refresh-review.mjs` after
+preparing the decision without `basis`. It binds the decision, canonical identity, links, qualification,
+lifecycle, deployments and referenced receipt contents. `node scripts/refresh-review.mjs <slug>` prints
+the current basis and status without writing, approving or queueing anything. Changed basis/receipt
+availability invalidates the community exception; it falls back to normal policy, never public approval.
+The review lasts at most 30 days, and daily selection still requires dated own-token liquidity/activity,
+deployment, non-observe/non-conflicted identity and all normal quota/fairness gates.
+
+`stop` requires a sourced controller rationale (e.g. confirmed closure, out-of-scope or reviewed selection
+exit). A stop takes precedence over seed, queue, manual force and infrastructure-reader assignment.
+Reassessment is due at its expiry (at most 90 days), but **expiry or changed evidence never resumes reads**.
+Release requires an explicit controller change removing/replacing the decision, with evidence and reason
+in its PR; Git history retains the stop. Do not classify a source outage, a stale snapshot or low activity
+alone as abandonment or a rug. The planner reports stopped names for cheap reassessment; it does not
+create a new polling loop. Final token cohort thresholds and a live viability-before-deep-read gate remain
+separate work requiring fresh measurements; the historical threshold experiment is not applied here.
+
 When both fresh and failed seeds are due, up to half the available seed slots are reserved for failed seeds and the remainder for new seeds, with unused space shared. This prevents continuous discovery from indefinitely postponing all failed initial reads. This is allocation fairness, not a guarantee that provider/time limits let every selected name finish.
 
 Blockscout requests reserve the documented route weight (usually 20 credits), including retries. The daily credit cap is 60,000, the automatic run cap 40,000; the provider advertises 100,000 free credits/day. The remaining 20,000 internal allowance supports explicit recovery without consuming provider headroom. These are weighted credits, not physical requests. Legacy same-day counters are multiplied by 20 on read and emitted as version 2. A 402 opens a persisted provider breaker until the next UTC date. Remaining-credit headers can only lower the local remaining allowance; conservative reservation slack may leave credits unused.
