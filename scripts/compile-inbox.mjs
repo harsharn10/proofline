@@ -144,9 +144,9 @@ export function inventoryCandidateCount(packet) {
 /**
  * Packet files on `ref` that differ from `base`, as { path, branchText, mainText }.
  * A file deleted on the branch is left alone — a producer does not delete from main.
- * A file main already carries with an `as_of` at least as new is left alone too: main's copy is the one
+ * A file main already carries with a newer `as_of` is left alone too: main's copy is the one
  * the compiler wrote and a controller may have corrected, and a packet that supersedes it must say so
- * with a newer `as_of`.
+ * with a newer `as_of`. Differing equal-date copies are held, not treated as completed work.
  */
 export async function candidatesFor(ref, base) {
   const raw = await git(["diff", "--no-renames", "--name-status", "-z", base, ref, "--", PACKET_ROOT]);
@@ -161,6 +161,10 @@ export async function candidatesFor(ref, base) {
     const mainText = await git(["show", `${base}:${path}`], { allowFail: true });
     if (mainText !== null) {
       const mine = asOfMs(mainText), theirs = asOfMs(branchText);
+      if (mine !== null && mine === theirs && mainText !== branchText) {
+        out.push({ path, held: 'submitted packet differs from main at the same as_of; controller review required' });
+        continue;
+      }
       if (mine !== null && theirs !== null && mine >= theirs) {
         out.push({ path, skipped: `main already carries a copy dated ${new Date(mine).toISOString()}; the branch copy is not newer` });
         continue;
@@ -330,6 +334,7 @@ export async function compileInbox({ branches = [], dry = false, remote = "origi
     try { found = await candidatesFor(ref, base); }
     catch (error) { branchReport.skipped.push({ path: "(branch)", errors: [error.message] }); continue; }
     for (const candidate of found) {
+      if (candidate.held) { branchReport.skipped.push({ path: candidate.path, errors: [candidate.held] }); continue; }
       if (candidate.skipped) { branchReport.unchanged.push({ path: candidate.path, reason: candidate.skipped }); continue; }
       if (!projects) {
         const paths = (await git(["ls-tree", "-r", "--name-only", base, "--", "content/projects"])).trim().split("\n").filter(path => path.endsWith(".yaml"));

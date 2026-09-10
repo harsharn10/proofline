@@ -12,7 +12,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { parse, stringify } from "yaml";
-import { compileInbox, duplicateReason, failingSlugs, inventoryCandidateCount, isInventoryPacket, researchIntake, ownTokenDuplicate } from "./compile-inbox.mjs";
+import { compileInbox, candidatesFor, duplicateReason, failingSlugs, inventoryCandidateCount, isInventoryPacket, researchIntake, ownTokenDuplicate } from "./compile-inbox.mjs";
 import { runCompile } from "./compile-packet.mjs";
 import { seedWithMinimums } from './lib/research-test-fixture.mjs';
 
@@ -122,6 +122,29 @@ async function run(work, options = {}) {
   try { return await compileInbox({ branches: [PRODUCER_BRANCH], log: process.env.DEBUG_COMPILE_INBOX ? console.log : () => {}, ...options }); }
   finally { process.chdir(previous); }
 }
+
+await test("same-date differences from main are held, not hidden as unchanged or recompiled", async () => {
+  const path = packetPath("alpha", "WORK-20260902-grok-heavy-alpha");
+  const { root, work } = await fixtureRepo({ [path]: packetFor({
+    slug: "alpha", name: "Alpha", symbol: "ALP", address: "0x1111111111111111111111111111111111111111",
+    workId: "WORK-20260902-grok-heavy-alpha", asOf: "2026-09-02T09:00:00Z",
+    summary: "A different same-date assertion that needs review.",
+  }) });
+  const previous = process.cwd();
+  try {
+    process.chdir(work);
+    const candidates = await candidatesFor(`origin/${PRODUCER_BRANCH}`, "origin/main");
+    assert.equal(candidates.length, 1);
+    assert.match(candidates[0].held, /same as_of/);
+    assert.equal(candidates[0].skipped, undefined, "pending-work planner must retain this submission");
+    process.chdir(previous);
+    const report = await run(work, { dry: true });
+    assert.equal(report.compiled.length, 0);
+    assert.equal(report.branches[0].unchanged.length, 0);
+    assert.match(report.branches[0].skipped[0].errors[0], /controller review/);
+    assert.equal((await git(work, "status", "--porcelain")).trim(), "");
+  } finally { process.chdir(previous); await rm(root, { recursive: true, force: true }); }
+});
 
 async function snapshot(dir) {
   const out = {};

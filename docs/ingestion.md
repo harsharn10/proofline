@@ -44,6 +44,10 @@ are separate approvals, not side effects of a packet.
 
 ## Replay and conflict behavior
 
+A submitted packet differing from main at the same `as_of` is held for controller review,
+not silently classified as unchanged. It remains pending work so another bot is not assigned
+the same name. Older superseded copies remain no-ops; do not bump dates merely to bypass a hold.
+
 The compiler preserves existing feed IDs. Replaying the same X/Twitter post under another work ID does
 not create a new row; contradictory copy requires an explicit sourced correction. General docs/API/address
 URLs can describe different events, so only matching date/kind/title/body is coalesced there. Semantic
