@@ -1,0 +1,197 @@
+slug: alandale
+name: Alandale
+symbol: LUTE
+category: Native AMM
+lifecycle: mainnet
+coverage: stub
+summary: Alandale is a ve(3,3) DEX on Robinhood Chain. Traders swap through classic AMM pools or Algebra concentrated-liquidity pools. Liquidity providers earn LUTE emissions. Holders lock LUTE into veLUTE and vote each epoch on which pools receive those emissions. Official docs and the app say trading fees and bribes from a pool go to the lockers who voted for it. The app footer states it reads on-chain data from Robinhood, chain 4663.
+tldr: Alandale is a ve(3,3) DEX on Robinhood Chain. Traders swap through classic AMM pools or Algebra concentrated-liquidity pools.
+tldr_source: derived
+why_people_care:
+  - "Thesis: a Robinhood-only ve(3,3) venue: lock LUTE for veLUTE, vote weekly emissions, and collect that pool's fees. [claim S1 S3]"
+  - "Traction (Sep 9, 2026): Llama Alandale V3 Robinhood TVL $870,422.52 and 24h DEX volume $8,857,627; V2 TVL $52,617.77 on the same chain. [claim S7 S8 S9]"
+  - "Catalyst: Official X and the airdrop app say 1,300,000 LUTE is set aside for RVH holders and stakers. [claim S16 S26]"
+risks:
+  - Several documented ve(3,3) core addresses share 2430-byte bytecode; implementations were not read. [verified S5]
+  - Llama audits field is 0; no audit report found on the site, docs, or GitHub this round. [claim S7 S12]
+  - LUTE owner() is the Minter; AlgebraFactory owner is a small unread contract. [verified S5]
+themes:
+  - ve33
+  - clmm
+  - amm
+  - vote-escrow
+  - robinhood-native
+official_links:
+  - kind: site
+    url: https://alandale.xyz
+  - kind: app
+    url: https://app.alandale.xyz/
+  - kind: app
+    url: https://app.alandale.xyz/airdrop
+  - kind: docs
+    url: https://alandale.gitbook.io/alandale
+  - kind: x
+    url: https://x.com/alandalexyz
+  - kind: telegram
+    url: https://t.me/alandalexyz
+  - kind: discord
+    url: https://discord.gg/DT6kEY9kz
+  - kind: github
+    url: https://github.com/Alandale-xyz/alandale-contracts
+  - kind: explorer
+    url: https://robinhoodchain.blockscout.com/address/0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA
+  - kind: explorer
+    url: https://robinhoodchain.blockscout.com/address/0x16494A80E08Bcb9285D87b67149d7b01774D82F8
+  - kind: dexscreener
+    url: https://dexscreener.com/robinhood/0xfa0b90e406c9a6f08ad2cbb4b367b063d7cf46c2
+  - kind: other
+    url: https://defillama.com/protocol/alandale-v3
+  - kind: other
+    url: https://defillama.com/holders-revenue
+dependencies: []
+deployments:
+  - label: LUTE ERC-20 (RPC name Alandale, symbol LUTE). Llama protocol.address and docs token row are this address, not AlgebraFactory.
+    chain: robinhood-chain
+    address: "0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA"
+    role: token
+    verified: true
+    sources:
+      - S4
+      - S5
+      - S6
+      - S7
+  - label: AlgebraFactory (concentrated liquidity)
+    chain: robinhood-chain
+    address: "0x16494A80E08Bcb9285D87b67149d7b01774D82F8"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+  - label: PairFactory (classic pools)
+    chain: robinhood-chain
+    address: "0xe0799417eff30A12249b8c30941BC2d7c52A0339"
+    role: factory
+    verified: true
+    sources:
+      - S4
+      - S5
+  - label: RouterV2
+    chain: robinhood-chain
+    address: "0xB90b0E114a32a3dA7b61D5eaae7D35Af9B1B5582"
+    role: router
+    verified: false
+    sources:
+      - S4
+      - S5
+  - label: SwapRouter (Algebra)
+    chain: robinhood-chain
+    address: "0x8971d5A8F950F021e97583855925B021bfaE2b35"
+    role: router
+    verified: false
+    sources:
+      - S4
+      - S5
+  - label: VotingEscrow (veLUTE)
+    chain: robinhood-chain
+    address: "0xc1a79e3A7b04c3f21C6409a78Ab58A8C822bE7dC"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S5
+  - label: Voter
+    chain: robinhood-chain
+    address: "0x4cF1c47B95031cD2bb1d102021D8Ede60392971C"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S5
+  - label: Minter (also LUTE owner())
+    chain: robinhood-chain
+    address: "0x782355E7771A9Aa0834de4Ae981DCF3b7aeC11e6"
+    role: other
+    verified: true
+    sources:
+      - S4
+      - S5
+  - label: NonfungiblePositionManager
+    chain: robinhood-chain
+    address: "0xe62a5F67516dBDBA2Aa28b1512C8Ff44E42cB5c3"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S5
+  - label: GaugeRewarder (CL emissions claims)
+    chain: robinhood-chain
+    address: "0x8A76f49e091F21C896122B4879541930322b799D"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S5
+  - label: Airdrop (VeLuteSplitMerklAidrop per docs)
+    chain: robinhood-chain
+    address: "0x8f90745342622be6ABbC575Cc250Af9179cabe6f"
+    role: other
+    verified: false
+    sources:
+      - S4
+      - S5
+  - label: AlgebraFactory owner() (unread contract, 171 bytes of code)
+    chain: robinhood-chain
+    address: "0x2a04c1d26767dd30f62712dcfcf1222f733a2b0e"
+    role: admin
+    verified: false
+    sources:
+      - S5
+metrics:
+  - kind: tvl
+    value: 923039
+    currency: USD
+    as_of: 2026-09-09
+    class: claim
+    sources:
+      - S10
+  - kind: volume_24h
+    value: 8857627
+    currency: USD
+    as_of: 2026-09-09
+    class: claim
+    sources:
+      - S8
+  - kind: fees_24h
+    value: 4836
+    currency: USD
+    as_of: 2026-09-09
+    class: claim
+    sources:
+      - S11
+review:
+  researcher: codex
+  approver: pending
+  methodology_version: proofline-v1.0
+  reviewed_at: 2026-09-10
+  published_at: null
+research_state:
+  as_of: 2026-09-10T03:42:09.546Z
+  work_id: WORK-20260910-codex-alandale-recovery
+  tier: seed
+  full_as_of: null
+findings:
+  positive: []
+  risk:
+    - text: "Receipts: on September 10, the site and GitBook welcome crosslinked the site, app and documentation. DefiLlama's Alandale V3 endpoint returned the same site and LUTE address with Robinhood Chain as its only listed chain. These matches support attribution, not an audit or editorial identity approval. [claim R-42 R-44 R-45] - Numbers: at chain 4663 block 0x385a4a5, the documented RouterV2, SwapRouter, NonfungiblePositionManager, GaugeRewarder and Airdrop addresses returned 14446, 12286, 24208, 2430 and 2430 bytes of code respectively. The previously reported factory-owner address returned 171 bytes. The exact address mapping is in REP-11; the read proves existence, not current privileges or implementation safety. Historical TVL and volume remain September 9 observations. [verified R-43] - Adversarial: code at an address does not establish an audited implementation, safe admin controls or the identity of privileged key holders. Proxy/admin slots and deployment-matched audit evidence remain unresolved."
+      class: unknown
+  missing:
+    - text: "Which documented addresses are ERC-1967 proxies, and what are the live implementations and admin keys? Next: eth_getStorageAt implementation/admin slots; retry Blockscout API v2 when Cloudflare allows it"
+    - text: "Is there an audit whose scope matches the 4663 deployments? Next: Search auditor indexes if a later post names a firm; read any report added under docs"
+    - text: "Who holds AlgebraFactory owner 0x2a04c1d2…2b0e, and can that key change fees or factories without delay? Next: Identify the owner contract on explorer and read timelock/AccessManager if present"
+    - text: "Do DexScreener discord.com/invite/QTQdSCm2b and app footer discord.gg/DT6kEY9kz land on the same guild? Next: Resolve both invites and record whether they are one server"
+    - text: "Latest posts since 2026-09-04 from @RHDaily__, @0xSammy, @ahboyash, @andrewtalksdefi, @HoodInsider_ that name Alandale? Next: Keep Latest from: @alandalexyz and RVH/Coffer follow-ups; do not ingest census-other follow-list posts into the Alandale feed"
+    - text: "Should crumbs, rvh, dividend-hound, ample, t3tris-finance, gami-labs, or accountable become their own seed assignments? Next: Controller assignment; do not compile candidates from this packet into census rows"
+    - text: "Which named individuals control Alandale and its privileged contracts? Next: Targeted verifier task: inspect repository maintainers and authoritative disclosures, then crosslink named controllers; otherwise retain unknown."
+    - text: "How many distinct users actively use Alandale, separate from aggregate liquidity or trading volume? Next: Reproduce a bounded transaction/user window from attributed pools using free chain reads or a supplied Dune export; document pool attribution and exclusions before comparing."
+  unresolved: []
