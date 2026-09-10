@@ -25,6 +25,7 @@ jobs:
   # available to a job-level `if` — a job output is.
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       credentials: ${{ steps.credentials.outputs.present }}
       telegram_enabled: ${{ steps.switch.outputs.enabled }}
@@ -70,6 +71,7 @@ jobs:
     needs: verify
     if: needs.verify.outputs.credentials == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
