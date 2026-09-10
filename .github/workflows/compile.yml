@@ -1,7 +1,7 @@
 name: Compile packets
 
-# The unattended half of docs/research-system.md §6. Grok Heavy PUTs packets onto long-lived producer
-# branches through the contents API; nobody merges those PRs. Once daily this job lifts the packet
+# The unattended half of docs/research-system.md §6. Producers submit bounded packet PRs;
+# nobody merges those PRs. Once daily this job lifts controller-accepted packet
 # files off those branches, validates them, compiles the valid ones into content/, runs the content
 # gates, and pushes the result to main so Render redeploys.
 #
@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: "Manual producer branch override (default: open, ready, same-repository producer PRs)"
+        description: "Narrow to one accepted open producer PR (never bypasses exact-head controller acceptance)"
         required: false
         type: string
 
@@ -74,11 +74,11 @@ jobs:
           set -euo pipefail
           mkdir -p build
           # A failed API request must fail the job, never fall back to historical branches.
-          gh api "repos/$REPO/pulls?state=open&base=main&per_page=100" --paginate --slurp > build/open-prs.json
+          node scripts/compile-intake.mjs
           ARGS=(--open-prs build/open-prs.json)
           if [ -n "${BRANCH_INPUT:-}" ]; then
             case "$BRANCH_INPUT" in
-              grok-heavy/*|grok-bot/*|supergrok/*|grok/*|codex/*) ARGS=(--branch "$BRANCH_INPUT") ;;
+              grok-heavy/*|grok-bot/*|supergrok/*|grok/*|codex/*) ARGS+=(--branch "$BRANCH_INPUT") ;;
               *) echo "branch input '$BRANCH_INPUT' is not a producer branch"; exit 1 ;;
             esac
           fi
@@ -108,7 +108,11 @@ jobs:
           git config user.email "bot@proofline.local"
           for attempt in 1 2 3; do
             git fetch origin main
-            if git rebase origin/main && npm run validate:release && git push origin HEAD:main; then exit 0; fi
+            if git rebase origin/main && npm run validate:release; then
+              # Revocation/API failure is not a push race: stop rather than retrying acceptance.
+              node scripts/compile-intake.mjs --verify-report build/compile-report.json || exit 1
+              if git push origin HEAD:main; then exit 0; fi
+            fi
             git rebase --abort 2>/dev/null || true
             sleep 20
           done
@@ -134,7 +138,7 @@ jobs:
               echo "These packets did not compile this run and were skipped. Everything else on this branch compiled; a skipped packet never blocks the rest of the batch."
               echo
               jq -r '.skipped[] | "**`" + .path + "`**\n\n```text\n" + (.errors | join("\n")) + "\n```\n"' <<< "$ROW"
-              echo "Fix by PUTting the same path again on this branch — the next daily compile (11:47 UTC), or a manual dispatch, picks the new copy up. A packet that names a possible match created in the same batch is skipped this round and compiles on the next one, once that name is in the registry."
+              echo "Fix the packet on this branch, then request controller review and exact-head/path acceptance under docs/ingestion.md. A new push invalidates the prior acceptance. The daily compile or an authorized manual dispatch picks up accepted copies only. A packet naming a possible match created in the same batch waits until that name is in the registry."
               echo
               echo "<!-- $MARKER -->"
             } > comment.md

@@ -15,6 +15,7 @@ import { parse, stringify } from "yaml";
 import { compileInbox, candidatesFor, duplicateReason, failingSlugs, inventoryCandidateCount, isInventoryPacket, researchIntake, ownTokenDuplicate } from "./compile-inbox.mjs";
 import { runCompile } from "./compile-packet.mjs";
 import { seedWithMinimums } from './lib/research-test-fixture.mjs';
+import { ACCEPTANCE_MARKER } from './lib/compile-acceptance.mjs';
 
 const execFileAsync = promisify(execFile);
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -116,10 +117,22 @@ async function fixtureRepo(packets, { ownToken = null } = {}) {
 }
 
 /** Run the compiler inside the fixture repo, the way the workflow runs it from the repo root. */
+async function approvedPr(work, branch, number = 1) {
+  const sha = (await git(work, 'rev-parse', `origin/${branch}`).catch(() => 'a'.repeat(40))).trim();
+  const packets = (await git(work, 'ls-tree', '-r', '--name-only', `origin/${branch}`, '--', 'research/inbox/packets').catch(() => '')).trim().split('\n').filter(p => p.endsWith('.md'));
+  const at = new Date().toISOString();
+  return { number, state: 'open', draft: false, head: { ref: branch, sha, repo: { full_name: 'owner/repo' } },
+    base: { ref: 'main', repo: { full_name: 'owner/repo' } }, proofline_checked_at: at,
+    proofline_comments: [{ id: number, user: { login: 'owner' }, created_at: at,
+      body: `${ACCEPTANCE_MARKER}\n\`\`\`json\n${JSON.stringify({ version: 1, head_sha: sha, decision: 'accept', packets })}\n\`\`\`` }] };
+}
 async function run(work, options = {}) {
+  const branches = options.branches ?? [PRODUCER_BRANCH];
+  const openPrs = Object.hasOwn(options, 'openPrs') ? options.openPrs : branches.length ?
+    await Promise.all(branches.map((b, i) => approvedPr(work, b, i + 1))) : undefined;
   const previous = process.cwd();
   process.chdir(work);
-  try { return await compileInbox({ branches: [PRODUCER_BRANCH], log: process.env.DEBUG_COMPILE_INBOX ? console.log : () => {}, ...options }); }
+  try { return await compileInbox({ branches, openPrs, repository: 'owner/repo', log: process.env.DEBUG_COMPILE_INBOX ? console.log : () => {}, ...options }); }
   finally { process.chdir(previous); }
 }
 
@@ -427,10 +440,7 @@ await test("empty and inaccessible producer inputs have distinct operational out
     const empty=await run(work,{branches:[PRODUCER_BRANCH]});
     assert.equal(empty.status,'no-change');assert.equal(empty.ok,true);
     await assert.rejects(run(work,{branches:['grok/missing']}),/couldn't find remote ref/,'fetch failures stop the workflow');
-    const missing=await run(work,{branches:['grok/missing'],fetch:false});
-    assert.equal(missing.status,'blocked');assert.equal(missing.ok,true,'safe no-write execution remains successful');
-    const persisted=JSON.parse(await readFile(join(work,'build/compile-report.json'),'utf8'));
-    assert.equal(persisted.status,'blocked');
+    await assert.rejects(run(work,{branches:['grok/missing'],fetch:false}),/unknown revision|ambiguous argument/,'missing fetched revision fails closed');
   } finally {await rm(root,{recursive:true,force:true});}
 });
 
@@ -445,7 +455,7 @@ await test("active research intake follows PR lifecycle and fails closed", async
   const {root,work}=await fixtureRepo({[packetPath("beta","WORK-20260903-grok-heavy-beta")]:VALID});
   try {
     const head=(await git(work,"rev-parse",`origin/${PRODUCER_BRANCH}`)).trim();
-    const current={...row,head:{...row.head,sha:head}};
+    const current={...await approvedPr(work,PRODUCER_BRANCH,62),head:{...row.head,sha:head}};
     const empty=await run(work,{branches:[],openPrs:[]});
     assert.equal(empty.status,"no-change");assert.deepEqual(empty.branches,[]);
     const held=await run(work,{branches:[],openPrs:[{...current,draft:true}]});
@@ -454,6 +464,42 @@ await test("active research intake follows PR lifecycle and fails closed", async
     await assert.rejects(run(work,{branches:[],openPrs:[row]}),/head changed/);
     const active=await run(work,{branches:[],openPrs:[current]});
     assert.deepEqual(active.compiled,["beta"]);
+  } finally {await rm(root,{recursive:true,force:true});}
+});
+
+await test('unattended and manual-branch compilation hold unaccepted packets; dry review does not grant acceptance', async () => {
+  const path=packetPath('beta','WORK-20260903-grok-heavy-beta');
+  const {root,work}=await fixtureRepo({[path]:VALID});
+  try {
+    const pr=await approvedPr(work,PRODUCER_BRANCH);
+    pr.proofline_comments=[];
+    for (const branches of [[],[PRODUCER_BRANCH]]) {
+      const held=await run(work,{branches,openPrs:[pr]});
+      assert.equal(held.status,'blocked');assert.deepEqual(held.compiled,[]);
+      assert.match(held.branches[0].skipped[0].errors[0],/controller acceptance required/);
+      assert.equal((await git(work,'status','--porcelain')).trim(),'');
+    }
+    const dry=await run(work,{dry:true,openPrs:[pr]});
+    assert.deepEqual(dry.compiled,['beta']);assert.equal(dry.status,'dry-run');
+    assert.equal((await git(work,'status','--porcelain')).trim(),'');
+    const accepted=await run(work);
+    assert.deepEqual(accepted.compiled,['beta']);
+    assert.equal(accepted.acceptances[0].path,path);assert.equal(accepted.acceptances[0].comment_id,1);
+  } finally {await rm(root,{recursive:true,force:true});}
+});
+
+await test('accepting one packet cannot admit another packet on the same ready PR', async () => {
+  const beta=packetPath('beta','WORK-20260903-grok-heavy-beta'), gamma=packetPath('gamma','WORK-20260903-grok-heavy-gamma');
+  const {root,work}=await fixtureRepo({[beta]:VALID,[gamma]:INVALID.replace('tooling/not-a-real-leaf','tooling/scanner')});
+  try {
+    const pr=await approvedPr(work,PRODUCER_BRANCH);
+    const value={version:1,head_sha:pr.head.sha,decision:'accept',packets:[beta]};
+    pr.proofline_comments[0].body=`${ACCEPTANCE_MARKER}\n\`\`\`json\n${JSON.stringify(value)}\n\`\`\``;
+    const report=await run(work,{openPrs:[pr]});
+    assert.deepEqual(report.compiled,['beta']);assert.equal(report.status,'partial');
+    assert.equal(existsSync(join(work,'content/projects/gamma.yaml')),false);
+    assert.deepEqual(report.acceptances.map(a=>a.path),[beta]);
+    assert.match(report.branches[0].skipped.find(s=>s.path===gamma).errors[0],/path is not accepted/);
   } finally {await rm(root,{recursive:true,force:true});}
 });
 

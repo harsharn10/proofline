@@ -46,3 +46,13 @@ test('daily collection and independent watchdog retain their schedules', () => {
     assert.equal(job['timeout-minutes'], 10);
   }
 });
+test('manual and scheduled compile both snapshot acceptance and recheck it before pushing', () => {
+  const steps=workflow('compile').jobs.compile.steps;
+  const intake=steps.find(s=>s.id==='compile').run;
+  assert.match(intake,/node scripts\/compile-intake\.mjs/);
+  assert.match(intake,/ARGS\+=\(--branch/);
+  assert.doesNotMatch(intake,/ARGS=\(--branch/);
+  const push=steps.find(s=>s.name==='Commit and push the compiled content').run;
+  assert.match(push,/compile-intake\.mjs --verify-report build\/compile-report\.json \|\| exit 1/);
+  assert.ok(push.indexOf('--verify-report') < push.indexOf('git push'));
+});
