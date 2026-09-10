@@ -1,5 +1,5 @@
 import YAML from "yaml";
-import { feedPage, normalizeFeedSearch } from "./feed-page";
+import { feedPage, normalizeFeedSearch } from "./feed-page.ts";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 // @ts-expect-error Shared deterministic relationship projection.
