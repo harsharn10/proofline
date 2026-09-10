@@ -1,5 +1,6 @@
 import { addressKey, ownActivityAt, isOwnDeployment } from "./relationships.mjs";
 import { officialSurfaceConfirmed } from './share-bar.mjs';
+import { refreshReviewStatus } from './refresh-review.mjs';
 
 export const DAY = 86_400_000;
 export const REFRESH_POLICY = Object.freeze({
@@ -12,10 +13,10 @@ const ms = value => Number.isFinite(Date.parse(value)) ? Date.parse(value) : nul
 
 // Machine eligibility is not identity/editorial approval. A provisional name needs an
 // official surface and sourced, located own deployment; no quote or shared-token shortcut.
-export function dailyIdentityEligible(project, census, index) {
+export function dailyIdentityEligible(project, census, index, review = null) {
   if (census?.role === 'observe' || hasIdentityConflict(project, census, index)) return false;
   if (census?.identity?.status === 'verified') return true;
-  return census?.identity?.status === 'provisional' && officialSurfaceConfirmed(census) &&
+  return census?.identity?.status === 'provisional' && (officialSurfaceConfirmed(census) || review?.community) &&
     ['mainnet', 'beta'].includes(project.lifecycle) &&
     census?.qualifying?.deployed_on_chain?.value === true &&
     (project.deployments ?? []).some(d => d.chain === 'robinhood-chain' && d.verified === true &&
@@ -43,16 +44,18 @@ export function selectInfrastructureReaders(index, eligibleSlugs, chain) {
 }
 
 export function refreshDecision({ project, census, previous, seededAt, index, aboveShareBar,
-  queuedAt, now = Date.now(), force = false, infrastructureReaders = selectInfrastructureReaders(index) }) {
+  queuedAt, now = Date.now(), force = false, sources = [], infrastructureReaders = selectInfrastructureReaders(index) }) {
+  const review = refreshReviewStatus({project,census,sources,index,now});
   const first = !previous;
   const queued = ms(queuedAt) !== null && now - ms(queuedAt) >= 0 && now - ms(queuedAt) <= 7 * DAY;
   const ownAt = ownActivityAt(project, previous, index, now);
   const age = ownAt ? now - ms(ownAt) : null;
   const seedAge = ms(seededAt) === null ? null : now - ms(seededAt);
   const conflict = hasIdentityConflict(project, census, index);
-  const eligible = dailyIdentityEligible(project, census, index);
+  const eligible = dailyIdentityEligible(project, census, index, review);
   let tier, reason, ignored = false;
-  if (conflict && !first) { tier = "dormant"; ignored = true; reason = "identity conflict: Claude review required"; }
+  if (review.stopped) { tier = 'dormant'; ignored = true; reason = review.reason; }
+  else if (conflict && !first) { tier = "dormant"; ignored = true; reason = "identity conflict: Claude review required"; }
   else if (first) { tier = "live"; reason = "one initial seed read"; }
   else if (queued) { tier = "hot"; reason = "dated reactivation request"; }
   else if (age !== null && age > REFRESH_POLICY.archiveAfter && !aboveShareBar) {
@@ -71,7 +74,7 @@ export function refreshDecision({ project, census, previous, seededAt, index, ab
   // Shared infrastructure is monitored through at least one deterministic representative.
   const representative = (project.deployments ?? []).some(d =>
     infrastructureReaders.get(addressKey(d.chain, d.address)) === project.slug);
-  if (!conflict && representative && tier !== "hot" && !first && !['inactive', 'announced', 'testnet-only'].includes(project.lifecycle)) {
+  if (!review.stopped && !conflict && representative && tier !== "hot" && !first && !['inactive', 'announced', 'testnet-only'].includes(project.lifecycle)) {
     ignored = false; tier = "live"; reason = "shared infrastructure representative: weekly";
   }
   const interval = REFRESH_POLICY[tier];
@@ -88,13 +91,14 @@ export function refreshDecision({ project, census, previous, seededAt, index, ab
   const freshnessDue = tier === 'hot' && componentTimes.some(at =>
     at + REFRESH_POLICY.freshness <= now + DAY + REFRESH_POLICY.schedulerHeadroom);
   // Small tolerance covers scheduler jitter, not a half-day early refresh.
-  const due = force || !ignored && (retryReady || newQueueRequest) &&
-    (first || queued || failed || freshnessDue || ms(lastAt) === null || now - ms(lastAt) >= interval - 2 * 3600_000);
+  const due = !review.stopped && (force || !ignored && (retryReady || newQueueRequest) &&
+    (first || queued || failed || freshnessDue || ms(lastAt) === null || now - ms(lastAt) >= interval - 2 * 3600_000));
   // Success age describes freshness, not retry precedence. Age every failed read from its
   // attempt using the same daily retry clock, so hot failures cannot starve maintenance retries.
   const priorityAt = failed || ms(lastAt) === null ? attemptedAt : ms(lastAt);
   const overdue = priorityAt === null ? 100 : Math.max(0, (now - priorityAt) / (failed ? DAY : interval));
-  return { tier, reason: force ? `manual override; ${reason}` : reason, ignored: ignored && !force,
+  return { tier, reason: force && !review.stopped ? `manual override; ${reason}` : reason, ignored: ignored && (!force || review.stopped),
+    review: project.refresh_review ? review : null,
     due, retry: failed, seed: first || Boolean(previous?.refresh && lastAt === null), queued, ownActivityAt: ownAt, intervalDays: interval / DAY,
     priority: queued ? 1000 + overdue : overdue + (!failed && tier === "hot" ? 2 : 0),
     lastSuccessAt: lastAt ?? null };

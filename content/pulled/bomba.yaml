@@ -1,13 +1,13 @@
 slug: bomba
-pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
+pulled_at: 2026-09-10T15:55:20.710Z # chain head 59526587 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
     label: BOMBA token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: Bombardilo
     proxy:
       type: none
       implementation: null
@@ -15,16 +15,10 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: null
-    created_at: null
-    holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'tokens/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'transactions?filter=to/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
+    created_block: 51079107
+    created_at: 2026-08-31T18:30:19.000Z
+    holders: 662
+    errors: []
   - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
     label: DopplerERC20V1 implementation
     role: implementation
@@ -101,129 +95,87 @@ addresses:
     created_at: 2026-06-30T22:03:11.000Z
     holders: null
     errors: []
-  - address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
-    label: PLTR Palantir Technologies • Robinhood Token (pair quote / numeraire)
-    role: token
-    is_contract: true
-    source_verified: true
-    contract_name: BeaconProxy
-    proxy:
-      type: none
-      implementation: null
-      admin: null
-    owner: null
-    owner_type: none
-    safe: null
-    created_block: 48285
-    created_at: 2026-06-10T15:26:04.000Z
-    holders: 36928
-    errors: []
 metrics: []
 market:
   token_address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
-  pulled_at: 2026-09-08T21:10:27.749Z
+  pulled_at: 2026-09-10T15:55:20.710Z
   pairs:
     - dex: uniswap
       pair_address: "0xa1bb85096e15d26cca05bda378052dd4dccf24527286cf76d9dc51332eba1e79"
       quote_symbol: PLTR
-      price_usd: 0.00004256
-      liquidity_usd: 40385.9
-      volume_h24: 6755.97
-      volume_h6: 323.18
+      price_usd: 0.00003659
+      liquidity_usd: 35891.38
+      volume_h24: 5672.21
+      volume_h6: 109.66
       txns_h24:
-        buys: 125
-        sells: 124
-      price_change_h24: 0.87
-      market_cap: 42366
-      fdv: 42366
+        buys: 58
+        sells: 44
+      price_change_h24: -17.03
+      market_cap: 36433
+      fdv: 36433
       created_at: 2026-08-31T18:30:19.000Z
-    - dex: uniswap
-      pair_address: "0xd8b8aed67c6417a7b37d74b566bcd934206d8617a63203186d2419b0c449f2bf"
-      quote_symbol: USDG
-      price_usd: 0.00003537
-      liquidity_usd: 15.09
-      volume_h24: 3.74
-      volume_h6: 0
-      txns_h24:
-        buys: 1
-        sells: 1
-      price_change_h24: -41.24
-      market_cap: 35209
-      fdv: 35209
-      created_at: 2026-09-01T18:03:01.000Z
-  liquidity_usd: 40400.99
-  volume_h24: 6759.71
-  trades_h24: 251
-  price_usd: 0.00004256
-  price_change_h24: 0.87
-  market_cap_usd: 42366
-  fdv_usd: 42366
-  fdv: 42366
+  liquidity_usd: 35891.38
+  volume_h24: 5672.21
+  trades_h24: 102
+  price_usd: 0.00003659
+  price_change_h24: -17.03
+  market_cap_usd: 36433
+  fdv_usd: 36433
+  fdv: 36433
   first_pair_at: 2026-08-31T18:30:19.000Z
-  top10_share: null
-  top10_share_ex_pools: null
-  burned_share: null
-  top10_as_of: null
-  launchpad: null
+  top10_share: 0.903018198906002
+  top10_share_ex_pools: 0.1665054282864636
+  burned_share: 0.0045625254536131
+  top10_as_of: 2026-09-10T15:55:20.710Z
+  launchpad:
+    slug: doppler
+    via: factory
+    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
+    shared: false
   rialto: null
   pair_asset:
     ticker: PLTR
     name: Palantir Technologies
     address: "0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a"
     category: stock
-    tokenized_value_usd: 1829388.86
-    tokenized_shares: 10493.827
-    change_7d: -33265.43
+    tokenized_value_usd: 2076000.3
+    tokenized_shares: 12245.622
+    change_7d: -205236.62
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors:
-    - step: launchpad
-      message: addresses/0x525F24BF41F178174788C3297Af9c0Af1bA01E18 did not return creator_address_hash
-    - step: top10_share
-      message: 'tokens/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: 'tokens/0x525F24BF41F178174788C3297Af9c0Af1bA01E18/holders: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: token total_supply was not returned for 0x525F24BF41F178174788C3297Af9c0Af1bA01E18
-    - step: top10_share_ex_pools
-      message: holder page was not available for 0x525F24BF41F178174788C3297Af9c0Af1bA01E18
+  errors: []
 structure:
-  pulled_at: 2026-09-08T21:10:27.749Z
+  pulled_at: 2026-09-10T15:55:20.710Z
   mint: unknown
+  mint_as_of: null
   renounced: false
+  renounced_as_of: 2026-09-10T15:55:20.710Z
   lp:
     - pair: "0xa1bb85096e15d26cca05bda378052dd4dccf24527286cf76d9dc51332eba1e79"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0xd8b8aed67c6417a7b37d74b566bcd934206d8617a63203186d2419b0c449f2bf"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors:
     - step: mint
-      message: 'smart-contracts/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
-    - step: mint
       message: verified ABI unavailable
+    - step: mint
+      message: 'smart-contracts/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
 activity:
-  pulled_at: 2026-09-08T21:10:27.749Z
+  pulled_at: 2026-09-10T15:55:20.710Z
   addresses:
     - address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
       label: BOMBA token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 2103
+      token_transfers_count: 0
+      last_tx_at: 2026-09-10T04:00:24.000Z
+      last_method: "0x095ea7b3"
+      txns_24h: 13
       launches_24h: null
-      window_as_of: null
+      window_as_of: 2026-09-10T15:55:20.710Z
       stale_since: null
-      errors:
-        - step: blockscout
-          message: 'counters/0x525F24BF41F178174788C3297Af9c0Af1bA01E18: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+      errors: []
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       label: DopplerERC20V1 implementation
       role: implementation
@@ -245,50 +197,40 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-09-08T21:10:27.749Z
+      window_as_of: 2026-09-10T15:55:20.710Z
       stale_since: null
       errors: []
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       label: LongLauncher (creation tx to)
       role: factory
-      transactions_count: 29212
+      transactions_count: 31972
       token_transfers_count: 10
-      last_tx_at: 2026-09-08T21:09:58.000Z
+      last_tx_at: 2026-09-10T07:46:47.000Z
       last_method: create
-      txns_24h: 1781
-      launches_24h: 1776
-      window_as_of: 2026-09-08T21:10:27.749Z
-      stale_since: null
-      errors: []
-    - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
-      label: Airlock (token owner)
-      role: admin
-      transactions_count: 9892
-      token_transfers_count: 520446
-      last_tx_at: 2026-09-08T21:11:02.000Z
-      last_method: create
-      txns_24h: 171
-      launches_24h: null
-      window_as_of: 2026-09-08T21:10:27.749Z
-      stale_since: null
-      errors: []
-    - address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
-      label: PLTR Palantir Technologies • Robinhood Token (pair quote / numeraire)
-      role: token
-      transactions_count: 22581
-      token_transfers_count: 57
-      last_tx_at: 2026-09-08T21:27:21.000Z
-      last_method: approve
-      txns_24h: 250
-      launches_24h: null
-      window_as_of: 2026-09-08T21:10:27.749Z
+      txns_24h: 100
+      launches_24h: 99
+      window_as_of: 2026-09-10T15:55:20.710Z
       stale_since: null
       errors:
         - step: txns_24h capped
-          message: stopped after 5 pages; count is a floor
-  last_activity_at: 2026-09-08T21:27:21.000Z
-  txns_24h: 2202
-  launches_24h: 1776
+          message: stopped after 2 pages; count is a floor
+    - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+      label: Airlock (token owner)
+      role: admin
+      transactions_count: 10112
+      token_transfers_count: 540547
+      last_tx_at: 2026-09-10T15:50:26.000Z
+      last_method: create
+      txns_24h: 100
+      launches_24h: null
+      window_as_of: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      errors:
+        - step: txns_24h capped
+          message: stopped after 2 pages; count is a floor
+  last_activity_at: 2026-09-10T15:50:26.000Z
+  txns_24h: 213
+  launches_24h: 99
   window_as_of: 2026-09-04T20:46:36.233Z
   stale_since: 2026-09-04T20:46:36.233Z
 reads:
@@ -297,23 +239,23 @@ reads:
     - kind: address
       address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
       status: read
-      reason: token DexScreener trade count changed
+      reason: --full override
       signal_value: null
-      signal: null
+      signal: "0xa2d151c7d602bd5017523468e48094568dca15ad3641809ae65417a0899d6bd7"
       code_hash: d6778098513fa311
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 3
+      credits: 80
     - kind: activity
       address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
       status: read
-      reason: token DexScreener trade count changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: null
+      signal: "0xa2d151c7d602bd5017523468e48094568dca15ad3641809ae65417a0899d6bd7"
       code_hash: d6778098513fa311
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 1
+      credits: 20
     - kind: address
       address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       status: unchanged
@@ -321,7 +263,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: 8ef9efc9c3c5b922
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: 2026-09-04T20:46:36.233Z
       credits: 0
     - kind: activity
@@ -331,17 +273,17 @@ reads:
       signal_value: null
       signal: null
       code_hash: 8ef9efc9c3c5b922
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: 2026-09-04T20:46:36.233Z
       credits: 0
     - kind: address
       address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       status: read
-      reason: factory signal unavailable
+      reason: factory signal unavailable; code hash unchanged, metadata not re-read
       signal_value: null
       signal: null
       code_hash: b3931c1995f630dc
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -351,97 +293,83 @@ reads:
       signal_value: null
       signal: null
       code_hash: b3931c1995f630dc
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
       credits: 0
     - kind: address
       address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       status: read
-      reason: factory baseline unavailable
+      reason: factory signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xc6265a359821d2808f7fa0779b9544a6761c9b215d7b28c0be0a3ca6fc8909ad"
+      signal: "0xc20b6cbe8545320117da606e538ae9bc9af596f598c653b627c41848ce8fd824"
       code_hash: 564d0fd58633bdbd
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
       credits: 0
     - kind: activity
       address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       status: read
-      reason: factory baseline unavailable; 24h walk refreshed
+      reason: factory signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0xc6265a359821d2808f7fa0779b9544a6761c9b215d7b28c0be0a3ca6fc8909ad"
+      signal: "0xc20b6cbe8545320117da606e538ae9bc9af596f598c653b627c41848ce8fd824"
       code_hash: 564d0fd58633bdbd
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
       credits: 0
     - kind: address
       address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       status: read
-      reason: admin baseline unavailable
+      reason: admin signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x62e1ff6c3644db424bcc5975208498e8ae5bdcbda677be94ecf9aa1a04b5bfc6"
+      signal: "0x2527eb4d203c00f85952013eb07b1d6dec95cdec46d04d4baeb8459a19db506f"
       code_hash: f8de098a2663a757
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
       credits: 0
     - kind: activity
       address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       status: read
-      reason: admin baseline unavailable; 24h walk refreshed
+      reason: admin signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0x62e1ff6c3644db424bcc5975208498e8ae5bdcbda677be94ecf9aa1a04b5bfc6"
+      signal: "0x2527eb4d203c00f85952013eb07b1d6dec95cdec46d04d4baeb8459a19db506f"
       code_hash: f8de098a2663a757
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: null
-      credits: 0
-    - kind: address
-      address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
-      status: read
-      reason: token DexScreener trade count changed
-      signal_value: null
-      signal: "0xdbc69488a28d8a032c27018d45b60cbc26e3ac1ba4c3f4f102c2b5f423abe230"
-      code_hash: caced2aa743efc36
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: null
-      credits: 0
-    - kind: activity
-      address: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
-      status: read
-      reason: token DexScreener trade count changed; 24h walk refreshed
-      signal_value: null
-      signal: "0xdbc69488a28d8a032c27018d45b60cbc26e3ac1ba4c3f4f102c2b5f423abe230"
-      code_hash: caced2aa743efc36
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
       credits: 0
     - kind: top10
       address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
       status: read
       reason: token change signal changed
-      signal_value: 251
+      signal_value: 102
       signal: null
       code_hash: null
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 1
+      credits: 20
     - kind: structure
       address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
       status: read
       reason: token change signal changed
-      signal_value: 251
+      signal_value: 102
       signal: null
       code_hash: d6778098513fa311
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 1
+      credits: 20
     - kind: lp
       address: "0x525F24BF41F178174788C3297Af9c0Af1bA01E18"
       status: read
       reason: token change signal changed
-      signal_value: 251
+      signal_value: 102
       signal: null
       code_hash: null
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
       credits: 0
+refresh:
+  policy_version: 1
+  status: partial
+  attempted_at: 2026-09-10T15:55:20.710Z
+  last_success_at: 2026-09-08T21:10:27.749Z
+  reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors: []

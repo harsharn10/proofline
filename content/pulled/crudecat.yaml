@@ -1,13 +1,13 @@
 slug: crudecat
-pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
+pulled_at: 2026-09-10T15:55:20.710Z # chain head 59526587 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
     label: CRUDECAT token (CircusQuoteTokenV3)
     role: token
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: CircusQuoteTokenV3
     proxy:
       type: none
       implementation: null
@@ -15,22 +15,16 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: null
-    created_at: null
-    holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'tokens/0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'transactions?filter=to/0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e: HTTP 402: {"error":"Out of credits"}'
+    created_block: 19395214
+    created_at: 2026-07-25T23:12:52.000Z
+    holders: 7546
+    errors: []
   - address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
     label: Circus launchpad (token launchpad())
     role: factory
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: ERC1967Proxy
     proxy:
       type: eip1967
       implementation: "0x822e175c1ae12166a0ea3299d083da48e6c42b96"
@@ -38,37 +32,16 @@ addresses:
     owner: "0x90ae1f7ded5b00599bf6bfdea6a1ef1f05fa0681"
     owner_type: eoa
     safe: null
-    created_block: null
-    created_at: null
+    created_block: 14971385
+    created_at: 2026-07-20T19:59:48.000Z
     holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'transactions?filter=to/0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00: HTTP 402: {"error":"Out of credits"}'
-  - address: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
-    label: USO Stock Token rail (pair quote)
-    role: token
-    is_contract: true
-    source_verified: true
-    contract_name: BeaconProxy
-    proxy:
-      type: none
-      implementation: null
-      admin: null
-    owner: null
-    owner_type: none
-    safe: null
-    created_block: 48277
-    created_at: 2026-06-10T15:25:06.000Z
-    holders: 6891
     errors: []
   - address: "0xc3a873867C79b234A5179BeC2899846376258BeD"
     label: Uniswap v3 CRUDECAT/USO 1% pool
     role: other
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: UniswapV3Pool
     proxy:
       type: none
       implementation: null
@@ -76,16 +49,16 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: null
-    created_at: null
+    created_block: 19403171
+    created_at: 2026-07-25T23:26:11.000Z
     holders: null
     errors: []
   - address: "0x7D687dd0e3bf5025FbAc010042a5943300c8463a"
     label: CtoManager (token ctoManager)
     role: proxy
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: ERC1967Proxy
     proxy:
       type: eip1967
       implementation: "0xf255e4cf099d56dc89192c5f5471a3de00f44a07"
@@ -93,16 +66,16 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: null
-    created_at: null
+    created_block: 16114463
+    created_at: 2026-07-22T03:48:51.000Z
     holders: null
     errors: []
   - address: "0x74D4b708E6ce0748E4b968403E115dD69E60BE8F"
     label: MetadataController (token metadataController)
     role: proxy
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: ERC1967Proxy
     proxy:
       type: eip1967
       implementation: "0x3a13a087b7111d56b9a939fa4b8b4675364c776a"
@@ -110,70 +83,84 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: null
-    created_at: null
+    created_block: 16114463
+    created_at: 2026-07-22T03:48:51.000Z
     holders: null
     errors: []
 metrics: []
 market:
   token_address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
-  pulled_at: 2026-09-08T21:10:27.749Z
+  pulled_at: 2026-09-10T15:55:20.710Z
   pairs:
     - dex: uniswap
       pair_address: "0xc3a873867C79b234A5179BeC2899846376258BeD"
       quote_symbol: USO
-      price_usd: 0.005325
-      liquidity_usd: 201474.35
-      volume_h24: 205152.63
-      volume_h6: 48887.07
+      price_usd: 0.003729
+      liquidity_usd: 174916.46
+      volume_h24: 210624.81
+      volume_h6: 28525.84
       txns_h24:
-        buys: 496
-        sells: 558
-      price_change_h24: -4.91
-      market_cap: 5325292
-      fdv: 5325292
+        buys: 387
+        sells: 387
+      price_change_h24: -2.29
+      market_cap: 1790511
+      fdv: 3729072
       created_at: 2026-07-25T23:26:11.000Z
     - dex: uniswap
       pair_address: "0x9894214ea7dcee7290d160ca0f508019b3b9c57f0039411faac75701dc7c4248"
       quote_symbol: USDG
-      price_usd: 0.005497
-      liquidity_usd: 326.25
-      volume_h24: 91.87
-      volume_h6: 10.76
+      price_usd: 0.00351
+      liquidity_usd: 458.62
+      volume_h24: 174.79
+      volume_h6: 52.1
       txns_h24:
-        buys: 7
-        sells: 5
-      price_change_h24: -5.61
-      market_cap: 5497285
-      fdv: 5497285
+        buys: 10
+        sells: 10
+      price_change_h24: -17.73
+      market_cap: 1685640
+      fdv: 3510659
       created_at: 2026-09-05T22:14:20.000Z
     - dex: uniswap
-      pair_address: "0x639614361d7da97bc0a24d855b34eb8c7f88d80eaf54467ec7fd809513e2b393"
+      pair_address: "0x7011d9c752a6cd60ce59dbb02c83998a13f021ecf5547e025b588cba853ba101"
       quote_symbol: USDG
-      price_usd: 0.005365
-      liquidity_usd: 41.6
-      volume_h24: 9.88
+      price_usd: 0.003709
+      liquidity_usd: 293.85
+      volume_h24: 13.15
       volume_h6: 0
       txns_h24:
-        buys: 3
+        buys: 0
+        sells: 3
+      price_change_h24: -11.7
+      market_cap: 1781166
+      fdv: 3709611
+      created_at: 2026-08-15T02:14:13.000Z
+    - dex: uniswap
+      pair_address: "0x85532c1434050d6b2deab4d6c2910f90094901a5f916127fc0b4c68580038935"
+      quote_symbol: ETH
+      price_usd: 0.003729
+      liquidity_usd: 381.37
+      volume_h24: 11.22
+      volume_h6: 0
+      txns_h24:
+        buys: 0
         sells: 2
-      price_change_h24: -10.45
-      market_cap: 5365832
-      fdv: 5365832
-      created_at: 2026-08-25T19:33:24.000Z
-  liquidity_usd: 201842.2
-  volume_h24: 205254.38
-  trades_h24: 1071
-  price_usd: 0.005325
-  price_change_h24: -4.91
-  market_cap_usd: 5325292
-  fdv_usd: 5325292
-  fdv: 5325292
+      price_change_h24: -6.9
+      market_cap: 1790712
+      fdv: 3729491
+      created_at: 2026-08-15T02:15:40.000Z
+  liquidity_usd: 176050.3
+  volume_h24: 210823.97
+  trades_h24: 799
+  price_usd: 0.003729
+  price_change_h24: -2.29
+  market_cap_usd: 1790511
+  fdv_usd: 3729072
+  fdv: 3729072
   first_pair_at: 2026-07-25T23:26:11.000Z
-  top10_share: null
-  top10_share_ex_pools: null
-  burned_share: null
-  top10_as_of: null
+  top10_share: 0.6729254131184083
+  top10_share_ex_pools: 0.657075080100045
+  burned_share: 0
+  top10_as_of: 2026-09-10T15:55:20.710Z
   launchpad: null
   rialto: null
   pair_asset:
@@ -181,137 +168,117 @@ market:
     name: United States Oil Fund
     address: "0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344"
     category: etf
-    tokenized_value_usd: 1501380.03
-    tokenized_shares: 10576.078
-    change_7d: 154516.5
+    tokenized_value_usd: 1440915.1
+    tokenized_shares: 9867.254000000003
+    change_7d: 158073.41
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
   errors:
     - step: launchpad
+      message: creator 0x673c82AC17660D67C31c62E23AB2b68812891532 did not match a launchpad factory, curve or known launcher deployer
+    - step: launchpad
       message: addresses/0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e did not return creator_address_hash
-    - step: top10_share
-      message: 'tokens/0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: 'tokens/0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e/holders: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: token total_supply was not returned for 0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e
-    - step: top10_share_ex_pools
-      message: holder page was not available for 0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e
 structure:
-  pulled_at: 2026-09-08T21:10:27.749Z
-  mint: unknown
+  pulled_at: 2026-09-10T15:55:20.710Z
+  mint: no-mint-function
+  mint_as_of: 2026-09-10T15:55:20.710Z
   renounced: null
+  renounced_as_of: null
   lp:
     - pair: "0xc3a873867C79b234A5179BeC2899846376258BeD"
       locked_share: null
       holder_kind: null
-      reason: LP token details could not be read from the explorer
+      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
+      as_of: null
     - pair: "0x9894214ea7dcee7290d160ca0f508019b3b9c57f0039411faac75701dc7c4248"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x639614361d7da97bc0a24d855b34eb8c7f88d80eaf54467ec7fd809513e2b393"
+      as_of: null
+    - pair: "0x7011d9c752a6cd60ce59dbb02c83998a13f021ecf5547e025b588cba853ba101"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
+    - pair: "0x85532c1434050d6b2deab4d6c2910f90094901a5f916127fc0b4c68580038935"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors:
-    - step: mint
-      message: 'smart-contracts/0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e: HTTP 402: {"error":"Out of credits"}'
-    - step: mint
-      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
-    - step: lp
-      message: 'tokens/0xc3a873867c79b234a5179bec2899846376258bed: HTTP 402: {"error":"Out of credits"}'
 activity:
-  pulled_at: 2026-09-08T21:10:27.749Z
+  pulled_at: 2026-09-10T15:55:20.710Z
   addresses:
     - address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
       label: CRUDECAT token (CircusQuoteTokenV3)
       role: token
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
-      launches_24h: null
-      window_as_of: null
-      stale_since: null
-      errors:
-        - step: blockscout
-          message: 'counters/0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
-    - address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
-      label: Circus launchpad (token launchpad())
-      role: factory
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
-      launches_24h: null
-      window_as_of: null
-      stale_since: null
-      errors:
-        - step: blockscout
-          message: 'counters/0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
-    - address: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
-      label: USO Stock Token rail (pair quote)
-      role: token
-      transactions_count: 14387
-      token_transfers_count: 45
-      last_tx_at: 2026-09-08T21:34:55.000Z
+      transactions_count: 38861
+      token_transfers_count: 27
+      last_tx_at: 2026-09-10T15:45:58.000Z
       last_method: approve
-      txns_24h: 250
+      txns_24h: 100
       launches_24h: null
-      window_as_of: 2026-09-08T21:10:27.749Z
+      window_as_of: 2026-09-10T15:55:20.710Z
       stale_since: null
       errors:
         - step: txns_24h capped
-          message: stopped after 5 pages; count is a floor
+          message: stopped after 2 pages; count is a floor
+    - address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
+      label: Circus launchpad (token launchpad())
+      role: factory
+      transactions_count: 131066
+      token_transfers_count: 121811
+      last_tx_at: 2026-09-10T12:51:57.000Z
+      last_method: "0x359a23fc"
+      txns_24h: 100
+      launches_24h: 0
+      window_as_of: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      errors:
+        - step: txns_24h capped
+          message: stopped after 2 pages; count is a floor
     - address: "0xc3a873867C79b234A5179BeC2899846376258BeD"
       label: Uniswap v3 CRUDECAT/USO 1% pool
       role: other
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 1
+      token_transfers_count: 128102
+      last_tx_at: 2026-08-17T23:08:13.000Z
+      last_method: increaseObservationCardinalityNext
+      txns_24h: 0
       launches_24h: null
-      window_as_of: null
+      window_as_of: 2026-09-10T15:55:20.710Z
       stale_since: null
       errors: []
     - address: "0x7D687dd0e3bf5025FbAc010042a5943300c8463a"
       label: CtoManager (token ctoManager)
       role: proxy
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 2
+      token_transfers_count: 1
+      last_tx_at: 2026-07-22T17:11:26.000Z
+      last_method: "0x2f2ff15d"
+      txns_24h: 0
       launches_24h: null
-      window_as_of: null
+      window_as_of: 2026-09-10T15:55:20.710Z
       stale_since: null
       errors: []
     - address: "0x74D4b708E6ce0748E4b968403E115dD69E60BE8F"
       label: MetadataController (token metadataController)
       role: proxy
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 2
+      token_transfers_count: 1
+      last_tx_at: 2026-07-22T17:11:30.000Z
+      last_method: "0x2f2ff15d"
+      txns_24h: 0
       launches_24h: null
-      window_as_of: null
+      window_as_of: 2026-09-10T15:55:20.710Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-09-08T21:34:55.000Z
-  txns_24h: 250
-  launches_24h: null
-  window_as_of: 2026-09-08T21:10:27.749Z
+  last_activity_at: 2026-09-10T15:45:58.000Z
+  txns_24h: 200
+  launches_24h: 0
+  window_as_of: 2026-09-10T15:55:20.710Z
   stale_since: null
 reads:
   tier: hot
@@ -319,151 +286,137 @@ reads:
     - kind: address
       address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
       status: read
-      reason: token DexScreener trade count changed
+      reason: --full override
       signal_value: null
-      signal: null
+      signal: "0x01a78178f92b4af36c0c63b6162b859bca11a1b309cb9954b2ef5abc3b731225"
       code_hash: c37742211251bd06
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 3
+      credits: 80
     - kind: activity
       address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
       status: read
-      reason: token DexScreener trade count changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: null
+      signal: "0x01a78178f92b4af36c0c63b6162b859bca11a1b309cb9954b2ef5abc3b731225"
       code_hash: c37742211251bd06
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 1
+      credits: 40
     - kind: address
       address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
       status: read
-      reason: factory signal unavailable
+      reason: --full override
       signal_value: null
-      signal: null
+      signal: "0xebbe794f14e7d5f867ad0b7dc8761c3d406bfc317fd9cb6e63c6d19756f40ab6"
       code_hash: 1347bf7670f8efc0
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 2
+      credits: 60
     - kind: activity
       address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
       status: read
-      reason: factory signal unavailable; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: null
+      signal: "0xebbe794f14e7d5f867ad0b7dc8761c3d406bfc317fd9cb6e63c6d19756f40ab6"
       code_hash: 1347bf7670f8efc0
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 1
-    - kind: address
-      address: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
-      status: read
-      reason: token DexScreener trade count changed
-      signal_value: null
-      signal: "0x3230c8daae04f6a0d7e4873b159923449104949224b4542fb92010a4dfc2302a"
-      code_hash: caced2aa743efc36
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: null
-      credits: 0
-    - kind: activity
-      address: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
-      status: read
-      reason: token DexScreener trade count changed; 24h walk refreshed
-      signal_value: null
-      signal: "0x3230c8daae04f6a0d7e4873b159923449104949224b4542fb92010a4dfc2302a"
-      code_hash: caced2aa743efc36
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: null
-      credits: 0
+      credits: 40
     - kind: address
       address: "0xc3a873867C79b234A5179BeC2899846376258BeD"
-      status: unchanged
-      reason: other role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override
       signal_value: null
-      signal: null
+      signal: "0xf35a0d0fd7b3e2aeebc593963979bfdaa6d23b318e8d37c52c901faee8d40999"
       code_hash: eadd873fb3783c6d
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: 2026-09-04T20:46:36.233Z
-      credits: 0
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 60
     - kind: activity
       address: "0xc3a873867C79b234A5179BeC2899846376258BeD"
-      status: unchanged
-      reason: other role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: null
+      signal: "0xf35a0d0fd7b3e2aeebc593963979bfdaa6d23b318e8d37c52c901faee8d40999"
       code_hash: eadd873fb3783c6d
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: 2026-09-04T20:46:36.233Z
-      credits: 0
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 20
     - kind: address
       address: "0x7D687dd0e3bf5025FbAc010042a5943300c8463a"
-      status: unchanged
-      reason: proxy role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override
       signal_value: null
-      signal: null
+      signal: "0xbcefefd1af90cef5142b60cd4d67a88bc24f4463500caeb01685505616ec04dc"
       code_hash: dff49a810b24778c
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: 2026-09-04T20:46:36.233Z
-      credits: 0
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 60
     - kind: activity
       address: "0x7D687dd0e3bf5025FbAc010042a5943300c8463a"
-      status: unchanged
-      reason: proxy role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: null
+      signal: "0xbcefefd1af90cef5142b60cd4d67a88bc24f4463500caeb01685505616ec04dc"
       code_hash: dff49a810b24778c
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: 2026-09-04T20:46:36.233Z
-      credits: 0
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 20
     - kind: address
       address: "0x74D4b708E6ce0748E4b968403E115dD69E60BE8F"
-      status: unchanged
-      reason: proxy role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override
       signal_value: null
-      signal: null
+      signal: "0x4434c3b85ab31411a5403968c24770ecd358a31aaf1f84582f5d7c9d5c51596a"
       code_hash: dff49a810b24778c
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: 2026-09-04T20:46:36.233Z
-      credits: 0
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 60
     - kind: activity
       address: "0x74D4b708E6ce0748E4b968403E115dD69E60BE8F"
-      status: unchanged
-      reason: proxy role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: null
+      signal: "0x4434c3b85ab31411a5403968c24770ecd358a31aaf1f84582f5d7c9d5c51596a"
       code_hash: dff49a810b24778c
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: 2026-09-04T20:46:36.233Z
-      credits: 0
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 20
     - kind: top10
       address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
       status: read
       reason: token change signal changed
-      signal_value: 1071
+      signal_value: 799
       signal: null
       code_hash: null
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 1
+      credits: 20
     - kind: structure
       address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
       status: read
       reason: token change signal changed
-      signal_value: 1071
+      signal_value: 799
       signal: null
       code_hash: c37742211251bd06
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 1
+      credits: 20
     - kind: lp
       address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
       status: read
       reason: token change signal changed
-      signal_value: 1071
+      signal_value: 799
       signal: null
       code_hash: null
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-10T15:55:20.710Z
       stale_since: null
-      credits: 1
+      credits: 20
+refresh:
+  policy_version: 1
+  status: complete
+  attempted_at: 2026-09-10T15:55:20.710Z
+  last_success_at: 2026-09-10T15:55:20.710Z
+  reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors: []

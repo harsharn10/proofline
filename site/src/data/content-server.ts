@@ -4,6 +4,8 @@ import { feedPage, normalizeFeedSearch } from "./feed-page.ts";
 import { productActivityStatus } from '../../../scripts/lib/research-state.mjs';
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
+// @ts-expect-error Shared read-only exact-pool projection is plain ESM.
+import { stockPairIndex } from '../../../scripts/lib/stock-pairs.mjs';
 // @ts-expect-error Shared deterministic relationship projection.
 import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolumeSummary, subjectObservations, subjectHistory } from "../../../scripts/lib/relationships.mjs";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
@@ -1023,6 +1025,17 @@ export const getCategoryContent = createServerFn({ method: "GET" }).validator((i
 export const getRelationships = createServerFn({ method: "GET" }).handler(async () => {
   const content = getCachedContent();
   return sharedRelationships(buildRelationships(content.dossiers, Object.values(content.dependencies))) as RelationshipGraph;
+});
+
+export type StockPairs = {
+  total: number; reviewedStockAddresses: number; unreviewedStockAddresses: number; conflicts: number; limit: number;
+  rows: Array<{id:string;pool:string;chain:string;stock:string;stockAddress:string;slug:string;name:string;tokenAddress:string;
+    asOf:string|null;state:string;legVolumeUsd:number|null;source:string|null;referenceSources:Array<{id:string;url:string}>}>;
+};
+export const getStockPairs = createServerFn({ method: 'GET' }).handler(async (): Promise<StockPairs> => {
+  const content=getCachedContent();
+  return stockPairIndex({projects:content.dossiers,census:[...content.censusBySlug.values()],
+    dependencies:Object.values(content.dependencies),files:content.dossiers.map(d=>d.pulled).filter(Boolean)});
 });
 
 export type RelationshipGraph = {

@@ -1,13 +1,13 @@
 slug: koli
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-10T15:55:20.710Z # chain head 59526587 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18"
     label: KOLI token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: KOLI
     proxy:
       type: none
       implementation: null
@@ -15,14 +15,10 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: null
-    created_at: null
-    holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'tokens/0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18: HTTP 402: {"error":"Out of credits"}'
+    created_block: 52108211
+    created_at: 2026-09-01T23:23:36.000Z
+    holders: 941
+    errors: []
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
     label: DopplerERC20V1Factory (create tokenFactory)
     role: factory
@@ -74,23 +70,6 @@ addresses:
     created_at: 2026-07-13T11:36:09.000Z
     holders: null
     errors: []
-  - address: "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
-    label: NVIDIA • Robinhood Token (pair quote rail)
-    role: token
-    is_contract: true
-    source_verified: true
-    contract_name: BeaconProxy
-    proxy:
-      type: none
-      implementation: null
-      admin: null
-    owner: null
-    owner_type: none
-    safe: null
-    created_block: 45898
-    created_at: 2026-06-09T18:53:36.000Z
-    holders: 106096
-    errors: []
   - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
     label: Airlock (token owner)
     role: other
@@ -119,125 +98,84 @@ addresses:
 metrics: []
 market:
   token_address: "0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-10T15:55:20.710Z
   pairs:
     - dex: uniswap
       pair_address: "0x1d67df0e83b4bfd6366279c55d40e82e7e6df010d90d928fd08c1c9d76481aa4"
       quote_symbol: NVDA
-      price_usd: 0.00003575
-      liquidity_usd: 35798.9
-      volume_h24: 3423.84
-      volume_h6: 158.65
+      price_usd: 0.00002972
+      liquidity_usd: 30874.76
+      volume_h24: 87.88
+      volume_h6: 8.28
       txns_h24:
-        buys: 130
-        sells: 86
-      price_change_h24: -1.17
-      market_cap: 35757
-      fdv: 35757
+        buys: 10
+        sells: 5
+      price_change_h24: 0.88
+      market_cap: 29723
+      fdv: 29723
       created_at: 2026-09-01T23:23:36.000Z
-    - dex: uniswap
-      pair_address: "0x914fc4e93681146dac46182c4fdb8dc51b75bed5820dd350c0f51248de31acef"
-      quote_symbol: USDG
-      price_usd: 0.00003667
-      liquidity_usd: 33.44
-      volume_h24: 9.14
-      volume_h6: 0
-      txns_h24:
-        buys: 4
-        sells: 2
-      price_change_h24: 0.95
-      market_cap: 36674
-      fdv: 36674
-      created_at: 2026-09-02T23:35:47.000Z
-    - dex: uniswap
-      pair_address: "0xf7f0e1010e8deac73b69ca355a2558e287d4611b689fb2f6d2c826ed48a0924b"
-      quote_symbol: NVDA
-      price_usd: 6.613e-37
-      liquidity_usd: null
-      volume_h24: 0.24
-      volume_h6: 0
-      txns_h24:
-        buys: 0
-        sells: 2
-      price_change_h24: -100
-      market_cap: null
-      fdv: null
-      created_at: 2026-09-02T08:27:48.000Z
-  liquidity_usd: 35832.34
-  volume_h24: 3433.22
-  trades_h24: 224
-  price_usd: 0.00003575
-  price_change_h24: -1.17
-  market_cap_usd: 35757
-  fdv_usd: 35757
-  fdv: 35757
+  liquidity_usd: 30874.76
+  volume_h24: 87.88
+  trades_h24: 15
+  price_usd: 0.00002972
+  price_change_h24: 0.88
+  market_cap_usd: 29723
+  fdv_usd: 29723
+  fdv: 29723
   first_pair_at: 2026-09-01T23:23:36.000Z
-  top10_share: null
-  top10_share_ex_pools: null
-  burned_share: null
-  top10_as_of: null
-  launchpad: null
+  top10_share: 0.9432658107066064
+  top10_share_ex_pools: 0.0709675029891157
+  burned_share: 0
+  top10_as_of: 2026-09-10T15:55:20.710Z
+  launchpad:
+    slug: doppler
+    via: factory
+    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
+    shared: false
   rialto: null
   pair_asset:
     ticker: NVDA
     name: NVIDIA
     address: "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec"
     category: stock
-    tokenized_value_usd: 14054234.41
-    tokenized_shares: 61519.95799999999
-    change_7d: 947407.35
+    tokenized_value_usd: 19082047.06
+    tokenized_shares: 85313.39499999997
+    change_7d: 522117.98
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors:
-    - step: launchpad
-      message: addresses/0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18 did not return creator_address_hash
-    - step: top10_share
-      message: 'tokens/0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: 'tokens/0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18/holders: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: token total_supply was not returned for 0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18
-    - step: top10_share_ex_pools
-      message: holder page was not available for 0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18
+  errors: []
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-10T15:55:20.710Z
   mint: unknown
+  mint_as_of: null
   renounced: false
+  renounced_as_of: 2026-09-10T15:55:20.710Z
   lp:
     - pair: "0x1d67df0e83b4bfd6366279c55d40e82e7e6df010d90d928fd08c1c9d76481aa4"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x914fc4e93681146dac46182c4fdb8dc51b75bed5820dd350c0f51248de31acef"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0xf7f0e1010e8deac73b69ca355a2558e287d4611b689fb2f6d2c826ed48a0924b"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors:
     - step: mint
-      message: 'smart-contracts/0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18: HTTP 402: {"error":"Out of credits"}'
-    - step: mint
       message: verified ABI unavailable
+    - step: mint
+      message: 'smart-contracts/0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18: HTTP 402: {"error":"Out of credits"}'
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-10T15:55:20.710Z
   addresses:
     - address: "0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18"
       label: KOLI token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 3689
+      token_transfers_count: 0
+      last_tx_at: 2026-09-10T14:58:57.000Z
+      last_method: "0x095ea7b3"
+      txns_24h: 6
       launches_24h: null
-      errors:
-        - step: blockscout
-          message: 'counters/0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+      window_as_of: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      errors: []
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory (create tokenFactory)
       role: factory
@@ -247,6 +185,8 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-10T15:55:20.710Z
+      stale_since: null
       errors: []
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       label: DopplerERC20V1 implementation
@@ -257,42 +197,179 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-10T15:55:20.710Z
+      stale_since: null
       errors: []
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       label: LongLauncher (create caller)
       role: factory
-      transactions_count: 13369
-      token_transfers_count: 4
-      last_tx_at: 2026-09-04T20:52:03.000Z
+      transactions_count: 31972
+      token_transfers_count: 10
+      last_tx_at: 2026-09-10T07:46:47.000Z
       last_method: create
-      txns_24h: 2000
-      launches_24h: 1998
+      txns_24h: 100
+      launches_24h: 99
+      window_as_of: 2026-09-10T15:55:20.710Z
+      stale_since: null
       errors:
         - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
-    - address: "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
-      label: NVIDIA • Robinhood Token (pair quote rail)
-      role: token
-      transactions_count: 250208
-      token_transfers_count: 98
-      last_tx_at: 2026-09-04T21:55:26.000Z
-      last_method: approve
-      txns_24h: 2000
-      launches_24h: null
-      errors:
-        - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
+          message: stopped after 2 pages; count is a floor
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (token owner)
       role: other
-      transactions_count: 9126
-      token_transfers_count: 445362
-      last_tx_at: 2026-09-04T20:42:51.000Z
+      transactions_count: 10112
+      token_transfers_count: 540547
+      last_tx_at: 2026-09-10T15:50:26.000Z
       last_method: create
-      txns_24h: 112
+      txns_24h: 100
       launches_24h: null
-      errors: []
-  last_activity_at: 2026-09-04T21:55:26.000Z
-  txns_24h: 4112
-  launches_24h: 1998
+      window_as_of: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      errors:
+        - step: txns_24h capped
+          message: stopped after 2 pages; count is a floor
+  last_activity_at: 2026-09-10T15:50:26.000Z
+  txns_24h: 206
+  launches_24h: 99
+  window_as_of: 2026-09-10T15:55:20.710Z
+  stale_since: null
+reads:
+  tier: hot
+  explorer:
+    - kind: address
+      address: "0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: "0xcfe6fa580d36275a35ac2c7e6be95796ed13231b2db419f6c543b3daab756de2"
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 80
+    - kind: activity
+      address: "0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: "0xcfe6fa580d36275a35ac2c7e6be95796ed13231b2db419f6c543b3daab756de2"
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 20
+    - kind: address
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: "0xc20b6cbe8545320117da606e538ae9bc9af596f598c653b627c41848ce8fd824"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: "0xc20b6cbe8545320117da606e538ae9bc9af596f598c653b627c41848ce8fd824"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: "0x2527eb4d203c00f85952013eb07b1d6dec95cdec46d04d4baeb8459a19db506f"
+      code_hash: f8de098a2663a757
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: "0x2527eb4d203c00f85952013eb07b1d6dec95cdec46d04d4baeb8459a19db506f"
+      code_hash: f8de098a2663a757
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 0
+    - kind: top10
+      address: "0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18"
+      status: read
+      reason: token change signal changed
+      signal_value: 15
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 20
+    - kind: structure
+      address: "0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18"
+      status: read
+      reason: token change signal changed
+      signal_value: 15
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 20
+    - kind: lp
+      address: "0xb8D9F969dB56bb57353e36Fd0015D98e3A761E18"
+      status: read
+      reason: token change signal changed
+      signal_value: 15
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-10T15:55:20.710Z
+      stale_since: null
+      credits: 0
+refresh:
+  policy_version: 1
+  status: partial
+  attempted_at: 2026-09-10T15:55:20.710Z
+  last_success_at: 2026-09-04T20:46:36.233Z
+  reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors: []
