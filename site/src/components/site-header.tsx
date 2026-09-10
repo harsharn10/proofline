@@ -14,7 +14,7 @@ export function SiteHeader() {
         </span>
         ICARUS
       </Link>
-      <nav className="crumb-nav">
+      <nav className="crumb-nav" aria-label="Primary navigation">
         <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "on" }}>
           Registry
         </Link>
@@ -22,6 +22,7 @@ export function SiteHeader() {
           Feed
         </Link>
         <Link to="/relationships" activeProps={{ className: "on" }}>Connections</Link>
+        <Link to="/pairs" activeProps={{ className: "on" }}>Stock pairs</Link>
         <Link to="/methodology" activeProps={{ className: "on" }}>
           How to read this
         </Link>

@@ -141,6 +141,16 @@ The existing optional Pulse Worker remains a separately bounded ten-minute live 
 
 ## Frontend and operations
 
+The `/pairs` view is a bounded projection of retained Rialto pool legs, joined by exact chain and
+contract to a tracked subject's own token and a source-verified stock reference. Tickers are labels,
+never join keys. Ambiguous stock references or contradictory pool legs are withheld; duplicate
+observations are collapsed and equal-time estimate conflicts are disclosed. Unreviewed references
+produce an explicit review gap, not invented pairs or an assertion that no pools exist.
+The view makes no provider calls and creates no profiles. It shows at most 100 pools in stock/project
+order. Rialto per-leg USD estimates are not whole-pool volume or a "best pairs" ranking. Missing,
+stale and retained measurements remain visible; stock-address backfill and independently sourced
+pool liquidity/volume are prerequisites for a defensible leaderboard.
+
 YAML parsing and research Markdown sanitization now happen at build time. Public-serving bundles omit account notes and carry a bounded history window; full source history stays in Git. Connections expose evidence-backed infrastructure relationships. Code, packets, machine observations, and approval ledgers retain separate ownership.
 
 Do not use the old cost tables as proof of 1,000-name capacity: they measured requests and included quota-denied reads. Measure completed relevant names, overdue age, weighted provider cost, public payload size, and deployed Worker CPU after rollout. Full static prerendering, incremental event cursors and per-address observation storage are follow-on changes, not claimed as implemented by this policy.
