@@ -6,6 +6,7 @@
 //   npm run build && npm run smoke
 
 import { spawn } from "node:child_process";
+import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { parse } from "yaml";
 
@@ -50,7 +51,7 @@ async function reviewServerFunctions() {
   }));
 }
 
-function startPreview() {
+function startPreview(extraEnv = {}) {
   const runtime = process.env.SMOKE_RUNTIME;
   const command = runtime === "node-server" ? "node" : "npm";
   const args = runtime === "cloudflare"
@@ -61,7 +62,7 @@ function startPreview() {
   const child = spawn(command, args, {
     stdio: ["ignore", "pipe", "pipe"],
     detached: true, // own process group, so we can kill vite (npm's grandchild) too
-    env: { ...process.env, PORT: String(PORT) },
+    env: { ...process.env, PORT: String(PORT), ...extraEnv },
   });
   let output = "";
   child.stdout.on("data", (d) => (output += d));
@@ -73,7 +74,7 @@ async function waitForServer() {
   const deadline = Date.now() + READY_TIMEOUT_MS;
   while (Date.now() < deadline) {
     try {
-      const res = await fetch(`${BASE}/`);
+      const res = await fetch(`${BASE}/disclaimer`);
       if (res.ok) return;
     } catch {
       // preview server not accepting connections yet
@@ -84,11 +85,34 @@ async function waitForServer() {
 }
 
 async function main() {
-  const { child, getOutput } = startPreview();
+  // Exercise a cold runtime with a local provider spy: static/meta pages must not
+  // fetch Pulse, while the dashboard still can. No real provider traffic in this test.
+  let pulseReads = 0;
+  const pulseSpy = process.env.SMOKE_RUNTIME === "node-server" ? createServer((_req, res) => {
+    pulseReads++;
+    res.setHeader("content-type", "application/json");
+    res.end(JSON.stringify({ at: new Date().toISOString(), ticks: 0, alerts: [], hot: [] }));
+  }) : null;
+  if (pulseSpy) await new Promise(resolve => pulseSpy.listen(0, "127.0.0.1", resolve));
+  const pulseAddress = pulseSpy?.address();
+  const { child, getOutput } = startPreview(pulseAddress && typeof pulseAddress === "object"
+    ? { PULSE_URL: `http://127.0.0.1:${pulseAddress.port}` } : {});
   const failures = [];
 
   try {
     await waitForServer();
+
+    if (pulseSpy) {
+      for (const path of ["/feed", "/methodology", "/n/pons", "/n/cashcat", "/relationships", "/terms", "/privacy"]) {
+        const response = await fetch(BASE + path);
+        await response.text();
+        if (response.status !== 200) failures.push(`cold ${path} returned ${response.status}`);
+      }
+      console.log(`  ${pulseReads === 0 ? "ok  " : "FAIL"} metadata/feed/dossier pages made ${pulseReads} Pulse reads (expected 0)`);
+      if (pulseReads !== 0) failures.push("shared metadata must not trigger live Pulse reads");
+      await fetch(`${BASE}/`).then(response => response.text());
+      if (pulseReads !== 1) failures.push(`dashboard should make one cached Pulse read, got ${pulseReads}`);
+    }
 
     for (const route of ROUTES) {
       const res = await fetch(BASE + route);
@@ -250,6 +274,7 @@ async function main() {
     const output = getOutput().trim();
     if (output) console.error(output);
   } finally {
+    if (pulseSpy) await new Promise(resolve => pulseSpy.close(resolve));
     // Kill the whole process group: child.kill() would stop npm but orphan vite, whose open
     // stdio pipe keeps a CI step alive indefinitely (the 2026-08-31 Validate hang).
     try {
