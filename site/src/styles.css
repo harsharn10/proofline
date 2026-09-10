@@ -159,6 +159,7 @@
   .logo:hover { color: var(--t1); }
   .crumb-nav { display: flex; gap: 14px; align-items: center; }
   .crumb-nav a {
+    white-space: nowrap;
     font-size: 13px; color: var(--t2);
     border-bottom: 2px solid transparent; padding: 4px 0;
   }
@@ -507,11 +508,15 @@
   .themetoggle:hover { color: var(--t1); border-color: var(--t2); }
 
   /* ── responsive ─────────────────────────────────────────────────────── */
+  @media (max-width: 1000px) {
+    .topbar { flex-wrap: wrap; }
+    .crumb-nav { order: 3; width: 100%; overflow-x: auto; padding-bottom: 4px; }
+    .crumb-nav a { flex-shrink: 0; }
+  }
   @media (max-width: 640px) {
     .wrap { padding: 0 16px; }
     .topbar { padding: 11px 16px; gap: 12px; }
     .topbar .asof { display: none; }
-    .crumb-nav { display: none; }
     .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
     .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .tabs a { padding: 10px 11px; }

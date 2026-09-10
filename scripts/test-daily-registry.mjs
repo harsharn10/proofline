@@ -377,3 +377,4 @@ test("retry cap counts failed seeds, manual selection overrides caps, ordinary w
   assert.equal(selection.filter(t=>t.refresh.retry).length,5,'new discovery cannot starve failed seeds');
   assert.equal(selection.filter(t=>!t.refresh.retry).length,5,'failed seeds cannot starve discovery');
 });
+import './test-stock-pairs.mjs';

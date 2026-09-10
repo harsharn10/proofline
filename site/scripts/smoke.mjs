@@ -25,6 +25,7 @@ const ROUTES = [
   "/feed",
   "/methodology",
   "/relationships",
+  "/pairs",
   "/data/registry.json",
   "/data/health.json",
   "/disclaimer",
@@ -107,7 +108,7 @@ async function main() {
     await waitForServer();
 
     if (pulseSpy) {
-      for (const path of ["/feed", "/methodology", "/n/pons", "/n/cashcat", "/relationships", "/terms", "/privacy"]) {
+      for (const path of ["/feed", "/methodology", "/n/pons", "/n/cashcat", "/relationships", "/pairs", "/terms", "/privacy"]) {
         const response = await fetch(BASE + path);
         await response.text();
         if (response.status !== 200) failures.push(`cold ${path} returned ${response.status}`);
@@ -143,6 +144,16 @@ async function main() {
     }
 
     const publicHtml = await fetch(`${BASE}/`).then((response) => response.text());
+    const pairHtml = await fetch(`${BASE}/pairs`).then(response => response.text());
+    const pairMain = pairHtml.match(/<main\b[\s\S]*?<\/main>/)?.[0] ?? "";
+    for (const [label, passed] of [
+      ["pair page explains exact-contract and per-leg semantics", pairMain.includes("exact contracts") && pairMain.includes("per-leg USD estimate")],
+      ["pair page has a table or an honest source-review gap", pairMain.includes("<table") || pairMain.includes("No source-verified pair list yet")],
+      ["pair response remains bounded", Buffer.byteLength(pairHtml) < 300_000 && !pairHtml.includes('"histories"')],
+    ]) {
+      console.log(`  ${passed ? "ok  " : "FAIL"} ${label}`);
+      if (!passed) failures.push(label);
+    }
     // /feed has a wire-only loader. Even a filtered deep link must not hydrate the
     // directory's histories/KPIs; filters still work in SSR before client JavaScript.
     const feedHtml = await fetch(`${BASE}/feed`).then(response => response.text());
