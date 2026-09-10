@@ -4,15 +4,16 @@ name: Pull chain facts
 #
 # content/pulled/** is machine-owned (docs/research-system.md §2): scripts/pull.mjs is its only
 # writer, the files are fully regenerated every run, and nobody hand-edits them. This workflow is
-# consequently the one job in the repository allowed to push to main directly — everything else goes
-# through a pull request. It earns that by writing nothing else: the data commit is scoped to
-# content/pulled/**, and a failed `npm run validate` after the pull aborts before it, so a bad pull
+# one of the scoped bot writers allowed to push to main directly. It writes pulled data and quota/
+# queue state only, and a failed `npm run validate` after the pull aborts before the data commit, so a bad pull
 # cannot land on main.
 #
-# Once daily at 09:17 UTC, away from the busy top of the hour.
+# Called after compile by the daily coordinator; manual narrow recovery stays available.
 on:
-  schedule:
-    - cron: "17 9 * * *"
+  workflow_call:
+    secrets:
+      BLOCKSCOUT_API_KEY:
+        required: false
   workflow_dispatch:
     inputs:
       only:
@@ -153,14 +154,22 @@ jobs:
           done
           echo "budget push failed after 3 attempts"; exit 1
 
+      - name: Record lane execution receipt
+        if: always()
+        env:
+          PIPELINE_KIND: pull
+          PIPELINE_RESULT: ${{ job.status }}
+        run: node scripts/pipeline-receipt.mjs
+
       - name: Retain daily selection and quota report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: daily-pull-${{ github.run_id }}
+          name: daily-pull-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             build/pull-plan.json
             build/pull-report.json
+            build/pull-run.json
           retention-days: 7
           if-no-files-found: warn
 

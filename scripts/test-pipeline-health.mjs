@@ -2,12 +2,14 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { basename } from 'node:path';
 import { access } from 'node:fs/promises';
-import { assessRun, assessReport, compileDisposition, selectReportArtifact } from './lib/pipeline-health.mjs';
-import { checkPipeline } from './pipeline-health.mjs';
+import { assessRun, assessReport, assessReceipt, compileDisposition, selectReportArtifact } from './lib/pipeline-health.mjs';
+import { checkPipeline, checkDaily } from './pipeline-health.mjs';
+import { executionReceipt } from './pipeline-receipt.mjs';
 
 const now=Date.parse('2026-09-09T15:37:00Z');
 const at='2026-09-09T09:20:00Z';
-const run={databaseId:123,status:'completed',conclusion:'success',createdAt:'2026-09-09T09:17:00Z',event:'schedule'};
+const run={databaseId:123,attempt:1,headSha:'a'.repeat(40),status:'completed',conclusion:'success',createdAt:'2026-09-09T09:17:00Z',event:'schedule'};
+const receipt=(kind='pull',result='success')=>executionReceipt({GITHUB_RUN_ID:'123',GITHUB_RUN_ATTEMPT:'1',GITHUB_SHA:run.headSha,GITHUB_EVENT_NAME:'schedule',PIPELINE_KIND:kind,PIPELINE_RESULT:result},'b'.repeat(40),at);
 const pull=()=>({at,status:'complete',selected:1,completed:['a'],deferred_names:[],deferred_reads:[],failures:[],run_errors:[],budget:{provider_exhausted:false}});
 const plan=()=>({at,selected:[{slug:'a'}],deferred:[]});
 const compile=()=>({generated_at:at,dry:false,ok:true,branches:[{skipped:[]}],compiled:[],inventory:[],preexistingErrors:[],gates:{validate:{ok:true,skipped:true},score:{ok:true,skipped:true}}});
@@ -60,14 +62,55 @@ test('read-only command runner inspects only scheduled reports and cleans its te
   const command=async args=>{
     calls.push(args);
     if(args[0]==='run'&&args[1]==='list') return JSON.stringify([run]);
-    if(args[0]==='api') return JSON.stringify({artifacts:[{name:'daily-pull-123',expired:false,size_in_bytes:50}]});
+    if(args[0]==='api') return JSON.stringify({artifacts:[{name:'daily-pull-123-1',expired:false,size_in_bytes:50}]});
     downloaded=args.at(-1);return '';
   };
-  const readJson=async path=>basename(path)==='pull-report.json'?pull():plan();
+  const readJson=async path=>({'pull-report.json':pull(),'pull-plan.json':plan(),'pull-run.json':receipt()})[basename(path)];
   assert.equal((await checkPipeline('pull',{repo:'owner/repo',now,command,readJson})).healthy,true);
-  assert(calls[0].includes('schedule'));assert(calls[0].includes('main'));
+  assert(calls[0].includes('schedule'));assert(calls[0].includes('main'));assert(calls[0].includes('daily-registry.yml'));
   await assert.rejects(access(downloaded));
   assert.equal((await checkPipeline('pull',{repo:'owner/repo',now,command:async()=>{throw Error('API unavailable')}})).healthy,false);
   assert.equal((await checkPipeline('pull',{repo:'owner/repo',now,command,readJson:async()=>{throw Error('bad JSON')}})).healthy,false);
   assert.equal((await checkPipeline('pull',{repo:'invalid',now,command})).healthy,false);
+});
+
+test('execution receipts bind lane, event, attempt, revision and time without claiming deployment',()=>{
+  assert.deepEqual(assessReceipt('pull',run,receipt(),now),[]);
+  assert.equal(receipt().workspace_sha,'b'.repeat(40),'workspace can advance after a bot commit');
+  assert.equal(receipt().deployed_sha,undefined);
+  for(const changed of [null,{}, {...receipt(),version:2},{...receipt(),kind:'compile'},
+    {...receipt(),run_id:124},{...receipt(),run_attempt:2},{...receipt(),event:'workflow_dispatch'},
+    {...receipt(),trigger_sha:'c'.repeat(40)},{...receipt(),workspace_sha:'invalid'},
+    {...receipt(),result:'skipped'},{...receipt(),at:'2026-09-08'},{...receipt(),at:'2027-01-01'}])
+    assert(assessReceipt('pull',run,changed,now).length);
+  assert.throws(()=>executionReceipt({},run.headSha),/Invalid/);
+});
+
+test('coordinator failure cannot hide a successful pull, and lane failure cannot borrow parent success',async()=>{
+  const calls=[];
+  let parent={...run,conclusion:'failure'}, compileResult='failure', pullResult='success', attempt=1;
+  const command=async args=>{
+    calls.push(args);
+    if(args[0]==='run'&&args[1]==='list')return JSON.stringify([parent]);
+    if(args[0]==='api')return JSON.stringify({artifacts:['pull','compile'].map(kind=>({name:`daily-${kind}-123-${attempt}`,expired:false,size_in_bytes:50}))});
+    return '';
+  };
+  const readJson=async path=>({'pull-report.json':pull(),'pull-plan.json':plan(),'pull-run.json':receipt('pull',pullResult),
+    'compile-report.json':compile(),'compile-run.json':receipt('compile',compileResult)})[basename(path)];
+  const check=()=>checkDaily({repo:'owner/repo',now,command,readJson});
+  let results=await check();
+  assert.deepEqual(results.map(r=>[r.kind,r.healthy]),[['coordinator',false],['compile',false],['pull',true]]);
+  assert.equal(calls.filter(args=>args[1]==='list').length,1,'one parent snapshot for both lanes');
+  parent={...run}; compileResult='success';pullResult='failure';
+  results=await check();assert.equal(results[0].healthy,true);assert.equal(results[2].healthy,false);
+  pullResult='success';parent={...run,attempt:2};
+  results=await check();assert.equal(results[1].healthy,false,'attempt-1 artifacts cannot satisfy attempt 2');
+  attempt=2;
+  results=await check();assert.equal(results[2].healthy,false,'renamed old receipt still cannot satisfy attempt 2');
+  parent={...run,event:'workflow_dispatch'};
+  results=await check();assert(results.every(result=>!result.healthy));
+  parent=null;
+  results=await check();assert(results.every(result=>!result.healthy));
+  results=await checkDaily({repo:'owner/repo',now,command:async()=>{throw Error('API offline')}});
+  assert.equal(results[0].healthy,false);
 });

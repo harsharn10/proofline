@@ -10,10 +10,12 @@ name: Compile packets
 # exits 2 rather than pushing a red main. Invalid packets are reported on the producer's PR and skipped
 # — one bad packet never blocks the rest.
 #
-# 11:47 UTC, with space after the 09:17 pull and the external daily research window.
+# First lane of the daily coordinator; manual recovery stays available.
 on:
-  schedule:
-    - cron: "47 11 * * *"
+  workflow_call:
+    secrets:
+      BLOCKSCOUT_API_KEY:
+        required: false
   workflow_dispatch:
     inputs:
       branch:
@@ -138,7 +140,7 @@ jobs:
               echo "These packets did not compile this run and were skipped. Everything else on this branch compiled; a skipped packet never blocks the rest of the batch."
               echo
               jq -r '.skipped[] | "**`" + .path + "`**\n\n```text\n" + (.errors | join("\n")) + "\n```\n"' <<< "$ROW"
-              echo "Fix the packet on this branch, then request controller review and exact-head/path acceptance under docs/ingestion.md. A new push invalidates the prior acceptance. The daily compile or an authorized manual dispatch picks up accepted copies only. A packet naming a possible match created in the same batch waits until that name is in the registry."
+              echo "Fix the packet on this branch, then request controller review and exact-head/path acceptance under docs/ingestion.md. A new push invalidates the prior acceptance. See docs/operating-flow.md for daily timing or authorized manual recovery; only accepted copies compile. A possible match created in the same batch must exist in the registry before the dependent packet can compile."
               echo
               echo "<!-- $MARKER -->"
             } > comment.md
@@ -187,13 +189,21 @@ jobs:
           echo "compile-inbox exited ${{ steps.compile.outputs.code }} — see the 'Compile gate failed' issue."
           exit 1
 
+      - name: Record lane execution receipt
+        if: always()
+        env:
+          PIPELINE_KIND: compile
+          PIPELINE_RESULT: ${{ job.status }}
+        run: node scripts/pipeline-receipt.mjs
+
       - name: Retain compiler report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: daily-compile-${{ github.run_id }}
+          name: daily-compile-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             build/compile-report.*
             build/open-prs.json
+            build/compile-run.json
           retention-days: 7
           if-no-files-found: warn

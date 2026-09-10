@@ -55,10 +55,24 @@ The UTC cron expressions in `.github/workflows/` are authoritative. Chicago time
 | Full backfill / Grok | Relevant name with material missing depth | Suggested 45–90 min/name; all three verification passes, dated metrics or searched gaps |
 | Targeted update / Grok | Material event, correction or selected measurement | Suggested 15–45 min/name; real delta, prior packet pointer, no check-only packet |
 | Verification / Claude | Assigned claims from a different producer | Suggested 15–30 min/name; independent method/result/date/block, unresolved limitations retained |
-| Machine pull / GitHub | 09:17 UTC / 04:17 CDT daily when enabled | 30 min work deadline, 45 min job timeout; report success, partial progress and retries separately |
-| Compile / GitHub + controller | 11:47 UTC / 06:47 CDT daily, or authorized manual run | 30 min job timeout; accepted diff and per-packet disposition, not merely green execution |
+| Daily coordinator / GitHub | 09:17 UTC / 04:17 CDT daily when enabled | Compile first, then pull; separate reusable jobs and reports, no repeated dispatch loop |
+| Compile / GitHub + controller | First coordinator lane, or authorized manual run | 30 min job timeout; accepted diff and per-packet disposition, not merely green execution |
+| Machine pull / GitHub | After compile finishes, including failure; cancellation stops the cycle | 30 min work deadline, 45 min job timeout; report success, partial progress and retries separately |
 | CI/deployment / GitHub + host | Accepted main change | Use actual run/deploy timestamps, not a promised duration; verify deployed SHA and changed public fields |
 | Health / GitHub | 15:37 UTC / 10:37 CDT daily | 5 min timeout; inspect reports and missing work even when jobs are green |
+
+`daily-registry.yml` owns the single collection clock. `compile.yml` and `pull.yml` remain independently
+dispatchable for scoped recovery, not separately scheduled. Each lane checks out current main, retains
+its existing validation/quota limits and acquires `main-bots`; the parent must not acquire that lock.
+The watchdog reads one scheduled coordinator run and each lane's versioned receipt/report for that
+exact run ID and attempt. It reports a failed coordinator separately from a successful recovery lane.
+An old-attempt artifact or a manual run cannot substitute for scheduled evidence. Rerunning only one
+lane leaves the other lane without current-attempt evidence; inspect or rerun the whole bounded cycle
+when scheduled certification is needed. The retired `compile-cycles.sh` dispatches nothing.
+
+Rollout: land the exact-head controller acceptance gate before consolidating. After merge, verify the
+first current-definition scheduled coordinator, both lane artifacts, data freshness and deployment;
+local/PR tests do not establish live scheduling. Do not rerun old scheduled workflow definitions.
 
 Human/model times are proposed planning budgets, not measured performance or enforced automation.
 If a read is blocked, record the failed surface and next useful check; do not exhaust the time budget

@@ -39,7 +39,7 @@ The signal path asks whether a committed change would alter what a reader does. 
 message has to pass is the owner's: *would a subscriber who follows Robinhood Chain act on this or be
 surprised by it*. Fewer messages is always the safer failure.
 
-It runs after a successful `Pull chain facts` workflow and can send at most three alerts per UTC day,
+It runs after a successful `Daily registry` coordinator or manual `Pull chain facts` workflow and can send at most three alerts per UTC day,
 never more than one for the same name that day:
 
 | Signal | Trigger | Daily cap | Kicker |
