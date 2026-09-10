@@ -29,6 +29,14 @@ test('packet gate is bounded, PR-only and covers grok-bot', () => {
   assert.match(job.if, /grok-bot\//);
   assert.equal(job['timeout-minutes'], 5);
 });
+test('publish pushes retain approval/content/policy triggers, excluding unrelated docs and frontend', () => {
+  const paths = workflow('publish').on.push.paths;
+  for (const path of ['content/**', 'ops/telegram-review.json', 'scripts/telegram-digest.mjs', 'scripts/score.mjs', 'scripts/lib/**', 'schema/**', 'package.json', 'package-lock.json', '.github/workflows/publish.yml']) {
+    assert.ok(paths.includes(path), path);
+  }
+  assert.equal(paths.some(p => p === '**' || p.startsWith('docs/') || p.startsWith('site/')), false);
+  assert.deepEqual(workflow('publish').on.workflow_run.workflows, ['Pull chain facts']);
+});
 test('daily collection and independent watchdog retain their schedules', () => {
   for (const name of ['pull', 'compile', 'daily-health']) {
     assert.equal(workflow(name).on.schedule.length, 1);

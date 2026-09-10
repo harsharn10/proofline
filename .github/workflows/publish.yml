@@ -5,6 +5,19 @@ name: Publish
 on:
   push:
     branches: [main]
+    # A docs/frontend-only merge cannot add an approval or change a publication's evidence.
+    # Keep policy, scoring dependencies and all canonical content in scope; scheduled/manual
+    # recovery remains available independently of these push filters.
+    paths:
+      - 'content/**'
+      - 'ops/telegram-review.json'
+      - 'scripts/telegram-digest.mjs'
+      - 'scripts/score.mjs'
+      - 'scripts/lib/**'
+      - 'schema/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/publish.yml'
   schedule:
     - cron: "0 13 * * *"
     - cron: "0 14 * * 0"
