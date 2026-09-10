@@ -97,6 +97,7 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
   const packet = parsePacket(await readFile(packetPath, "utf8"));
   const packetErrors = checkPacket(packet.frontmatter, packet.body);
   if (enforceMinimums) {
+    packetErrors.push(...validateAgainst('packet', packet.frontmatter));
     const { enforceResearchMinimums } = await import('./lib/research-minimums.mjs');
     packetErrors.push(...enforceResearchMinimums(packet));
   }

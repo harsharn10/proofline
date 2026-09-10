@@ -65,6 +65,18 @@ test('direct compiler refuses a deficient seed before any writes', async () => {
     assert.deepEqual(await readdir(root), []);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+test('direct compiler enforces packet schema as well as evidence minimums', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'proofline-schema-test-'));
+  try {
+    const packetPath = join(root, 'bad.md');
+    const text = seedWithMinimums(await readFile('fixtures/compile-packet/icarus-fields.md', 'utf8'));
+    const p = parsePacket(text);
+    p.frontmatter.claims[0].field = 'identity.not-a-schema-field';
+    await writeFile(packetPath, `---\n${stringify(p.frontmatter)}---\n${p.body}`);
+    await assert.rejects(runCompile({ packetPath, contentDir: join(root, 'output') }), /allowed values|schema/);
+    assert.deepEqual(await readdir(root), ['bad.md'], 'schema error creates no canonical output');
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
 test('update tier cannot bypass seed minimums for a new canonical project', async () => {
   const root = await mkdtemp(join(tmpdir(), 'proofline-update-test-'));
   try {
