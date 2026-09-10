@@ -34,6 +34,7 @@ import {
   selectDailyAlerts,
 } from "./lib/signals.mjs";
 import { locatedOnChain, officialSurfaceConfirmed } from "./lib/share-bar.mjs";
+import { publicationPauseReason } from './lib/publication-policy.mjs';
 
 const execFileAsync = promisify(execFile);
 const args = process.argv.slice(2);
@@ -732,18 +733,13 @@ if (backtestDays > 0) {
 // The owner's kill switch (#89) covers every mode, not only the approval-gated publications:
 // alerts, the daily brief and the Sunday wrap all stop when the channel is paused. A dry run still
 // previews, so pausing the channel never blinds the operator to what would have gone out.
-if (review.channel_enabled !== true && !dryRun) {
-  console.log("Icarus channel delivery is paused in ops/telegram-review.json — nothing sent.");
-  process.exit(0);
-}
-
 // `wire_enabled` is the flag the owner actually set to false on 2026-09-04 to stop automatic sends,
 // and it is the same predicate the pulse Worker's deploy derives (channel_enabled && wire_enabled),
 // so one repository flag governs both senders. Approval-gated publications are unaffected: they are
 // still individually reviewed, and selectApproved gates them on channel_enabled alone.
-const AUTOMATIC_MODES = new Set(["alerts", "brief", "weekly"]);
-if (review.wire_enabled === false && !dryRun && modes.some((mode) => AUTOMATIC_MODES.has(mode))) {
-  console.log("Icarus automatic sends are paused in ops/telegram-review.json (wire_enabled) — nothing sent.");
+const pauseReason = publicationPauseReason(review, modes);
+if (pauseReason && !dryRun) {
+  console.log(pauseReason);
   process.exit(0);
 }
 

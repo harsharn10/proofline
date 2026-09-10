@@ -12,6 +12,7 @@ on:
       - 'content/**'
       - 'ops/telegram-review.json'
       - 'scripts/telegram-digest.mjs'
+      - 'scripts/publish-preflight.mjs'
       - 'scripts/score.mjs'
       - 'scripts/lib/**'
       - 'schema/**'
@@ -69,14 +70,6 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install
-        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
-        run: npm ci
-
-      - name: Derive scores
-        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
-        run: npm run score
-
       - name: Select Telegram mode
         id: mode
         env:
@@ -93,13 +86,31 @@ jobs:
             *) mode="publications" ;;
           esac
           echo "arg=--$mode" >> "$GITHUB_OUTPUT"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
           echo "Telegram mode: $mode"
+
+      # Built-in Node modules only: a paused wire/no-candidate publication never needs npm or scoring.
+      # This is a preparation gate, not an approval. The sender reads/checks the ledger again.
+      - name: Check whether publication preparation is needed
+        id: preflight
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
+        env:
+          PUBLICATION_MODE: ${{ steps.mode.outputs.mode }}
+        run: node scripts/publish-preflight.mjs
+
+      - name: Install
+        if: ${{ steps.preflight.outputs.run == 'true' }}
+        run: npm ci
+
+      - name: Derive scores
+        if: ${{ steps.preflight.outputs.run == 'true' }}
+        run: npm run score
 
       # Skipped (not failed) when the repo secrets aren't set, so forks and secret-less CI runs stay
       # green.
       - name: Telegram delivery
         id: digest
-        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
+        if: ${{ steps.preflight.outputs.run == 'true' }}
         run: node scripts/telegram-digest.mjs "${{ steps.mode.outputs.arg }}"
 
       # Only runs when the digest step above actually ran (outcome == success — 'skipped' when the

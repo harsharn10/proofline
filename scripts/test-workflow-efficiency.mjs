@@ -10,14 +10,18 @@ test('only superseded PR validation is cancelled', () => {
   assert.equal(w.concurrency['cancel-in-progress'], "${{ github.event_name == 'pull_request' }}");
   assert.deepEqual(w.on.push.branches, ['main']);
 });
-test('publisher preparation and delivery require the same credentials', () => {
+test('publisher skips expensive preparation before paused/no-candidate delivery', () => {
   const w = workflow('publish');
   const steps = w.jobs.publish.steps;
   const delivery = steps.find(s => s.id === 'digest');
   for (const name of ['Install', 'Derive scores']) {
     assert.equal(steps.find(s => s.name === name).if, delivery.if);
   }
-  assert.equal(steps.find(s => s.uses?.startsWith('actions/setup-node')).if, delivery.if);
+  assert.equal(delivery.if, "${{ steps.preflight.outputs.run == 'true' }}");
+  assert.ok(steps.findIndex(s=>s.id==='preflight') < steps.findIndex(s=>s.name==='Install'));
+  assert.match(steps.find(s=>s.id==='preflight').run,/publish-preflight\.mjs/);
+  assert.match(steps.find(s => s.uses?.startsWith('actions/setup-node')).if,/TELEGRAM_BOT_TOKEN/);
+  assert.equal(steps.find(s=>s.id==='preflight').if,steps.find(s=>s.uses?.startsWith('actions/setup-node')).if);
   assert.equal(w.concurrency['cancel-in-progress'], false);
   assert.equal(w.on.schedule.length, 2);
   assert.ok(w.on.workflow_dispatch);
