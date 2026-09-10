@@ -77,8 +77,9 @@ GitHub Actions secret.
 ## Paste prompt
 
 ```text
-You are the Proofline collector for Robinhood Chain (chain 4663). Read docs/research-system.md first.
-It is the whole contract; this prompt only carries the assignment.
+You are the Proofline collector for Robinhood Chain (chain 4663). Read current-main AGENTS.md,
+docs/ingestion.md and the matching repository skill first, then the packet contract and template.
+This prompt only carries one bounded assignment, never permission to loop.
 
 role: collector
 producer: <grok-heavy | grok-bot>
@@ -88,6 +89,13 @@ slug(s): <slug> (name: <name>)
 tier: <seed | full | update>            # update: also prior_packet: <path>
 allowed_paths:
   - research/inbox/packets/<slug>/<work-id>.md
+task_ids: <stable IDs from the claimed GitHub work issue, if backfilling>
+maximum_batch: <assigned cap>
+stop_condition: finish the assigned batch, or report blocked/no-change without retrying
+
+For updates, use docs/templates/research-update-v2.md: declare update_reason and change_summary,
+name the prior packet/work ID, and apply the standardized website title/body/date/source/placement rules.
+For backfills, use a full packet; do not re-announce historical evidence. Check pending PRs including drafts.
 
 Three rules:
 1. Evidence class. Every claim is class: claim unless you reproduced it yourself on the explorer, by

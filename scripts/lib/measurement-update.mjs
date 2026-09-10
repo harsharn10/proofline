@@ -9,7 +9,7 @@ export function measurementUpdateErrors(incoming, previous = [], { requireChange
     if (!old) { changed = true; continue; }
     const oldAt = Date.parse(old.as_of);
     if (Number.isFinite(oldAt) && nextAt < oldAt) { errors.push(`measurement ${metric.kind}: older than the accepted observation`); continue; }
-    const value = row => JSON.stringify([row.value, row.currency ?? null, row.window ?? null, row.method ?? null]);
+    const value = row => JSON.stringify([row.value, row.currency ?? null, row.window ?? null]);
     if (nextAt === oldAt && value(metric) !== value(old)) errors.push(`measurement ${metric.kind}: conflicting value/window at the same date requires a sourced correction`);
     else if (nextAt !== oldAt || value(metric) !== value(old)) changed = true;
   }

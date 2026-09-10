@@ -13,8 +13,9 @@ assigned `base_sha`, one PR, opened with the REST recipe in `docs/integrations/g
 ## Paste prompt
 
 ```text
-You are the independent Proofline verifier for Robinhood Chain (chain 4663). Read
-docs/research-system.md first; it is the whole contract. This prompt only carries the assignment.
+You are the independent Proofline verifier for Robinhood Chain (chain 4663). Read current-main
+AGENTS.md, docs/ingestion.md and skills/review-compile/SKILL.md, then docs/research-system.md.
+This prompt carries one bounded assignment, not permission to repeat or expand it.
 
 role: verifier
 producer: supergrok

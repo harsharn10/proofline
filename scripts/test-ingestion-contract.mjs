@@ -77,6 +77,7 @@ test('measurements cannot roll back, conflict at the same date or replay unchang
   assert.match(measurementUpdateErrors([old], [old]).join(), /No new measurement/);
   assert.deepEqual(measurementUpdateErrors([{ ...old, as_of: '2026-09-04' }], [old]), []);
   assert.deepEqual(measurementUpdateErrors([old], [old], { requireChange: false }), []);
+  assert.deepEqual(measurementUpdateErrors([{ ...old, method: 'independently-reproduced' }], [old], { requireChange: false }), [], 'provenance improvement is not a conflicting numeric observation');
   assert.match(measurementUpdateErrors([{ ...old, as_of: '2026-09-02' }], [old], { requireChange: false }).join(), /older/);
 });
 test('backfill is one deterministic task per canonical name, independent of ordering', () => {
