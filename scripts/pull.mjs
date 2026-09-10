@@ -100,6 +100,7 @@ import {
 } from "./lib/pull/rialto.mjs";
 import { createCreditBudget, blockscoutCreditCost } from "./lib/pull/budget.mjs";
 import { openActivityCache } from "./lib/pull/activity-cache.mjs";
+import { createPullAttempt, finishPullAttempt } from './lib/pull/attempt.mjs';
 import { buildRelationships, relationshipIndex, addressKey, isOwnDeployment, referenceReason } from "./lib/relationships.mjs";
 import { refreshDecision, selectRefreshTargets, hasIdentityConflict, selectInfrastructureReaders } from "./lib/refresh-policy.mjs";
 import { refreshReviewStatus } from './lib/refresh-review.mjs';
@@ -794,6 +795,7 @@ async function main() {
   const cappedRows = [];
   const errorCounts = new Map();
   const completedSlugs = [];
+  const partialNames = [];
   const deferredReads = [];
   const deferredNames = selection.deferred.map(t => t.slug);
   // Measured, not assumed: what this run actually spent per tier is what the projection is built on.
@@ -811,6 +813,7 @@ async function main() {
       continue;
     }
     const slugStarted = Date.now();
+    const attempt = createPullAttempt();
     // Names are processed one at a time, so the run counter's movement across a name is that name's
     // spend exactly — the concurrency is inside a name, and each of those reads has its own scope.
     const slugCreditsStart = creditBudget.snapshot().run_credits;
@@ -822,6 +825,7 @@ async function main() {
       market = tokenAddress
         ? await readMarket(dexscreener, tokenAddress, { pulledAt })
         : emptyMarket(pulledAt, [{ step: "no token address", message: `no ${CHAIN} deployment with role token` }]);
+      attempt.record('market', market.errors);
     }
 
     const previousActivityAt = target.previous?.activity?.pulled_at ?? null;
@@ -830,6 +834,7 @@ async function main() {
       args.rpcOnly ? CONCURRENCY : explorerConfig.addressConcurrency,
       async (entry) => {
       const rpcResult = await readRpc(rpc, entry.address);
+      attempt.record('rpc', rpcResult.errors, entry.address);
       if (args.rpcOnly) return { row: mergeAddress(entry, rpcResult, null), creator: null, activity: null, changed: true, records: [] };
 
       const previousAddress = priorAddressFor(target.previous, entry.address);
@@ -916,6 +921,7 @@ async function main() {
         }
       });
       const signalCredits = signalRead.credits;
+      attempt.record('signal', signalError ? [signalError] : [], entry.address);
 
       const decision = explorerChangeDecision({
         role: entry.role,
@@ -949,6 +955,7 @@ async function main() {
         const walk = await readAddressActivity(activityClient, entry, {
           now, firstPage, readCounters: false, allowPaging: false, activityCache,
         });
+        attempt.record('activity', walk.errors, entry.address);
         const measured = walk.txns_24h !== null;
         const fresh = carryActivityFacts({
           ...walk,
@@ -978,6 +985,7 @@ async function main() {
         holders: true,
       }));
       const bsResult = addressRead.value;
+      attempt.record('explorer', bsResult.errors, entry.address);
       const addressCredits = addressRead.credits;
       const addressDeferred = hasBudgetDeferral(bsResult.errors);
       const freshRow = mergeAddress(entry, rpcResult, bsResult);
@@ -992,6 +1000,7 @@ async function main() {
         now, firstPage, activityCache, ...(args.full ? {} : { maxPages: 2 }),
       }));
       const walk = activityRead.value;
+      attempt.record('activity', walk.errors, entry.address);
       const activityCredits = activityRead.credits;
       const measured = walk.txns_24h !== null;
       const fresh = carryActivityFacts(walk, previousActivity);
@@ -1041,6 +1050,7 @@ async function main() {
           pairAddresses: market.pairs.map((pair) => pair.pair_address),
         }));
         const top10 = top10Read.value;
+        attempt.record('concentration', top10.errors, tokenAddress);
         const top10Credits = top10Read.credits;
         const top10Deferred = hasBudgetDeferral(top10.errors);
         const creator = creators.get(tokenAddress.toLowerCase()) ?? null;
@@ -1075,8 +1085,10 @@ async function main() {
           ownershipCredits = ownershipRead.credits;
         }
         const structureDeferred = hasBudgetDeferral(ownership.errors);
+        attempt.record('ownership', ownership.errors, tokenAddress);
         const lpRead = await creditBudget.withCredits(tokenLabel, () => readLpLocks(blockscout, market.pairs, { lockers: holderExclusions }));
         const locks = lpRead.value;
+        attempt.record('liquidity-locks', locks.errors, tokenAddress);
         const lpCredits = lpRead.credits;
         const lpDeferred = hasBudgetDeferral(locks.errors);
         structure = carryStructureFacts({
@@ -1104,6 +1116,7 @@ async function main() {
           for (const error of rialto.errors) {
             market.errors.push({ step: "rialto", message: `${error.step}: ${error.message}` });
           }
+          attempt.record('rialto', rialto.errors, tokenAddress);
         } else {
           market.rialto = null;
           market.pair_asset = null;
@@ -1136,18 +1149,17 @@ async function main() {
       reads: args.rpcOnly ? undefined : { tier: target.tier, explorer: readRecords },
       errors: slugErrors,
     };
-    const retryable = [...slugErrors, ...addresses.flatMap(a => a.errors ?? []),
-      ...(market?.errors ?? []), ...(activity?.addresses ?? []).flatMap(a => a.errors ?? []),
-      ...(structure?.errors ?? [])].some(e => /deferred:|HTTP (?:402|429|5\d\d)|timeout|after \d+ attempts|bot challenge|invalid activity response/i.test(e.message));
-    doc.refresh = { policy_version: 1, status: retryable ? "partial" : "complete",
-      attempted_at: pulledAt, last_success_at: retryable ? target.refresh.lastSuccessAt : pulledAt,
-      reason: target.refresh.reason };
+    attempt.record('metrics-and-run', slugErrors);
+    const {retryable, retryable_errors: retryableErrors, refresh} = finishPullAttempt(attempt,
+      {attemptedAt: pulledAt, lastSuccessAt: target.refresh.lastSuccessAt, reason: target.refresh.reason});
+    doc.refresh = refresh;
 
     try {
       const { path, written } = await writePulled(doc, { blockNumber, dry: args.dry, validate });
       if (written) {
         totals.files++;
         if (!retryable) completedSlugs.push(target.slug);
+        else partialNames.push({slug: target.slug, current_retryable_errors: retryableErrors});
         // The snapshot is appended only after the YAML lands, so the series never claims a run that
         // failed validation actually happened.
         appendHistory(target.slug, snapshotFrom(doc));
@@ -1344,6 +1356,7 @@ async function main() {
   await writeFile("build/pull-report.json", `${JSON.stringify({ at: pulledAt,
     status: runErrors.length || deferredNames.length || deferredReads.length || failures.length || creditBudget.snapshot().provider_exhausted || completedSlugs.length < targets.length ? "degraded" : "complete",
     selected: targets.length, completed: completedSlugs, deferred_names: deferredNames,
+    partial_names: partialNames,
     deferred_reads: [...new Set(deferredReads)], failures, budget: creditBudget.snapshot(),
     activity_cache: activityCache.snapshot(), run_errors: runErrors,
   }, null, 2)}\n`);
