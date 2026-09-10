@@ -75,6 +75,22 @@ export function parsePairs(body, chainId = DEX_CHAIN_ID) {
   return raw.filter((p) => p?.chainId === chainId).map(parsePair);
 }
 
+// Scheduling needs stronger evidence than the compatibility/display parser: omitted counts there
+// become zero, and sums may cover only some pools. Never use those defaults to prove inactivity.
+export function marketScreenEvidence(body, address, { pulledAt, chainId = DEX_CHAIN_ID } = {}) {
+  const raw = Array.isArray(body) ? body : Array.isArray(body?.pairs) ? body.pairs : [];
+  const pairs = raw.filter(p => p?.chainId === chainId);
+  const number = value => typeof value === 'number' && Number.isFinite(value) && value >= 0;
+  const count = value => number(value) && Number.isSafeInteger(value);
+  const complete = pairs.length > 0 && pairs.every(p =>
+    typeof p?.pairAddress === 'string' && p.pairAddress.length > 0 &&
+    typeof p?.baseToken?.address === 'string' && p.baseToken.address.toLowerCase() === address.toLowerCase() &&
+    number(p.liquidity?.usd) && number(p.volume?.h24) &&
+    count(p.txns?.h24?.buys) && count(p.txns?.h24?.sells));
+  return { complete, token_address: address, chain_id: chainId, observed_at: pulledAt,
+    pair_count: pairs.length };
+}
+
 /** The deepest pool, ties broken by 24h volume. Null when no pair reports liquidity at all. */
 export function topLiquidityPair(pairs = []) {
   let best = null;
@@ -162,15 +178,15 @@ export function emptyMarket(pulledAt, errors = []) {
  * the older all-chain route is tried next, and only a second failure is recorded, because one
  * endpoint being down must not read as "this token does not trade".
  */
-export async function readMarket(client, address, { pulledAt, chainId = DEX_CHAIN_ID } = {}) {
+export async function readMarket(client, address, { pulledAt, chainId = DEX_CHAIN_ID, onObservation } = {}) {
   const errors = [];
-  let pairs = null;
+  let body = null;
 
   try {
-    pairs = parsePairs(await client.tokenPairs(chainId, address), chainId);
+    body = await client.tokenPairs(chainId, address);
   } catch (e) {
     try {
-      pairs = parsePairs(await client.tokensFallback(address), chainId);
+      body = await client.tokensFallback(address);
     } catch (fallbackError) {
       errors.push({ step: "dexscreener", message: `token-pairs ${address}: ${e.message}` });
       errors.push({ step: "dexscreener", message: `latest/dex/tokens ${address}: ${fallbackError.message}` });
@@ -179,6 +195,8 @@ export async function readMarket(client, address, { pulledAt, chainId = DEX_CHAI
 
   const market = emptyMarket(pulledAt, errors);
   market.token_address = address;
-  if (pairs === null) return market;
+  if (body === null) return market;
+  onObservation?.(marketScreenEvidence(body, address, { pulledAt, chainId }));
+  const pairs = parsePairs(body, chainId);
   return { ...market, ...aggregatePairs(pairs), pairs };
 }
