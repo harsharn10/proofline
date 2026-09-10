@@ -13,6 +13,7 @@ import { leafLabel } from "./taxonomy.mjs";
 import { conductWarnings, voiceWarnings } from "./voice.mjs";
 import { REQUIRED_HEADINGS, PENDING_LINE } from "./research-md.mjs";
 import { reviewKeyFor } from "./telegram.mjs";
+import { enforceResearchMinimums } from "./research-minimums.mjs";
 
 /** Machine producer ids (research-system §2). Any of them, or a human GitHub id, may file a packet; none
  *  may resolve a conflict — that is a controller's call — so the resolver check rejects the whole list. */
@@ -418,6 +419,7 @@ export async function validatePacketDirectory(root = PACKET_ROOT, census = []) {
         continue;
       }
       const packetWarnings = [];
+      for (const message of enforceResearchMinimums(packet)) errors.push(`${where}: ${message}`);
       for (const message of validatePacket(packet, { census, path: where, warnings: packetWarnings })) errors.push(`${where}: ${message}`);
       for (const message of packetWarnings) warnings.push(`${where}: ${message}`);
       // One assignment (one work id) legitimately covers many slugs — a batch files one packet per slug

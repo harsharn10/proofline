@@ -286,7 +286,7 @@ await test("packet compiles Icarus card fields and feed idempotently", async () 
   const content = join(temp, "content");
   try {
     await cp("content", content, { recursive: true });
-    await runCompile({ packetPath, contentDir: content });
+    await runCompile({ packetPath, contentDir: content, enforceMinimums: false });
     const first = new Map();
     async function snapshot(dir, relative = "") {
       for (const entry of await readdir(dir, { withFileTypes: true })) {
@@ -298,7 +298,7 @@ await test("packet compiles Icarus card fields and feed idempotently", async () 
     await snapshot(content);
     const checked = await validateContent(content);
     assert.deepEqual(checked.errors, [], checked.errors.join("\n"));
-    await runCompile({ packetPath, contentDir: content });
+    await runCompile({ packetPath, contentDir: content, enforceMinimums: false });
     const second = new Map();
     async function snapshotAgain(dir, relative = "") {
       for (const entry of await readdir(dir, { withFileTypes: true })) {
