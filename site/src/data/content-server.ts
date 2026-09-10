@@ -972,6 +972,15 @@ async function directoryBundle(sectionId?: string): Promise<DirectoryBundle> {
 
 export const getContent = createServerFn({ method: "GET" }).handler(() => directoryBundle());
 
+// The full wire needs neither directory histories/KPIs nor a live Pulse read. Keep its
+// existing order, complete filter universe and build clock without serializing other pages.
+export const getWire = createServerFn({ method: "GET" }).handler(
+  (): Pick<DirectoryBundle, "wire" | "now"> => {
+    const content = getCachedContent();
+    return { wire: content.wire, now: content.now };
+  },
+);
+
 // Compact home filters need the newest six of each kind, not the entire archive.
 export function compactWire(items: WireItem[]): WireItem[] {
   const counts = new Map<string, number>();

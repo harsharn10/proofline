@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Wire } from "@/components/wire/wire";
-import { getContent } from "@/data/content-server";
+import { getWire } from "@/data/content-server";
 import { isWireKind, type WireKind } from "@/data/types";
 
 type FeedSearch = { kind?: WireKind; name?: string };
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/feed")({
       ...(typeof name === "string" && /^[a-z0-9][a-z0-9-]*$/.test(name) ? { name } : {}),
     };
   },
-  loader: () => getContent(),
+  loader: () => getWire(),
   head: () => ({
     meta: [
       { title: "The wire · Icarus" },
