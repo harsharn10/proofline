@@ -11,7 +11,9 @@ objects, who may write which paths, roles, the packet format (§5), branch and P
 and conflict rules. Controlled product and display labels are in [`docs/taxonomy.md`](docs/taxonomy.md)
 with the machine copy in `schema/taxonomy.json`. Producer notes restate the contract for one producer:
 [`Grok desk`](docs/integrations/grok-bot.md) and [`SuperGrok verifier`](docs/integrations/supergrok.md).
-Grok's runtime skills live in `.grok/`. Dated inbox notes and historical implementation plans are
+All agents start at [AGENTS.md](AGENTS.md). Shared role skills live in `skills/`; the existing `.grok/`
+entrypoints route there. [Ingestion and website update rules](docs/ingestion.md) are the shared policy.
+Dated inbox notes and historical implementation plans are
 evidence, not instructions.
 
 ## Commands

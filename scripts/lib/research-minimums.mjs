@@ -68,5 +68,24 @@ export function researchMinimumGaps(packet) {
 }
 
 export function enforceResearchMinimums(packet) {
-  return isLegacyPacket(packet) ? [] : researchMinimumGaps(packet).map(g => `research minimum: ${g}`);
+  if (isLegacyPacket(packet)) return [];
+  const errors = researchMinimumGaps(packet).map(g => `research minimum: ${g}`);
+  const f = packet.frontmatter ?? {};
+  if (f.packet_tier === 'update') {
+    if (!['event', 'measurement', 'correction', 'verification'].includes(f.update_reason)) errors.push('update: declare update_reason (event, measurement, correction or verification); backfills use a full packet');
+    if (typeof f.change_summary !== 'string' || !f.change_summary.trim()) errors.push('update: change_summary must explain the material difference, not a routine check');
+    if (!f.prior_packet || !f.supersedes) errors.push('update: prior_packet and supersedes must identify the prior work');
+    if (f.update_reason === 'event' && !refs(f.events).some(e => e && ['material', 'urgent'].includes(e.impact) && ['feed', 'both'].includes(e.site_recommendation))) errors.push('update: event updates need a material/urgent public event');
+    if (f.update_reason === 'measurement' && !refs(f.metrics).length) errors.push('update: measurement updates need dated metrics');
+    if (f.update_reason === 'correction' && !refs(f.claims).some(c => c?.supersedes)) errors.push('update: corrections need a superseding claim');
+    if (f.update_reason === 'verification' && (f.role !== 'verifier' || !refs(f.reproductions).length)) errors.push('update: verification needs an independent verifier role and reproductions');
+  }
+  for (const event of refs(f.events)) {
+    if (!event || !['feed', 'both'].includes(event.site_recommendation)) continue;
+    if (typeof event.summary !== 'string' || !event.summary.trim() || event.summary.length > 600) errors.push('website: event summary must be nonempty and at most 600 characters');
+    if (typeof event.title !== 'string' || !event.title.trim() || event.title.length > 80) errors.push('website: event title must be nonempty and at most 80 characters');
+    if (!Number.isFinite(Date.parse(event.occurred_at))) errors.push('website: event needs its actual occurrence date');
+    if (!refs(event.receipt_ids).some(id => refs(f.receipts).some(r => r?.id === id && sourceUrl(r.url)))) errors.push('website: event needs a source URL');
+  }
+  return errors;
 }

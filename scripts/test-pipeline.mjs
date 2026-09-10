@@ -267,7 +267,7 @@ await test("packet compiles Icarus card fields and feed idempotently", async () 
   assert.deepEqual(compiled.project.themes, ["chain-data", "monitoring", "tooling"]);
   assert.deepEqual(compiled.project.official_links.map((link) => link.kind), ["site", "docs", "github", "explorer", "dexscreener", "app"]);
   assert.equal(new Set(compiled.project.official_links.map((link) => normalizeUrl(link.url))).size, compiled.project.official_links.length);
-  assert.deepEqual(compiled.feed.items.map((item) => item.kind), ["company", "ct", "onchain", "risk"]);
+  assert.deepEqual(compiled.feed.items.map((item) => item.kind), ["company", "ct", "risk"], 'profile-only onchain evidence is not a feed announcement');
   assert.equal(compiled.feed.items[0].account, "@fields");
   assert.equal(compiled.feed.items[1].account, "@reader");
   assert.equal(compiled.feed.items[0].body, packet.frontmatter.events[0].summary);
@@ -486,6 +486,9 @@ await test("the feed carries reader-facing events under ids that survive an edit
 
   // The id is the event, not the wording: an edited (or over-long) title replaces its item, never adds one.
   const retitled = reshaped((frontmatter) => { frontmatter.events[0].title = "Router reproduced on chain 4663 after a second read of the deployment bytecode"; });
+  assert.throws(() => compile(retitled, null, null, result.sources, result.feed), /explicit sourced correction/);
+  retitled.frontmatter.update_reason = 'correction';
+  retitled.frontmatter.claims[0].supersedes = retitled.frontmatter.claims[1].id;
   const second = compile(retitled, null, null, result.sources, result.feed);
   assert.equal(second.feed.items.length, 1, "a retitled event replaces its feed item");
   assert.equal(second.feed.items[0].id, result.feed.items[0].id);

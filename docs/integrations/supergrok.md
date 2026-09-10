@@ -1,5 +1,9 @@
 # SuperGrok verifier
 
+Start at current-main `AGENTS.md`, `docs/ingestion.md` and `skills/review-compile/SKILL.md`.
+The paste prompt below supplies assignment fields, not standing permission to loop. New verifier updates
+use `update_reason: verification`, `change_summary`, and actual independent reproductions.
+
 SuperGrok (producer `supergrok`) verifies one collector packet or one canonical profile per run and
 files its own verifier packet. Contract: `docs/research-system.md` §3 (role), §5 (packet), §7
 (evidence). It never edits the collector packet, resolves conflicts, merges identities, or calls its

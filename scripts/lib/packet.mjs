@@ -14,6 +14,7 @@ import { conductWarnings, voiceWarnings } from "./voice.mjs";
 import { REQUIRED_HEADINGS, PENDING_LINE } from "./research-md.mjs";
 import { reviewKeyFor } from "./telegram.mjs";
 import { enforceResearchMinimums } from "./research-minimums.mjs";
+import { mergeWebsiteEvents } from './website-events.mjs';
 
 /** Machine producer ids (research-system §2). Any of them, or a human GitHub id, may file a packet; none
  *  may resolve a conflict — that is a controller's call — so the resolver check rejects the whole list. */
@@ -1414,9 +1415,8 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
   if (!(tldr && tldrSource)) delete project.tldr_source;
   const receiptsById = new Map((frontmatter.receipts ?? []).map((receipt) => [receipt.id, receipt]));
   const feedItems = (frontmatter.events ?? []).map((event) => {
-    // site_recommendation "none" is the producer saying this event is not for readers. Honour it: the
-    // public feed is not a dump of every URL-backed event in the packet.
-    if (event.site_recommendation === "none") return null;
+    // Profile-only and internal evidence are not feed announcements.
+    if (!["feed", "both"].includes(event.site_recommendation)) return null;
     const receipt = (event.receipt_ids ?? []).map((id) => receiptsById.get(id))
       .find((row) => typeof row?.url === "string" && /^https?:\/\//i.test(row.url));
     if (!receipt) return null;
@@ -1438,7 +1438,9 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
       sources,
     };
   }).filter((item) => item?.sources.length);
-  const feed = { slug: frontmatter.slug, items: mergeUnique(priorFeed?.items, feedItems, (row) => row.id) };
+  const feed = { slug: frontmatter.slug, items: mergeWebsiteEvents(priorFeed?.items, feedItems, {
+    correction: frontmatter.update_reason === 'correction' && (frontmatter.claims ?? []).some(c => c.supersedes),
+  }) };
   const research = researchDocument(frontmatter, body, receiptToSource, ledger, {
     coverage,
     priorResearch,
