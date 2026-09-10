@@ -436,7 +436,6 @@ reproductions:
     result: HTTP 200 from api.llama.fi/protocol/alandale-v3. Response names Alandale V3, URL https://alandale.xyz, address robinhood:0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA, chains [Robinhood Chain]. Endpoint identity is confirmed; aggregator methodology is not an independent audit.
   - id: REP-13
     method: official-crosslink
-    chain_id: null
     checked_at: 2026-09-10T03:42:09.453Z
     receipt_ids:
       - R-44
@@ -1066,7 +1065,7 @@ claims:
       - REP-11
     supersedes: null
   - id: CLM-59
-    field: identity.aggregator
+    field: identity.domain
     value: DefiLlama Alandale V3 record links alandale.xyz and the LUTE address on Robinhood Chain
     class: claim
     observed_at: 2026-09-10T03:42:09.546Z
@@ -1076,7 +1075,7 @@ claims:
       - REP-12
     supersedes: null
   - id: CLM-60
-    field: identity.crosslinks
+    field: identity.domain
     value: Alandale site and GitBook welcome crosslink their site/app/docs surfaces; identity approval remains pending
     class: verified
     observed_at: 2026-09-10T03:42:09.453Z
