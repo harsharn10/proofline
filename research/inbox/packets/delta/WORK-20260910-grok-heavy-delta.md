@@ -212,31 +212,37 @@ A liquidity manager: users deposit a token or LP into a stake or a shaped Uniswa
 
 Themes: vault, rwa, memecoin
 
-TL;DR: LP manager on 4663. Docs list ladder v8 and a 7.5% claim fee; Llama TVL is far below the token book and the 2m+ TVL post.
+TL;DR: LP manager on 4663. Docs list ladder v8 and a 7.5% claim fee; deployed fee controls and the app's active manager remain unconfirmed.
 
 ## Why it matters
 
-- Thesis: unmanaged Uniswap LP on Robinhood Chain can be deposited or shaped without handing keys to the team. [claim R-2]
+- Thesis: docs describe shaped Uniswap liquidity positions and a share of pool fees. [claim R-2]
 - Traction: DELTA/WETH v3 still prints seven-figure 24h volume. [claim R-5]
-- Catalyst: which ladder is live, and whether owner bounds in the FAQ match bytecode, remain unread. [claim R-2]
+- Catalyst: docs list ladder v8 above v3; which manager the app uses remains unconfirmed. [claim R-2]
 
 ## What could go wrong
 
-- Two EOAs own the vault/ladder stack with no timelock in owner(). [verified R-7]
-- FAQ owner limits are unread on unverified source. [claim R-2]
-- TVL figures from Llama, DexScreener and X are not the same custody. [claim R-17]
+- VaultFactory and ladder v8 return different owner addresses. [verified R-7 R-13]
+- FAQ says the owner cannot raise fees or move staked positions; deployed limits are unconfirmed. [claim R-2]
+- Llama TVL, DELTA pool liquidity and the project's TVL claim are different measures, not interchangeable totals. [inference R-3 R-5 R-17]
 
 ## Product and mechanics
 
 Stakes attach to one WETH pool and stream rewards over seven days. Pools mint a shaped Uniswap position into a Delta-held NFT. Current docs take 7.5% of claimed fees, never principal; the 2026-09-02 packet recorded 1%. That 7.5% is docs copy, not a reproduced on-chain fee. [claim R-2]
 
-Docs now list DeltaLadderManager v8 0xbCb9…d5FB above v3. Both have code. Which one the app uses for new positions was not read from JS. [verified R-13 R-12]
+Docs list DeltaLadderManager v8 0xbCb9…d5FB above v3. [claim R-2]
+
+Both listed ladder addresses have code. [verified R-13 R-12]
+
+Which manager the app uses for new positions was not established from its JS. [unknown]
 
 ## Control and security
 
-VaultFactory / VaultFarmFactory / Llama router owner() is 0xf98c…2a1d. Ladder v3, v8 and both Llama ladder managers owner() is 0xb1c2…9e69. Both are empty-code EOAs this pass. [verified R-7 R-12 R-13]
+VaultFactory, VaultFarmFactory and the Llama router return owner 0xf98c…2a1d. Ladder v3, v8 and both Llama ladder managers return owner 0xb1c2…9e69. These reads do not establish every privileged path. [verified R-7 R-8 R-12 R-13 R-14 R-15 R-16]
 
-FAQ says that owner can pause and lower fees but cannot raise fees or seize deposits. Source was not verified, so that bound is a project claim. Llama audits=0. [claim R-2]
+FAQ says that owner can pause and lower fees but cannot raise fees or move staked positions; these bounds remain project claims, not reproduced deployed controls. [claim R-2]
+
+Llama reports audits=0; that field does not establish the absence of an audit. [claim R-17]
 
 ## Team and provenance
 
@@ -244,21 +250,24 @@ deltaliquidity.app, docs and @deltaliquidity print the same CA. A 2026-09-10 pos
 
 ## Economics and activity
 
-Llama Robinhood Chain TVL $9,540.89 (custodied adapter slice). DexScreener DELTA/WETH v3 liquidity $829,483.95 and 24h volume $1,560,235.74 (token book). @deltaliquidity posted 2m+ TVL on 9 Sep. These are different measurements. [claim R-5 R-17]
+Llama reports Robinhood Chain TVL of $9,540.89. DexScreener reports DELTA/WETH v3 liquidity of $829,483.95 and 24h volume of $1,560,235.74. @deltaliquidity posted 2m+ TVL on 9 Sep. [claim R-3 R-5 R-17]
+
+These values are not interchangeable: token-pool liquidity is not protocol TVL, and the project's TVL scope has not been reconciled with Llama's. [inference R-3 R-5 R-17]
 
 ## Material risks
 
-- Unverified factories plus two EOAs mean pause/fee/upgrade behaviour is unread. [verified R-7]
-- Mixing token-book liquidity with protocol TVL overstates custody. [claim R-17]
+- Pause, fee and upgrade controls were not established from deployed source this pass. [unknown]
+- Treating token-pool liquidity as protocol TVL would conflate different measurements. [inference R-5 R-17]
 
 ## Verification passes
 
-- Receipts: docs, X, DexScreener and Llama opened 2026-09-10; RPC eth_getCode/owner() on every listed deployment. [verified R-2 R-5 R-7 R-17]
+- Receipts: collector reports opening docs, X, DexScreener and Llama on 2026-09-10 and recording contract-code and owner reads; a page fetch is not deployment verification. [claim R-2 R-3 R-5 R-7 R-17]
 - Numbers: Llama figure is currentChainTvls Robinhood Chain; DexScreener volume is the v3 pair, not protocol fees. [claim R-5 R-17]
 - Adversarial: v8 could be unused docs while v3 or a Llama adapter still takes new positions; app JS is required. [inference R-2 R-13]
 
 ## Operations log
 
+- Controller correction by codex, 2026-09-10, requested by the owner: narrowed card/control wording, separated docs claims from RPC facts and matched metric citations to their sources. Original observations and unresolved gaps are unchanged; this is not new collection or independent verification.
 - Task 5b892e12a71969049fdb. Identity and primary_leaf copied from the accepted full packet.
 - RPC 2026-09-10T18:24Z. Blockscout REST Cloudflare this pass.
 - Llama protocol delta, not delta-liquidity.

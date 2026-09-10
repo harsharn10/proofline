@@ -164,17 +164,17 @@ Circus is a Robinhood Chain token launchpad at circus.trade. Classic Curve launc
 
 Themes: launchpad
 
-TL;DR: ETH bonding-curve pad on 4663. Official copy disagrees on Uniswap v3 vs v4 IPO; the implementation is still unverified.
+TL;DR: ETH bonding-curve pad on 4663. Official copy disagrees on v3 vs v4 graduation; implementation source was not read this pass.
 
 ## Why it matters
 
 - Thesis: a public ETH curve plus a claimed locked IPO is the product, not a private raise. [claim R-2]
 - Traction: homepage printed 48 graduated tokens and $1.22M raised on curves. [claim R-1]
-- Catalyst: implementation source and the v3 vs v4 IPO path still unread. [verified R-5]
+- Catalyst: homepage says v3 graduation; docs say v4. The routing conflict remains unresolved. [disputed R-1 R-2]
 
 ## What could go wrong
 
-- Proxy owner() is a single EOA; the labeled timelock does not own it. [verified R-4]
+- Proxy owner() returns an address with no code, not the labeled timelock address. [verified R-4 R-7 R-8]
 - Homepage and docs disagree on Uniswap v3 vs v4 graduation. [disputed R-1 R-2]
 - No audit artifact was located despite "audited factory" copy. [unknown]
 
@@ -200,17 +200,19 @@ Homepage counters are project UI, not an independent TVL. DexScreener's deepest 
 
 ## Material risks
 
-- A single EOA can call owner-only proxy functions unless a hidden module says otherwise. [verified R-4]
-- Unverified implementation plus v3/v4 copy conflict means the IPO lock story is unread. [disputed R-1 R-2]
+- Proxy owner() returns an address with no code; this read alone does not establish access checks on privileged functions. [verified R-4 R-8]
+- Homepage and docs disagree on v3/v4 graduation; neither establishes the deployed route. [disputed R-1 R-2]
+- Implementation source and the deployed liquidity-lock controls were not established this pass. [unknown]
 
 ## Verification passes
 
-- Receipts: homepage, how-it-works, X and DexScreener opened 2026-09-10; RPC eth_getCode/owner/impl-slot/getMinDelay run. [verified R-1 R-2 R-4]
+- Receipts: collector reports opening homepage, how-it-works, X and DexScreener on 2026-09-10; contract-code, owner, implementation-slot and delay reads are recorded separately. [claim R-1 R-2 R-3 R-4 R-7 R-10]
 - Numbers: $1.22M / 48 graduated are homepage strings; CRUDECAT volume is a DexScreener pair, not factory volume. [claim R-1 R-10]
 - Adversarial: CRUDECAT's USO v3 book could be a later market, not the Circus IPO pool; factory logs are still required. [inference R-10]
 
 ## Operations log
 
+- Controller correction by codex, 2026-09-10, requested by the owner: narrowed card wording and matched citations to existing receipts. Source-read and routing gaps remain unresolved; no new collection or changed observation dates.
 - Task 7d6a46d05bed01f6c679. Classification copied from the accepted seed.
 - RPC 2026-09-10T18:24Z. Blockscout REST Cloudflare this pass.
 - No audit URL. Implementation source name unread.

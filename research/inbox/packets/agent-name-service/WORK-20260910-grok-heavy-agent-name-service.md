@@ -197,12 +197,12 @@ TL;DR: .agent names resolve on 4663 to an agent key and wallet. Three of four re
 ## Why it matters
 
 - Thesis: Robinhood Chain agent software can look up a stable handle instead of a hex string. [claim R-1]
-- Traction: four registry contracts still have code; $ANS has a thin Uniswap v4 ETH book. [claim R-5]
-- Catalyst: fee recipient, buyback path and revoke powers remain unpublished. [claim R-2]
+- Traction: DexScreener shows a thin $ANS/ETH Uniswap v4 book, not registry fee revenue. [claim R-5]
+- Catalyst: docs describe governance-configurable fees but do not name a fee recipient. [claim R-2]
 
 ## What could go wrong
 
-- A single empty-code EOA is owner() on three of four registry contracts, with no timelock in that call path. [verified R-11]
+- Three registry contracts return the same owner address; that address has no code. [verified R-11 R-12 R-14 R-19]
 - No audit report was located. [unknown]
 - Registration ETH and any $ANS buyback sink are not printed on docs. [claim R-2]
 
@@ -234,17 +234,18 @@ Docs say registration, renewal and marketplace fees are governance-configurable;
 
 ## Material risks
 
-- Three registry owner() calls return one EOA with no code and no timelock in that path. [verified R-11]
+- Three registry owner() calls return the same address, which has no code; this does not establish all privileged paths. [verified R-11 R-12 R-14 R-19]
 - Audit absence and unpublished fee sink leave revoke and treasury behaviour unread. [unknown]
 
 ## Verification passes
 
-- Receipts: site, docs, X and DexScreener were opened 2026-09-10; RPC eth_getCode/owner() were run against the listed addresses. [verified R-1 R-2 R-5 R-11]
+- Receipts: collector reports opening site, docs, X and DexScreener on 2026-09-10 and recording RPC reads for the listed contracts; these are separate evidence types. [claim R-1 R-2 R-3 R-5 R-11]
 - Numbers: liquidity and 24h volume are the DexScreener v4 pair, not a registry TVL. [claim R-5]
 - Adversarial: a same-ticker ANS token or a Pons-launched memecoin could be confused with the registrar; the docs-named four-contract set and the X bio link to agentsn.xyz argue this row is the namespace, not the pad. [inference R-2 R-3]
 
 ## Operations log
 
+- Controller correction by codex, 2026-09-10, requested by the owner: narrowed card wording and matched citations to existing receipts. No new collection, changed observation dates, identity decisions or gap closure.
 - Task ecc4cd43582877107060. Prior packet WORK-20260903-grok-heavy-icarus-research reused for identity and classification.
 - RPC https://rpc.mainnet.chain.robinhood.com eth_getCode/owner() 2026-09-10T18:24Z.
 - Blockscout REST /api/v2 returned HTML (Cloudflare) this pass; explorer URLs kept as locators, facts taken from RPC.
