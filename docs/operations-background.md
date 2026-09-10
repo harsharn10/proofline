@@ -9,7 +9,7 @@ Audited against main `6223871` on 2026-09-09. Repository configuration is not pr
 | Pipeline health | Daily 15:37 UTC; manual | Keep independent: chaining to success would hide missed/failed collection. |
 | Publish | Relevant main pushes, successful pulls, daily brief, Sunday wrap, manual | Skip docs/frontend-only pushes; preserve content/approval/policy triggers; skip install/scoring without delivery credentials. |
 | Validate | PR updates and main pushes | Cancel superseded PR checks only; preserve every main run. |
-| Packet PR gate | Successful PR Validate | API-only classification, bounded to five minutes; never merges. |
+| Packet PR gate | Successful PR Validate | API-only, bounded to five minutes; ordinary Codex implementation PRs skip packet comments. Research/canonical edits, renamed-away evidence and Grok producer branches retain review; never merges. |
 | Generated-file guard | PR | Keep ownership safety gate. |
 | Pulse deploy | Relevant main paths; manual | Bound verify/deploy to ten minutes each. |
 | Pulse Worker | Every ten minutes | Keep: produces dashboard `/pulse.json`, not only Telegram. Disabling alerts does not make collection redundant. |

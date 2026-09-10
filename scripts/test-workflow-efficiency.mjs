@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { parse } from 'yaml';
 
 const workflow = (name) => parse(readFileSync(new URL(`../.github/workflows/${name}.yml`, import.meta.url), 'utf8'));
@@ -28,6 +29,24 @@ test('packet gate is bounded, PR-only and covers grok-bot', () => {
   assert.match(job.if, /workflow_run.event == 'pull_request'/);
   assert.match(job.if, /grok-bot\//);
   assert.equal(job['timeout-minutes'], 5);
+});
+test('packet relevance skips ordinary implementation but retains canonical edits and renamed-away evidence',()=>{
+  const job=workflow('automerge-feed').jobs.classify;
+  const script=job.steps.find(s=>s.id==='paths').run;
+  const predicate=script.match(/RELEVANT="\$\(jq '([^']+)'/)[1];
+  const relevant=pages=>{
+    const r=spawnSync('jq',[predicate],{input:JSON.stringify(pages),encoding:'utf8'});
+    assert.equal(r.status,0,r.stderr);return r.stdout.trim()==='true';
+  };
+  assert.equal(relevant([[{filename:'scripts/pull.mjs'},{filename:'docs/process.md'}]]),false);
+  for(const filename of ['research/inbox/packets/a/work.md','research/inbox/assignments/a.json','content/projects/a.yaml'])
+    assert.equal(relevant([[{filename,status:'modified'}]]),true);
+  assert.equal(relevant([[{filename:'README.md',previous_filename:'research/inbox/packets/a/work.md',status:'renamed'}]]),true);
+  assert.equal(relevant([[{filename:'site/src/index.ts'}],[{filename:'content/projects/a.yaml',status:'removed'}]]),true,'all pages inspected');
+  assert.match(script,/\[\[ "\$BRANCH" == codex\/\* && "\$RELEVANT" == false \]\]/,'only ordinary Codex work skips, never Grok');
+  assert(script.indexOf('Implementation-only')<script.indexOf('allowlisted=true'));
+  assert.equal(job.steps.some(s=>s.uses?.startsWith('actions/checkout')),false,'untrusted PR code is never executed');
+  assert.match(job.steps.find(s=>s.id==='pr').run,/HEAD.*!=.*HEAD_SHA/);
 });
 test('publish pushes retain approval/content/policy triggers, excluding unrelated docs and frontend', () => {
   const paths = workflow('publish').on.push.paths;
