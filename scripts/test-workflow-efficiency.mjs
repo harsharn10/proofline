@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { parse } from 'yaml';
 
 const workflow = (name) => parse(readFileSync(new URL(`../.github/workflows/${name}.yml`, import.meta.url), 'utf8'));
@@ -35,14 +36,52 @@ test('publish pushes retain approval/content/policy triggers, excluding unrelate
     assert.ok(paths.includes(path), path);
   }
   assert.equal(paths.some(p => p === '**' || p.startsWith('docs/') || p.startsWith('site/')), false);
-  assert.deepEqual(workflow('publish').on.workflow_run.workflows, ['Pull chain facts']);
+  assert.deepEqual(workflow('publish').on.workflow_run.workflows, ['Daily registry', 'Pull chain facts']);
 });
-test('daily collection and independent watchdog retain their schedules', () => {
-  for (const name of ['pull', 'compile', 'daily-health']) {
+test('one daily coordinator orders separate lanes without starving pull after compile failure', () => {
+  const daily=workflow('daily-registry');
+  assert.equal(daily.concurrency.group,'daily-registry');
+  assert.equal(daily.concurrency['cancel-in-progress'],false);
+  assert.equal(daily.jobs.compile.uses,'./.github/workflows/compile.yml');
+  assert.equal(daily.jobs.pull.uses,'./.github/workflows/pull.yml');
+  assert.equal(daily.jobs.pull.needs,'compile');
+  assert.equal(daily.jobs.pull.if,'${{ !cancelled() }}');
+  assert.equal(daily.jobs.pull.permissions.contents,'write');
+  for(const job of Object.values(daily.jobs)){
+    assert.equal(job.concurrency,undefined,'no nested acquisition of main-bots');
+    assert.deepEqual(Object.keys(job.secrets),['BLOCKSCOUT_API_KEY']);
+  }
+  for (const name of ['daily-registry', 'daily-health']) {
     assert.equal(workflow(name).on.schedule.length, 1);
     assert.ok(Object.hasOwn(workflow(name).on, 'workflow_dispatch'));
   }
+  for(const name of ['pull','compile']){
+    const w=workflow(name),job=w.jobs[name];
+    assert.equal(w.on.schedule,undefined,'no duplicate lane cron');
+    assert.ok(Object.hasOwn(w.on,'workflow_call'));
+    assert.ok(Object.hasOwn(w.on,'workflow_dispatch'));
+    assert.equal(job.concurrency.group,'main-bots');
+    assert.equal(job.concurrency['cancel-in-progress'],false);
+    assert(job['timeout-minutes']<=45);
+    const upload=job.steps.find(s=>s.uses?.startsWith('actions/upload-artifact'));
+    assert.equal(upload.with.name,`daily-${name}-\${{ github.run_id }}-\${{ github.run_attempt }}`);
+    assert.match(upload.with.path,new RegExp(`${name}-run.json`));
+    assert.equal(upload.with['retention-days'],7);
+    const receipt=job.steps.find(s=>s.run==='node scripts/pipeline-receipt.mjs');
+    assert.equal(receipt.if,'always()');
+    assert.equal(receipt.env.PIPELINE_RESULT,'${{ job.status }}');
+    assert.equal(receipt.env.PIPELINE_KIND,name);
+    assert(job.steps.indexOf(receipt)<job.steps.indexOf(upload));
+  }
+  assert.equal(workflow('pull').jobs.pull.env.PULL_DEADLINE_MINUTES,'30');
+  assert.deepEqual(workflow('pull').on.workflow_dispatch.inputs.tier.options,['all','hot','live','quiet','dormant']);
   for (const job of Object.values(workflow('pulse-deploy').jobs)) {
     assert.equal(job['timeout-minutes'], 10);
   }
+});
+test('retired repeated-dispatch helper fails locally without a GitHub command',()=>{
+  const path=new URL('../ops/controller/compile-cycles.sh',import.meta.url);
+  assert.doesNotMatch(readFileSync(path,'utf8'),/gh (workflow|api|run)/);
+  const result=spawnSync('/bin/sh',[path.pathname],{encoding:'utf8'});
+  assert.equal(result.status,1);assert.match(result.stderr,/Retired/);
 });

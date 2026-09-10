@@ -61,7 +61,22 @@ Use [the operating map](operating-flow.md) for the single shared flow, owners an
 Grok assignments use the generated bounded worklist; daily limits live in the shared policy.
 This document owns measurement selection, costs and health semantics, not another workflow map.
 
-Health: inspect the latest scheduled main pull/compile runs and their retained reports, not just the last successful workflow badge. Require a successful scheduled run within 36 hours and valid timestamped artifacts. Pull health checks exact selected-name completion, failed/deferred reads, provider exhaustion and plan membership. Intentional selection deferrals are visible backlog, not failed selected work; deferred names whose last success exceeds their interval plus a grace of max(7 days, one interval) alert. Compiler outcomes distinguish complete, no-change, partial, blocked, failed and dry-run; only complete/no-change with successful gates is healthy. Routine superseded copies are not producer errors. Manual narrow dispatches do not substitute for the scheduled cycle; rerun the failed scheduled run after recovery or await the next scheduled cycle. No automatic paid failover or retry storm. Artifacts are retained for 7 days; missing legacy/expired/corrupt artifacts fail closed until a new scheduled run supplies evidence. The health reader uses bounded read-only GitHub requests and no npm install. A cron hosted on GitHub cannot independently detect a complete GitHub outage; public observation timestamps remain the reader-visible fallback. These checks do not independently re-measure every stored field or prove external research sessions completed.
+Health inspects the latest scheduled main coordinator, not just the last successful badge. Require a
+successful scheduled run within 36 hours and timestamped per-lane reports bound to that run ID, attempt
+and trigger SHA by versioned execution receipts. Parent failure and lane outcomes are separate: a
+failed compile does not suppress inspection of a successful pull. The receipt's workspace SHA describes
+checkout/commit state, not the deployed website or fresh measurements. Old-attempt artifacts, manual
+dispatches and missing/expired/corrupt artifacts cannot substitute for current scheduled evidence.
+
+Pull health checks exact selected-name completion, failed/deferred reads, provider exhaustion and plan
+membership. Intentional selection deferrals are visible backlog, not failed selected work; deferred
+names whose last success exceeds their interval plus a grace of max(7 days, one interval) alert.
+Compiler outcomes distinguish complete, no-change, partial, blocked, failed and dry-run; only
+complete/no-change with successful gates is healthy. Routine superseded copies are not producer errors.
+Artifacts are retained for 7 days. The health reader uses bounded read-only GitHub requests and no npm
+install. No automatic paid failover or retry storm. A cron hosted on GitHub cannot independently detect
+a complete GitHub outage; public observation timestamps remain the reader-visible fallback. These
+checks do not independently re-measure every stored field or prove external research sessions completed.
 
 Grok and Claude sessions are external to these workflows. Changing repository instructions does not start or reschedule a running external session. On rollout the owner/controller must point the existing Grok session to the new daily assignment; do not leave the old six-hour prompt running. No model API calls or new paid service are introduced here.
 

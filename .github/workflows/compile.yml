@@ -1,7 +1,7 @@
 name: Compile packets
 
-# The unattended half of docs/research-system.md §6. Grok Heavy PUTs packets onto long-lived producer
-# branches through the contents API; nobody merges those PRs. Once daily this job lifts the packet
+# The unattended half of docs/research-system.md §6. Producers submit bounded packet
+# branches through PRs; nobody merges those PRs. Once daily this job lifts the accepted packet
 # files off those branches, validates them, compiles the valid ones into content/, runs the content
 # gates, and pushes the result to main so Render redeploys.
 #
@@ -10,10 +10,12 @@ name: Compile packets
 # exits 2 rather than pushing a red main. Invalid packets are reported on the producer's PR and skipped
 # — one bad packet never blocks the rest.
 #
-# 11:47 UTC, with space after the 09:17 pull and the external daily research window.
+# First lane of the daily coordinator; manual recovery stays available.
 on:
-  schedule:
-    - cron: "47 11 * * *"
+  workflow_call:
+    secrets:
+      BLOCKSCOUT_API_KEY:
+        required: false
   workflow_dispatch:
     inputs:
       branch:
@@ -134,7 +136,7 @@ jobs:
               echo "These packets did not compile this run and were skipped. Everything else on this branch compiled; a skipped packet never blocks the rest of the batch."
               echo
               jq -r '.skipped[] | "**`" + .path + "`**\n\n```text\n" + (.errors | join("\n")) + "\n```\n"' <<< "$ROW"
-              echo "Fix by PUTting the same path again on this branch — the next daily compile (11:47 UTC), or a manual dispatch, picks the new copy up. A packet that names a possible match created in the same batch is skipped this round and compiles on the next one, once that name is in the registry."
+              echo "Fix the same packet path on this branch and obtain controller acceptance for the updated head. See docs/operating-flow.md for the next daily compile or authorized manual recovery. A possible match created in the same batch must exist in the registry before the dependent packet can compile."
               echo
               echo "<!-- $MARKER -->"
             } > comment.md
@@ -183,13 +185,21 @@ jobs:
           echo "compile-inbox exited ${{ steps.compile.outputs.code }} — see the 'Compile gate failed' issue."
           exit 1
 
+      - name: Record lane execution receipt
+        if: always()
+        env:
+          PIPELINE_KIND: compile
+          PIPELINE_RESULT: ${{ job.status }}
+        run: node scripts/pipeline-receipt.mjs
+
       - name: Retain compiler report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: daily-compile-${{ github.run_id }}
+          name: daily-compile-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             build/compile-report.*
             build/open-prs.json
+            build/compile-run.json
           retention-days: 7
           if-no-files-found: warn

@@ -1,0 +1,28 @@
+name: Daily registry
+
+# One clock, two recoverable lanes. No parent main-bots lock: the called jobs own it.
+on:
+  schedule:
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+concurrency:
+  group: daily-registry
+  cancel-in-progress: false
+jobs:
+  compile:
+    uses: ./.github/workflows/compile.yml
+    secrets:
+      BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}
+  pull:
+    needs: compile
+    # A failed compile must not starve measurement recovery; cancellation still stops work.
+    if: ${{ !cancelled() }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/pull.yml
+    secrets:
+      BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}

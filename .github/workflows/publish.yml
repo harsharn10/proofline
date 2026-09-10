@@ -22,7 +22,7 @@ on:
     - cron: "0 13 * * *"
     - cron: "0 14 * * 0"
   workflow_run:
-    workflows: ["Pull chain facts"]
+    workflows: ["Daily registry", "Pull chain facts"]
     types: [completed]
   workflow_dispatch:
     inputs:
