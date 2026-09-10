@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 import { parse } from "yaml";
 import { buildRelationships } from "./lib/relationships.mjs";
 import { REFRESH_POLICY } from "./lib/refresh-policy.mjs";
+import { reassessmentSlice } from './lib/admission-policy.mjs';
 
 export async function buildRegistryReport() {
   const readDir = async dir => Promise.all((await readdir(dir)).filter(f => f.endsWith(".yaml"))
@@ -30,10 +31,16 @@ export async function buildRegistryReport() {
     action: "Claude resolves identity against receipts; never auto-merge slugs.",
   }));
   const report = { version: 1, base_sha: revision.stdout.trim(), generated_at: plan.at, policy: REFRESH_POLICY, relationships, refresh: plan,
+    reassessment: { recommendations_only: true, maximum: REFRESH_POLICY.seedLimit,
+      // Cheap discovery/primary-surface checks, not forced full RPC reads or research packets.
+      dormant: reassessmentSlice(plan.ignored.filter(row => !row.reason.startsWith('identity conflict')), Date.parse(plan.at)),
+      dependencies: relationships.dependencies.filter(row => row.projects.length === 0),
+      instruction: 'Reconcile lifecycle and dependency relevance using existing bulk analytics first. Record no-change in task state; never auto-reactivate.' },
     grok: { maximum_updates: REFRESH_POLICY.researchLimit, maximum_new_seeds: REFRESH_POLICY.seedLimit,
       updates: research, discovery: "Only confirmed primary surfaces with a concrete product, deployment, or dated launch. Match address, official domain and handle against the registry and pending packets before seeding." },
     claude: { conflicts, identity_holds: plan.ignored.filter(row => row.reason.startsWith("identity conflict")),
       unassigned_infrastructure: plan.infrastructure.filter(row => row.reader === null),
+      lifecycle_holds: [...plan.selected, ...plan.deferred, ...plan.not_due].filter(row => row.reason.startsWith('lifecycle/activity mismatch')),
       instruction: "Review source receipts, relationship meaning, new identity collisions and the latest degraded pull report; approve code separately from research and channel delivery." } };
   await mkdir("build", { recursive: true });
   await writeFile("build/registry.json", `${JSON.stringify(report, null, 2)}\n`);

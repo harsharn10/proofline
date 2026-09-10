@@ -53,8 +53,8 @@ export function buildRelationships(projects = [], dependencies = []) {
     identityConflict: node.projects.filter(p => p.roles.includes("token")).length > 1,
   }));
   return { version: 1, projectNames, addresses,
-    dependencies: [...links].sort(([a], [b]) => a.localeCompare(b)).map(([id, slugs]) => ({
-      id, name: dependencies.find(d => d.id === id)?.name ?? id, projects: [...new Set(slugs)].sort(),
+    dependencies: [...new Set([...links.keys(), ...dependencies.map(d => d.id)])].sort().map(id => ({
+      id, name: dependencies.find(d => d.id === id)?.name ?? id, projects: [...new Set(links.get(id) ?? [])].sort(),
     })) };
 }
 
@@ -83,9 +83,11 @@ export function ownActivityAt(project, pulled, index, now = Date.now()) {
   const times = (pulled?.activity?.addresses ?? [])
     .filter(a => own.has(addressKey(pulled.chain, a.address)))
     .map(a => a.last_tx_at).filter(at => Number.isFinite(Date.parse(at)) && Date.parse(at) <= now);
-  if ((pulled?.market?.trades_h24 ?? 0) > 0 &&
+  if ((pulled?.market?.trades_h24 ?? 0) > 0 && !pulled.market.stale_since &&
+      own.has(addressKey(pulled.chain, pulled.market.token_address)) &&
       (project.deployments ?? []).some(d => d.chain === pulled.chain && d.role === "token" && own.has(addressKey(d.chain, d.address)))) {
-    const at = pulled.market.pulled_at ?? pulled.pulled_at;
+    // Legacy files without a market timestamp are unknown, not fresh at file rewrite time.
+    const at = pulled.market.pulled_at;
     if (Number.isFinite(Date.parse(at)) && Date.parse(at) <= now) times.push(at);
   }
   return times.sort((a,b) => Date.parse(a) - Date.parse(b)).at(-1) ?? null;

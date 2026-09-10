@@ -54,7 +54,7 @@ test("known totals preserve zero and do not disguise missing observations", () =
 
 test("own activity rejects conflicted tokens, other-chain market attribution and future times", () => {
   const conflicted=relationshipIndex(buildRelationships([a,{...b,deployments:[deployment(1,'token')]}]));
-  const data={chain:'robinhood-chain',market:{trades_h24:3,pulled_at:new Date(now).toISOString()},activity:{addresses:[{address:address(1),last_tx_at:new Date(now+DAY).toISOString()}]}};
+  const data={chain:'robinhood-chain',market:{token_address:address(1),trades_h24:3,pulled_at:new Date(now).toISOString()},activity:{addresses:[{address:address(1),last_tx_at:new Date(now+DAY).toISOString()}]}};
   assert.equal(ownActivityAt(a,data,conflicted,now),null);
   assert.equal(ownActivityAt(a,{...data,chain:'ethereum'},index,now),null);
   assert.equal(ownActivityAt(a,data,index,now),new Date(now).toISOString());
@@ -149,10 +149,10 @@ test("shared factory activity does not revive an inactive token; relevance needs
   assert.equal(revived.due,true);assert.equal(revived.tier,'hot');
 });
 test("daily relevance, weekly maintenance, seed caps and overdue fairness", () => {
-  const previous={chain:'robinhood-chain',pulled_at:new Date(now-2*DAY).toISOString(),market:{trades_h24:2},activity:{addresses:[]}};
+  const previous={chain:'robinhood-chain',pulled_at:new Date(now-2*DAY).toISOString(),market:{token_address:address(1),trades_h24:2,pulled_at:new Date(now-2*DAY).toISOString()},activity:{addresses:[]}};
   const hot=refreshDecision({project:a,census,previous,index,aboveShareBar:true,now});
   assert.equal(hot.tier,'hot');assert.equal(hot.due,true);
-  const low=refreshDecision({project:b,census,previous,index,aboveShareBar:false,now});
+  const low=refreshDecision({project:b,census,previous:{...previous,market:{...previous.market,token_address:address(2)}},index,aboveShareBar:false,now});
   assert.equal(low.tier,'live');assert.equal(low.due,false);
   const queue=Array.from({length:30},(_,i)=>({slug:String(i),refresh:{due:true,seed:i<20,priority:i}}));
   const chosen=selectRefreshTargets(queue,{limit:15,seedLimit:2});
@@ -232,7 +232,7 @@ test("daily allocations preserve regular and seed progress while rotating persis
   for(let day=0;day<5;day++) {
     const clock=now+day*DAY;
     const targets=projects.map(p=>({slug:p.slug,refresh:refreshDecision({project:p,census,index:localIndex,now:clock,aboveShareBar:true,
-      previous:state.has(p.slug)?{...state.get(p.slug),market:{trades_h24:1,pulled_at:new Date(clock).toISOString()}}:null})}));
+      previous:state.has(p.slug)?{...state.get(p.slug),market:{token_address:p.deployments.find(d=>d.role==='token')?.address,trades_h24:1,pulled_at:new Date(clock).toISOString()}}:null})}));
     const result=selectRefreshTargets(targets);
     assert(result.selected.some(t=>t.slug===projects[80].slug),'ordinary due name progresses every day');
     assert(result.selected.filter(t=>t.refresh.retry).length<=20,'retry budget remains bounded');

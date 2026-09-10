@@ -45,6 +45,9 @@ export function refreshDecision({ project, census, previous, seededAt, index, ab
     tier = "dormant"; ignored = true; reason = "no own activity for 90 days and below relevance bar";
   } else if (age === null && seedAge !== null && seedAge > REFRESH_POLICY.archiveAfter && !aboveShareBar) {
     tier = "dormant"; ignored = true; reason = "seeded over 90 days ago; no own activity or relevance signal";
+  } else if (['inactive', 'announced'].includes(project.lifecycle)) {
+    tier = 'quiet'; reason = age !== null && age <= 7 * DAY ?
+      'lifecycle/activity mismatch: controller review; monthly maintenance' : 'not an active product: monthly maintenance';
   } else if (reviewed && aboveShareBar && age !== null && age <= 7 * DAY) {
     tier = "hot"; reason = "confirmed, relevant and active: daily";
   } else if (age !== null && age <= 30 * DAY || seedAge !== null && seedAge <= REFRESH_POLICY.seedWindow) {
@@ -53,7 +56,7 @@ export function refreshDecision({ project, census, previous, seededAt, index, ab
   // Shared infrastructure is monitored through at least one deterministic representative.
   const representative = (project.deployments ?? []).some(d =>
     infrastructureReaders.get(addressKey(d.chain, d.address)) === project.slug);
-  if (!conflict && representative && tier !== "hot" && !first) {
+  if (!conflict && representative && tier !== "hot" && !first && !['inactive', 'announced'].includes(project.lifecycle)) {
     ignored = false; tier = "live"; reason = "shared infrastructure representative: weekly";
   }
   const interval = REFRESH_POLICY[tier];

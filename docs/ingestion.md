@@ -5,6 +5,11 @@ This is the shared operating policy for the four repository skills. The packet s
 `scripts/lib/refresh-policy.mjs` define relevance and budgets. Do not copy thresholds into agent prompts.
 This policy supersedes old six-hour, mandatory-event and keep-looping prompts. It does not start a cycle.
 
+Before discovery seeding, use [admission screening](admission-policy.md) to separate identity, relevance,
+research depth and refresh. FOMO/CoinGecko recognition is optional; Dune/Rialto activity must retain its
+exact subject, provenance and measurement window. The offline planner recommends, the controller verifies
+and assigns, and the compiler's existing evidence gates still apply. A planner pass is not publication approval.
+
 ## One canonical identity, four different jobs
 
 | Job | Input and acceptance | Output |
