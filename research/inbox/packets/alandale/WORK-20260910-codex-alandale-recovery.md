@@ -1909,7 +1909,7 @@ TL;DR: Robinhood-only ve(3,3) CLMM: lock LUTE for veLUTE, vote emissions, collec
 
 - Receipts: on September 10, the site and GitBook welcome crosslinked the site, app and documentation. DefiLlama's Alandale V3 endpoint returned the same site and LUTE address with Robinhood Chain as its only listed chain. These matches support attribution, not an audit or editorial identity approval. [claim R-42 R-44 R-45]
 - Numbers: at chain 4663 block 0x385a4a5, the documented RouterV2, SwapRouter, NonfungiblePositionManager, GaugeRewarder and Airdrop addresses returned 14446, 12286, 24208, 2430 and 2430 bytes of code respectively. The previously reported factory-owner address returned 171 bytes. The exact address mapping is in REP-11; the read proves existence, not current privileges or implementation safety. Historical TVL and volume remain September 9 observations. [verified R-43]
-- Adversarial: code at an address does not establish an audited implementation, safe admin controls or the identity of the controller. Proxy/admin slots and deployment-matched audit evidence remain unresolved. [unknown]
+- Adversarial: code at an address does not establish an audited implementation, safe admin controls or the identity of privileged key holders. Proxy/admin slots and deployment-matched audit evidence remain unresolved. [unknown]
 
 ## Operations log
 
