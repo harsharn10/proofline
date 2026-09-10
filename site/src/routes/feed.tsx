@@ -1,21 +1,14 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Wire } from "@/components/wire/wire";
 import { getWire } from "@/data/content-server";
-import { isWireKind, type WireKind } from "@/data/types";
-
-type FeedSearch = { kind?: WireKind; name?: string };
+import { normalizeFeedSearch } from "@/data/feed-page";
 
 export const Route = createFileRoute("/feed")({
   // The wire's filters are route state, not component state: `/feed?name=pons` has to arrive at the
   // reader already narrowed, for a crawler and for a no-JS reader as much as for the deep link.
-  validateSearch: (search: Record<string, unknown>): FeedSearch => {
-    const name = search.name;
-    return {
-      ...(isWireKind(search.kind) ? { kind: search.kind } : {}),
-      ...(typeof name === "string" && /^[a-z0-9][a-z0-9-]*$/.test(name) ? { name } : {}),
-    };
-  },
-  loader: () => getWire(),
+  validateSearch: normalizeFeedSearch,
+  loaderDeps: ({ search }) => search,
+  loader: ({ deps }) => getWire({ data: deps }),
   head: () => ({
     meta: [
       { title: "The wire · Icarus" },
@@ -43,6 +36,7 @@ function FeedPage() {
         items={bundle.wire}
         now={bundle.now}
         allowNameFilter
+        filterMeta={{ names: bundle.names, counts: bundle.counts }}
         kind={kind ?? "all"}
         name={name ?? ""}
         onFilter={(next) =>
@@ -56,6 +50,11 @@ function FeedPage() {
           })
         }
       />
+      <nav aria-label="Feed pages" className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
+        {bundle.page > 1 ? <Link to="/feed" search={{ kind, name, ...(bundle.page > 2 ? { page: bundle.page - 1 } : {}) }}>← Newer</Link> : <span />}
+        <span aria-live="polite">{bundle.first}–{bundle.last} of {bundle.total} · Page {bundle.page} of {bundle.pages}</span>
+        {bundle.page < bundle.pages ? <Link to="/feed" search={{ kind, name, page: bundle.page + 1 }}>Older →</Link> : <span />}
+      </nav>
     </main>
   );
 }

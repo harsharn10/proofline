@@ -26,6 +26,7 @@ export function Wire({
   kind: kindProp,
   name: nameProp,
   onFilter,
+  filterMeta,
 }: {
   items: WireItem[];
   now: number;
@@ -35,6 +36,7 @@ export function Wire({
   kind?: WireFilter;
   name?: string;
   onFilter?: (next: { kind: WireFilter; name: string }) => void;
+  filterMeta?: { names: WireItem["name"][]; counts: Record<WireFilter, number> };
 }) {
   const [localKind, setLocalKind] = useState<WireFilter>("all");
   const [localName, setLocalName] = useState("");
@@ -50,11 +52,12 @@ export function Wire({
     }
   };
 
-  const names = useMemo(
+  const localNames = useMemo(
     () => [...new Map(items.map((item) => [item.name.slug, item.name])).values()]
       .sort((a, b) => a.name.localeCompare(b.name)),
     [items],
   );
+  const names = filterMeta?.names ?? localNames;
   const inName = name ? items.filter((item) => item.slug === name) : items;
   const filtered = inName.filter((item) => kind === "all" || item.kind === kind);
   // The compact strip shows six rows, so it never advertises a corpus-wide count above them.
@@ -74,7 +77,7 @@ export function Wire({
           >
             {filter.label}
             {showCounts
-              ? ` · ${inName.filter((item) => filter.value === "all" || item.kind === filter.value).length}`
+              ? ` · ${filterMeta?.counts[filter.value] ?? inName.filter((item) => filter.value === "all" || item.kind === filter.value).length}`
               : ""}
           </button>
         ))}

@@ -1,4 +1,5 @@
 import YAML from "yaml";
+import { feedPage, normalizeFeedSearch } from "./feed-page";
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 // @ts-expect-error Shared deterministic relationship projection.
@@ -972,10 +973,10 @@ async function directoryBundle(sectionId?: string): Promise<DirectoryBundle> {
 
 // The full wire needs neither directory histories/KPIs nor a live Pulse read. Keep its
 // existing order, complete filter universe and build clock without serializing other pages.
-export const getWire = createServerFn({ method: "GET" }).handler(
-  (): Pick<DirectoryBundle, "wire" | "now"> => {
+export const getWire = createServerFn({ method: "GET" }).validator(normalizeFeedSearch).handler(
+  ({ data }) => {
     const content = getCachedContent();
-    return { wire: content.wire, now: content.now };
+    return { ...feedPage(content.wire, data), now: content.now };
   },
 );
 
