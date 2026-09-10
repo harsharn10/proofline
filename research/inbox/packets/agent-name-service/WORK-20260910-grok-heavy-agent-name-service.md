@@ -134,8 +134,8 @@ claims:
   - { id: CLM-11, field: deployment.address, value: "Token deployer EOA 0x4B4BCA71E68E80130E477Ba831399A12A088Ed69", class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-17], reproduction_ids: [REP-8], supersedes: null }
   - { id: CLM-12, field: deployment.address, value: "RobinhoodLocker 0xD0f7d8c6e9f6D80c297bEbe4F7fD1B9C8125C32F", class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-18], reproduction_ids: [REP-9], supersedes: null }
   - { id: CLM-13, field: communications.status, value: "@RHAgentNS pinned 2026-08-31 post that .agent is live on Robinhood Chain and links agentsn.xyz; no later material product post located this pass", class: claim, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-3], reproduction_ids: [], supersedes: null }
-  - { id: CLM-14, field: team.identity, value: "No named legal entity or named maintainers on site, docs or X; two distinct EOAs observed", class: unknown, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-1, R-2, R-3], reproduction_ids: [], supersedes: null }
-  - { id: CLM-15, field: security.audit, value: "No audit report URL on site, docs or X this pass", class: unknown, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-1, R-2, R-3], reproduction_ids: [], supersedes: null }
+  - { id: CLM-14, field: team.identity, value: "No named legal entity or named maintainers established this pass", class: unknown, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [], reproduction_ids: [], supersedes: null }
+  - { id: CLM-15, field: security.audit, value: "No audit report URL established this pass", class: unknown, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [], reproduction_ids: [], supersedes: null }
   - { id: CLM-16, field: control.owner, value: "owner() on AgentNames, AgentIdentity and AgentMarket is EOA 0x35A95822889e73f54ffD06371AB53Dd0Fd646155 (empty code); AgentResolver owner() reverts; no timelock in that call path", class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-11, R-12, R-13, R-14, R-19], reproduction_ids: [REP-1, REP-2, REP-3, REP-4, REP-10], supersedes: null }
   - { id: CLM-17, field: control.privileged-role, value: "Token deployer 0x4B4B…Ed69 is a different empty-code EOA from registry owner 0x35A9…6155; no shared Safe or timelock located", class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-17, R-19], reproduction_ids: [REP-8, REP-10], supersedes: null }
   - { id: CLM-18, field: economics.metric, value: "Docs say registration, renewal and marketplace fees are governance-configurable; no 4663 fee-recipient or buyback address is printed on docs", class: claim, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-2], reproduction_ids: [], supersedes: null }
@@ -161,7 +161,7 @@ events:
     receipt_ids: [R-11, R-12, R-14, R-19]
 
 receipts:
-  - { id: R-1, publisher: Agent Name Service, title: "Official site", url: "https://www.agentsn.xyz", published_at: null, accessed_at: 2026-09-10T18:20:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-2, CLM-3, CLM-14], excerpt: "Names that resolve to agents. claw.agent points at an on-chain identity: the agent's own key, its wallet, its endpoint, and what it can do. A wallet cannot claim one." }
+  - { id: R-1, publisher: Agent Name Service, title: "Official site", url: "https://www.agentsn.xyz", published_at: null, accessed_at: 2026-09-10T18:20:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-2, CLM-3], excerpt: "Names that resolve to agents. claw.agent points at an on-chain identity: the agent's own key, its wallet, its endpoint, and what it can do. A wallet cannot claim one." }
   - { id: R-2, publisher: Agent Name Service, title: "Docs / contracts", url: "https://www.agentsn.xyz/docs", published_at: null, accessed_at: 2026-09-10T18:20:00Z, kind: docs, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-3, CLM-4, CLM-5, CLM-6, CLM-7, CLM-18], excerpt: "Everything lives in four contracts. AgentNames 0x858D…15c9, AgentIdentity 0xb7fC…9c2A, AgentResolver 0x0713…5f9f, AgentMarket 0x7FcD…357D. Every one of these numbers is governance-configurable." }
   - { id: R-3, publisher: Agent Name Service, title: "@RHAgentNS profile and pinned post", url: "https://x.com/RHAgentNS", published_at: 2026-08-31T00:00:00Z, accessed_at: 2026-09-10T18:20:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [CLM-3, CLM-13], excerpt: "Bio: Agent Name Service is the .agent namespace on Robinhood Chain. claw.agent resolves to an on-chain agent identity. Link agentsn.xyz. Pinned Aug 31: Live on Robinhood Chain." }
   - { id: R-4, publisher: Robinhood RPC, title: "eth_getCode ANS token", url: "https://robinhoodchain.blockscout.com/address/0xdB9Bc67f022d967C3a912Ebe3e6ffe25d5F70C24", published_at: null, accessed_at: 2026-09-10T18:24:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-8], excerpt: "eth_getCode 3248 bytes; owner() reverted." }
@@ -192,19 +192,19 @@ A .agent namespace on Robinhood Chain. A name resolves to an agent identity (key
 
 Themes: agent, tooling
 
-TL;DR: On-chain .agent names that resolve to an agent key, wallet and endpoint; four docs-named contracts are live on 4663 and owned by a single EOA. [CLM-1 CLM-16]
+TL;DR: .agent names resolve on 4663 to an agent key and wallet. Three of four registry contracts share one EOA owner; resolver owner() reverts.
 
 ## Why it matters
 
-- Thesis: Robinhood Chain agent software can look up a stable handle instead of a hex string [CLM-1].
-- Traction: four registry contracts still have code; $ANS has a thin Uniswap v4 ETH book [CLM-4 CLM-19].
-- Catalyst: fee recipient, buyback path and revoke powers remain unpublished [CLM-18].
+- Thesis: Robinhood Chain agent software can look up a stable handle instead of a hex string. [claim R-1]
+- Traction: four registry contracts still have code; $ANS has a thin Uniswap v4 ETH book. [claim R-5]
+- Catalyst: fee recipient, buyback path and revoke powers remain unpublished. [claim R-2]
 
 ## What could go wrong
 
-- A single empty-code EOA is owner() on three of four registry contracts, with no timelock in that call path [CLM-16].
-- No audit report was located [CLM-15].
-- Registration ETH and any $ANS buyback sink are not printed on docs [CLM-18].
+- A single empty-code EOA is owner() on three of four registry contracts, with no timelock in that call path. [verified R-11]
+- No audit report was located. [unknown]
+- Registration ETH and any $ANS buyback sink are not printed on docs. [claim R-2]
 
 ## Product and mechanics
 
