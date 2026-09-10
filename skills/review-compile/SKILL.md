@@ -5,6 +5,10 @@ description: Independently verify Proofline research submissions and control can
 
 # Review and canonical compilation
 
+Use `docs/operating-flow.md` for the shared flow, schedule, four clocks and completion checklist.
+Check accepted `research_state` separately from editorial review and coverage. Historical full packets
+can be on file without meeting today's evidence floor. Do not rewrite approval dates to make them fresh.
+
 Read current main `AGENTS.md`, `docs/ingestion.md`, `docs/process.md`, `docs/research-system.md` and
 `docs/design/icarus/review-checklist.md`. These repository paths are the shared contract, not a remembered prompt.
 

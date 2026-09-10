@@ -262,7 +262,7 @@ function CardHeader({ dossier, site, dependencies, tree, section, now, token, wi
   const statusPill = (
     <StatusPill
       status={dossier.kpis.status}
-      relativeTime={dossier.kpis.lastActivityAt ? relativeTime(dossier.kpis.lastActivityAt, now) : null}
+      relativeTime={['mainnet','beta'].includes(dossier.lifecycle) && dossier.kpis.lastActivityAt ? relativeTime(dossier.kpis.lastActivityAt, now) : null}
     />
   );
   return (
@@ -274,7 +274,7 @@ function CardHeader({ dossier, site, dependencies, tree, section, now, token, wi
           {dossier.symbol ? <span className="card-symbol">{dossier.symbol}</span> : null}
           <Badge tone={dossier.card.officialConfirmed ? "ok" : "warn"}>
             {dossier.card.officialConfirmed ? <Icon name="check" /> : null}
-            {dossier.card.officialConfirmed ? "Official · links confirmed" : "Unclaimed"}
+            {dossier.card.officialConfirmed ? "Project links on file" : "Project links unconfirmed"}
           </Badge>
           {statusSource ? <a href={statusSource} target="_blank" rel="noreferrer">{statusPill}</a> : statusPill}
           {!token && dossier.derived.score !== null ? (
@@ -287,6 +287,11 @@ function CardHeader({ dossier, site, dependencies, tree, section, now, token, wi
           ) : null}
         </div>
         <Tldr dossier={dossier} />
+        <p className="card-tldr">
+          {dossier.researchState ? `${dossier.researchState.full_as_of ? 'Detailed research' : 'Initial research'} on file · evidence as of ${dateLabel(dossier.researchState.as_of)}` : 'Research date not recorded'}
+          {' · '}{hasSecondReview ? `Independently reviewed ${dateLabel(dossier.review.reviewed_at)}` : 'Independent review pending'}
+          {dossier.pulled?.market?.pulled_at ? ` · Market measured ${dateLabel(dossier.pulled.market.pulled_at)}` : ' · Market measurement unavailable'}
+        </p>
         <HeaderTags dossier={dossier} site={site} dependencies={dependencies} tree={tree} token={token} />
       </div>
       <SegmentedControl label="Chart window" options={WINDOW_OPTIONS} value={window} onChange={onWindow} />
@@ -391,7 +396,7 @@ function OfficialAndStructure({ dossier, site, token }: Pick<NameCardProps, "dos
   const audit = auditState(dossier);
   return (
     <section>
-      <h2 className="card-label">Official</h2>
+      <h2 className="card-label">Project links</h2>
       <div className="card-fact-group">
         <FactRow label="Token">{addressValue(tokenRow?.address ?? null, site)}</FactRow>
         <FactRow label="Main contract">{addressValue(main?.address ?? null, site)}</FactRow>
@@ -528,7 +533,7 @@ function RelatedTable({ dossier, section, related }: Pick<NameCardProps, "dossie
           </tbody>
         </table>
       </DataTable>
-      <div className="card-legend"><span><i className="card-dot official" />Official</span><span><i className="card-dot unclaimed" />Unclaimed</span></div>
+      <div className="card-legend"><span><i className="card-dot official" />Links on file</span><span><i className="card-dot unclaimed" />Unconfirmed</span></div>
     </section>
   );
 }

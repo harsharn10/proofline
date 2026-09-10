@@ -246,6 +246,19 @@ async function main() {
 
     const dossierRes = await fetch(`${BASE}/n/pons`);
     const dossierHtml = await dossierRes.text();
+    for (const slug of ['stonkbroker', 'longbow', 'sight', 'arc']) {
+      const response = await fetch(`${BASE}/n/${slug}`);
+      const html = await response.text();
+      const project = parse(await readFile(new URL(`../../content/projects/${slug}.yaml`, import.meta.url), 'utf8'));
+      const header = html.split('name-card-header')[1]?.split('</header>')[0] ?? '';
+      const expectedDepth = project.research_state?.full_as_of ? 'Detailed research' : 'Initial research';
+      const honest = response.ok && header.includes(expectedDepth) &&
+        (project.review.approver !== 'pending' || header.includes('Independent review pending')) &&
+        !header.includes('links confirmed') &&
+        (project.lifecycle !== 'announced' || header.includes('Announced'));
+      console.log(`  ${honest ? 'ok  ' : 'FAIL'} /n/${slug} separates accepted research, review and product lifecycle`);
+      if (!honest) failures.push(`/n/${slug}: research-state/lifecycle header mismatch`);
+    }
     const tokenHtml = await fetch(`${BASE}/n/cashcat?tab=control`).then(response => response.text());
     const structureHtml = tokenHtml.slice(tokenHtml.indexOf(">Structure</h2>"));
     const pulled = parse(await readFile(new URL("../../content/pulled/cashcat.yaml", import.meta.url), "utf8"));

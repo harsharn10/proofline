@@ -5,6 +5,10 @@ description: Plan or operate Proofline machine-observation seeding and selective
 
 # Machine observations
 
+Use `docs/operating-flow.md` for schedule, handoffs and the separate evidence/review/measurement/deployment
+clocks. A green pull is not proof every name refreshed. Report selected, changed, skipped and failed work;
+do not treat token trading as proof an announced product launched or rewrite editorial research dates.
+
 Read current main `AGENTS.md`, `docs/ingestion.md`, `docs/daily-registry.md` and the current workflow definition.
 Start with `node scripts/pull.mjs --plan`: it makes no provider requests. Distinguish an initial machine read
 from a research seed. Use the existing selector and budgets, not a new list or per-agent thresholds.

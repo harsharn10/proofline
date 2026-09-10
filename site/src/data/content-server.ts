@@ -1,5 +1,7 @@
 import YAML from "yaml";
 import { feedPage, normalizeFeedSearch } from "./feed-page.ts";
+// @ts-expect-error Shared lifecycle guard, tested with the compiler research-state helpers.
+import { productActivityStatus } from '../../../scripts/lib/research-state.mjs';
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 // @ts-expect-error Shared deterministic relationship projection.
@@ -114,6 +116,7 @@ type ProjectFile = {
   dependencies: string[];
   deployments: Deployment[];
   review: Review;
+  research_state?: Dossier['researchState'];
   findings: Findings;
   themes?: string[];
 };
@@ -235,7 +238,7 @@ function directorySortKey(dossiers: Dossier[]): Dossier[] {
       return (b.derived.score ?? -1) - (a.derived.score ?? -1);
     }
     if (a.coverage !== b.coverage) return a.coverage === "full" ? -1 : 1;
-    return b.review.reviewed_at.localeCompare(a.review.reviewed_at);
+    return (b.researchState?.as_of ?? b.review.reviewed_at).localeCompare(a.researchState?.as_of ?? a.review.reviewed_at);
   });
 }
 
@@ -360,6 +363,7 @@ function loadContent(): ServerContent {
       deployments: project.deployments,
       findings: project.findings,
       review: project.review,
+      researchState: project.research_state,
       research,
       feed,
       wire: [],
@@ -478,6 +482,7 @@ function toDirectoryEntry(
     },
     dependencyIds: d.dependencies,
     reviewedAt: d.review.reviewed_at,
+    researchUpdatedAt: d.researchState?.as_of ?? null,
     derived: d.derived,
     feedCount: d.feed.length,
     tree,
@@ -803,16 +808,7 @@ function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | nu
   const windowAge = now - Date.parse(activity?.window_as_of ?? activity?.pulled_at ?? "");
   const activityFresh = !activity?.stale_since && Number.isFinite(windowAge) && windowAge >= 0 && windowAge <= 36 * 3600_000;
   const trades = marketFresh ? market?.trades_h24 ?? null : null;
-  let status: Kpis["status"];
-  if (d.lifecycle === "testnet-only") status = "testnet";
-  else if (!located) status = "announced";
-  else {
-    const age = lastActivityAt ? now - new Date(lastActivityAt).getTime() : null;
-    if (age !== null && age >= 0 && age <= 7 * DAY) status = "live";
-    else if (age !== null && age <= 30 * DAY) status = "quiet";
-    else if (age !== null) status = "dormant";
-    else status = located ? "quiet" : "announced";
-  }
+  const status: Kpis['status'] = productActivityStatus(d.lifecycle, located, lastActivityAt, now);
   return {
     status,
     lastActivityAt,

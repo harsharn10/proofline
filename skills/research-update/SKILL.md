@@ -5,6 +5,10 @@ description: Collect a material Proofline research delta or fill an explicitly a
 
 # Research update and targeted backfill
 
+Use `docs/operating-flow.md` for owners, suggested time budgets and completion stages. A full backfill
+adds research depth, not editorial approval. Keep unchanged facts' observation dates and report no-change
+checks without a packet; never bump dates or flags solely because a bot ran.
+
 Read current main `AGENTS.md`, `docs/ingestion.md`, `docs/daily-registry.md`, and the applicable packet
 template under `docs/templates/`. Read the assigned prior packet, canonical profile, sources and feed.
 

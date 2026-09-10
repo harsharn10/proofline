@@ -132,7 +132,10 @@ not establish is written as the string `NULL — <reason>`. Omission is not comp
 Vocabulary bridges until the schemas migrate:
 
 - Coverage: packets use `candidate | seed | full`. The census and project schemas accept `full | stub`.
-  The compiler maps `seed` to `stub` and `full` to `full`. `candidate` never becomes a census row.
+  The compiler leaves new and existing stub profiles at `stub`, even for a full packet; it preserves
+  existing `full` coverage and scoring. Full coverage requires an explicit editorial decision.
+  Accepted packet depth/date live separately in `research_state`; see [the operating map](operating-flow.md).
+  `candidate` never becomes a census row.
 - Lifecycle: a packet may say `unknown`. The census never does. The compiler refuses to create or change
   a census row from a packet whose lifecycle is `unknown`; the gap is filed and the row stays as it was.
 - `lifecycle: mainnet` needs an explorer or RPC receipt, a DefiLlama chain-slice figure, or docs that
