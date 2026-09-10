@@ -1015,6 +1015,9 @@
         "next"
       ],
       "properties": {
+        "area": {
+          "enum": ["identity", "product", "deployment", "control", "security", "team", "economics", "activity", "communications"]
+        },
         "priority": {
           "$comment": "The contract spells these uppercase; the lowercase spelling used in the desk assignments is accepted and the compiler uppercases it.",
           "enum": [
@@ -1135,6 +1138,9 @@
         "possible_matches"
       ],
       "properties": {
+        "crosslink_claim_ids": {
+          "$ref": "#/$defs/claimRefs"
+        },
         "canonical_name": {
           "$ref": "#/$defs/text"
         },

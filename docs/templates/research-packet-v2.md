@@ -8,6 +8,8 @@
 # Use the protocol's canonical slug for its own token. Only independently launched projects get new slugs.
 # Shared factories and quote/collateral tokens are not the subject's own token. Record their sourced relationships.
 # Keep the PR draft until ready for scheduled intake; closing it retires it from automatic collection.
+# This is synthetic example evidence, not publishable research. Replace and verify every source.
+# New seed/full packets must pass the evidence floor in docs/research-system.md (New-packet minimums).
 contract_version: proofline-research-v2
 work_id: WORK-20260902-grok-heavy-example-protocol
 producer: grok-heavy                  # grok-heavy | grok-bot | supergrok | codex | claude | <github id>
@@ -24,6 +26,7 @@ allowed_paths:
   - research/inbox/packets/example-protocol/WORK-20260902-grok-heavy-example-protocol.md
 
 identity:
+  crosslink_claim_ids: [CLM-3]         # explicit site/docs/account crosslink claim, backed by both surfaces
   canonical_name: Example Protocol
   aliases: [ExampleFi]
   symbols: [EXMP]
@@ -76,7 +79,7 @@ reproductions:                        # method: explorer-rpc|explorer-ui|officia
 claims:                               # class: verified|claim|inference|disputed|unknown
   - { id: CLM-1, field: product.mechanism, value: "Deposits are pooled into one ERC-4626 vault; withdrawal is open", class: claim, observed_at: 2026-09-02T13:00:00Z, receipt_ids: [R-1], reproduction_ids: [], supersedes: null }
   - { id: CLM-2, field: deployment.address, value: "0x1111111111111111111111111111111111111111", class: verified, observed_at: 2026-09-02T13:40:00Z, receipt_ids: [R-2], reproduction_ids: [REP-1], supersedes: null }
-  - { id: CLM-3, field: identity.domain, value: "https://example-protocol.org", class: claim, observed_at: 2026-09-02T13:00:00Z, receipt_ids: [R-1], reproduction_ids: [], supersedes: null }
+  - { id: CLM-3, field: identity.domain, value: "The official site and vault documentation link to each other", class: claim, observed_at: 2026-09-02T13:00:00Z, receipt_ids: [R-1, R-4], reproduction_ids: [], supersedes: null }
   - { id: CLM-4, field: control.owner, value: "0x2222222222222222222222222222222222222222", class: verified, observed_at: 2026-09-02T13:40:00Z, receipt_ids: [R-2], reproduction_ids: [REP-1], supersedes: null }
   - { id: CLM-5, field: lifecycle, value: mainnet, class: verified, observed_at: 2026-09-02T13:40:00Z, receipt_ids: [R-2], reproduction_ids: [REP-1], supersedes: null }
   - { id: CLM-6, field: security.audit, value: "No audit report was located in this review", class: unknown, observed_at: 2026-09-02T13:20:00Z, receipt_ids: [], reproduction_ids: [], supersedes: null }
@@ -102,16 +105,21 @@ events:                               # type: company|ct|onchain|risk
 receipts:                             # kind: official-site|docs|whitepaper|social|explorer|repository|audit|announcement|third-party-data|news|other
   - { id: R-1, publisher: Example Protocol, title: "Vault documentation", url: "https://docs.example-protocol.org/vault", published_at: 2026-08-20T00:00:00Z, accessed_at: 2026-09-02T13:00:00Z, kind: docs, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-3], excerpt: "Deposits are pooled into a single ERC-4626 vault. Withdrawals are open at any block." }
   - { id: R-2, publisher: Blockscout, title: "Address page 0x1111…", url: "https://robinhoodchain.blockscout.com/address/0x1111111111111111111111111111111111111111", published_at: null, accessed_at: 2026-09-02T13:40:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-2, CLM-4, CLM-5, EVT-1], excerpt: "Contract, verified source, name ExampleVault, created in tx 0x3333… block 51234567; owner 0x2222…" }
-  - { id: R-3, publisher: DefiLlama, title: "Example Protocol chain slice", url: "https://api.llama.fi/protocol/example-protocol", published_at: null, accessed_at: 2026-09-02T13:50:00Z, kind: third-party-data, authority: aggregator, authenticity: unconfirmed, supports: [], excerpt: "currentChainTvls.RobinhoodChain 128400" }
+  - { id: R-3, publisher: DefiLlama, title: "Example Protocol chain slice", url: "https://api.llama.fi/protocol/example-protocol", published_at: null, accessed_at: 2026-09-02T13:50:00Z, kind: third-party-data, authority: aggregator, authenticity: confirmed, supports: [], excerpt: "currentChainTvls.RobinhoodChain 128400" }
+  - { id: R-4, publisher: Example Protocol, title: "Official site", url: "https://example-protocol.org", published_at: null, accessed_at: 2026-09-02T13:00:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-3], excerpt: "Documentation: https://docs.example-protocol.org/vault" }
 
 gaps:                                 # priority: P0 | P1 | P2
   - { priority: P0, question: "Can the owner change the withdrawal path without a timelock?", checked: "verified source on the explorer, docs, X account, 2026-09-02", next: "read the setter's access modifier in the verified source" }
-  - { priority: P1, question: "Is there an audit?", checked: "docs, site, GitHub org, X account and the report index of every auditor named, 2026-09-02", next: "ask the project in public and record the answer as a claim" }
+  - { area: security, priority: P1, question: "Is there an audit?", checked: "docs, site, GitHub org, X account and the report index of every auditor named, 2026-09-02", next: "ask the project in public and record the answer as a claim" }
+  - { area: team, priority: P1, question: "Who controls the repository?", checked: "Site and repository ownership", next: "Crosslink named maintainers" }
+  - { area: economics, priority: P2, question: "What fees accrue to users?", checked: "Docs and chain-slice API", next: "Reproduce the fee window" }
+  - { area: activity, priority: P2, question: "How many users are active?", checked: "Explorer transactions", next: "Define and reproduce the active-user window" }
+  - { area: communications, priority: P2, question: "Which announcements remain current?", checked: "Site news and official account", next: "Verify dated material changes" }
 ---
 
 # Example Protocol — research packet
 
-Ten headings, in this order, all present for tier `full`. A `seed` packet may leave the body out; an
+Ten headings, in this order, all present for tier `full`. A `seed` needs What it is and Themes; an
 `update` packet keeps only Verification passes and Operations log. The first paragraph of What it is
 becomes the site summary: one paragraph, mechanism first, no marketing. Every paragraph from Product
 and mechanics through Verification passes ends with one tag: `[verified R-2]`, `[claim R-1]`,
@@ -141,7 +149,7 @@ Three bullets, one line each, ending with the claim ids that back them: the thes
 Up to three bullets, plain words, mechanism not intent, each with the claim ids that back it.
 
 - A single key owns the vault and can change the yield source with no delay [CLM-4].
-- No audit matched the deployed code [CLM-7].
+- No audit report was located in this review [CLM-6].
 
 ## Product and mechanics
 

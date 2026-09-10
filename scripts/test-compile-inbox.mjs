@@ -14,6 +14,7 @@ import { promisify } from "node:util";
 import { parse, stringify } from "yaml";
 import { compileInbox, duplicateReason, failingSlugs, inventoryCandidateCount, isInventoryPacket, researchIntake, ownTokenDuplicate } from "./compile-inbox.mjs";
 import { runCompile } from "./compile-packet.mjs";
+import { seedWithMinimums } from './lib/research-test-fixture.mjs';
 
 const execFileAsync = promisify(execFile);
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -50,7 +51,7 @@ function packetFor({ slug, name, symbol, address, workId, asOf = "2026-09-03T09:
     .replace(/^allowed_paths: .*$/m, `allowed_paths: [research/inbox/packets/${slug}/${workId}.md]`);
   // The first paragraph under "## What it is" is what compile() turns into the published summary.
   if (summary) text = text.replace(/(## What it is\n\n)[^\n]*/, `$1${summary}`);
-  return mutate(text);
+  return mutate(seedWithMinimums(text));
 }
 
 const packetPath = (slug, workId) => `research/inbox/packets/${slug}/${workId}.md`;

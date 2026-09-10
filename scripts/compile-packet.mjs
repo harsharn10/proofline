@@ -92,9 +92,13 @@ async function appendChangelog(path, entry) {
   return true;
 }
 
-export async function runCompile({ packetPath, contentDir = "content", dryRun = false }) {
+export async function runCompile({ packetPath, contentDir = "content", dryRun = false, enforceMinimums = true }) {
   const packet = parsePacket(await readFile(packetPath, "utf8"));
   const packetErrors = checkPacket(packet.frontmatter, packet.body);
+  if (enforceMinimums) {
+    const { enforceResearchMinimums } = await import('./lib/research-minimums.mjs');
+    packetErrors.push(...enforceResearchMinimums(packet));
+  }
   if (packetErrors.length) throw new Error(packetErrors.join("\n"));
   const slug = packet.frontmatter.slug;
   const root = resolve(contentDir);
@@ -108,6 +112,8 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
   const censusText = await textOr(censusPath, null);
   const census = censusText === null ? [] : parse(censusText) ?? [];
   const priorProject = await yamlOr(projectPath, null);
+  if (enforceMinimums && packet.frontmatter.packet_tier === 'update' && !priorProject)
+    throw new Error('An update packet cannot seed a new project; submit a seed/full packet with the research minimums.');
   const priorCensusRow = census.find((row) => row.slug === slug) ?? null;
   const priorSources = await yamlOr(sourcesPath, null);
   const priorFeed = await yamlOr(feedPath, null);

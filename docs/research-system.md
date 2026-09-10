@@ -357,3 +357,25 @@ account; coming-up signals use `launch-date`, `whitelist`, and `mint` dated with
 - Dated handoff files. Open work is tracked as issues (`docs/reviews/<date>/issues/` drafts).
 - Positional feed ids such as `<slug>-14` for new items. Existing ids stay until the compiler rewrites
   the file.
+
+## 10. New-packet minimums and legacy reporting
+
+The first enforcement slice of #50 is a structural evidence floor, not a certification of research quality. `npm run validate` and the unattended compiler's directory validation apply it; direct `compile-packet.mjs` also refuses deficient packets before writes. The pure `compile()` transformation and single-record structural validators remain reusable separately. `runCompile({enforceMinimums:false})` is reserved for isolated legacy transformation tests, is not a CLI option, and is never used by production intake.
+
+New or edited seed/full packets require:
+
+| Area | Machine-checkable floor |
+| --- | --- |
+| Receipt diversity | At least three distinct confirmed HTTP(S) URLs, with primary site/docs, onchain, and independent/aggregator evidence. Tracking parameters and fragments do not make additional sources. |
+| Identity | `identity.crosslink_claim_ids` names an identity claim backed by two distinct confirmed source URLs. Existing census collision checks still apply. |
+| Qualification | Each of the four tests has a receipt-backed claim, including a fail/unknown finding. |
+| Research areas | Each of identity, product, deployment, control, security, team, economics, activity and communications has a supported claim or a gap carrying `area`, `question`, `checked`, and `next`. Unknown/disputed claims do not erase a gap. |
+| Deployments | Every listed 20-byte address has an address-specific claim with an explorer UI/RPC reproduction on chain 4663 and an onchain receipt. No located deployment requires a searched-surfaces deployment gap. |
+| Narrative | A What it is paragraph; existing schema, Themes, event and evidence-tag gates continue to apply. |
+| Full tier | Findings recorded for receipts, numbers and adversarial verification passes; a dated receipt-backed event; metrics or an explicit economics gap. |
+
+This checks that evidence is supplied, not that a producer labelled it truthfully. Reviewers must still inspect identity crosslinks, census **and pending** matches, mechanism accuracy, independent-source provenance, owner/Safe/proxy read completeness, audit-to-deployment scope and metric windows. A different producer's verifier review is still needed before any nonprovisional score decision. This slice does not add a `meets_standard` badge, grant full coverage, promote scores, merge identities or enable publication.
+
+`ops/research-legacy.json` pins fingerprints of the 183 accepted packets at main `62238719022d1573045a619e6aeee487172b88f2`. It is a reviewed one-time compatibility baseline, not a registry that collectors extend. Fingerprints cover parsed frontmatter and narrative: unchanged legacy evidence remains valid; editing a claim or backdating a new packet cannot inherit the exemption. Existing structural validation still runs on exempt packets. Discovery inventory is not a project and is excluded from the seed/full floor; update packets retain their delta contract and need not repeat a full dossier.
+
+Run `npm run audit:research` for a read-only JSON report of every packet's gaps and census names with no seed/full packet. Initial baseline: 183 packets, 182 with one or more newly required structural gaps, zero census names without a seed/full packet. These counts are **not** 182 false or unusable dossiers: most predate the explicit crosslink and area metadata. Do not delete them or invent receipts to clear the report. Prioritize material active-name gaps using daily relevance selection; leave dormant names alone unless evidence changes. The audit writes nothing to canonical content or refresh queues.

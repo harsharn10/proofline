@@ -104,13 +104,13 @@ await test("CLI writes only canonical files, is idempotent, and supports dry-run
       await writeFile(join(dir, "census.yaml"), "[]\n");
       await writeFile(join(dir, "changelog.yaml"), "# One entry per published change. Newest last.\n");
     }
-    await runCompile({ packetPath: "fixtures/compile-packet/new-seed.md", contentDir: root });
+    await runCompile({ packetPath: "fixtures/compile-packet/new-seed.md", contentDir: root, enforceMinimums: false });
     const first = await treeSnapshot(root);
-    await runCompile({ packetPath: "fixtures/compile-packet/new-seed.md", contentDir: root });
+    await runCompile({ packetPath: "fixtures/compile-packet/new-seed.md", contentDir: root, enforceMinimums: false });
     assert.deepEqual(await treeSnapshot(root), first, "second compile produces no diff");
     const changelog = parse(await readFile(join(root, "changelog", "alpha.yaml"), "utf8"));
     assert.equal(changelog.length, 1, "same packet does not append changelog twice");
-    await runCompile({ packetPath: "fixtures/compile-packet/new-seed.md", contentDir: dryRoot, dryRun: true });
+    await runCompile({ packetPath: "fixtures/compile-packet/new-seed.md", contentDir: dryRoot, dryRun: true, enforceMinimums: false });
     assert.equal((await readdir(join(dryRoot, "projects"))).length, 0, "dry-run writes nothing");
   } finally {
     await rm(root, { recursive: true, force: true });
