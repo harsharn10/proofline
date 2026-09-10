@@ -82,6 +82,25 @@ Grok and Claude sessions are external to these workflows. Changing repository in
 
 Recovery must also match the workflow version. Rerunning a historical scheduled job can use its old workflow definition with newer checked-out code; do not rerun it blindly after an interface change such as required PR-intake snapshots. Validate recovery against current main, use the current manual workflow where appropriate, and await a new scheduled cycle for scheduled-health evidence. A manual or local dry-run success does not replace that evidence.
 
+The watchdog separately runs `scripts/measurement-health.mjs`, even after execution-report failure.
+It compares the public `/data/health.json` manifest's served SHA to current main and recomputes ages at
+check time. The manifest is built from the existing read-only planner and canonical pulled files;
+it exposes no credentials or private account notes. Requests are HTTPS-only, unauthenticated, bounded
+to 15 seconds and 2 MB with no redirect/retry. Missing or malformed output is unverified, not healthy.
+
+Fresh, stale, retained, undated and unmeasured are distinct component states. Zero is measured; null
+is not. Activity row dates/retention flags take precedence over aggregate dates. Mint, LP and
+concentration use their own field dates; undated legacy/address facts never borrow `pulled_at`.
+Daily hot market/metric components and dynamic activity rows require fresh observations. Activity
+criticality reuses the puller's role/recent-activity predicate; an aggregate containing intentionally
+quiet contracts does not force all of them to refresh daily. Partial collection, future
+dates and maintenance beyond its interval plus max(7 days, one interval) require attention. Ignored
+identities/archives remain disclosed without forcing reads. Noncritical static/structure dates are
+inventory, not an instruction to remeasure every contract daily. Counts describe components, not names.
+An old build alone does not force a daily rebuild when main is unchanged and measurements remain within
+their policy. Deployment mismatch remains visible during an in-progress host build; recheck the exact
+revision after deployment. This does not prove research completion or authorize automatic recovery.
+
 The existing optional Pulse Worker remains a separately bounded ten-minute live snapshot. Its checked-in `TELEGRAM_ENABLED` switch is false; the registry's separate `ops/telegram-review.json` ledger has `channel_enabled: true` at the reconciled main snapshot. Do not describe the whole system as paused or infer successful delivery from either flag alone: approval fingerprints, destination configuration and runtime credentials also apply. Preserve each existing setting; collection, compilation and a documentation change do not authorize enabling publication. Pulse source rules are hour-based, so changing its cron to daily would require a different signal design. The researched registry and packet cycle are daily.
 
 ## Frontend and operations

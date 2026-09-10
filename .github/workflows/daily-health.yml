@@ -23,3 +23,6 @@ jobs:
           node-version: 22
       - name: Inspect latest scheduled coordinator and per-lane receipts/reports
         run: node scripts/pipeline-health.mjs
+      - name: Inspect served revision and measurement freshness independently
+        if: always()
+        run: node scripts/measurement-health.mjs
