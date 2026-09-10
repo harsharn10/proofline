@@ -101,6 +101,7 @@ import {
 import { createCreditBudget, blockscoutCreditCost } from "./lib/pull/budget.mjs";
 import { openActivityCache } from "./lib/pull/activity-cache.mjs";
 import { createPullAttempt, finishPullAttempt } from './lib/pull/attempt.mjs';
+import { quietTokenScreen } from './lib/pull/quiet-token.mjs';
 import { buildRelationships, relationshipIndex, addressKey, isOwnDeployment, referenceReason } from "./lib/relationships.mjs";
 import { refreshDecision, selectRefreshTargets, hasIdentityConflict, selectInfrastructureReaders } from "./lib/refresh-policy.mjs";
 import { refreshReviewStatus } from './lib/refresh-review.mjs';
@@ -796,6 +797,7 @@ async function main() {
   const errorCounts = new Map();
   const completedSlugs = [];
   const partialNames = [];
+  const screenedReads = [];
   const deferredReads = [];
   const deferredNames = selection.deferred.map(t => t.slug);
   // Measured, not assumed: what this run actually spent per tier is what the projection is built on.
@@ -817,13 +819,14 @@ async function main() {
     // Names are processed one at a time, so the run counter's movement across a name is that name's
     // spend exactly — the concurrency is inside a name, and each of those reads has its own scope.
     const slugCreditsStart = creditBudget.snapshot().run_credits;
-    // Free sources lead. DexScreener's trade counter is the token change signal, so an unchanged
-    // token never spends explorer credits merely to learn that its holder/ABI facts are unchanged.
+    // Free sources lead. Complete market evidence can screen established quiet tokens after RPC
+    // checks; all other tokens still use the independent explorer change signal below.
     const tokenAddress = tokenAddressFor(target.addresses);
     let market = null;
+    let marketEvidence = null;
     if (!args.rpcOnly) {
       market = tokenAddress
-        ? await readMarket(dexscreener, tokenAddress, { pulledAt })
+        ? await readMarket(dexscreener, tokenAddress, { pulledAt, onObservation: evidence => { marketEvidence = evidence; } })
         : emptyMarket(pulledAt, [{ step: "no token address", message: `no ${CHAIN} deployment with role token` }]);
       attempt.record('market', market.errors);
     }
@@ -856,7 +859,10 @@ async function main() {
       const refreshMutable = args.full || codeChanged || previousAddress?.source_verified !== true ||
         rpcResult.proxy?.implementation !== previousAddress?.proxy?.implementation ||
         !Number.isFinite(mutableAge) || mutableAge >= 7 * 86_400_000;
-      const gate = needsExplorerSignal({
+      const screen = quietTokenScreen({ target, entry, market, evidence: marketEvidence, rpc: rpcResult,
+        previousAddress, previousRead: previousAddressRead, index: graphIndex, infrastructureReaders,
+        now, force: forceCadence });
+      const gate = screen.skip ? { signal: false, reason: screen.reason } : needsExplorerSignal({
         role: entry.role, full: refreshMutable, first, lastTxAt: previousActivity?.last_tx_at, now,
       });
 
@@ -877,8 +883,12 @@ async function main() {
 
       if (!gate.signal) {
         walksSkipped++;
+        if (screen.skip) screenedReads.push({ slug: target.slug, address: entry.address, reason: screen.reason,
+          market_as_of: market.pulled_at, own_activity_at: target.refresh.ownActivityAt,
+          liquidity_usd: market.liquidity_usd, volume_h24: market.volume_h24,
+          trades_h24: market.trades_h24, complete_pairs: marketEvidence.pair_count });
         return {
-          row: carriedRow(), creator: null, activity: carriedActivity(), changed: false, codeHash,
+          row: carriedRow(), creator: null, activity: carriedActivity(), changed: false, codeHash, screen,
           records: [
             explorerReadRecord({ kind: "address", address: entry.address, status: "unchanged", reason: gate.reason, signal: previousAddressRead?.signal ?? null, codeHash, checkedAt: pulledAt, previous: previousAddressRead, credits: 0 }),
             explorerReadRecord({ kind: "activity", address: entry.address, status: "unchanged", reason: gate.reason, signal: previousAddressRead?.signal ?? null, codeHash, checkedAt: pulledAt, previous: previousActivityRead, credits: 0 }),
@@ -1104,7 +1114,7 @@ async function main() {
         market = carryMarketFacts(market, priorMarket);
         structure = carryStructureFacts(null, priorStructure);
         for (const [kind, previous] of [["top10", priorTop10Read], ["structure", priorStructureRead], ["lp", priorLpRead]]) {
-          readRecords.push(explorerReadRecord({ kind, address: tokenAddress, status: "unchanged", reason: "token change signals unchanged; explorer measurement skipped", signalValue: market.trades_h24, checkedAt: pulledAt, previous, credits: 0 }));
+          readRecords.push(explorerReadRecord({ kind, address: tokenAddress, status: "unchanged", reason: tokenRead?.screen?.skip ? tokenRead.screen.reason : "token change signals unchanged; explorer measurement skipped", signalValue: market.trades_h24, checkedAt: pulledAt, previous, credits: 0 }));
         }
       }
 
@@ -1357,6 +1367,7 @@ async function main() {
     status: runErrors.length || deferredNames.length || deferredReads.length || failures.length || creditBudget.snapshot().provider_exhausted || completedSlugs.length < targets.length ? "degraded" : "complete",
     selected: targets.length, completed: completedSlugs, deferred_names: deferredNames,
     partial_names: partialNames,
+    screened_reads: screenedReads,
     deferred_reads: [...new Set(deferredReads)], failures, budget: creditBudget.snapshot(),
     activity_cache: activityCache.snapshot(), run_errors: runErrors,
   }, null, 2)}\n`);

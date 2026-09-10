@@ -73,14 +73,31 @@ Reassessment is due at its expiry (at most 90 days), but **expiry or changed evi
 Release requires an explicit controller change removing/replacing the decision, with evidence and reason
 in its PR; Git history retains the stop. Do not classify a source outage, a stale snapshot or low activity
 alone as abandonment or a rug. The planner reports stopped names for cheap reassessment; it does not
-create a new polling loop. Final token cohort thresholds and a live viability-before-deep-read gate remain
-separate work requiring fresh measurements; the historical threshold experiment is not applied here.
+create a new polling loop. Final token cohort/admission thresholds remain separate work; the historical
+threshold experiment is not applied here. The bounded read-depth screen below does not change admission.
 
 When both fresh and failed seeds are due, up to half the available seed slots are reserved for failed seeds and the remainder for new seeds, with unused space shared. This prevents continuous discovery from indefinitely postponing all failed initial reads. This is allocation fairness, not a guarantee that provider/time limits let every selected name finish.
 
 Blockscout requests reserve the documented route weight (usually 20 credits), including retries. The daily credit cap is 60,000, the automatic run cap 40,000; the provider advertises 100,000 free credits/day. The remaining 20,000 internal allowance supports explicit recovery without consuming provider headroom. These are weighted credits, not physical requests. Legacy same-day counters are multiplied by 20 on read and emitted as version 2. A 402 opens a persisted provider breaker until the next UTC date. Remaining-credit headers can only lower the local remaining allowance; conservative reservation slack may leave credits unused.
 
 Default activity walks use two pages; deep legacy role-specific walks are available only with `--full`. A cap produces a lower bound, not an exact total. Shared low-level RPC/explorer method calls retain per-run memoization. Address documents are still stored per project for compatibility; the graph is deduplicated, and a future storage migration can normalize those files without changing consumers.
+
+For ordinary monthly token-only maintenance, the existing free market and RPC reads run first.
+`scripts/lib/pull/quiet-token.mjs` can then skip that token's explorer signal, metadata/activity walk,
+concentration and ABI/LP reads. It requires successful seeding, known own activity older than 30 days
+but no older than the existing 90-day archive boundary, current below-$25K liquidity and **measured**
+zero 24-hour volume/trades. Every returned in-chain pool must have an exact subject base-token match
+and complete raw liquidity/volume/buy/sell counts; the compatibility parser's zero defaults cannot
+establish inactivity. Empty pools, partial fields, errors and unknown/future dates keep normal reads.
+
+Known code hash, proxy and ownership must be unchanged after successful RPC checks. Seeds, retries,
+dated queue work, manual overrides, protocols/apps/tools, identity conflicts and shared-infrastructure
+representatives are not screened. Independent non-token address monitoring continues. Renewed trading,
+liquidity at the bar, or changed/unknown control immediately keeps the normal deeper path on that due run.
+The report's `screened_reads` records exact token, reason and market/activity dates; canonical read
+records retain the reason with zero explorer credits. Retained field dates/caveats are not refreshed,
+and no token-transfer count or "abandoned/rug" conclusion is inferred from zero trading. This reduces
+read depth only: it creates no polling loop, changes no cadence and claims no savings before measurement.
 
 `npm run audit:observations` is a read-only inventory of repeated payloads and unresolved variants. It preserves project bindings, measurement windows and market token perspectives. Repeated canonical-JSON bytes are not measured compressed-storage savings or duplicate provider calls. Address facts without uniform field-level dates remain undated in the audit; never replace them with a file refresh time. Define field/source provenance before physical normalization. Market-volume keys accept both pool contract addresses and 32-byte pool IDs; this does not widen deployment/token identity or turn a pool ID into a contract address.
 
