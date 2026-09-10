@@ -73,7 +73,15 @@ jobs:
           # Every file: status added|modified, no previous_filename, path under the packet allowlist.
           # There is no additions-only ledger check any more: content/sources/ is off the allowlist, so a
           # producer touching it is already flagged as outside-allowlist.
-          FILES="$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[] | [.status, .filename, (.previous_filename // "")] | @tsv')"
+          FILES_JSON="$(gh api "repos/$REPO/pulls/$PR/files" --paginate --slurp)"
+          # Codex also builds ordinary code/docs. Only research/canonical paths need this packet
+          # comment gate; previous paths keep renames out of the lane relevant. API/JSON errors fail.
+          RELEVANT="$(jq '[.[][] | [.filename, .previous_filename] | .[] | select(type == "string") | select(startswith("research/") or startswith("content/"))] | length > 0' <<< "$FILES_JSON")"
+          if [[ "$BRANCH" == codex/* && "$RELEVANT" == false ]]; then
+            echo "Implementation-only Codex PR — packet gate has no work; no comment."
+            exit 0
+          fi
+          FILES="$(jq -r '.[][] | [.status, .filename, (.previous_filename // "")] | @tsv' <<< "$FILES_JSON")"
           echo "Files in PR #$PR (status, path, previous path):"
           echo "$FILES"
           while IFS=$'\t' read -r STATUS FILENAME PREVIOUS; do

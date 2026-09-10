@@ -11,7 +11,7 @@ Use the [operating map](operating-flow.md) for authoritative timing. Repository 
 | Pipeline health | Independent daily clock; manual | Keep independent: chaining to success would hide missed/failed collection; inspect exact-attempt lane receipts. |
 | Publish | Relevant main pushes, successful coordinator/manual pulls, daily brief, Sunday wrap, manual | Preserve approval/pause gates. Failed coordinator does not launch alerts even if its pull lane completed; publication is independently recoverable. |
 | Validate | PR updates and main pushes | Cancel superseded PR checks only; preserve every main run. |
-| Packet PR gate | Successful PR Validate | API-only classification, bounded to five minutes; never merges. |
+| Packet PR gate | Successful PR Validate | API-only, bounded to five minutes; ordinary Codex implementation PRs skip packet comments. Research/canonical edits, renamed-away evidence and Grok producer branches retain review; never merges. |
 | Generated-file guard | PR | Keep ownership safety gate. |
 | Pulse deploy | Relevant main paths; manual | Bound verify/deploy to ten minutes each. |
 | Pulse Worker | Ten-minute cron in configuration | Do not start yet: latest deploy skipped for absent credentials and KV binding has no namespace ID. Local configuration is not proof of a live collector. It needs a separate bounded rollout; do not change to daily without redesigning hour-based signals. |
