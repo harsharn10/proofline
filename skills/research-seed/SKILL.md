@@ -15,6 +15,8 @@ Require a bounded assignment with main SHA, owner, slugs, allowed paths and stop
 expensive sources, match official domain, handle, chain/address and token ownership against census,
 canonical deployments and pending producer PRs including drafts. A match is an update or controller hold,
 not another token profile. Discovery inventories are leads, not accepted projects.
+Use the generated discovery recommendations described in `docs/admission-policy.md`; a watch result
+names evidence still needed, not permission to seed. Cached lead numbers are not dated measurements.
 
 Collect the shared seed minimums; reproduce chain claims and keep unknowns explicit with searched surfaces.
 Write one packet per assigned canonical slug, `packet_tier: seed`; use the full template shape but only

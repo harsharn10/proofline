@@ -14,6 +14,8 @@ template under `docs/templates/`. Read the assigned prior packet, canonical prof
 
 Require explicit task IDs/owner and a current pending-PR check. Already claimed, blocked, no-change,
 pending or identity-held names are not new work. Use shared eligibility; don't build another relevance list.
+The controller's checked task-state export is defined in `docs/ingestion.md`. Never release a reservation
+because its comment is old or because a new refresh policy makes the name eligible.
 For a material delta use `research-update-v2.md` with a supported reason, old/new difference, exact sources
 and dates. Existing profile fields remain unchanged unless the evidence specifically supports changing them.
 

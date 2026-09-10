@@ -12,7 +12,8 @@ can be on file without meeting today's evidence floor. Do not rewrite approval d
 Read current main `AGENTS.md`, `docs/ingestion.md`, `docs/process.md`, `docs/research-system.md` and
 `docs/design/icarus/review-checklist.md`. These repository paths are the shared contract, not a remembered prompt.
 
-Before assigning backfill, inspect current GitHub task ownership and pending submissions. Generate the plan
+Before assigning backfill, inspect current GitHub task ownership and pending submissions. Use the checked
+input export in `docs/ingestion.md` instead of manually copying issue JSON. Generate the plan
 with fresh PR and task-state snapshots, pin the main SHA and claim a bounded set in the work issue.
 Use one controller for claims; no claim/lease service is implemented. Keep paused cycles paused.
 

@@ -1,6 +1,6 @@
 # Order of operations
 
-Current collection cadence and relevance rules: [Selective daily registry](daily-registry.md). Pull at 09:17 UTC and compile at 11:47 UTC, daily. Live product priorities and decision notes: [#102](https://github.com/harsharn10/proofline/issues/102). GitHub settings and protection follow-up: [#103](https://github.com/harsharn10/proofline/issues/103).
+Current collection cadence and relevance rules: [Selective daily registry](daily-registry.md). Timing and responsibilities: [operating map](operating-flow.md). Live product priorities and decision notes: [#102](https://github.com/harsharn10/proofline/issues/102). GitHub settings and protection follow-up: [#103](https://github.com/harsharn10/proofline/issues/103).
 
 ## Use the right place
 
@@ -32,8 +32,8 @@ construction, whatever the diff says.
 | Writer | Owns | Lands through |
 | --- | --- | --- |
 | Producers (`grok`, `grok-heavy`, `supergrok`, `grok-bot`, Codex research runs) | `research/inbox/packets/<slug>/` | A producer branch and PR that the producer never merges. The compile workflow lifts packets off the branch. |
-| Compile bot | `content/**` compiled from packets, `content/changelog/` | Pushes to `main` daily at 11:47 UTC |
-| Pull bot | `content/pulled/**`, `ops/pull-budget.json`, `ops/pull-queue.json` | Pushes to `main` daily at 09:17 UTC |
+| Compile bot | `content/**` compiled from packets, `content/changelog/` | Pushes to `main` on the compile schedule |
+| Pull bot | `content/pulled/**`, `ops/pull-budget.json`, `ops/pull-queue.json` | Pushes to `main` on the pull schedule |
 | Publish bot | Telegram review state under `ops/` | Pushes to `main` after a content change |
 | Codex (build assignments) | `scripts/`, `site/`, `schema/`, `pulse/`, `docs/`, `.github/` within the assignment's `allowed_paths` | `codex/<YYYYMMDD>/<work-id>` branch and PR |
 | Controller (a Claude session or the owner) | Assignments, compile PRs, fixes, docs, review, merge | `claude/<YYYYMMDD>/<topic>` branch and PR |
@@ -88,8 +88,8 @@ cases and reports the others. Read-only review, issue comments and planning do n
    its existing validated workflow. Close an issue only when its acceptance criteria are met;
    partial work uses `Refs #N`, not `Closes #N`. Put remaining work and the next action in the
    linked issue, without a separate handoff-doc PR for every session.
-9. **Bots keep going.** Pull at 09:17 UTC, compile at 11:47 UTC, daily. Nothing in steps 0 to 8 waits
-   for them, and they do not wait for you.
+9. **Bot independence.** Enabled schedules follow the operating map. Steps 0 to 8 do not wait for
+   bots; paused external sessions remain paused. Instructions do not start a cycle.
 
 ## Stacks
 

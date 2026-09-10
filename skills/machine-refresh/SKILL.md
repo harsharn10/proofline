@@ -16,6 +16,9 @@ from a research seed. Use the existing selector and budgets, not a new list or p
 Actual collection or manual overrides require a scoped authorized run. Keep stopped schedules stopped.
 Do not use `--full`/`--only` to bypass identity concerns or run blanket refreshes. Only the puller writes
 machine data and append-only observation history. Shared infrastructure activity is not every token's activity.
+Daily provisional eligibility and quote-asset exclusions are defined in `docs/daily-registry.md`, not in
+this skill. Collection eligibility never grants identity or editorial approval. After a pause, report the
+scoped recovery needed; a productive plan alone does not make the site's measurements fresh.
 
 Retained measurements keep their measurement dates; failed reads are partial/blocked, never fresh zeroes.
 Inspect completion/deferred/provider reports, not just a green workflow badge. Preserve quota accounting

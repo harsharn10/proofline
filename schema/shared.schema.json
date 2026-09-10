@@ -27,7 +27,7 @@
     "metricKind": { "enum": ["tvl","volume_24h","fees_24h","revenue_24h","market_cap","holders"] },
     "chain": { "enum": ["robinhood-chain","arbitrum-one","ethereum","base","solana","hyperliquid","other"] },
     "address": { "type": "string", "pattern": "^(0x[0-9a-fA-F]{40}|[1-9A-HJ-NP-Za-km-z]{32,44}|not-verified)$" },
-    "role": { "enum": ["token","factory","router","vault","proxy","implementation","admin","multisig","timelock","other"] },
+    "role": { "enum": ["token","reference-token","factory","router","vault","proxy","implementation","admin","multisig","timelock","other"] },
     "deployment": { "type": "object", "additionalProperties": false, "required": ["label","chain","address","role","verified","sources"],
       "properties": {
         "label": { "type": "string" },

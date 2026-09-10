@@ -100,7 +100,7 @@ import {
 } from "./lib/pull/rialto.mjs";
 import { createCreditBudget, blockscoutCreditCost } from "./lib/pull/budget.mjs";
 import { openActivityCache } from "./lib/pull/activity-cache.mjs";
-import { buildRelationships, relationshipIndex } from "./lib/relationships.mjs";
+import { buildRelationships, relationshipIndex, addressKey, isOwnDeployment, referenceReason } from "./lib/relationships.mjs";
 import { refreshDecision, selectRefreshTargets, hasIdentityConflict, selectInfrastructureReaders } from "./lib/refresh-policy.mjs";
 import {
   consumeQueue,
@@ -349,9 +349,20 @@ export function explorerReadRecord({
   };
 }
 
-export function aboveShareBar(census, pulled) {
+export function aboveShareBar(census, pulled, context = null) {
   const tvl = pulled?.metrics?.find((metric) => metric.kind === "tvl")?.value ?? null;
   const usesLiquidity = census?.identity?.entity_kind === "token" || census?.tree?.primary?.startsWith("launch/");
+  if (context) {
+    const { project, index, now = Date.now() } = context;
+    const observedAt = usesLiquidity ? pulled?.market?.pulled_at : pulled?.metrics?.find(m => m.kind === 'tvl')?.as_of;
+    const age = now - Date.parse(observedAt);
+    // Selection can use a recent stale measurement to recover it, but not an undated or
+    // months-old value. Public display keeps its stricter 36-hour freshness policy.
+    if (!Number.isFinite(age) || age < 0 || age > 7 * 86_400_000) return false;
+    if (usesLiquidity && !(project.deployments ?? []).some(d => d.role === 'token' &&
+        addressKey(d.chain, d.address) === addressKey(pulled?.chain, pulled?.market?.token_address) &&
+        isOwnDeployment(project, d, index))) return false;
+  }
   return meetsShareBar({
     officialConfirmed: officialSurfaceConfirmed(census),
     hasContractOn4663: locatedOnChain(pulled),
@@ -385,9 +396,11 @@ export function memoizeClient(client) {
 }
 
 /** One row per address to pull, deduplicated within a slug, first label and role winning. */
-export function addressesFor(project) {
+export function addressesFor(project, index = null) {
   const seen = new Map();
   for (const d of project?.deployments ?? []) {
+    // References remain on the relationship map, not a repeated per-project token read.
+    if (d.role === 'reference-token' || index && ['token', 'other'].includes(d.role) && referenceReason(d, index)) continue;
     if (d?.chain !== CHAIN) continue;
     if (!d?.address || d.address === NOT_VERIFIED) continue;
     const key = d.address.toLowerCase();
@@ -559,11 +572,13 @@ async function main() {
   const projectFiles = (await readdir("content/projects")).filter((f) => f.endsWith(".yaml"));
   const projects = new Map();
   for (const f of projectFiles) projects.set(basename(f, ".yaml"), await readYaml(join("content/projects", f)));
-  const graph = buildRelationships([...projects.values()]);
+  const dependencies = await Promise.all((await readdir('content/dependencies')).filter(f => f.endsWith('.yaml'))
+    .map(f => readYaml(join('content/dependencies', f))));
+  const graph = buildRelationships([...projects.values()], dependencies);
   const graphIndex = relationshipIndex(graph);
   const censusBySlug = new Map(census.map(row => [row.slug, row]));
   const infrastructureReaders = selectInfrastructureReaders(graphIndex, new Set([...projects.values()]
-    .filter(project => censusBySlug.has(project.slug) && addressesFor(project).length > 0 &&
+    .filter(project => censusBySlug.has(project.slug) && addressesFor(project, graphIndex).length > 0 &&
       !hasIdentityConflict(project, censusBySlug.get(project.slug), graphIndex)).map(project => project.slug)), CHAIN);
   const forceCadence = Boolean(args.only || args.full || args.rialtoOnly);
 
@@ -580,7 +595,7 @@ async function main() {
     if (wanted && !wanted.has(row.slug)) continue;
     const project = projects.get(row.slug);
     if (!project) continue;
-    const addresses = addressesFor(project);
+    const addresses = addressesFor(project, graphIndex);
     // A name with no located address still gets a file when its ledger cites a DefiLlama protocol
     // page: the chain-slice metrics are worth reading on their own.
     const ledger = await readYaml(join("content/sources", `${row.slug}.yaml`)).catch(() => null);
@@ -591,7 +606,7 @@ async function main() {
     const lastSnapshot = history.at(-1) ?? null;
     const refresh = refreshDecision({ project, census: row, previous, index: graphIndex, infrastructureReaders,
       seededAt: history[0]?.at ?? previous?.pulled_at,
-      aboveShareBar: aboveShareBar(row, previous),
+      aboveShareBar: aboveShareBar(row, previous, { project, index: graphIndex, now: Date.parse(pulledAt) }),
       queuedAt: queueBySlug.get(row.slug)?.at ?? null,
       now: Date.parse(pulledAt),
       force: forceCadence,

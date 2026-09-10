@@ -27,6 +27,7 @@ export type Chain =
 
 export type DeploymentRole =
   | "token"
+  | "reference-token"
   | "factory"
   | "router"
   | "vault"

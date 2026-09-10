@@ -25,6 +25,16 @@ do not count them as independent votes or sum their totals. A provider's query t
 
 ## Offline controller command
 
+For stored discovery leads, first run `node scripts/planning-inputs.mjs --issue 132` after fetching current
+main/PR refs. It assembles canonical/dependency addresses, pending packet addresses (including drafts),
+subjects from `content/pulled/discovery.yaml`, and runs this planner automatically. Outputs are
+`build/admission-input.json` and `build/admission-plan.json`; no hand-written input YAML is needed to
+surface a lead for review. Missing identity/deployment evidence remains `watch`, not automatic admission.
+Legacy discovery numbers have no individual measurement windows: they remain undated lead hints, not
+fabricated DEX Screener receipts or sustained-activity evidence. The controller/collector supplies real
+dated evidence using the format below before a seed recommendation is possible. Fork packet PRs or
+changed/unfetched heads fail closed for pending-identity review.
+
 `npm run admission:plan -- input.yaml [dune-results.json]` prints recommendations only. Input has:
 
 ```yaml

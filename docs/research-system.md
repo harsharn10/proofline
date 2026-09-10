@@ -28,6 +28,20 @@ Owner decision, September 9, 2026: a protocol and its own token share one canoni
 
 A launchpad's own token follows the same rule. Independent projects launched through it remain separate canonical projects, linked by their sourced launch infrastructure/attribution. Shared factories, routers and pools do not imply common ownership. Quote assets and collateral are dependencies, not the subject project's own token (`role: other` where a deployment reference is needed). Discovery does not imply an active profile or daily refresh for every launched token; use the selective registry policy. Protocol TVL, token liquidity and shared-pool volume remain distinct measurement scopes.
 
+Direct and unattended compilation reject `role: token` when its chain/address belongs to a canonical
+dependency card or its label explicitly identifies a quote/collateral reference. Correct the role with
+receipts; do not remove the dependency match or rename the label just to bypass the check. Ambiguous
+labels and independently launched assets still require semantic review. `repair-reference-roles.mjs
+--check` audits the historical role-only repair; `--write` is a controller-authorized canonical repair,
+not a producer command. Accepted historical packets and their evidence dates remain immutable.
+
+Use `role: reference-token` for an independently launched, traded or example token mentioned on a
+platform profile. Retain its source receipts and any separate canonical owner profile. This role does
+not assert a specific launch/team relationship: that still needs evidence. Reference activity, holders
+and market data never become the platform's own-token KPIs, including retained pre-correction pulls.
+Re-listing a canonical reference as an own token is held even under a renamed label. No identities are
+merged or automatically approved by a deployment-role correction.
+
 The inbox compiler holds any proposal assigning another canonical project's own-token deployment to its subject on the same chain, including updates to an existing unrelated profile. Update the owning canonical slug instead. Existing records are never automatically merged; ambiguous identity evidence remains held for the controller.
 
 ## 2. Field ownership
@@ -210,8 +224,8 @@ Hard stops:
 
 ### Unattended compile
 
-Steps 5 and 6 run on a schedule, with no human in the loop. `.github/workflows/compile.yml` fires daily
-at 11:47 UTC, after the 09:17 UTC pull, sharing its `main-bots` concurrency group so
+Steps 5 and 6 run on the [operating map](operating-flow.md) schedule, with no human in the loop.
+`.github/workflows/compile.yml` shares the puller’s `main-bots` concurrency group so
 only one bot writes main at a time — and runs `scripts/compile-inbox.mjs`:
 
 1. **Collect.** Snapshot all open PRs targeting main from GitHub with pagination. Only ready (non-draft), same-repository PRs under `grok-heavy/`, `grok-bot/`, `supergrok/`, `grok/` or `codex/` are active. Drafts are held; closed/merged PRs and orphan branches are retired from automatic intake; fork PRs are excluded. Use bounded submission PRs; standing #62 is retired only after the new skills are on main and its packet diff is empty (docs/ingestion.md). Build PRs contribute no work unless they actually contain changed packets. API/snapshot errors fail closed, and fetched heads must match the snapshot. The snapshot and intake states are retained with the compile report. A manual `workflow_dispatch` branch is an explicit operator override, not automatic reactivation. Packet files under

@@ -35,38 +35,10 @@ Never merge, never enable auto-merge. CI comments; the compile bot lifts the pac
 
 ## What happens to a packet
 
-A branch is single-assignment (`<producer>/<YYYYMMDD>/<work-id>`). Standing instructions live on main,
-not in an open PR. The compiler reads open, ready, same-repository submissions and skips drafts/retired work.
-After accepted output is confirmed on main, the controller closes the PR with each packet's disposition.
-
-When workflows are enabled, these triggers inspect a filed packet; neither starts a Grok session.
-
-- **Within minutes.** Validate runs on the branch, then the packet PR gate comments on the PR: either
-  "waiting for controller" (every file is a packet or an assignment) or "needs controller review"
-  (something renamed, deleted, or outside `research/inbox/packets/` and `research/inbox/assignments/`).
-- **Daily, not a latency guarantee.** The compile workflow is configured for 11:47 UTC. It lifts every packet
-  file that differs from main off the branch, validates it, compiles the valid ones into `content/`,
-  runs the content gates and pushes to main; the site redeploys from main. The PR is not merged, and no
-  bot will ever merge it — only the packet files move.
-
-A packet that does not validate is skipped and reported in one comment on the PR, with each skipped
-file's errors in a fenced block. So is a packet that validates but whose compiled prose fails the release
-lint — a banned hype word in the "What it is" paragraph, a producer name in a finding — which is dropped
-after the compile and named the same way. The rest of the batch still compiles: one bad packet never
-blocks the others. To fix one, `PUT` the same path again on the same branch with the corrections — the
-next compile picks up the new copy. A packet that supersedes one already compiled onto main must carry a newer
-`as_of`, or it is left alone as an older copy of what main already has. A packet naming a possible match
-that is being created in the same batch is skipped that round and compiles on the next one.
-
-One skip has a different fix. A packet filed under a **new** slug that turns out to be a second name for
-a name the registry already has — the same official handle or domain — is skipped as
-`duplicate of <existing slug> on the official handle/domain; write an update packet for <existing slug>
-instead of a new name`. Re-PUTting it will not help: the token and the protocol that issued it are one
-entry. File the evidence as an update packet at `research/inbox/packets/<existing slug>/<work-id>.md`
-instead. The established name always keeps the slug; the newcomer is the one dropped.
-
-A discovery round (`slug: discovery-inventory`) is kept as a record and counted in the compile report as
-`inventory: N candidates`. It is never compiled into a project: those names become assignments first.
+Use [the operating map](../operating-flow.md) for ownership and timing,
+[ingestion](../ingestion.md#submission-lifecycle-and-rollout) for packet disposition/replay, and
+[the research contract](../research-system.md#unattended-compile) for compiler gates.
+This integration document only owns the REST submission recipe; it does not redefine intake policy.
 
 ## Token scope
 
@@ -97,22 +69,8 @@ For updates, use docs/templates/research-update-v2.md: declare update_reason and
 name the prior packet/work ID, and apply the standardized website title/body/date/source/placement rules.
 For backfills, use a full packet; do not re-announce historical evidence. Check pending PRs including drafts.
 
-Three rules:
-1. Evidence class. Every claim is class: claim unless you reproduced it yourself on the explorer, by
-   RPC, or from a primary API and cite that reproduction; only then verified. Every claim carries a
-   receipt id, a date, and the handle or URL it came from. No number without a source.
-2. Mainnet bar. lifecycle: mainnet needs an explorer or RPC receipt, a DefiLlama chain-slice figure,
-   or docs that publish live addresses. A project post alone is lifecycle: announced.
-3. No conduct words. Never write a verdict about a person, team or account. The only flags are
-   handle-collision | unconfirmed-official | third-party-link | copypasta-pattern | wrong-chain |
-   ca-collision, each with a receipt. Describe what was posted, never intent.
-
-Packet format: docs/research-system.md §5. One file at the allowed path: YAML frontmatter dossier plus
-the body sections for the tier. Write "NULL — <reason>" for a field you tried and could not establish.
-Record possible matches against content/census.yaml and pending packets; never merge them yourself.
-Every address is a record {value, chain, source, seen, exists_on_4663, explorer_source_verified} with
-the booleans null until checked. Do not set scores, approval, conflict resolution or channel decisions.
-Do not write content/**.
+Evidence classes, lifecycle proof, conduct rules, role ownership and packet fields are defined in
+docs/research-system.md, not repeated in this prompt. Follow the matching skill for this assignment.
 
 Branch and PR (docs/integrations/grok-bot.md):
 - POST /repos/harsharn10/proofline/git/refs: branch <producer>/<YYYYMMDD>/<work-id> from base_sha.

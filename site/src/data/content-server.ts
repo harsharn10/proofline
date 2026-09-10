@@ -5,7 +5,7 @@ import { productActivityStatus } from '../../../scripts/lib/research-state.mjs';
 import { createServerFn } from "@tanstack/react-start";
 import rawContent from "virtual:proofline-content";
 // @ts-expect-error Shared deterministic relationship projection.
-import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolumeSummary } from "../../../scripts/lib/relationships.mjs";
+import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolumeSummary, subjectObservations, subjectHistory } from "../../../scripts/lib/relationships.mjs";
 import { parseResearchMarkdown, renderWholeMarkdown } from "./markdown";
 import { readerCopy } from "../lib/dejargon";
 import {
@@ -320,7 +320,7 @@ function loadContent(): ServerContent {
   }
 
   const projects = Object.entries(rawContent.projects).map(([file, raw]) => ({file, project: parseYaml<ProjectFile>(raw)}));
-  const activityIndex = relationshipIndex(buildRelationships(projects.map(entry => entry.project)));
+  const activityIndex = relationshipIndex(buildRelationships(projects.map(entry => entry.project), Object.values(dependencies)));
   const dossiers: Dossier[] = projects.map(({file, project}) => {
     const slug = file.replace(/\.yaml$/, "");
     const sourcesFile = readYamlOrWarn<SourcesFile>(
@@ -337,8 +337,9 @@ function loadContent(): ServerContent {
       null,
     );
     const feed = feedFile ? [...feedFile.items].sort((a, b) => b.date.localeCompare(a.date)) : [];
-    const pulled = readYamlOrWarn<PulledFile | null>(rawContent.pulled[`${slug}.yaml`], `pulled/${slug}.yaml`, slug, null);
-    const history = parseHistory(rawContent.pulledHistory[`${slug}.jsonl`]);
+    const pulled = subjectObservations(project,
+      readYamlOrWarn<PulledFile | null>(rawContent.pulled[`${slug}.yaml`], `pulled/${slug}.yaml`, slug, null), activityIndex) as PulledFile | null;
+    const history = subjectHistory(project, parseHistory(rawContent.pulledHistory[`${slug}.jsonl`]), activityIndex) as HistoryPoint[];
     const dailySeries = parseDailySeries(pulledSeries[`${slug}.json`]);
     const censusRow = censusBySlug.get(slug);
     const pulledCard = pulled as (PulledFile & PulledCardFields) | null;
@@ -423,7 +424,8 @@ function loadContent(): ServerContent {
     changelog: changelogAll,
     censusBySlug,
     treeBySlug,
-    histories: Object.fromEntries(Object.keys(rawContent.projects).map(file => [file.replace(/\.yaml$/, ""), parseHistory(rawContent.pulledHistory[file.replace(/\.yaml$/, ".jsonl")])])),
+    histories: Object.fromEntries(projects.map(({file,project}) => [project.slug,
+      subjectHistory(project, parseHistory(rawContent.pulledHistory[file.replace(/\.yaml$/, ".jsonl")]), activityIndex)])),
     wire: compiledWire,
     chainStats,
     generatedAt: derivedFile.generated_at,
@@ -828,11 +830,11 @@ function kpisFor(d: { lifecycle: Dossier["lifecycle"] }, pulled: PulledFile | nu
   };
 }
 
-// The holder count of the project's token contract (role token, else the first address with one).
+// Only the subject token has a holder count; a factory or referenced token is not a fallback.
 function tokenHolders(pulled: PulledFile | null): number | null {
   if (!pulled) return null;
   const token = pulled.addresses.find((a) => a.role === "token" && a.holders !== null);
-  return token?.holders ?? pulled.addresses.find((a) => a.holders !== null)?.holders ?? null;
+  return token?.holders ?? null;
 }
 
 const PEER_LIMIT = 6;

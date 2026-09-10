@@ -17,6 +17,50 @@ export function poolKey(chain, id) {
   return null;
 }
 
+// A role label is a contradiction detector, not evidence of ownership. Dependency matches
+// are chain-qualified; do not maintain a second hard-coded token address list.
+export function referenceReason(deployment, index = new Map()) {
+  if (deployment.role === 'reference-token') return 'explicit reference token, not the subject token';
+  const key = addressKey(deployment.chain, deployment.address);
+  if (!key) return null;
+  const dependencies = index.get(key)?.dependencies ?? [];
+  if (dependencies.length) return `canonical dependency: ${dependencies.join(', ')}`;
+  const label = deployment.label ?? '';
+  // Do not match "PAIR token" (a ticker) or "TAYSOM (graduation, quote TSM)"
+  // (the subject mentioning its counterparty). Ambiguous descriptions need review.
+  if (/(?:^|[(/;]\s*)(?:pair[ -]?quote|quote|collateral)\b/i.test(label) ||
+      /\bpairToken\b|\bpair token\b/.test(label)) return 'label identifies a quote/collateral asset';
+  return null;
+}
+
+export function isOwnDeployment(project, deployment, index) {
+  const node = index.get(addressKey(deployment.chain, deployment.address));
+  return Boolean(node && !referenceReason(deployment, index) &&
+    (deployment.role === 'token' ? !node.identityConflict : node.projects.length === 1));
+}
+
+// Read-time interpretation only: retained machine files are immutable evidence of what was
+// sampled, but an old role must not override corrected canonical token ownership on the site.
+export function subjectObservations(project, pulled, index) {
+  if (!pulled) return null;
+  const refs = new Set((project.deployments ?? []).filter(d => referenceReason(d, index))
+    .map(d => addressKey(d.chain, d.address)));
+  const ownToken = (project.deployments ?? []).filter(d => d.role === 'token' && isOwnDeployment(project,d,index));
+  const hasMarket = ownToken.some(d => addressKey(d.chain,d.address) === addressKey(pulled.chain,pulled.market?.token_address));
+  const keep = row => !refs.has(addressKey(pulled.chain,row.address));
+  return {...pulled, addresses:(pulled.addresses ?? []).filter(keep),
+    market:hasMarket ? pulled.market : null, structure:hasMarket ? pulled.structure : null,
+    activity:pulled.activity ? {...pulled.activity,addresses:(pulled.activity.addresses ?? []).filter(keep)} : pulled.activity};
+}
+
+export function subjectHistory(project, history, index) {
+  if ((project.deployments ?? []).some(d => d.role === 'token' && isOwnDeployment(project,d,index))) return history;
+  // Historical snapshots have no token-address identity. Keep protocol measurements and
+  // observation dates; withhold token-only series when the subject has no own token.
+  const keys = ['holders','liquidity_usd','volume_h24','trades_h24','price_usd','price_change_h24','market_cap','market_cap_usd','fdv','fdv_usd','top10_share'];
+  return history.map(point => ({...point,...Object.fromEntries(keys.map(key=>[key,null]))}));
+}
+
 export function buildRelationships(projects = [], dependencies = []) {
   const nodes = new Map();
   const links = new Map();
@@ -76,10 +120,8 @@ export function sharedRelationships(graph) {
 // Only activity belonging to this project's token or unshared deployment can keep it alive.
 // Activity at a factory used by fifty projects says nothing about the other forty-nine tokens.
 export function ownActivityAt(project, pulled, index, now = Date.now()) {
-  const own = new Set((project.deployments ?? []).filter(d => {
-    const node = index.get(addressKey(d.chain, d.address));
-    return node && (d.role === "token" && !node.identityConflict || node.projects.length === 1);
-  }).map(d => addressKey(d.chain, d.address)));
+  const own = new Set((project.deployments ?? []).filter(d => isOwnDeployment(project, d, index))
+    .map(d => addressKey(d.chain, d.address)));
   const times = (pulled?.activity?.addresses ?? [])
     .filter(a => own.has(addressKey(pulled.chain, a.address)))
     .map(a => a.last_tx_at).filter(at => Number.isFinite(Date.parse(at)) && Date.parse(at) <= now);
