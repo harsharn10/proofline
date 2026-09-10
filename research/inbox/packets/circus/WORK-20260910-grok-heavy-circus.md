@@ -87,8 +87,7 @@ deployments:
     address: { value: "0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D", chain: robinhood-chain, source: docs, seen: 2026-09-03, exists_on_4663: true, explorer_source_verified: null }
     receipt_ids: [R-9]
 
-metrics:
-  - { kind: volume_24h, value: 147032, currency: USD, as_of: 2026-09-10, window: 24h, method: "DexScreener CRUDECAT/USO Uniswap v3 pair volume.h24; CRUDECAT is listed on circus.trade, not proof the pair is the Circus graduation pool", class: claim, receipt_ids: [R-10] }
+metrics: []
 
 reproductions:
   - { id: REP-1, method: explorer-rpc, chain_id: 4663, checked_at: 2026-09-10T18:24:00Z, receipt_ids: [R-4], result: "eth_getCode 130 bytes at 0xb7fA…cb00; owner() 0x90Ae…0681; ERC1967 impl slot 0x822E…2B96" }
@@ -110,8 +109,9 @@ claims:
   - { id: CLM-8, field: deployment.address, value: "Launchpad owner EOA 0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681", class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-8], reproduction_ids: [REP-5], supersedes: null }
   - { id: CLM-9, field: deployment.address, value: "circusQuoteLocker 0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D", class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-9], reproduction_ids: [REP-6], supersedes: null }
   - { id: CLM-10, field: control.owner, value: "Launchpad proxy owner() is EOA 0x90Ae…0681 with empty code; implementation owner() is the zero address; labeled timelock getMinDelay() reverts and is not the proxy owner", class: verified, observed_at: 2026-09-10T18:24:00Z, receipt_ids: [R-4, R-5, R-7, R-8], reproduction_ids: [REP-1, REP-2, REP-4, REP-5], supersedes: null }
-  - { id: CLM-11, field: security.audit, value: "how-it-works says every circus token is minted from the same audited factory; no report URL on site, docs or X this pass", class: unknown, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-2, R-3], reproduction_ids: [], supersedes: null }
-  - { id: CLM-12, field: team.identity, value: "No named legal entity or named maintainers on site, docs or X bio", class: unknown, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-1, R-2, R-3], reproduction_ids: [], supersedes: null }
+  - { id: CLM-11, field: security.audit, value: "No audit report URL established this pass", class: unknown, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [], reproduction_ids: [], supersedes: null }
+  - { id: CLM-12, field: team.identity, value: "No named legal entity or named maintainers established this pass", class: unknown, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [], reproduction_ids: [], supersedes: null }
+  - { id: CLM-17, field: communications.status, value: "how-it-works states every circus token is minted from the same audited factory; that is project copy, not a located report", class: claim, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-2], reproduction_ids: [], supersedes: null }
   - { id: CLM-13, field: communications.status, value: "@circus_trade still posts launch marketing; no audit or implementation-source post located this pass", class: claim, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-3], reproduction_ids: [], supersedes: null }
   - { id: CLM-14, field: product.mechanism, value: "Homepage hero still says graduation to Uniswap v3; /how-it-works now says the curve graduates atomically to Uniswap v4 and LP is locked forever", class: disputed, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-1, R-2], reproduction_ids: [], supersedes: null }
   - { id: CLM-15, field: activity.status, value: "Homepage printed Raised on Curves $1.22M and Graduated Tokens 48; CRUDECAT is listed on the board", class: claim, observed_at: 2026-09-10T18:20:00Z, receipt_ids: [R-1], reproduction_ids: [], supersedes: null }
@@ -137,7 +137,7 @@ events:
 
 receipts:
   - { id: R-1, publisher: Circus Trade, title: "Homepage", url: "https://circus.trade", published_at: null, accessed_at: 2026-09-10T18:20:00Z, kind: official-site, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-2, CLM-3, CLM-14, CLM-15], excerpt: "Every coin starts on a transparent bonding curve priced in ETH. When the curve fills at ~4.2 ETH raised, it graduates to Uniswap v3 automatically, with liquidity locked forever. Raised on Curves $1.22M. Graduated Tokens 48." }
-  - { id: R-2, publisher: Circus Trade, title: "How it works", url: "https://circus.trade/how-it-works", published_at: null, accessed_at: 2026-09-10T18:20:00Z, kind: docs, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-3, CLM-11, CLM-14], excerpt: "When the curve raises ~$6k, it graduates atomically — in one transaction the raise plus remaining tokens become a Uniswap v4 pool, and the LP is locked forever. Fair Open LIVE, powered by Doppler. Every circus token is minted from the same audited factory." }
+  - { id: R-2, publisher: Circus Trade, title: "How it works", url: "https://circus.trade/how-it-works", published_at: null, accessed_at: 2026-09-10T18:20:00Z, kind: docs, authority: primary, authenticity: confirmed, supports: [CLM-1, CLM-3, CLM-14, CLM-17], excerpt: "When the curve raises ~$6k, it graduates atomically — in one transaction the raise plus remaining tokens become a Uniswap v4 pool, and the LP is locked forever. Fair Open LIVE, powered by Doppler. Every circus token is minted from the same audited factory." }
   - { id: R-3, publisher: Circus Trade, title: "@circus_trade profile", url: "https://x.com/circus_trade", published_at: null, accessed_at: 2026-09-10T18:20:00Z, kind: social, authority: primary, authenticity: confirmed, supports: [CLM-3, CLM-13], excerpt: "Bio: circus.trade The Greatest Show. Pinned Jul 20 welcome post. No audit URL in the visible posts this pass." }
   - { id: R-4, publisher: Robinhood RPC, title: "eth_getCode/owner launchpad proxy", url: "https://robinhoodchain.blockscout.com/address/0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00", published_at: null, accessed_at: 2026-09-10T18:24:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-4, CLM-10, EVT-1], excerpt: "eth_getCode 130 bytes; owner() 0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681; impl slot 0x822E…2B96" }
   - { id: R-5, publisher: Robinhood RPC, title: "eth_getCode implementation", url: "https://robinhoodchain.blockscout.com/address/0x822E175C1ae12166A0Ea3299d083Da48E6C42B96", published_at: null, accessed_at: 2026-09-10T18:24:00Z, kind: explorer, authority: onchain, authenticity: confirmed, supports: [CLM-5, CLM-10], excerpt: "eth_getCode 24061 bytes; owner() zero address; Blockscout REST blocked this pass so source name remains unread" }
@@ -164,19 +164,19 @@ Circus is a Robinhood Chain token launchpad at circus.trade. Classic Curve launc
 
 Themes: launchpad
 
-TL;DR: ETH bonding-curve pad whose proxy is live on 4663; official copy disagrees on whether IPO is Uniswap v3 or v4, and the implementation is still unverified. [CLM-1 CLM-14 CLM-5]
+TL;DR: ETH bonding-curve pad on 4663. Official copy disagrees on Uniswap v3 vs v4 IPO; the implementation is still unverified.
 
 ## Why it matters
 
-- Thesis: a public ETH curve plus a claimed locked IPO is the product, not a private raise [CLM-1].
-- Traction: homepage printed 48 graduated tokens and $1.22M raised on curves [CLM-15].
-- Catalyst: implementation source and the v3/v4 IPO path still unread [CLM-5 CLM-14].
+- Thesis: a public ETH curve plus a claimed locked IPO is the product, not a private raise. [claim R-2]
+- Traction: homepage printed 48 graduated tokens and $1.22M raised on curves. [claim R-1]
+- Catalyst: implementation source and the v3 vs v4 IPO path still unread. [verified R-5]
 
 ## What could go wrong
 
-- Proxy owner() is a single EOA; the labeled timelock does not own it [CLM-10].
-- Homepage and docs disagree on Uniswap v3 vs v4 graduation [CLM-14].
-- No audit artifact was located despite "audited factory" copy [CLM-11].
+- Proxy owner() is a single EOA; the labeled timelock does not own it. [verified R-4]
+- Homepage and docs disagree on Uniswap v3 vs v4 graduation. [disputed R-1 R-2]
+- No audit artifact was located despite "audited factory" copy. [unknown]
 
 ## Product and mechanics
 
@@ -196,7 +196,7 @@ circus.trade and @circus_trade cross-link. No legal name or repository is publis
 
 ## Economics and activity
 
-Homepage counters are project UI, not an independent TVL. DexScreener's deepest CRUDECAT book this pass is a Uniswap v3 USO pair; that does not prove Circus's graduation router. [claim R-1 R-10]
+Homepage counters are project UI, not an independent TVL. DexScreener's deepest CRUDECAT book this pass is a Uniswap v3 USO pair listed on the circus.trade board; that volume is CRUDECAT's book, not a Circus factory KPI. [claim R-1 R-10]
 
 ## Material risks
 
