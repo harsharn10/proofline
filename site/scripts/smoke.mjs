@@ -108,6 +108,23 @@ async function main() {
     }
 
     const publicHtml = await fetch(`${BASE}/`).then((response) => response.text());
+    // /feed has a wire-only loader. Even a filtered deep link must not hydrate the
+    // directory's histories/KPIs; filters still work in SSR before client JavaScript.
+    const feedHtml = await fetch(`${BASE}/feed`).then(response => response.text());
+    const filteredFeed = await fetch(`${BASE}/feed?name=pons`).then(response => response.text());
+    const emptyFeed = await fetch(`${BASE}/feed?name=not-a-name`).then(response => response.text());
+    const feedMain = html => html.match(/<main\b[\s\S]*?<\/main>/)?.[0] ?? "";
+    const visibleRows = html => (feedMain(html).match(/<li\b/g) ?? []).length;
+    for (const [label, passed] of [
+      ["feed contains the full wire", visibleRows(feedHtml) > visibleRows(filteredFeed) && visibleRows(filteredFeed) > 0],
+      ["feed name deep link is filtered before hydration", feedMain(filteredFeed).includes('value="pons" selected=""') && !feedMain(filteredFeed).includes('>CASHCAT</button>')],
+      ["unknown feed name has an honest empty state", visibleRows(emptyFeed) === 0 && feedMain(emptyFeed).includes("No wire items match these filters yet.")],
+      ["feed response excludes directory history/KPI payload", !feedHtml.includes('"histories"') && !feedHtml.includes('"holdersDelta7d"')],
+    ]) {
+      console.log(`  ${passed ? "ok  " : "FAIL"} ${label}`);
+      if (!passed) failures.push(label);
+    }
+    console.log(`  feed response: ${Buffer.byteLength(feedHtml)} decoded bytes; filtered: ${Buffer.byteLength(filteredFeed)}`);
     const legalChecks = [
       [
         "/",
