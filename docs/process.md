@@ -99,8 +99,9 @@ The v3 stack was #74 and #75 through #76.
 
 ## Named exceptions
 
-- `grok-heavy/standing/updates` (PR #62) is long-lived by design: one work id per daily cycle,
-  never merged. Do not prune it.
+- Standing producer PRs are being retired in favor of bounded submissions and repository skills.
+  Close #62 only after the replacement is on main and its packet diff is confirmed empty. Never merge it
+  or delete uncompiled evidence. Use the lifecycle in `docs/ingestion.md` for subsequent batches.
 - A data migration that must rewrite `content/pulled/**` (a schema change, a repair) carries the
   label `allow-pulled-data`, says why in the body, and merges right before a bot cycle so the bot
   overwrites it within the hour.

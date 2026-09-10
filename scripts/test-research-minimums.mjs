@@ -70,6 +70,9 @@ test('update tier cannot bypass seed minimums for a new canonical project', asyn
   try {
     const p = await fixture();
     p.frontmatter.packet_tier = 'update';
+    p.frontmatter.update_reason = 'event';
+    p.frontmatter.change_summary = 'A new material event';
+    p.frontmatter.events[0].impact = 'material';
     p.frontmatter.supersedes = 'WORK-20260902-grok-heavy-prior';
     p.frontmatter.prior_packet = 'research/inbox/packets/missing/prior.md';
     const packetPath = join(root, 'packet.md');

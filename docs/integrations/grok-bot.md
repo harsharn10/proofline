@@ -2,7 +2,8 @@
 
 Grok Heavy runs (producer `grok-heavy`) and the scheduled Grok desk (producer `grok-bot`) collect
 evidence for assigned slugs and hand it over as packets. The contract is `docs/research-system.md`.
-The scheduled desk runs every 6 hours; a Grok Heavy run happens once per assignment.
+Start at `AGENTS.md` and `docs/ingestion.md` on current main. Runs are bounded assignments under the
+shared daily relevance policy; a stopped session stays stopped. The repository skills replace old standing prompts.
 
 ## What the desk collects
 
@@ -34,16 +35,16 @@ Never merge, never enable auto-merge. CI comments; the compile bot lifts the pac
 
 ## What happens to a packet
 
-A branch is either single-assignment (`<producer>/<YYYYMMDD>/<work-id>`) or long-lived (one standing
-branch and one open PR that stay open across runs, such as `grok-heavy/standing/updates`). The compile
-bot reads both the same way: each run it takes whatever packet files on the branch differ from main.
+A branch is single-assignment (`<producer>/<YYYYMMDD>/<work-id>`). Standing instructions live on main,
+not in an open PR. The compiler reads open, ready, same-repository submissions and skips drafts/retired work.
+After accepted output is confirmed on main, the controller closes the PR with each packet's disposition.
 
-Two clocks run on a filed packet. Neither needs a human.
+When workflows are enabled, these triggers inspect a filed packet; neither starts a Grok session.
 
 - **Within minutes.** Validate runs on the branch, then the packet PR gate comments on the PR: either
   "waiting for controller" (every file is a packet or an assignment) or "needs controller review"
   (something renamed, deleted, or outside `research/inbox/packets/` and `research/inbox/assignments/`).
-- **Within six hours.** The compile workflow runs at :47 past, every six hours. It lifts every packet
+- **Daily, not a latency guarantee.** The compile workflow is configured for 11:47 UTC. It lifts every packet
   file that differs from main off the branch, validates it, compiles the valid ones into `content/`,
   runs the content gates and pushes to main; the site redeploys from main. The PR is not merged, and no
   bot will ever merge it — only the packet files move.
@@ -76,8 +77,9 @@ GitHub Actions secret.
 ## Paste prompt
 
 ```text
-You are the Proofline collector for Robinhood Chain (chain 4663). Read docs/research-system.md first.
-It is the whole contract; this prompt only carries the assignment.
+You are the Proofline collector for Robinhood Chain (chain 4663). Read current-main AGENTS.md,
+docs/ingestion.md and the matching repository skill first, then the packet contract and template.
+This prompt only carries one bounded assignment, never permission to loop.
 
 role: collector
 producer: <grok-heavy | grok-bot>
@@ -87,6 +89,13 @@ slug(s): <slug> (name: <name>)
 tier: <seed | full | update>            # update: also prior_packet: <path>
 allowed_paths:
   - research/inbox/packets/<slug>/<work-id>.md
+task_ids: <stable IDs from the claimed GitHub work issue, if backfilling>
+maximum_batch: <assigned cap>
+stop_condition: finish the assigned batch, or report blocked/no-change without retrying
+
+For updates, use docs/templates/research-update-v2.md: declare update_reason and change_summary,
+name the prior packet/work ID, and apply the standardized website title/body/date/source/placement rules.
+For backfills, use a full packet; do not re-announce historical evidence. Check pending PRs including drafts.
 
 Three rules:
 1. Evidence class. Every claim is class: claim unless you reproduced it yourself on the explorer, by

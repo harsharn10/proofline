@@ -211,7 +211,7 @@ Steps 5 and 6 run on a schedule, with no human in the loop. `.github/workflows/c
 at 11:47 UTC, after the 09:17 UTC pull, sharing its `main-bots` concurrency group so
 only one bot writes main at a time — and runs `scripts/compile-inbox.mjs`:
 
-1. **Collect.** Snapshot all open PRs targeting main from GitHub with pagination. Only ready (non-draft), same-repository PRs under `grok-heavy/`, `grok-bot/`, `supergrok/`, `grok/` or `codex/` are active. Drafts are held; closed/merged PRs and orphan branches are retired from automatic intake; fork PRs are excluded. The standing #62 intake remains explicitly open and is never merged. Build PRs contribute no work unless they actually contain changed packets. API/snapshot errors fail closed, and fetched heads must match the snapshot. The snapshot and intake states are retained with the compile report. A manual `workflow_dispatch` branch is an explicit operator override, not automatic reactivation. Packet files under
+1. **Collect.** Snapshot all open PRs targeting main from GitHub with pagination. Only ready (non-draft), same-repository PRs under `grok-heavy/`, `grok-bot/`, `supergrok/`, `grok/` or `codex/` are active. Drafts are held; closed/merged PRs and orphan branches are retired from automatic intake; fork PRs are excluded. Use bounded submission PRs; standing #62 is retired only after the new skills are on main and its packet diff is empty (docs/ingestion.md). Build PRs contribute no work unless they actually contain changed packets. API/snapshot errors fail closed, and fetched heads must match the snapshot. The snapshot and intake states are retained with the compile report. A manual `workflow_dispatch` branch is an explicit operator override, not automatic reactivation. Packet files under
    `research/inbox/packets/` that differ from main are written into the working tree. A file main already
    carries with an `as_of` at least as new is left alone: main's copy is the one that compiled and a
    controller may have corrected it, so a packet that supersedes it must carry a newer `as_of`.
@@ -319,8 +319,9 @@ slash. Normalize text by trimming and collapsing whitespace. Hash = SHA-1 of the
 - Source entry identity: `sha1(normalized url | normalized claim)`. The ledger keeps `S<n>` as the
   display id; the compiler assigns new ids above the current maximum and never renumbers. Same hash
   means the same entry. Same `S<n>` with a different hash is a hard conflict.
-- Feed item `id`: `sha1(normalized sourceUrl | slug | date | normalized title)`. `date` is the post
-  date; a post captured without its date is dated to the capture date and the body says so.
+- New feed candidate `id`: `sha1(slug | work_id | event_id)`. The compiler additionally coalesces
+  evidence-equivalent incoming events while preserving existing IDs: X/Twitter post ID across URL variants,
+  otherwise normalized source URL + date + kind + title + body. Dates are actual event dates, not reread dates.
 - Changelog `review_key`: `sha1(date | slug | type | title)` computed once when the entry is created
   (`reviewKeyFor` in `scripts/lib/telegram.mjs`) and never recomputed, so a later title edit does not
   mint a new key. The sender prefers it over the title-based fallback.
@@ -333,7 +334,9 @@ and the card format live in `docs/channel-publishing.md`.
 The compiler maps a URL-backed packet event into `content/feed/<slug>.yaml`: the event summary becomes
 the body, the cited receipt URL becomes `sourceUrl`, and the stable id uses the formula above. A post by
 the project's official handle is `company`; another account is `ct`; an explorer or DefiLlama receipt
-is `onchain`; and a flagged event is `risk`. Existing items merge by id, so compiling twice is a no-op.
+is `onchain`; and a flagged event is `risk`. Only placement `feed`/`both` creates feed rows; `profile`/`none`
+does not. Replays retain existing IDs, conflicting copy requires a sourced correction, and event-only
+updates with no new website row are rejected before writing. See `docs/ingestion.md` for the update template.
 The public wire labels those four stored kinds as `company` → **Announcements**, `ct` → **Talk**,
 `onchain` → **On-chain**, and `risk` → **Icarus notes**. The stored event summary is the wire gist
 verbatim apart from whitespace normalization; titles are limited to 80 characters. The optional event

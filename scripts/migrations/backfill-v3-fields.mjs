@@ -46,7 +46,9 @@ export async function backfillV3Fields({
     // canonical input. A controller-edited project is the exception: compile() preserves its copy.
     if (compileProject.controller_edited !== true)
       for (const field of V3_FIELDS) delete compileProject[field];
-    const result = compile(parsePacket(packetText), compileProject, censusBySlug.get(slug), sources, feed, { census });
+    // Project this fixed historical packet alone; the migration below intentionally updates only
+    // bodies of already-existing IDs. Do not route this repair through new-submission conflict merging.
+    const result = compile(parsePacket(packetText), compileProject, censusBySlug.get(slug), sources, null, { census });
     stats.notices.push(...result.notices.map((notice) => `${slug}: ${notice}`));
 
     const nextProject = structuredClone(project);

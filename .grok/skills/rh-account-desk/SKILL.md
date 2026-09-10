@@ -10,6 +10,10 @@ description: >
 
 # Account desk
 
+First read `AGENTS.md` and `docs/ingestion.md` from current GitHub main. Account work is a bounded
+subtask of an explicit assignment, not a reason to restart loops or reread every account. Record
+only materially supported changes; unchanged checks produce an issue note, not a new packet.
+
 Canonical tiers: `content/accounts.yaml` in `/Users/harsharnsingh/proofline` (compiler-owned; you
 never edit it). Prior scores: `research/inbox/account-desk.yaml` (historical, read only). Contract:
 `docs/research-system.md` §5 (account proposals) and §7 (conduct).

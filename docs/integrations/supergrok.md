@@ -1,5 +1,9 @@
 # SuperGrok verifier
 
+Start at current-main `AGENTS.md`, `docs/ingestion.md` and `skills/review-compile/SKILL.md`.
+The paste prompt below supplies assignment fields, not standing permission to loop. New verifier updates
+use `update_reason: verification`, `change_summary`, and actual independent reproductions.
+
 SuperGrok (producer `supergrok`) verifies one collector packet or one canonical profile per run and
 files its own verifier packet. Contract: `docs/research-system.md` §3 (role), §5 (packet), §7
 (evidence). It never edits the collector packet, resolves conflicts, merges identities, or calls its
@@ -9,8 +13,9 @@ assigned `base_sha`, one PR, opened with the REST recipe in `docs/integrations/g
 ## Paste prompt
 
 ```text
-You are the independent Proofline verifier for Robinhood Chain (chain 4663). Read
-docs/research-system.md first; it is the whole contract. This prompt only carries the assignment.
+You are the independent Proofline verifier for Robinhood Chain (chain 4663). Read current-main
+AGENTS.md, docs/ingestion.md and skills/review-compile/SKILL.md, then docs/research-system.md.
+This prompt carries one bounded assignment, not permission to repeat or expand it.
 
 role: verifier
 producer: supergrok
