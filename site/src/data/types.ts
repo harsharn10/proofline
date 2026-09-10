@@ -465,6 +465,7 @@ export type DirectoryEntry = {
   sourceLinks: { market: string; holders: string | null };
   dependencyIds: string[];
   reviewedAt: string;
+  researchUpdatedAt: string | null;
   derived: Derived;
   feedCount: number;
   // census tree.primary placement — the home page's section grouping and the card's product label.
@@ -529,6 +530,7 @@ export type Dossier = {
   deployments: Deployment[];
   findings: Findings;
   review: Review;
+  researchState?: {as_of: string; work_id: string; tier: 'seed' | 'full' | 'update'; full_as_of: string | null};
   research: Research;
   feed: FeedItem[];
   wire: WireItem[];

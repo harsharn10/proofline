@@ -5,6 +5,9 @@ description: Seed a genuinely new Proofline Robinhood Chain project from an assi
 
 # Research seed
 
+Use `docs/operating-flow.md` for owners, planning time budgets and state meanings. A collected seed is
+not compiled/live or independently reviewed; report the exact stage reached, never flip approval flags.
+
 Read current GitHub main: `AGENTS.md`, `docs/ingestion.md`, `docs/research-system.md` sections 4–7 and 10,
 and `docs/templates/research-packet-v2.md`. These paths are relative to the repository root.
 

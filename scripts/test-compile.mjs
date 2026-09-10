@@ -50,6 +50,8 @@ await test("compile a full packet into an existing stub without granting full co
   const seed = compile(await fixture("new-seed.md"));
   const update = compile(await fixture("update-full.md"), seed.project, seed.censusRow, seed.sources, seed.feed);
   assert.equal(update.project.coverage, "stub");
+  assert.deepEqual(update.project.review, seed.project.review, "accepted research never rewrites approval history");
+  assert.equal(update.project.research_state.full_as_of, (await fixture("update-full.md")).frontmatter.as_of);
   assert.equal(update.project.deployments.length, 2, "existing factory and new router both remain");
   assert.equal(update.project.deployments[1].address, "0x2222222222222222222222222222222222222222");
   assert.equal(update.project.deployments[1].verified, true);
@@ -77,6 +79,19 @@ await test("mainnet cannot be created from an unreproduced deployment", async ()
   assert.equal(result.project.lifecycle, "announced");
   assert.ok(result.project.findings.missing.some((row) => row.text.includes("Mainnet status was not promoted")));
   assert.equal(result.project.deployments[0].verified, false);
+});
+
+await test("collector evidence labels cannot grant identity approval or erase a hold", async () => {
+  const packet = await fixture("new-seed.md");
+  packet.frontmatter.classification.evidence_state = "verified";
+  const seed = compile(packet);
+  assert.equal(seed.censusRow.identity.status, "provisional");
+  for (const status of ["verified", "conflicted"]) {
+    seed.censusRow.identity = { ...seed.censusRow.identity, status, ...(status === "conflicted" ? {conflict_ids:["CON-99"]} : {}) };
+    const result = compile(packet, seed.project, seed.censusRow, seed.sources, seed.feed);
+    assert.equal(result.censusRow.identity.status, status);
+    if (status === "conflicted") assert.deepEqual(result.censusRow.identity.conflict_ids, ["CON-99"]);
+  }
 });
 
 async function treeSnapshot(root) {

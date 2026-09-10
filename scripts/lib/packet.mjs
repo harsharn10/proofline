@@ -14,6 +14,7 @@ import { conductWarnings, voiceWarnings } from "./voice.mjs";
 import { REQUIRED_HEADINGS, PENDING_LINE } from "./research-md.mjs";
 import { reviewKeyFor } from "./telegram.mjs";
 import { enforceResearchMinimums } from "./research-minimums.mjs";
+import { nextResearchState } from './research-state.mjs';
 import { mergeWebsiteEvents } from './website-events.mjs';
 
 /** Machine producer ids (research-system §2). Any of them, or a human GitHub id, may file a packet; none
@@ -1269,7 +1270,11 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
   }
   const primaryLeaf = frontmatter.classification.primary_leaf;
   const identityConflicts = (frontmatter.conflicts ?? []).filter((row) => row.status !== "resolved" && String(row.field).startsWith("identity"));
-  const identityStatus = identityConflicts.length ? "conflicted" : frontmatter.classification.evidence_state === "verified" ? "verified" : "provisional";
+  // Evidence class is not controller identity approval. Preserve holds until explicitly resolved.
+  const priorIdentity = priorCensusRow?.identity;
+  const identityStatus = identityConflicts.length || priorIdentity?.status === "conflicted"
+    ? "conflicted" : priorIdentity?.status === "verified" ? "verified" : "provisional";
+  const conflictIds = [...new Set([...(priorIdentity?.conflict_ids ?? []), ...identityConflicts.map(row => row.id)])];
   // An alias that is only another canonical name — the launchpad that lists its launches, the token that
   // borrows a word — is dropped rather than written into the registry, where it would make two names look
   // like one. The disclosure rule that produced the warning is validatePacket §5.
@@ -1287,7 +1292,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     entity_kind: frontmatter.identity.entity_kind,
     chain_scope: frontmatter.identity.chain_scope,
     status: identityStatus,
-    ...(identityConflicts.length ? { conflict_ids: identityConflicts.map((row) => row.id) } : {}),
+    ...(conflictIds.length ? { conflict_ids: conflictIds } : {}),
   };
   const projectLinks = officialLinks(priorProject?.official_links, frontmatter.links, PROJECT_LINK_KINDS);
   // The census schema intentionally has a smaller link vocabulary; explorer and DexScreener links
@@ -1410,6 +1415,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     deployments: mergeDeployments(priorProject?.deployments, deployments),
     ...(metrics.length || priorProject?.metrics ? { metrics: mergeUnique(priorProject?.metrics, metrics, (row) => row.kind) } : {}),
     review: priorProject?.review ?? { researcher: frontmatter.producer, approver: "pending", methodology_version: "proofline-v1.0", reviewed_at: frontmatter.as_of.slice(0, 10), published_at: null },
+    research_state: nextResearchState(priorProject?.research_state, frontmatter),
     findings: findingsFromBody(frontmatter, body, receiptToSource, priorProject, metricGaps),
   };
   if (!(tldr && tldrSource)) delete project.tldr_source;

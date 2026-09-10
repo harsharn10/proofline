@@ -5,6 +5,8 @@ dated packet, or standing prompt is not the operating policy. Record the main SH
 
 For research/data work, read [the ingestion contract](docs/ingestion.md) and the matching skill:
 
+The [operating map](docs/operating-flow.md) defines shared flow, owners, timing and state semantics.
+
 | Assignment | Skill |
 | --- | --- |
 | New canonical project / Grok discovery seed | [research-seed](skills/research-seed/SKILL.md) |
