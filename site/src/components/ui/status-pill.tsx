@@ -1,12 +1,6 @@
-export type Status = "live" | "quiet" | "dormant" | "announced" | "testnet";
+import { STATUS_LABEL, type ActivityStatus } from "@/data/types";
 
-const labels: Record<Status, string> = {
-  live: "Live",
-  quiet: "Quiet",
-  dormant: "Dormant",
-  announced: "Announced",
-  testnet: "Testnet",
-};
+export type Status = ActivityStatus;
 
 export type StatusPillProps = {
   status: Status;
@@ -17,7 +11,7 @@ export function StatusPill({ status, relativeTime }: StatusPillProps) {
   return (
     <span className={`ui-status ui-status-${status}`}>
       <i aria-hidden="true" />
-      <span>{labels[status]}</span>
+      <span>{STATUS_LABEL[status]}</span>
       {relativeTime ? <span className="ui-status-time">{relativeTime}</span> : null}
     </span>
   );
