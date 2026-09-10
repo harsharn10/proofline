@@ -400,7 +400,7 @@ export function addressesFor(project, index = null) {
   const seen = new Map();
   for (const d of project?.deployments ?? []) {
     // References remain on the relationship map, not a repeated per-project token read.
-    if (index && ['token', 'other'].includes(d.role) && referenceReason(d, index)) continue;
+    if (d.role === 'reference-token' || index && ['token', 'other'].includes(d.role) && referenceReason(d, index)) continue;
     if (d?.chain !== CHAIN) continue;
     if (!d?.address || d.address === NOT_VERIFIED) continue;
     const key = d.address.toLowerCase();

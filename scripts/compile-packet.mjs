@@ -8,12 +8,14 @@ import { parsePacket, checkPacket, compile } from "./lib/packet.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { checkResearch } from "./lib/research-md.mjs";
 import { measurementUpdateErrors } from './lib/measurement-update.mjs';
-import { buildRelationships, relationshipIndex, referenceReason } from './lib/relationships.mjs';
+import { buildRelationships, relationshipIndex, referenceReason, addressKey } from './lib/relationships.mjs';
 
-export function referenceTokenErrors(packet, dependencies = []) {
+export function referenceTokenErrors(packet, dependencies = [], priorProject = null) {
   const index = relationshipIndex(buildRelationships([], dependencies));
   return (packet.deployments ?? []).flatMap(d => {
-    const reason = referenceReason({ ...d, chain: d.address?.chain, address: d.address?.value }, index);
+    const canonical = { ...d, chain: d.address?.chain, address: d.address?.value };
+    const prior = priorProject?.deployments?.find(old => addressKey(old.chain, old.address) === addressKey(canonical.chain, canonical.address));
+    const reason = referenceReason(canonical, index) || (prior && referenceReason(prior, index));
     return d.role === 'token' && reason ? [`${d.label}: ${reason}; use role other for reference assets, not the subject's own token`] : [];
   });
 }
@@ -131,6 +133,8 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
   const censusText = await textOr(censusPath, null);
   const census = censusText === null ? [] : parse(censusText) ?? [];
   const priorProject = await yamlOr(projectPath, null);
+  const priorRoleErrors = referenceTokenErrors(packet.frontmatter, dependencies, priorProject);
+  if (priorRoleErrors.length) throw new Error(priorRoleErrors.join('\n'));
   if (enforceMinimums && packet.frontmatter.packet_tier === 'update' && !priorProject)
     throw new Error('An update packet cannot seed a new project; submit a seed/full packet with the research minimums.');
   const priorCensusRow = census.find((row) => row.slug === slug) ?? null;

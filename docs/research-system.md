@@ -35,6 +35,13 @@ labels and independently launched assets still require semantic review. `repair-
 --check` audits the historical role-only repair; `--write` is a controller-authorized canonical repair,
 not a producer command. Accepted historical packets and their evidence dates remain immutable.
 
+Use `role: reference-token` for an independently launched, traded or example token mentioned on a
+platform profile. Retain its source receipts and any separate canonical owner profile. This role does
+not assert a specific launch/team relationship: that still needs evidence. Reference activity, holders
+and market data never become the platform's own-token KPIs, including retained pre-correction pulls.
+Re-listing a canonical reference as an own token is held even under a renamed label. No identities are
+merged or automatically approved by a deployment-role correction.
+
 The inbox compiler holds any proposal assigning another canonical project's own-token deployment to its subject on the same chain, including updates to an existing unrelated profile. Update the owning canonical slug instead. Existing records are never automatically merged; ambiguous identity evidence remains held for the controller.
 
 ## 2. Field ownership

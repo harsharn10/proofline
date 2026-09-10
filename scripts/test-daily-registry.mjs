@@ -4,9 +4,9 @@ import { createCreditBudget, blockscoutCreditCost, normalizeBudgetState } from "
 import { requestJson } from "./lib/pull/http.mjs";
 import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolume, uniqueVolumeSummary } from "./lib/relationships.mjs";
 import { refreshDecision, selectRefreshTargets, selectInfrastructureReaders, hasIdentityConflict, DAY } from "./lib/refresh-policy.mjs";
-import { referenceReason } from './lib/relationships.mjs';
+import { referenceReason, subjectObservations, subjectHistory } from './lib/relationships.mjs';
 import { referenceTokenErrors } from './compile-packet.mjs';
-import { aboveShareBar } from './pull.mjs';
+import { aboveShareBar, addressesFor } from './pull.mjs';
 
 const now = Date.parse("2026-09-09T12:00:00Z");
 const address = n => `0x${String(n).padStart(40, "0")}`;
@@ -16,6 +16,34 @@ const a = project("a",1), b = project("b",2);
 const graph = buildRelationships([a,b]);
 const index = relationshipIndex(graph);
 const census = { identity: { status: "verified" }, role: "subject" };
+
+test('independent launched tokens remain mapped without transferring their activity or old market to the platform',()=>{
+  const owner={...a,deployments:[deployment(1,'token')]};
+  const platform={...b,deployments:[deployment(1,'reference-token'),deployment(2,'reference-token'),deployment(9,'factory')]};
+  const idx=relationshipIndex(buildRelationships([owner,platform]));
+  assert.equal(idx.get(`robinhood-chain:${address(1)}`).identityConflict,false);
+  assert.equal(idx.get(`robinhood-chain:${address(1)}`).projects.length,2);
+  const prior={chain:'robinhood-chain',addresses:[{...deployment(1,'token'),holders:99}],
+    market:{token_address:address(1),trades_h24:12,pulled_at:new Date(now).toISOString()},
+    structure:{mint:'yes'}, metrics:[{kind:'tvl',value:88}],
+    activity:{addresses:[{address:address(1),last_tx_at:new Date(now).toISOString()}]}};
+  assert.equal(ownActivityAt(platform,prior,idx,now),null);
+  assert.equal(ownActivityAt(owner,prior,idx,now),new Date(now).toISOString());
+  const interpreted=subjectObservations(platform,prior,idx);
+  assert.equal(interpreted.market,null);
+  assert.equal(interpreted.structure,null);
+  assert.deepEqual(interpreted.addresses,[]);
+  assert.deepEqual(interpreted.metrics,prior.metrics);
+  assert.equal(prior.market.trades_h24,12,'retained machine evidence is untouched');
+  assert.equal(subjectObservations(owner,prior,idx).market,prior.market);
+  const history=[{at:'2026-09-01',holders:99,volume_h24:42,revenue_24h:3,tvl:88}];
+  assert.equal(subjectHistory(platform,history,idx)[0].holders,null);
+  assert.equal(subjectHistory(platform,history,idx)[0].tvl,88);
+  assert.equal(history[0].holders,99);
+  assert.deepEqual(addressesFor(platform,idx).map(d=>d.role),['factory']);
+  const packet={deployments:[{label:'renamed',role:'token',address:{chain:'robinhood-chain',value:address(1)}}]};
+  assert.equal(referenceTokenErrors(packet,[],platform).length,1,'renaming a known reference cannot restore own-token role');
+});
 
 test('reference assets cannot supply own activity, compiler token roles, or liquidity eligibility', () => {
   const p = { ...a, deployments: [deployment(1, 'token'), {...deployment(2, 'other'), label:'WETH (pair quote)'}] };
