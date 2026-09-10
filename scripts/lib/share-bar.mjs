@@ -3,16 +3,20 @@ export const SHARE_BAR_MIN_USD = 25_000;
 /**
  * The first clause of the share bar (Icarus spec §3 rule 3): is the official surface confirmed?
  * One definition for the site bundle and the score emitter, reading the census row both already
- * hold — at least one official link of kind `site` or `docs`, a row that is not on the watchlist
+ * hold — an official `site`/`docs` link, or a product `app` link, and a row not on the watchlist
  * (role `observe` marks the names whose official surface or mechanism is not confirmed, FoxPad
  * among them), and an identity that is not conflicted. The second-pass flag
  * `qualifying.citable.verified` is deliberately not part of this clause: it records controller
  * verification, which almost no row has yet, not whether the surface is official.
+ * Only protocol/application/tool profiles may use `app` here. Token rows also use `app`
+ * for third-party launchpad listings; those are not the token's own product surface.
+ * A social account or market-listing link alone is not a substitute for this clause.
  */
 export function officialSurfaceConfirmed(census) {
   if (!census) return false;
+  const product = ["protocol", "application", "tool"].includes(census.identity?.entity_kind);
   const hasSurface = (census.official_links ?? []).some(
-    (link) => link?.kind === "site" || link?.kind === "docs",
+    (link) => link?.kind === "site" || link?.kind === "docs" || product && link?.kind === "app",
   );
   const onWatchlist = census.role === "observe";
   return hasSurface && !onWatchlist && census.identity?.status !== "conflicted";

@@ -4,6 +4,7 @@ import { admissionDecision, duneObservations, rialtoObservations, reassessmentSl
 import { admissionPlan } from './admission-plan.mjs';
 import { buildRelationships, relationshipIndex, ownActivityAt } from './lib/relationships.mjs';
 import { refreshDecision } from './lib/refresh-policy.mjs';
+import { officialSurfaceConfirmed } from './lib/share-bar.mjs';
 const now = Date.parse('2026-09-10T12:00:00Z');
 const at = new Date(now).toISOString();
 const address = '0x' + '1'.repeat(40);
@@ -29,6 +30,23 @@ test('badge is exact-contract recognition, not identity, deployment or safety ap
   for (const change of [{address:'0x'+'2'.repeat(40)},{chain:'base'},{kind:'coingecko-preview'},{status:'unknown'},{observed_at:'2020-01-01'}])
     assert.equal(decide([...base,{...obs('fomo-verified'),...change}]).decision,'watch');
   assert.equal(decide([...base,obs('coingecko-active')]).research,'targeted');
+});
+test('reviewed community-token receipts can recommend research without granting daily surface eligibility',()=>{
+  const communityBase=base.map(o=>({...o,source_url:o.kind==='identity-crosslink'
+    ? 'https://x.com/example/status/123' : 'https://example.org/deployment-receipt'}));
+  const recognized={...obs('coingecko-active'),source_url:'https://www.coingecko.com/en/coins/example'};
+  const input=structuredClone([...communityBase,recognized]);
+  assert.equal(decide(input).decision,'seed','a website is not required by the admission evidence lane');
+  assert.equal(decide(input).research,'targeted');
+  for(const kind of ['identity-crosslink','robinhood-relevance','deployment','coingecko-active'])
+    assert.equal(decide(input.filter(o=>o.kind!==kind)).decision,'watch',`${kind} cannot be replaced by a social link`);
+  assert.equal(decide(input.map(o=>o.kind==='identity-crosslink'?{...o,address:'0x'+'2'.repeat(40)}:o)).decision,'watch');
+  const row={identity:{status:'provisional',entity_kind:'token'},role:'subject',
+    qualifying:{deployed_on_chain:{value:true}},official_links:[{kind:'x',url:'https://x.com/example'}]};
+  assert.equal(officialSurfaceConfirmed(row),false,'a stored X link alone still does not grant surface eligibility');
+  assert.equal(officialSurfaceConfirmed({...row,official_links:[...row.official_links,
+    {kind:'app',url:`https://app.long.xyz/tokens/${address}`}]}),false,'a launchpad listing does not bypass token evidence review');
+  assert.deepEqual(input,[...communityBase,recognized],'recommendations do not mutate or approve evidence');
 });
 test('protocols and dependencies need no token badge; token spikes do not buy full research',()=>{
   assert.equal(decide([...base,obs('product-mechanism')],{subject:{...subject,entity_kind:'protocol'}}).decision,'seed');

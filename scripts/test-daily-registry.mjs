@@ -95,6 +95,31 @@ test('hot selection recovers component expiry without extending timestamps or by
   assert.equal(previous.market.pulled_at,new Date(now-12*3600_000).toISOString());
 });
 
+test('canonical app links qualify for daily consideration without replacing other evidence gates', () => {
+  const p={...a,lifecycle:'mainnet'};
+  const row={role:'subject',identity:{status:'provisional',entity_kind:'protocol'},tree:{primary:'launch/bonding-curve'},
+    official_links:[{kind:'app',url:'https://example.org'}],qualifying:{deployed_on_chain:{value:true}}};
+  const previous={chain:'robinhood-chain',pulled_at:new Date(now-DAY).toISOString(),
+    addresses:[{address:address(1),is_contract:true}],
+    market:{token_address:address(1),liquidity_usd:100000,trades_h24:3,pulled_at:new Date(now-DAY).toISOString()}};
+  const original=structuredClone({p,row,previous});
+  const decide=(c=row,project=p,prior=previous)=>refreshDecision({project,census:c,previous:prior,index,now,
+    aboveShareBar:aboveShareBar(c,prior,{project,index,now})});
+  assert.equal(decide().tier,'hot');
+  assert.notEqual(decide({...row,identity:{...row.identity,entity_kind:'token'}}).tier,'hot',
+    'a token third-party app listing is not its own product surface');
+  assert.notEqual(decide({...row,role:'observe'}).tier,'hot');
+  assert.equal(decide({...row,identity:{...row.identity,status:'conflicted'}}).ignored,true);
+  assert.notEqual(decide({...row,qualifying:{}}).tier,'hot');
+  assert.notEqual(decide(row,{...p,lifecycle:'inactive'}).tier,'hot');
+  assert.notEqual(decide(row,{...p,deployments:p.deployments.map(d=>({...d,verified:false}))}).tier,'hot');
+  for(const market of [{...previous.market,liquidity_usd:24999},
+    {...previous.market,pulled_at:new Date(now-8*DAY).toISOString()},
+    {...previous.market,token_address:address(2)}])
+    assert.notEqual(decide(row,p,{...previous,market}).tier,'hot');
+  assert.deepEqual({p,row,previous},original,'surface recognition does not rewrite identity or measurements');
+});
+
 test("volume coverage preserves fresh zero and reports missing, stale and conflicting pools", () => {
   const file = (id,value,at=now) => ({chain:'robinhood-chain',market:{pulled_at:new Date(at).toISOString(),pairs:[{pair_address:address(id),volume_h24:value}]}});
   assert.deepEqual(uniqueVolumeSummary([file(1,0),file(1,0)],now),{value:0,partial:false,pools:1,freshPools:1});

@@ -1667,6 +1667,26 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
 
     assert.equal(officialSurfaceConfirmedCore(confirmed), true, "a subject row with a site link confirms even before the second-pass flag");
     assert.equal(rules.meetsShareBar(barEntry(confirmed)), true, "a confirmed surface still clears the bar");
+    for (const kind of ["site", "docs", "app"]) {
+      const linked = censusRow({ role: "subject", official_links: [{ kind, url: "https://example.org" }] });
+      assert.equal(officialSurfaceConfirmedCore(linked), true, `${kind} is a canonical product surface`);
+      assert.equal(rules.officialSurfaceConfirmed(linked), true, `site and emitter agree on ${kind}`);
+      assert.equal(meetsShareBarCore(barEntry(linked)), true, `${kind} meets the surface clause`);
+      assert.equal(rules.meetsShareBar(barEntry(linked)), true);
+      assert.equal(officialSurfaceConfirmedCore({ ...linked, role: "observe" }), false);
+      assert.equal(officialSurfaceConfirmedCore({ ...linked, identity: { status: "conflicted" } }), false);
+    }
+    for (const kind of ["x", "telegram", "github", "whitepaper", "other"]) {
+      assert.equal(officialSurfaceConfirmedCore(censusRow({ role: "subject", official_links: [{ kind, url: "https://example.org" }] })), false,
+        `${kind} alone does not bypass the product surface gate`);
+    }
+    for (const entity_kind of ["protocol", "application", "tool", "token", "collection", undefined]) {
+      const appOnly = censusRow({ role: "subject", identity: { status: "provisional", entity_kind },
+        official_links: [{ kind: "app", url: "https://example.org/listing" }] });
+      const expected = ["protocol", "application", "tool"].includes(entity_kind);
+      assert.equal(officialSurfaceConfirmedCore(appOnly), expected, `${entity_kind} app semantics`);
+      assert.equal(rules.officialSurfaceConfirmed(appOnly), expected, "site uses the same product-only rule");
+    }
     assert.equal(
       officialSurfaceConfirmedCore(censusRow({ official_links: [{ kind: "x", url: "https://x.com/fox_onrh" }] })),
       false,
