@@ -1,10 +1,32 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { parse } from 'yaml';
 
 const workflow = (name) => parse(readFileSync(new URL(`../.github/workflows/${name}.yml`, import.meta.url), 'utf8'));
+test('action runtimes are immutable and upgrades preserve explicit cache/archive behavior', () => {
+  const pins = {
+    'actions/checkout': '3d3c42e5aac5ba805825da76410c181273ba90b1',
+    'actions/setup-node': '820762786026740c76f36085b0efc47a31fe5020',
+    'actions/upload-artifact': '043fb46d1a93c77aae656e7c1c64a875d1fc6a0a',
+  };
+  for (const file of readdirSync(new URL('../.github/workflows/', import.meta.url)).filter(f=>f.endsWith('.yml'))) {
+    const w=workflow(file.slice(0,-4));
+    for (const job of Object.values(w.jobs)) for (const step of job.steps??[]) {
+      if (!step.uses) continue;
+      const [name,ref]=step.uses.split('@');
+      assert.equal(ref,pins[name],`${file}: unreviewed action/version ${step.uses}`);
+      assert.match(ref,/^[a-f0-9]{40}$/);
+      if(name==='actions/setup-node') {
+        assert.equal(step.with['node-version'],22);
+        assert.equal(step.with['package-manager-cache'],false);
+      }
+      if(name==='actions/upload-artifact') assert.equal(step.with.archive,true);
+      if(name==='actions/checkout') assert.notEqual(step.with?.['allow-unsafe-pr-checkout'],true);
+    }
+  }
+});
 test('only superseded PR validation is cancelled', () => {
   const w = workflow('validate');
   assert.equal(w.concurrency.group, 'validate-${{ github.event.pull_request.number || github.run_id }}');
