@@ -8,6 +8,9 @@
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
+import YAML from "yaml";
+import { uniqueLaunches } from "../../scripts/lib/relationships.mjs";
+import { formatKpi } from "../src/data/types.ts";
 import { parse } from "yaml";
 
 const PORT = Number(process.env.SMOKE_PORT ?? 8081); // override when 8081 is taken by another worktree's server
@@ -254,6 +257,14 @@ async function main() {
 
     const dossierRes = await fetch(`${BASE}/n/pons`);
     const dossierHtml = await dossierRes.text();
+    const ponsRead = YAML.parse(await readFile(new URL('../../content/pulled/pons.yaml',import.meta.url),'utf8'));
+    const launches = uniqueLaunches([ponsRead],Date.now());
+    if (launches.value !== null) {
+      const expected = formatKpi('launches24h',launches.value,launches.partial);
+      const visible = dossierHtml.includes(expected) && dossierHtml.includes('launch calls 24h');
+      console.log(`  ${visible ? 'ok  ' : 'FAIL'} Pons factory-window KPI is ${expected}`);
+      if (!visible) failures.push('Pons fresh factory KPI must survive unrelated retained activity and label partial counts');
+    }
     for (const slug of ['stonkbroker', 'longbow', 'sight', 'arc', 'alandale']) {
       const response = await fetch(`${BASE}/n/${slug}`);
       const html = await response.text();

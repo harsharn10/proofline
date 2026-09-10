@@ -242,7 +242,7 @@ function CategoryPage() {
                     {keys.map((key) => (
                       <td key={key} title={KPI_SOURCE[key]}>
                         <Link to="/n/$slug" params={{ slug: entry.slug }}>
-                          {formatKpi(key, entry.kpis[key])}
+                          {formatKpi(key, entry.kpis[key], entry.kpis.launches24hPartial)}
                         </Link>
                       </td>
                     ))}

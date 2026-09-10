@@ -1497,6 +1497,21 @@ ${REQUIRED_HEADINGS.map((h) => `## ${h}\n\n_Research pending._\n`).join("\n")}`;
     assert.equal(rules.observationTotals(observations,trees,now,'tokens').volume24h,99,'category is isolated');
     assert.equal(rules.observationTotals(observations,trees,now,'missing').launches.value,null,'empty category is unknown, not zero');
     assert.equal(rules.observationTotals(observations,trees,now).launches.value,null,'cross-category conflicts are not silently summed on home');
+    const staleAggregate={chain:'robinhood-chain',addresses:[],metrics:[],activity:{
+      pulled_at:new Date(now).toISOString(),window_as_of:'2026-08-01',stale_since:'2026-08-01',launches_24h:999,
+      addresses:[{address,role:'factory',window_as_of:new Date(now).toISOString(),stale_since:null,launches_24h:12,errors:[{step:'capped'}]},
+        {address:`0x${'2'.repeat(40)}`,role:'other',window_as_of:'2026-08-01',stale_since:'2026-08-01',launches_24h:null}]} };
+    const kpis=rules.kpisFor({lifecycle:'mainnet'},staleAggregate,[],now,null);
+    assert.equal(kpis.launches24h,12,'profile KPI uses fresh factory window, not stale unrelated contract aggregate');
+    assert.equal(kpis.launches24hPartial,true,'capped launch window stays partial');
+    const uiTypes=await import(pathToFileURL(join(process.cwd(),'site/src/data/types.ts')).href);
+    assert.equal(uiTypes.formatKpi('launches24h',kpis.launches24h,kpis.launches24hPartial),'12 · partial');
+    assert.equal(uiTypes.formatKpi('launches24h',null,true),'—');
+    assert.equal(uiTypes.formatKpi('launches24h',0,true),'0 · partial');
+    assert.equal(uiTypes.formatKpi('holders',12,true),'12','launch partial flag cannot leak to other KPI units');
+    staleAggregate.activity.addresses[0].window_as_of=null;
+    assert.equal(rules.kpisFor({lifecycle:'mainnet'},staleAggregate,[],now,null).launches24h,null);
+    assert.equal(rules.kpisFor({lifecycle:'mainnet'},null,[],now,null).launches24h,null);
     const poolId = `0x${'a'.repeat(64)}`;
     const poolObservation = (slug, value) => ({slug,pulled:{chain:'robinhood-chain',market:{
       pulled_at:new Date(now).toISOString(),pairs:[{pair_address:poolId,volume_h24:value}]}}});

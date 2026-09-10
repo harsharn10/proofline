@@ -460,7 +460,7 @@ function MetricsAndChart({ dossier, site, section, token, window }: Pick<NameCar
             <MetricTile
               key={key}
               label={KPI_LABEL[key]}
-              value={formatKpi(key, value)}
+              value={formatKpi(key, value, dossier.kpis.launches24hPartial)}
               sub={value === null ? "not read" : `${key.includes("24h") ? "24h · " : ""}${KPI_SOURCE[key]}`}
               href={href}
             />
@@ -526,7 +526,7 @@ function RelatedTable({ dossier, section, related }: Pick<NameCardProps, "dossie
               <tr key={entry.slug} className={entry.slug === dossier.slug ? "is-current" : undefined}>
                 <td><Link to="/n/$slug" params={{ slug: entry.slug }}><span className={`card-dot ${entry.officialConfirmed ? "official" : "unclaimed"}`} />{entry.name}</Link></td>
                 {keys.slice(0, 4).map((key) => (
-                  <td key={key}>{entry.kpis[key] !== null && entry.sourceLinks[key] ? <a href={entry.sourceLinks[key]} target="_blank" rel="noreferrer">{formatKpi(key, entry.kpis[key])}</a> : "—"}</td>
+                  <td key={key}>{entry.kpis[key] !== null && entry.sourceLinks[key] ? <a href={entry.sourceLinks[key]} target="_blank" rel="noreferrer">{formatKpi(key, entry.kpis[key], entry.kpis.launches24hPartial)}</a> : "—"}</td>
                 ))}
                 <td>{token ? (entry.launchpad ? <Link to="/n/$slug" params={{ slug: entry.launchpad }}>{titleCase(entry.launchpad)}</Link> : "—") : entry.score !== null ? <Link to="/n/$slug" params={{ slug: entry.slug }} search={{}}>{entry.score}/100</Link> : "—"}</td>
               </tr>

@@ -64,7 +64,7 @@ export function CategoryCards({
                       className="ml-auto whitespace-nowrap font-medium"
                       title={announced ? undefined : `Source on ${entry.name} profile`}
                     >
-                      {announced ? "announced" : formatKpi(key, entry.kpis[key])}
+                      {announced ? "announced" : formatKpi(key, entry.kpis[key], entry.kpis.launches24hPartial)}
                     </span>
                     {!announced && readFigure(entry.kpis.marketCap) !== null ? (
                       <span className="whitespace-nowrap text-[10.5px] text-[var(--t3)]">
