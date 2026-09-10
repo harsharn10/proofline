@@ -5,6 +5,7 @@ import { parsePacket } from './lib/packet.mjs';
 import { buildRegistryReport } from './registry-plan.mjs';
 import { researchIntake, candidatesFor } from './compile-inbox.mjs';
 import { buildBackfillPlan } from './lib/research-backfill.mjs';
+import { taskSnapshotState } from './lib/planning-inputs.mjs';
 
 const args = process.argv.slice(2);
 const options = {};
@@ -38,9 +39,10 @@ for (const dir of await readdir('research/inbox/packets', { withFileTypes: true 
 }
 const registry = await buildRegistryReport(); // local ignored build projection; no provider calls
 const census = parse(await readFile('content/census.yaml', 'utf8'));
+const snapshot = options['--task-state'] ? JSON.parse(await readFile(options['--task-state'], 'utf8')) : null;
 const plan = buildBackfillPlan({ slugs: census.map(r => r.slug), packets, refresh: registry.refresh,
   identities: Object.fromEntries(census.map(r => [r.slug, r.identity?.entity_kind])),
   identityHolds: [...registry.claude.identity_holds.map(r => r.slug), ...registry.claude.conflicts.flatMap(r => r.slugs)], pending,
-  taskState: options['--task-state'] ? JSON.parse(await readFile(options['--task-state'], 'utf8')) : null,
+  taskState: snapshot?.version === 1 ? taskSnapshotState(snapshot) : snapshot,
   limit: options['--limit'] ? Number(options['--limit']) : 10 });
 console.log(JSON.stringify({ base_sha: base, generated_at: registry.generated_at, intake, ...plan }, null, 2));

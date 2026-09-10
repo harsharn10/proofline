@@ -79,8 +79,30 @@ snapshots fail closed. The planner only writes the existing ignored `build/regis
 JSON output is a report, never canonical data or an automatic refresh queue.
 
 Task IDs hash canonical slug and sorted gap set, not today's date or a producer work ID. Store assignment
-ownership/status in the linked GitHub work issue, not an open standing branch. Before assigning a batch,
-the controller exports that issue's current task states as JSON and supplies `--task-state <file>`:
+ownership/status in the linked GitHub work issue, not an open standing branch. Export checked inputs with:
+
+```sh
+git fetch origin
+node scripts/planning-inputs.mjs --issue 132
+node scripts/research-backfill.mjs --open-prs build/open-prs.json --task-state build/task-state.json
+```
+
+This reads paginated GitHub PRs and issue comments, checks exact fetched heads, and writes only ignored
+`build/` reports. Run on a main-equivalent canonical corpus. The issue owner's newest explicit manifest
+is authoritative; ordinary producer comments and old prose are not machine task state. Missing/malformed
+manifests fail closed, not as an empty worklist. Full manifests retain every earlier task with a disposition:
+
+````markdown
+<!-- proofline:task-state:v1 -->
+```json
+{"version":1,"tasks":{"20-character-task-id":{"slug":"example","status":"claimed","owner":"grok-heavy"}}}
+```
+````
+
+Use a real task ID from the plan, not the placeholder above. Snapshots retain source comment and checked
+time and expire after 24 hours; claims themselves do not silently expire. Only the single controller writes
+manifests. This automates export, not locking, release, assignment or dispatch. Hand-reviewed legacy JSON
+maps remain accepted for compatibility:
 
 ```json
 {"task-id-from-plan": {"status": "claimed", "owner": "grok-heavy"}}
@@ -108,6 +130,7 @@ carry its named questions; a new work ID alone cannot reset a task.
 4. Verifier independently checks the risky claims. Compiler lifts accepted packets through current gates; never merge a producer branch into main.
 5. Confirm canonical diff, report and site deployment. Close the submission PR with accepted main SHA and a disposition for every held/rejected item. Preserve evidence; don't drop unresolved packets.
 
-There is no automated PR-closing or agent-dispatch service in this change. The controller performs steps
-1 and 5. Retire standing #62 only after this replacement is on main and a fresh diff confirms no uncompiled
-work; preserve draft #95 until Alandale receives its own disposition. No schedules are resumed by rollout.
+There is no automated PR-closing or agent-dispatch service. The controller performs steps 1 and 5.
+Standing #62 and Alandale's #95/#139 have been retired with evidence/dispositions retained. Alandale was
+accepted at main `3088e5fb0928af52e26cb72b8b17e6944168ff8d`; do not assign another seed from historical
+handoffs. Current task state belongs in the work issue. No schedules are resumed by rollout.

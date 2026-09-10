@@ -11,6 +11,8 @@ defines implemented refresh budgets. Saving instructions does not start Grok, Cl
 
 ```mermaid
 flowchart TD
+  Discovery["Stored discovery + canonical/dependency addresses + current PRs"] --> Inputs["Planning command: candidate recommendations + checked task-state export"]
+  Inputs --> Match
   Lead["Grok: bounded discovery leads"] --> Match{"Controller: identity match + admission"}
   Match -->|duplicate| Existing["Use existing protocol slug; link its own token"]
   Match -->|irrelevant or insufficient| Hold["Ignore or hold with reason; no repeated full research"]
@@ -100,3 +102,14 @@ backfill queue, not permission to invent data or force flags green.
 The one-time research-state backfill derives only from packets at a pinned accepted main SHA:
 `node scripts/migrate-research-state.mjs <40-character-main-sha> --check` (then authorized `--write`).
 It refuses unrelated project edits and packet changes and never changes approval or identity fields.
+
+## Where each rule lives
+
+Start with three operating references: this map (owners/timing), [ingestion](ingestion.md)
+(assignments, task state, public output and packet disposition), and [research system](research-system.md)
+(evidence/identity/compiler contract). Specialized details remain in [admission](admission-policy.md)
+and [daily registry](daily-registry.md); they do not define another lifecycle. Skills route to these
+rules. Integration docs own provider submission recipes, not duplicated thresholds or flow instructions.
+
+`node scripts/planning-inputs.mjs --issue 132` automates input preparation, not admission or bot dispatch.
+Check the resulting reports and explicit task reservation before launching a finite collector run.
