@@ -246,7 +246,7 @@ async function main() {
 
     const dossierRes = await fetch(`${BASE}/n/pons`);
     const dossierHtml = await dossierRes.text();
-    for (const slug of ['stonkbroker', 'longbow', 'sight', 'arc']) {
+    for (const slug of ['stonkbroker', 'longbow', 'sight', 'arc', 'alandale']) {
       const response = await fetch(`${BASE}/n/${slug}`);
       const html = await response.text();
       const project = parse(await readFile(new URL(`../../content/projects/${slug}.yaml`, import.meta.url), 'utf8'));
@@ -258,6 +258,18 @@ async function main() {
         (project.lifecycle !== 'announced' || header.includes('Announced'));
       console.log(`  ${honest ? 'ok  ' : 'FAIL'} /n/${slug} separates accepted research, review and product lifecycle`);
       if (!honest) failures.push(`/n/${slug}: research-state/lifecycle header mismatch`);
+      const observations = await readFile(new URL(`../../content/pulled/${slug}.yaml`, import.meta.url), 'utf8')
+        .then(raw => parse(raw)).catch(error => { if (error.code === 'ENOENT') return null; throw error; });
+      if (!observations && ['mainnet','beta'].includes(project.lifecycle) && !header.includes('Activity unmeasured'))
+        failures.push(`/n/${slug}: absent machine reads must not imply Announced, Quiet or Live`);
+      const earliest = (observations?.addresses ?? []).filter(row => row.is_contract === true && row.created_at && Number.isFinite(Date.parse(row.created_at)))
+        .sort((a,b) => Date.parse(a.created_at) - Date.parse(b.created_at))[0];
+      if (earliest) {
+        const tag = (header.match(/<a\b[^>]*>[\s\S]*?<\/a>/g) ?? []).find(anchor => anchor.includes('Contract created')) ?? '';
+        const sourced = tag.toLowerCase().includes(`/address/${earliest.address.toLowerCase()}`) && !header.includes('>Mainnet<');
+        console.log(`  ${sourced ? 'ok  ' : 'FAIL'} /n/${slug} contract date cites its own address, not product launch`);
+        if (!sourced) failures.push(`/n/${slug}: contract creation date source/label mismatch`);
+      }
     }
     const tokenHtml = await fetch(`${BASE}/n/cashcat?tab=control`).then(response => response.text());
     const structureHtml = tokenHtml.slice(tokenHtml.indexOf(">Structure</h2>"));

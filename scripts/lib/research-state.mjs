@@ -11,8 +11,10 @@ export function nextResearchState(prior, packet) {
 export function productActivityStatus(lifecycle, located, lastActivityAt, now = Date.now()) {
   if (lifecycle === 'testnet-only') return 'testnet';
   if (lifecycle === 'inactive') return 'dormant';
-  if (lifecycle === 'announced' || !located) return 'announced';
+  if (lifecycle === 'announced') return 'announced';
+  // Accepted mainnet/beta research can precede its first machine refresh.
+  if (!located) return ['mainnet', 'beta'].includes(lifecycle) ? 'unmeasured' : 'announced';
   const age = now - Date.parse(lastActivityAt);
-  if (!Number.isFinite(age) || age < 0) return 'quiet';
+  if (!Number.isFinite(age) || age < 0) return 'unmeasured';
   return age <= 7 * 86400_000 ? 'live' : age <= 30 * 86400_000 ? 'quiet' : 'dormant';
 }

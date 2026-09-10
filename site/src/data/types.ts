@@ -277,10 +277,10 @@ export type ChainStats = {
   tvlByCategory: Array<{ category: string; tvlUsd: number }>;
 };
 
-// Activity status, computed server-side from the pulled reads (never asserted by a person):
+// Activity status combines accepted product lifecycle with dated machine reads:
 // live = on-chain activity or trades inside 7 days; quiet = inside 30 days; dormant = older;
-// announced = nothing located on chain; testnet = lifecycle testnet-only.
-export type ActivityStatus = "live" | "quiet" | "dormant" | "announced" | "testnet";
+// announced/testnet follow lifecycle; unmeasured is missing or invalid activity, not a launch claim.
+export type ActivityStatus = "live" | "quiet" | "dormant" | "announced" | "testnet" | "unmeasured";
 
 // The tracker numbers a card and a profile show. Every figure is a dated read from a named free
 // source (DexScreener, Blockscout, DefiLlama); null means not read, never zero.
@@ -822,6 +822,7 @@ export const STATUS_LABEL: Record<ActivityStatus, string> = {
   dormant: "Dormant",
   announced: "Announced",
   testnet: "Testnet",
+  unmeasured: "Activity unmeasured",
 };
 export function statusTone(status: ActivityStatus): Tone {
   switch (status) {
