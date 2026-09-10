@@ -4,6 +4,9 @@ import { createCreditBudget, blockscoutCreditCost, normalizeBudgetState } from "
 import { requestJson } from "./lib/pull/http.mjs";
 import { buildRelationships, sharedRelationships, relationshipIndex, ownActivityAt, knownTotal, uniqueLaunches, uniqueVolume, uniqueVolumeSummary } from "./lib/relationships.mjs";
 import { refreshDecision, selectRefreshTargets, selectInfrastructureReaders, hasIdentityConflict, DAY } from "./lib/refresh-policy.mjs";
+import { referenceReason } from './lib/relationships.mjs';
+import { referenceTokenErrors } from './compile-packet.mjs';
+import { aboveShareBar } from './pull.mjs';
 
 const now = Date.parse("2026-09-09T12:00:00Z");
 const address = n => `0x${String(n).padStart(40, "0")}`;
@@ -13,6 +16,45 @@ const a = project("a",1), b = project("b",2);
 const graph = buildRelationships([a,b]);
 const index = relationshipIndex(graph);
 const census = { identity: { status: "verified" }, role: "subject" };
+
+test('reference assets cannot supply own activity, compiler token roles, or liquidity eligibility', () => {
+  const p = { ...a, deployments: [deployment(1, 'token'), {...deployment(2, 'other'), label:'WETH (pair quote)'}] };
+  const deps = [{id:'stock-tokens', deployments:[deployment(1, 'token')]}];
+  const idx = relationshipIndex(buildRelationships([p], deps));
+  const pulled = {chain:'robinhood-chain',market:{token_address:address(1),liquidity_usd:100000,trades_h24:4,pulled_at:new Date(now).toISOString()},
+    activity:{addresses:[{address:address(1),last_tx_at:new Date(now).toISOString()},{address:address(2),last_tx_at:new Date(now).toISOString()}]}};
+  assert.equal(ownActivityAt(p,pulled,idx,now),null);
+  const packet = label => ({deployments:[{label, role:'token',address:{chain:'robinhood-chain',value:address(1)}}]});
+  assert.equal(referenceTokenErrors(packet('RDDT'),deps).length,1);
+  assert.equal(referenceTokenErrors(packet('WETH (pair quote)')).length,1);
+  assert.equal(referenceTokenErrors(packet('PAIR token (own token)')).length,0);
+  assert.equal(referenceReason({...deployment(2,'token'),label:'TAYSOM (graduation, quote TSM)'}),null);
+  assert.equal(referenceTokenErrors({deployments:[{role:'token',address:{chain:'ethereum',value:address(1)}}]},deps).length,0);
+  assert.equal(aboveShareBar({...census,identity:{entity_kind:'token'},official_links:[{kind:'site'}]},pulled,{project:p,index:idx,now}),false);
+});
+
+test('provisional daily eligibility preserves evidence, observe, conflict and lifecycle gates', () => {
+  const p={...a,lifecycle:'mainnet'};
+  const row={role:'subject',identity:{status:'provisional'},official_links:[{kind:'site',url:'https://example.org'}],qualifying:{deployed_on_chain:{value:true}}};
+  const previous={chain:'robinhood-chain',pulled_at:new Date(now-DAY).toISOString(),market:{token_address:address(1),trades_h24:3,pulled_at:new Date(now-DAY).toISOString()}};
+  const decide=(changes={})=>refreshDecision({project:p,census:row,previous,index,now,aboveShareBar:true,...changes});
+  assert.equal(decide().tier,'hot');
+  assert.equal(row.identity.status,'provisional');
+  for(const changes of [{census:{...row,role:'observe'}},{census:{...row,official_links:[]}},
+    {census:{...row,qualifying:{}}},{project:{...p,deployments:p.deployments.map(d=>({...d,verified:false}))}},
+    {project:{...p,lifecycle:'announced'}},{aboveShareBar:false}]) assert.notEqual(decide(changes).tier,'hot');
+  assert.equal(decide({census:{...row,identity:{status:'conflicted'}}}).ignored,true);
+});
+
+test('hot selection recovers component expiry without extending timestamps or bypassing retry cooldown', () => {
+  const previous={chain:'robinhood-chain',pulled_at:new Date(now).toISOString(),
+    market:{token_address:address(1),trades_h24:1,pulled_at:new Date(now-12*3600_000).toISOString()}};
+  const decide=(changes={})=>refreshDecision({project:a,census,previous,index,now,aboveShareBar:true,...changes});
+  assert.equal(decide().due,true,'next daily run would fall at component expiry');
+  assert.equal(decide({previous:{...previous,market:{...previous.market,pulled_at:new Date(now).toISOString()}}}).due,false);
+  assert.equal(decide({previous:{...previous,refresh:{status:'partial',last_success_at:previous.pulled_at,attempted_at:previous.pulled_at}}}).due,false);
+  assert.equal(previous.market.pulled_at,new Date(now-12*3600_000).toISOString());
+});
 
 test("volume coverage preserves fresh zero and reports missing, stale and conflicting pools", () => {
   const file = (id,value,at=now) => ({chain:'robinhood-chain',market:{pulled_at:new Date(at).toISOString(),pairs:[{pair_address:address(id),volume_h24:value}]}});

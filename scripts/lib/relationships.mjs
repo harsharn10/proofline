@@ -17,6 +17,27 @@ export function poolKey(chain, id) {
   return null;
 }
 
+// A role label is a contradiction detector, not evidence of ownership. Dependency matches
+// are chain-qualified; do not maintain a second hard-coded token address list.
+export function referenceReason(deployment, index = new Map()) {
+  const key = addressKey(deployment.chain, deployment.address);
+  if (!key) return null;
+  const dependencies = index.get(key)?.dependencies ?? [];
+  if (dependencies.length) return `canonical dependency: ${dependencies.join(', ')}`;
+  const label = deployment.label ?? '';
+  // Do not match "PAIR token" (a ticker) or "TAYSOM (graduation, quote TSM)"
+  // (the subject mentioning its counterparty). Ambiguous descriptions need review.
+  if (/(?:^|[(/;]\s*)(?:pair[ -]?quote|quote|collateral)\b/i.test(label) ||
+      /\bpairToken\b|\bpair token\b/.test(label)) return 'label identifies a quote/collateral asset';
+  return null;
+}
+
+export function isOwnDeployment(project, deployment, index) {
+  const node = index.get(addressKey(deployment.chain, deployment.address));
+  return Boolean(node && !referenceReason(deployment, index) &&
+    (deployment.role === 'token' ? !node.identityConflict : node.projects.length === 1));
+}
+
 export function buildRelationships(projects = [], dependencies = []) {
   const nodes = new Map();
   const links = new Map();
@@ -76,10 +97,8 @@ export function sharedRelationships(graph) {
 // Only activity belonging to this project's token or unshared deployment can keep it alive.
 // Activity at a factory used by fifty projects says nothing about the other forty-nine tokens.
 export function ownActivityAt(project, pulled, index, now = Date.now()) {
-  const own = new Set((project.deployments ?? []).filter(d => {
-    const node = index.get(addressKey(d.chain, d.address));
-    return node && (d.role === "token" && !node.identityConflict || node.projects.length === 1);
-  }).map(d => addressKey(d.chain, d.address)));
+  const own = new Set((project.deployments ?? []).filter(d => isOwnDeployment(project, d, index))
+    .map(d => addressKey(d.chain, d.address)));
   const times = (pulled?.activity?.addresses ?? [])
     .filter(a => own.has(addressKey(pulled.chain, a.address)))
     .map(a => a.last_tx_at).filter(at => Number.isFinite(Date.parse(at)) && Date.parse(at) <= now);

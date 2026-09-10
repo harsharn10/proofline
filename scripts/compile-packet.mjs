@@ -1,13 +1,22 @@
 #!/usr/bin/env node
 // Compile one packet-v2 Markdown file into canonical Proofline content.
 //   node scripts/compile-packet.mjs <packet.md> [--content-dir <dir>] [--dry-run]
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { parseDocument, parse, stringify } from "yaml";
 import { parsePacket, checkPacket, compile } from "./lib/packet.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
 import { checkResearch } from "./lib/research-md.mjs";
 import { measurementUpdateErrors } from './lib/measurement-update.mjs';
+import { buildRelationships, relationshipIndex, referenceReason } from './lib/relationships.mjs';
+
+export function referenceTokenErrors(packet, dependencies = []) {
+  const index = relationshipIndex(buildRelationships([], dependencies));
+  return (packet.deployments ?? []).flatMap(d => {
+    const reason = referenceReason({ ...d, chain: d.address?.chain, address: d.address?.value }, index);
+    return d.role === 'token' && reason ? [`${d.label}: ${reason}; use role other for reference assets, not the subject's own token`] : [];
+  });
+}
 
 function argumentsFor(argv) {
   let packetPath = null, contentDir = "content", dryRun = false;
@@ -104,6 +113,14 @@ export async function runCompile({ packetPath, contentDir = "content", dryRun = 
   if (packetErrors.length) throw new Error(packetErrors.join("\n"));
   const slug = packet.frontmatter.slug;
   const root = resolve(contentDir);
+  const dependencyFiles = await readdir(join(root, 'dependencies')).catch(error => {
+    if (error.code === 'ENOENT') return [];
+    throw error;
+  });
+  const dependencies = await Promise.all(dependencyFiles.filter(f => f.endsWith('.yaml'))
+    .map(f => yamlOr(join(root, 'dependencies', f), null)));
+  const roleErrors = referenceTokenErrors(packet.frontmatter, dependencies);
+  if (roleErrors.length) throw new Error(roleErrors.join('\n'));
   const censusPath = join(root, "census.yaml");
   const projectPath = join(root, "projects", `${slug}.yaml`);
   const sourcesPath = join(root, "sources", `${slug}.yaml`);

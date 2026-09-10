@@ -1,12 +1,26 @@
-import { addressKey, ownActivityAt } from "./relationships.mjs";
+import { addressKey, ownActivityAt, isOwnDeployment } from "./relationships.mjs";
+import { officialSurfaceConfirmed } from './share-bar.mjs';
 
 export const DAY = 86_400_000;
 export const REFRESH_POLICY = Object.freeze({
   version: 1, dailyLimit: 80, seedLimit: 10, retryLimit: 20, researchLimit: 20,
   hot: DAY, live: 7 * DAY, quiet: 30 * DAY, dormant: 30 * DAY,
   archiveAfter: 90 * DAY, seedWindow: 14 * DAY,
+  freshness: 36 * 3600_000, schedulerHeadroom: 2 * 3600_000,
 });
 const ms = value => Number.isFinite(Date.parse(value)) ? Date.parse(value) : null;
+
+// Machine eligibility is not identity/editorial approval. A provisional name needs an
+// official surface and sourced, located own deployment; no quote or shared-token shortcut.
+export function dailyIdentityEligible(project, census, index) {
+  if (census?.role === 'observe' || hasIdentityConflict(project, census, index)) return false;
+  if (census?.identity?.status === 'verified') return true;
+  return census?.identity?.status === 'provisional' && officialSurfaceConfirmed(census) &&
+    ['mainnet', 'beta'].includes(project.lifecycle) &&
+    census?.qualifying?.deployed_on_chain?.value === true &&
+    (project.deployments ?? []).some(d => d.chain === 'robinhood-chain' && d.verified === true &&
+      d.sources?.length > 0 && isOwnDeployment(project, d, index));
+}
 
 export function hasIdentityConflict(project, census, index) {
   return census?.identity?.status === "conflicted" || (project.deployments ?? [])
@@ -36,7 +50,7 @@ export function refreshDecision({ project, census, previous, seededAt, index, ab
   const age = ownAt ? now - ms(ownAt) : null;
   const seedAge = ms(seededAt) === null ? null : now - ms(seededAt);
   const conflict = hasIdentityConflict(project, census, index);
-  const reviewed = census?.role !== "observe" && census?.identity?.status === "verified";
+  const eligible = dailyIdentityEligible(project, census, index);
   let tier, reason, ignored = false;
   if (conflict && !first) { tier = "dormant"; ignored = true; reason = "identity conflict: Claude review required"; }
   else if (first) { tier = "live"; reason = "one initial seed read"; }
@@ -45,18 +59,19 @@ export function refreshDecision({ project, census, previous, seededAt, index, ab
     tier = "dormant"; ignored = true; reason = "no own activity for 90 days and below relevance bar";
   } else if (age === null && seedAge !== null && seedAge > REFRESH_POLICY.archiveAfter && !aboveShareBar) {
     tier = "dormant"; ignored = true; reason = "seeded over 90 days ago; no own activity or relevance signal";
-  } else if (['inactive', 'announced'].includes(project.lifecycle)) {
+  } else if (['inactive', 'announced', 'testnet-only'].includes(project.lifecycle)) {
     tier = 'quiet'; reason = age !== null && age <= 7 * DAY ?
       'lifecycle/activity mismatch: controller review; monthly maintenance' : 'not an active product: monthly maintenance';
-  } else if (reviewed && aboveShareBar && age !== null && age <= 7 * DAY) {
-    tier = "hot"; reason = "confirmed, relevant and active: daily";
+  } else if (eligible && aboveShareBar && age !== null && age <= 7 * DAY) {
+    tier = "hot"; reason = census.identity.status === 'verified' ? 'confirmed, relevant and active: daily' :
+      'evidenced provisional identity, relevant and active: daily (not editorial approval)';
   } else if (age !== null && age <= 30 * DAY || seedAge !== null && seedAge <= REFRESH_POLICY.seedWindow) {
     tier = "live"; reason = "recent own activity or seed observation window: weekly";
   } else { tier = age === null ? "dormant" : "quiet"; reason = "maintenance only: monthly"; }
   // Shared infrastructure is monitored through at least one deterministic representative.
   const representative = (project.deployments ?? []).some(d =>
     infrastructureReaders.get(addressKey(d.chain, d.address)) === project.slug);
-  if (!conflict && representative && tier !== "hot" && !first && !['inactive', 'announced'].includes(project.lifecycle)) {
+  if (!conflict && representative && tier !== "hot" && !first && !['inactive', 'announced', 'testnet-only'].includes(project.lifecycle)) {
     ignored = false; tier = "live"; reason = "shared infrastructure representative: weekly";
   }
   const interval = REFRESH_POLICY[tier];
@@ -66,9 +81,15 @@ export function refreshDecision({ project, census, previous, seededAt, index, ab
   const attemptedAt = ms(previous?.refresh?.attempted_at);
   const retryReady = !failed || attemptedAt === null || now - attemptedAt >= DAY - 2 * 3600_000;
   const newQueueRequest = queued && (attemptedAt === null || ms(queuedAt) > attemptedAt);
+  // A late successful file rewrite cannot postpone stale component measurements. For hot
+  // names, read before a component would expire ahead of the next daily run + jitter.
+  const componentTimes = [previous?.market?.pulled_at, previous?.activity?.pulled_at,
+    ...(previous?.metrics ?? []).map(m => m.as_of)].map(ms).filter(at => at !== null && at <= now);
+  const freshnessDue = tier === 'hot' && componentTimes.some(at =>
+    at + REFRESH_POLICY.freshness <= now + DAY + REFRESH_POLICY.schedulerHeadroom);
   // Small tolerance covers scheduler jitter, not a half-day early refresh.
   const due = force || !ignored && (retryReady || newQueueRequest) &&
-    (first || queued || failed || ms(lastAt) === null || now - ms(lastAt) >= interval - 2 * 3600_000);
+    (first || queued || failed || freshnessDue || ms(lastAt) === null || now - ms(lastAt) >= interval - 2 * 3600_000);
   // Success age describes freshness, not retry precedence. Age every failed read from its
   // attempt using the same daily retry clock, so hot failures cannot starve maintenance retries.
   const priorityAt = failed || ms(lastAt) === null ? attemptedAt : ms(lastAt);
