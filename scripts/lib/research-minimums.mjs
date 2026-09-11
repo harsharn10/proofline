@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { reproducedAddressClaim } from './deployment-evidence.mjs';
 
 export const RESEARCH_AREAS = ['identity', 'product', 'deployment', 'control', 'security', 'team', 'economics', 'activity', 'communications'];
 export const packetFingerprint = (packet) => createHash('sha256').update(JSON.stringify([packet.frontmatter, packet.body])).digest('hex');
@@ -48,10 +49,10 @@ export function researchMinimumGaps(packet) {
     if (!claims.some(c => String(c.field).startsWith(`${area}.`) && supported(c)) && !gapFor(area))
       errors.push(`${area}: needs a supported claim or an explicit area-tagged gap with checked surfaces and next step`);
   }
-  const reproduced = c => supported(c) && refs(c.reproduction_ids).some(id => rows('reproductions').some(r => r.id === id && ['explorer-rpc', 'explorer-ui'].includes(r.method) && r.chain_id === 4663 && refs(r.receipt_ids).some(rid => usable.some(source => source.id === rid && source.authority === 'onchain'))));
   for (const d of rows('deployments')) {
     const address = d.address?.value;
-    if (typeof address === 'string' && /^0x[a-fA-F0-9]{40}$/.test(address) && !claims.some(c => c.field === 'deployment.address' && String(JSON.stringify(c.value)).toLowerCase().includes(address.toLowerCase()) && reproduced(c)))
+    if (typeof address === 'string' && /^0x[a-fA-F0-9]{40}$/.test(address) &&
+        !reproducedAddressClaim(f, address, { classes: ['verified', 'claim', 'inference'] }))
       errors.push(`deployment ${d.label}: needs an address-specific onchain reproduction`);
   }
   if (!rows('deployments').length && !gapFor('deployment')) errors.push('deployment: no address located requires an explicit searched-surfaces gap');

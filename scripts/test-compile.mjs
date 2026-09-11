@@ -6,6 +6,7 @@ import { parse } from "yaml";
 import { parsePacket, checkPacket, compile, feedIdentity } from "./lib/packet.mjs";
 import { runCompile } from "./compile-packet.mjs";
 import { validateAgainst } from "./lib/schemas.mjs";
+import { planFindingsRepair } from "./repair-pilot-findings.mjs";
 
 let failures = 0;
 async function test(name, fn) {
@@ -126,6 +127,116 @@ await test("mainnet cannot be created from an unreproduced deployment", async ()
   assert.equal(result.project.lifecycle, "announced");
   assert.ok(result.project.findings.missing.some((row) => row.text.includes("Mainnet status was not promoted")));
   assert.equal(result.project.deployments[0].verified, false);
+});
+
+await test("findings keep list items, continuations and paragraph evidence separate", async () => {
+  const packet = await fixture("update-full.md");
+  packet.frontmatter.packet_tier = "seed";
+  packet.body = `## Verification passes
+
+- Contract code exists. [verified R-1]
+- Audit scope is unresolved. [unknown]
+- Product copy says swaps work. [claim R-2]
+
+A standalone observation. [claim R-2]
+
+## Material risks
+
+1. Routing remains disputed. [disputed R-2]
+2. A long risk has
+   an indented continuation. [claim R-2]
+* Untagged evidence gap.
++ Multiple supporting sources. [verified R-1] [claim R-2]
++ Still unresolved despite a separate code read. [unknown] [verified R-1]
+
+### Examples, not findings
+\x60\x60\x60md
+## Verification passes
+- Example assertion. [verified R-1]
+\x60\x60\x60
+`;
+  const out = compile(packet);
+  assert.deepEqual(out.project.findings.positive.map(r => r.text), [
+    "Contract code exists.", "Product copy says swaps work.", "A standalone observation.",
+  ]);
+  assert.deepEqual(out.project.findings.risk, [
+    { text: "Audit scope is unresolved.", class: "unknown" },
+    { text: "Routing remains disputed.", class: "disputed", sources: ["S2"] },
+    { text: "A long risk has an indented continuation.", class: "claim", sources: ["S2"] },
+    { text: "Untagged evidence gap.", class: "unknown" },
+    { text: "Multiple supporting sources.", class: "claim", sources: ["S1", "S2"] },
+    { text: "Still unresolved despite a separate code read.", class: "unknown" },
+  ]);
+  assert.ok(out.project.findings.unresolved.some(r => r.text === "Routing remains disputed."));
+  assert.deepEqual(validateAgainst("project", out.project), []);
+  const again = compile(packet, out.project, out.censusRow, out.sources, out.feed);
+  assert.deepEqual(again.project.findings, out.project.findings, "replay does not duplicate findings");
+});
+
+await test("mainnet uses the matching prose-address reproduction, not source-code verification", async () => {
+  const packet = await fixture("new-seed.md");
+  const address = packet.frontmatter.deployments[0].address.value;
+  packet.frontmatter.claims[0].value = `Factory deployed at ${address}.`;
+  packet.frontmatter.deployments[0].address.explorer_source_verified = false;
+  const out = compile(packet);
+  assert.equal(out.project.lifecycle, "mainnet");
+  assert.equal(out.project.deployments[0].verified, true, "deployment existence is reproduced");
+  assert.equal(packet.frontmatter.deployments[0].address.explorer_source_verified, false);
+  assert.ok(!out.project.findings.missing.some(r => r.text.includes("Mainnet status was not promoted")));
+  for (const edit of [
+    f => { f.claims[0].value = "Factory 0x2222222222222222222222222222222222222222"; },
+    f => { f.claims[0].value = `${address}0`; },
+    f => { f.claims[0].value = `${address} and 0x2222222222222222222222222222222222222222`; },
+    f => { f.claims[0].field = "control.owner"; },
+    f => { f.reproductions[0].chain_id = 1; },
+    f => { f.reproductions[0].method = "official-crosslink"; },
+    f => { f.receipts[0].authority = "primary"; },
+    f => { f.receipts[0].authenticity = "unconfirmed"; },
+    f => { f.receipts[0].url = "https://example.test/address/0x2222222222222222222222222222222222222222"; },
+    f => { f.deployments[0].address.chain = "ethereum"; },
+    f => { f.receipts.push({ ...f.receipts[0], id: "R-2" }); f.reproductions[0].receipt_ids = ["R-2"]; },
+  ]) {
+    const bad = structuredClone(packet); edit(bad.frontmatter);
+    assert.equal(compile(bad).project.lifecycle, "announced", JSON.stringify(bad.frontmatter.claims[0]));
+  }
+  packet.frontmatter.claims[0].value = { address, note: "Factory" };
+  assert.equal(compile(packet).project.lifecycle, "mainnet", "structured addresses also work");
+});
+
+await test("batch RPC evidence can bind a separately linked official contract table", async () => {
+  const packet = await fixture("new-seed.md");
+  const f = packet.frontmatter, address = f.deployments[0].address.value;
+  f.receipts[0].url = "https://rpc.example.test";
+  f.receipts[0].title = "Batch code read";
+  f.receipts[0].excerpt = "Non-empty code on the linked official contract table.";
+  f.reproductions[0].result = "Non-empty code on the linked official contract table.";
+  f.receipts.push({ ...f.receipts[0], id: "R-2", authority: "primary", kind: "docs",
+    url: "https://example.test/contracts", excerpt: `Factory ${address}` });
+  f.claims[0].receipt_ids.push("R-2");
+  f.reproductions[0].receipt_ids.push("R-2");
+  assert.equal(compile(packet).project.lifecycle, "mainnet");
+  f.reproductions[0].receipt_ids = ["R-1"];
+  assert.equal(compile(packet).project.lifecycle, "announced", "unlinked docs cannot supply the reproduced address");
+});
+
+await test("retaining mainnet is not reported as a rejected lifecycle promotion", async () => {
+  const packet = await fixture("new-seed.md");
+  const before = compile(packet);
+  packet.frontmatter.deployments[0].address.exists_on_4663 = false;
+  const out = compile(packet, before.project, before.censusRow, before.sources, before.feed);
+  assert.equal(out.project.lifecycle, "mainnet");
+  assert.ok(!out.project.findings.missing.some(r => r.text.includes("Mainnet status was not promoted")));
+});
+
+await test("findings recovery preserves all other fields, refuses drift, and is idempotent", async () => {
+  const accepted = compile(await fixture("new-seed.md")).project;
+  const findings = { ...structuredClone(accepted.findings), risk: [{ text: "Audit scope unresolved.", class: "unknown" }] };
+  const fixed = planFindingsRepair(accepted, accepted, findings);
+  assert.deepEqual({ ...fixed, findings: accepted.findings }, accepted);
+  assert.deepEqual(planFindingsRepair(accepted, fixed, findings), fixed);
+  assert.throws(() => planFindingsRepair(accepted, { ...accepted, summary: "Later editorial copy." }, findings), /project changed/);
+  assert.throws(() => planFindingsRepair(accepted, { ...accepted, findings: { ...findings, risk: [{ text: 'Later review note.', class: 'unknown' }] } }, findings), /findings drifted/);
+  assert.throws(() => planFindingsRepair(accepted, accepted, { ...findings, risk: [{ text: "Missing receipt.", class: "verified" }] }), /sources/);
 });
 
 await test("collector evidence labels cannot grant identity approval or erase a hold", async () => {
