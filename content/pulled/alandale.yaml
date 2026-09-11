@@ -1,5 +1,5 @@
 slug: alandale
-pulled_at: 2026-09-10T05:46:03.134Z # chain head 59164177 at read time
+pulled_at: 2026-09-11T13:33:55.921Z # chain head 60295786 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 27940378
     created_at: 2026-08-04T21:16:55.000Z
-    holders: 210
+    holders: 209
     errors: []
   - address: "0x16494A80E08Bcb9285D87b67149d7b01774D82F8"
     label: AlgebraFactory (concentrated liquidity)
@@ -221,8 +221,8 @@ addresses:
     label: AlgebraFactory owner() (unread contract, 171 bytes of code)
     role: admin
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: SafeProxy
     proxy:
       type: none
       implementation: null
@@ -230,143 +230,115 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: null
-    created_at: null
+    created_block: 18460107
+    created_at: 2026-07-24T21:08:16.000Z
     holders: null
-    errors:
-      - step: blockscout
-        message: "addresses/0x2a04c1d26767dd30f62712dcfcf1222f733a2b0e: timeout after 10000ms after 3 attempts"
+    errors: []
 metrics:
   - kind: tvl
-    value: 916243
-    as_of: 2026-09-10T04:12:47.000Z
+    value: 971745
+    as_of: 2026-09-11T11:59:35.000Z
     source_url: https://api.llama.fi/protocol/alandale-v3
   - kind: fees_24h
-    value: 3899
-    as_of: 2026-09-10T05:46:03.134Z
+    value: 3906
+    as_of: 2026-09-11T13:33:55.921Z
     source_url: https://api.llama.fi/summary/fees/alandale-v3?dataType=dailyFees
   - kind: revenue_24h
-    value: 3899
-    as_of: 2026-09-10T05:46:03.134Z
+    value: 3906
+    as_of: 2026-09-11T13:33:55.921Z
     source_url: https://api.llama.fi/summary/fees/alandale-v3?dataType=dailyRevenue
   - kind: volume_24h
-    value: 8529725
-    as_of: 2026-09-10T05:46:03.134Z
+    value: 9034587
+    as_of: 2026-09-11T13:33:55.921Z
     source_url: https://api.llama.fi/summary/dexs/alandale-v3?dataType=dailyVolume
 market:
   token_address: "0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA"
-  pulled_at: 2026-09-10T05:46:03.134Z
+  pulled_at: 2026-09-11T13:33:55.921Z
   pairs:
     - dex: alandale
       pair_address: "0xFA0b90E406C9A6F08aD2cbB4B367B063D7cf46C2"
       quote_symbol: WETH
-      price_usd: 0.006999
-      liquidity_usd: 154887.01
-      volume_h24: 25939.52
-      volume_h6: 7058.5
+      price_usd: 0.006493
+      liquidity_usd: 151745.06
+      volume_h24: 20651.6
+      volume_h6: 2204.06
       txns_h24:
-        buys: 31
-        sells: 61
-      price_change_h24: -16.06
-      market_cap: 355446
-      fdv: 3860473
+        buys: 21
+        sells: 65
+      price_change_h24: -5.93
+      market_cap: 3581477
+      fdv: 3581477
       created_at: null
     - dex: alandale
       pair_address: "0x426e33194aA6dc8Ef2bAC618954266Aba9E12B2F"
       quote_symbol: WETH
-      price_usd: 0.007026
-      liquidity_usd: 45858.36
-      volume_h24: 2505.33
-      volume_h6: 522.64
+      price_usd: 0.00648
+      liquidity_usd: 44225.21
+      volume_h24: 1499.17
+      volume_h6: 226.42
       txns_h24:
-        buys: 7
-        sells: 21
-      price_change_h24: -15.57
-      market_cap: 356830
-      fdv: 3875500
+        buys: 4
+        sells: 19
+      price_change_h24: -6.57
+      market_cap: 3574014
+      fdv: 3574014
       created_at: 2026-08-10T16:38:24.000Z
     - dex: alandale
       pair_address: "0xaD8D8C09ab39BbF7E65f4B6896860D956dc8580e"
       quote_symbol: USDG
-      price_usd: 0.00701
-      liquidity_usd: 43084.03
-      volume_h24: 19125.21
-      volume_h6: 3267.03
+      price_usd: 0.006468
+      liquidity_usd: 41132.53
+      volume_h24: 19072.87
+      volume_h6: 3245.64
       txns_h24:
-        buys: 40
-        sells: 64
-      price_change_h24: -15.85
-      market_cap: 355981
-      fdv: 3866283
+        buys: 57
+        sells: 62
+      price_change_h24: -6.72
+      market_cap: 3567323
+      fdv: 3567323
       created_at: null
-    - dex: uniswap
-      pair_address: "0xcaf11fbe4f8622ffbac7d8e97df70bf8cb19959983351aa0920713f0d881fa91"
-      quote_symbol: ETH
-      price_usd: 0.008399
-      liquidity_usd: 16265.71
-      volume_h24: 525.72
-      volume_h6: 0
-      txns_h24:
-        buys: 0
-        sells: 5
-      price_change_h24: 0.01
-      market_cap: 426516
-      fdv: 4543204
-      created_at: 2026-09-07T20:08:11.000Z
     - dex: uniswap
       pair_address: "0x2031afa6d12081470b89d0a56b390b3fc5a2477b9d9c421efba1d6723e5e7d50"
       quote_symbol: USDG
-      price_usd: 0.04714
-      liquidity_usd: 400.54
-      volume_h24: 7.05
-      volume_h6: 0
-      txns_h24:
-        buys: 0
-        sells: 2
-      price_change_h24: -0.71
-      market_cap: 2394263
-      fdv: 25503451
-      created_at: 2026-08-13T01:12:53.000Z
-    - dex: uniswap
-      pair_address: "0x668dfe550cbf6eee933b982c78c8c957eeddc1473a6bf739f12b3379711e458a"
-      quote_symbol: USDG
-      price_usd: 0.02748
-      liquidity_usd: 140.01
-      volume_h24: 7.26
+      price_usd: 0.03317
+      liquidity_usd: 335.75
+      volume_h24: 32.46
       volume_h6: 0
       txns_h24:
         buys: 0
         sells: 1
       price_change_h24: null
-      market_cap: 1395833
-      fdv: 14868272
-      created_at: 2026-09-01T17:30:24.000Z
-  liquidity_usd: 260635.66
-  volume_h24: 48110.09
-  trades_h24: 232
-  price_usd: 0.006999
-  price_change_h24: -16.06
-  market_cap_usd: 355446
-  fdv_usd: 3860473
-  fdv: 3860473
+      market_cap: 18298784
+      fdv: 18298784
+      created_at: 2026-08-13T01:12:53.000Z
+  liquidity_usd: 237438.55
+  volume_h24: 41256.1
+  trades_h24: 229
+  price_usd: 0.006493
+  price_change_h24: -5.93
+  market_cap_usd: 3581477
+  fdv_usd: 3581477
+  fdv: 3581477
   first_pair_at: 2026-08-10T16:38:24.000Z
-  top10_share: 0.9824106528909088
-  top10_share_ex_pools: 0.953945642707748
+  top10_share: 0.9835255990027488
+  top10_share_ex_pools: 0.95307021895662
   burned_share: 0
-  top10_as_of: 2026-09-10T05:46:03.134Z
+  top10_as_of: 2026-09-11T13:33:55.921Z
   launchpad: null
   rialto: null
   pair_asset: null
   volume_disagreement: null
   errors:
     - step: launchpad
+      message: contract code hash unchanged, so addresses/0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA was not re-read for its creator, and no launchpad was previously attributed
+    - step: launchpad
       message: creator 0xfaa6365e8cefF2aA50426B02DbfE102a7e9891f3 did not match a launchpad factory, curve or known launcher deployer
 structure:
-  pulled_at: 2026-09-10T05:46:03.134Z
+  pulled_at: 2026-09-11T13:33:55.921Z
   mint: owner-can-mint
   mint_as_of: 2026-09-10T05:46:03.134Z
   renounced: false
-  renounced_as_of: 2026-09-10T05:46:03.134Z
+  renounced_as_of: 2026-09-11T13:33:55.921Z
   lp:
     - pair: "0xFA0b90E406C9A6F08aD2cbB4B367B063D7cf46C2"
       locked_share: null
@@ -383,35 +355,25 @@ structure:
       holder_kind: null
       reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
       as_of: null
-    - pair: "0xcaf11fbe4f8622ffbac7d8e97df70bf8cb19959983351aa0920713f0d881fa91"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-      as_of: null
     - pair: "0x2031afa6d12081470b89d0a56b390b3fc5a2477b9d9c421efba1d6723e5e7d50"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-      as_of: null
-    - pair: "0x668dfe550cbf6eee933b982c78c8c957eeddc1473a6bf739f12b3379711e458a"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
       as_of: null
   errors: []
 activity:
-  pulled_at: 2026-09-10T05:46:03.134Z
+  pulled_at: 2026-09-11T13:33:55.921Z
   addresses:
     - address: "0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA"
       label: LUTE ERC-20 (RPC name Alandale, symbol LUTE). Llama protocol.address and docs token row are this address, not AlgebraFactory.
       role: token
-      transactions_count: 1128
+      transactions_count: 1176
       token_transfers_count: 1
-      last_tx_at: 2026-09-10T05:43:47.000Z
+      last_tx_at: 2026-09-11T12:42:41.000Z
       last_method: approve
-      txns_24h: 73
+      txns_24h: 33
       launches_24h: null
-      window_as_of: 2026-09-10T05:46:03.134Z
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors: []
     - address: "0x16494A80E08Bcb9285D87b67149d7b01774D82F8"
@@ -421,9 +383,9 @@ activity:
       token_transfers_count: 0
       last_tx_at: 2026-09-10T02:38:04.000Z
       last_method: createPool
-      txns_24h: 2
-      launches_24h: 2
-      window_as_of: 2026-09-10T05:46:03.134Z
+      txns_24h: 0
+      launches_24h: 0
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors: []
     - address: "0xe0799417eff30A12249b8c30941BC2d7c52A0339"
@@ -435,31 +397,31 @@ activity:
       last_method: grantRole
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-09-10T05:46:03.134Z
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors: []
     - address: "0xB90b0E114a32a3dA7b61D5eaae7D35Af9B1B5582"
       label: RouterV2
       role: router
-      transactions_count: 146
-      token_transfers_count: 148
-      last_tx_at: 2026-09-10T05:43:58.000Z
-      last_method: swapExactTokensForTokens
-      txns_24h: 3
+      transactions_count: 150
+      token_transfers_count: 152
+      last_tx_at: 2026-09-11T06:16:28.000Z
+      last_method: swapExactTokensForETH
+      txns_24h: 2
       launches_24h: null
-      window_as_of: 2026-09-10T05:46:03.134Z
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors: []
     - address: "0x8971d5A8F950F021e97583855925B021bfaE2b35"
       label: SwapRouter (Algebra)
       role: router
-      transactions_count: 2364
-      token_transfers_count: 1801
-      last_tx_at: 2026-09-10T04:51:42.000Z
+      transactions_count: 2530
+      token_transfers_count: 1895
+      last_tx_at: 2026-09-11T12:50:43.000Z
       last_method: exactInputSingle
       txns_24h: 100
       launches_24h: null
-      window_as_of: 2026-09-10T05:46:03.134Z
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors:
         - step: txns_24h capped
@@ -467,25 +429,25 @@ activity:
     - address: "0xc1a79e3A7b04c3f21C6409a78Ab58A8C822bE7dC"
       label: VotingEscrow (veLUTE)
       role: other
-      transactions_count: 186
-      token_transfers_count: 157
-      last_tx_at: 2026-09-10T03:37:13.000Z
-      last_method: depositFor
-      txns_24h: 30
+      transactions_count: 207
+      token_transfers_count: 173
+      last_tx_at: 2026-09-11T12:43:50.000Z
+      last_method: increase_unlock_time
+      txns_24h: 15
       launches_24h: null
-      window_as_of: 2026-09-10T05:46:03.134Z
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors: []
     - address: "0x4cF1c47B95031cD2bb1d102021D8Ede60392971C"
       label: Voter
       role: other
-      transactions_count: 320
+      transactions_count: 350
       token_transfers_count: 172
-      last_tx_at: 2026-09-10T05:26:32.000Z
+      last_tx_at: 2026-09-11T12:47:33.000Z
       last_method: claimRewards
-      txns_24h: 61
+      txns_24h: 36
       launches_24h: null
-      window_as_of: 2026-09-10T05:46:03.134Z
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors: []
     - address: "0x782355E7771A9Aa0834de4Ae981DCF3b7aeC11e6"
@@ -498,18 +460,18 @@ activity:
       txns_24h: 0
       launches_24h: null
       window_as_of: 2026-09-10T05:46:03.134Z
-      stale_since: null
+      stale_since: 2026-09-10T05:46:03.134Z
       errors: []
     - address: "0xe62a5F67516dBDBA2Aa28b1512C8Ff44E42cB5c3"
       label: NonfungiblePositionManager
       role: other
-      transactions_count: 2719
-      token_transfers_count: 259
-      last_tx_at: 2026-09-10T05:41:22.000Z
-      last_method: collect
+      transactions_count: 3088
+      token_transfers_count: 307
+      last_tx_at: 2026-09-11T13:33:51.000Z
+      last_method: mint
       txns_24h: 100
       launches_24h: null
-      window_as_of: 2026-09-10T05:46:03.134Z
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors:
         - step: txns_24h capped
@@ -517,265 +479,265 @@ activity:
     - address: "0x8A76f49e091F21C896122B4879541930322b799D"
       label: GaugeRewarder (CL emissions claims)
       role: other
-      transactions_count: 538
-      token_transfers_count: 714
-      last_tx_at: 2026-09-10T05:42:21.000Z
+      transactions_count: 588
+      token_transfers_count: 766
+      last_tx_at: 2026-09-11T12:47:40.000Z
       last_method: claim
-      txns_24h: 61
+      txns_24h: 45
       launches_24h: null
-      window_as_of: 2026-09-10T05:46:03.134Z
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors: []
     - address: "0x8f90745342622be6ABbC575Cc250Af9179cabe6f"
       label: Airdrop (VeLuteSplitMerklAidrop per docs)
       role: other
-      transactions_count: 47
-      token_transfers_count: 48
-      last_tx_at: 2026-09-09T09:06:56.000Z
+      transactions_count: 50
+      token_transfers_count: 51
+      last_tx_at: 2026-09-10T19:39:12.000Z
       last_method: claim
-      txns_24h: 1
+      txns_24h: 2
       launches_24h: null
-      window_as_of: 2026-09-10T05:46:03.134Z
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors: []
     - address: "0x2a04c1d26767dd30f62712dcfcf1222f733a2b0e"
       label: AlgebraFactory owner() (unread contract, 171 bytes of code)
       role: admin
-      transactions_count: 116
+      transactions_count: 122
       token_transfers_count: 0
-      last_tx_at: 2026-09-10T02:40:28.000Z
+      last_tx_at: 2026-09-11T00:14:32.000Z
       last_method: execTransaction
       txns_24h: 6
       launches_24h: null
-      window_as_of: 2026-09-10T05:46:03.134Z
+      window_as_of: 2026-09-11T13:33:55.921Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-09-10T05:43:58.000Z
-  txns_24h: 437
-  launches_24h: 2
+  last_activity_at: 2026-09-11T13:33:51.000Z
+  txns_24h: 339
+  launches_24h: 0
   window_as_of: 2026-09-10T05:46:03.134Z
-  stale_since: null
+  stale_since: 2026-09-10T05:46:03.134Z
 reads:
-  tier: live
+  tier: hot
   explorer:
     - kind: address
       address: "0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA"
       status: read
-      reason: --full override
+      reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xdbbb29fe6f4b371b11c5623b3f50da9ad12d359899c73508113559040f5e3bdc"
+      signal: "0x3809a9fd238a253b1418d809d8de71c95031289d96dac4167298e4dfc32c9e62"
       code_hash: 40425a902354275d
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
-      credits: 80
+      credits: 40
     - kind: activity
       address: "0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: token DexScreener trade count changed; 24h walk refreshed
       signal_value: null
-      signal: "0xdbbb29fe6f4b371b11c5623b3f50da9ad12d359899c73508113559040f5e3bdc"
+      signal: "0x3809a9fd238a253b1418d809d8de71c95031289d96dac4167298e4dfc32c9e62"
       code_hash: 40425a902354275d
-      checked_at: 2026-09-10T05:46:03.134Z
-      stale_since: null
-      credits: 60
-    - kind: address
-      address: "0x16494A80E08Bcb9285D87b67149d7b01774D82F8"
-      status: read
-      reason: --full override
-      signal_value: null
-      signal: "0x0f47cd8e663e98280985b2cf23a2fbcd7b809dcab8cbf5768d58878f3a76edd0"
-      code_hash: 5f4d8937b3e02d7a
-      checked_at: 2026-09-10T05:46:03.134Z
-      stale_since: null
-      credits: 60
-    - kind: activity
-      address: "0x16494A80E08Bcb9285D87b67149d7b01774D82F8"
-      status: read
-      reason: --full override; 24h walk refreshed
-      signal_value: null
-      signal: "0x0f47cd8e663e98280985b2cf23a2fbcd7b809dcab8cbf5768d58878f3a76edd0"
-      code_hash: 5f4d8937b3e02d7a
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
       credits: 20
     - kind: address
+      address: "0x16494A80E08Bcb9285D87b67149d7b01774D82F8"
+      status: unchanged
+      reason: factory signal unchanged
+      signal_value: null
+      signal: "0x0f47cd8e663e98280985b2cf23a2fbcd7b809dcab8cbf5768d58878f3a76edd0"
+      code_hash: 5f4d8937b3e02d7a
+      checked_at: 2026-09-11T13:33:55.921Z
+      stale_since: 2026-09-10T05:46:03.134Z
+      credits: 20
+    - kind: activity
+      address: "0x16494A80E08Bcb9285D87b67149d7b01774D82F8"
+      status: unchanged
+      reason: factory signal unchanged; 24h window recounted from the signal page
+      signal_value: null
+      signal: "0x0f47cd8e663e98280985b2cf23a2fbcd7b809dcab8cbf5768d58878f3a76edd0"
+      code_hash: 5f4d8937b3e02d7a
+      checked_at: 2026-09-11T13:33:55.921Z
+      stale_since: 2026-09-10T05:46:03.134Z
+      credits: 0
+    - kind: address
       address: "0xe0799417eff30A12249b8c30941BC2d7c52A0339"
-      status: read
-      reason: --full override
+      status: unchanged
+      reason: factory signal unchanged
       signal_value: null
       signal: "0x76c02d34cdb524b45ecbe7a764e335415df1ca5257187217bb972ce49e76ab0c"
       code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
-      stale_since: null
-      credits: 60
+      checked_at: 2026-09-11T13:33:55.921Z
+      stale_since: 2026-09-10T05:46:03.134Z
+      credits: 20
     - kind: activity
       address: "0xe0799417eff30A12249b8c30941BC2d7c52A0339"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: factory signal unchanged; 24h window recounted from the signal page
       signal_value: null
       signal: "0x76c02d34cdb524b45ecbe7a764e335415df1ca5257187217bb972ce49e76ab0c"
       code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-09-11T13:33:55.921Z
+      stale_since: 2026-09-10T05:46:03.134Z
+      credits: 0
     - kind: address
       address: "0xB90b0E114a32a3dA7b61D5eaae7D35Af9B1B5582"
       status: read
-      reason: --full override
+      reason: router signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xfb2e7a175b1d62f0fce876c5b94eeed6804739805b6b7982a81f5eec8efa6c15"
+      signal: "0x59b8545c546c03a721174f8db86dc13060f39d1474075c026caeb507ff8c7a84"
       code_hash: 9849efc768779509
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
-      credits: 80
+      credits: 20
     - kind: activity
       address: "0xB90b0E114a32a3dA7b61D5eaae7D35Af9B1B5582"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: router signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0xfb2e7a175b1d62f0fce876c5b94eeed6804739805b6b7982a81f5eec8efa6c15"
+      signal: "0x59b8545c546c03a721174f8db86dc13060f39d1474075c026caeb507ff8c7a84"
       code_hash: 9849efc768779509
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
       credits: 20
     - kind: address
       address: "0x8971d5A8F950F021e97583855925B021bfaE2b35"
       status: read
-      reason: --full override
+      reason: router signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x7b4eb7d12f1eb5b30544ac40fde390287d2f083015838f2fd955fee2c38d6359"
+      signal: "0x21e8a61d72a40b8ac6a93d56a4442b1b0eae334755129369843d22462be8cdc7"
       code_hash: c7ee17153ce6e577
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
-      credits: 60
+      credits: 20
     - kind: activity
       address: "0x8971d5A8F950F021e97583855925B021bfaE2b35"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: router signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0x7b4eb7d12f1eb5b30544ac40fde390287d2f083015838f2fd955fee2c38d6359"
+      signal: "0x21e8a61d72a40b8ac6a93d56a4442b1b0eae334755129369843d22462be8cdc7"
       code_hash: c7ee17153ce6e577
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
       credits: 40
     - kind: address
       address: "0xc1a79e3A7b04c3f21C6409a78Ab58A8C822bE7dC"
       status: read
-      reason: --full override
+      reason: other signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x155335e7f82b9a1bc6be4bc4a975c7333bde2d0539fa584d69ed76192de85938"
+      signal: "0xcf13e132bb3685123b826d518626596d02b06f1fc078f0b2d874acb7bd01e24c"
       code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
-      credits: 100
+      credits: 20
     - kind: activity
       address: "0xc1a79e3A7b04c3f21C6409a78Ab58A8C822bE7dC"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: other signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0x155335e7f82b9a1bc6be4bc4a975c7333bde2d0539fa584d69ed76192de85938"
+      signal: "0xcf13e132bb3685123b826d518626596d02b06f1fc078f0b2d874acb7bd01e24c"
       code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
       credits: 20
     - kind: address
       address: "0x4cF1c47B95031cD2bb1d102021D8Ede60392971C"
       status: read
-      reason: --full override
+      reason: other signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xe6529d39be67a8f8760da90aff31a1d8f76522c494061e0b314d5eba279b8296"
+      signal: "0x36a35298296defee93ab3833acda59b742fe40aa4b78162f2a4ba24da885cd7b"
       code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
-      credits: 60
+      credits: 20
     - kind: activity
       address: "0x4cF1c47B95031cD2bb1d102021D8Ede60392971C"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: other signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0xe6529d39be67a8f8760da90aff31a1d8f76522c494061e0b314d5eba279b8296"
+      signal: "0x36a35298296defee93ab3833acda59b742fe40aa4b78162f2a4ba24da885cd7b"
       code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
-      stale_since: null
-      credits: 40
-    - kind: address
-      address: "0x782355E7771A9Aa0834de4Ae981DCF3b7aeC11e6"
-      status: read
-      reason: --full override
-      signal_value: null
-      signal: "0x12f285cb9b23d5bc911ded16e7302a47b711af22107099022b71953c847c9ece"
-      code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
-      stale_since: null
-      credits: 100
-    - kind: activity
-      address: "0x782355E7771A9Aa0834de4Ae981DCF3b7aeC11e6"
-      status: read
-      reason: --full override; 24h walk refreshed
-      signal_value: null
-      signal: "0x12f285cb9b23d5bc911ded16e7302a47b711af22107099022b71953c847c9ece"
-      code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
       credits: 20
     - kind: address
+      address: "0x782355E7771A9Aa0834de4Ae981DCF3b7aeC11e6"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: "0x12f285cb9b23d5bc911ded16e7302a47b711af22107099022b71953c847c9ece"
+      code_hash: 0026c302b8ffe6aa
+      checked_at: 2026-09-11T13:33:55.921Z
+      stale_since: 2026-09-10T05:46:03.134Z
+      credits: 0
+    - kind: activity
+      address: "0x782355E7771A9Aa0834de4Ae981DCF3b7aeC11e6"
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
+      signal_value: null
+      signal: "0x12f285cb9b23d5bc911ded16e7302a47b711af22107099022b71953c847c9ece"
+      code_hash: 0026c302b8ffe6aa
+      checked_at: 2026-09-11T13:33:55.921Z
+      stale_since: 2026-09-10T05:46:03.134Z
+      credits: 0
+    - kind: address
       address: "0xe62a5F67516dBDBA2Aa28b1512C8Ff44E42cB5c3"
       status: read
-      reason: --full override
+      reason: other signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x3732282ad602011fc85ba0a6a56da7b1ece7d754f8850f857d30deca276d0646"
+      signal: "0x8c8af4ac5163462cae3bf3c0f6701e226f7eec44b564b33436b2ec36150de648"
       code_hash: 9049b443438f440f
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
-      credits: 80
+      credits: 20
     - kind: activity
       address: "0xe62a5F67516dBDBA2Aa28b1512C8Ff44E42cB5c3"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: other signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0x3732282ad602011fc85ba0a6a56da7b1ece7d754f8850f857d30deca276d0646"
+      signal: "0x8c8af4ac5163462cae3bf3c0f6701e226f7eec44b564b33436b2ec36150de648"
       code_hash: 9049b443438f440f
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
       credits: 40
     - kind: address
       address: "0x8A76f49e091F21C896122B4879541930322b799D"
       status: read
-      reason: --full override
+      reason: other signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x2d0800698a95b001f1567e756b2e6b1c237984a4f4f3928bb606062306718cbc"
+      signal: "0x92a436fb78cdbf592ca88cc71a6cad9e706a5298e150850eed3738e751323552"
       code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
-      credits: 60
+      credits: 20
     - kind: activity
       address: "0x8A76f49e091F21C896122B4879541930322b799D"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: other signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0x2d0800698a95b001f1567e756b2e6b1c237984a4f4f3928bb606062306718cbc"
+      signal: "0x92a436fb78cdbf592ca88cc71a6cad9e706a5298e150850eed3738e751323552"
       code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
-      credits: 40
+      credits: 20
     - kind: address
       address: "0x8f90745342622be6ABbC575Cc250Af9179cabe6f"
       status: read
-      reason: --full override
+      reason: other signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x7c21f85e5cbcb0c96034ad89c81ab6ebe4572d520cfdc7e383c59836462a11eb"
+      signal: "0xe40cd81a9577a9dfbf535fd1459e818598325baa7b1198f3b641f3fdae8aa9f1"
       code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
-      credits: 60
+      credits: 20
     - kind: activity
       address: "0x8f90745342622be6ABbC575Cc250Af9179cabe6f"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: other signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0x7c21f85e5cbcb0c96034ad89c81ab6ebe4572d520cfdc7e383c59836462a11eb"
+      signal: "0xe40cd81a9577a9dfbf535fd1459e818598325baa7b1198f3b641f3fdae8aa9f1"
       code_hash: 0026c302b8ffe6aa
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
       credits: 20
     - kind: address
@@ -783,55 +745,55 @@ reads:
       status: read
       reason: --full override
       signal_value: null
-      signal: "0x928011ff14aea0e5c6b68a91734ace21243d47e49f07c113ee73605d13f7372d"
+      signal: "0x9f747d8425198e75053ad0d0d1b209998cff851e7e75a7d265c58554d1753464"
       code_hash: 788b11033f24c6fe
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
-      credits: 100
+      credits: 60
     - kind: activity
       address: "0x2a04c1d26767dd30f62712dcfcf1222f733a2b0e"
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x928011ff14aea0e5c6b68a91734ace21243d47e49f07c113ee73605d13f7372d"
+      signal: "0x9f747d8425198e75053ad0d0d1b209998cff851e7e75a7d265c58554d1753464"
       code_hash: 788b11033f24c6fe
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
       credits: 20
     - kind: top10
       address: "0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA"
       status: read
       reason: token change signal changed
-      signal_value: 232
+      signal_value: 229
       signal: null
       code_hash: null
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA"
-      status: read
-      reason: token change signal changed
-      signal_value: 232
+      status: unchanged
+      reason: contract code hash unchanged; verified ABI not re-read
+      signal_value: 229
       signal: null
       code_hash: 40425a902354275d
-      checked_at: 2026-09-10T05:46:03.134Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-09-11T13:33:55.921Z
+      stale_since: 2026-09-10T05:46:03.134Z
+      credits: 0
     - kind: lp
       address: "0xD1e861CC5Eee7eA88649206b74504D78CCD7AEeA"
       status: read
       reason: token change signal changed
-      signal_value: 232
+      signal_value: 229
       signal: null
       code_hash: null
-      checked_at: 2026-09-10T05:46:03.134Z
+      checked_at: 2026-09-11T13:33:55.921Z
       stale_since: null
       credits: 80
 refresh:
   policy_version: 1
-  status: partial
-  attempted_at: 2026-09-10T05:46:03.134Z
-  last_success_at: null
-  reason: manual override; one initial seed read
+  status: complete
+  attempted_at: 2026-09-11T13:33:55.921Z
+  last_success_at: 2026-09-11T13:33:55.921Z
+  reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors: []
