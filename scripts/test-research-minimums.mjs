@@ -58,6 +58,22 @@ test('full template passes floor and missing verification passes fail', async ()
   p.body = p.body.replace('- Adversarial:', '- Omitted:');
   assert.ok(researchMinimumGaps(p).some(e => e.includes('adversarial')));
 });
+test('deployment floor shares exact prose-address and reproduction binding with the compiler', async () => {
+  const p = parsePacket(await readFile('docs/templates/research-packet-v2.md', 'utf8'));
+  const address = p.frontmatter.deployments[0].address.value;
+  const claim = p.frontmatter.claims.find(c => c.field === 'deployment.address');
+  claim.value = `Vault deployment at ${address}.`;
+  assert.deepEqual(researchMinimumGaps(p), []);
+  for (const value of [`${address}0`, `${address} plus 0x4444444444444444444444444444444444444444`]) {
+    const bad = structuredClone(p);
+    bad.frontmatter.claims.find(c => c.id === claim.id).value = value;
+    assert.ok(researchMinimumGaps(bad).some(e => e.includes('address-specific')));
+  }
+  const bad = structuredClone(p);
+  bad.frontmatter.claims.find(c => c.id === claim.id).receipt_ids = ['R-1'];
+  assert.ok(researchMinimumGaps(bad).some(e => e.includes('address-specific')),
+    'a reproduction tied only to a different receipt cannot establish this claim');
+});
 test('direct compiler refuses a deficient seed before any writes', async () => {
   const root = await mkdtemp(join(tmpdir(), 'proofline-minimum-test-'));
   try {

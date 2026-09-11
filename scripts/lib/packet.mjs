@@ -16,6 +16,7 @@ import { reviewKeyFor } from "./telegram.mjs";
 import { enforceResearchMinimums } from "./research-minimums.mjs";
 import { nextResearchState } from './research-state.mjs';
 import { mergeWebsiteEvents } from './website-events.mjs';
+import { reproducedAddressClaim } from './deployment-evidence.mjs';
 
 /** Machine producer ids (research-system §2). Any of them, or a human GitHub id, may file a packet; none
  *  may resolve a conflict — that is a controller's call — so the resolver check rejects the whole list. */
@@ -777,8 +778,15 @@ function themeErrors(themes) {
 
 function bodySections(body) {
   const sections = new Map();
-  let current = null;
+  let current = null, fence = null;
   for (const line of String(body ?? "").replace(/\r\n/g, "\n").split("\n")) {
+    const marker = /^\s{0,3}(`{3,}|~{3,})/.exec(line);
+    if (fence || marker) {
+      if (current) sections.get(current).push(line);
+      if (!fence) fence = marker[1];
+      else if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length) fence = null;
+      continue;
+    }
     const heading = line.match(/^## (.+?)\s*$/);
     if (heading) { current = heading[1]; sections.set(current, []); }
     else if (current) sections.get(current).push(line);
@@ -988,10 +996,7 @@ function sourceIds(receiptIds, receiptToSource) {
 }
 
 function claimForAddress(frontmatter, address) {
-  return (frontmatter.claims ?? []).find((claim) =>
-    claim.class === "verified" && claim.reproduction_ids?.length &&
-    normalizeText(typeof claim.value === "object" ? claim.value?.address ?? claim.value?.value : claim.value).toLowerCase() === normalizeText(address).toLowerCase(),
-  );
+  return reproducedAddressClaim(frontmatter, address);
 }
 
 function mainnetAllowed(frontmatter) {
@@ -1003,7 +1008,8 @@ function mainnetAllowed(frontmatter) {
       const published = `${receipt?.url ?? ""} ${receipt?.title ?? ""} ${receipt?.excerpt ?? ""}`.toLowerCase();
       return receipt?.kind === "docs" && published.includes(String(address).toLowerCase());
     });
-    return address && deployment.address?.exists_on_4663 === true && (claimForAddress(frontmatter, address) || docsReceipt);
+    return address && deployment.address?.chain === "robinhood-chain" &&
+      deployment.address?.exists_on_4663 === true && (claimForAddress(frontmatter, address) || docsReceipt);
   });
   const supportedMetric = (frontmatter.metrics ?? []).some((metric) =>
     (metric.receipt_ids ?? []).some((id) => ["onchain", "aggregator"].includes(receipts.get(id)?.authority)),
@@ -1027,16 +1033,43 @@ function mappedTag(text, receiptToSource) {
 }
 
 function stripTag(text) {
-  const match = String(text).match(/\[(verified|claim|inference|disputed|unknown)((?:\s+R-[1-9][0-9]*)*)\]\s*$/);
+  const match = String(text).match(PACKET_TAGS_END_RE);
   if (!match) return { text: normalizeText(text), cls: "unknown", receipts: [] };
+  const tags = [...match[0].matchAll(/\[(verified|claim|inference|disputed|unknown)((?:\s+R-[1-9][0-9]*)*)\]/gi)];
+  const cls = tags.map(tag => tag[1].toLowerCase())
+    .reduce((weakest, next) => EVIDENCE_RANK[next] < EVIDENCE_RANK[weakest] ? next : weakest);
   return {
     text: normalizeText(String(text).slice(0, match.index).replace(/^[-*]\s+/, "")),
-    cls: match[1],
-    receipts: match[2].trim().split(/\s+/).filter(Boolean),
+    cls,
+    receipts: [...new Set(tags.flatMap(tag => tag[2].trim().split(/\s+/).filter(Boolean)))],
   };
 }
 
-function findingsFromBody(frontmatter, body, receiptToSource, priorProject, extraGaps = []) {
+/** Paragraphs and individual Markdown list items, never a whole list under its last item's tag. */
+function findingStatements(text) {
+  const out = [];
+  let current = [], listItem = false, fence = null;
+  const flush = () => { if (current.length) out.push(current.join(" ")); current = []; listItem = false; };
+  for (const line of String(text ?? "").replace(/\r\n/g, "\n").split("\n")) {
+    const marker = /^\s{0,3}(`{3,}|~{3,})/.exec(line);
+    if (fence) {
+      if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length) fence = null;
+      continue;
+    }
+    if (marker) { flush(); fence = marker[1]; continue; }
+    if (!line.trim() || /^\s*#{1,6}\s/.test(line)) { flush(); continue; }
+    const bullet = /^\s*(?:[-*+]|\d+[.)])\s+(.+)$/.exec(line);
+    if (bullet) { flush(); current = [bullet[1].trim()]; listItem = true; }
+    else {
+      if (listItem && /^\S/.test(line)) flush();
+      current.push(line.trim());
+    }
+  }
+  flush();
+  return out;
+}
+
+function findingsFromBody(frontmatter, body, receiptToSource, priorProject, extraGaps = [], effectiveLifecycle) {
   const sections = bodySections(body);
   const positive = [], risk = [], unresolved = [];
   const addFinding = (bucket, paragraph) => {
@@ -1047,18 +1080,18 @@ function findingsFromBody(frontmatter, body, receiptToSource, priorProject, extr
     bucket.push(finding);
     if (parsed.cls === "disputed") unresolved.push({ text: parsed.text });
   };
-  for (const paragraph of paragraphs(sections.get("Verification passes"))) {
+  for (const paragraph of findingStatements(sections.get("Verification passes"))) {
     const parsed = stripTag(paragraph);
     addFinding(["verified", "claim"].includes(parsed.cls) ? positive : risk, paragraph);
   }
-  for (const paragraph of paragraphs(sections.get("Material risks"))) addFinding(risk, paragraph);
+  for (const paragraph of findingStatements(sections.get("Material risks"))) addFinding(risk, paragraph);
   for (const conflict of frontmatter.conflicts ?? [])
     if (conflict.status !== "resolved") unresolved.push({ text: `${conflict.field} remains unresolved (${conflict.id}).` });
   const missing = [
     ...(frontmatter.gaps ?? []).map((gap) => ({ text: [gap.question, gap.next ? `Next: ${gap.next}` : null].filter(Boolean).join(" ") })),
     ...extraGaps.map((text) => ({ text: normalizeText(text) })),
   ];
-  if (frontmatter.classification.lifecycle === "mainnet" && !mainnetAllowed(frontmatter))
+  if (frontmatter.classification.lifecycle === "mainnet" && effectiveLifecycle !== "mainnet" && !mainnetAllowed(frontmatter))
     missing.push({ text: "Mainnet status was not promoted because the packet did not meet the explorer, RPC, docs-address or supported-metric bar." });
   return {
     positive: mergeUnique(priorProject?.findings?.positive, positive, (row) => row.text),
@@ -1417,7 +1450,7 @@ export function compile(packet, priorProject = null, priorCensusRow = null, prio
     ...(metrics.length || priorProject?.metrics ? { metrics: mergeUnique(priorProject?.metrics, metrics, (row) => row.kind) } : {}),
     review: priorProject?.review ?? { researcher: frontmatter.producer, approver: "pending", methodology_version: "proofline-v1.0", reviewed_at: frontmatter.as_of.slice(0, 10), published_at: null },
     research_state: nextResearchState(priorProject?.research_state, frontmatter),
-    findings: findingsFromBody(frontmatter, body, receiptToSource, priorProject, metricGaps),
+    findings: findingsFromBody(frontmatter, body, receiptToSource, priorProject, metricGaps, lifecycle),
   };
   if (!(tldr && tldrSource)) delete project.tldr_source;
   const receiptsById = new Map((frontmatter.receipts ?? []).map((receipt) => [receipt.id, receipt]));
