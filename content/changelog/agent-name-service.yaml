@@ -160,3 +160,286 @@
   reviewer: grok-heavy
   methodology_version: proofline-v1.0
   review_key: 43d501b56a009b55
+- date: 2026-09-10
+  slug: agent-name-service
+  type: finding
+  severity: Material
+  title: Research record updated
+  detail: New packet evidence was mapped into the canonical record; unresolved conflicts and evidence gaps remain explicit.
+  prior:
+    tldr: A .agent namespace on Robinhood Chain. A name resolves to an agent identity (key, wallet, endpoint, capabilities), not a wallet.
+    why_people_care:
+      - Robinhood Chain has several human name systems; this one is the census row for agent identity. [claim S4]
+      - Four contracts named on agentsn.xyz/docs have non-empty code on chain 4663, and $ANS has a Uniswap v4 book, so census announced is below the mainnet bar. [claim S4]
+      - It is not Bankr and not Pons; Pons only launched the token. [claim S4]
+    risks:
+      - The four registry contracts are unverified, so fee sinks, revocation and upgrade paths were not read. [claim S4]
+      - Token deployer 0x4B4B…Ed69 and registry deployer 0x35A9…6155 are different EOAs. [claim S4]
+      - Blockscout lists other ERC-20s with the same or similar name. [claim S4]
+    official_links:
+      - kind: x
+        url: https://x.com/RHAgentNS
+      - kind: site
+        url: https://www.agentsn.xyz
+      - kind: docs
+        url: https://www.agentsn.xyz/docs
+      - kind: app
+        url: https://www.agentsn.xyz/register
+    deployments:
+      - &a1
+        label: Registrar
+        chain: robinhood-chain
+        address: not-verified
+        role: other
+        verified: false
+        sources: []
+      - label: AgentNames (registrar)
+        chain: robinhood-chain
+        address: "0x858D52Db9D8484b4921cd6c39Ab5D706BE2155c9"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S14
+          - S19
+      - label: AgentIdentity
+        chain: robinhood-chain
+        address: "0xb7fC672671868e529dB8D123f21b655F9E819c2A"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S15
+          - S18
+      - label: AgentResolver
+        chain: robinhood-chain
+        address: "0x0713447f8e918A217762412005529E339f005f9f"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S16
+      - label: AgentMarket
+        chain: robinhood-chain
+        address: "0x7FcD3C337B6F9203db4287c46A1a607bE6d5357D"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S17
+      - label: ANS token (PonsV2LauncherToken)
+        chain: robinhood-chain
+        address: "0xdB9Bc67f022d967C3a912Ebe3e6ffe25d5F70C24"
+        role: token
+        verified: true
+        sources:
+          - S7
+          - S8
+          - S9
+          - S10
+      - label: Pons v2 launch factory (token launchFactory)
+        chain: robinhood-chain
+        address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+        role: factory
+        verified: false
+        sources:
+          - S8
+          - S9
+          - S10
+      - label: PonsV2BondingCurve (token curve)
+        chain: robinhood-chain
+        address: "0x09eD966e77c02DDd1FF43948D284A85d8e92a0DE"
+        role: other
+        verified: false
+        sources:
+          - S9
+          - S10
+      - label: Token deployer EOA
+        chain: robinhood-chain
+        address: "0x4B4BCA71E68E80130E477Ba831399A12A088Ed69"
+        role: admin
+        verified: false
+        sources:
+          - S9
+          - S10
+          - S12
+      - label: RobinhoodLocker (ANS lock)
+        chain: robinhood-chain
+        address: "0xD0f7d8c6e9f6D80c297bEbe4F7fD1B9C8125C32F"
+        role: other
+        verified: false
+        sources:
+          - S12
+          - S13
+    metrics:
+      - &a2
+        kind: holders
+        value: 64
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S8
+      - &a3
+        kind: tvl
+        value: 5066.36
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S11
+      - kind: volume_24h
+        value: 1.2
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S11
+      - &a4
+        kind: market_cap
+        value: 3154
+        currency: USD
+        as_of: 2026-09-03
+        class: claim
+        sources:
+          - S11
+  new:
+    tldr: .agent names resolve on 4663 to an agent key and wallet. Three of four registry contracts share one EOA owner; resolver owner() reverts.
+    why_people_care:
+      - "Thesis: Robinhood Chain agent software can look up a stable handle instead of a hex string. [claim S28]"
+      - "Traction: DexScreener shows a thin $ANS/ETH Uniswap v4 book, not registry fee revenue. [claim S32]"
+      - "Catalyst: docs describe governance-configurable fees but do not name a fee recipient. [claim S29]"
+    risks:
+      - Three registry contracts return the same owner address; that address has no code. [verified S33 S34 S36 S41]
+      - No audit report was located. [unknown]
+      - Registration ETH and any $ANS buyback sink are not printed on docs. [claim S29]
+    official_links:
+      - kind: x
+        url: https://x.com/RHAgentNS
+      - kind: site
+        url: https://www.agentsn.xyz
+      - kind: docs
+        url: https://www.agentsn.xyz/docs
+      - kind: app
+        url: https://www.agentsn.xyz/register
+      - kind: dexscreener
+        url: https://dexscreener.com/robinhood/0x229ef251e1a4a896a12641277df62b6ec176eaa341f7e2ac7e8c605add66fda8
+    deployments:
+      - *a1
+      - label: AgentNames (registrar)
+        chain: robinhood-chain
+        address: "0x858D52Db9D8484b4921cd6c39Ab5D706BE2155c9"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S14
+          - S19
+          - S29
+          - S33
+      - label: AgentIdentity
+        chain: robinhood-chain
+        address: "0xb7fC672671868e529dB8D123f21b655F9E819c2A"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S15
+          - S18
+          - S29
+          - S34
+      - label: AgentResolver
+        chain: robinhood-chain
+        address: "0x0713447f8e918A217762412005529E339f005f9f"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S16
+          - S29
+          - S35
+      - label: AgentMarket
+        chain: robinhood-chain
+        address: "0x7FcD3C337B6F9203db4287c46A1a607bE6d5357D"
+        role: other
+        verified: true
+        sources:
+          - S5
+          - S17
+          - S29
+          - S36
+      - label: ANS token (PonsV2LauncherToken)
+        chain: robinhood-chain
+        address: "0xdB9Bc67f022d967C3a912Ebe3e6ffe25d5F70C24"
+        role: token
+        verified: true
+        sources:
+          - S7
+          - S8
+          - S9
+          - S10
+          - S31
+          - S32
+          - S42
+      - label: Pons v2 launch factory (token launchFactory)
+        chain: robinhood-chain
+        address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+        role: factory
+        verified: true
+        sources:
+          - S8
+          - S9
+          - S10
+          - S37
+          - S43
+      - label: PonsV2BondingCurve (token curve)
+        chain: robinhood-chain
+        address: "0x09eD966e77c02DDd1FF43948D284A85d8e92a0DE"
+        role: other
+        verified: true
+        sources:
+          - S9
+          - S10
+          - S38
+          - S44
+      - label: Token deployer EOA
+        chain: robinhood-chain
+        address: "0x4B4BCA71E68E80130E477Ba831399A12A088Ed69"
+        role: admin
+        verified: false
+        sources:
+          - S9
+          - S10
+          - S12
+          - S39
+      - label: RobinhoodLocker (ANS lock)
+        chain: robinhood-chain
+        address: "0xD0f7d8c6e9f6D80c297bEbe4F7fD1B9C8125C32F"
+        role: other
+        verified: true
+        sources:
+          - S12
+          - S13
+          - S40
+          - S45
+      - label: Registry owner / deployer EOA
+        chain: robinhood-chain
+        address: "0x35A95822889e73f54ffD06371AB53Dd0Fd646155"
+        role: admin
+        verified: false
+        sources:
+          - S33
+          - S41
+    metrics:
+      - *a2
+      - *a3
+      - kind: volume_24h
+        value: 1.07
+        currency: USD
+        as_of: 2026-09-10
+        class: claim
+        sources:
+          - S32
+      - *a4
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: f9f4ba5a8d2f01e2

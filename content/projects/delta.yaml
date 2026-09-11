@@ -4,7 +4,7 @@ symbol: DELTA
 category: Liquidity manager
 lifecycle: mainnet
 coverage: stub
-summary: "A liquidity manager: users deposit a token or LP into a stake or a shaped Uniswap position and collect a share of that pool's swap fees in ETH. Open or join a pool on deltaliquidity.app, claim streamed fees after a 1% protocol cut, and withdraw with no lockup. @deltaliquidity runs the app. DELTA is a Pons v1 launch token, not the vault."
+summary: "A liquidity manager: users deposit a token or LP into a stake or a shaped Uniswap position and collect a share of that pool's swap fees in ETH. Open or join a pool on deltaliquidity.app, claim streamed fees after a protocol cut, and withdraw with no lockup. @deltaliquidity runs the app. DELTA is a Pons v1 launch token, not the vault."
 official_links:
   - kind: x
     url: https://x.com/deltaliquidity
@@ -16,6 +16,8 @@ official_links:
     url: https://deltaliquidity.app/pools
   - kind: discord
     url: https://discord.gg/deltaliquidity
+  - kind: dexscreener
+    url: https://dexscreener.com/robinhood/0xd64fbda67e1015df43fa5e49f02ca844729e5f94
 dependencies:
   - uniswap
 deployments:
@@ -31,6 +33,8 @@ deployments:
       - S13
       - S14
       - S21
+      - S41
+      - S56
   - label: LP manager / vault contracts
     chain: robinhood-chain
     address: not-verified
@@ -48,14 +52,19 @@ deployments:
       - S18
       - S21
       - S37
+      - S42
+      - S55
+      - S57
   - label: PonsLaunchFactory (token creator)
     chain: robinhood-chain
     address: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB"
     role: factory
-    verified: false
+    verified: true
     sources:
       - S14
       - S15
+      - S43
+      - S58
   - label: VaultFactory (docs; creates stakes)
     chain: robinhood-chain
     address: "0x68EDc4948F60D21c4a7Dcbb8Ed4500cE6D0b153c"
@@ -65,6 +74,8 @@ deployments:
       - S10
       - S21
       - S32
+      - S39
+      - S44
   - label: VaultFarmFactory (docs)
     chain: robinhood-chain
     address: "0x2bdA3FeB985d812a5932fe59eD4D8627BA3A10d1"
@@ -73,6 +84,8 @@ deployments:
     sources:
       - S10
       - S21
+      - S39
+      - S45
   - label: DeltaZap (docs)
     chain: robinhood-chain
     address: "0xC0b8eC7589ee49c53305517bFd53BEd708392294"
@@ -81,6 +94,8 @@ deployments:
     sources:
       - S10
       - S21
+      - S39
+      - S46
   - label: TwapOracle (docs)
     chain: robinhood-chain
     address: "0xA26cB1b06AAE9E58D5DBCCE40f7fC38c0aced62C"
@@ -89,16 +104,21 @@ deployments:
     sources:
       - S10
       - S21
+      - S39
+      - S47
   - label: DeltaPositionBuilder (docs)
     chain: robinhood-chain
     address: "0x6235cF6bd8419b34942F4EDDB39C880BD96dD700"
     role: other
-    verified: false
+    verified: true
     sources:
       - S10
       - S21
       - S33
-  - label: DeltaLadderManager v3 (docs current)
+      - S39
+      - S48
+      - S59
+  - label: DeltaLadderManager v3 (docs)
     chain: robinhood-chain
     address: "0x5cA6214227D1195c4b7b4B96847b8966c688295D"
     role: vault
@@ -106,6 +126,8 @@ deployments:
     sources:
       - S10
       - S21
+      - S39
+      - S49
   - label: Llama adapter LADDER_MANAGER
     chain: robinhood-chain
     address: "0x64680254BF644BBdDe394b95129895c13317FeD4"
@@ -114,6 +136,7 @@ deployments:
     sources:
       - S20
       - S21
+      - S51
   - label: Llama adapter LADDER_MANAGER_V2
     chain: robinhood-chain
     address: "0xC5941433114BB47a9733CB31a0A3A3dBfF45B418"
@@ -122,6 +145,7 @@ deployments:
     sources:
       - S20
       - S21
+      - S52
   - label: Llama adapter ROUTER_V3
     chain: robinhood-chain
     address: "0x46dFEa430d1F069C129E26445319562e29f39C47"
@@ -130,21 +154,30 @@ deployments:
     sources:
       - S20
       - S21
+      - S53
+  - label: DeltaLadderManager v8 (docs current listing)
+    chain: robinhood-chain
+    address: "0xbCb96b15dC2246D242c879316c86e25e846ad5FB"
+    role: vault
+    verified: false
+    sources:
+      - S39
+      - S50
 metrics:
   - kind: tvl
-    value: 13804
+    value: 9540.89
     currency: USD
-    as_of: 2026-09-02
+    as_of: 2026-09-10
     class: claim
     sources:
-      - S19
+      - S54
   - kind: volume_24h
-    value: 4343372.01
+    value: 1560235.74
     currency: USD
-    as_of: 2026-09-02
+    as_of: 2026-09-10
     class: claim
     sources:
-      - S17
+      - S42
   - kind: market_cap
     value: 14760957
     currency: USD
@@ -222,6 +255,16 @@ findings:
       class: verified
       sources:
         - S29
+    - text: "Receipts: collector reports opening docs, X, DexScreener and Llama on 2026-09-10 and recording contract-code and owner reads; a page fetch is not deployment verification. [claim R-2 R-3 R-5 R-7 R-17] - Numbers: Llama figure is currentChainTvls Robinhood Chain; DexScreener volume is the v3 pair, not protocol fees. [claim R-5 R-17] - Adversarial: v8 could be unused docs while v3 or a Llama adapter still takes new positions; app JS is required."
+      class: inference
+      sources:
+        - S39
+        - S50
+    - text: Pause, fee and upgrade controls were not established from deployed source this pass. [unknown] - Treating token-pool liquidity as protocol TVL would conflate different measurements.
+      class: inference
+      sources:
+        - S42
+        - S54
   missing:
     - text: Token address from the bio not reproduced on Blockscout
     - text: Vault and manager contracts not located
@@ -235,6 +278,10 @@ findings:
     - text: "Can site TVL $1,440,933 be reconstructed as the sum of user-custodied Uniswap positions the app indexes, versus Llama's $13,804 custodied slice? Next: sum position NFT amounts the app lists, or ask Llama to add a user-custodied metric"
     - text: "Does anyone still operate deltaliquidity.xyz, and is the constructor website field updated on chain? Next: leave as stale constructor metadata unless DNS returns"
     - text: "Is 0xfA1A…bD5 connected to this team, or only a ticker collision? Next: leave unmerged unless a primary post links the two CAs"
+    - text: "Is there an audit report whose scope matches VaultFactory, ladder managers and DeltaPositionBuilder? Next: record any report URL and match bytecode"
+    - text: "Which ladder manager is live for new positions: docs v8 0xbCb9…d5FB, docs v3 0x5cA6…295D, or Llama 0x6468… / 0xC594…? Next: read the app's configured manager address"
+    - text: "Do unverified VaultFactory / ladder sources match the FAQ (owner can pause and lower fee, cannot raise fee or move deposits), and is there a timelock? Next: verified source or eth_call pause/fee setters"
+    - text: "Can site/X '2m+ TVL' be reconstructed as user-custodied Uniswap positions versus Llama's $9.5k custodied slice? Next: sum position NFT amounts the app lists, or ask Llama for a user-custodied metric"
   unresolved:
     - text: DefiLlama listed Delta at about $16,201 TVL on 2026-08-31 against the project's $1M+ post; Proofline could not tell whether the Llama row is stale or covers a different product slice.
     - text: economics.metric remains unresolved (CON-1).
@@ -243,17 +290,16 @@ themes:
   - rwa
   - memecoin
 risks:
-  - Site TVL (~$1.44M) and Llama TVL (~$13.8k) are different custody slices. Using the token pair or the site header as "protocol TVL" overstates what the contracts hold. [claim S9 S19]
-  - Vault and ladder owner() values are EOAs with no timelock in the path that was opened. [verified S21] [claim S10]
-  - A second Robinhood token also named Delta / DELTA (0xfA1A…bD5) exists. Pairing that ticker with this product mixes two contracts. [verified S29]
-tldr: "A liquidity manager: users deposit a token or LP into a stake or a shaped Uniswap position and collect a share of that pool's swap fees in ETH."
-tldr_source: derived
+  - VaultFactory and ladder v8 return different owner addresses. [verified S44 S50]
+  - FAQ says the owner cannot raise fees or move staked positions; deployed limits are unconfirmed. [claim S39]
+  - Llama TVL, DELTA pool liquidity and the project's TVL claim are different measures, not interchangeable totals. [inference S40 S42 S54]
+tldr: LP manager on 4663. Docs list ladder v8 and a 7.5% claim fee; deployed fee controls and the app's active manager remain unconfirmed.
 why_people_care:
-  - "Delta is a live LP manager on chain 4663: it sits next to Uniswap v3 and v4 books and takes a 1% cut of claimed swap fees rather than minting rewards. [claim S10]"
-  - The DELTA/WETH Uniswap v3 book was about $1.16M of liquidity with about $4.34M of 24h volume at fetch, matching the GeckoTerminal trending DELTA/WETH print this window. [claim S17 S18]
-  - That book is the token pair, not DefiLlama's $13,804 protocol-custodied TVL. [claim S19]
+  - "Thesis: docs describe shaped Uniswap liquidity positions and a share of pool fees. [claim S39]"
+  - "Traction: DELTA/WETH v3 still prints seven-figure 24h volume. [claim S42]"
+  - "Catalyst: docs list ladder v8 above v3; which manager the app uses remains unconfirmed. [claim S39]"
 research_state:
-  as_of: 2026-09-02T23:10:00Z
-  work_id: WORK-20260903-grok-heavy-icarus-research
+  as_of: 2026-09-10T18:30:00Z
+  work_id: WORK-20260910-grok-heavy-delta
   tier: full
-  full_as_of: 2026-09-02T23:10:00Z
+  full_as_of: 2026-09-10T18:30:00Z

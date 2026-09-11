@@ -12,3 +12,142 @@
   reviewer: grok-heavy
   methodology_version: proofline-v1.0
   review_key: bd006c5d28cfe06b
+- date: 2026-09-10
+  slug: circus
+  type: finding
+  severity: Material
+  title: Research record updated
+  detail: "New packet evidence was mapped into the canonical record; unresolved conflicts and evidence gaps remain explicit. Open conflicts: CON-1."
+  prior:
+    summary: Circus is a Robinhood Chain token launchpad at circus.trade. Classic Curve launches a fixed-supply token onto an ETH bonding curve and graduates into a locked Uniswap pool. A second Fair Open lane is described as a Doppler locked Uniswap v4 pool with no bonding phase. The handle linked from the site footer is @circus_trade.
+    tldr: Circus is a Robinhood Chain token launchpad at circus.trade.
+    why_people_care:
+      - Emerson's 30-day labeled set still has a Circus row (597 tokens, one factory) while most DEX volume sits on other pads. [claim S13 S14]
+      - OKX reconstructs about $46.2M lifetime DEX volume on the circus.trade label, with a large RWA share on few traded tokens. [claim S13 S14]
+      - The pad is not a census row. [claim S13 S14]
+    risks:
+      - The live factory is an upgradeable ERC1967 proxy. owner() is one externally owned account with no code and no pending owner. [verified S8 S9] [claim S2 S12]
+      - JS names a timelock, but getMinDelay() reverted and the proxy owner is still that EOA. [verified S8 S9] [claim S2 S12]
+      - Home copy and how-it-works disagree on Uniswap v3 versus v4 at graduation. [verified S8 S9] [claim S2 S12]
+    deployments:
+      - label: barcusLaunchpad / circusQuoteLaunchpad (ERC1967 proxy)
+        chain: robinhood-chain
+        address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
+        role: factory
+        verified: true
+        sources:
+          - S3
+          - S8
+          - S9
+      - label: Launchpad implementation (ERC1967 slot)
+        chain: robinhood-chain
+        address: "0x822E175C1ae12166A0Ea3299d083Da48E6C42B96"
+        role: implementation
+        verified: true
+        sources:
+          - S8
+          - S9
+          - S10
+      - label: CircusLocker (barcusLocker)
+        chain: robinhood-chain
+        address: "0xA256bC02dbB92ed1cB607a7DE7b0bbEBca29e930"
+        role: other
+        verified: true
+        sources:
+          - S3
+          - S11
+      - label: JS barcusTimelock
+        chain: robinhood-chain
+        address: "0xC126829B4b3782ad30484b298C762507bf9bCa2A"
+        role: timelock
+        verified: false
+        sources:
+          - S3
+          - S12
+      - label: Launchpad owner() / factory creator
+        chain: robinhood-chain
+        address: "0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681"
+        role: admin
+        verified: true
+        sources:
+          - S8
+          - S9
+      - label: circusQuoteLocker
+        chain: robinhood-chain
+        address: "0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D"
+        role: other
+        verified: false
+        sources:
+          - S3
+          - S11
+  new:
+    summary: Circus is a Robinhood Chain token launchpad at circus.trade. Classic Curve launches a fixed-supply token onto an ETH bonding curve and graduates into a locked Uniswap pool. A second Fair Open lane is described as a Doppler locked Uniswap v4 pool with no bonding phase. The handle linked from the site is @circus_trade.
+    tldr: ETH bonding-curve pad on 4663. Official copy disagrees on v3 vs v4 graduation; implementation source was not read this pass.
+    why_people_care:
+      - "Thesis: a public ETH curve plus a claimed locked IPO is the product, not a private raise. [claim S2]"
+      - "Traction: homepage printed 48 graduated tokens and $1.22M raised on curves. [claim S19]"
+      - "Catalyst: homepage says v3 graduation; docs say v4. The routing conflict remains unresolved. [disputed S19 S2]"
+    risks:
+      - Proxy owner() returns an address with no code, not the labeled timelock address. [verified S21 S24 S25]
+      - Homepage and docs disagree on Uniswap v3 vs v4 graduation. [disputed S19 S2]
+      - No audit artifact was located despite "audited factory" copy. [unknown]
+    deployments:
+      - label: barcusLaunchpad / circusQuoteLaunchpad (ERC1967 proxy)
+        chain: robinhood-chain
+        address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
+        role: factory
+        verified: true
+        sources:
+          - S3
+          - S8
+          - S9
+          - S21
+      - label: Launchpad implementation (ERC1967 slot)
+        chain: robinhood-chain
+        address: "0x822E175C1ae12166A0Ea3299d083Da48E6C42B96"
+        role: implementation
+        verified: true
+        sources:
+          - S8
+          - S9
+          - S10
+          - S22
+      - label: CircusLocker (barcusLocker)
+        chain: robinhood-chain
+        address: "0xA256bC02dbB92ed1cB607a7DE7b0bbEBca29e930"
+        role: other
+        verified: true
+        sources:
+          - S3
+          - S11
+          - S23
+      - label: JS barcusTimelock
+        chain: robinhood-chain
+        address: "0xC126829B4b3782ad30484b298C762507bf9bCa2A"
+        role: timelock
+        verified: false
+        sources:
+          - S3
+          - S12
+          - S24
+      - label: Launchpad owner() / factory creator
+        chain: robinhood-chain
+        address: "0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681"
+        role: admin
+        verified: true
+        sources:
+          - S8
+          - S9
+          - S25
+      - label: circusQuoteLocker
+        chain: robinhood-chain
+        address: "0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D"
+        role: other
+        verified: false
+        sources:
+          - S3
+          - S11
+          - S26
+  reviewer: grok-heavy
+  methodology_version: proofline-v1.0
+  review_key: 914021cae7f7c407
