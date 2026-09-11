@@ -226,6 +226,19 @@ findings:
         - S13
         - S17
         - S19
+    - text: "Receipts: collector reports opening docs, X, DexScreener and Llama on 2026-09-10 and recording contract-code and owner reads; a page fetch is not deployment verification."
+      class: claim
+      sources:
+        - S39
+        - S40
+        - S42
+        - S44
+        - S54
+    - text: "Numbers: Llama figure is currentChainTvls Robinhood Chain; DexScreener volume is the v3 pair, not protocol fees."
+      class: claim
+      sources:
+        - S42
+        - S54
   risk:
     - text: "Adversarial: the strongest contrary reading is that Gecko trending DELTA/WETH is the other Robinhood DELTA (0xfA1A…bD5, ~$4.5M reported liq) or Ethereum Delta Financial (Llama slug delta-financial, 0x9EA3…). Trending pool 0xd64fbd… has base 0xe8ff…a791; 0xfA1A… 24h volume is $0.04; Llama slug delta points at deltaliquidity.app. A weaker contrary reading is that Delta is only a Pons memecoin: the token is a Pons launch, but docs-listed vault and ladder contracts exist with code on 4663."
       class: inference
@@ -255,12 +268,14 @@ findings:
       class: verified
       sources:
         - S29
-    - text: "Receipts: collector reports opening docs, X, DexScreener and Llama on 2026-09-10 and recording contract-code and owner reads; a page fetch is not deployment verification. [claim R-2 R-3 R-5 R-7 R-17] - Numbers: Llama figure is currentChainTvls Robinhood Chain; DexScreener volume is the v3 pair, not protocol fees. [claim R-5 R-17] - Adversarial: v8 could be unused docs while v3 or a Llama adapter still takes new positions; app JS is required."
+    - text: "Adversarial: v8 could be unused docs while v3 or a Llama adapter still takes new positions; app JS is required."
       class: inference
       sources:
         - S39
         - S50
-    - text: Pause, fee and upgrade controls were not established from deployed source this pass. [unknown] - Treating token-pool liquidity as protocol TVL would conflate different measurements.
+    - text: Pause, fee and upgrade controls were not established from deployed source this pass.
+      class: unknown
+    - text: Treating token-pool liquidity as protocol TVL would conflate different measurements.
       class: inference
       sources:
         - S42
