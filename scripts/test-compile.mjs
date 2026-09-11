@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { parse } from "yaml";
 import { parsePacket, checkPacket, compile, feedIdentity } from "./lib/packet.mjs";
 import { runCompile } from "./compile-packet.mjs";
+import { validateAgainst } from "./lib/schemas.mjs";
 
 let failures = 0;
 async function test(name, fn) {
@@ -60,6 +61,52 @@ await test("compile a full packet into an existing stub without granting full co
   assert.ok(update.research.includes("[verified S2]"), "packet receipt ids become canonical source ids");
   assert.ok(update.research.includes("## Engineering\n\n_Research pending._"));
   assert.ok(!("scoring" in update.project));
+});
+
+await test("unknown card evidence survives mapping, fallback and truncation without borrowed sources", async () => {
+  for (const suffix of ["[unknown]", "[unknown]   "]) {
+    const packet = await fixture("new-seed.md");
+    packet.body = `## What could go wrong\n\n- No audit report was located. ${suffix}\n`;
+    assert.deepEqual(compile(packet).project.risks, ["No audit report was located. [unknown]"]);
+    assert.deepEqual(validateAgainst("project", compile(packet).project), []);
+  }
+
+  const packet = await fixture("new-seed.md");
+  packet.body = "## What could go wrong\n\n- No audit report was located. [verified R-999]\n";
+  assert.throws(() => compile(packet), /R-999 is referenced but not defined/);
+  packet.body = `## What could go wrong\n\n- ${"The audit scope remains unresolved and needs investigation; ".repeat(8)} [unknown]\n`;
+  const [risk] = compile(packet).project.risks;
+  assert.ok(risk.length <= 200);
+  assert.match(risk, /… \[unknown\]$/);
+  assert.ok(!risk.includes("[claim"));
+
+  packet.body = `## What could go wrong\n\n- ${"Some contract code exists but audit coverage remains unresolved; ".repeat(8)} [verified R-1] [unknown]\n`;
+  const [mixed] = compile(packet).project.risks;
+  assert.ok(mixed.length <= 200);
+  assert.match(mixed, /… \[verified S1\] \[unknown\]$/);
+});
+
+await test("derived unknown reasons are not promoted to sourced claims and unknown risk paragraphs survive", async () => {
+  const packet = await fixture("new-seed.md");
+  packet.body = `## Why it matters\n\nProduct utility is unknown. Activity is unknown. Adoption is unknown. [unknown]\n\n## What could go wrong\n\nNo audit report was located. [unknown]\n`;
+  const result = compile(packet);
+  assert.equal(result.project.why_people_care, undefined);
+  assert.deepEqual(result.project.risks, ["No audit report was located. [unknown]"]);
+  assert.ok(result.notices.some(n => n.includes("every bullet needs a source id")));
+  for (const risk of ["No audit report.", "No audit report. [verified]", "No audit report. [unknown S1]"]) {
+    assert.ok(validateAgainst("project", { ...result.project, risks: [risk] }).length,
+      "only an explicit source-free unknown or a source-backed evidence tag is allowed");
+  }
+  assert.ok(validateAgainst("project", { ...result.project,
+    why_people_care: ["One. [unknown]", "Two. [claim S1]", "Three. [claim S1]"] }).length,
+    "schema still rejects unknown positive reasons");
+
+  packet.body = "## What could go wrong\n\n- Missing audit scope.\n- Code exists. [verified R-1]\n- Audit coverage remains disputed. [disputed R-1]\n";
+  assert.deepEqual(compile(packet).project.risks, [
+    "Missing audit scope. [claim S1]",
+    "Code exists. [verified S1]",
+    "Audit coverage remains disputed. [disputed S1]",
+  ], "untagged fallback and explicit sourced classes keep their existing behavior");
 });
 
 await test("an explicit conflict keeps prior state and files the disagreement", async () => {
@@ -127,6 +174,13 @@ await test("CLI writes only canonical files, is idempotent, and supports dry-run
     assert.equal(changelog.length, 1, "same packet does not append changelog twice");
     await runCompile({ packetPath: "fixtures/compile-packet/new-seed.md", contentDir: dryRoot, dryRun: true, enforceMinimums: false });
     assert.equal((await readdir(join(dryRoot, "projects"))).length, 0, "dry-run writes nothing");
+    // Isolated legacy fixture: exercise the full canonical schema path, not only pure compile().
+    const unknownPacketPath = join(root, "unknown-risk.md");
+    await writeFile(unknownPacketPath, `${await readFile("fixtures/compile-packet/new-seed.md", "utf8")}\n## What could go wrong\n\n- No audit report was located. [unknown]\n`);
+    const beforeDry = await treeSnapshot(root);
+    const unknown = await runCompile({ packetPath: unknownPacketPath, contentDir: root, dryRun: true, enforceMinimums: false });
+    assert.deepEqual(unknown.project.risks, ["No audit report was located. [unknown]"]);
+    assert.deepEqual(await treeSnapshot(root), beforeDry, "unknown-risk dry-run writes nothing");
   } finally {
     await rm(root, { recursive: true, force: true });
     await rm(dryRoot, { recursive: true, force: true });
