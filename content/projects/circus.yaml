@@ -85,7 +85,21 @@ review:
   reviewed_at: 2026-09-03
   published_at: null
 findings:
-  positive: []
+  positive:
+    - text: "Receipts: collector reports opening homepage, how-it-works, X and DexScreener on 2026-09-10; contract-code, owner, implementation-slot and delay reads are recorded separately."
+      class: claim
+      sources:
+        - S19
+        - S2
+        - S20
+        - S21
+        - S24
+        - S27
+    - text: "Numbers: $1.22M / 48 graduated are homepage strings; CRUDECAT volume is a DexScreener pair, not factory volume."
+      class: claim
+      sources:
+        - S19
+        - S27
   risk:
     - text: "Receipts: circus.trade, how-it-works, barcus-1 JS, X profile and posts, Emerson and OKX Dune, Llama protocols, GitHub org circus, Blockscout api/v2, and RPC were opened on 2026-09-03; excerpts copied from those responses. [verified R-1 R-3 R-8 R-13] - Numbers: token counts and volume are Dune aggregator rows, not Llama. Bytecode lengths, nonce, owner(), and the implementation slot are chain 4663 RPC. Site $1.20M / 41 graduated are HTML counters. [verified R-8] [claim R-13 R-14] - Adversarial: strongest contrary reading is that 0xb7fA…cb00 is a leftover quote-lane proxy and new launches use Doppler airlock 0xeb7C…0862, or that Emerson's Circus label is a registry alias for another pad. Official JS sets both barcusLaunchpad and circusQuoteLaunchpad to this address on chainId 4663; Emerson factory map labels it Circus. A second JS barcusLaunchpad 0x9F4e…D5Cf has no code on 4663. Pons, LONG, Varo, Coinbarrel, and LetsCash use different factories."
       class: inference
@@ -98,11 +112,21 @@ findings:
       sources:
         - S13
         - S14
-    - text: "Receipts: collector reports opening homepage, how-it-works, X and DexScreener on 2026-09-10; contract-code, owner, implementation-slot and delay reads are recorded separately. [claim R-1 R-2 R-3 R-4 R-7 R-10] - Numbers: $1.22M / 48 graduated are homepage strings; CRUDECAT volume is a DexScreener pair, not factory volume. [claim R-1 R-10] - Adversarial: CRUDECAT's USO v3 book could be a later market, not the Circus IPO pool; factory logs are still required."
+    - text: "Adversarial: CRUDECAT's USO v3 book could be a later market, not the Circus IPO pool; factory logs are still required."
       class: inference
       sources:
         - S27
-    - text: Proxy owner() returns an address with no code; this read alone does not establish access checks on privileged functions. [verified R-4 R-8] - Homepage and docs disagree on v3/v4 graduation; neither establishes the deployed route. [disputed R-1 R-2] - Implementation source and the deployed liquidity-lock controls were not established this pass.
+    - text: Proxy owner() returns an address with no code; this read alone does not establish access checks on privileged functions.
+      class: verified
+      sources:
+        - S21
+        - S25
+    - text: Homepage and docs disagree on v3/v4 graduation; neither establishes the deployed route.
+      class: disputed
+      sources:
+        - S19
+        - S2
+    - text: Implementation source and the deployed liquidity-lock controls were not established this pass.
       class: unknown
   missing:
     - text: "Is launchpad implementation 0x822E…2B96 source-verified anywhere, and what is its source name? Next: read verified source if it lands; otherwise treat the proxy as shell-only"
@@ -116,9 +140,9 @@ findings:
     - text: "Is launchpad implementation 0x822E…2B96 source-verified anywhere, and what is its source name? Next: read verified source if it lands"
     - text: "Does a graduated Circus pair land in Uniswap v3 or v4, and which pool manager / nfpm is used? Next: eth_getLogs or a create/graduate tx against PoolManager 0x8366…0951 and v3 factory 0x1f7d…2EfA"
     - text: "Can homepage Raised on Curves $1.22M and Graduated Tokens 48 be reproduced from factory events? Next: sum curve/graduate events on 0xb7fA…cb00"
-    - text: Mainnet status was not promoted because the packet did not meet the explorer, RPC, docs-address or supported-metric bar.
   unresolved:
     - text: product.mechanism remains unresolved (CON-1).
+    - text: Homepage and docs disagree on v3/v4 graduation; neither establishes the deployed route.
 tldr: ETH bonding-curve pad on 4663. Official copy disagrees on v3 vs v4 graduation; implementation source was not read this pass.
 why_people_care:
   - "Thesis: a public ETH curve plus a claimed locked IPO is the product, not a private raise. [claim S2]"

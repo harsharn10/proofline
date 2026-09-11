@@ -141,6 +141,18 @@ findings:
       sources:
         - S3
         - S2
+    - text: "Receipts: collector reports opening site, docs, X and DexScreener on 2026-09-10 and recording RPC reads for the listed contracts; these are separate evidence types."
+      class: claim
+      sources:
+        - S28
+        - S29
+        - S30
+        - S32
+        - S33
+    - text: "Numbers: liquidity and 24h volume are the DexScreener v4 pair, not a registry TVL."
+      class: claim
+      sources:
+        - S32
   risk:
     - text: "Receipts: agentsn.xyz, /docs, /register, X profile and named status URLs, Blockscout address/token/tx/search APIs, DexScreener latest/dex/tokens, DefiLlama protocols, github.com/RHAgentNS (404), and RPC eth_getCode/eth_call were opened on 2026-09-03; excerpts are copied from those responses. [verified R-1 R-4 R-6 R-8] - Numbers: 5066.36 USD is DexScreener Uniswap v4 ANS/ETH liquidity.usd, not protocol TVL; 1.2 USD is that pair's volume.h24; 64 is Blockscout holders_count; 47823576.32 ANS is the lock amount, not circulating supply. [claim R-5 R-8 R-9] - Adversarial: the strongest contrary reading is that Agent Name Service is Hoodle NS, RHNS, .hood or Bankr, or that census `announced` still holds because the registrar is unverified. Distinct handle, domain and four docs-named contracts with non-empty code, plus a verified Pons v2 token whose socials() match the site, argue against a merge and meet the mainnet bar."
       class: inference
@@ -151,12 +163,19 @@ findings:
         - S11
     - text: "Four registry contracts are unverified; owner, fee recipient and revoke path were not read. [claim R-11 R-12] [unknown] - Token deployer and registry deployer are different EOAs with no code. [verified R-6 R-15] - Registration price and buyback share are project posts and site JS, not a reproduced fee-sink balance. [claim R-1 R-18] - Other ERC-20s on chain 4663 use AgentNS / Agent Name Service / RHAgentNS names. Flag: ca-collision. [claim R-24] - No audit report URL was located."
       class: unknown
-    - text: "Receipts: collector reports opening site, docs, X and DexScreener on 2026-09-10 and recording RPC reads for the listed contracts; these are separate evidence types. [claim R-1 R-2 R-3 R-5 R-11] - Numbers: liquidity and 24h volume are the DexScreener v4 pair, not a registry TVL. [claim R-5] - Adversarial: a same-ticker ANS token or a Pons-launched memecoin could be confused with the registrar; the docs-named four-contract set and the X bio link to agentsn.xyz argue this row is the namespace, not the pad."
+    - text: "Adversarial: a same-ticker ANS token or a Pons-launched memecoin could be confused with the registrar; the docs-named four-contract set and the X bio link to agentsn.xyz argue this row is the namespace, not the pad."
       class: inference
       sources:
         - S29
         - S30
-    - text: Three registry owner() calls return the same address, which has no code; this does not establish all privileged paths. [verified R-11 R-12 R-14 R-19] - Audit absence and unpublished fee sink leave revoke and treasury behaviour unread.
+    - text: Three registry owner() calls return the same address, which has no code; this does not establish all privileged paths.
+      class: verified
+      sources:
+        - S33
+        - S34
+        - S36
+        - S41
+    - text: Audit absence and unpublished fee sink leave revoke and treasury behaviour unread.
       class: unknown
   missing:
     - text: Lifecycle not verified — no deployment evidence reviewed
