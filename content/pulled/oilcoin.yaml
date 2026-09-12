@@ -1,13 +1,13 @@
 slug: oilcoin
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-12T12:50:49.906Z # chain head 61119753 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
     label: OILCOIN token (EIP-1167 DopplerERC20V1 clone)
     role: token
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: OilCoin
     proxy:
       type: none
       implementation: null
@@ -15,14 +15,10 @@ addresses:
     owner: "0xeb7c034704ef8dcd2d32324c1545f62fb4ad0862"
     owner_type: contract
     safe: null
-    created_block: null
-    created_at: null
-    holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'tokens/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
+    created_block: 52796163
+    created_at: 2026-09-02T18:45:10.000Z
+    holders: 97
+    errors: []
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
     label: DopplerERC20V1Factory (create tokenFactory)
     role: factory
@@ -74,23 +70,6 @@ addresses:
     created_at: 2026-07-13T11:36:09.000Z
     holders: null
     errors: []
-  - address: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
-    label: USO Stock Token rail (pair quote)
-    role: token
-    is_contract: true
-    source_verified: true
-    contract_name: BeaconProxy
-    proxy:
-      type: none
-      implementation: null
-      admin: null
-    owner: null
-    owner_type: none
-    safe: null
-    created_block: 48277
-    created_at: 2026-06-10T15:25:06.000Z
-    holders: 6267
-    errors: []
   - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
     label: Airlock (token owner)
     role: other
@@ -119,107 +98,84 @@ addresses:
 metrics: []
 market:
   token_address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-12T12:50:49.906Z
   pairs:
     - dex: uniswap
       pair_address: "0x413dc2a61b3684cfe76522d39027cf486a71535bd0e538243be95aed87e2fbe1"
       quote_symbol: USO
-      price_usd: 0.00004114
-      liquidity_usd: 38543.52
-      volume_h24: 8186.44
-      volume_h6: 1433.58
+      price_usd: 0.00003909
+      liquidity_usd: 38148.34
+      volume_h24: 1888.1
+      volume_h6: 0
       txns_h24:
-        buys: 87
-        sells: 66
-      price_change_h24: -26.21
-      market_cap: 41140
-      fdv: 41140
+        buys: 10
+        sells: 5
+      price_change_h24: -14.65
+      market_cap: 39097
+      fdv: 39097
       created_at: 2026-09-02T18:45:10.000Z
-    - dex: uniswap
-      pair_address: "0x8c68451d45caaada65cec323775ac2e45d668e5ccea1380768d8313aa724f5fb"
-      quote_symbol: USDG
-      price_usd: 0.00004072
-      liquidity_usd: 41.77
-      volume_h24: 5.28
-      volume_h6: 5.01
-      txns_h24:
-        buys: 0
-        sells: 2
-      price_change_h24: -34.92
-      market_cap: 40724
-      fdv: 40724
-      created_at: 2026-09-02T20:21:06.000Z
-  liquidity_usd: 38585.29
-  volume_h24: 8191.72
-  trades_h24: 155
-  price_usd: 0.00004114
-  price_change_h24: -26.21
-  market_cap_usd: 41140
-  fdv_usd: 41140
-  fdv: 41140
+  liquidity_usd: 38148.34
+  volume_h24: 1888.1
+  trades_h24: 15
+  price_usd: 0.00003909
+  price_change_h24: -14.65
+  market_cap_usd: 39097
+  fdv_usd: 39097
+  fdv: 39097
   first_pair_at: 2026-09-02T18:45:10.000Z
-  top10_share: null
-  top10_share_ex_pools: null
-  burned_share: null
-  top10_as_of: null
-  launchpad: null
+  top10_share: 0.939899525053768
+  top10_share_ex_pools: 0.1789838182127004
+  burned_share: 0
+  top10_as_of: 2026-09-12T12:50:49.906Z
+  launchpad:
+    slug: doppler
+    via: factory
+    address: "0x1b37d3a72082029c44b35b604ea473617580b69a"
+    shared: false
   rialto: null
   pair_asset:
     ticker: USO
     name: United States Oil Fund
     address: "0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344"
     category: etf
-    tokenized_value_usd: 1476667.34
-    tokenized_shares: 10392.479
-    change_7d: 165656.12
+    tokenized_value_usd: 2121838.32
+    tokenized_shares: 13698.117000000004
+    change_7d: 190403.83
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors:
-    - step: launchpad
-      message: addresses/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18 did not return creator_address_hash
-    - step: top10_share
-      message: 'tokens/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: 'tokens/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18/holders: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: token total_supply was not returned for 0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18
-    - step: top10_share_ex_pools
-      message: holder page was not available for 0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18
+  errors: []
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-12T12:50:49.906Z
   mint: unknown
+  mint_as_of: null
   renounced: false
+  renounced_as_of: 2026-09-12T12:50:49.906Z
   lp:
     - pair: "0x413dc2a61b3684cfe76522d39027cf486a71535bd0e538243be95aed87e2fbe1"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-    - pair: "0x8c68451d45caaada65cec323775ac2e45d668e5ccea1380768d8313aa724f5fb"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors:
     - step: mint
-      message: 'smart-contracts/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
-    - step: mint
       message: verified ABI unavailable
+    - step: mint
+      message: 'smart-contracts/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-12T12:50:49.906Z
   addresses:
     - address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
       label: OILCOIN token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 2502
+      token_transfers_count: 0
+      last_tx_at: 2026-09-11T14:06:11.000Z
+      last_method: "0x095ea7b3"
+      txns_24h: 1
       launches_24h: null
-      errors:
-        - step: blockscout
-          message: 'counters/0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+      window_as_of: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      errors: []
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       label: DopplerERC20V1Factory (create tokenFactory)
       role: factory
@@ -229,6 +185,8 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
+      window_as_of: 2026-09-12T12:50:49.906Z
+      stale_since: null
       errors: []
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
       label: DopplerERC20V1 implementation
@@ -239,40 +197,177 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
+      window_as_of: 2026-09-12T12:50:49.906Z
+      stale_since: null
       errors: []
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       label: LongLauncher (create caller)
       role: factory
-      transactions_count: 13369
-      token_transfers_count: 4
-      last_tx_at: 2026-09-04T20:52:03.000Z
+      transactions_count: 31976
+      token_transfers_count: 10
+      last_tx_at: 2026-09-11T23:28:12.000Z
       last_method: create
-      txns_24h: 2000
-      launches_24h: 1998
-      errors:
-        - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
-    - address: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
-      label: USO Stock Token rail (pair quote)
-      role: token
-      transactions_count: 8257
-      token_transfers_count: 45
-      last_tx_at: 2026-09-04T22:12:30.000Z
-      last_method: approve
-      txns_24h: 1548
-      launches_24h: null
+      txns_24h: 4
+      launches_24h: 4
+      window_as_of: 2026-09-12T12:50:49.906Z
+      stale_since: null
       errors: []
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (token owner)
       role: other
-      transactions_count: 9126
-      token_transfers_count: 445362
-      last_tx_at: 2026-09-04T20:42:51.000Z
+      transactions_count: 11407
+      token_transfers_count: 564124
+      last_tx_at: 2026-09-12T12:40:09.000Z
       last_method: create
-      txns_24h: 112
+      txns_24h: 100
       launches_24h: null
-      errors: []
-  last_activity_at: 2026-09-04T22:12:30.000Z
-  txns_24h: 3660
-  launches_24h: 1998
+      window_as_of: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      errors:
+        - step: txns_24h capped
+          message: stopped after 2 pages; count is a floor
+  last_activity_at: 2026-09-12T12:40:09.000Z
+  txns_24h: 105
+  launches_24h: 4
+  window_as_of: 2026-09-12T12:50:49.906Z
+  stale_since: null
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: "0xd9b7a91d69db88fe70b18dfe7d7e5f682f89431671cfcd5f818b1f2ba0a250d7"
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 80
+    - kind: activity
+      address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: "0xd9b7a91d69db88fe70b18dfe7d7e5f682f89431671cfcd5f818b1f2ba0a250d7"
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 20
+    - kind: address
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: b3931c1995f630dc
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: null
+      code_hash: 8ef9efc9c3c5b922
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: "0xe66e9de232dc3b1a36fdda9372287666039aff74691a71282ce1d36d6cdc7ca2"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: "0xe66e9de232dc3b1a36fdda9372287666039aff74691a71282ce1d36d6cdc7ca2"
+      code_hash: 564d0fd58633bdbd
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 0
+    - kind: address
+      address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: "0xb0fe3adea958d9ce2ed89575f551397b0bf0ca17736608880268522c1168d3dd"
+      code_hash: f8de098a2663a757
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 0
+    - kind: activity
+      address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: "0xb0fe3adea958d9ce2ed89575f551397b0bf0ca17736608880268522c1168d3dd"
+      code_hash: f8de098a2663a757
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 0
+    - kind: top10
+      address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
+      status: read
+      reason: token change signal changed
+      signal_value: 15
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 20
+    - kind: structure
+      address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
+      status: read
+      reason: token change signal changed
+      signal_value: 15
+      signal: null
+      code_hash: d6778098513fa311
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 20
+    - kind: lp
+      address: "0x9CB19d6e3F87543826E50F61FF4C5A6cdf3B1E18"
+      status: read
+      reason: token change signal changed
+      signal_value: 15
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 0
+refresh:
+  policy_version: 1
+  status: complete
+  attempted_at: 2026-09-12T12:50:49.906Z
+  last_success_at: 2026-09-12T12:50:49.906Z
+  reason: "recent own activity or seed observation window: weekly"
 errors: []

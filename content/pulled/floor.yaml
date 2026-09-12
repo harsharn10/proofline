@@ -1,13 +1,13 @@
 slug: floor
-pulled_at: 2026-09-04T20:46:36.233Z # chain head 54560868 at read time
+pulled_at: 2026-09-12T12:50:49.906Z # chain head 61119753 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x8aD25c65587979533fa1cA0d2194A76D5bAE305d"
     label: $FLR token (RPC name FLOOR, symbol FLR, ERC-20)
     role: token
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: PonsV2LauncherToken
     proxy:
       type: none
       implementation: null
@@ -15,19 +15,15 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: null
-    created_at: null
-    holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0x8aD25c65587979533fa1cA0d2194A76D5bAE305d: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'tokens/0x8aD25c65587979533fa1cA0d2194A76D5bAE305d: HTTP 402: {"error":"Out of credits"}'
+    created_block: 39983647
+    created_at: 2026-08-18T20:25:13.000Z
+    holders: 730
+    errors: []
   - address: "0xEf9Cb10585F7641c89AFb5Ab97559749CB7B1b71"
     label: Site-labeled FLOOR Vault
     role: vault
     is_contract: true
-    source_verified: null
+    source_verified: false
     contract_name: null
     proxy:
       type: none
@@ -36,17 +32,15 @@ addresses:
     owner: "0xe1ea1bc285a49293fb75490fa0e3f497d04302a5"
     owner_type: eoa
     safe: null
-    created_block: null
-    created_at: null
+    created_block: 45407748
+    created_at: 2026-08-25T03:32:40.000Z
     holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0xEf9Cb10585F7641c89AFb5Ab97559749CB7B1b71: HTTP 402: {"error":"Out of credits"}'
+    errors: []
   - address: "0xc2f799fF3c16DBE4801A8bF9c9b47177BcFD2479"
     label: Site-labeled FLOOR Distributor
     role: other
     is_contract: true
-    source_verified: null
+    source_verified: false
     contract_name: null
     proxy:
       type: none
@@ -55,121 +49,207 @@ addresses:
     owner: "0xe1ea1bc285a49293fb75490fa0e3f497d04302a5"
     owner_type: eoa
     safe: null
-    created_block: null
-    created_at: null
+    created_block: 46012790
+    created_at: 2026-08-25T20:24:06.000Z
     holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0xc2f799fF3c16DBE4801A8bF9c9b47177BcFD2479: HTTP 402: {"error":"Out of credits"}'
+    errors: []
 metrics: []
 market:
   token_address: "0x8aD25c65587979533fa1cA0d2194A76D5bAE305d"
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-12T12:50:49.906Z
   pairs:
     - dex: uniswap
       pair_address: "0x2a526d2b957a6f58ba5bf796cd966fe1de4269fb80ad654c313f9c603bf2c1c5"
       quote_symbol: ETH
-      price_usd: 0.0001257
-      liquidity_usd: 32531.1
-      volume_h24: 46404.73
-      volume_h6: 5424.71
+      price_usd: 0.00001767
+      liquidity_usd: 12389.81
+      volume_h24: 2716.3
+      volume_h6: 7
       txns_h24:
-        buys: 143
-        sells: 256
-      price_change_h24: -34.82
-      market_cap: 108907
-      fdv: 118906
+        buys: 9
+        sells: 12
+      price_change_h24: 5.81
+      market_cap: 15306
+      fdv: 16712
       created_at: 2026-08-18T20:29:34.000Z
-  liquidity_usd: 32531.1
-  volume_h24: 46404.73
-  trades_h24: 399
-  price_usd: 0.0001257
-  price_change_h24: -34.82
-  market_cap_usd: 108907
-  fdv_usd: 118906
-  fdv: 118906
+  liquidity_usd: 12389.81
+  volume_h24: 2716.3
+  trades_h24: 21
+  price_usd: 0.00001767
+  price_change_h24: 5.81
+  market_cap_usd: 15306
+  fdv_usd: 16712
+  fdv: 16712
   first_pair_at: 2026-08-18T20:29:34.000Z
-  top10_share: null
-  top10_share_ex_pools: null
-  burned_share: null
-  top10_as_of: null
-  launchpad: null
+  top10_share: 0.6896767572305909
+  top10_share_ex_pools: 0.1881484218171434
+  burned_share: 0.0546962281755155
+  top10_as_of: 2026-09-12T12:50:49.906Z
+  launchpad:
+    slug: pons
+    via: creator
+    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
   rialto: null
   pair_asset: null
   volume_disagreement: null
-  errors:
-    - step: launchpad
-      message: addresses/0x8aD25c65587979533fa1cA0d2194A76D5bAE305d did not return creator_address_hash
-    - step: top10_share
-      message: 'tokens/0x8aD25c65587979533fa1cA0d2194A76D5bAE305d: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: 'tokens/0x8aD25c65587979533fa1cA0d2194A76D5bAE305d/holders: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: token total_supply was not returned for 0x8aD25c65587979533fa1cA0d2194A76D5bAE305d
-    - step: top10_share_ex_pools
-      message: holder page was not available for 0x8aD25c65587979533fa1cA0d2194A76D5bAE305d
+  errors: []
 structure:
-  pulled_at: 2026-09-04T20:46:36.233Z
-  mint: unknown
+  pulled_at: 2026-09-12T12:50:49.906Z
+  mint: no-mint-function
+  mint_as_of: 2026-09-12T12:50:49.906Z
   renounced: null
+  renounced_as_of: null
   lp:
     - pair: "0x2a526d2b957a6f58ba5bf796cd966fe1de4269fb80ad654c313f9c603bf2c1c5"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors:
-    - step: mint
-      message: 'smart-contracts/0x8aD25c65587979533fa1cA0d2194A76D5bAE305d: HTTP 402: {"error":"Out of credits"}'
-    - step: mint
-      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-04T20:46:36.233Z
+  pulled_at: 2026-09-12T12:50:49.906Z
   addresses:
     - address: "0x8aD25c65587979533fa1cA0d2194A76D5bAE305d"
       label: $FLR token (RPC name FLOOR, symbol FLR, ERC-20)
       role: token
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 4480
+      token_transfers_count: 18
+      last_tx_at: 2026-09-12T10:43:42.000Z
+      last_method: approve
+      txns_24h: 9
       launches_24h: null
-      errors:
-        - step: blockscout
-          message: 'counters/0x8aD25c65587979533fa1cA0d2194A76D5bAE305d: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+      window_as_of: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      errors: []
     - address: "0xEf9Cb10585F7641c89AFb5Ab97559749CB7B1b71"
       label: Site-labeled FLOOR Vault
       role: vault
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 225
+      token_transfers_count: 3819
+      last_tx_at: 2026-09-09T21:58:56.000Z
+      last_method: "0x2e17de78"
+      txns_24h: 0
       launches_24h: null
-      errors:
-        - step: blockscout
-          message: 'counters/0xEf9Cb10585F7641c89AFb5Ab97559749CB7B1b71: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+      window_as_of: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      errors: []
     - address: "0xc2f799fF3c16DBE4801A8bF9c9b47177BcFD2479"
       label: Site-labeled FLOOR Distributor
       role: other
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 548
+      token_transfers_count: 10728
+      last_tx_at: 2026-09-03T21:37:57.000Z
+      last_method: "0x72a67eb4"
+      txns_24h: 0
       launches_24h: null
-      errors:
-        - step: blockscout
-          message: 'counters/0xc2f799fF3c16DBE4801A8bF9c9b47177BcFD2479: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
-  last_activity_at: null
-  txns_24h: null
+      window_as_of: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      errors: []
+  last_activity_at: 2026-09-12T10:43:42.000Z
+  txns_24h: 9
   launches_24h: null
+  window_as_of: 2026-09-12T12:50:49.906Z
+  stale_since: null
+reads:
+  tier: live
+  explorer:
+    - kind: address
+      address: "0x8aD25c65587979533fa1cA0d2194A76D5bAE305d"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: "0xafcbf70710e22b36020d2258a31e2090edb9d58ec35fab3123bdf68bb14ee794"
+      code_hash: 1a6720de86e28116
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 80
+    - kind: activity
+      address: "0x8aD25c65587979533fa1cA0d2194A76D5bAE305d"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: "0xafcbf70710e22b36020d2258a31e2090edb9d58ec35fab3123bdf68bb14ee794"
+      code_hash: 1a6720de86e28116
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 20
+    - kind: address
+      address: "0xEf9Cb10585F7641c89AFb5Ab97559749CB7B1b71"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: "0x1fe6a845966b51f8daadc9bbaffc48454c40836cbbf37197aedf0ecabfe94df7"
+      code_hash: 891bdfa0340f19fb
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 80
+    - kind: activity
+      address: "0xEf9Cb10585F7641c89AFb5Ab97559749CB7B1b71"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: "0x1fe6a845966b51f8daadc9bbaffc48454c40836cbbf37197aedf0ecabfe94df7"
+      code_hash: 891bdfa0340f19fb
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 20
+    - kind: address
+      address: "0xc2f799fF3c16DBE4801A8bF9c9b47177BcFD2479"
+      status: read
+      reason: --full override
+      signal_value: null
+      signal: "0x6dc16f43a3c256ed0d1d9567a1f67d738504a7d261d9ef464c79298dbff961f1"
+      code_hash: 71e6d02f142bc835
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 60
+    - kind: activity
+      address: "0xc2f799fF3c16DBE4801A8bF9c9b47177BcFD2479"
+      status: read
+      reason: --full override; 24h walk refreshed
+      signal_value: null
+      signal: "0x6dc16f43a3c256ed0d1d9567a1f67d738504a7d261d9ef464c79298dbff961f1"
+      code_hash: 71e6d02f142bc835
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 20
+    - kind: top10
+      address: "0x8aD25c65587979533fa1cA0d2194A76D5bAE305d"
+      status: read
+      reason: token change signal changed
+      signal_value: 21
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 20
+    - kind: structure
+      address: "0x8aD25c65587979533fa1cA0d2194A76D5bAE305d"
+      status: read
+      reason: token change signal changed
+      signal_value: 21
+      signal: null
+      code_hash: 1a6720de86e28116
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 20
+    - kind: lp
+      address: "0x8aD25c65587979533fa1cA0d2194A76D5bAE305d"
+      status: read
+      reason: token change signal changed
+      signal_value: 21
+      signal: null
+      code_hash: null
+      checked_at: 2026-09-12T12:50:49.906Z
+      stale_since: null
+      credits: 0
+refresh:
+  policy_version: 1
+  status: complete
+  attempted_at: 2026-09-12T12:50:49.906Z
+  last_success_at: 2026-09-12T12:50:49.906Z
+  reason: "recent own activity or seed observation window: weekly"
 errors: []
