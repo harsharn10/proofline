@@ -1,5 +1,5 @@
 slug: varo
-pulled_at: 2026-09-12T12:50:49.906Z # chain head 61119753 at read time
+pulled_at: 2026-09-13T13:48:17.833Z # chain head 62004468 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x851153fe84239C2dC55fa191aC2f099e20a6d0b8"
@@ -18,9 +18,7 @@ addresses:
     created_block: null
     created_at: null
     holders: null
-    errors:
-      - step: blockscout
-        message: 'transactions/0x3a654e0ca2db6054f853abd49cbf142cc0600b7687b021cec48d4aeda8a0f36f: HTTP 500: {"error":"Internal server error","source":"upstream"}'
+    errors: []
   - address: "0x95C4AB0Bb4557811d2642cb12ae5eFb7E82f15b7"
     label: Launchpad implementation (ERC1967 slot)
     role: implementation
@@ -41,7 +39,7 @@ addresses:
 metrics: []
 market:
   token_address: null
-  pulled_at: 2026-09-12T12:50:49.906Z
+  pulled_at: 2026-09-13T13:48:17.833Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -65,7 +63,7 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-12T12:50:49.906Z
+  pulled_at: 2026-09-13T13:48:17.833Z
   addresses:
     - address: "0x851153fe84239C2dC55fa191aC2f099e20a6d0b8"
       label: Launchpad factory (ERC1967 proxy)
@@ -76,7 +74,7 @@ activity:
       last_method: "0x4f07898f"
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-09-12T12:50:49.906Z
+      window_as_of: 2026-09-13T13:48:17.833Z
       stale_since: null
       errors: []
     - address: "0x95C4AB0Bb4557811d2642cb12ae5eFb7E82f15b7"
@@ -88,37 +86,37 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-09-12T12:50:49.906Z
+      window_as_of: 2026-09-13T13:48:17.833Z
       stale_since: null
       errors: []
   last_activity_at: 2026-09-02T17:58:54.000Z
   txns_24h: 0
   launches_24h: 0
-  window_as_of: 2026-09-12T12:50:49.906Z
+  window_as_of: 2026-09-13T13:48:17.833Z
   stale_since: null
 reads:
   tier: live
   explorer:
     - kind: address
       address: "0x851153fe84239C2dC55fa191aC2f099e20a6d0b8"
-      status: read
-      reason: --full override
+      status: unchanged
+      reason: factory signal unchanged
       signal_value: null
       signal: "0x6746516d79020a035e7867662b09eb5816268293f92a43625d62fa443ca360a4"
       code_hash: a1a45c7c96259490
-      checked_at: 2026-09-12T12:50:49.906Z
-      stale_since: null
-      credits: 100
+      checked_at: 2026-09-13T13:48:17.833Z
+      stale_since: 2026-09-12T12:50:49.906Z
+      credits: 40
     - kind: activity
       address: "0x851153fe84239C2dC55fa191aC2f099e20a6d0b8"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: factory signal unchanged; 24h window recounted from the signal page
       signal_value: null
       signal: "0x6746516d79020a035e7867662b09eb5816268293f92a43625d62fa443ca360a4"
       code_hash: a1a45c7c96259490
-      checked_at: 2026-09-12T12:50:49.906Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-09-13T13:48:17.833Z
+      stale_since: 2026-09-12T12:50:49.906Z
+      credits: 0
     - kind: address
       address: "0x95C4AB0Bb4557811d2642cb12ae5eFb7E82f15b7"
       status: read
@@ -126,9 +124,9 @@ reads:
       signal_value: null
       signal: "0x42a763635a57d15c1b5eaece519333fdf18415733599532bff183879e5aefc33"
       code_hash: 693bdc8157d8d6dd
-      checked_at: 2026-09-12T12:50:49.906Z
+      checked_at: 2026-09-13T13:48:17.833Z
       stale_since: null
-      credits: 60
+      credits: 80
     - kind: activity
       address: "0x95C4AB0Bb4557811d2642cb12ae5eFb7E82f15b7"
       status: read
@@ -136,13 +134,13 @@ reads:
       signal_value: null
       signal: "0x42a763635a57d15c1b5eaece519333fdf18415733599532bff183879e5aefc33"
       code_hash: 693bdc8157d8d6dd
-      checked_at: 2026-09-12T12:50:49.906Z
+      checked_at: 2026-09-13T13:48:17.833Z
       stale_since: null
       credits: 20
 refresh:
   policy_version: 1
-  status: partial
-  attempted_at: 2026-09-12T12:50:49.906Z
-  last_success_at: 2026-09-04T20:46:36.233Z
+  status: complete
+  attempted_at: 2026-09-13T13:48:17.833Z
+  last_success_at: 2026-09-13T13:48:17.833Z
   reason: "recent own activity or seed observation window: weekly"
 errors: []
