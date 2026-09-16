@@ -1,5 +1,5 @@
 slug: robindex
-pulled_at: 2026-09-08T16:39:21.499Z # chain head 57839799 at read time
+pulled_at: 2026-09-16T14:12:42.997Z # chain head 64570956 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 27657355
     created_at: 2026-08-04T13:23:42.000Z
-    holders: 226
+    holders: 207
     errors: []
   - address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
     label: Uniswap v3 ROBINDEX/WETH pool
@@ -39,35 +39,35 @@ addresses:
 metrics: []
 market:
   token_address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
-  pulled_at: 2026-09-08T16:39:21.499Z
+  pulled_at: 2026-09-16T14:12:42.997Z
   pairs:
     - dex: uniswap
       pair_address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
       quote_symbol: WETH
-      price_usd: 0.00003155
-      liquidity_usd: 17318.16
-      volume_h24: 1713.3
-      volume_h6: 689.4
+      price_usd: 0.00001751
+      liquidity_usd: 11901.33
+      volume_h24: 14.26
+      volume_h6: 0
       txns_h24:
-        buys: 9
-        sells: 5
-      price_change_h24: 24.99
-      market_cap: 30935
-      fdv: 30935
+        buys: 0
+        sells: 2
+      price_change_h24: -1.28
+      market_cap: 17176
+      fdv: 17176
       created_at: 2026-08-04T13:23:42.000Z
-  liquidity_usd: 17318.16
-  volume_h24: 1713.3
-  trades_h24: 14
-  price_usd: 0.00003155
-  price_change_h24: 24.99
-  market_cap_usd: 30935
-  fdv_usd: 30935
-  fdv: 30935
+  liquidity_usd: 11901.33
+  volume_h24: 14.26
+  trades_h24: 2
+  price_usd: 0.00001751
+  price_change_h24: -1.28
+  market_cap_usd: 17176
+  fdv_usd: 17176
+  fdv: 17176
   first_pair_at: 2026-08-04T13:23:42.000Z
-  top10_share: 0.6497708542714377
-  top10_share_ex_pools: 0.3351730795970751
+  top10_share: 0.7699254822339348
+  top10_share_ex_pools: 0.3483055788531323
   burned_share: 0.0195515576409012
-  top10_as_of: 2026-09-08T16:39:21.499Z
+  top10_as_of: 2026-09-16T14:12:42.997Z
   launchpad:
     slug: pons
     via: factory
@@ -78,120 +78,129 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-08T16:39:21.499Z
+  pulled_at: 2026-09-16T14:12:42.997Z
   mint: no-mint-function
+  mint_as_of: null
   renounced: null
+  renounced_as_of: null
   lp:
     - pair: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
       locked_share: null
       holder_kind: null
       reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
+      as_of: null
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-08T16:39:21.499Z
+  pulled_at: 2026-09-16T14:12:42.997Z
   addresses:
     - address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
       label: ROBINDEX token (PonsLauncherToken)
       role: token
-      transactions_count: 1472
+      transactions_count: 1508
       token_transfers_count: 7
-      last_tx_at: 2026-09-08T12:56:25.000Z
+      last_tx_at: 2026-09-15T21:31:18.000Z
       last_method: approve
-      txns_24h: 4
+      txns_24h: 1
       launches_24h: null
-      window_as_of: 2026-09-08T16:39:21.499Z
+      window_as_of: 2026-09-16T14:12:42.997Z
       stale_since: null
       errors: []
     - address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
       label: Uniswap v3 ROBINDEX/WETH pool
       role: other
       transactions_count: 0
-      token_transfers_count: 10278
+      token_transfers_count: 12242
       last_tx_at: null
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-09-04T20:46:36.233Z
-      stale_since: 2026-09-04T20:46:36.233Z
+      window_as_of: 2026-09-16T14:12:42.997Z
+      stale_since: null
       errors: []
-  last_activity_at: 2026-09-08T12:56:25.000Z
-  txns_24h: 4
+  last_activity_at: 2026-09-15T21:31:18.000Z
+  txns_24h: 1
   launches_24h: null
-  window_as_of: 2026-09-04T20:46:36.233Z
-  stale_since: 2026-09-04T20:46:36.233Z
+  window_as_of: 2026-09-16T14:12:42.997Z
+  stale_since: null
 reads:
   tier: live
   explorer:
     - kind: address
       address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
       status: read
-      reason: token DexScreener trade count changed
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xc62945ec63aad933cb50e9a8a9dc5cbee935fa2bfbd4fdfd4677e75d1e8175df"
+      signal: "0x74bca8c0a02e4e72daae234f25a6c6091efbac18dffb61ddf19449f36b941df0"
       code_hash: a34bc47e3c422122
-      checked_at: 2026-09-08T16:39:21.499Z
+      checked_at: 2026-09-16T14:12:42.997Z
       stale_since: null
-      credits: 4
+      credits: 40
     - kind: activity
       address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
       status: read
-      reason: token DexScreener trade count changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xc62945ec63aad933cb50e9a8a9dc5cbee935fa2bfbd4fdfd4677e75d1e8175df"
+      signal: "0x74bca8c0a02e4e72daae234f25a6c6091efbac18dffb61ddf19449f36b941df0"
       code_hash: a34bc47e3c422122
-      checked_at: 2026-09-08T16:39:21.499Z
+      checked_at: 2026-09-16T14:12:42.997Z
       stale_since: null
-      credits: 1
+      credits: 20
     - kind: address
       address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
-      status: unchanged
-      reason: other role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
       signal: null
       code_hash: f98ef04dbb492e9b
-      checked_at: 2026-09-08T16:39:21.499Z
-      stale_since: 2026-09-04T20:46:36.233Z
-      credits: 0
+      checked_at: 2026-09-16T14:12:42.997Z
+      stale_since: null
+      credits: 20
     - kind: activity
       address: "0xcC14BF25919D57D8C365A47F3D59515C5D4ddf4D"
-      status: unchanged
-      reason: other role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override; 24h walk refreshed
       signal_value: null
       signal: null
       code_hash: f98ef04dbb492e9b
-      checked_at: 2026-09-08T16:39:21.499Z
-      stale_since: 2026-09-04T20:46:36.233Z
-      credits: 0
+      checked_at: 2026-09-16T14:12:42.997Z
+      stale_since: null
+      credits: 20
     - kind: top10
       address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
       status: read
       reason: token change signal changed
-      signal_value: 14
+      signal_value: 2
       signal: null
       code_hash: null
-      checked_at: 2026-09-08T16:39:21.499Z
+      checked_at: 2026-09-16T14:12:42.997Z
       stale_since: null
-      credits: 1
+      credits: 20
     - kind: structure
       address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
-      status: read
-      reason: token change signal changed
-      signal_value: 14
+      status: unchanged
+      reason: contract code hash unchanged; verified ABI not re-read
+      signal_value: 2
       signal: null
       code_hash: a34bc47e3c422122
-      checked_at: 2026-09-08T16:39:21.499Z
-      stale_since: null
-      credits: 1
+      checked_at: 2026-09-16T14:12:42.997Z
+      stale_since: 2026-09-08T16:39:21.499Z
+      credits: 0
     - kind: lp
       address: "0xd82f70F530AFf45b831d6eE17062B4E85395C6F3"
       status: read
       reason: token change signal changed
-      signal_value: 14
+      signal_value: 2
       signal: null
       code_hash: null
-      checked_at: 2026-09-08T16:39:21.499Z
+      checked_at: 2026-09-16T14:12:42.997Z
       stale_since: null
-      credits: 1
+      credits: 20
+refresh:
+  policy_version: 1
+  status: complete
+  attempted_at: 2026-09-16T14:12:42.997Z
+  last_success_at: 2026-09-16T14:12:42.997Z
+  reason: "recent own activity or seed observation window: weekly"
 errors: []
