@@ -1,13 +1,13 @@
 slug: op
-pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
+pulled_at: 2026-09-18T13:36:03.312Z # chain head 66265447 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
     label: OP token (PonsV2LauncherToken)
     role: token
     is_contract: true
-    source_verified: null
-    contract_name: null
+    source_verified: true
+    contract_name: Sandisk Optimus
     proxy:
       type: none
       implementation: null
@@ -15,16 +15,10 @@ addresses:
     owner: null
     owner_type: none
     safe: null
-    created_block: null
-    created_at: null
-    holders: null
-    errors:
-      - step: blockscout
-        message: 'addresses/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'tokens/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
-      - step: blockscout
-        message: 'transactions?filter=to/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
+    created_block: 51169078
+    created_at: 2026-08-31T21:02:01.000Z
+    holders: 276
+    errors: []
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory
     role: factory
@@ -69,269 +63,213 @@ addresses:
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
     errors: []
-  - address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
-    label: SNDK quote (pairToken / Robinhood Stock Token rail)
-    role: token
-    is_contract: true
-    source_verified: true
-    contract_name: BeaconProxy
-    proxy:
-      type: none
-      implementation: null
-      admin: null
-    owner: null
-    owner_type: none
-    safe: null
-    created_block: 48293
-    created_at: 2026-06-10T15:27:03.000Z
-    holders: 25972
-    errors: []
 metrics: []
 market:
   token_address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
-  pulled_at: 2026-09-08T21:10:27.749Z
+  pulled_at: 2026-09-18T13:36:03.312Z
   pairs:
     - dex: uniswap
       pair_address: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
       quote_symbol: SNDK
-      price_usd: 0.00004439
-      liquidity_usd: 20442.5
-      volume_h24: 41728.26
-      volume_h6: 8701.41
+      price_usd: 0.00000573
+      liquidity_usd: 7145.48
+      volume_h24: 84.79
+      volume_h6: 69.64
       txns_h24:
-        buys: 127
-        sells: 121
-      price_change_h24: -22.57
-      market_cap: 44393
-      fdv: 44393
+        buys: 4
+        sells: 3
+      price_change_h24: 6.35
+      market_cap: 5731
+      fdv: 5731
       created_at: 2026-08-31T21:02:46.000Z
-  liquidity_usd: 20442.5
-  volume_h24: 41728.26
-  trades_h24: 248
-  price_usd: 0.00004439
-  price_change_h24: -22.57
-  market_cap_usd: 44393
-  fdv_usd: 44393
-  fdv: 44393
+  liquidity_usd: 7145.48
+  volume_h24: 84.79
+  trades_h24: 7
+  price_usd: 0.00000573
+  price_change_h24: 6.35
+  market_cap_usd: 5731
+  fdv_usd: 5731
+  fdv: 5731
   first_pair_at: 2026-08-31T21:02:46.000Z
-  top10_share: null
-  top10_share_ex_pools: null
-  burned_share: null
-  top10_as_of: null
-  launchpad: null
+  top10_share: 0.8571563682497579
+  top10_share_ex_pools: 0.1746614324789415
+  burned_share: 0
+  top10_as_of: 2026-09-18T13:36:03.312Z
+  launchpad:
+    slug: pons
+    via: creator
+    address: "0x3711cea4feade896c913c68f01eda97cb06d1a42"
+    shared: false
   rialto: null
   pair_asset:
     ticker: SNDK
     name: Sandisk Corporation
     address: "0xb90a19ff0af67f7779aff50a882a9cff42446400"
     category: stock
-    tokenized_value_usd: 1738559.28
-    tokenized_shares: 999.1719999999991
-    change_7d: 240430.76
+    tokenized_value_usd: 1638168.35
+    tokenized_shares: 1014.7289999999996
+    change_7d: -125420.5
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors:
-    - step: launchpad
-      message: addresses/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214 did not return creator_address_hash
-    - step: top10_share
-      message: 'tokens/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: 'tokens/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214/holders: HTTP 402: {"error":"Out of credits"}'
-    - step: top10_share
-      message: token total_supply was not returned for 0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214
-    - step: top10_share_ex_pools
-      message: holder page was not available for 0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214
+  errors: []
 structure:
-  pulled_at: 2026-09-08T21:10:27.749Z
-  mint: unknown
+  pulled_at: 2026-09-18T13:36:03.312Z
+  mint: no-mint-function
+  mint_as_of: 2026-09-18T13:36:03.312Z
   renounced: null
+  renounced_as_of: null
   lp:
     - pair: "0x62e9d888f0a5ac01ceb645b548b0eb18e0ee921784649fe365ce8baec5ebdc67"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors:
-    - step: mint
-      message: 'smart-contracts/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
-    - step: mint
-      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-08T21:10:27.749Z
+  pulled_at: 2026-09-18T13:36:03.312Z
   addresses:
     - address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
       label: OP token (PonsV2LauncherToken)
       role: token
-      transactions_count: null
-      token_transfers_count: null
-      last_tx_at: null
-      last_method: null
-      txns_24h: null
+      transactions_count: 2450
+      token_transfers_count: 1
+      last_tx_at: 2026-09-16T03:43:43.000Z
+      last_method: approve
+      txns_24h: 0
       launches_24h: null
-      window_as_of: null
+      window_as_of: 2026-09-18T13:36:03.312Z
       stale_since: null
-      errors:
-        - step: blockscout
-          message: 'counters/0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214: HTTP 402: {"error":"Out of credits"}'
-        - step: blockscout
-          message: 'transactions?filter=to page 1: HTTP 402: {"error":"Out of credits"}'
+      errors: []
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: PonsV2LaunchFactory
       role: factory
-      transactions_count: 162864
-      token_transfers_count: 24334
-      last_tx_at: 2026-09-08T21:10:31.000Z
+      transactions_count: 256941
+      token_transfers_count: 35127
+      last_tx_at: 2026-09-18T13:36:03.000Z
       last_method: launchToken
-      txns_24h: 2000
-      launches_24h: 1683
-      window_as_of: 2026-09-08T21:10:27.749Z
+      txns_24h: 90
+      launches_24h: 65
+      window_as_of: 2026-09-18T13:36:03.312Z
       stale_since: null
       errors:
         - step: txns_24h capped
-          message: stopped after 40 pages; count is a floor
+          message: stopped after 2 pages; count is a floor
     - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
       label: V2LaunchLocker (locked graduation position)
       role: vault
-      transactions_count: 14
-      token_transfers_count: 20284
-      last_tx_at: 2026-09-06T00:04:54.000Z
-      last_method: "0xa480ca79"
+      transactions_count: 15
+      token_transfers_count: 29280
+      last_tx_at: 2026-09-13T14:42:33.000Z
+      last_method: isLocked
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-09-08T21:10:27.749Z
+      window_as_of: 2026-09-18T13:36:03.312Z
       stale_since: null
       errors: []
-    - address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
-      label: SNDK quote (pairToken / Robinhood Stock Token rail)
-      role: token
-      transactions_count: 11687
-      token_transfers_count: 41
-      last_tx_at: 2026-09-08T21:28:09.000Z
-      last_method: approve
-      txns_24h: 250
-      launches_24h: null
-      window_as_of: 2026-09-08T21:10:27.749Z
-      stale_since: null
-      errors:
-        - step: txns_24h capped
-          message: stopped after 5 pages; count is a floor
-  last_activity_at: 2026-09-08T21:28:09.000Z
-  txns_24h: 2250
-  launches_24h: 1683
-  window_as_of: 2026-09-08T21:10:27.749Z
+  last_activity_at: 2026-09-18T13:36:03.000Z
+  txns_24h: 90
+  launches_24h: 65
+  window_as_of: 2026-09-18T13:36:03.312Z
   stale_since: null
 reads:
-  tier: hot
+  tier: live
   explorer:
     - kind: address
       address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
       status: read
-      reason: token DexScreener trade count changed
+      reason: --full override
       signal_value: null
-      signal: null
+      signal: "0x50e63b99ba51f9c5681e75f3596760d2666f9f084dd4bee74ad2a7fcc64238e0"
       code_hash: 93595a440df135c8
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-18T13:36:03.312Z
       stale_since: null
-      credits: 3
+      credits: 80
     - kind: activity
       address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
       status: read
-      reason: token DexScreener trade count changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: null
+      signal: "0x50e63b99ba51f9c5681e75f3596760d2666f9f084dd4bee74ad2a7fcc64238e0"
       code_hash: 93595a440df135c8
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-18T13:36:03.312Z
       stale_since: null
-      credits: 1
+      credits: 20
     - kind: address
       address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       status: read
-      reason: factory baseline unavailable
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xd535d6679e2dae2b239b0640a427c9f6a4cb22b676828c5ce540411aee00a0a9"
+      signal: "0xff75782ced401f2d82e886d898dffa288054291f48d51c08e92c8c4dd3becee5"
       code_hash: 2ac92839c8aafdd8
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-18T13:36:03.312Z
       stale_since: null
       credits: 0
     - kind: activity
       address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       status: read
-      reason: factory baseline unavailable; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xd535d6679e2dae2b239b0640a427c9f6a4cb22b676828c5ce540411aee00a0a9"
+      signal: "0xff75782ced401f2d82e886d898dffa288054291f48d51c08e92c8c4dd3becee5"
       code_hash: 2ac92839c8aafdd8
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-18T13:36:03.312Z
       stale_since: null
       credits: 0
     - kind: address
       address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
       status: read
-      reason: vault baseline unavailable
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xaf9a4a03533761f1a104aefa69e4dc884a2153e44519d3a9ba8e3d8c65c36bbe"
+      signal: "0x6aadee9a92af9eed4ebdc725889365f0446b1ccad858113d917b409a9f080559"
       code_hash: 693ee37f225b5208
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-18T13:36:03.312Z
       stale_since: null
       credits: 0
     - kind: activity
       address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
       status: read
-      reason: vault baseline unavailable; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xaf9a4a03533761f1a104aefa69e4dc884a2153e44519d3a9ba8e3d8c65c36bbe"
+      signal: "0x6aadee9a92af9eed4ebdc725889365f0446b1ccad858113d917b409a9f080559"
       code_hash: 693ee37f225b5208
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: null
-      credits: 0
-    - kind: address
-      address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
-      status: read
-      reason: token DexScreener trade count changed
-      signal_value: null
-      signal: "0x367aee6d1f38f33f97688d8e13f5b8c6fd9ee99ce6d9f0db6fd3fcf49f4e8cfe"
-      code_hash: caced2aa743efc36
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: null
-      credits: 0
-    - kind: activity
-      address: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
-      status: read
-      reason: token DexScreener trade count changed; 24h walk refreshed
-      signal_value: null
-      signal: "0x367aee6d1f38f33f97688d8e13f5b8c6fd9ee99ce6d9f0db6fd3fcf49f4e8cfe"
-      code_hash: caced2aa743efc36
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-18T13:36:03.312Z
       stale_since: null
       credits: 0
     - kind: top10
       address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
       status: read
       reason: token change signal changed
-      signal_value: 248
+      signal_value: 7
       signal: null
       code_hash: null
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-18T13:36:03.312Z
       stale_since: null
-      credits: 1
+      credits: 20
     - kind: structure
       address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
       status: read
       reason: token change signal changed
-      signal_value: 248
+      signal_value: 7
       signal: null
       code_hash: 93595a440df135c8
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-18T13:36:03.312Z
       stale_since: null
-      credits: 1
+      credits: 20
     - kind: lp
       address: "0xF25Ccb1036C41e953F84eC9F3cC72f8d73953214"
       status: read
       reason: token change signal changed
-      signal_value: 248
+      signal_value: 7
       signal: null
       code_hash: null
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-09-18T13:36:03.312Z
       stale_since: null
       credits: 0
+refresh:
+  policy_version: 1
+  status: complete
+  attempted_at: 2026-09-18T13:36:03.312Z
+  last_success_at: 2026-09-18T13:36:03.312Z
+  reason: "recent own activity or seed observation window: weekly"
 errors: []
