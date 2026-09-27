@@ -1,5 +1,5 @@
 slug: crudecat
-pulled_at: 2026-09-26T13:45:01.788Z # chain head 73128703 at read time
+pulled_at: 2026-09-27T14:41:38.287Z # chain head 74018134 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 19395214
     created_at: 2026-07-25T23:12:52.000Z
-    holders: 7335
+    holders: 7363
     errors: []
   - address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
     label: Circus launchpad (token launchpad())
@@ -90,35 +90,63 @@ addresses:
 metrics: []
 market:
   token_address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
-  pulled_at: 2026-09-26T13:45:01.788Z
+  pulled_at: 2026-09-27T14:41:38.287Z
   pairs:
     - dex: uniswap
       pair_address: "0xc3a873867C79b234A5179BeC2899846376258BeD"
       quote_symbol: USO
-      price_usd: 0.001392
-      liquidity_usd: 104888.71
-      volume_h24: 11614.2
-      volume_h6: 3977.38
+      price_usd: 0.001785
+      liquidity_usd: 119262.79
+      volume_h24: 71214.92
+      volume_h6: 55437.25
       txns_h24:
-        buys: 39
-        sells: 25
-      price_change_h24: 21.31
-      market_cap: 668495
-      fdv: 1392266
+        buys: 148
+        sells: 100
+      price_change_h24: 26.16
+      market_cap: 857172
+      fdv: 1785219
       created_at: 2026-07-25T23:26:11.000Z
-  liquidity_usd: 104888.71
-  volume_h24: 11614.2
-  trades_h24: 64
-  price_usd: 0.001392
-  price_change_h24: 21.31
-  market_cap_usd: 668495
-  fdv_usd: 1392266
-  fdv: 1392266
+    - dex: uniswap
+      pair_address: "0xf85f8174700315aee36fc1676bd4f9a95d3732b007f92b085d44233579bc27c9"
+      quote_symbol: ETH
+      price_usd: 0.002021
+      liquidity_usd: 213.26
+      volume_h24: 30.43
+      volume_h6: 26.93
+      txns_h24:
+        buys: 10
+        sells: 5
+      price_change_h24: 26.37
+      market_cap: 970450
+      fdv: 2021142
+      created_at: 2026-09-14T09:16:41.000Z
+    - dex: uniswap
+      pair_address: "0x6826d7c249f2819e88dba80dc8b90cec96c391db9a009397ec956962c92fc08d"
+      quote_symbol: ETH
+      price_usd: 0.002108
+      liquidity_usd: 78.74
+      volume_h24: 19.13
+      volume_h6: 15.3
+      txns_h24:
+        buys: 7
+        sells: 2
+      price_change_h24: 31.96
+      market_cap: 1012540
+      fdv: 2108802
+      created_at: 2026-09-14T02:21:14.000Z
+  liquidity_usd: 119554.79
+  volume_h24: 71264.48
+  trades_h24: 272
+  price_usd: 0.001785
+  price_change_h24: 26.16
+  market_cap_usd: 857172
+  fdv_usd: 1785219
+  fdv: 1785219
   first_pair_at: 2026-07-25T23:26:11.000Z
-  top10_share: 0.8117549118361935
-  top10_share_ex_pools: 0.7770281795298872
+  top10_share: 0.8418129781343825
+  top10_share_ex_pools: 0.8087600818528187
   burned_share: 0
-  top10_as_of: 2026-09-26T13:45:01.788Z
+  top10_as_of: 2026-09-27T14:41:38.287Z
   launchpad: null
   rialto: null
   pair_asset:
@@ -139,7 +167,7 @@ market:
     - step: launchpad
       message: addresses/0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e did not return creator_address_hash
 structure:
-  pulled_at: 2026-09-26T13:45:01.788Z
+  pulled_at: 2026-09-27T14:41:38.287Z
   mint: no-mint-function
   mint_as_of: 2026-09-10T15:55:20.710Z
   renounced: null
@@ -150,36 +178,44 @@ structure:
       holder_kind: null
       reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
       as_of: null
+    - pair: "0xf85f8174700315aee36fc1676bd4f9a95d3732b007f92b085d44233579bc27c9"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
+    - pair: "0x6826d7c249f2819e88dba80dc8b90cec96c391db9a009397ec956962c92fc08d"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-26T13:45:01.788Z
+  pulled_at: 2026-09-27T14:41:38.287Z
   addresses:
     - address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
       label: CRUDECAT token (CircusQuoteTokenV3)
       role: token
-      transactions_count: 40352
+      transactions_count: 40412
       token_transfers_count: 27
-      last_tx_at: 2026-09-26T13:43:18.000Z
+      last_tx_at: 2026-09-27T14:40:26.000Z
       last_method: approve
-      txns_24h: 100
+      txns_24h: 69
       launches_24h: null
-      window_as_of: 2026-09-26T13:45:01.788Z
+      window_as_of: 2026-09-27T14:41:38.287Z
       stale_since: null
-      errors:
-        - step: txns_24h capped
-          message: stopped after 2 pages; count is a floor
+      errors: []
     - address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
       label: Circus launchpad (token launchpad())
       role: factory
-      transactions_count: 135140
-      token_transfers_count: 125229
-      last_tx_at: 2026-09-25T15:35:21.000Z
+      transactions_count: 135294
+      token_transfers_count: 125364
+      last_tx_at: 2026-09-27T07:39:13.000Z
       last_method: claimCreatorFees
       txns_24h: 100
-      launches_24h: 4
-      window_as_of: 2026-09-26T13:45:01.788Z
+      launches_24h: 1
+      window_as_of: 2026-09-27T14:41:38.287Z
       stale_since: null
       errors:
         - step: txns_24h capped
@@ -220,9 +256,9 @@ activity:
       window_as_of: 2026-09-25T14:36:34.863Z
       stale_since: 2026-09-25T14:36:34.863Z
       errors: []
-  last_activity_at: 2026-09-26T13:43:18.000Z
-  txns_24h: 200
-  launches_24h: 4
+  last_activity_at: 2026-09-27T14:40:26.000Z
+  txns_24h: 169
+  launches_24h: 1
   window_as_of: 2026-09-25T14:36:34.863Z
   stale_since: 2026-09-25T14:36:34.863Z
 reads:
@@ -233,9 +269,9 @@ reads:
       status: read
       reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xa76d1a2440d72f1e55a9fffd63c42af197bb45abf9f78bd49f3a2ff8e167a21f"
+      signal: "0x16b0cf39a6427e580ca3f6936775ab9429a2ba47beb9738a6d8dc72bdb37a1b1"
       code_hash: c37742211251bd06
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: null
       credits: 40
     - kind: activity
@@ -243,9 +279,9 @@ reads:
       status: read
       reason: token DexScreener trade count changed; 24h walk refreshed
       signal_value: null
-      signal: "0xa76d1a2440d72f1e55a9fffd63c42af197bb45abf9f78bd49f3a2ff8e167a21f"
+      signal: "0x16b0cf39a6427e580ca3f6936775ab9429a2ba47beb9738a6d8dc72bdb37a1b1"
       code_hash: c37742211251bd06
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: null
       credits: 40
     - kind: address
@@ -253,9 +289,9 @@ reads:
       status: read
       reason: factory signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xd1070976deca8048cfb26cd173304f6334ed9fe592ba6a74f34069d2780d0c3e"
+      signal: "0x5337f8df41de1341c258ad1926b26bc3a39e43b952cd99b34a32bbd13e774a4b"
       code_hash: 1347bf7670f8efc0
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -263,9 +299,9 @@ reads:
       status: read
       reason: factory signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0xd1070976deca8048cfb26cd173304f6334ed9fe592ba6a74f34069d2780d0c3e"
+      signal: "0x5337f8df41de1341c258ad1926b26bc3a39e43b952cd99b34a32bbd13e774a4b"
       code_hash: 1347bf7670f8efc0
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: null
       credits: 40
     - kind: address
@@ -275,7 +311,7 @@ reads:
       signal_value: null
       signal: "0xf35a0d0fd7b3e2aeebc593963979bfdaa6d23b318e8d37c52c901faee8d40999"
       code_hash: eadd873fb3783c6d
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: 2026-09-25T14:36:34.863Z
       credits: 0
     - kind: activity
@@ -285,7 +321,7 @@ reads:
       signal_value: null
       signal: "0xf35a0d0fd7b3e2aeebc593963979bfdaa6d23b318e8d37c52c901faee8d40999"
       code_hash: eadd873fb3783c6d
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: 2026-09-25T14:36:34.863Z
       credits: 0
     - kind: address
@@ -295,7 +331,7 @@ reads:
       signal_value: null
       signal: "0xbcefefd1af90cef5142b60cd4d67a88bc24f4463500caeb01685505616ec04dc"
       code_hash: dff49a810b24778c
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: 2026-09-25T14:36:34.863Z
       credits: 0
     - kind: activity
@@ -305,7 +341,7 @@ reads:
       signal_value: null
       signal: "0xbcefefd1af90cef5142b60cd4d67a88bc24f4463500caeb01685505616ec04dc"
       code_hash: dff49a810b24778c
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: 2026-09-25T14:36:34.863Z
       credits: 0
     - kind: address
@@ -315,7 +351,7 @@ reads:
       signal_value: null
       signal: "0x4434c3b85ab31411a5403968c24770ecd358a31aaf1f84582f5d7c9d5c51596a"
       code_hash: dff49a810b24778c
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: 2026-09-25T14:36:34.863Z
       credits: 0
     - kind: activity
@@ -325,43 +361,43 @@ reads:
       signal_value: null
       signal: "0x4434c3b85ab31411a5403968c24770ecd358a31aaf1f84582f5d7c9d5c51596a"
       code_hash: dff49a810b24778c
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: 2026-09-25T14:36:34.863Z
       credits: 0
     - kind: top10
       address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
       status: read
       reason: token change signal changed
-      signal_value: 64
+      signal_value: 272
       signal: null
       code_hash: null
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
       status: unchanged
       reason: contract code hash unchanged; verified ABI not re-read
-      signal_value: 64
+      signal_value: 272
       signal: null
       code_hash: c37742211251bd06
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: 2026-09-10T15:55:20.710Z
       credits: 0
     - kind: lp
       address: "0xBD957Cc9f1e94617792F37bC40f2F299e78AcF3e"
       status: read
       reason: token change signal changed
-      signal_value: 64
+      signal_value: 272
       signal: null
       code_hash: null
-      checked_at: 2026-09-26T13:45:01.788Z
+      checked_at: 2026-09-27T14:41:38.287Z
       stale_since: null
       credits: 20
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-09-26T13:45:01.788Z
-  last_success_at: 2026-09-26T13:45:01.788Z
+  attempted_at: 2026-09-27T14:41:38.287Z
+  last_success_at: 2026-09-27T14:41:38.287Z
   reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors: []
