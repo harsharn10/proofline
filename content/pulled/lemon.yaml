@@ -1,5 +1,5 @@
 slug: lemon
-pulled_at: 2026-09-29T15:50:21.951Z # chain head 75777134 at read time
+pulled_at: 2026-09-30T15:55:10.549Z # chain head 76639139 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x2bA793Fd69Bf251Fd1Af90b576bE8B9fA6Be46DB"
@@ -68,7 +68,7 @@ addresses:
     safe: null
     created_block: 19020802
     created_at: 2026-07-25T12:46:57.000Z
-    holders: 12229
+    holders: 12242
     errors: []
   - address: "0x01fe057d1C5FB09A4ac02860758DDf26Df9336B5"
     label: LEMON/WETH Uniswap V3 pool
@@ -90,35 +90,49 @@ addresses:
 metrics: []
 market:
   token_address: "0xf0E17e54239CD945Cd7bEa471a3a2CA6a8C7f7A3"
-  pulled_at: 2026-09-29T15:50:21.951Z
+  pulled_at: 2026-09-30T15:55:10.549Z
   pairs:
     - dex: uniswap
       pair_address: "0x01fe057d1C5FB09A4ac02860758DDf26Df9336B5"
       quote_symbol: WETH
-      price_usd: 0.0001077
-      liquidity_usd: 38140.45
-      volume_h24: 7859.49
-      volume_h6: 2386.5
+      price_usd: 0.0001799
+      liquidity_usd: 50887.07
+      volume_h24: 34183.66
+      volume_h6: 10471.9
       txns_h24:
-        buys: 55
-        sells: 36
-      price_change_h24: 11.11
-      market_cap: 106553
-      fdv: 106553
+        buys: 142
+        sells: 97
+      price_change_h24: 65.45
+      market_cap: 177877
+      fdv: 177877
       created_at: 2026-07-25T12:46:57.000Z
-  liquidity_usd: 38140.45
-  volume_h24: 7859.49
-  trades_h24: 91
-  price_usd: 0.0001077
-  price_change_h24: 11.11
-  market_cap_usd: 106553
-  fdv_usd: 106553
-  fdv: 106553
+    - dex: uniswap
+      pair_address: "0x71d43a6db3dfdee13385f1dccf7bca5a657b336a74d4d16a5d3f05c0b45d6963"
+      quote_symbol: USDG
+      price_usd: 0.0001725
+      liquidity_usd: 10.51
+      volume_h24: 1.44
+      volume_h6: 0.41
+      txns_h24:
+        buys: 4
+        sells: 0
+      price_change_h24: 44.47
+      market_cap: 170588
+      fdv: 170588
+      created_at: 2026-08-05T18:06:31.000Z
+  liquidity_usd: 50897.58
+  volume_h24: 34185.1
+  trades_h24: 243
+  price_usd: 0.0001799
+  price_change_h24: 65.45
+  market_cap_usd: 177877
+  fdv_usd: 177877
+  fdv: 177877
   first_pair_at: 2026-07-25T12:46:57.000Z
-  top10_share: 0.4656254999913504
-  top10_share_ex_pools: 0.2732719459762327
-  burned_share: 0.0112994468101803
-  top10_as_of: 2026-09-29T15:50:21.951Z
+  top10_share: 0.4292174099131069
+  top10_share_ex_pools: 0.2798234173721904
+  burned_share: 0.0112996900789943
+  top10_as_of: 2026-09-30T15:55:10.549Z
   launchpad:
     slug: lemon
     via: factory
@@ -129,7 +143,7 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-29T15:50:21.951Z
+  pulled_at: 2026-09-30T15:55:10.549Z
   mint: no-mint-function
   mint_as_of: null
   renounced: null
@@ -140,9 +154,14 @@ structure:
       holder_kind: null
       reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
       as_of: null
+    - pair: "0x71d43a6db3dfdee13385f1dccf7bca5a657b336a74d4d16a5d3f05c0b45d6963"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors: []
 activity:
-  pulled_at: 2026-09-29T15:50:21.951Z
+  pulled_at: 2026-09-30T15:55:10.549Z
   addresses:
     - address: "0x2bA793Fd69Bf251Fd1Af90b576bE8B9fA6Be46DB"
       label: LemonLaunchFactory (Instant V3)
@@ -153,19 +172,19 @@ activity:
       last_method: launchToken
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-09-29T15:50:21.951Z
+      window_as_of: 2026-09-30T15:55:10.549Z
       stale_since: null
       errors: []
     - address: "0xC10309Cf03Bc81c121a8270E3A28E159a9296903"
       label: LemonLaunchLocker
       role: other
-      transactions_count: 39686
-      token_transfers_count: 162807
-      last_tx_at: 2026-09-29T15:41:32.000Z
+      transactions_count: 40071
+      token_transfers_count: 164229
+      last_tx_at: 2026-09-30T15:35:24.000Z
       last_method: collectFees
-      txns_24h: 98
+      txns_24h: 97
       launches_24h: null
-      window_as_of: 2026-09-29T15:50:21.951Z
+      window_as_of: 2026-09-30T15:55:10.549Z
       stale_since: null
       errors:
         - step: txns_24h capped
@@ -173,27 +192,29 @@ activity:
     - address: "0xEF2c099803Fff879443009722AA2B9C46E020aB6"
       label: Platform fee receiver / owner EOA
       role: admin
-      transactions_count: 9210
-      token_transfers_count: 61918
-      last_tx_at: 2026-09-29T14:31:23.000Z
+      transactions_count: 9290
+      token_transfers_count: 62399
+      last_tx_at: 2026-09-30T15:22:16.000Z
       last_method: null
-      txns_24h: 21
+      txns_24h: 68
       launches_24h: null
-      window_as_of: 2026-09-29T15:50:21.951Z
+      window_as_of: 2026-09-30T15:55:10.549Z
       stale_since: null
       errors: []
     - address: "0xf0E17e54239CD945Cd7bEa471a3a2CA6a8C7f7A3"
       label: $LEMON.FUN (official pad token)
       role: token
-      transactions_count: 14655
+      transactions_count: 14754
       token_transfers_count: 53
-      last_tx_at: 2026-09-29T13:57:09.000Z
-      last_method: transfer
-      txns_24h: 39
+      last_tx_at: 2026-09-30T15:41:06.000Z
+      last_method: approve
+      txns_24h: 100
       launches_24h: null
-      window_as_of: 2026-09-29T15:50:21.951Z
+      window_as_of: 2026-09-30T15:55:10.549Z
       stale_since: null
-      errors: []
+      errors:
+        - step: txns_24h capped
+          message: stopped after 2 pages; count is a floor
     - address: "0x01fe057d1C5FB09A4ac02860758DDf26Df9336B5"
       label: LEMON/WETH Uniswap V3 pool
       role: other
@@ -206,8 +227,8 @@ activity:
       window_as_of: 2026-09-26T13:45:01.788Z
       stale_since: 2026-09-26T13:45:01.788Z
       errors: []
-  last_activity_at: 2026-09-29T15:41:32.000Z
-  txns_24h: 158
+  last_activity_at: 2026-09-30T15:41:06.000Z
+  txns_24h: 265
   launches_24h: 0
   window_as_of: 2026-09-26T13:45:01.788Z
   stale_since: 2026-09-26T13:45:01.788Z
@@ -221,7 +242,7 @@ reads:
       signal_value: null
       signal: "0x98b19c2bdc4c21bb44c31d25741ab97e5cba485864f14cb3d51b1e464c4325ee"
       code_hash: 5aa19e05f93f71c2
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: 2026-09-25T14:36:34.863Z
       credits: 20
     - kind: activity
@@ -231,7 +252,7 @@ reads:
       signal_value: null
       signal: "0x98b19c2bdc4c21bb44c31d25741ab97e5cba485864f14cb3d51b1e464c4325ee"
       code_hash: 5aa19e05f93f71c2
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: 2026-09-25T14:36:34.863Z
       credits: 0
     - kind: address
@@ -239,9 +260,9 @@ reads:
       status: read
       reason: other signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xe77fdcbe692a4c46c4ad025542abb8ea34e01dcbeb7a4a73c56650595d6c4c26"
+      signal: "0xcd2b40370456886c3f900fc92d8e2796fe9953fb2cc248786ff4bafc936a929d"
       code_hash: c78a3411dacedf91
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -249,9 +270,9 @@ reads:
       status: read
       reason: other signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0xe77fdcbe692a4c46c4ad025542abb8ea34e01dcbeb7a4a73c56650595d6c4c26"
+      signal: "0xcd2b40370456886c3f900fc92d8e2796fe9953fb2cc248786ff4bafc936a929d"
       code_hash: c78a3411dacedf91
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
       credits: 40
     - kind: address
@@ -259,29 +280,29 @@ reads:
       status: read
       reason: admin signal changed
       signal_value: null
-      signal: "0x3efbbe546a24c22b8845bdd1e3ba587bec3cc244f1a7c557d8341231e4467539"
+      signal: "0x65fa96951eabab56d2f4f2b4be838d1624b162fdff4145559089dc75a5862dac"
       code_hash: 32fe3c9a7df98a84
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
-      credits: 40
+      credits: 100
     - kind: activity
       address: "0xEF2c099803Fff879443009722AA2B9C46E020aB6"
       status: read
       reason: admin signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0x3efbbe546a24c22b8845bdd1e3ba587bec3cc244f1a7c557d8341231e4467539"
+      signal: "0x65fa96951eabab56d2f4f2b4be838d1624b162fdff4145559089dc75a5862dac"
       code_hash: 32fe3c9a7df98a84
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
-      credits: 20
+      credits: 40
     - kind: address
       address: "0xf0E17e54239CD945Cd7bEa471a3a2CA6a8C7f7A3"
       status: read
       reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x4d4d0d71365a1f4f1477454a451bb9a5e90c955423df328cab3417f3a5500f9f"
+      signal: "0x0d01dd97ff2973a64266e1ab369c61172a9913dc6a3e418c2e7aa1953711228f"
       code_hash: 25c84522c56136a0
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
       credits: 40
     - kind: activity
@@ -289,11 +310,11 @@ reads:
       status: read
       reason: token DexScreener trade count changed; 24h walk refreshed
       signal_value: null
-      signal: "0x4d4d0d71365a1f4f1477454a451bb9a5e90c955423df328cab3417f3a5500f9f"
+      signal: "0x0d01dd97ff2973a64266e1ab369c61172a9913dc6a3e418c2e7aa1953711228f"
       code_hash: 25c84522c56136a0
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
-      credits: 20
+      credits: 40
     - kind: address
       address: "0x01fe057d1C5FB09A4ac02860758DDf26Df9336B5"
       status: unchanged
@@ -301,7 +322,7 @@ reads:
       signal_value: null
       signal: "0x3da9c6c24ddfebacf884dcd5dbc735e32157a4172f358563b2976fa73ba2a3f8"
       code_hash: 0a866755e73c4ece
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: 2026-09-26T13:45:01.788Z
       credits: 0
     - kind: activity
@@ -311,43 +332,43 @@ reads:
       signal_value: null
       signal: "0x3da9c6c24ddfebacf884dcd5dbc735e32157a4172f358563b2976fa73ba2a3f8"
       code_hash: 0a866755e73c4ece
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: 2026-09-26T13:45:01.788Z
       credits: 0
     - kind: top10
       address: "0xf0E17e54239CD945Cd7bEa471a3a2CA6a8C7f7A3"
       status: read
       reason: token change signal changed
-      signal_value: 91
+      signal_value: 243
       signal: null
       code_hash: null
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0xf0E17e54239CD945Cd7bEa471a3a2CA6a8C7f7A3"
       status: unchanged
       reason: contract code hash unchanged; verified ABI not re-read
-      signal_value: 91
+      signal_value: 243
       signal: null
       code_hash: 25c84522c56136a0
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: 2026-09-08T16:39:21.499Z
       credits: 0
     - kind: lp
       address: "0xf0E17e54239CD945Cd7bEa471a3a2CA6a8C7f7A3"
       status: read
       reason: token change signal changed
-      signal_value: 91
+      signal_value: 243
       signal: null
       code_hash: null
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
       credits: 20
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-09-29T15:50:21.951Z
-  last_success_at: 2026-09-29T15:50:21.951Z
+  attempted_at: 2026-09-30T15:55:10.549Z
+  last_success_at: 2026-09-30T15:55:10.549Z
   reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors: []

@@ -1,5 +1,5 @@
 slug: pipedog
-pulled_at: 2026-09-29T15:50:21.951Z # chain head 75777134 at read time
+pulled_at: 2026-09-30T15:55:10.549Z # chain head 76639139 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 21879606
     created_at: 2026-07-28T20:29:10.000Z
-    holders: 8788
+    holders: 8777
     errors: []
   - address: "0xB7f10f74B39291b9290b779978e19A7637C742D6"
     label: Uniswap v3 PIPEDOG/WETH 1% pool
@@ -52,82 +52,70 @@ addresses:
     created_block: 8930
     created_at: 2026-05-22T17:58:26.000Z
     holders: null
-    errors: []
+    errors:
+      - step: blockscout
+        message: 'transactions?filter=to/0x1f7d7550B1b028f7571E69A784071F0205FD2EfA: HTTP 500: {"error":"Internal server error","source":"upstream"}'
 metrics: []
 market:
   token_address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
-  pulled_at: 2026-09-29T15:50:21.951Z
+  pulled_at: 2026-09-30T15:55:10.549Z
   pairs:
     - dex: uniswap
       pair_address: "0xB7f10f74B39291b9290b779978e19A7637C742D6"
       quote_symbol: WETH
-      price_usd: 0.001709
-      liquidity_usd: 7806632.11
-      volume_h24: 286205.59
-      volume_h6: 46317.27
+      price_usd: 0.001725
+      liquidity_usd: 7863913.17
+      volume_h24: 137199.23
+      volume_h6: 32637.32
       txns_h24:
-        buys: 359
-        sells: 378
-      price_change_h24: -5.67
-      market_cap: 21103314
-      fdv: 21103314
+        buys: 348
+        sells: 457
+      price_change_h24: 0.91
+      market_cap: 21304784
+      fdv: 21304784
       created_at: 2026-07-28T20:31:52.000Z
     - dex: "0x5481864ddd46a2D798Df0925C23B7846e776E5E3"
       pair_address: "0xde58373Adc0892dF6263835529cD87ffe3FA3728"
       quote_symbol: USDG
-      price_usd: 0.001728
-      liquidity_usd: 840.84
-      volume_h24: 616.21
-      volume_h6: 83.3
+      price_usd: 0.001707
+      liquidity_usd: 886.53
+      volume_h24: 864.3
+      volume_h6: 193.56
       txns_h24:
-        buys: 19
-        sells: 20
-      price_change_h24: -3.81
-      market_cap: 21342541
-      fdv: 21342541
+        buys: 15
+        sells: 21
+      price_change_h24: 0.89
+      market_cap: 21083808
+      fdv: 21083808
       created_at: null
-    - dex: rubicon
-      pair_address: "0x5e7FFa07Cb557aD03A5c4344d518D78283AFc8e5"
-      quote_symbol: WETH
-      price_usd: 0.001736
-      liquidity_usd: 967.14
-      volume_h24: 328.87
+    - dex: uniswap
+      pair_address: "0x3078bf0a7a6b5a2eb4bc367516854ae93a9aae334e0067f2a2be5cb616bfec6f"
+      quote_symbol: ETH
+      price_usd: 0.001725
+      liquidity_usd: 49.58
+      volume_h24: 0.53
       volume_h6: 0
       txns_h24:
-        buys: 3
-        sells: 7
-      price_change_h24: -4.96
-      market_cap: 21437375
-      fdv: 21437375
-      created_at: 2026-09-27T20:30:44.000Z
+        buys: 2
+        sells: 0
+      price_change_h24: 0.56
+      market_cap: 21303221
+      fdv: 21303221
+      created_at: 2026-09-29T21:01:30.000Z
     - dex: up
       pair_address: "0x8F025eA06dfd42B95f1357BC3df80929ec2B8Ea0"
       quote_symbol: WETH
-      price_usd: 0.001775
-      liquidity_usd: 267.11
-      volume_h24: 0.41
-      volume_h6: 0
+      price_usd: 0.001725
+      liquidity_usd: 41.76
+      volume_h24: 0.23
+      volume_h6: 0.23
       txns_h24:
         buys: 0
         sells: 2
-      price_change_h24: -0.12
-      market_cap: 21923203
-      fdv: 21923203
+      price_change_h24: -1.25
+      market_cap: 21301060
+      fdv: 21301060
       created_at: null
-    - dex: uniswap
-      pair_address: "0x4591beefde89f86720cecc1964409a582d33309d5ca476de9abf1fe114b7a0c4"
-      quote_symbol: ETH
-      price_usd: 0.001813
-      liquidity_usd: 28.19
-      volume_h24: 0.78
-      volume_h6: 0.13
-      txns_h24:
-        buys: 0
-        sells: 2
-      price_change_h24: -0.23
-      market_cap: 22385827
-      fdv: 22385827
-      created_at: 2026-09-24T07:31:48.000Z
     - dex: uniswap
       pair_address: "0x655fb1fb603523bac4d80618c7b83cb9c3cae6b534586286ba5396995932a507"
       quote_symbol: VLAD
@@ -136,9 +124,9 @@ market:
       volume_h24: 0
       volume_h6: 0
       txns_h24:
-        buys: 7
-        sells: 4
-      price_change_h24: 3.96
+        buys: 11
+        sells: 1
+      price_change_h24: 41.07
       market_cap: null
       fdv: null
       created_at: 2026-09-06T21:22:05.000Z
@@ -150,39 +138,25 @@ market:
       volume_h24: 0
       volume_h6: 0
       txns_h24:
-        buys: 1
-        sells: 2
-      price_change_h24: 1.3
+        buys: 4
+        sells: 0
+      price_change_h24: 4.16
       market_cap: null
       fdv: null
       created_at: 2026-09-07T10:56:43.000Z
-    - dex: uniswap
-      pair_address: "0xd1a0cb746db241a7c8aac19c0b2f5739bfbadd0714eea26e4764ec208dcb744a"
-      quote_symbol: PIPEDOG
-      price_usd: null
-      liquidity_usd: null
-      volume_h24: 0
-      volume_h6: 0
-      txns_h24:
-        buys: 1
-        sells: 1
-      price_change_h24: -1.03
-      market_cap: null
-      fdv: null
-      created_at: 2026-09-26T20:29:24.000Z
-  liquidity_usd: 7808735.39
-  volume_h24: 287151.86
-  trades_h24: 806
-  price_usd: 0.001709
-  price_change_h24: -5.67
-  market_cap_usd: 21103314
-  fdv_usd: 21103314
-  fdv: 21103314
+  liquidity_usd: 7864891.04
+  volume_h24: 138064.29
+  trades_h24: 861
+  price_usd: 0.001725
+  price_change_h24: 0.91
+  market_cap_usd: 21304784
+  fdv_usd: 21304784
+  fdv: 21304784
   first_pair_at: 2026-07-28T20:31:52.000Z
-  top10_share: 0.2846197244736915
-  top10_share_ex_pools: 0.1040531876927163
+  top10_share: 0.2841324553955463
+  top10_share_ex_pools: 0.1039531823168435
   burned_share: 0
-  top10_as_of: 2026-09-29T15:50:21.951Z
+  top10_as_of: 2026-09-30T15:55:10.549Z
   launchpad: null
   rialto: null
   pair_asset: null
@@ -193,7 +167,7 @@ market:
     - step: launchpad
       message: creator 0xa359E6190740930Bb65e611B553724b0CE73e814 did not match a launchpad factory, curve or known launcher deployer
 structure:
-  pulled_at: 2026-09-29T15:50:21.951Z
+  pulled_at: 2026-09-30T15:55:10.549Z
   mint: no-mint-function
   mint_as_of: null
   renounced: null
@@ -209,20 +183,15 @@ structure:
       holder_kind: null
       reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
       as_of: null
-    - pair: "0x5e7FFa07Cb557aD03A5c4344d518D78283AFc8e5"
+    - pair: "0x3078bf0a7a6b5a2eb4bc367516854ae93a9aae334e0067f2a2be5cb616bfec6f"
       locked_share: null
       holder_kind: null
-      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
       as_of: null
     - pair: "0x8F025eA06dfd42B95f1357BC3df80929ec2B8Ea0"
       locked_share: null
       holder_kind: null
       reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
-      as_of: null
-    - pair: "0x4591beefde89f86720cecc1964409a582d33309d5ca476de9abf1fe114b7a0c4"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
       as_of: null
     - pair: "0x655fb1fb603523bac4d80618c7b83cb9c3cae6b534586286ba5396995932a507"
       locked_share: null
@@ -234,31 +203,26 @@ structure:
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
       as_of: null
-    - pair: "0xd1a0cb746db241a7c8aac19c0b2f5739bfbadd0714eea26e4764ec208dcb744a"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-      as_of: null
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-29T15:50:21.951Z
+  pulled_at: 2026-09-30T15:55:10.549Z
   addresses:
     - address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
       label: PIPEDOG token (fixed-supply ERC-20)
       role: token
-      transactions_count: 20809
+      transactions_count: 20919
       token_transfers_count: 60
-      last_tx_at: 2026-09-29T15:34:56.000Z
+      last_tx_at: 2026-09-30T15:36:27.000Z
       last_method: approve
-      txns_24h: 100
+      txns_24h: 49
       launches_24h: null
-      window_as_of: 2026-09-29T15:50:21.951Z
+      window_as_of: 2026-09-30T15:55:10.549Z
       stale_since: null
       errors:
-        - step: txns_24h capped
-          message: stopped after 2 pages; count is a floor
+        - step: blockscout
+          message: 'transactions?filter=to page 2: HTTP 500: {"error":"Internal server error","source":"upstream"}'
     - address: "0xB7f10f74B39291b9290b779978e19A7637C742D6"
       label: Uniswap v3 PIPEDOG/WETH 1% pool
       role: other
@@ -281,10 +245,12 @@ activity:
       txns_24h: 0
       launches_24h: 0
       window_as_of: 2026-09-29T15:50:21.951Z
-      stale_since: null
-      errors: []
-  last_activity_at: 2026-09-29T15:34:56.000Z
-  txns_24h: 100
+      stale_since: 2026-09-29T15:50:21.951Z
+      errors:
+        - step: blockscout
+          message: 'transactions?filter=to page 1: HTTP 500: {"error":"Internal server error","source":"upstream"}'
+  last_activity_at: 2026-09-30T15:36:27.000Z
+  txns_24h: 49
   launches_24h: 0
   window_as_of: 2026-09-26T13:45:01.788Z
   stale_since: 2026-09-26T13:45:01.788Z
@@ -296,21 +262,21 @@ reads:
       status: read
       reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xbfec6ccb572a8966a8ff382b10346ad12bcecb185654fde5282e0fec7b1f7833"
+      signal: "0xa4c23b4103a0a4e930ea3f68fb0b9affc7095634df23a624df4f5e9b49d58075"
       code_hash: 0eb8f1f8ff5c18d5
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
-      credits: 40
+      credits: 60
     - kind: activity
       address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
       status: read
       reason: token DexScreener trade count changed; 24h walk refreshed
       signal_value: null
-      signal: "0xbfec6ccb572a8966a8ff382b10346ad12bcecb185654fde5282e0fec7b1f7833"
+      signal: "0xa4c23b4103a0a4e930ea3f68fb0b9affc7095634df23a624df4f5e9b49d58075"
       code_hash: 0eb8f1f8ff5c18d5
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
-      credits: 40
+      credits: 80
     - kind: address
       address: "0xB7f10f74B39291b9290b779978e19A7637C742D6"
       status: unchanged
@@ -318,7 +284,7 @@ reads:
       signal_value: null
       signal: "0xa4eaf8bb3382bb1931389264a8d20d764b57ccb9e250a11583ca6e2be3542103"
       code_hash: 7522f11ddb0571da
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: 2026-09-26T13:45:01.788Z
       credits: 0
     - kind: activity
@@ -328,63 +294,63 @@ reads:
       signal_value: null
       signal: "0xa4eaf8bb3382bb1931389264a8d20d764b57ccb9e250a11583ca6e2be3542103"
       code_hash: 7522f11ddb0571da
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: 2026-09-26T13:45:01.788Z
       credits: 0
     - kind: address
       address: "0x1f7d7550B1b028f7571E69A784071F0205FD2EfA"
-      status: unchanged
-      reason: factory signal unchanged
+      status: read
+      reason: factory signal unavailable; code hash unchanged, metadata not re-read
       signal_value: null
       signal: "0x4a82a13c731f2acb0c67f4cc07aeadda4f6d083f301936e23f8b14760192c0f0"
       code_hash: 3cd490900c66ab69
-      checked_at: 2026-09-29T15:50:21.951Z
-      stale_since: 2026-09-28T17:39:12.831Z
+      checked_at: 2026-09-30T15:55:10.549Z
+      stale_since: null
       credits: 0
     - kind: activity
       address: "0x1f7d7550B1b028f7571E69A784071F0205FD2EfA"
-      status: unchanged
-      reason: factory signal unchanged; 24h window recounted from the signal page
+      status: read
+      reason: factory signal unavailable; 24h walk refreshed
       signal_value: null
       signal: "0x4a82a13c731f2acb0c67f4cc07aeadda4f6d083f301936e23f8b14760192c0f0"
       code_hash: 3cd490900c66ab69
-      checked_at: 2026-09-29T15:50:21.951Z
-      stale_since: 2026-09-28T17:39:12.831Z
+      checked_at: 2026-09-30T15:55:10.549Z
+      stale_since: null
       credits: 0
     - kind: top10
       address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
       status: read
       reason: token change signal changed
-      signal_value: 806
+      signal_value: 861
       signal: null
       code_hash: null
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
       status: unchanged
       reason: contract code hash unchanged; verified ABI not re-read
-      signal_value: 806
+      signal_value: 861
       signal: null
       code_hash: 0eb8f1f8ff5c18d5
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: 2026-09-08T21:10:27.749Z
       credits: 0
     - kind: lp
       address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
       status: read
       reason: token change signal changed
-      signal_value: 806
+      signal_value: 861
       signal: null
       code_hash: null
-      checked_at: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-09-30T15:55:10.549Z
       stale_since: null
-      credits: 80
+      credits: 60
 refresh:
   policy_version: 1
-  status: complete
-  attempted_at: 2026-09-29T15:50:21.951Z
+  status: partial
+  attempted_at: 2026-09-30T15:55:10.549Z
   last_success_at: 2026-09-29T15:50:21.951Z
   reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors: []
