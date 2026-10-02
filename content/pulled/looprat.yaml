@@ -1,5 +1,5 @@
 slug: looprat
-pulled_at: 2026-09-25T14:36:34.863Z # chain head 72303447 at read time
+pulled_at: 2026-10-02T15:47:53.687Z # chain head 78350273 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x642d30C84211aDE7768fE557fbAed7224e2068c7"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 53017112
     created_at: 2026-09-03T01:05:21.000Z
-    holders: 676
+    holders: 670
     errors: []
   - address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
     label: PonsV2LaunchDeployer
@@ -117,21 +117,35 @@ addresses:
 metrics: []
 market:
   token_address: "0x642d30C84211aDE7768fE557fbAed7224e2068c7"
-  pulled_at: 2026-09-25T14:36:34.863Z
-  pairs: []
-  liquidity_usd: null
-  volume_h24: null
-  trades_h24: null
-  price_usd: null
-  price_change_h24: null
-  market_cap_usd: null
-  fdv_usd: null
-  fdv: null
-  first_pair_at: null
-  top10_share: 0.9018491251710447
-  top10_share_ex_pools: 0.1341743581000444
+  pulled_at: 2026-10-02T15:47:53.687Z
+  pairs:
+    - dex: uniswap
+      pair_address: "0x592abba969c83f98a7be9f5fb89ebcd436d9d16219567be94dfed61fe0d34be2"
+      quote_symbol: ETH
+      price_usd: 0.000004661
+      liquidity_usd: 6638.3
+      volume_h24: 2.45
+      volume_h6: 2.45
+      txns_h24:
+        buys: 2
+        sells: 1
+      price_change_h24: 0.39
+      market_cap: 4662
+      fdv: 4662
+      created_at: 2026-09-03T01:15:39.000Z
+  liquidity_usd: 6638.3
+  volume_h24: 2.45
+  trades_h24: 3
+  price_usd: 0.000004661
+  price_change_h24: 0.39
+  market_cap_usd: 4662
+  fdv_usd: 4662
+  fdv: 4662
+  first_pair_at: 2026-09-03T01:15:39.000Z
+  top10_share: 0.908782122396564
+  top10_share_ex_pools: 0.1189616481196001
   burned_share: 0
-  top10_as_of: 2026-09-25T14:36:34.863Z
+  top10_as_of: 2026-10-02T15:47:53.687Z
   launchpad:
     slug: pons
     via: creator
@@ -142,7 +156,7 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-09-25T14:36:34.863Z
+  pulled_at: 2026-10-02T15:47:53.687Z
   mint: no-mint-function
   mint_as_of: null
   renounced: null
@@ -153,37 +167,22 @@ structure:
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
       as_of: null
-    - pair: "0x3be736fbffea561adee90bfa26046af8385174e36d09e4bf7fdc17ccf06ae11f"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-      as_of: null
-    - pair: "0x3529d0d83ca160df02dd097bf23476bd37082b7941d2782bee9a3c9f7c835817"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-      as_of: null
-    - pair: "0xec274e51c6adc7e1696aae84e69544b38c7972d8f0bf7f5d77a861e87b1d9c5e"
-      locked_share: null
-      holder_kind: null
-      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
-      as_of: null
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-09-25T14:36:34.863Z
+  pulled_at: 2026-10-02T15:47:53.687Z
   addresses:
     - address: "0x642d30C84211aDE7768fE557fbAed7224e2068c7"
       label: Looprat token (PonsV2LauncherToken bytecode)
       role: token
-      transactions_count: 4102
+      transactions_count: 4113
       token_transfers_count: 0
-      last_tx_at: 2026-09-25T09:51:11.000Z
+      last_tx_at: 2026-09-30T02:48:49.000Z
       last_method: approve
-      txns_24h: 2
+      txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-09-25T14:36:34.863Z
+      window_as_of: 2026-10-02T15:47:53.687Z
       stale_since: null
       errors: []
     - address: "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42"
@@ -195,19 +194,19 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-09-25T14:36:34.863Z
+      window_as_of: 2026-10-02T15:47:53.687Z
       stale_since: null
       errors: []
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: PonsV2LaunchFactory (token launchFactory)
       role: factory
-      transactions_count: 285366
-      token_transfers_count: 38176
-      last_tx_at: 2026-09-25T14:36:28.000Z
+      transactions_count: 301671
+      token_transfers_count: 40170
+      last_tx_at: 2026-10-02T15:47:39.000Z
       last_method: launchToken
-      txns_24h: 86
-      launches_24h: 79
-      window_as_of: 2026-09-25T14:36:34.863Z
+      txns_24h: 92
+      launches_24h: 77
+      window_as_of: 2026-10-02T15:47:53.687Z
       stale_since: null
       errors:
         - step: txns_24h capped
@@ -215,13 +214,13 @@ activity:
     - address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
       label: PonsV2LaunchAndBuy (create tx to)
       role: router
-      transactions_count: 323808
-      token_transfers_count: 285982
-      last_tx_at: 2026-09-25T14:36:25.000Z
+      transactions_count: 352261
+      token_transfers_count: 298461
+      last_tx_at: 2026-10-02T15:47:37.000Z
       last_method: launchAndBuy
-      txns_24h: 78
+      txns_24h: 89
       launches_24h: null
-      window_as_of: 2026-09-25T14:36:34.863Z
+      window_as_of: 2026-10-02T15:47:53.687Z
       stale_since: null
       errors:
         - step: txns_24h capped
@@ -235,7 +234,7 @@ activity:
       last_method: sweepFees
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-09-25T14:36:34.863Z
+      window_as_of: 2026-10-02T15:47:53.687Z
       stale_since: null
       errors: []
     - address: "0xA0974A36ebcDEcBFf49aebf2A3d323624d080764"
@@ -247,13 +246,13 @@ activity:
       last_method: approve
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-09-25T14:36:34.863Z
+      window_as_of: 2026-10-02T15:47:53.687Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-09-25T14:36:28.000Z
-  txns_24h: 166
-  launches_24h: 79
-  window_as_of: 2026-09-25T14:36:34.863Z
+  last_activity_at: 2026-10-02T15:47:39.000Z
+  txns_24h: 181
+  launches_24h: 77
+  window_as_of: 2026-10-02T15:47:53.687Z
   stale_since: null
 reads:
   tier: live
@@ -263,9 +262,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xf319f73aec1286ddc91cc8c93dbd3df734f1993a50d99c22587f5c9411888c89"
+      signal: "0xc719fee00a658315de76202eb74855d69c2301a83cc53be6f9537ea858876031"
       code_hash: 9ebbd435fc41ed1f
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 40
     - kind: activity
@@ -273,9 +272,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xf319f73aec1286ddc91cc8c93dbd3df734f1993a50d99c22587f5c9411888c89"
+      signal: "0xc719fee00a658315de76202eb74855d69c2301a83cc53be6f9537ea858876031"
       code_hash: 9ebbd435fc41ed1f
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 20
     - kind: address
@@ -285,7 +284,7 @@ reads:
       signal_value: null
       signal: "0x849d092ee4ed37d8138636839c28aabd2878e445cb68ba99c4cdafa11a778b2e"
       code_hash: 03e83a4788c83fb5
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -295,7 +294,7 @@ reads:
       signal_value: null
       signal: "0x849d092ee4ed37d8138636839c28aabd2878e445cb68ba99c4cdafa11a778b2e"
       code_hash: 03e83a4788c83fb5
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 0
     - kind: address
@@ -303,9 +302,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x739422f6290ce09847c571eef3ea0bfcef2a53a7be3ca0e7eb287e1ac8efdc8e"
+      signal: "0x76ff400c6d4ed7a7008086f205c90aa088629d15e1d3f042ce5e32dbc829c650"
       code_hash: 2ac92839c8aafdd8
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -313,9 +312,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x739422f6290ce09847c571eef3ea0bfcef2a53a7be3ca0e7eb287e1ac8efdc8e"
+      signal: "0x76ff400c6d4ed7a7008086f205c90aa088629d15e1d3f042ce5e32dbc829c650"
       code_hash: 2ac92839c8aafdd8
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 0
     - kind: address
@@ -323,9 +322,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x755cfcd545f56e91ee410c2a634f81cf02250c6724ad02e4a077553599efd58e"
+      signal: "0x07b809778b8eb78aaa8eb79b97cee0ccfbe2ca7383f9fa274c5a99296fcaba14"
       code_hash: 8557d5489003bbc0
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -333,9 +332,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x755cfcd545f56e91ee410c2a634f81cf02250c6724ad02e4a077553599efd58e"
+      signal: "0x07b809778b8eb78aaa8eb79b97cee0ccfbe2ca7383f9fa274c5a99296fcaba14"
       code_hash: 8557d5489003bbc0
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 0
     - kind: address
@@ -345,7 +344,7 @@ reads:
       signal_value: null
       signal: "0x58662329a6f17c575e36baeddef18454b4191f426b7d3cb54686a306f805cc31"
       code_hash: 3d51291e28a4aa9b
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -355,7 +354,7 @@ reads:
       signal_value: null
       signal: "0x58662329a6f17c575e36baeddef18454b4191f426b7d3cb54686a306f805cc31"
       code_hash: 3d51291e28a4aa9b
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 20
     - kind: address
@@ -365,7 +364,7 @@ reads:
       signal_value: null
       signal: "0x030fead82e237f30b68bec700c8feb6b7bbd3820f384871c8af3adafcb172d8b"
       code_hash: 5277bfce61ecb855
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 40
     - kind: activity
@@ -375,43 +374,43 @@ reads:
       signal_value: null
       signal: "0x030fead82e237f30b68bec700c8feb6b7bbd3820f384871c8af3adafcb172d8b"
       code_hash: 5277bfce61ecb855
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 20
     - kind: top10
       address: "0x642d30C84211aDE7768fE557fbAed7224e2068c7"
       status: read
       reason: token change signal changed
-      signal_value: null
+      signal_value: 3
       signal: null
       code_hash: null
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0x642d30C84211aDE7768fE557fbAed7224e2068c7"
       status: unchanged
       reason: contract code hash unchanged; verified ABI not re-read
-      signal_value: null
+      signal_value: 3
       signal: null
       code_hash: 9ebbd435fc41ed1f
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: 2026-09-08T21:10:27.749Z
       credits: 0
     - kind: lp
       address: "0x642d30C84211aDE7768fE557fbAed7224e2068c7"
       status: read
       reason: token change signal changed
-      signal_value: null
+      signal_value: 3
       signal: null
       code_hash: null
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-02T15:47:53.687Z
       stale_since: null
       credits: 0
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-09-25T14:36:34.863Z
-  last_success_at: 2026-09-25T14:36:34.863Z
+  attempted_at: 2026-10-02T15:47:53.687Z
+  last_success_at: 2026-10-02T15:47:53.687Z
   reason: "recent own activity or seed observation window: weekly"
 errors: []
