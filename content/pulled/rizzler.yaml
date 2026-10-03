@@ -1,13 +1,13 @@
 slug: rizzler
-pulled_at: 2026-09-25T14:36:34.863Z # chain head 72303447 at read time
+pulled_at: 2026-10-03T14:18:49.095Z # chain head 79149078 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x59ccd2519c57c7d06331Caa984326BD33E36Db01"
     label: RIZZLER token
     role: token
     is_contract: true
-    source_verified: false
-    contract_name: RIZZLER
+    source_verified: true
+    contract_name: LaunchToken
     proxy:
       type: none
       implementation: null
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 52782263
     created_at: 2026-09-02T18:21:12.000Z
-    holders: 374
+    holders: 369
     errors: []
   - address: "0xcE9C48cFa068947f77738c81Be406B53338E5B0d"
     label: RWAERC20LaunchpadFactory (token factory(); o1 current)
@@ -73,21 +73,35 @@ addresses:
 metrics: []
 market:
   token_address: "0x59ccd2519c57c7d06331Caa984326BD33E36Db01"
-  pulled_at: 2026-09-25T14:36:34.863Z
-  pairs: []
-  liquidity_usd: null
-  volume_h24: null
-  trades_h24: null
-  price_usd: null
-  price_change_h24: null
-  market_cap_usd: null
-  fdv_usd: null
-  fdv: null
-  first_pair_at: null
-  top10_share: 0.9113346761547936
+  pulled_at: 2026-10-03T14:18:49.095Z
+  pairs:
+    - dex: uniswap
+      pair_address: "0xc5427117c9e24248907ce1dfe180d0ecded142b7c358d05f22a094b4add13dbd"
+      quote_symbol: COST
+      price_usd: 0.000005487
+      liquidity_usd: 5351.31
+      volume_h24: 6.73
+      volume_h6: 0
+      txns_h24:
+        buys: 1
+        sells: 1
+      price_change_h24: -0.15
+      market_cap: 5488
+      fdv: 5488
+      created_at: 2026-09-02T18:21:12.000Z
+  liquidity_usd: 5351.31
+  volume_h24: 6.73
+  trades_h24: 2
+  price_usd: 0.000005487
+  price_change_h24: -0.15
+  market_cap_usd: 5488
+  fdv_usd: 5488
+  fdv: 5488
+  first_pair_at: 2026-09-02T18:21:12.000Z
+  top10_share: 0.9120764182686236
   top10_share_ex_pools: 0.073498235202973
   burned_share: 0
-  top10_as_of: 2026-09-25T14:36:34.863Z
+  top10_as_of: 2026-10-03T14:18:49.095Z
   launchpad: null
   rialto: null
   pair_asset:
@@ -95,9 +109,9 @@ market:
     name: Costco
     address: "0x4ea005168d7f09a7a0ba9d1def21a479950e44c2"
     category: stock
-    tokenized_value_usd: 1315186.29
-    tokenized_shares: 1462.276698060001
-    change_7d: -7837.8
+    tokenized_value_usd: 1101664.35
+    tokenized_shares: 1204.0837125700014
+    change_7d: 18699.42
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
   errors:
@@ -106,9 +120,9 @@ market:
     - step: launchpad
       message: addresses/0x59ccd2519c57c7d06331Caa984326BD33E36Db01 did not return creator_address_hash
 structure:
-  pulled_at: 2026-09-25T14:36:34.863Z
-  mint: unknown
-  mint_as_of: null
+  pulled_at: 2026-10-03T14:18:49.095Z
+  mint: no-mint-function
+  mint_as_of: 2026-10-03T14:18:49.095Z
   renounced: null
   renounced_as_of: null
   lp:
@@ -118,37 +132,33 @@ structure:
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
       as_of: null
   errors:
-    - step: mint
-      message: verified ABI unavailable
     - step: renounced
       message: owner() was not present or could not be read
-    - step: mint
-      message: 'smart-contracts/0x59ccd2519c57c7d06331Caa984326BD33E36Db01: HTTP 402: {"error":"Out of credits"}'
 activity:
-  pulled_at: 2026-09-25T14:36:34.863Z
+  pulled_at: 2026-10-03T14:18:49.095Z
   addresses:
     - address: "0x59ccd2519c57c7d06331Caa984326BD33E36Db01"
       label: RIZZLER token
       role: token
-      transactions_count: 2144
+      transactions_count: 2153
       token_transfers_count: 0
-      last_tx_at: 2026-09-23T14:31:24.000Z
-      last_method: "0x095ea7b3"
+      last_tx_at: 2026-09-29T23:04:58.000Z
+      last_method: approve
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-09-25T14:36:34.863Z
+      window_as_of: 2026-10-03T14:18:49.095Z
       stale_since: null
       errors: []
     - address: "0xcE9C48cFa068947f77738c81Be406B53338E5B0d"
       label: RWAERC20LaunchpadFactory (token factory(); o1 current)
       role: factory
-      transactions_count: 4339
+      transactions_count: 4398
       token_transfers_count: 0
-      last_tx_at: 2026-09-25T13:37:51.000Z
-      last_method: createLaunch
-      txns_24h: 23
-      launches_24h: 22
-      window_as_of: 2026-09-25T14:36:34.863Z
+      last_tx_at: 2026-10-03T13:47:48.000Z
+      last_method: createLaunchAndBuy
+      txns_24h: 5
+      launches_24h: 4
+      window_as_of: 2026-10-03T14:18:49.095Z
       stale_since: null
       errors: []
     - address: "0xf86dfDb678D8E5d932100Ef479A59fa65a82a5Eb"
@@ -160,25 +170,25 @@ activity:
       last_method: initializeFactory
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-09-25T14:36:34.863Z
+      window_as_of: 2026-10-03T14:18:49.095Z
       stale_since: null
       errors: []
     - address: "0x0310cFEbE1D7A69f2414f6595bBe9d17c5342aCc"
       label: LaunchHook (Uniswap v4 hook on RIZZLER/COST)
       role: other
       transactions_count: 1
-      token_transfers_count: 8355
+      token_transfers_count: 8453
       last_tx_at: 2026-08-29T04:47:03.000Z
       last_method: initialize
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-09-25T14:36:34.863Z
+      window_as_of: 2026-10-03T14:18:49.095Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-09-25T13:37:51.000Z
-  txns_24h: 23
-  launches_24h: 22
-  window_as_of: 2026-09-25T14:36:34.863Z
+  last_activity_at: 2026-10-03T13:47:48.000Z
+  txns_24h: 5
+  launches_24h: 4
+  window_as_of: 2026-10-03T14:18:49.095Z
   stale_since: null
 reads:
   tier: live
@@ -188,9 +198,9 @@ reads:
       status: read
       reason: --full override
       signal_value: null
-      signal: "0x22767c110119f3dd62de8ea382b190897d192144c6fa40b63575e91b03c38373"
+      signal: "0x258bf96b070f6d76fc3985adacd2bddacdc469e84218c652ddc661e8a0f2699b"
       code_hash: e9c7d84b737aa5a0
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 80
     - kind: activity
@@ -198,9 +208,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x22767c110119f3dd62de8ea382b190897d192144c6fa40b63575e91b03c38373"
+      signal: "0x258bf96b070f6d76fc3985adacd2bddacdc469e84218c652ddc661e8a0f2699b"
       code_hash: e9c7d84b737aa5a0
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 20
     - kind: address
@@ -208,9 +218,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xb15578942fa11b0bff325635891fdc6bd53fc1ee25d9ac950f23236f58019524"
+      signal: "0xdd5a540203594ae81c5e3063975b42e2a6422d78ceb1df167014d5585590c2ca"
       code_hash: 9b648b15c784efaa
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -218,9 +228,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xb15578942fa11b0bff325635891fdc6bd53fc1ee25d9ac950f23236f58019524"
+      signal: "0xdd5a540203594ae81c5e3063975b42e2a6422d78ceb1df167014d5585590c2ca"
       code_hash: 9b648b15c784efaa
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 0
     - kind: address
@@ -230,7 +240,7 @@ reads:
       signal_value: null
       signal: "0xf799dbe3cb675a1fe19dc4c63cba1e36c1578a11445e6e4ba7e2698a1292cbce"
       code_hash: 692324fd6cbf86e5
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -240,7 +250,7 @@ reads:
       signal_value: null
       signal: "0xf799dbe3cb675a1fe19dc4c63cba1e36c1578a11445e6e4ba7e2698a1292cbce"
       code_hash: 692324fd6cbf86e5
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 0
     - kind: address
@@ -250,7 +260,7 @@ reads:
       signal_value: null
       signal: "0x8584b447d244d806709fde6c54d30284e66ab681b10fe3172ab4b936c023ddc2"
       code_hash: c95cd7f581bba7ff
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -260,43 +270,43 @@ reads:
       signal_value: null
       signal: "0x8584b447d244d806709fde6c54d30284e66ab681b10fe3172ab4b936c023ddc2"
       code_hash: c95cd7f581bba7ff
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 0
     - kind: top10
       address: "0x59ccd2519c57c7d06331Caa984326BD33E36Db01"
       status: read
       reason: token change signal changed
-      signal_value: null
+      signal_value: 2
       signal: null
       code_hash: null
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0x59ccd2519c57c7d06331Caa984326BD33E36Db01"
       status: read
       reason: token change signal changed
-      signal_value: null
+      signal_value: 2
       signal: null
       code_hash: e9c7d84b737aa5a0
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 20
     - kind: lp
       address: "0x59ccd2519c57c7d06331Caa984326BD33E36Db01"
       status: read
       reason: token change signal changed
-      signal_value: null
+      signal_value: 2
       signal: null
       code_hash: null
-      checked_at: 2026-09-25T14:36:34.863Z
+      checked_at: 2026-10-03T14:18:49.095Z
       stale_since: null
       credits: 0
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-09-25T14:36:34.863Z
-  last_success_at: 2026-09-25T14:36:34.863Z
+  attempted_at: 2026-10-03T14:18:49.095Z
+  last_success_at: 2026-10-03T14:18:49.095Z
   reason: "recent own activity or seed observation window: weekly"
 errors: []
