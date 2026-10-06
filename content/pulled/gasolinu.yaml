@@ -1,5 +1,5 @@
 slug: gasolinu
-pulled_at: 2026-10-05T18:26:09.086Z # chain head 80996263 at read time
+pulled_at: 2026-10-06T15:56:18.974Z # chain head 81752868 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x1e6EA1e89151cDc8443968Bf047cfa3177181e18"
@@ -17,8 +17,16 @@ addresses:
     safe: null
     created_block: 52808783
     created_at: 2026-09-02T19:07:07.000Z
-    holders: 1233
-    errors: []
+    holders: 1222
+    errors:
+      - step: rpc
+        message: "eth_getCode 0x1e6EA1e89151cDc8443968Bf047cfa3177181e18: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0x1e6EA1e89151cDc8443968Bf047cfa3177181e18: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt admin 0x1e6EA1e89151cDc8443968Bf047cfa3177181e18: explorer served a bot challenge"
+      - step: rpc
+        message: "owner: read returned empty where a value existed; kept previous"
   - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
     label: DopplerERC20V1 implementation
     role: implementation
@@ -98,63 +106,63 @@ addresses:
 metrics: []
 market:
   token_address: "0x1e6EA1e89151cDc8443968Bf047cfa3177181e18"
-  pulled_at: 2026-10-05T18:26:09.086Z
+  pulled_at: 2026-10-06T15:56:18.974Z
   pairs:
     - dex: uniswap
       pair_address: "0x0e83588ff3914c9801584d55d4dabf9d28880728d73ccff7394ded9aae02afa8"
       quote_symbol: USO
-      price_usd: 0.0002759
-      liquidity_usd: 151341.38
-      volume_h24: 13212.31
-      volume_h6: 4970.66
+      price_usd: 0.0002507
+      liquidity_usd: 141979.63
+      volume_h24: 10290.86
+      volume_h6: 3960.59
       txns_h24:
-        buys: 70
-        sells: 83
-      price_change_h24: 7.34
-      market_cap: 275955
-      fdv: 275955
+        buys: 63
+        sells: 51
+      price_change_h24: -10.26
+      market_cap: 250734
+      fdv: 250734
       created_at: 2026-09-02T19:07:07.000Z
     - dex: uniswap
       pair_address: "0xFfD8B41E94173f88d55Fbc7695d493229D3Aa48A"
       quote_symbol: WETH
-      price_usd: 0.0002743
-      liquidity_usd: 4058.45
-      volume_h24: 989.97
-      volume_h6: 437.59
+      price_usd: 0.0002515
+      liquidity_usd: 3532.4
+      volume_h24: 948.72
+      volume_h6: 160.96
       txns_h24:
-        buys: 17
-        sells: 16
-      price_change_h24: 5.8
-      market_cap: 274313
-      fdv: 274313
+        buys: 14
+        sells: 25
+      price_change_h24: -6.96
+      market_cap: 251542
+      fdv: 251542
       created_at: 2026-09-19T17:37:58.000Z
     - dex: uniswap
       pair_address: "0x9de0831D498725b40C8Dd2Ed6CeeCaE21E871fD5"
       quote_symbol: MASKS
-      price_usd: 0.000266
-      liquidity_usd: 97
-      volume_h24: 2.22
-      volume_h6: 1.02
+      price_usd: 0.0002599
+      liquidity_usd: 97.36
+      volume_h24: 1.3
+      volume_h6: 1.3
       txns_h24:
-        buys: 2
-        sells: 0
-      price_change_h24: 0.23
-      market_cap: 266061
-      fdv: 266061
+        buys: 0
+        sells: 2
+      price_change_h24: -1.01
+      market_cap: 259998
+      fdv: 259998
       created_at: 2026-09-26T14:20:44.000Z
-  liquidity_usd: 155496.83
-  volume_h24: 14204.5
-  trades_h24: 188
-  price_usd: 0.0002759
-  price_change_h24: 7.34
-  market_cap_usd: 275955
-  fdv_usd: 275955
-  fdv: 275955
+  liquidity_usd: 145609.39
+  volume_h24: 11240.88
+  trades_h24: 155
+  price_usd: 0.0002507
+  price_change_h24: -10.26
+  market_cap_usd: 250734
+  fdv_usd: 250734
+  fdv: 250734
   first_pair_at: 2026-09-02T19:07:07.000Z
-  top10_share: 0.5454817447630087
-  top10_share_ex_pools: 0.2434015081701321
+  top10_share: 0.556133413714977
+  top10_share_ex_pools: 0.2404567587045829
   burned_share: 0
-  top10_as_of: 2026-10-05T18:26:09.086Z
+  top10_as_of: 2026-10-06T15:56:18.974Z
   launchpad:
     slug: doppler
     via: factory
@@ -166,14 +174,14 @@ market:
     name: United States Oil Fund
     address: "0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344"
     category: etf
-    tokenized_value_usd: 2699707.39
-    tokenized_shares: 18319.24669999998
-    change_7d: -26746.1
+    tokenized_value_usd: 3172365.38
+    tokenized_shares: 21526.53442000001
+    change_7d: -31428.74
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-10-05T18:26:09.086Z
+  pulled_at: 2026-10-06T15:56:18.974Z
   mint: unknown
   mint_as_of: null
   renounced: false
@@ -197,21 +205,23 @@ structure:
   errors:
     - step: mint
       message: verified ABI unavailable
+    - step: renounced
+      message: owner() was not present or could not be read
     - step: mint
       message: 'smart-contracts/0x1e6EA1e89151cDc8443968Bf047cfa3177181e18: HTTP 402: {"error":"Out of credits"}'
 activity:
-  pulled_at: 2026-10-05T18:26:09.086Z
+  pulled_at: 2026-10-06T15:56:18.974Z
   addresses:
     - address: "0x1e6EA1e89151cDc8443968Bf047cfa3177181e18"
       label: GASOLINU token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 5768
+      transactions_count: 5780
       token_transfers_count: 6
-      last_tx_at: 2026-10-05T17:15:30.000Z
+      last_tx_at: 2026-10-06T13:49:42.000Z
       last_method: "0x095ea7b3"
-      txns_24h: 11
+      txns_24h: 14
       launches_24h: null
-      window_as_of: 2026-10-05T18:26:09.086Z
+      window_as_of: 2026-10-06T15:56:18.974Z
       stale_since: null
       errors: []
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
@@ -235,7 +245,7 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-10-05T18:26:09.086Z
+      window_as_of: 2026-10-06T15:56:18.974Z
       stale_since: null
       errors: []
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
@@ -247,25 +257,25 @@ activity:
       last_method: create
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-10-05T18:26:09.086Z
+      window_as_of: 2026-10-06T15:56:18.974Z
       stale_since: null
       errors: []
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (token owner())
       role: other
-      transactions_count: 19254
-      token_transfers_count: 799604
-      last_tx_at: 2026-10-05T18:16:56.000Z
+      transactions_count: 19481
+      token_transfers_count: 804391
+      last_tx_at: 2026-10-06T15:52:40.000Z
       last_method: create
       txns_24h: 100
       launches_24h: null
-      window_as_of: 2026-10-05T18:26:09.086Z
+      window_as_of: 2026-10-06T15:56:18.974Z
       stale_since: null
       errors:
         - step: txns_24h capped
           message: stopped after 2 pages; count is a floor
-  last_activity_at: 2026-10-05T18:16:56.000Z
-  txns_24h: 111
+  last_activity_at: 2026-10-06T15:52:40.000Z
+  txns_24h: 114
   launches_24h: 0
   window_as_of: 2026-10-02T15:47:53.687Z
   stale_since: 2026-10-02T15:47:53.687Z
@@ -275,21 +285,21 @@ reads:
     - kind: address
       address: "0x1e6EA1e89151cDc8443968Bf047cfa3177181e18"
       status: read
-      reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
+      reason: --full override
       signal_value: null
-      signal: "0x3bef062acb285c9be48d529a6068cf81c5836429e4a50626b1d3efa219126b74"
-      code_hash: d6778098513fa311
-      checked_at: 2026-10-05T18:26:09.086Z
+      signal: "0x6ee27e729fc3745f6b32860c1c4ae53a266136b5655a2fa1cd1fe8d544040fb5"
+      code_hash: null
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: null
-      credits: 40
+      credits: 80
     - kind: activity
       address: "0x1e6EA1e89151cDc8443968Bf047cfa3177181e18"
       status: read
-      reason: token DexScreener trade count changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x3bef062acb285c9be48d529a6068cf81c5836429e4a50626b1d3efa219126b74"
-      code_hash: d6778098513fa311
-      checked_at: 2026-10-05T18:26:09.086Z
+      signal: "0x6ee27e729fc3745f6b32860c1c4ae53a266136b5655a2fa1cd1fe8d544040fb5"
+      code_hash: null
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: null
       credits: 20
     - kind: address
@@ -299,7 +309,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: 8ef9efc9c3c5b922
-      checked_at: 2026-10-05T18:26:09.086Z
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: 2026-10-02T15:47:53.687Z
       credits: 0
     - kind: activity
@@ -309,7 +319,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: 8ef9efc9c3c5b922
-      checked_at: 2026-10-05T18:26:09.086Z
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: 2026-10-02T15:47:53.687Z
       credits: 0
     - kind: address
@@ -319,7 +329,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: b3931c1995f630dc
-      checked_at: 2026-10-05T18:26:09.086Z
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -329,37 +339,37 @@ reads:
       signal_value: null
       signal: null
       code_hash: b3931c1995f630dc
-      checked_at: 2026-10-05T18:26:09.086Z
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: null
       credits: 0
     - kind: address
       address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
-      status: unchanged
-      reason: factory signal unchanged
+      status: read
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
       signal: "0xe41a3fd7112f33b4a8e8ec36fbae7394e876b3b81590749ce8562e48a3e5e6ee"
       code_hash: 564d0fd58633bdbd
-      checked_at: 2026-10-05T18:26:09.086Z
-      stale_since: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-10-06T15:56:18.974Z
+      stale_since: null
       credits: 0
     - kind: activity
       address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
-      status: unchanged
-      reason: factory signal unchanged; 24h window recounted from the signal page
+      status: read
+      reason: --full override; 24h walk refreshed
       signal_value: null
       signal: "0xe41a3fd7112f33b4a8e8ec36fbae7394e876b3b81590749ce8562e48a3e5e6ee"
       code_hash: 564d0fd58633bdbd
-      checked_at: 2026-10-05T18:26:09.086Z
-      stale_since: 2026-09-29T15:50:21.951Z
+      checked_at: 2026-10-06T15:56:18.974Z
+      stale_since: null
       credits: 0
     - kind: address
       address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       status: read
       reason: other signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xfb47249c4539f9d526f2615d89dbb22506e468c9a3a492662f7ae068b3c25ca1"
+      signal: "0x298d90b1bd5b36d3fb5c106459542ab115e233f02e92660927eeaf4972528660"
       code_hash: f8de098a2663a757
-      checked_at: 2026-10-05T18:26:09.086Z
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -367,45 +377,45 @@ reads:
       status: read
       reason: other signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0xfb47249c4539f9d526f2615d89dbb22506e468c9a3a492662f7ae068b3c25ca1"
+      signal: "0x298d90b1bd5b36d3fb5c106459542ab115e233f02e92660927eeaf4972528660"
       code_hash: f8de098a2663a757
-      checked_at: 2026-10-05T18:26:09.086Z
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: null
       credits: 0
     - kind: top10
       address: "0x1e6EA1e89151cDc8443968Bf047cfa3177181e18"
       status: read
       reason: token change signal changed
-      signal_value: 188
+      signal_value: 155
       signal: null
       code_hash: null
-      checked_at: 2026-10-05T18:26:09.086Z
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0x1e6EA1e89151cDc8443968Bf047cfa3177181e18"
       status: read
       reason: token change signal changed
-      signal_value: 188
+      signal_value: 155
       signal: null
-      code_hash: d6778098513fa311
-      checked_at: 2026-10-05T18:26:09.086Z
+      code_hash: null
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: null
       credits: 20
     - kind: lp
       address: "0x1e6EA1e89151cDc8443968Bf047cfa3177181e18"
       status: read
       reason: token change signal changed
-      signal_value: 188
+      signal_value: 155
       signal: null
       code_hash: null
-      checked_at: 2026-10-05T18:26:09.086Z
+      checked_at: 2026-10-06T15:56:18.974Z
       stale_since: null
       credits: 40
 refresh:
   policy_version: 1
-  status: complete
-  attempted_at: 2026-10-05T18:26:09.086Z
+  status: partial
+  attempted_at: 2026-10-06T15:56:18.974Z
   last_success_at: 2026-10-05T18:26:09.086Z
   reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors: []
