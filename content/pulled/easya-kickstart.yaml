@@ -1,5 +1,5 @@
 slug: easya-kickstart
-pulled_at: 2026-10-02T15:47:53.687Z # chain head 78350273 at read time
+pulled_at: 2026-10-09T16:11:10.535Z # chain head 84287767 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x519fd71F5df8242Fb8BccAA346eA5B20c336273e"
@@ -64,12 +64,16 @@ addresses:
       implementation: null
       admin: null
     owner: null
-    owner_type: none
+    owner_type: unknown
     safe: null
     created_block: 52603751
     created_at: 2026-09-02T13:16:34.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getStorageAt admin 0xEF241C8da8e44B57296Cb1C58Cc6C769a04994BE: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_call owner() 0xEF241C8da8e44B57296Cb1C58Cc6C769a04994BE: explorer served a bot challenge"
   - address: "0xC190fb813Df94A936643cDD29A45deeDD089ab66"
     label: ETH factory ProxyAdmin
     role: admin
@@ -86,7 +90,13 @@ addresses:
     created_block: 9065045
     created_at: 2026-07-13T23:32:34.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getStorageAt implementation 0xC190fb813Df94A936643cDD29A45deeDD089ab66: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt admin 0xC190fb813Df94A936643cDD29A45deeDD089ab66: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_call owner() 0xC190fb813Df94A936643cDD29A45deeDD089ab66: explorer served a bot challenge"
   - address: "0xe2f56e355983482948B4029E2D3a9a552805c8e9"
     label: StockLaunchpad ProxyAdmin
     role: admin
@@ -103,7 +113,15 @@ addresses:
     created_block: 51015318
     created_at: 2026-08-31T16:42:40.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getCode 0xe2f56e355983482948B4029E2D3a9a552805c8e9: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0xe2f56e355983482948B4029E2D3a9a552805c8e9: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt admin 0xe2f56e355983482948B4029E2D3a9a552805c8e9: explorer served a bot challenge"
+      - step: rpc
+        message: "owner: read returned empty where a value existed; kept previous"
   - address: "0x981DA90234D2570450b38bAc900D5244b386e587"
     label: feeCollector / ProxyAdmin owner()
     role: admin
@@ -120,19 +138,25 @@ addresses:
     created_block: null
     created_at: null
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getCode 0x981DA90234D2570450b38bAc900D5244b386e587: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0x981DA90234D2570450b38bAc900D5244b386e587: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt admin 0x981DA90234D2570450b38bAc900D5244b386e587: explorer served a bot challenge"
 metrics:
   - kind: fees_24h
-    value: 12
-    as_of: 2026-10-02T15:47:53.687Z
+    value: 5.16
+    as_of: 2026-10-09T16:11:10.535Z
     source_url: https://api.llama.fi/summary/fees/easya-kickstart?dataType=dailyFees
   - kind: revenue_24h
-    value: 5.91
-    as_of: 2026-10-02T15:47:53.687Z
+    value: 2.58
+    as_of: 2026-10-09T16:11:10.535Z
     source_url: https://api.llama.fi/summary/fees/easya-kickstart?dataType=dailyRevenue
 market:
   token_address: null
-  pulled_at: 2026-10-02T15:47:53.687Z
+  pulled_at: 2026-10-09T16:11:10.535Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -156,18 +180,18 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-10-02T15:47:53.687Z
+  pulled_at: 2026-10-09T16:11:10.535Z
   addresses:
     - address: "0x519fd71F5df8242Fb8BccAA346eA5B20c336273e"
       label: ETH PumpFactory proxy
       role: factory
-      transactions_count: 3045
-      token_transfers_count: 16161
-      last_tx_at: 2026-09-29T17:58:27.000Z
+      transactions_count: 3046
+      token_transfers_count: 16166
+      last_tx_at: 2026-10-05T16:20:32.000Z
       last_method: createToken
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0x2A01f98D59A0f34869B5A52C705045135c29E815"
@@ -179,7 +203,7 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0x785dCae72C87Ad4d28A703A6c5db455891615Fc1"
@@ -191,7 +215,7 @@ activity:
       last_method: createToken
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0xEF241C8da8e44B57296Cb1C58Cc6C769a04994BE"
@@ -203,7 +227,7 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0xC190fb813Df94A936643cDD29A45deeDD089ab66"
@@ -215,7 +239,7 @@ activity:
       last_method: upgradeAndCall
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0xe2f56e355983482948B4029E2D3a9a552805c8e9"
@@ -227,25 +251,25 @@ activity:
       last_method: upgradeAndCall
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0x981DA90234D2570450b38bAc900D5244b386e587"
       label: feeCollector / ProxyAdmin owner()
       role: admin
       transactions_count: 61
-      token_transfers_count: 322
+      token_transfers_count: 323
       last_tx_at: 2026-09-24T17:09:24.000Z
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-09-29T17:58:27.000Z
+  last_activity_at: 2026-10-05T16:20:32.000Z
   txns_24h: 0
   launches_24h: 0
-  window_as_of: 2026-10-02T15:47:53.687Z
+  window_as_of: 2026-10-09T16:11:10.535Z
   stale_since: null
 reads:
   tier: live
@@ -255,9 +279,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x8627b009eaf5ffa8662659b350981bda9668c9ef78a024985bb8bfea0f36240a"
+      signal: "0xb39ad066a427a3dc1145b811131637e5999156b8d1d8bec13328108baaf16acd"
       code_hash: 0e5ca4c82c0e6ad8
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -265,9 +289,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x8627b009eaf5ffa8662659b350981bda9668c9ef78a024985bb8bfea0f36240a"
+      signal: "0xb39ad066a427a3dc1145b811131637e5999156b8d1d8bec13328108baaf16acd"
       code_hash: 0e5ca4c82c0e6ad8
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: address
@@ -277,7 +301,7 @@ reads:
       signal_value: null
       signal: "0x05e3be6a206b523c80d8874ed43a2351ca37c0991c78b5b1325901a9e82aac03"
       code_hash: 53d3c878068969fd
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -287,7 +311,7 @@ reads:
       signal_value: null
       signal: "0x05e3be6a206b523c80d8874ed43a2351ca37c0991c78b5b1325901a9e82aac03"
       code_hash: 53d3c878068969fd
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: address
@@ -297,7 +321,7 @@ reads:
       signal_value: null
       signal: "0x1a755d0805d82aec271d05b096c3f1812fc0d0497b130784266d991151917a24"
       code_hash: 99591728d4878a61
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -307,7 +331,7 @@ reads:
       signal_value: null
       signal: "0x1a755d0805d82aec271d05b096c3f1812fc0d0497b130784266d991151917a24"
       code_hash: 99591728d4878a61
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: address
@@ -317,7 +341,7 @@ reads:
       signal_value: null
       signal: "0x23c064a54103a72061a7e810d0b4437c19b67be5746b78701452fe38bca90788"
       code_hash: fdf90e5bb43492c9
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -327,7 +351,7 @@ reads:
       signal_value: null
       signal: "0x23c064a54103a72061a7e810d0b4437c19b67be5746b78701452fe38bca90788"
       code_hash: fdf90e5bb43492c9
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: address
@@ -337,7 +361,7 @@ reads:
       signal_value: null
       signal: "0x86d348f97a00e4ec83bbe000aab7582954b814ab3e7d14a9000b9b8dee56dc8e"
       code_hash: a88dbd788a0970dc
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -347,53 +371,53 @@ reads:
       signal_value: null
       signal: "0x86d348f97a00e4ec83bbe000aab7582954b814ab3e7d14a9000b9b8dee56dc8e"
       code_hash: a88dbd788a0970dc
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: address
       address: "0xe2f56e355983482948B4029E2D3a9a552805c8e9"
       status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      reason: --full override
       signal_value: null
       signal: "0x6e6587e6857ad7b049a85fa98a381c5b2b68206a131a5730f0bda3588d762142"
-      code_hash: a88dbd788a0970dc
-      checked_at: 2026-10-02T15:47:53.687Z
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 60
     - kind: activity
       address: "0xe2f56e355983482948B4029E2D3a9a552805c8e9"
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
       signal: "0x6e6587e6857ad7b049a85fa98a381c5b2b68206a131a5730f0bda3588d762142"
-      code_hash: a88dbd788a0970dc
-      checked_at: 2026-10-02T15:47:53.687Z
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: address
       address: "0x981DA90234D2570450b38bAc900D5244b386e587"
       status: read
       reason: --full override
-      signal_value: 58
-      signal: "58"
+      signal_value: null
+      signal: "0x7bc2b34e13ad445b7eeceb5038e25ad762305cb51e95a8772dedf24621307e34"
       code_hash: null
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 40
     - kind: activity
       address: "0x981DA90234D2570450b38bAc900D5244b386e587"
       status: read
       reason: --full override; 24h walk refreshed
-      signal_value: 58
-      signal: "58"
+      signal_value: null
+      signal: "0x7bc2b34e13ad445b7eeceb5038e25ad762305cb51e95a8772dedf24621307e34"
       code_hash: null
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 40
+      credits: 20
 refresh:
   policy_version: 1
-  status: complete
-  attempted_at: 2026-10-02T15:47:53.687Z
+  status: partial
+  attempted_at: 2026-10-09T16:11:10.535Z
   last_success_at: 2026-10-02T15:47:53.687Z
   reason: "recent own activity or seed observation window: weekly"
 errors:

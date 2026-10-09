@@ -1,5 +1,5 @@
 slug: meridian
-pulled_at: 2026-10-08T16:27:48.859Z # chain head 83453877 at read time
+pulled_at: 2026-10-09T16:11:10.535Z # chain head 84287767 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
@@ -17,8 +17,14 @@ addresses:
     safe: null
     created_block: 22051004
     created_at: 2026-07-29T01:15:03.000Z
-    holders: 631
-    errors: []
+    holders: 667
+    errors:
+      - step: rpc
+        message: "eth_getCode 0x24b84023c8e4Da635be228C380C09bfE5271BF9d: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0x24b84023c8e4Da635be228C380C09bfE5271BF9d: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt admin 0x24b84023c8e4Da635be228C380C09bfE5271BF9d: explorer served a bot challenge"
   - address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
     label: AccountableYield strategy (ERC1967 proxy; app manageUrl)
     role: proxy
@@ -35,7 +41,11 @@ addresses:
     created_block: 22051004
     created_at: 2026-07-29T01:15:03.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getCode 0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC: explorer served a bot challenge"
   - address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
     label: AccountableYield implementation
     role: implementation
@@ -52,7 +62,11 @@ addresses:
     created_block: 16386002
     created_at: 2026-07-22T11:22:45.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getCode 0x2639dA0923aBFFe46a753b765E0856Cc3E121710: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0x2639dA0923aBFFe46a753b765E0856Cc3E121710: explorer served a bot challenge"
   - address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
     label: YieldStrategyFactory (Accountable)
     role: factory
@@ -74,7 +88,13 @@ addresses:
     created_block: 16386224
     created_at: 2026-07-22T11:23:07.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getCode 0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f: explorer served a bot challenge"
+      - step: rpc
+        message: "owner: read returned empty where a value existed; kept previous"
   - address: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
     label: YieldStrategyFactory owner Safe
     role: multisig
@@ -112,23 +132,25 @@ addresses:
     created_block: 203471
     created_at: 2026-06-25T18:41:27.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_call owner() 0xE42847eE3feE1B29065F14D39EcF664A04d70475: explorer served a bot challenge"
 metrics:
   - kind: tvl
-    value: 3143862
-    as_of: 2026-10-08T14:40:11.000Z
+    value: 3077419
+    as_of: 2026-10-09T15:41:11.000Z
     source_url: https://api.llama.fi/protocol/meridian-perps
   - kind: fees_24h
-    value: 70.71
-    as_of: 2026-10-08T16:27:48.859Z
+    value: 70.34
+    as_of: 2026-10-09T16:11:10.535Z
     source_url: https://api.llama.fi/summary/fees/meridian-perps?dataType=dailyFees
   - kind: revenue_24h
-    value: 70.71
-    as_of: 2026-10-08T16:27:48.859Z
+    value: 70.34
+    as_of: 2026-10-09T16:11:10.535Z
     source_url: https://api.llama.fi/summary/fees/meridian-perps?dataType=dailyRevenue
 market:
   token_address: null
-  pulled_at: 2026-10-08T16:27:48.859Z
+  pulled_at: 2026-10-09T16:11:10.535Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -152,30 +174,30 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-10-08T16:27:48.859Z
+  pulled_at: 2026-10-09T16:11:10.535Z
   addresses:
     - address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
       label: Meridian Liquidity Provider (MLP share vault)
       role: vault
-      transactions_count: 1453
-      token_transfers_count: 1734
-      last_tx_at: 2026-10-08T15:34:08.000Z
-      last_method: requestRedeem
-      txns_24h: 17
+      transactions_count: 1470
+      token_transfers_count: 1751
+      last_tx_at: 2026-10-09T05:40:01.000Z
+      last_method: deposit
+      txns_24h: 10
       launches_24h: null
-      window_as_of: 2026-10-08T16:27:48.859Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
       label: AccountableYield strategy (ERC1967 proxy; app manageUrl)
       role: proxy
-      transactions_count: 134
+      transactions_count: 136
       token_transfers_count: 4
-      last_tx_at: 2026-10-07T22:15:49.000Z
+      last_tx_at: 2026-10-09T10:15:49.000Z
       last_method: accrueAndProcess
-      txns_24h: 1
+      txns_24h: 2
       launches_24h: null
-      window_as_of: 2026-10-08T16:27:48.859Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
@@ -187,8 +209,8 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-03T14:18:49.095Z
-      stale_since: 2026-10-03T14:18:49.095Z
+      window_as_of: 2026-10-09T16:11:10.535Z
+      stale_since: null
       errors: []
     - address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
       label: YieldStrategyFactory (Accountable)
@@ -199,7 +221,7 @@ activity:
       last_method: createYieldStrategy
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-10-08T16:27:48.859Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
@@ -211,7 +233,7 @@ activity:
       last_method: execTransaction
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-08T16:27:48.859Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0xE42847eE3feE1B29065F14D39EcF664A04d70475"
@@ -226,8 +248,8 @@ activity:
       window_as_of: 2026-10-03T14:18:49.095Z
       stale_since: 2026-10-03T14:18:49.095Z
       errors: []
-  last_activity_at: 2026-10-08T15:34:08.000Z
-  txns_24h: 18
+  last_activity_at: 2026-10-09T10:15:49.000Z
+  txns_24h: 12
   launches_24h: 0
   window_as_of: 2026-10-03T14:18:49.095Z
   stale_since: 2026-10-03T14:18:49.095Z
@@ -237,83 +259,83 @@ reads:
     - kind: address
       address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
       status: read
-      reason: vault signal changed; code hash unchanged, metadata not re-read
+      reason: --full override
       signal_value: null
-      signal: "0x378c3579104dafaac63f84b2af1cbdaa61098174e92c14aa83a73d9549380e3e"
-      code_hash: 1c000304ed01324c
-      checked_at: 2026-10-08T16:27:48.859Z
+      signal: "0xa3cb298d38dd0547d97b771f157e91db90d84863149452a381847a8a9513b665"
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 80
     - kind: activity
       address: "0x24b84023c8e4Da635be228C380C09bfE5271BF9d"
       status: read
-      reason: vault signal changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x378c3579104dafaac63f84b2af1cbdaa61098174e92c14aa83a73d9549380e3e"
-      code_hash: 1c000304ed01324c
-      checked_at: 2026-10-08T16:27:48.859Z
+      signal: "0xa3cb298d38dd0547d97b771f157e91db90d84863149452a381847a8a9513b665"
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: address
       address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
       status: read
-      reason: proxy signal changed; code hash unchanged, metadata not re-read
+      reason: --full override
       signal_value: null
-      signal: "0x2b998a49bc6e4a507fb32dd9d248646e18120236847c510741804bb7b4b3a0e7"
-      code_hash: 07f22738dfcdc3b7
-      checked_at: 2026-10-08T16:27:48.859Z
+      signal: "0xe686dcb271134c2377039d33f4ea3ed76b01fa975c5c3bad329e9eddd2b1d1db"
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 60
     - kind: activity
       address: "0xF62c201e9A28F6A57C4262004dd2e8B8e95bB1eC"
       status: read
-      reason: proxy signal changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x2b998a49bc6e4a507fb32dd9d248646e18120236847c510741804bb7b4b3a0e7"
-      code_hash: 07f22738dfcdc3b7
-      checked_at: 2026-10-08T16:27:48.859Z
+      signal: "0xe686dcb271134c2377039d33f4ea3ed76b01fa975c5c3bad329e9eddd2b1d1db"
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 20
     - kind: address
       address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
-      status: unchanged
-      reason: implementation role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override
       signal_value: null
       signal: null
-      code_hash: 45f616107a68c031
-      checked_at: 2026-10-08T16:27:48.859Z
-      stale_since: 2026-10-03T14:18:49.095Z
-      credits: 0
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
+      stale_since: null
+      credits: 60
     - kind: activity
       address: "0x2639dA0923aBFFe46a753b765E0856Cc3E121710"
-      status: unchanged
-      reason: implementation role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override; 24h walk refreshed
       signal_value: null
       signal: null
-      code_hash: 45f616107a68c031
-      checked_at: 2026-10-08T16:27:48.859Z
-      stale_since: 2026-10-03T14:18:49.095Z
-      credits: 0
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
+      stale_since: null
+      credits: 20
     - kind: address
       address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
-      status: unchanged
-      reason: factory signal unchanged
+      status: read
+      reason: --full override
       signal_value: null
       signal: "0x28fe07f3a7b8d3cade043704f1f2454e8aaf535fcb4bd523af0cdf16a06c0398"
-      code_hash: 861252ce202318e5
-      checked_at: 2026-10-08T16:27:48.859Z
-      stale_since: 2026-10-07T16:27:29.507Z
-      credits: 20
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
+      stale_since: null
+      credits: 60
     - kind: activity
       address: "0xA4d6a4aD35fc632aEE1dC48A2aEc2aaa37B51F9f"
-      status: unchanged
-      reason: factory signal unchanged; 24h window recounted from the signal page
+      status: read
+      reason: --full override; 24h walk refreshed
       signal_value: null
       signal: "0x28fe07f3a7b8d3cade043704f1f2454e8aaf535fcb4bd523af0cdf16a06c0398"
-      code_hash: 861252ce202318e5
-      checked_at: 2026-10-08T16:27:48.859Z
-      stale_since: 2026-10-07T16:27:29.507Z
-      credits: 0
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
+      stale_since: null
+      credits: 20
     - kind: address
       address: "0x4B07AaA370189E5603DF56C84f59c5A59181BFB1"
       status: unchanged
@@ -321,7 +343,7 @@ reads:
       signal_value: null
       signal: "0x8c7453340f8c04f9d53142497ab9363bdecf44438e379d1e6fe96f969ac5f273"
       code_hash: 788b11033f24c6fe
-      checked_at: 2026-10-08T16:27:48.859Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: 2026-10-07T16:27:29.507Z
       credits: 20
     - kind: activity
@@ -331,7 +353,7 @@ reads:
       signal_value: null
       signal: "0x8c7453340f8c04f9d53142497ab9363bdecf44438e379d1e6fe96f969ac5f273"
       code_hash: 788b11033f24c6fe
-      checked_at: 2026-10-08T16:27:48.859Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: 2026-10-07T16:27:29.507Z
       credits: 0
     - kind: address
@@ -341,7 +363,7 @@ reads:
       signal_value: null
       signal: "0xe00a762d8359689513188358a92fb37955282d96f60102892f2584691eee7e92"
       code_hash: ec8ad1f28fba0df1
-      checked_at: 2026-10-08T16:27:48.859Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: 2026-10-03T14:18:49.095Z
       credits: 0
     - kind: activity
@@ -351,13 +373,13 @@ reads:
       signal_value: null
       signal: "0xe00a762d8359689513188358a92fb37955282d96f60102892f2584691eee7e92"
       code_hash: ec8ad1f28fba0df1
-      checked_at: 2026-10-08T16:27:48.859Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: 2026-10-03T14:18:49.095Z
       credits: 0
 refresh:
   policy_version: 1
-  status: complete
-  attempted_at: 2026-10-08T16:27:48.859Z
+  status: partial
+  attempted_at: 2026-10-09T16:11:10.535Z
   last_success_at: 2026-10-08T16:27:48.859Z
   reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors:

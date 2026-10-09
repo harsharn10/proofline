@@ -1,5 +1,5 @@
 slug: maxfi
-pulled_at: 2026-10-02T15:47:53.687Z # chain head 78350273 at read time
+pulled_at: 2026-10-09T16:11:10.535Z # chain head 84287767 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
@@ -18,7 +18,11 @@ addresses:
     created_block: 16810524
     created_at: 2026-07-22T23:11:26.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getCode 0x1195C074F898b7644bA732407619c9804dFE6DCE: explorer served a bot challenge"
+      - step: rpc
+        message: "owner: read returned empty where a value existed; kept previous"
   - address: "0x999A74ddFde1575C4db454A0300d5F0351A891dE"
     label: SnuggleVaultUpgradeable
     role: implementation
@@ -52,7 +56,9 @@ addresses:
     created_block: 16810744
     created_at: 2026-07-22T23:11:48.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getCode 0x71b55E366a0F43260b1138A32c312ba7bb7F30F7: explorer served a bot challenge"
   - address: "0x76bDb43d2EC3b190087076649224F47A58C44eF2"
     label: UniswapV3Adapter
     role: other
@@ -89,20 +95,20 @@ addresses:
     errors: []
 metrics:
   - kind: tvl
-    value: 7229698
-    as_of: 2026-10-02T14:58:11.000Z
+    value: 6461797
+    as_of: 2026-10-09T15:06:47.000Z
     source_url: https://api.llama.fi/protocol/snuggle
   - kind: fees_24h
-    value: 43387
-    as_of: 2026-10-02T15:47:53.687Z
+    value: 33614
+    as_of: 2026-10-09T16:11:10.535Z
     source_url: https://api.llama.fi/summary/fees/snuggle?dataType=dailyFees
   - kind: revenue_24h
-    value: 5543
-    as_of: 2026-10-02T15:47:53.687Z
+    value: 4363
+    as_of: 2026-10-09T16:11:10.535Z
     source_url: https://api.llama.fi/summary/fees/snuggle?dataType=dailyRevenue
 market:
   token_address: null
-  pulled_at: 2026-10-02T15:47:53.687Z
+  pulled_at: 2026-10-09T16:11:10.535Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -126,18 +132,18 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-10-02T15:47:53.687Z
+  pulled_at: 2026-10-09T16:11:10.535Z
   addresses:
     - address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
       label: MaxFi Robinhood vault (SnuggleVault proxy)
       role: vault
-      transactions_count: 278260
-      token_transfers_count: 3188751
-      last_tx_at: 2026-10-02T15:47:36.000Z
-      last_method: withdraw
-      txns_24h: 80
+      transactions_count: 292995
+      token_transfers_count: 3517919
+      last_tx_at: 2026-10-09T16:09:29.000Z
+      last_method: updateParameters
+      txns_24h: 91
       launches_24h: null
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors:
         - step: txns_24h capped
@@ -151,7 +157,7 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0x71b55E366a0F43260b1138A32c312ba7bb7F30F7"
@@ -163,19 +169,19 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0x76bDb43d2EC3b190087076649224F47A58C44eF2"
       label: UniswapV3Adapter
       role: other
       transactions_count: 0
-      token_transfers_count: 752809
+      token_transfers_count: 827052
       last_tx_at: 2026-07-22T23:11:57.000Z
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0x413Ca90D38D964546c2fE03cB103df57372630F6"
@@ -187,13 +193,13 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-02T15:47:53.687Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-10-02T15:47:36.000Z
-  txns_24h: 80
+  last_activity_at: 2026-10-09T16:09:29.000Z
+  txns_24h: 91
   launches_24h: null
-  window_as_of: 2026-10-02T15:47:53.687Z
+  window_as_of: 2026-10-09T16:11:10.535Z
   stale_since: null
 reads:
   tier: live
@@ -201,23 +207,23 @@ reads:
     - kind: address
       address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
       status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      reason: --full override
       signal_value: null
-      signal: "0x7feefad40fc9b85d5a57708645af3eaa9344cebb9beb6b61157a2abedc1fb59f"
-      code_hash: 7685c811f1ab3140
-      checked_at: 2026-10-02T15:47:53.687Z
+      signal: "0xad8bb836b1f3d6baab3583678143bcea41f66eac2a921644478bea4cd7ba09b8"
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 0
     - kind: activity
       address: "0x1195C074F898b7644bA732407619c9804dFE6DCE"
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x7feefad40fc9b85d5a57708645af3eaa9344cebb9beb6b61157a2abedc1fb59f"
-      code_hash: 7685c811f1ab3140
-      checked_at: 2026-10-02T15:47:53.687Z
+      signal: "0xad8bb836b1f3d6baab3583678143bcea41f66eac2a921644478bea4cd7ba09b8"
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 40
+      credits: 0
     - kind: address
       address: "0x999A74ddFde1575C4db454A0300d5F0351A891dE"
       status: read
@@ -225,9 +231,9 @@ reads:
       signal_value: null
       signal: "0xb3c08783e365700844ce6a592cafd6fdb3b54514a2e73fef0209ad3f65b0817e"
       code_hash: 384f201e59633145
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 0
     - kind: activity
       address: "0x999A74ddFde1575C4db454A0300d5F0351A891dE"
       status: read
@@ -235,29 +241,29 @@ reads:
       signal_value: null
       signal: "0xb3c08783e365700844ce6a592cafd6fdb3b54514a2e73fef0209ad3f65b0817e"
       code_hash: 384f201e59633145
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 0
     - kind: address
       address: "0x71b55E366a0F43260b1138A32c312ba7bb7F30F7"
       status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      reason: --full override
       signal_value: null
       signal: "0x1ac4f7f5210e4ef4841ff7fa0a98087ed6065ae75221f323928795fda69d0593"
-      code_hash: cfedba06e3db9d15
-      checked_at: 2026-10-02T15:47:53.687Z
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 0
     - kind: activity
       address: "0x71b55E366a0F43260b1138A32c312ba7bb7F30F7"
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
       signal: "0x1ac4f7f5210e4ef4841ff7fa0a98087ed6065ae75221f323928795fda69d0593"
-      code_hash: cfedba06e3db9d15
-      checked_at: 2026-10-02T15:47:53.687Z
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 0
     - kind: address
       address: "0x76bDb43d2EC3b190087076649224F47A58C44eF2"
       status: read
@@ -265,9 +271,9 @@ reads:
       signal_value: null
       signal: "0x72b5215436ea9932325cc2a07ff135b46ae031de76e069a94e4f6a39a4b8ac05"
       code_hash: 4590b56df33ae7c4
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 0
     - kind: activity
       address: "0x76bDb43d2EC3b190087076649224F47A58C44eF2"
       status: read
@@ -275,9 +281,9 @@ reads:
       signal_value: null
       signal: "0x72b5215436ea9932325cc2a07ff135b46ae031de76e069a94e4f6a39a4b8ac05"
       code_hash: 4590b56df33ae7c4
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 0
     - kind: address
       address: "0x413Ca90D38D964546c2fE03cB103df57372630F6"
       status: read
@@ -285,9 +291,9 @@ reads:
       signal_value: null
       signal: "0xb643eb49800b43d18f9f8182d0eecbef9fcac4434bc21bb04c75f9ca4fab4b76"
       code_hash: 8c33b31d2cc527e1
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 0
     - kind: activity
       address: "0x413Ca90D38D964546c2fE03cB103df57372630F6"
       status: read
@@ -295,13 +301,13 @@ reads:
       signal_value: null
       signal: "0xb643eb49800b43d18f9f8182d0eecbef9fcac4434bc21bb04c75f9ca4fab4b76"
       code_hash: 8c33b31d2cc527e1
-      checked_at: 2026-10-02T15:47:53.687Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 20
+      credits: 0
 refresh:
   policy_version: 1
-  status: complete
-  attempted_at: 2026-10-02T15:47:53.687Z
+  status: partial
+  attempted_at: 2026-10-09T16:11:10.535Z
   last_success_at: 2026-10-02T15:47:53.687Z
   reason: "shared infrastructure representative: weekly"
 errors:

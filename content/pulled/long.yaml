@@ -1,5 +1,5 @@
 slug: long
-pulled_at: 2026-09-08T21:10:27.749Z # chain head 58001090 at read time
+pulled_at: 2026-10-09T16:11:10.535Z # chain head 84287767 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
@@ -35,7 +35,15 @@ addresses:
     created_block: 8123342
     created_at: 2026-07-12T21:19:53.000Z
     holders: null
-    errors: []
+    errors:
+      - step: rpc
+        message: "eth_getCode 0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt implementation 0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845: explorer served a bot challenge"
+      - step: rpc
+        message: "eth_getStorageAt admin 0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845: explorer served a bot challenge"
+      - step: rpc
+        message: "owner: read returned empty where a value existed; kept previous"
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
     label: DopplerERC20V1Factory (trusted token factory)
     role: factory
@@ -81,7 +89,7 @@ addresses:
 metrics: []
 market:
   token_address: null
-  pulled_at: 2026-09-08T21:10:27.749Z
+  pulled_at: 2026-10-09T16:11:10.535Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -105,30 +113,30 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-09-08T21:10:27.749Z
+  pulled_at: 2026-10-09T16:11:10.535Z
   addresses:
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       label: LongLauncher (PRD 0x22e9…eeED)
       role: factory
-      transactions_count: 29212
+      transactions_count: 31988
       token_transfers_count: 10
-      last_tx_at: 2026-09-08T21:09:58.000Z
+      last_tx_at: 2026-09-29T08:45:11.000Z
       last_method: create
-      txns_24h: 1781
-      launches_24h: 1776
-      window_as_of: 2026-09-08T21:10:27.749Z
+      txns_24h: 0
+      launches_24h: 0
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845"
       label: TickerAirlockFactory (PRD 0x9c88…0845)
       role: factory
-      transactions_count: 10
+      transactions_count: 18
       token_transfers_count: 0
-      last_tx_at: 2026-07-13T00:52:04.000Z
+      last_tx_at: 2026-09-29T03:06:00.000Z
       last_method: create
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-09-08T21:10:27.749Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
@@ -140,107 +148,113 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-09-08T21:10:27.749Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (create primitive)
       role: router
-      transactions_count: 9892
-      token_transfers_count: 520446
-      last_tx_at: 2026-09-08T21:11:02.000Z
+      transactions_count: 19968
+      token_transfers_count: 819611
+      last_tx_at: 2026-10-09T16:02:06.000Z
       last_method: create
-      txns_24h: 171
+      txns_24h: 86
       launches_24h: null
-      window_as_of: 2026-09-08T21:10:27.749Z
+      window_as_of: 2026-10-09T16:11:10.535Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-09-08T21:11:02.000Z
-  txns_24h: 1952
-  launches_24h: 1776
-  window_as_of: 2026-09-08T21:10:27.749Z
+  last_activity_at: 2026-10-09T16:02:06.000Z
+  txns_24h: 86
+  launches_24h: 0
+  window_as_of: 2026-10-09T16:11:10.535Z
   stale_since: null
 reads:
-  tier: live
+  tier: quiet
   explorer:
     - kind: address
       address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       status: read
-      reason: factory signal changed; code hash unchanged, metadata not re-read
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xc6265a359821d2808f7fa0779b9544a6761c9b215d7b28c0be0a3ca6fc8909ad"
+      signal: "0xe41a3fd7112f33b4a8e8ec36fbae7394e876b3b81590749ce8562e48a3e5e6ee"
       code_hash: 564d0fd58633bdbd
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 0
     - kind: activity
       address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       status: read
-      reason: factory signal changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xc6265a359821d2808f7fa0779b9544a6761c9b215d7b28c0be0a3ca6fc8909ad"
+      signal: "0xe41a3fd7112f33b4a8e8ec36fbae7394e876b3b81590749ce8562e48a3e5e6ee"
       code_hash: 564d0fd58633bdbd
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
-      credits: 0
+      credits: 20
     - kind: address
       address: "0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845"
-      status: unchanged
-      reason: factory signal unchanged
+      status: read
+      reason: --full override
       signal_value: null
-      signal: "0xaeb69131d6ad8057d804fdc6d392cb0ffaeac27824647a4f071c0bf130f61fa6"
-      code_hash: 84d022517ff706be
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: 2026-09-08T11:21:05.295Z
-      credits: 1
+      signal: "0x10711712099d3f43793cbdd058832b4bf1cca3a89723b771a9bb188801d0147f"
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
+      stale_since: null
+      credits: 60
     - kind: activity
       address: "0x9c88f06B72FCD3ceDBEF3BE7521eE5Abd72d0845"
-      status: unchanged
-      reason: factory signal unchanged; 24h window recounted from the signal page
+      status: read
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xaeb69131d6ad8057d804fdc6d392cb0ffaeac27824647a4f071c0bf130f61fa6"
-      code_hash: 84d022517ff706be
-      checked_at: 2026-09-08T21:10:27.749Z
-      stale_since: 2026-09-08T11:21:05.295Z
-      credits: 0
+      signal: "0x10711712099d3f43793cbdd058832b4bf1cca3a89723b771a9bb188801d0147f"
+      code_hash: null
+      checked_at: 2026-10-09T16:11:10.535Z
+      stale_since: null
+      credits: 20
     - kind: address
       address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       status: read
-      reason: factory signal unavailable; code hash unchanged, metadata not re-read
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
       signal: null
       code_hash: b3931c1995f630dc
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 0
     - kind: activity
       address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       status: read
-      reason: factory signal unavailable; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
       signal: null
       code_hash: b3931c1995f630dc
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 0
     - kind: address
       address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       status: read
-      reason: router signal changed; code hash unchanged, metadata not re-read
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x62e1ff6c3644db424bcc5975208498e8ae5bdcbda677be94ecf9aa1a04b5bfc6"
+      signal: "0x9ec1a3bf85f9bc78f650a132ae30839c947da8610d6adb08084bdd8db4575e83"
       code_hash: f8de098a2663a757
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 0
     - kind: activity
       address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       status: read
-      reason: router signal changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x62e1ff6c3644db424bcc5975208498e8ae5bdcbda677be94ecf9aa1a04b5bfc6"
+      signal: "0x9ec1a3bf85f9bc78f650a132ae30839c947da8610d6adb08084bdd8db4575e83"
       code_hash: f8de098a2663a757
-      checked_at: 2026-09-08T21:10:27.749Z
+      checked_at: 2026-10-09T16:11:10.535Z
       stale_since: null
       credits: 0
+refresh:
+  policy_version: 1
+  status: partial
+  attempted_at: 2026-10-09T16:11:10.535Z
+  last_success_at: 2026-09-08T21:10:27.749Z
+  reason: "maintenance only: monthly"
 errors: []
