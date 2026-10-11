@@ -1,5 +1,5 @@
 slug: circus
-pulled_at: 2026-10-04T14:47:41.628Z # chain head 80017837 at read time
+pulled_at: 2026-10-11T15:39:07.600Z # chain head 85944181 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
@@ -107,7 +107,7 @@ addresses:
 metrics: []
 market:
   token_address: null
-  pulled_at: 2026-10-04T14:47:41.628Z
+  pulled_at: 2026-10-11T15:39:07.600Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -131,20 +131,22 @@ market:
       message: no robinhood-chain deployment with role token
 structure: null
 activity:
-  pulled_at: 2026-10-04T14:47:41.628Z
+  pulled_at: 2026-10-11T15:39:07.600Z
   addresses:
     - address: "0xb7fA26c6fcB8801cAbc538B82A6e80Ae1C43cb00"
       label: barcusLaunchpad / circusQuoteLaunchpad (ERC1967 proxy)
       role: factory
-      transactions_count: 137779
-      token_transfers_count: 128310
-      last_tx_at: 2026-10-04T09:51:39.000Z
-      last_method: "0xcce7ec13"
-      txns_24h: 7
+      transactions_count: 138894
+      token_transfers_count: 129164
+      last_tx_at: 2026-10-10T20:58:27.000Z
+      last_method: claimCreatorFees
+      txns_24h: 100
       launches_24h: 0
-      window_as_of: 2026-10-04T14:47:41.628Z
+      window_as_of: 2026-10-11T15:39:07.600Z
       stale_since: null
-      errors: []
+      errors:
+        - step: txns_24h capped
+          message: stopped after 2 pages; count is a floor
     - address: "0x822E175C1ae12166A0Ea3299d083Da48E6C42B96"
       label: Launchpad implementation (ERC1967 slot)
       role: implementation
@@ -154,7 +156,7 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-04T14:47:41.628Z
+      window_as_of: 2026-10-11T15:39:07.600Z
       stale_since: null
       errors: []
     - address: "0xA256bC02dbB92ed1cB607a7DE7b0bbEBca29e930"
@@ -166,7 +168,7 @@ activity:
       last_method: harvestAndWithdraw
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-04T14:47:41.628Z
+      window_as_of: 2026-10-11T15:39:07.600Z
       stale_since: null
       errors: []
     - address: "0xC126829B4b3782ad30484b298C762507bf9bCa2A"
@@ -178,37 +180,37 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-04T14:47:41.628Z
+      window_as_of: 2026-10-11T15:39:07.600Z
       stale_since: null
       errors: []
     - address: "0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681"
       label: Launchpad owner() / factory creator
       role: admin
-      transactions_count: 291
-      token_transfers_count: 124
+      transactions_count: 319
+      token_transfers_count: 146
       last_tx_at: 2026-09-25T20:21:00.000Z
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-04T14:47:41.628Z
+      window_as_of: 2026-10-11T15:39:07.600Z
       stale_since: null
       errors: []
     - address: "0xF421C3977E5D5Fc4aBe50195391970a6AB1d2B7D"
       label: circusQuoteLocker
       role: other
-      transactions_count: 74
-      token_transfers_count: 234
-      last_tx_at: 2026-10-03T20:27:29.000Z
+      transactions_count: 88
+      token_transfers_count: 269
+      last_tx_at: 2026-10-10T20:33:07.000Z
       last_method: "0x51cff8d9"
       txns_24h: 2
       launches_24h: null
-      window_as_of: 2026-10-04T14:47:41.628Z
+      window_as_of: 2026-10-11T15:39:07.600Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-10-04T09:51:39.000Z
-  txns_24h: 9
+  last_activity_at: 2026-10-10T20:58:27.000Z
+  txns_24h: 102
   launches_24h: 0
-  window_as_of: 2026-10-04T14:47:41.628Z
+  window_as_of: 2026-10-11T15:39:07.600Z
   stale_since: null
 reads:
   tier: live
@@ -218,9 +220,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xe5da167e0baa97591a5467e5be12591facf12a7f55e60798bf8d96844218ae8c"
+      signal: "0x44f26868c738b1d2d5a131b9df11a4c8e1df5289e47af0e59a842d94696f06e4"
       code_hash: 1347bf7670f8efc0
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -228,11 +230,11 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xe5da167e0baa97591a5467e5be12591facf12a7f55e60798bf8d96844218ae8c"
+      signal: "0x44f26868c738b1d2d5a131b9df11a4c8e1df5289e47af0e59a842d94696f06e4"
       code_hash: 1347bf7670f8efc0
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
-      credits: 20
+      credits: 40
     - kind: address
       address: "0x822E175C1ae12166A0Ea3299d083Da48E6C42B96"
       status: read
@@ -240,7 +242,7 @@ reads:
       signal_value: null
       signal: "0xb8992cbc62b704e16adacf5f00916d1fb421057a33d71abf36d7c2616edfb6d7"
       code_hash: 534ba1bc38973a8f
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 60
     - kind: activity
@@ -250,7 +252,7 @@ reads:
       signal_value: null
       signal: "0xb8992cbc62b704e16adacf5f00916d1fb421057a33d71abf36d7c2616edfb6d7"
       code_hash: 534ba1bc38973a8f
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 20
     - kind: address
@@ -260,7 +262,7 @@ reads:
       signal_value: null
       signal: "0x1c517e54207f2c9071d0ab7bdd844b765c82f29b107e3836818274e5fef6d173"
       code_hash: 441d47d1ff932f77
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -270,7 +272,7 @@ reads:
       signal_value: null
       signal: "0x1c517e54207f2c9071d0ab7bdd844b765c82f29b107e3836818274e5fef6d173"
       code_hash: 441d47d1ff932f77
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 20
     - kind: address
@@ -280,7 +282,7 @@ reads:
       signal_value: null
       signal: "0x09d84dbfc310d025af8ecf5f16593b4ffcdf427af1999d18d790e5fad910161f"
       code_hash: 236f2c490db4e45e
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 60
     - kind: activity
@@ -290,27 +292,27 @@ reads:
       signal_value: null
       signal: "0x09d84dbfc310d025af8ecf5f16593b4ffcdf427af1999d18d790e5fad910161f"
       code_hash: 236f2c490db4e45e
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 20
     - kind: address
       address: "0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681"
       status: read
       reason: --full override
-      signal_value: 289
-      signal: "289"
+      signal_value: 317
+      signal: "317"
       code_hash: null
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 20
     - kind: activity
       address: "0x90Ae1f7Ded5B00599bF6BFdea6A1EF1f05FA0681"
       status: read
       reason: --full override; 24h walk refreshed
-      signal_value: 289
-      signal: "289"
+      signal_value: 317
+      signal: "317"
       code_hash: null
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 40
     - kind: address
@@ -318,9 +320,9 @@ reads:
       status: read
       reason: --full override
       signal_value: null
-      signal: "0xa3cb49c2bbcd9bcbf4bae5b4b23e93ee9effc0a06675415a39af34eb468354cb"
+      signal: "0xbb26d50d21677e8c3897cf6968180f85b34a195bdcd9035debc7a1faf334bb90"
       code_hash: 90e75cd77f3d5390
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 60
     - kind: activity
@@ -328,15 +330,15 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xa3cb49c2bbcd9bcbf4bae5b4b23e93ee9effc0a06675415a39af34eb468354cb"
+      signal: "0xbb26d50d21677e8c3897cf6968180f85b34a195bdcd9035debc7a1faf334bb90"
       code_hash: 90e75cd77f3d5390
-      checked_at: 2026-10-04T14:47:41.628Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 20
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-10-04T14:47:41.628Z
-  last_success_at: 2026-10-04T14:47:41.628Z
+  attempted_at: 2026-10-11T15:39:07.600Z
+  last_success_at: 2026-10-11T15:39:07.600Z
   reason: "shared infrastructure representative: weekly"
 errors: []

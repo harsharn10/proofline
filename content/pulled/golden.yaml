@@ -1,5 +1,5 @@
 slug: golden
-pulled_at: 2026-10-09T16:11:10.535Z # chain head 84287767 at read time
+pulled_at: 2026-10-11T15:39:07.600Z # chain head 85944181 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xdFee8e117DfEF700D7C41170f67c4A591445217a"
@@ -13,18 +13,14 @@ addresses:
       implementation: null
       admin: null
     owner: null
-    owner_type: none
+    owner_type: unknown
     safe: null
     created_block: 53026208
     created_at: 2026-09-03T01:20:52.000Z
     holders: 111
     errors:
       - step: rpc
-        message: "eth_getCode 0xdFee8e117DfEF700D7C41170f67c4A591445217a: explorer served a bot challenge"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0xdFee8e117DfEF700D7C41170f67c4A591445217a: explorer served a bot challenge"
-      - step: rpc
-        message: "eth_getStorageAt admin 0xdFee8e117DfEF700D7C41170f67c4A591445217a: explorer served a bot challenge"
+        message: "eth_call owner() 0xdFee8e117DfEF700D7C41170f67c4A591445217a: explorer served a bot challenge"
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: PonsV2LaunchFactory
     role: factory
@@ -46,15 +42,7 @@ addresses:
     created_block: 26841846
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e: explorer served a bot challenge"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e: explorer served a bot challenge"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e: explorer served a bot challenge"
-      - step: rpc
-        message: "owner: read returned empty where a value existed; kept previous"
+    errors: []
   - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
     label: V2LaunchLocker (top holder / locked position)
     role: vault
@@ -76,19 +64,11 @@ addresses:
     created_block: 26841845
     created_at: 2026-08-03T14:41:19.000Z
     holders: null
-    errors:
-      - step: rpc
-        message: "eth_getCode 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: explorer served a bot challenge"
-      - step: rpc
-        message: "eth_getStorageAt implementation 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: explorer served a bot challenge"
-      - step: rpc
-        message: "eth_getStorageAt admin 0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952: explorer served a bot challenge"
-      - step: rpc
-        message: "owner: read returned empty where a value existed; kept previous"
+    errors: []
 metrics: []
 market:
   token_address: "0xdFee8e117DfEF700D7C41170f67c4A591445217a"
-  pulled_at: 2026-10-09T16:11:10.535Z
+  pulled_at: 2026-10-11T15:39:07.600Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -102,7 +82,7 @@ market:
   top10_share: 0.9877222177949008
   top10_share_ex_pools: 0.0676220542693091
   burned_share: 0
-  top10_as_of: 2026-10-09T16:11:10.535Z
+  top10_as_of: 2026-10-11T15:39:07.600Z
   launchpad:
     slug: pons
     via: creator
@@ -114,16 +94,16 @@ market:
     name: Trump Media & Technology Group • Robinhood Token
     address: "0x1d11f0496982706c5e14a514d4e79f2e6bde4516"
     category: Stocks
-    tokenized_value_usd: 1767804.85
-    tokenized_shares: 215585.95771999971
-    change_7d: -194027.36
+    tokenized_value_usd: 1725526.1
+    tokenized_shares: 212765.24059999964
+    change_7d: -202126.98
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-10-09T16:11:10.535Z
+  pulled_at: 2026-10-11T15:39:07.600Z
   mint: no-mint-function
-  mint_as_of: 2026-10-09T16:11:10.535Z
+  mint_as_of: 2026-10-11T15:39:07.600Z
   renounced: null
   renounced_as_of: null
   lp:
@@ -136,7 +116,7 @@ structure:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-10-09T16:11:10.535Z
+  pulled_at: 2026-10-11T15:39:07.600Z
   addresses:
     - address: "0xdFee8e117DfEF700D7C41170f67c4A591445217a"
       label: GOLDEN token (PonsV2LauncherToken)
@@ -147,19 +127,19 @@ activity:
       last_method: approve
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-09T16:11:10.535Z
+      window_as_of: 2026-10-11T15:39:07.600Z
       stale_since: null
       errors: []
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: PonsV2LaunchFactory
       role: factory
-      transactions_count: 309678
-      token_transfers_count: 40874
-      last_tx_at: 2026-10-09T16:09:20.000Z
+      transactions_count: 310917
+      token_transfers_count: 41003
+      last_tx_at: 2026-10-11T15:38:37.000Z
       last_method: launchToken
-      txns_24h: 100
-      launches_24h: 87
-      window_as_of: 2026-10-09T16:11:10.535Z
+      txns_24h: 97
+      launches_24h: 80
+      window_as_of: 2026-10-11T15:39:07.600Z
       stale_since: null
       errors:
         - step: txns_24h capped
@@ -168,18 +148,18 @@ activity:
       label: V2LaunchLocker (top holder / locked position)
       role: vault
       transactions_count: 15
-      token_transfers_count: 35550
+      token_transfers_count: 35720
       last_tx_at: 2026-09-13T14:42:33.000Z
       last_method: isLocked
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-10-09T16:11:10.535Z
+      window_as_of: 2026-10-11T15:39:07.600Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-10-09T16:09:20.000Z
-  txns_24h: 100
-  launches_24h: 87
-  window_as_of: 2026-10-09T16:11:10.535Z
+  last_activity_at: 2026-10-11T15:38:37.000Z
+  txns_24h: 97
+  launches_24h: 80
+  window_as_of: 2026-10-11T15:39:07.600Z
   stale_since: null
 reads:
   tier: live
@@ -190,8 +170,8 @@ reads:
       reason: --full override
       signal_value: null
       signal: "0x39c44b54daadc63e3a7fa4c5de151b137f6a03a46fdae56020cf929071129f14"
-      code_hash: null
-      checked_at: 2026-10-09T16:11:10.535Z
+      code_hash: 4e47c8bce8f39956
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 80
     - kind: activity
@@ -200,8 +180,8 @@ reads:
       reason: --full override; 24h walk refreshed
       signal_value: null
       signal: "0x39c44b54daadc63e3a7fa4c5de151b137f6a03a46fdae56020cf929071129f14"
-      code_hash: null
-      checked_at: 2026-10-09T16:11:10.535Z
+      code_hash: 4e47c8bce8f39956
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 20
     - kind: address
@@ -209,9 +189,9 @@ reads:
       status: read
       reason: --full override
       signal_value: null
-      signal: "0xe95d55083644b0e4573726c17093e14c0a50be9aa1524a9430de42dcd8015366"
-      code_hash: null
-      checked_at: 2026-10-09T16:11:10.535Z
+      signal: "0xce9232408c3a09eae236fa4a47c43a5e181cf33b7b9afb70493377b3b87a0b8a"
+      code_hash: 2ac92839c8aafdd8
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -219,9 +199,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xe95d55083644b0e4573726c17093e14c0a50be9aa1524a9430de42dcd8015366"
-      code_hash: null
-      checked_at: 2026-10-09T16:11:10.535Z
+      signal: "0xce9232408c3a09eae236fa4a47c43a5e181cf33b7b9afb70493377b3b87a0b8a"
+      code_hash: 2ac92839c8aafdd8
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 0
     - kind: address
@@ -230,18 +210,18 @@ reads:
       reason: --full override
       signal_value: null
       signal: "0x6aadee9a92af9eed4ebdc725889365f0446b1ccad858113d917b409a9f080559"
-      code_hash: null
-      checked_at: 2026-10-09T16:11:10.535Z
+      code_hash: 693ee37f225b5208
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
-      credits: 0
+      credits: 40
     - kind: activity
       address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
       signal: "0x6aadee9a92af9eed4ebdc725889365f0446b1ccad858113d917b409a9f080559"
-      code_hash: null
-      checked_at: 2026-10-09T16:11:10.535Z
+      code_hash: 693ee37f225b5208
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 0
     - kind: top10
@@ -251,7 +231,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: null
-      checked_at: 2026-10-09T16:11:10.535Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 20
     - kind: structure
@@ -260,8 +240,8 @@ reads:
       reason: token change signal changed
       signal_value: null
       signal: null
-      code_hash: null
-      checked_at: 2026-10-09T16:11:10.535Z
+      code_hash: 4e47c8bce8f39956
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 20
     - kind: lp
@@ -271,13 +251,13 @@ reads:
       signal_value: null
       signal: null
       code_hash: null
-      checked_at: 2026-10-09T16:11:10.535Z
+      checked_at: 2026-10-11T15:39:07.600Z
       stale_since: null
       credits: 0
 refresh:
   policy_version: 1
   status: partial
-  attempted_at: 2026-10-09T16:11:10.535Z
+  attempted_at: 2026-10-11T15:39:07.600Z
   last_success_at: 2026-10-02T15:47:53.687Z
   reason: "recent own activity or seed observation window: weekly"
 errors: []
