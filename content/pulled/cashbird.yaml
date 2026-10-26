@@ -1,5 +1,5 @@
 slug: cashbird
-pulled_at: 2026-10-19T16:27:41.299Z # chain head 92755699 at read time
+pulled_at: 2026-10-26T16:07:05.905Z # chain head 98540759 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 52053085
     created_at: 2026-09-01T21:50:40.000Z
-    holders: 1354
+    holders: 1325
     errors: []
   - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
     label: DopplerERC20V1Factory (token creator)
@@ -98,21 +98,35 @@ addresses:
 metrics: []
 market:
   token_address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
-  pulled_at: 2026-10-19T16:27:41.299Z
-  pairs: []
-  liquidity_usd: null
-  volume_h24: null
-  trades_h24: null
-  price_usd: null
-  price_change_h24: null
-  market_cap_usd: null
-  fdv_usd: null
-  fdv: null
-  first_pair_at: null
-  top10_share: 0.9255543570506128
-  top10_share_ex_pools: 0.1103899606774478
+  pulled_at: 2026-10-26T16:07:05.905Z
+  pairs:
+    - dex: uniswap
+      pair_address: "0xf25fc6cf0b524e236ffe33e762caee47ef7284ec65c175900a1542a6bc91fdfb"
+      quote_symbol: GLD
+      price_usd: 0.00003006
+      liquidity_usd: 32987.88
+      volume_h24: 8.6
+      volume_h6: 4.27
+      txns_h24:
+        buys: 5
+        sells: 4
+      price_change_h24: 0.46
+      market_cap: 30065
+      fdv: 30065
+      created_at: 2026-09-01T21:50:40.000Z
+  liquidity_usd: 32987.88
+  volume_h24: 8.6
+  trades_h24: 9
+  price_usd: 0.00003006
+  price_change_h24: 0.46
+  market_cap_usd: 30065
+  fdv_usd: 30065
+  fdv: 30065
+  first_pair_at: 2026-09-01T21:50:40.000Z
+  top10_share: 0.9612772464942616
+  top10_share_ex_pools: 0.1104612763005751
   burned_share: 0
-  top10_as_of: 2026-10-19T16:27:41.299Z
+  top10_as_of: 2026-10-26T16:07:05.905Z
   launchpad:
     slug: doppler
     via: factory
@@ -124,18 +138,18 @@ market:
     name: SPDR Gold Trust • Robinhood Token
     address: "0xc9a981fee1f9dec688bb123ccdecc63d0debfc4e"
     category: Commodities
-    tokenized_value_usd: 7553644.03
-    tokenized_shares: 19737.252839999976
-    change_7d: 8684.39
+    tokenized_value_usd: 8501569.05
+    tokenized_shares: 22214.128319999967
+    change_7d: 9774.22
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-10-19T16:27:41.299Z
+  pulled_at: 2026-10-26T16:07:05.905Z
   mint: unknown
   mint_as_of: null
   renounced: false
-  renounced_as_of: 2026-10-19T16:27:41.299Z
+  renounced_as_of: 2026-10-26T16:07:05.905Z
   lp:
     - pair: "0xf25fc6cf0b524e236ffe33e762caee47ef7284ec65c175900a1542a6bc91fdfb"
       locked_share: null
@@ -148,18 +162,18 @@ structure:
     - step: mint
       message: 'smart-contracts/0x38C8f642A04FEaC9899990276b4207fE4F621e18: HTTP 402: {"error":"Out of credits"}'
 activity:
-  pulled_at: 2026-10-19T16:27:41.299Z
+  pulled_at: 2026-10-26T16:07:05.905Z
   addresses:
     - address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
       label: CASHBIRD token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 5552
+      transactions_count: 5580
       token_transfers_count: 2
-      last_tx_at: 2026-10-18T07:48:31.000Z
+      last_tx_at: 2026-10-25T22:12:58.000Z
       last_method: "0x095ea7b3"
-      txns_24h: 0
+      txns_24h: 1
       launches_24h: null
-      window_as_of: 2026-10-19T16:27:41.299Z
+      window_as_of: 2026-10-26T16:07:05.905Z
       stale_since: null
       errors: []
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
@@ -171,7 +185,7 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-10-19T16:27:41.299Z
+      window_as_of: 2026-10-26T16:07:05.905Z
       stale_since: null
       errors: []
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
@@ -184,7 +198,7 @@ activity:
       txns_24h: 0
       launches_24h: null
       window_as_of: 2026-10-19T16:27:41.299Z
-      stale_since: null
+      stale_since: 2026-10-19T16:27:41.299Z
       errors: []
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
       label: LongLauncher (create caller)
@@ -195,165 +209,163 @@ activity:
       last_method: create
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-10-19T16:27:41.299Z
+      window_as_of: 2026-10-26T16:07:05.905Z
       stale_since: null
       errors: []
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (token owner)
       role: other
-      transactions_count: 20661
-      token_transfers_count: 870344
-      last_tx_at: 2026-10-19T16:26:06.000Z
+      transactions_count: 21241
+      token_transfers_count: 905804
+      last_tx_at: 2026-10-26T16:01:39.000Z
       last_method: create
-      txns_24h: 100
+      txns_24h: 43
       launches_24h: null
-      window_as_of: 2026-10-19T16:27:41.299Z
+      window_as_of: 2026-10-26T16:07:05.905Z
       stale_since: null
-      errors:
-        - step: txns_24h capped
-          message: stopped after 2 pages; count is a floor
-  last_activity_at: 2026-10-19T16:26:06.000Z
-  txns_24h: 100
+      errors: []
+  last_activity_at: 2026-10-26T16:01:39.000Z
+  txns_24h: 44
   launches_24h: 0
   window_as_of: 2026-10-19T16:27:41.299Z
-  stale_since: null
+  stale_since: 2026-10-19T16:27:41.299Z
 reads:
   tier: live
   explorer:
     - kind: address
       address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
       status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xb669617392d2f390e7a4f59ff1cb7e205ae201d00b35becf8c6a0998ba7e8078"
+      signal: "0x8f3d5c2b4654bab6c5c858f07b98e88a1bbb51438ac2ed87e650f93f6a7e4a6e"
       code_hash: d6778098513fa311
-      checked_at: 2026-10-19T16:27:41.299Z
+      checked_at: 2026-10-26T16:07:05.905Z
       stale_since: null
       credits: 40
     - kind: activity
       address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: token DexScreener trade count changed; 24h walk refreshed
       signal_value: null
-      signal: "0xb669617392d2f390e7a4f59ff1cb7e205ae201d00b35becf8c6a0998ba7e8078"
+      signal: "0x8f3d5c2b4654bab6c5c858f07b98e88a1bbb51438ac2ed87e650f93f6a7e4a6e"
       code_hash: d6778098513fa311
-      checked_at: 2026-10-19T16:27:41.299Z
+      checked_at: 2026-10-26T16:07:05.905Z
       stale_since: null
       credits: 20
     - kind: address
       address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      reason: factory signal unavailable; code hash unchanged, metadata not re-read
       signal_value: null
       signal: null
       code_hash: b3931c1995f630dc
-      checked_at: 2026-10-19T16:27:41.299Z
+      checked_at: 2026-10-26T16:07:05.905Z
       stale_since: null
       credits: 0
     - kind: activity
       address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: factory signal unavailable; 24h walk refreshed
       signal_value: null
       signal: null
       code_hash: b3931c1995f630dc
-      checked_at: 2026-10-19T16:27:41.299Z
+      checked_at: 2026-10-26T16:07:05.905Z
       stale_since: null
       credits: 0
     - kind: address
       address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
-      status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: null
       code_hash: 8ef9efc9c3c5b922
-      checked_at: 2026-10-19T16:27:41.299Z
-      stale_since: null
+      checked_at: 2026-10-26T16:07:05.905Z
+      stale_since: 2026-10-19T16:27:41.299Z
       credits: 0
     - kind: activity
       address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: implementation role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: null
       code_hash: 8ef9efc9c3c5b922
-      checked_at: 2026-10-19T16:27:41.299Z
-      stale_since: null
+      checked_at: 2026-10-26T16:07:05.905Z
+      stale_since: 2026-10-19T16:27:41.299Z
       credits: 0
     - kind: address
       address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
-      status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      status: unchanged
+      reason: factory signal unchanged
       signal_value: null
       signal: "0xe41a3fd7112f33b4a8e8ec36fbae7394e876b3b81590749ce8562e48a3e5e6ee"
       code_hash: 564d0fd58633bdbd
-      checked_at: 2026-10-19T16:27:41.299Z
-      stale_since: null
+      checked_at: 2026-10-26T16:07:05.905Z
+      stale_since: 2026-10-19T16:27:41.299Z
       credits: 0
     - kind: activity
       address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: factory signal unchanged; 24h window recounted from the signal page
       signal_value: null
       signal: "0xe41a3fd7112f33b4a8e8ec36fbae7394e876b3b81590749ce8562e48a3e5e6ee"
       code_hash: 564d0fd58633bdbd
-      checked_at: 2026-10-19T16:27:41.299Z
-      stale_since: null
+      checked_at: 2026-10-26T16:07:05.905Z
+      stale_since: 2026-10-19T16:27:41.299Z
       credits: 0
     - kind: address
       address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      reason: other signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xa36e5b4ba2b39b6a25e0a8ecd300c57a04807bdb8ee46824467a0922f870e347"
+      signal: "0x1ae52be327b7083a99246516906751f55221ee671e02d963630db99c4507067d"
       code_hash: f8de098a2663a757
-      checked_at: 2026-10-19T16:27:41.299Z
+      checked_at: 2026-10-26T16:07:05.905Z
       stale_since: null
       credits: 0
     - kind: activity
       address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: other signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0xa36e5b4ba2b39b6a25e0a8ecd300c57a04807bdb8ee46824467a0922f870e347"
+      signal: "0x1ae52be327b7083a99246516906751f55221ee671e02d963630db99c4507067d"
       code_hash: f8de098a2663a757
-      checked_at: 2026-10-19T16:27:41.299Z
+      checked_at: 2026-10-26T16:07:05.905Z
       stale_since: null
       credits: 0
     - kind: top10
       address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
       status: read
       reason: token change signal changed
-      signal_value: null
+      signal_value: 9
       signal: null
       code_hash: null
-      checked_at: 2026-10-19T16:27:41.299Z
+      checked_at: 2026-10-26T16:07:05.905Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
       status: read
       reason: token change signal changed
-      signal_value: null
+      signal_value: 9
       signal: null
       code_hash: d6778098513fa311
-      checked_at: 2026-10-19T16:27:41.299Z
+      checked_at: 2026-10-26T16:07:05.905Z
       stale_since: null
       credits: 20
     - kind: lp
       address: "0x38C8f642A04FEaC9899990276b4207fE4F621e18"
       status: read
       reason: token change signal changed
-      signal_value: null
+      signal_value: 9
       signal: null
       code_hash: null
-      checked_at: 2026-10-19T16:27:41.299Z
+      checked_at: 2026-10-26T16:07:05.905Z
       stale_since: null
       credits: 0
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-10-19T16:27:41.299Z
-  last_success_at: 2026-10-19T16:27:41.299Z
+  attempted_at: 2026-10-26T16:07:05.905Z
+  last_success_at: 2026-10-26T16:07:05.905Z
   reason: "recent own activity or seed observation window: weekly"
 errors: []
