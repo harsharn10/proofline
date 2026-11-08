@@ -1,5 +1,5 @@
 slug: quotrons
-pulled_at: 2026-11-01T16:00:34.458Z # chain head 103507277 at read time
+pulled_at: 2026-11-08T15:57:39.466Z # chain head 109345935 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 35489899
     created_at: 2026-08-13T15:14:36.000Z
-    holders: 3563
+    holders: 3545
     errors: []
   - address: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
     label: Canonical router (QuotronWethRouter)
@@ -192,49 +192,35 @@ addresses:
 metrics: []
 market:
   token_address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
-  pulled_at: 2026-11-01T16:00:34.458Z
+  pulled_at: 2026-11-08T15:57:39.466Z
   pairs:
     - dex: uniswap
       pair_address: "0x0b142aaf734f1b063355bfe854e282a13b26dcac86e2e564e74540f9b218d069"
       quote_symbol: WETH
-      price_usd: 2896.63
-      liquidity_usd: 294239.61
-      volume_h24: 37836.76
-      volume_h6: 18576.56
+      price_usd: 2294.094
+      liquidity_usd: 259498.55
+      volume_h24: 21666.33
+      volume_h6: 4340.99
       txns_h24:
-        buys: 45
-        sells: 36
-      price_change_h24: -0.44
-      market_cap: 3024067
-      fdv: 3024067
+        buys: 113
+        sells: 136
+      price_change_h24: -4.1
+      market_cap: 2362898
+      fdv: 2362898
       created_at: 2026-08-13T15:16:40.000Z
-    - dex: uniswap
-      pair_address: "0xBF674B5c8922205Cc79e3Ea0C429633346461996"
-      quote_symbol: WETH
-      price_usd: 1557.52
-      liquidity_usd: 0.05
-      volume_h24: 3.27
-      volume_h6: 0.02
-      txns_h24:
-        buys: 4
-        sells: 2
-      price_change_h24: -99.97
-      market_cap: 1626038
-      fdv: 1626038
-      created_at: 2026-09-10T21:31:44.000Z
-  liquidity_usd: 294239.66
-  volume_h24: 37840.03
-  trades_h24: 87
-  price_usd: 2896.63
-  price_change_h24: -0.44
-  market_cap_usd: 3024067
-  fdv_usd: 3024067
-  fdv: 3024067
+  liquidity_usd: 259498.55
+  volume_h24: 21666.33
+  trades_h24: 249
+  price_usd: 2294.094
+  price_change_h24: -4.1
+  market_cap_usd: 2362898
+  fdv_usd: 2362898
+  fdv: 2362898
   first_pair_at: 2026-08-13T15:16:40.000Z
-  top10_share: 0.3221718692498703
-  top10_share_ex_pools: 0.2949230960742035
+  top10_share: 0.3428952846436818
+  top10_share_ex_pools: 0.3053443225598103
   burned_share: 0
-  top10_as_of: 2026-11-01T16:00:34.458Z
+  top10_as_of: 2026-11-08T15:57:39.466Z
   launchpad: null
   rialto: null
   pair_asset: null
@@ -243,48 +229,45 @@ market:
     - step: launchpad
       message: contract code hash unchanged, so addresses/0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F was not re-read for its creator, and no launchpad was previously attributed
 structure:
-  pulled_at: 2026-11-01T16:00:34.458Z
+  pulled_at: 2026-11-08T15:57:39.466Z
   mint: no-mint-function
   mint_as_of: null
   renounced: false
-  renounced_as_of: 2026-11-01T16:00:34.458Z
+  renounced_as_of: 2026-11-08T15:57:39.466Z
   lp:
     - pair: "0x0b142aaf734f1b063355bfe854e282a13b26dcac86e2e564e74540f9b218d069"
       locked_share: null
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
       as_of: null
-    - pair: "0xBF674B5c8922205Cc79e3Ea0C429633346461996"
-      locked_share: null
-      holder_kind: null
-      reason: no known locker or burn among top holders
-      as_of: null
   errors: []
 activity:
-  pulled_at: 2026-11-01T16:00:34.458Z
+  pulled_at: 2026-11-08T15:57:39.466Z
   addresses:
     - address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
       label: QUOTRON V2 core (Quotron404V2)
       role: token
-      transactions_count: 49977
+      transactions_count: 50853
       token_transfers_count: 25
-      last_tx_at: 2026-11-01T15:15:36.000Z
-      last_method: transfer
-      txns_24h: 96
+      last_tx_at: 2026-11-08T15:48:54.000Z
+      last_method: approve
+      txns_24h: 100
       launches_24h: null
-      window_as_of: 2026-11-01T16:00:34.458Z
+      window_as_of: 2026-11-08T15:57:39.466Z
       stale_since: null
-      errors: []
+      errors:
+        - step: txns_24h capped
+          message: stopped after 2 pages; count is a floor
     - address: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
       label: Canonical router (QuotronWethRouter)
       role: router
-      transactions_count: 17823
-      token_transfers_count: 209466
-      last_tx_at: 2026-11-01T15:15:02.000Z
+      transactions_count: 18021
+      token_transfers_count: 213452
+      last_tx_at: 2026-11-08T14:26:21.000Z
       last_method: buyExactEth
-      txns_24h: 15
+      txns_24h: 59
       launches_24h: null
-      window_as_of: 2026-11-01T16:00:34.458Z
+      window_as_of: 2026-11-08T15:57:39.466Z
       stale_since: null
       errors: []
     - address: "0x62E200Cc8e4D95cf622f40Dd70f407C883EcB0cc"
@@ -297,7 +280,7 @@ activity:
       txns_24h: 0
       launches_24h: null
       window_as_of: 2026-11-01T16:00:34.458Z
-      stale_since: null
+      stale_since: 2026-11-01T16:00:34.458Z
       errors: []
     - address: "0x027ACa2794E44f24950D81227DcD516FfBB49d6e"
       label: V2 ERC-721 mirror (QuotronMirrorV2)
@@ -309,7 +292,7 @@ activity:
       txns_24h: 17
       launches_24h: null
       window_as_of: 2026-11-01T16:00:34.458Z
-      stale_since: null
+      stale_since: 2026-11-01T16:00:34.458Z
       errors: []
     - address: "0xe04fba61FD54Ba78Dd450A30d8Af40167aF5d3Ec"
       label: V2 reflections (QuotronReflectionsV2)
@@ -321,7 +304,7 @@ activity:
       txns_24h: 34
       launches_24h: null
       window_as_of: 2026-11-01T16:00:34.458Z
-      stale_since: null
+      stale_since: 2026-11-01T16:00:34.458Z
       errors: []
     - address: "0xb8960fdC8A0Be155d196C2795b75747763562df2"
       label: View quoter (QuotronWethQuoter)
@@ -333,7 +316,7 @@ activity:
       txns_24h: 0
       launches_24h: null
       window_as_of: 2026-11-01T16:00:34.458Z
-      stale_since: null
+      stale_since: 2026-11-01T16:00:34.458Z
       errors: []
     - address: "0x24e62Dd5C7058CC41ad9c5375C137460ea1Da2FE"
       label: Epoch converter (QuotronEpochConverter)
@@ -345,7 +328,7 @@ activity:
       txns_24h: 33
       launches_24h: null
       window_as_of: 2026-11-01T16:00:34.458Z
-      stale_since: null
+      stale_since: 2026-11-01T16:00:34.458Z
       errors: []
     - address: "0x15277aA1ecC13734d57C519a2DAA1cc4A748bA89"
       label: Recovery Safe
@@ -356,7 +339,7 @@ activity:
       last_method: execTransaction
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-01T16:00:34.458Z
+      window_as_of: 2026-11-08T15:57:39.466Z
       stale_since: null
       errors: []
     - address: "0x7171E64E979265aeD6588577D1c6b60A701d7866"
@@ -369,7 +352,7 @@ activity:
       txns_24h: 0
       launches_24h: null
       window_as_of: 2026-11-01T16:00:34.458Z
-      stale_since: null
+      stale_since: 2026-11-01T16:00:34.458Z
       errors: []
     - address: "0xb77e03DF4CAe1752aa1E2b52C46794026b46873E"
       label: QUOTRON/USDG Uniswap v3 pair
@@ -381,282 +364,282 @@ activity:
       txns_24h: 0
       launches_24h: null
       window_as_of: 2026-11-01T16:00:34.458Z
-      stale_since: null
+      stale_since: 2026-11-01T16:00:34.458Z
       errors: []
     - address: "0x40686524e56AfF0F1446958725dCF6e6dA5381E6"
       label: V1 QUOTRON core (retired)
       role: token
-      transactions_count: 6081
+      transactions_count: 6083
       token_transfers_count: 4
-      last_tx_at: 2026-10-30T07:48:30.000Z
+      last_tx_at: 2026-11-08T06:48:55.000Z
       last_method: approve
-      txns_24h: 0
+      txns_24h: 1
       launches_24h: null
-      window_as_of: 2026-11-01T16:00:34.458Z
+      window_as_of: 2026-11-08T15:57:39.466Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-11-01T15:33:45.000Z
-  txns_24h: 195
+  last_activity_at: 2026-11-08T15:48:54.000Z
+  txns_24h: 244
   launches_24h: null
   window_as_of: 2026-11-01T16:00:34.458Z
-  stale_since: null
+  stale_since: 2026-11-01T16:00:34.458Z
 reads:
   tier: live
   explorer:
     - kind: address
       address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
       status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x186e34b542f51515bfe0a95ad082806cdad56f02f7a63691920565835a53d612"
+      signal: "0x53d62a03cf45817f7b43963f46cbf404d9ce79e7367f2fb6a32ca82fbe22bedd"
       code_hash: 137f54da1563c7c9
-      checked_at: 2026-11-01T16:00:34.458Z
+      checked_at: 2026-11-08T15:57:39.466Z
       stale_since: null
       credits: 40
     - kind: activity
       address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: token DexScreener trade count changed; 24h walk refreshed
       signal_value: null
-      signal: "0x186e34b542f51515bfe0a95ad082806cdad56f02f7a63691920565835a53d612"
+      signal: "0x53d62a03cf45817f7b43963f46cbf404d9ce79e7367f2fb6a32ca82fbe22bedd"
       code_hash: 137f54da1563c7c9
-      checked_at: 2026-11-01T16:00:34.458Z
+      checked_at: 2026-11-08T15:57:39.466Z
       stale_since: null
       credits: 40
     - kind: address
       address: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
       status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      reason: router signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x1154ac4570a0ee00f44e01285883c100805355131f666b35adaa36143c00d08b"
+      signal: "0x67685286f75e495ef6b7dc75e3fa47e6533b77bdaf80d5a7be86b610ca86c840"
       code_hash: 55837a3498edb137
-      checked_at: 2026-11-01T16:00:34.458Z
+      checked_at: 2026-11-08T15:57:39.466Z
       stale_since: null
       credits: 20
     - kind: activity
       address: "0x42024fCFdB4F3089Dd619A0cEF0Cd24E7b841C18"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: router signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0x1154ac4570a0ee00f44e01285883c100805355131f666b35adaa36143c00d08b"
+      signal: "0x67685286f75e495ef6b7dc75e3fa47e6533b77bdaf80d5a7be86b610ca86c840"
       code_hash: 55837a3498edb137
-      checked_at: 2026-11-01T16:00:34.458Z
+      checked_at: 2026-11-08T15:57:39.466Z
       stale_since: null
-      credits: 20
+      credits: 40
     - kind: address
       address: "0x62E200Cc8e4D95cf622f40Dd70f407C883EcB0cc"
-      status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0xf7736424d36fc77e3fbfd7d9a781afb3be58e90abb4a519eee7685db6d705ad1"
       code_hash: 1410a01dbbcc719f
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: activity
       address: "0x62E200Cc8e4D95cf622f40Dd70f407C883EcB0cc"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0xf7736424d36fc77e3fbfd7d9a781afb3be58e90abb4a519eee7685db6d705ad1"
       code_hash: 1410a01dbbcc719f
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: address
       address: "0x027ACa2794E44f24950D81227DcD516FfBB49d6e"
-      status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0x27c806ca5de6e71e77bd7f2b882b6f7657eef820f980bbfc4e8e90bb29fcd7de"
       code_hash: d8355668ab675b78
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: activity
       address: "0x027ACa2794E44f24950D81227DcD516FfBB49d6e"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0x27c806ca5de6e71e77bd7f2b882b6f7657eef820f980bbfc4e8e90bb29fcd7de"
       code_hash: d8355668ab675b78
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: address
       address: "0xe04fba61FD54Ba78Dd450A30d8Af40167aF5d3Ec"
-      status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0x33a5e5a8343babdec5400b82f855f17ec0ca586d83f1898273c7ea8ff7eb9742"
       code_hash: e4b87f7c1939e6ab
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: activity
       address: "0xe04fba61FD54Ba78Dd450A30d8Af40167aF5d3Ec"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0x33a5e5a8343babdec5400b82f855f17ec0ca586d83f1898273c7ea8ff7eb9742"
       code_hash: e4b87f7c1939e6ab
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: address
       address: "0xb8960fdC8A0Be155d196C2795b75747763562df2"
-      status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0x48a5d223526303acedb551650cf993348dbcb4b1c40cc0adca0da65744e8483a"
       code_hash: 0f30e77d7667cf1b
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: activity
       address: "0xb8960fdC8A0Be155d196C2795b75747763562df2"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0x48a5d223526303acedb551650cf993348dbcb4b1c40cc0adca0da65744e8483a"
       code_hash: 0f30e77d7667cf1b
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: address
       address: "0x24e62Dd5C7058CC41ad9c5375C137460ea1Da2FE"
-      status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0x80428fa9812f3eb21a5a1c7fdf49a9c9003409b8af43b28247d06a1f295405c7"
       code_hash: 0009866203ec258d
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: activity
       address: "0x24e62Dd5C7058CC41ad9c5375C137460ea1Da2FE"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0x80428fa9812f3eb21a5a1c7fdf49a9c9003409b8af43b28247d06a1f295405c7"
       code_hash: 0009866203ec258d
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: address
       address: "0x15277aA1ecC13734d57C519a2DAA1cc4A748bA89"
-      status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      status: unchanged
+      reason: multisig signal unchanged
       signal_value: null
       signal: "0x1db20528738269663d1e72654fa91c512dc8dfd9c531fc92635991f4bddf5ab3"
       code_hash: 788b11033f24c6fe
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
       credits: 20
     - kind: activity
       address: "0x15277aA1ecC13734d57C519a2DAA1cc4A748bA89"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: multisig signal unchanged; 24h window recounted from the signal page
       signal_value: null
       signal: "0x1db20528738269663d1e72654fa91c512dc8dfd9c531fc92635991f4bddf5ab3"
       code_hash: 788b11033f24c6fe
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: address
       address: "0x7171E64E979265aeD6588577D1c6b60A701d7866"
-      status: read
-      reason: --full override
+      status: unchanged
+      reason: admin role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0xe6a94d077083a3f4a3058497792f3dea59564ee86f162974ccc66e0366563a99"
       code_hash: 4436ea74ed59b70a
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 40
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: activity
       address: "0x7171E64E979265aeD6588577D1c6b60A701d7866"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: admin role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0xe6a94d077083a3f4a3058497792f3dea59564ee86f162974ccc66e0366563a99"
       code_hash: 4436ea74ed59b70a
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: address
       address: "0xb77e03DF4CAe1752aa1E2b52C46794026b46873E"
-      status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0x1f065f39362cdbe5511101cf753a122e7002c99906db5f768c4efaa0f569b101"
       code_hash: 4b1ee8aa7a9c26a9
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: activity
       address: "0xb77e03DF4CAe1752aa1E2b52C46794026b46873E"
-      status: read
-      reason: --full override; 24h walk refreshed
+      status: unchanged
+      reason: other role is static and quiet for 7 days; signal skipped
       signal_value: null
       signal: "0x1f065f39362cdbe5511101cf753a122e7002c99906db5f768c4efaa0f569b101"
       code_hash: 4b1ee8aa7a9c26a9
-      checked_at: 2026-11-01T16:00:34.458Z
-      stale_since: null
-      credits: 20
+      checked_at: 2026-11-08T15:57:39.466Z
+      stale_since: 2026-11-01T16:00:34.458Z
+      credits: 0
     - kind: address
       address: "0x40686524e56AfF0F1446958725dCF6e6dA5381E6"
       status: read
-      reason: --full override; code hash unchanged, metadata not re-read
+      reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x8c2883b147f4ce479bbff02dc3aa4b436ac70fe5d029055fa8bce3f98c13f368"
+      signal: "0xd52f64cc07828e231a920195f570bc6462e0e8f2b0e42129ab28f04fa96bec19"
       code_hash: f70dce909a5e44ee
-      checked_at: 2026-11-01T16:00:34.458Z
+      checked_at: 2026-11-08T15:57:39.466Z
       stale_since: null
       credits: 40
     - kind: activity
       address: "0x40686524e56AfF0F1446958725dCF6e6dA5381E6"
       status: read
-      reason: --full override; 24h walk refreshed
+      reason: token DexScreener trade count changed; 24h walk refreshed
       signal_value: null
-      signal: "0x8c2883b147f4ce479bbff02dc3aa4b436ac70fe5d029055fa8bce3f98c13f368"
+      signal: "0xd52f64cc07828e231a920195f570bc6462e0e8f2b0e42129ab28f04fa96bec19"
       code_hash: f70dce909a5e44ee
-      checked_at: 2026-11-01T16:00:34.458Z
+      checked_at: 2026-11-08T15:57:39.466Z
       stale_since: null
       credits: 20
     - kind: top10
       address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
       status: read
       reason: token change signal changed
-      signal_value: 87
+      signal_value: 249
       signal: null
       code_hash: null
-      checked_at: 2026-11-01T16:00:34.458Z
+      checked_at: 2026-11-08T15:57:39.466Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
       status: unchanged
       reason: contract code hash unchanged; verified ABI not re-read
-      signal_value: 87
+      signal_value: 249
       signal: null
       code_hash: 137f54da1563c7c9
-      checked_at: 2026-11-01T16:00:34.458Z
+      checked_at: 2026-11-08T15:57:39.466Z
       stale_since: 2026-09-08T11:21:05.295Z
       credits: 0
     - kind: lp
       address: "0x5a86828Efd322bfb16d93cFeD16EE9BC14940D7F"
       status: read
       reason: token change signal changed
-      signal_value: 87
+      signal_value: 249
       signal: null
       code_hash: null
-      checked_at: 2026-11-01T16:00:34.458Z
+      checked_at: 2026-11-08T15:57:39.466Z
       stale_since: null
-      credits: 40
+      credits: 0
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-11-01T16:00:34.458Z
-  last_success_at: 2026-11-01T16:00:34.458Z
+  attempted_at: 2026-11-08T15:57:39.466Z
+  last_success_at: 2026-11-08T15:57:39.466Z
   reason: "recent own activity or seed observation window: weekly"
 errors: []
