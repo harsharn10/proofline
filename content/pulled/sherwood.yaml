@@ -1,5 +1,5 @@
 slug: sherwood
-pulled_at: 2026-11-08T15:57:39.466Z # chain head 109345935 at read time
+pulled_at: 2026-11-09T19:47:31.195Z # chain head 110314584 at read time
 chain: robinhood-chain
 addresses:
   - address: "0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736"
@@ -85,7 +85,7 @@ addresses:
     safe: null
     created_block: 31341426
     created_at: 2026-08-08T19:55:38.000Z
-    holders: 870
+    holders: 866
     errors: []
   - address: "0x93080bdF26050307d410d372640D4398397E0A6E"
     label: Vault admin EOA
@@ -123,48 +123,76 @@ addresses:
     errors: []
 metrics:
   - kind: tvl
-    value: 62099
-    as_of: 2026-11-08T12:52:11.000Z
+    value: 59770
+    as_of: 2026-11-09T15:18:59.000Z
     source_url: https://api.llama.fi/protocol/sherwood
   - kind: fees_24h
-    value: 0.2
-    as_of: 2026-11-08T15:57:39.466Z
+    value: 0.13
+    as_of: 2026-11-09T19:47:31.195Z
     source_url: https://api.llama.fi/summary/fees/sherwood?dataType=dailyFees
   - kind: revenue_24h
-    value: 0.2
-    as_of: 2026-11-08T15:57:39.466Z
+    value: 0.13
+    as_of: 2026-11-09T19:47:31.195Z
     source_url: https://api.llama.fi/summary/fees/sherwood?dataType=dailyRevenue
 market:
   token_address: "0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1"
-  pulled_at: 2026-11-08T15:57:39.466Z
+  pulled_at: 2026-11-09T19:47:31.195Z
   pairs:
     - dex: uniswap
       pair_address: "0x2e03323ecfe5e6e4c287bdb731ea0f8857e5afbbded6612fdca4b8de20d0d874"
       quote_symbol: ETH
-      price_usd: 0.00009534
-      liquidity_usd: 27027.56
-      volume_h24: 283.12
-      volume_h6: 80.79
+      price_usd: 0.00008359
+      liquidity_usd: 24658.69
+      volume_h24: 881.71
+      volume_h6: 168.91
       txns_h24:
-        buys: 8
-        sells: 9
-      price_change_h24: -1.95
-      market_cap: 94105
-      fdv: 94105
+        buys: 15
+        sells: 15
+      price_change_h24: -11.85
+      market_cap: 82510
+      fdv: 82510
       created_at: 2026-08-10T13:57:58.000Z
-  liquidity_usd: 27027.56
-  volume_h24: 283.12
-  trades_h24: 17
-  price_usd: 0.00009534
-  price_change_h24: -1.95
-  market_cap_usd: 94105
-  fdv_usd: 94105
-  fdv: 94105
+    - dex: uniswap
+      pair_address: "0xa35154055046a49b3c849270ee8885db9b48baaa8a1875018fe168ac66b89807"
+      quote_symbol: ETH
+      price_usd: 0.00009148
+      liquidity_usd: 348.26
+      volume_h24: 6.25
+      volume_h6: 0
+      txns_h24:
+        buys: 0
+        sells: 2
+      price_change_h24: -3.67
+      market_cap: 90297
+      fdv: 90297
+      created_at: 2026-09-14T08:37:55.000Z
+    - dex: uniswap
+      pair_address: "0x289be808be4fed2f4b09e88b0f1420958d4b1a0bafbf8da82095101aa7765556"
+      quote_symbol: ETH
+      price_usd: 0.00008588
+      liquidity_usd: 56.7
+      volume_h24: 3.27
+      volume_h6: 0
+      txns_h24:
+        buys: 0
+        sells: 3
+      price_change_h24: -3.3
+      market_cap: 84769
+      fdv: 84769
+      created_at: 2026-08-27T15:39:05.000Z
+  liquidity_usd: 25063.65
+  volume_h24: 891.23
+  trades_h24: 35
+  price_usd: 0.00008359
+  price_change_h24: -11.85
+  market_cap_usd: 82510
+  fdv_usd: 82510
+  fdv: 82510
   first_pair_at: 2026-08-10T13:57:58.000Z
-  top10_share: 0.4918878808402393
-  top10_share_ex_pools: 0.2325970608497002
+  top10_share: 0.497974117869033
+  top10_share_ex_pools: 0.2325973996586688
   burned_share: 0.0129969393745404
-  top10_as_of: 2026-11-08T15:57:39.466Z
+  top10_as_of: 2026-11-09T19:47:31.195Z
   launchpad:
     slug: pons
     via: creator
@@ -175,7 +203,7 @@ market:
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-11-08T15:57:39.466Z
+  pulled_at: 2026-11-09T19:47:31.195Z
   mint: no-mint-function
   mint_as_of: 2026-10-13T16:57:23.795Z
   renounced: null
@@ -186,22 +214,32 @@ structure:
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
       as_of: null
+    - pair: "0xa35154055046a49b3c849270ee8885db9b48baaa8a1875018fe168ac66b89807"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
+    - pair: "0x289be808be4fed2f4b09e88b0f1420958d4b1a0bafbf8da82095101aa7765556"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-11-08T15:57:39.466Z
+  pulled_at: 2026-11-09T19:47:31.195Z
   addresses:
     - address: "0xf54013b8BE8fdFcF0CD1fD727c803F16c2450736"
       label: SherwoodVault (immutable mixer + shielded DEX)
       role: vault
-      transactions_count: 2691
-      token_transfers_count: 5756
-      last_tx_at: 2026-11-07T18:45:59.000Z
-      last_method: transact
-      txns_24h: 1
+      transactions_count: 2700
+      token_transfers_count: 5781
+      last_tx_at: 2026-11-09T18:49:32.000Z
+      last_method: executeSwap
+      txns_24h: 7
       launches_24h: null
-      window_as_of: 2026-11-08T15:57:39.466Z
+      window_as_of: 2026-11-09T19:47:31.195Z
       stale_since: null
       errors: []
     - address: "0x52445Ae1B988CfDc668EB15628629ED7d0890C6A"
@@ -225,7 +263,7 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-08T15:57:39.466Z
+      window_as_of: 2026-11-09T19:47:31.195Z
       stale_since: null
       errors: []
     - address: "0x3d7bEA6294BC033fAA7e0e06F2D94088106CDb79"
@@ -243,41 +281,41 @@ activity:
     - address: "0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1"
       label: SHERWOOD token (PonsV2LauncherToken)
       role: token
-      transactions_count: 4597
+      transactions_count: 4602
       token_transfers_count: 28
-      last_tx_at: 2026-11-08T13:53:56.000Z
+      last_tx_at: 2026-11-09T14:30:42.000Z
       last_method: approve
       txns_24h: 5
       launches_24h: null
-      window_as_of: 2026-11-08T15:57:39.466Z
+      window_as_of: 2026-11-09T19:47:31.195Z
       stale_since: null
       errors: []
     - address: "0x93080bdF26050307d410d372640D4398397E0A6E"
       label: Vault admin EOA
       role: admin
       transactions_count: 217
-      token_transfers_count: 55
+      token_transfers_count: 56
       last_tx_at: 2026-10-02T21:27:21.000Z
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-08T15:57:39.466Z
+      window_as_of: 2026-11-09T19:47:31.195Z
       stale_since: null
       errors: []
     - address: "0x6cEE2DC8A42A5AA3f28799ea8Ebd23Ea5e07cc08"
       label: protocolFeeRecipient EOA
       role: other
       transactions_count: 49
-      token_transfers_count: 876
+      token_transfers_count: 880
       last_tx_at: 2026-10-24T23:48:02.000Z
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-08T15:57:39.466Z
+      window_as_of: 2026-11-09T19:47:31.195Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-11-08T13:53:56.000Z
-  txns_24h: 6
+  last_activity_at: 2026-11-09T18:49:32.000Z
+  txns_24h: 12
   launches_24h: null
   window_as_of: 2026-11-04T17:13:31.634Z
   stale_since: 2026-11-04T17:13:31.634Z
@@ -289,9 +327,9 @@ reads:
       status: read
       reason: vault signal changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x5536e20a3e9b3aaa0d3432662a53a7f362a3f88f75b52d1e89a9aaf2f1c50280"
+      signal: "0x35e2a6950b1db4fa37b45a554f23da4e9cefd141cb8e52a14255c1faca3e611a"
       code_hash: 362ee188d751cd6c
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -299,9 +337,9 @@ reads:
       status: read
       reason: vault signal changed; 24h walk refreshed
       signal_value: null
-      signal: "0x5536e20a3e9b3aaa0d3432662a53a7f362a3f88f75b52d1e89a9aaf2f1c50280"
+      signal: "0x35e2a6950b1db4fa37b45a554f23da4e9cefd141cb8e52a14255c1faca3e611a"
       code_hash: 362ee188d751cd6c
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 20
     - kind: address
@@ -311,7 +349,7 @@ reads:
       signal_value: null
       signal: "0x91b20ed28ede256d1ca884f5f3105c99bf7773042e1d4b7f61b82ef53e8486f5"
       code_hash: 11bb6f3980c854fb
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: 2026-11-04T17:13:31.634Z
       credits: 0
     - kind: activity
@@ -321,7 +359,7 @@ reads:
       signal_value: null
       signal: "0x91b20ed28ede256d1ca884f5f3105c99bf7773042e1d4b7f61b82ef53e8486f5"
       code_hash: 11bb6f3980c854fb
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: 2026-11-04T17:13:31.634Z
       credits: 0
     - kind: address
@@ -331,7 +369,7 @@ reads:
       signal_value: null
       signal: "0x360fc971d45dad4868a494a9fd777df0963c9f544c8fb86007feb165c69e44ce"
       code_hash: 5d4075f388d6f787
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 60
     - kind: activity
@@ -341,7 +379,7 @@ reads:
       signal_value: null
       signal: "0x360fc971d45dad4868a494a9fd777df0963c9f544c8fb86007feb165c69e44ce"
       code_hash: 5d4075f388d6f787
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 20
     - kind: address
@@ -351,7 +389,7 @@ reads:
       signal_value: null
       signal: "0xf4b5fa591c115834d5c28b18b2d559ab422ab307ce5f831d7a95e9c9c0319728"
       code_hash: 92704291449c6fb7
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: 2026-11-04T17:13:31.634Z
       credits: 0
     - kind: activity
@@ -361,7 +399,7 @@ reads:
       signal_value: null
       signal: "0xf4b5fa591c115834d5c28b18b2d559ab422ab307ce5f831d7a95e9c9c0319728"
       code_hash: 92704291449c6fb7
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: 2026-11-04T17:13:31.634Z
       credits: 0
     - kind: address
@@ -369,9 +407,9 @@ reads:
       status: read
       reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xc214af38edf0ef69f1281cbb06d481cbe53cf39d6fc531b9380dfa3a9fa3a194"
+      signal: "0x1aa06c3aeb45b34d5c46366fd5cf2161e96c6c7c532568b8983ba9225ed1bffd"
       code_hash: 26b8b21d52c7e65a
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 40
     - kind: activity
@@ -379,9 +417,9 @@ reads:
       status: read
       reason: token DexScreener trade count changed; 24h walk refreshed
       signal_value: null
-      signal: "0xc214af38edf0ef69f1281cbb06d481cbe53cf39d6fc531b9380dfa3a9fa3a194"
+      signal: "0x1aa06c3aeb45b34d5c46366fd5cf2161e96c6c7c532568b8983ba9225ed1bffd"
       code_hash: 26b8b21d52c7e65a
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 20
     - kind: address
@@ -391,7 +429,7 @@ reads:
       signal_value: 215
       signal: "215"
       code_hash: null
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -401,7 +439,7 @@ reads:
       signal_value: 215
       signal: "215"
       code_hash: null
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 40
     - kind: address
@@ -411,7 +449,7 @@ reads:
       signal_value: 47
       signal: "47"
       code_hash: null
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -421,44 +459,44 @@ reads:
       signal_value: 47
       signal: "47"
       code_hash: null
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 40
     - kind: top10
       address: "0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1"
       status: read
       reason: token change signal changed
-      signal_value: 17
+      signal_value: 35
       signal: null
       code_hash: null
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1"
       status: unchanged
       reason: contract code hash unchanged; verified ABI not re-read
-      signal_value: 17
+      signal_value: 35
       signal: null
       code_hash: 26b8b21d52c7e65a
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: 2026-10-13T16:57:23.795Z
       credits: 0
     - kind: lp
       address: "0xD4DC6B48Ad73EC51E71D9B8F65568f88609b92c1"
       status: read
       reason: token change signal changed
-      signal_value: 17
+      signal_value: 35
       signal: null
       code_hash: null
-      checked_at: 2026-11-08T15:57:39.466Z
+      checked_at: 2026-11-09T19:47:31.195Z
       stale_since: null
       credits: 0
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-11-08T15:57:39.466Z
-  last_success_at: 2026-11-08T15:57:39.466Z
+  attempted_at: 2026-11-09T19:47:31.195Z
+  last_success_at: 2026-11-09T19:47:31.195Z
   reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors:
   - step: llama
