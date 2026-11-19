@@ -1,5 +1,5 @@
 slug: pipedog
-pulled_at: 2026-11-18T18:02:04.093Z # chain head 117592970 at read time
+pulled_at: 2026-11-19T18:15:19.348Z # chain head 118422000 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 21879606
     created_at: 2026-07-28T20:29:10.000Z
-    holders: 8891
+    holders: 8890
     errors: []
   - address: "0xB7f10f74B39291b9290b779978e19A7637C742D6"
     label: Uniswap v3 PIPEDOG/WETH 1% pool
@@ -56,35 +56,49 @@ addresses:
 metrics: []
 market:
   token_address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
-  pulled_at: 2026-11-18T18:02:04.093Z
+  pulled_at: 2026-11-19T18:15:19.348Z
   pairs:
     - dex: uniswap
       pair_address: "0xB7f10f74B39291b9290b779978e19A7637C742D6"
       quote_symbol: WETH
-      price_usd: 0.0002397
-      liquidity_usd: 2369095.5
-      volume_h24: 45872.57
-      volume_h6: 14501.63
+      price_usd: 0.0002293
+      liquidity_usd: 2310043.84
+      volume_h24: 48351.01
+      volume_h6: 13628.86
       txns_h24:
-        buys: 447
-        sells: 956
-      price_change_h24: -5.49
-      market_cap: 2960226
-      fdv: 2960226
+        buys: 827
+        sells: 466
+      price_change_h24: -3.35
+      market_cap: 2831836
+      fdv: 2831836
       created_at: 2026-07-28T20:31:52.000Z
-  liquidity_usd: 2369095.5
-  volume_h24: 45872.57
-  trades_h24: 1403
-  price_usd: 0.0002397
-  price_change_h24: -5.49
-  market_cap_usd: 2960226
-  fdv_usd: 2960226
-  fdv: 2960226
+    - dex: uniswap
+      pair_address: "0x655fb1fb603523bac4d80618c7b83cb9c3cae6b534586286ba5396995932a507"
+      quote_symbol: VLAD
+      price_usd: null
+      liquidity_usd: null
+      volume_h24: null
+      volume_h6: null
+      txns_h24:
+        buys: 0
+        sells: 2
+      price_change_h24: -2.18
+      market_cap: null
+      fdv: null
+      created_at: 2026-09-06T21:22:05.000Z
+  liquidity_usd: 2310043.84
+  volume_h24: 48351.01
+  trades_h24: 1295
+  price_usd: 0.0002293
+  price_change_h24: -3.35
+  market_cap_usd: 2831836
+  fdv_usd: 2831836
+  fdv: 2831836
   first_pair_at: 2026-07-28T20:31:52.000Z
-  top10_share: 0.4706069924315905
-  top10_share_ex_pools: 0.0747420335044003
+  top10_share: 0.4786642926464303
+  top10_share_ex_pools: 0.0751564815576823
   burned_share: 0
-  top10_as_of: 2026-11-18T18:02:04.093Z
+  top10_as_of: 2026-11-19T18:15:19.348Z
   launchpad: null
   rialto: null
   pair_asset: null
@@ -95,7 +109,7 @@ market:
     - step: launchpad
       message: creator 0xa359E6190740930Bb65e611B553724b0CE73e814 did not match a launchpad factory, curve or known launcher deployer
 structure:
-  pulled_at: 2026-11-18T18:02:04.093Z
+  pulled_at: 2026-11-19T18:15:19.348Z
   mint: no-mint-function
   mint_as_of: 2026-10-13T16:57:23.795Z
   renounced: null
@@ -106,35 +120,40 @@ structure:
       holder_kind: null
       reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
       as_of: null
+    - pair: "0x655fb1fb603523bac4d80618c7b83cb9c3cae6b534586286ba5396995932a507"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-11-18T18:02:04.093Z
+  pulled_at: 2026-11-19T18:15:19.348Z
   addresses:
     - address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
       label: PIPEDOG token (fixed-supply ERC-20)
       role: token
-      transactions_count: 24817
+      transactions_count: 24891
       token_transfers_count: 78
-      last_tx_at: 2026-11-18T16:57:16.000Z
-      last_method: transfer
-      txns_24h: 73
+      last_tx_at: 2026-11-19T17:40:39.000Z
+      last_method: approve
+      txns_24h: 81
       launches_24h: null
-      window_as_of: 2026-11-18T18:02:04.093Z
+      window_as_of: 2026-11-19T18:15:19.348Z
       stale_since: null
       errors: []
     - address: "0xB7f10f74B39291b9290b779978e19A7637C742D6"
       label: Uniswap v3 PIPEDOG/WETH 1% pool
       role: other
       transactions_count: 3
-      token_transfers_count: 383098
+      token_transfers_count: 396995
       last_tx_at: 2026-09-05T14:58:01.000Z
       last_method: increaseObservationCardinalityNext
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-12T17:34:36.150Z
-      stale_since: 2026-11-12T17:34:36.150Z
+      window_as_of: 2026-11-19T18:15:19.348Z
+      stale_since: null
       errors: []
     - address: "0x1f7d7550B1b028f7571E69A784071F0205FD2EfA"
       label: UniswapV3Factory (pool creator)
@@ -143,16 +162,16 @@ activity:
       token_transfers_count: 9
       last_tx_at: 2026-11-17T22:19:54.000Z
       last_method: createPool
-      txns_24h: 12
-      launches_24h: 12
-      window_as_of: 2026-11-18T18:02:04.093Z
+      txns_24h: 0
+      launches_24h: 0
+      window_as_of: 2026-11-19T18:15:19.348Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-11-18T16:57:16.000Z
-  txns_24h: 85
-  launches_24h: 12
-  window_as_of: 2026-11-12T17:34:36.150Z
-  stale_since: 2026-11-12T17:34:36.150Z
+  last_activity_at: 2026-11-19T17:40:39.000Z
+  txns_24h: 81
+  launches_24h: 0
+  window_as_of: 2026-11-19T18:15:19.348Z
+  stale_since: null
 reads:
   tier: hot
   explorer:
@@ -161,9 +180,9 @@ reads:
       status: read
       reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xdde8c864fa7a0195961f6999bc60215f7190bd6bd0256c03f3e5d7a245bc14ec"
+      signal: "0x170ac17b4774752c633bac934240ea6220a1c2dd1130e1728a3b7eb42a65150f"
       code_hash: 0eb8f1f8ff5c18d5
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-19T18:15:19.348Z
       stale_since: null
       credits: 40
     - kind: activity
@@ -171,85 +190,85 @@ reads:
       status: read
       reason: token DexScreener trade count changed; 24h walk refreshed
       signal_value: null
-      signal: "0xdde8c864fa7a0195961f6999bc60215f7190bd6bd0256c03f3e5d7a245bc14ec"
+      signal: "0x170ac17b4774752c633bac934240ea6220a1c2dd1130e1728a3b7eb42a65150f"
       code_hash: 0eb8f1f8ff5c18d5
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-19T18:15:19.348Z
       stale_since: null
       credits: 40
     - kind: address
       address: "0xB7f10f74B39291b9290b779978e19A7637C742D6"
-      status: unchanged
-      reason: other role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
       signal: "0xa4eaf8bb3382bb1931389264a8d20d764b57ccb9e250a11583ca6e2be3542103"
       code_hash: 7522f11ddb0571da
-      checked_at: 2026-11-18T18:02:04.093Z
-      stale_since: 2026-11-12T17:34:36.150Z
-      credits: 0
+      checked_at: 2026-11-19T18:15:19.348Z
+      stale_since: null
+      credits: 20
     - kind: activity
       address: "0xB7f10f74B39291b9290b779978e19A7637C742D6"
-      status: unchanged
-      reason: other role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override; 24h walk refreshed
       signal_value: null
       signal: "0xa4eaf8bb3382bb1931389264a8d20d764b57ccb9e250a11583ca6e2be3542103"
       code_hash: 7522f11ddb0571da
-      checked_at: 2026-11-18T18:02:04.093Z
-      stale_since: 2026-11-12T17:34:36.150Z
-      credits: 0
+      checked_at: 2026-11-19T18:15:19.348Z
+      stale_since: null
+      credits: 20
     - kind: address
       address: "0x1f7d7550B1b028f7571E69A784071F0205FD2EfA"
-      status: read
-      reason: factory signal changed; code hash unchanged, metadata not re-read
+      status: unchanged
+      reason: factory signal unchanged
       signal_value: null
       signal: "0xf952733ab060d82ddddfbd514c8979d08eaacf954e1868fc59f17370b751c097"
       code_hash: 3cd490900c66ab69
-      checked_at: 2026-11-18T18:02:04.093Z
-      stale_since: null
+      checked_at: 2026-11-19T18:15:19.348Z
+      stale_since: 2026-11-18T18:02:04.093Z
       credits: 0
     - kind: activity
       address: "0x1f7d7550B1b028f7571E69A784071F0205FD2EfA"
-      status: read
-      reason: factory signal changed; 24h walk refreshed
+      status: unchanged
+      reason: factory signal unchanged; 24h window recounted from the signal page
       signal_value: null
       signal: "0xf952733ab060d82ddddfbd514c8979d08eaacf954e1868fc59f17370b751c097"
       code_hash: 3cd490900c66ab69
-      checked_at: 2026-11-18T18:02:04.093Z
-      stale_since: null
+      checked_at: 2026-11-19T18:15:19.348Z
+      stale_since: 2026-11-18T18:02:04.093Z
       credits: 0
     - kind: top10
       address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
       status: read
       reason: token change signal changed
-      signal_value: 1403
+      signal_value: 1295
       signal: null
       code_hash: null
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-19T18:15:19.348Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
       status: unchanged
       reason: contract code hash unchanged; verified ABI not re-read
-      signal_value: 1403
+      signal_value: 1295
       signal: null
       code_hash: 0eb8f1f8ff5c18d5
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-19T18:15:19.348Z
       stale_since: 2026-10-13T16:57:23.795Z
       credits: 0
     - kind: lp
       address: "0x5Cb6F181081301b44905F3ae15419112ecaBd8A6"
       status: read
       reason: token change signal changed
-      signal_value: 1403
+      signal_value: 1295
       signal: null
       code_hash: null
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-19T18:15:19.348Z
       stale_since: null
       credits: 20
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-11-18T18:02:04.093Z
-  last_success_at: 2026-11-18T18:02:04.093Z
+  attempted_at: 2026-11-19T18:15:19.348Z
+  last_success_at: 2026-11-19T18:15:19.348Z
   reason: "evidenced provisional identity, relevant and active: daily (not editorial approval)"
 errors: []
