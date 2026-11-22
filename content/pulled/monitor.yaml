@@ -1,5 +1,5 @@
 slug: monitor
-pulled_at: 2026-11-15T16:20:03.697Z # chain head 115088866 at read time
+pulled_at: 2026-11-22T17:08:25.550Z # chain head 120775309 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x1a911bb954dAA9CB38513423075bE74450351e18"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 52188141
     created_at: 2026-09-02T01:38:15.000Z
-    holders: 2038
+    holders: 2024
     errors: []
   - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
     label: DopplerERC20V1 implementation
@@ -98,49 +98,63 @@ addresses:
 metrics: []
 market:
   token_address: "0x1a911bb954dAA9CB38513423075bE74450351e18"
-  pulled_at: 2026-11-15T16:20:03.697Z
+  pulled_at: 2026-11-22T17:08:25.550Z
   pairs:
     - dex: uniswap
       pair_address: "0xcfa7bb34e23a7022c3de3e1618e1ff29cde8f16a76c341eca19d16f928968a3d"
       quote_symbol: PLTR
-      price_usd: 0.0004088
-      liquidity_usd: 183517.15
-      volume_h24: 5799.67
-      volume_h6: 3621.49
+      price_usd: 0.0003395
+      liquidity_usd: 157702.42
+      volume_h24: 5555.99
+      volume_h6: 3986.28
       txns_h24:
-        buys: 47
-        sells: 37
-      price_change_h24: 2.02
-      market_cap: 408872
-      fdv: 408872
+        buys: 42
+        sells: 39
+      price_change_h24: 12.36
+      market_cap: 339524
+      fdv: 339524
       created_at: 2026-09-02T01:38:15.000Z
     - dex: uniswap
       pair_address: "0x7C2FAB87f7368Bf6602D4476B47C6D2746EC000B"
       quote_symbol: WETH
-      price_usd: 0.0003985
-      liquidity_usd: 384.74
-      volume_h24: 53.72
-      volume_h6: 11.49
+      price_usd: 0.000338
+      liquidity_usd: 316.67
+      volume_h24: 71.38
+      volume_h6: 71.38
       txns_h24:
-        buys: 6
-        sells: 4
-      price_change_h24: 1.32
-      market_cap: 398575
-      fdv: 398575
+        buys: 4
+        sells: 6
+      price_change_h24: 3.81
+      market_cap: 338070
+      fdv: 338070
       created_at: 2026-09-05T17:08:32.000Z
-  liquidity_usd: 183901.89
-  volume_h24: 5853.39
-  trades_h24: 94
-  price_usd: 0.0004088
-  price_change_h24: 2.02
-  market_cap_usd: 408872
-  fdv_usd: 408872
-  fdv: 408872
+    - dex: uniswap
+      pair_address: "0x8aa76172b7ecb36d9fe6535734a2aca7d60905c5e85ff9100f38628dc7d70aae"
+      quote_symbol: USDG
+      price_usd: 0.0003409
+      liquidity_usd: 51.05
+      volume_h24: 1.57
+      volume_h6: 1.57
+      txns_h24:
+        buys: 2
+        sells: 0
+      price_change_h24: 6.97
+      market_cap: 340982
+      fdv: 340982
+      created_at: 2026-09-08T01:39:52.000Z
+  liquidity_usd: 158070.14
+  volume_h24: 5628.94
+  trades_h24: 93
+  price_usd: 0.0003395
+  price_change_h24: 12.36
+  market_cap_usd: 339524
+  fdv_usd: 339524
+  fdv: 339524
   first_pair_at: 2026-09-02T01:38:15.000Z
-  top10_share: 0.421382942543924
-  top10_share_ex_pools: 0.1854083376733104
+  top10_share: 0.4319272664065601
+  top10_share_ex_pools: 0.1865007199851054
   burned_share: 0
-  top10_as_of: 2026-11-15T16:20:03.697Z
+  top10_as_of: 2026-11-22T17:08:25.550Z
   launchpad:
     slug: doppler
     via: factory
@@ -152,18 +166,18 @@ market:
     name: Palantir Technologies
     address: "0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a"
     category: stock
-    tokenized_value_usd: 2167517.86
-    tokenized_shares: 12902.660029999995
-    change_7d: -47868.87
+    tokenized_value_usd: 1770845.28
+    tokenized_shares: 12341.245219999993
+    change_7d: -356785.4
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
   errors: []
 structure:
-  pulled_at: 2026-11-15T16:20:03.697Z
+  pulled_at: 2026-11-22T17:08:25.550Z
   mint: unknown
   mint_as_of: null
   renounced: false
-  renounced_as_of: 2026-11-15T16:20:03.697Z
+  renounced_as_of: 2026-11-22T17:08:25.550Z
   lp:
     - pair: "0xcfa7bb34e23a7022c3de3e1618e1ff29cde8f16a76c341eca19d16f928968a3d"
       locked_share: null
@@ -175,22 +189,27 @@ structure:
       holder_kind: null
       reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
       as_of: null
+    - pair: "0x8aa76172b7ecb36d9fe6535734a2aca7d60905c5e85ff9100f38628dc7d70aae"
+      locked_share: null
+      holder_kind: null
+      reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
+      as_of: null
   errors:
     - step: mint
       message: verified ABI unavailable
 activity:
-  pulled_at: 2026-11-15T16:20:03.697Z
+  pulled_at: 2026-11-22T17:08:25.550Z
   addresses:
     - address: "0x1a911bb954dAA9CB38513423075bE74450351e18"
       label: MONITOR token (EIP-1167 DopplerERC20V1 clone)
       role: token
-      transactions_count: 11113
-      token_transfers_count: 19
-      last_tx_at: 2026-11-15T08:08:28.000Z
-      last_method: "0x095ea7b3"
-      txns_24h: 9
+      transactions_count: 11152
+      token_transfers_count: 23
+      last_tx_at: 2026-11-22T14:58:01.000Z
+      last_method: "0xa9059cbb"
+      txns_24h: 1
       launches_24h: null
-      window_as_of: 2026-11-15T16:20:03.697Z
+      window_as_of: 2026-11-22T17:08:25.550Z
       stale_since: null
       errors: []
     - address: "0x3Be8B97Fd0e713B5aBE0649Fa830223B6B4BC599"
@@ -202,7 +221,7 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-15T16:20:03.697Z
+      window_as_of: 2026-11-22T17:08:25.550Z
       stale_since: null
       errors: []
     - address: "0x1B37D3a72082029c44B35B604Ea473617580b69a"
@@ -214,7 +233,7 @@ activity:
       last_method: null
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-11-15T16:20:03.697Z
+      window_as_of: 2026-11-22T17:08:25.550Z
       stale_since: null
       errors: []
     - address: "0x22e99278308B393ea1260859B181AD7E78f5eeED"
@@ -226,25 +245,25 @@ activity:
       last_method: create
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-11-15T16:20:03.697Z
+      window_as_of: 2026-11-22T17:08:25.550Z
       stale_since: null
       errors: []
     - address: "0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862"
       label: Airlock (token owner)
       role: admin
-      transactions_count: 21760
-      token_transfers_count: 978206
-      last_tx_at: 2026-11-15T15:32:51.000Z
+      transactions_count: 21887
+      token_transfers_count: 999448
+      last_tx_at: 2026-11-22T13:23:18.000Z
       last_method: create
-      txns_24h: 4
+      txns_24h: 19
       launches_24h: null
-      window_as_of: 2026-11-15T16:20:03.697Z
+      window_as_of: 2026-11-22T17:08:25.550Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-11-15T15:32:51.000Z
-  txns_24h: 13
+  last_activity_at: 2026-11-22T14:58:01.000Z
+  txns_24h: 20
   launches_24h: 0
-  window_as_of: 2026-11-15T16:20:03.697Z
+  window_as_of: 2026-11-22T17:08:25.550Z
   stale_since: null
 reads:
   tier: live
@@ -254,9 +273,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xc7100e754b8c995e12f6749791b20cd561404e30fa771f05f5025d37748a8ad1"
+      signal: "0x825efb981300fb6790df3bf281b5a012d69b249f971aa9a67436ee5dfe465b86"
       code_hash: d6778098513fa311
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 40
     - kind: activity
@@ -264,9 +283,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xc7100e754b8c995e12f6749791b20cd561404e30fa771f05f5025d37748a8ad1"
+      signal: "0x825efb981300fb6790df3bf281b5a012d69b249f971aa9a67436ee5dfe465b86"
       code_hash: d6778098513fa311
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 20
     - kind: address
@@ -276,7 +295,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: 8ef9efc9c3c5b922
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -286,7 +305,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: 8ef9efc9c3c5b922
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 0
     - kind: address
@@ -296,7 +315,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: b3931c1995f630dc
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -306,7 +325,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: b3931c1995f630dc
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 0
     - kind: address
@@ -316,7 +335,7 @@ reads:
       signal_value: null
       signal: "0x66f87891be6b43913e9c4cac7ea40dfe584ba5167653c741f7d96d279b2111fa"
       code_hash: 564d0fd58633bdbd
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -326,7 +345,7 @@ reads:
       signal_value: null
       signal: "0x66f87891be6b43913e9c4cac7ea40dfe584ba5167653c741f7d96d279b2111fa"
       code_hash: 564d0fd58633bdbd
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 0
     - kind: address
@@ -334,9 +353,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x23f0ddabc37bb651df680ea479eb6192b111285e829847b05e9b2aea6e191518"
+      signal: "0x5dc4cce35f6bd4d60066faf5d3dc6cd0bc4d26056711e12a40889ff56e78f1da"
       code_hash: f8de098a2663a757
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -344,45 +363,45 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x23f0ddabc37bb651df680ea479eb6192b111285e829847b05e9b2aea6e191518"
+      signal: "0x5dc4cce35f6bd4d60066faf5d3dc6cd0bc4d26056711e12a40889ff56e78f1da"
       code_hash: f8de098a2663a757
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 0
     - kind: top10
       address: "0x1a911bb954dAA9CB38513423075bE74450351e18"
       status: read
       reason: token change signal changed
-      signal_value: 94
+      signal_value: 93
       signal: null
       code_hash: null
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0x1a911bb954dAA9CB38513423075bE74450351e18"
       status: read
       reason: token change signal changed
-      signal_value: 94
+      signal_value: 93
       signal: null
       code_hash: d6778098513fa311
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 20
     - kind: lp
       address: "0x1a911bb954dAA9CB38513423075bE74450351e18"
       status: read
       reason: token change signal changed
-      signal_value: 94
+      signal_value: 93
       signal: null
       code_hash: null
-      checked_at: 2026-11-15T16:20:03.697Z
+      checked_at: 2026-11-22T17:08:25.550Z
       stale_since: null
       credits: 20
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-11-15T16:20:03.697Z
-  last_success_at: 2026-11-15T16:20:03.697Z
+  attempted_at: 2026-11-22T17:08:25.550Z
+  last_success_at: 2026-11-22T17:08:25.550Z
   reason: "recent own activity or seed observation window: weekly"
 errors: []
