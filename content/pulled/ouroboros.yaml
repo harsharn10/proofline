@@ -1,5 +1,5 @@
 slug: ouroboros
-pulled_at: 2026-11-16T19:34:22.624Z # chain head 116008006 at read time
+pulled_at: 2026-11-23T21:19:00.891Z # chain head 121719337 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x87aF913718f73168D4566bBF51683792aC2680eB"
@@ -73,21 +73,35 @@ addresses:
 metrics: []
 market:
   token_address: "0x87aF913718f73168D4566bBF51683792aC2680eB"
-  pulled_at: 2026-11-16T19:34:22.624Z
-  pairs: []
-  liquidity_usd: null
-  volume_h24: null
-  trades_h24: null
-  price_usd: null
+  pulled_at: 2026-11-23T21:19:00.891Z
+  pairs:
+    - dex: uniswap
+      pair_address: "0x6e18a4a21cdc8d04fd35afe130e0b37f32db9a2edb1304911b4e5cda91e7590b"
+      quote_symbol: CRCL
+      price_usd: 0.004939
+      liquidity_usd: 4109.74
+      volume_h24: 22580.52
+      volume_h6: 22580.52
+      txns_h24:
+        buys: 5
+        sells: 5
+      price_change_h24: null
+      market_cap: 4559
+      fdv: 4559
+      created_at: 2026-09-01T21:52:51.000Z
+  liquidity_usd: 4109.74
+  volume_h24: 22580.52
+  trades_h24: 10
+  price_usd: 0.004939
   price_change_h24: null
-  market_cap_usd: null
-  fdv_usd: null
-  fdv: null
-  first_pair_at: null
-  top10_share: 0.776481770251336
-  top10_share_ex_pools: 0.1570231172443069
+  market_cap_usd: 4559
+  fdv_usd: 4559
+  fdv: 4559
+  first_pair_at: 2026-09-01T21:52:51.000Z
+  top10_share: 0.7769488194738242
+  top10_share_ex_pools: 0.1471197188124034
   burned_share: 0
-  top10_as_of: 2026-11-16T19:34:22.624Z
+  top10_as_of: 2026-11-23T21:19:00.891Z
   launchpad: null
   rialto: null
   pair_asset:
@@ -95,16 +109,18 @@ market:
     name: Circle Internet Group
     address: "0xdf0992e440dd0be65bd8439b609d6d4366bf1cb5"
     category: stock
-    tokenized_value_usd: 10035959.41
-    tokenized_shares: 161349.82976999943
-    change_7d: -2245989.63
+    tokenized_value_usd: 7826248.2
+    tokenized_shares: 164728.44030999957
+    change_7d: -3230324.71
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
   errors:
     - step: launchpad
       message: contract code hash unchanged, so addresses/0x87aF913718f73168D4566bBF51683792aC2680eB was not re-read for its creator, and no launchpad was previously attributed
+    - step: rialto
+      message: 'router/tickers: HTTP 400: {"error":"failed to load CoinGecko tickers"}'
 structure:
-  pulled_at: 2026-11-16T19:34:22.624Z
+  pulled_at: 2026-11-23T21:19:00.891Z
   mint: no-mint-function
   mint_as_of: null
   renounced: null
@@ -115,38 +131,33 @@ structure:
       holder_kind: null
       reason: pair id is not a 20-byte address; Uniswap v4 pool id, not checked
       as_of: null
-    - pair: "0xBf7B9D3232DA3399A1fB59092b176e8477296cd1"
-      locked_share: null
-      holder_kind: null
-      reason: no ERC-20 LP token at the pair address; v3/v4 position, not checked
-      as_of: null
   errors: []
 activity:
-  pulled_at: 2026-11-16T19:34:22.624Z
+  pulled_at: 2026-11-23T21:19:00.891Z
   addresses:
     - address: "0x87aF913718f73168D4566bBF51683792aC2680eB"
       label: OUROBOROS token (verified ERC-20)
       role: token
-      transactions_count: 3213
+      transactions_count: 3214
       token_transfers_count: 0
-      last_tx_at: 2026-11-10T09:23:14.000Z
+      last_tx_at: 2026-11-18T13:52:16.000Z
       last_method: approve
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-16T19:34:22.624Z
+      window_as_of: 2026-11-23T21:19:00.891Z
       stale_since: null
       errors: []
     - address: "0x7bc2AF6Fb9A989505e9629470869a19143532AEC"
       label: OuroborosHook (Uniswap v4 hook)
       role: other
       transactions_count: 1
-      token_transfers_count: 109298
+      token_transfers_count: 109488
       last_tx_at: 2026-09-01T21:52:51.000Z
       last_method: bootstrap
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-09T19:47:31.195Z
-      stale_since: 2026-11-09T19:47:31.195Z
+      window_as_of: 2026-11-23T21:19:00.891Z
+      stale_since: null
       errors: []
     - address: "0x6dd59681d3Da8d0Ece6Fe9b92F88C50765f65b35"
       label: Hook deploy helper (unverified)
@@ -157,71 +168,69 @@ activity:
       last_method: deploy
       txns_24h: 0
       launches_24h: 0
-      window_as_of: 2026-11-16T19:34:22.624Z
+      window_as_of: 2026-11-23T21:19:00.891Z
       stale_since: null
       errors: []
     - address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
       label: Uniswap v4 PoolManager
       role: other
-      transactions_count: 72826
-      token_transfers_count: 421763248
-      last_tx_at: 2026-11-16T19:33:07.000Z
+      transactions_count: 73706
+      token_transfers_count: 429439226
+      last_tx_at: 2026-11-23T21:01:08.000Z
       last_method: initialize
-      txns_24h: 99
+      txns_24h: 56
       launches_24h: null
-      window_as_of: 2026-11-16T19:34:22.624Z
+      window_as_of: 2026-11-23T21:19:00.891Z
       stale_since: null
-      errors:
-        - step: txns_24h capped
-          message: stopped after 2 pages; count is a floor
-  last_activity_at: 2026-11-16T19:33:07.000Z
-  txns_24h: 99
+      errors: []
+  last_activity_at: 2026-11-23T21:01:08.000Z
+  txns_24h: 56
   launches_24h: 0
-  window_as_of: 2026-11-09T19:47:31.195Z
-  stale_since: 2026-11-09T19:47:31.195Z
+  window_as_of: 2026-11-23T21:19:00.891Z
+  stale_since: null
 reads:
   tier: live
   explorer:
     - kind: address
       address: "0x87aF913718f73168D4566bBF51683792aC2680eB"
       status: read
-      reason: token DexScreener trade count changed; code hash unchanged, metadata not re-read
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xa8774fd879190ce5c6a42a8eab73bb7990296164822f01f464aefb966330a762"
+      signal: "0xc10c9f6b813e698b1f22bc44be485a89675877790a55daf9f48389f0449f3d43"
       code_hash: 11cb54936a75c210
-      checked_at: 2026-11-16T19:34:22.624Z
+      checked_at: 2026-11-23T21:19:00.891Z
       stale_since: null
       credits: 40
     - kind: activity
       address: "0x87aF913718f73168D4566bBF51683792aC2680eB"
       status: read
-      reason: token DexScreener trade count changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xa8774fd879190ce5c6a42a8eab73bb7990296164822f01f464aefb966330a762"
+      signal: "0xc10c9f6b813e698b1f22bc44be485a89675877790a55daf9f48389f0449f3d43"
       code_hash: 11cb54936a75c210
-      checked_at: 2026-11-16T19:34:22.624Z
+      checked_at: 2026-11-23T21:19:00.891Z
       stale_since: null
       credits: 20
     - kind: address
       address: "0x7bc2AF6Fb9A989505e9629470869a19143532AEC"
-      status: unchanged
-      reason: other role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
       signal: "0x3d374daf3dc043ffb654b497ce6520f0c52b38b1dc26f8a27024be880de059bb"
       code_hash: 1fe6e86952d6408c
-      checked_at: 2026-11-16T19:34:22.624Z
-      stale_since: 2026-11-09T19:47:31.195Z
-      credits: 0
+      checked_at: 2026-11-23T21:19:00.891Z
+      stale_since: null
+      credits: 20
     - kind: activity
       address: "0x7bc2AF6Fb9A989505e9629470869a19143532AEC"
-      status: unchanged
-      reason: other role is static and quiet for 7 days; signal skipped
+      status: read
+      reason: --full override; 24h walk refreshed
       signal_value: null
       signal: "0x3d374daf3dc043ffb654b497ce6520f0c52b38b1dc26f8a27024be880de059bb"
       code_hash: 1fe6e86952d6408c
-      checked_at: 2026-11-16T19:34:22.624Z
-      stale_since: 2026-11-09T19:47:31.195Z
-      credits: 0
+      checked_at: 2026-11-23T21:19:00.891Z
+      stale_since: null
+      credits: 20
     - kind: address
       address: "0x6dd59681d3Da8d0Ece6Fe9b92F88C50765f65b35"
       status: read
@@ -229,7 +238,7 @@ reads:
       signal_value: null
       signal: "0xd136827cc9e6cc4f22925da9aa3ca3c1d838fec1d93480529b802ac62557098e"
       code_hash: 5ffb5f585ca14641
-      checked_at: 2026-11-16T19:34:22.624Z
+      checked_at: 2026-11-23T21:19:00.891Z
       stale_since: null
       credits: 60
     - kind: activity
@@ -239,63 +248,63 @@ reads:
       signal_value: null
       signal: "0xd136827cc9e6cc4f22925da9aa3ca3c1d838fec1d93480529b802ac62557098e"
       code_hash: 5ffb5f585ca14641
-      checked_at: 2026-11-16T19:34:22.624Z
+      checked_at: 2026-11-23T21:19:00.891Z
       stale_since: null
       credits: 20
     - kind: address
       address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
       status: read
-      reason: other signal changed; code hash unchanged, metadata not re-read
+      reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xcfa872b4850f8991ca8258b79981834b62ac70776f0d4f0dbfdd6e606d83a18e"
+      signal: "0x5defeae61bf5f252824b8126a55865cc340f2630cb4f38305a2fff7012e9791a"
       code_hash: e7a173d496190055
-      checked_at: 2026-11-16T19:34:22.624Z
+      checked_at: 2026-11-23T21:19:00.891Z
       stale_since: null
       credits: 20
     - kind: activity
       address: "0x8366a39CC670B4001A1121B8F6A443A643e40951"
       status: read
-      reason: other signal changed; 24h walk refreshed
+      reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xcfa872b4850f8991ca8258b79981834b62ac70776f0d4f0dbfdd6e606d83a18e"
+      signal: "0x5defeae61bf5f252824b8126a55865cc340f2630cb4f38305a2fff7012e9791a"
       code_hash: e7a173d496190055
-      checked_at: 2026-11-16T19:34:22.624Z
+      checked_at: 2026-11-23T21:19:00.891Z
       stale_since: null
       credits: 40
     - kind: top10
       address: "0x87aF913718f73168D4566bBF51683792aC2680eB"
       status: read
       reason: token change signal changed
-      signal_value: null
+      signal_value: 10
       signal: null
       code_hash: null
-      checked_at: 2026-11-16T19:34:22.624Z
+      checked_at: 2026-11-23T21:19:00.891Z
       stale_since: null
       credits: 20
     - kind: structure
       address: "0x87aF913718f73168D4566bBF51683792aC2680eB"
       status: unchanged
       reason: contract code hash unchanged; verified ABI not re-read
-      signal_value: null
+      signal_value: 10
       signal: null
       code_hash: 11cb54936a75c210
-      checked_at: 2026-11-16T19:34:22.624Z
+      checked_at: 2026-11-23T21:19:00.891Z
       stale_since: 2026-09-08T16:39:21.499Z
       credits: 0
     - kind: lp
       address: "0x87aF913718f73168D4566bBF51683792aC2680eB"
       status: read
       reason: token change signal changed
-      signal_value: null
+      signal_value: 10
       signal: null
       code_hash: null
-      checked_at: 2026-11-16T19:34:22.624Z
+      checked_at: 2026-11-23T21:19:00.891Z
       stale_since: null
       credits: 0
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-11-16T19:34:22.624Z
-  last_success_at: 2026-11-16T19:34:22.624Z
+  attempted_at: 2026-11-23T21:19:00.891Z
+  last_success_at: 2026-11-23T21:19:00.891Z
   reason: "recent own activity or seed observation window: weekly"
 errors: []
