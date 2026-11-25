@@ -1,5 +1,5 @@
 slug: microwave
-pulled_at: 2026-11-18T18:02:04.093Z # chain head 117592970 at read time
+pulled_at: 2026-11-25T19:14:39.809Z # chain head 123246084 at read time
 chain: robinhood-chain
 addresses:
   - address: "0x79E1B7E59054fd4E18Ad7C71E5781162BF28888b"
@@ -17,7 +17,7 @@ addresses:
     safe: null
     created_block: 52426027
     created_at: 2026-09-02T08:17:58.000Z
-    holders: 350
+    holders: 348
     errors: []
   - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
     label: Pons v2 launch factory (launchFactory)
@@ -122,7 +122,7 @@ addresses:
 metrics: []
 market:
   token_address: "0x79E1B7E59054fd4E18Ad7C71E5781162BF28888b"
-  pulled_at: 2026-11-18T18:02:04.093Z
+  pulled_at: 2026-11-25T19:14:39.809Z
   pairs: []
   liquidity_usd: null
   volume_h24: null
@@ -133,10 +133,10 @@ market:
   fdv_usd: null
   fdv: null
   first_pair_at: null
-  top10_share: 0.895602900866835
+  top10_share: 0.8984516234646595
   top10_share_ex_pools: 0.1730001107523312
   burned_share: 0.506847113421953
-  top10_as_of: 2026-11-18T18:02:04.093Z
+  top10_as_of: 2026-11-25T19:14:39.809Z
   launchpad:
     slug: pons
     via: creator
@@ -148,14 +148,16 @@ market:
     name: United States Oil Fund
     address: "0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344"
     category: etf
-    tokenized_value_usd: 2347396.59
-    tokenized_shares: 16738.424049999976
-    change_7d: -136752.92
+    tokenized_value_usd: 2070654.61
+    tokenized_shares: 15289.482499999993
+    change_7d: -155188.25
     source_url: https://analytics.rialto.xyz/tokenization
   volume_disagreement: null
-  errors: []
+  errors:
+    - step: rialto
+      message: 'router/tickers: HTTP 400: {"error":"failed to load CoinGecko tickers"}'
 structure:
-  pulled_at: 2026-11-18T18:02:04.093Z
+  pulled_at: 2026-11-25T19:14:39.809Z
   mint: no-mint-function
   mint_as_of: null
   renounced: null
@@ -170,44 +172,42 @@ structure:
     - step: renounced
       message: owner() was not present or could not be read
 activity:
-  pulled_at: 2026-11-18T18:02:04.093Z
+  pulled_at: 2026-11-25T19:14:39.809Z
   addresses:
     - address: "0x79E1B7E59054fd4E18Ad7C71E5781162BF28888b"
       label: MICROWAVE token (PonsV2LauncherToken)
       role: token
-      transactions_count: 3362
+      transactions_count: 3364
       token_transfers_count: 2
-      last_tx_at: 2026-11-13T06:27:10.000Z
+      last_tx_at: 2026-11-22T04:50:08.000Z
       last_method: approve
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-18T18:02:04.093Z
+      window_as_of: 2026-11-25T19:14:39.809Z
       stale_since: null
       errors: []
     - address: "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
       label: Pons v2 launch factory (launchFactory)
       role: factory
-      transactions_count: 323312
-      token_transfers_count: 42563
-      last_tx_at: 2026-11-18T18:00:57.000Z
-      last_method: launchToken
-      txns_24h: 100
-      launches_24h: 51
-      window_as_of: 2026-11-18T18:02:04.093Z
+      transactions_count: 324151
+      token_transfers_count: 42700
+      last_tx_at: 2026-11-25T19:09:05.000Z
+      last_method: transferCreatorFeeRecipient
+      txns_24h: 97
+      launches_24h: 52
+      window_as_of: 2026-11-25T19:14:39.809Z
       stale_since: null
-      errors:
-        - step: txns_24h capped
-          message: stopped after 2 pages; count is a floor
+      errors: []
     - address: "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948"
       label: PonsV2LaunchAndBuy (launchAndBuy)
       role: router
-      transactions_count: 403566
-      token_transfers_count: 313498
-      last_tx_at: 2026-11-18T17:59:26.000Z
+      transactions_count: 406947
+      token_transfers_count: 314559
+      last_tx_at: 2026-11-25T19:13:21.000Z
       last_method: launchAndBuy
-      txns_24h: 100
+      txns_24h: 99
       launches_24h: null
-      window_as_of: 2026-11-18T18:02:04.093Z
+      window_as_of: 2026-11-25T19:14:39.809Z
       stale_since: null
       errors:
         - step: txns_24h capped
@@ -221,7 +221,7 @@ activity:
       last_method: sweepFees
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-18T18:02:04.093Z
+      window_as_of: 2026-11-25T19:14:39.809Z
       stale_since: null
       errors: []
     - address: "0xbfDcC6a3e2dAb9B80303c9956011CaBec10Ab90B"
@@ -233,25 +233,25 @@ activity:
       last_method: redeem
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-18T18:02:04.093Z
+      window_as_of: 2026-11-25T19:14:39.809Z
       stale_since: null
       errors: []
     - address: "0x267444D099b10fB5Ed7c3Cc7B7c767AdcA574952"
       label: V2LaunchLocker (locked LP)
       role: other
       transactions_count: 15
-      token_transfers_count: 37694
+      token_transfers_count: 37803
       last_tx_at: 2026-09-13T14:42:33.000Z
       last_method: isLocked
       txns_24h: 0
       launches_24h: null
-      window_as_of: 2026-11-18T18:02:04.093Z
+      window_as_of: 2026-11-25T19:14:39.809Z
       stale_since: null
       errors: []
-  last_activity_at: 2026-11-18T18:00:57.000Z
-  txns_24h: 200
-  launches_24h: 51
-  window_as_of: 2026-11-18T18:02:04.093Z
+  last_activity_at: 2026-11-25T19:13:21.000Z
+  txns_24h: 196
+  launches_24h: 52
+  window_as_of: 2026-11-25T19:14:39.809Z
   stale_since: null
 reads:
   tier: live
@@ -261,9 +261,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0x18575a863c89bb5d70536938893548844444947213286e9e9d55efc83c029d49"
+      signal: "0x4f09bb5e98d75c46a259d3fa226207d452fcc6da3bafca37c22319c8f974d0a1"
       code_hash: f3d0ad6110985eb5
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 40
     - kind: activity
@@ -271,9 +271,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0x18575a863c89bb5d70536938893548844444947213286e9e9d55efc83c029d49"
+      signal: "0x4f09bb5e98d75c46a259d3fa226207d452fcc6da3bafca37c22319c8f974d0a1"
       code_hash: f3d0ad6110985eb5
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 20
     - kind: address
@@ -281,9 +281,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xc59abefa5b61837b96f369db7435411733201ab171d5eb87fd1dfe997054066f"
+      signal: "0x09ee08cdf411cb213c9efb5c00e3b6d6a5daa8cbd37043debf10bcc37c8e4281"
       code_hash: 2ac92839c8aafdd8
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -291,9 +291,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xc59abefa5b61837b96f369db7435411733201ab171d5eb87fd1dfe997054066f"
+      signal: "0x09ee08cdf411cb213c9efb5c00e3b6d6a5daa8cbd37043debf10bcc37c8e4281"
       code_hash: 2ac92839c8aafdd8
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 0
     - kind: address
@@ -301,9 +301,9 @@ reads:
       status: read
       reason: --full override; code hash unchanged, metadata not re-read
       signal_value: null
-      signal: "0xbb85fe70e82e706d302701c51523d84c2bdcc26ee1a47f7c0f71396aa54487c4"
+      signal: "0x42b999bec2f9e1ff6981f2f94b52e2fedc6778714f33f245705ce57822e37fdc"
       code_hash: 8557d5489003bbc0
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -311,9 +311,9 @@ reads:
       status: read
       reason: --full override; 24h walk refreshed
       signal_value: null
-      signal: "0xbb85fe70e82e706d302701c51523d84c2bdcc26ee1a47f7c0f71396aa54487c4"
+      signal: "0x42b999bec2f9e1ff6981f2f94b52e2fedc6778714f33f245705ce57822e37fdc"
       code_hash: 8557d5489003bbc0
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 0
     - kind: address
@@ -323,7 +323,7 @@ reads:
       signal_value: null
       signal: "0x347188cda275de922a9ca27eae548973e1a1c0a471b394df358266f023863ae0"
       code_hash: 3fd451b5569dc731
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -333,7 +333,7 @@ reads:
       signal_value: null
       signal: "0x347188cda275de922a9ca27eae548973e1a1c0a471b394df358266f023863ae0"
       code_hash: 3fd451b5569dc731
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 20
     - kind: address
@@ -343,7 +343,7 @@ reads:
       signal_value: null
       signal: "0xa702cafc0f66e6d76f6b87e4309636ab14feed72cdbfea4d88ae7bce387baadb"
       code_hash: 0424dbe94a73d543
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 20
     - kind: activity
@@ -353,7 +353,7 @@ reads:
       signal_value: null
       signal: "0xa702cafc0f66e6d76f6b87e4309636ab14feed72cdbfea4d88ae7bce387baadb"
       code_hash: 0424dbe94a73d543
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 20
     - kind: address
@@ -363,7 +363,7 @@ reads:
       signal_value: null
       signal: "0x6aadee9a92af9eed4ebdc725889365f0446b1ccad858113d917b409a9f080559"
       code_hash: 693ee37f225b5208
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 0
     - kind: activity
@@ -373,7 +373,7 @@ reads:
       signal_value: null
       signal: "0x6aadee9a92af9eed4ebdc725889365f0446b1ccad858113d917b409a9f080559"
       code_hash: 693ee37f225b5208
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 0
     - kind: top10
@@ -383,7 +383,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: null
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 20
     - kind: structure
@@ -393,7 +393,7 @@ reads:
       signal_value: null
       signal: null
       code_hash: f3d0ad6110985eb5
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: 2026-09-08T21:10:27.749Z
       credits: 0
     - kind: lp
@@ -403,13 +403,13 @@ reads:
       signal_value: null
       signal: null
       code_hash: null
-      checked_at: 2026-11-18T18:02:04.093Z
+      checked_at: 2026-11-25T19:14:39.809Z
       stale_since: null
       credits: 0
 refresh:
   policy_version: 1
   status: complete
-  attempted_at: 2026-11-18T18:02:04.093Z
-  last_success_at: 2026-11-18T18:02:04.093Z
+  attempted_at: 2026-11-25T19:14:39.809Z
+  last_success_at: 2026-11-25T19:14:39.809Z
   reason: "recent own activity or seed observation window: weekly"
 errors: []
